@@ -463,8 +463,19 @@
       }
     }
 
+    function getSiteRootPath() {
+      const path = location.pathname || '/';
+      if (path.includes('/roster-site/')) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        const segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+
     (function wireTopNav() {
-      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const root = getSiteRootPath();
       const today = new Date();
       const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       latestIsoDate = isoDate;
@@ -542,7 +553,7 @@
     }
 
     async function getDeptLookup(kind) {
-      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const root = getSiteRootPath();
       const candidates = kind === 'import'
         ? [`${root}/import/schedules/index.json`, `${root}/schedules/index.json`]
         : [`${root}/schedules/index.json`];
@@ -673,7 +684,7 @@
       summary.textContent = '';
       diffList.innerHTML = '';
       try {
-        const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+        const root = getSiteRootPath();
         const empId = (localStorage.getItem(kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId') || '').trim();
         if (!empId) {
           err.textContent = t('noSavedEmp');
@@ -715,7 +726,7 @@
     async function loadDiff(kind) {
       applyDiffModeUi(kind);
       try {
-        const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+        const root = getSiteRootPath();
         const res = await fetch(`${root}/roster-diff/data/${kind}-latest.json?ts=${Date.now()}`);
         if (!res.ok) throw new Error(t('noAutoDiff', { kind }));
         lastDiffData = await res.json();
@@ -731,7 +742,7 @@
     }
 
     (function loadBannerChanger(){
-      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const root = getSiteRootPath();
       const s = document.createElement('script');
       s.src = `${root}/banner-changer.js?v=20260428`;
       s.defer = true;
