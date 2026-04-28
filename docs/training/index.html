@@ -652,15 +652,15 @@ body{
   });
   monthPicker?.addEventListener('change', () => { if(monthPicker.value) window.location.href = monthPicker.value; });
   rosterHomeBtn?.addEventListener('click', () => {
-    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+    const root = (function(){var p=window.location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs'):(s.length?('/'+s[0]):'');return '';})();
     window.location.href = root + '/';
   });
   if (rosterFlightIcon) {
-    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+    const root = (function(){var p=window.location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs'):(s.length?('/'+s[0]):'');return '';})();
     rosterFlightIcon.src = root + '/assets/icons/flight.png';
   }
   otherPageBtn?.addEventListener('click', () => {
-    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+    const root = (function(){var p=window.location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs'):(s.length?('/'+s[0]):'');return '';})();
     window.location.href = root + '/a-cup-of-book/';
   });
   if(statsFaces.length){

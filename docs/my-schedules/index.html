@@ -1659,12 +1659,12 @@
       if(wrap) wrap.style.display='none';
       const bm=document.getElementById('brandMini');
       if(bm) bm.style.display='none';
-      const base=location.pathname.includes('/roster-site/')?'/roster-site/':'/';
+      const base=(function(){var p=location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site/';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs/'): (s.length?('/'+s[0]+'/'):'/');return '/';})();
       if(document.referrer&&document.referrer.includes(location.host)) history.back();
       else location.href=base;
     }
     function goToRosterDiff(){
-      const base=location.pathname.includes('/roster-site/')?'/roster-site/':'/';
+      const base=(function(){var p=location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site/';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs/'): (s.length?('/'+s[0]+'/'):'/');return '/';})();
       location.href=base+'roster-diff/index.html';
     }
 
@@ -2110,7 +2110,7 @@
     /* SHARE */
     function shareS(){
       const id=data.id;
-      const base=location.pathname.includes('/roster-site/')?'/roster-site/':'/';
+      const base=(function(){var p=location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site/';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs/'): (s.length?('/'+s[0]+'/'):'/');return '/';})();
       const url=`${location.origin}${base}my-schedules/?emp=${encodeURIComponent(id)}`;
       if(navigator.share){navigator.share({title:'My Schedule',text:`Schedule: ${data.name}`,url});}
       else{navigator.clipboard.writeText(url);alert(lang==='ar'?'تم نسخ الرابط ✅':'Link copied ✅');}
@@ -2169,7 +2169,7 @@
 
     // Load source name for footer
     (function(){
-      const base=location.pathname.includes('/roster-site/')?'/roster-site/':'/';
+      const base=(function(){var p=location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site/';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs/'): (s.length?('/'+s[0]+'/'):'/');return '/';})();
       const paths=[base+'my-schedules/source.txt', base+'source.txt'];
       function tryFetch(i){
         if(i>=paths.length) return;

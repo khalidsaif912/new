@@ -1427,8 +1427,9 @@ function getSiteRootPath() {
   var path = location.pathname || '/';
   if (path.includes('/roster-site/')) return '/roster-site';
   if (location.hostname && location.hostname.endsWith('github.io')) {
-    var seg = path.split('/').filter(Boolean)[0];
-    return seg ? '/' + seg : '';
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
   }
   return '';
 }

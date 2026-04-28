@@ -1729,12 +1729,13 @@ function goToRosterDiff(event) {
 /* ===== Import path overrides ===== */
 function _importBase() {
   var path = location.pathname || '/';
+  var segs = path.split('/').filter(Boolean);
   var repoRoot = '';
   if (path.includes('/roster-site/')) {
     repoRoot = '/roster-site';
   } else if (location.hostname && location.hostname.endsWith('github.io')) {
-    var seg = path.split('/').filter(Boolean)[0];
-    repoRoot = seg ? '/' + seg : '';
+    if (segs.length >= 2 && segs[1] === 'docs') repoRoot = '/' + segs[0] + '/docs';
+    else repoRoot = segs.length ? '/' + segs[0] : '';
   }
   return location.origin + repoRoot + '/import';
 }
@@ -1749,12 +1750,13 @@ function goToMySchedule(event) {
 function goToExport(event) {
   if (event) event.preventDefault();
   var path = location.pathname || '/';
+  var segs = path.split('/').filter(Boolean);
   var repoRoot = '';
   if (path.includes('/roster-site/')) {
     repoRoot = '/roster-site';
   } else if (location.hostname && location.hostname.endsWith('github.io')) {
-    var seg = path.split('/').filter(Boolean)[0];
-    repoRoot = seg ? '/' + seg : '';
+    if (segs.length >= 2 && segs[1] === 'docs') repoRoot = '/' + segs[0] + '/docs';
+    else repoRoot = segs.length ? '/' + segs[0] : '';
   }
   location.href = location.origin + repoRoot + '/';
 }
