@@ -466,7 +466,7 @@
       <div class="chipVal" style="color:#059669;">7</div>
       <div class="chipLabel" data-key="departments">Departments</div>
     </div>
-    <a href="{BASE}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
       <div class="chipVal">🗓️</div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
@@ -1168,7 +1168,7 @@
 
   <div class="importBottom">
     <div class="quickActions">
-      <a class="btn" id="ctaBtn" href="{BASE}/now/">📋 Full Roster</a>
+      <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
       <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
     </div>
     
@@ -1699,6 +1699,21 @@ function goToRosterDiff(event) {
 })();
 
 
+function getSiteRootPath() {
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
 /* ===== Import path overrides ===== */
 function _importBase() {
   var path = location.pathname || '/';
@@ -1788,8 +1803,9 @@ function goToRosterDiff(event) {
 // Override the BASE placeholder for links that were hardcoded in Export HTML
 (function() {
   var base = _importBase();
-  document.querySelectorAll('a[href^="{BASE}"]').forEach(function(a) {
-    a.href = a.getAttribute('href').replace('{BASE}', base);
+  document.querySelectorAll('a[href*="{BASE}"], a[href*="{{BASE}}"]').forEach(function(a) {
+    var href = a.getAttribute('href') || '';
+    a.href = href.replaceAll('{{BASE}}', base).replaceAll('{BASE}', base);
   });
 })();
 

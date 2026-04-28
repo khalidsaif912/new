@@ -466,7 +466,7 @@
       <div class="chipVal" style="color:#059669;">7</div>
       <div class="chipLabel" data-key="departments">Departments</div>
     </div>
-    <a href="{BASE}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
       <div class="chipVal">🗓️</div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
@@ -1179,7 +1179,7 @@
 
   <div class="importBottom">
     <div class="quickActions">
-      <a class="btn" id="ctaBtn" href="{BASE}/now/">📋 Full Roster</a>
+      <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
       <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
     </div>
     
@@ -1649,7 +1649,7 @@ applyLang(LANG);
   var nameEl = document.getElementById('welcomeName');
   // استخدام مسار مطلق يعمل من أي صفحة
   var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  var base = getSiteRootUrl() + '/';
   fetch(base + 'schedules/' + empId + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
@@ -1684,17 +1684,13 @@ function goToImport(event) {
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/roster-diff/index.html'
-    : origin + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }
 
 (function bindFlightSwitchIcons() {
   var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   var iconUrl = root + '/assets/icons/flight.png';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
     img.src = iconUrl;
@@ -1703,9 +1699,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -1764,17 +1758,13 @@ function goToExport(event) {
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/roster-diff/index.html'
-    : origin + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }
 
 (function bindFlightSwitchIcons() {
   var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   var iconUrl = root + '/assets/icons/flight.png';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
     img.src = iconUrl;
@@ -1783,9 +1773,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -1809,7 +1797,7 @@ function goToRosterDiff(event) {
   var chip = document.getElementById('welcomeChip');
   var nameEl = document.getElementById('welcomeName');
   var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  var base = getSiteRootUrl() + '/';
   fetch(base + 'import/schedules/' + empId + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
@@ -1825,8 +1813,9 @@ function goToRosterDiff(event) {
 // Override the BASE placeholder for links that were hardcoded in Export HTML
 (function() {
   var base = _importBase();
-  document.querySelectorAll('a[href^="{BASE}"]').forEach(function(a) {
-    a.href = a.getAttribute('href').replace('{BASE}', base);
+  document.querySelectorAll('a[href*="{BASE}"], a[href*="{{BASE}}"]').forEach(function(a) {
+    var href = a.getAttribute('href') || '';
+    a.href = href.replaceAll('{{BASE}}', base).replaceAll('{BASE}', base);
   });
 })();
 

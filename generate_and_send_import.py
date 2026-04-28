@@ -652,8 +652,9 @@ function goToRosterDiff(event) {{
 // Override the BASE placeholder for links that were hardcoded in Export HTML
 (function() {{
   var base = _importBase();
-  document.querySelectorAll('a[href^="{{BASE}}"]').forEach(function(a) {{
-    a.href = a.getAttribute('href').replace('{{BASE}}', base);
+  document.querySelectorAll('a[href*="{{BASE}}"], a[href*="{{{{BASE}}}}"]').forEach(function(a) {{
+    var href = a.getAttribute('href') || '';
+    a.href = href.replaceAll('{{{{BASE}}}}', base).replaceAll('{{BASE}}', base);
   }});
 }})();
 
