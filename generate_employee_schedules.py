@@ -486,18 +486,22 @@ def main():
     parser = argparse.ArgumentParser(description='Generate employee schedules from roster Excel')
     parser.add_argument('--month', help='تحديد الشهر يدوياً YYYY-MM. اتركه فارغاً للكشف التلقائي.', default=None)
     parser.add_argument('--filename', help='اسم ملف Excel الأصلي للكشف عن الشهر منه (مثل Roster_March_2026.xlsx)', default=None)
+    parser.add_argument('--excel-file', help='مسار ملف Excel محلي لاستخدامه بدلاً من EXCEL_URL', default=None)
     args = parser.parse_args()
-
-    if not EXCEL_URL:
-        raise RuntimeError("❌ EXCEL_URL environment variable is missing")
 
     print("=" * 60)
     print("🗓️  Employee Schedule Generator")
     print("=" * 60)
 
     # تحميل Excel
-    data = download_excel(EXCEL_URL)
-    wb = load_workbook(BytesIO(data), data_only=True)
+    if args.excel_file:
+        print(f"📥 Loading local Excel: {args.excel_file}")
+        wb = load_workbook(args.excel_file, data_only=True)
+    else:
+        if not EXCEL_URL:
+            raise RuntimeError("❌ EXCEL_URL environment variable is missing (or use --excel-file)")
+        data = download_excel(EXCEL_URL)
+        wb = load_workbook(BytesIO(data), data_only=True)
 
     if args.month:
         # شهر محدد يدوياً
@@ -525,7 +529,8 @@ def main():
                 print(f"⚠️  Using current month: {year}-{month:02d}")
     else:
         # ── بدون filename: محاولة من URL ثم المحتوى ────────────
-        detected = detect_month_from_url(EXCEL_URL)
+        source_for_detect = EXCEL_URL if EXCEL_URL else (args.excel_file or "")
+        detected = detect_month_from_url(source_for_detect)
         if detected:
             year, month = detected
             print(f"📅 Month detected from URL: {year}-{month:02d}")

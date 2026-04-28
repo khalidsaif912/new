@@ -24,6 +24,8 @@ import os
 import re
 import json
 import hashlib
+import argparse
+import calendar
 import datetime as dt
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
@@ -231,6 +233,16 @@ def load_export_ui_template(repo_root: Path) -> Tuple[str, str]:
     return style, script
 
 
+def sanitize_export_script_for_import(script: str) -> str:
+    """
+    Import pages must not load export-specific alert scripts.
+    Keep shared UI behavior, but strip absence/change alert loaders.
+    """
+    script = re.sub(r"addScript\(root \+ ['/\\\"]\/absence-alert\.js['/\\\"]\);\s*", "", script)
+    script = re.sub(r"addScript\(root \+ ['/\\\"]\/change-alert\.js['/\\\"]\);\s*", "", script)
+    return script
+
+
 def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: dt.date, repo_base_path: str) -> str:
     day = date_obj.day
     date_label = date_obj.strftime("%d %B %Y")
@@ -250,7 +262,23 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
         dept_map.setdefault(dept, {}).setdefault(bucket, {"icon": icon, "accent": accent, "bg": bg, "text": text, "rows": []})
         dept_map[dept][bucket]["rows"].append((emp["name"], emp["id"], code))
 
-    depts = sorted(dept_map.items(), key=lambda x: x[0].lower())
+    # Strict Import department order requested by product owner.
+    import_order = [
+        "supervisors",
+        "documentation",
+        "import checkers",
+        "release control",
+        "import operators",
+        "flight dispatch (import)",
+        "flight dispatch (export)",
+    ]
+    order_idx = {name: i for i, name in enumerate(import_order)}
+
+    def dept_sort_key(item):
+        name = (item[0] or "").strip().lower()
+        return (order_idx.get(name, 10_000), name)
+
+    depts = sorted(dept_map.items(), key=dept_sort_key)
     dept_count = len(depts)
 
     summary = f"""
@@ -266,6 +294,14 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
     <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
       <div class="chipVal">🗓️</div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
+    </a>
+    <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToExport(event)">
+      <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Export" src="" /></div>
+      <div class="chipLabel" data-key="exportRoster">Export</div>
+    </a>
+    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+      <div class="chipVal"><span class="waveHand">👋</span></div>
+      <div class="chipLabel" id="welcomeName"></div>
     </a>
   </div>
 """
@@ -329,9 +365,9 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
 
     footer = f"""
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">{dt.datetime.now().strftime('%d%b%Y / %H:%M').upper()}</strong>
-    <br>Total: <strong>{total_emp} employees</strong>
-     &nbsp;·&nbsp; Source: <strong>{parsed.get('source_filename') or parsed['sheet']}</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">{dt.datetime.now().strftime('%d%b%Y / %H:%M').upper()}</strong>
+    <br>Total: <strong id="importTotalEmployees">{total_emp} employees</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">{parsed.get('source_filename') or parsed['sheet']}</strong>
   </div>
 """
 
@@ -342,18 +378,93 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Import Duty Roster</title>
   <style>{style}</style>
+  <style>
+    html, body {{ min-height: 100%; width:100%; overflow-x:hidden; }}
+    body {{ min-height: 100dvh; }}
+    .wrap {{
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 28px;
+    }}
+    .importBottom {{
+      margin-top: auto;
+      padding-top: 14px;
+    }}
+    .importBottom .quickActions {{
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }}
+    .footer {{
+      margin-top: 0;
+      padding: 10px 12px;
+      background: rgba(238,241,247,.96);
+      border-top: 1px solid rgba(148,163,184,.25);
+    }}
+    .summaryBar .summaryChip {{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }}
+    .summaryBar .summaryChip .chipVal {{
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }}
+    .summaryBar .summaryChip .chipLabel {{
+      margin-top: 4px;
+      line-height: 1.1;
+    }}
+    .summaryChip .chipIcon {{
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }}
+    .welcomeChip {{
+      display: none;
+      text-decoration: none;
+      cursor: pointer;
+    }}
+    .welcomeChip.visible {{
+      display: flex;
+    }}
+    .welcomeChip .chipLabel {{
+      max-width: 88px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .waveHand {{
+      display: inline-block;
+      transform-origin: 70% 70%;
+      animation: waveHand 1.8s ease-in-out infinite;
+    }}
+    @keyframes waveHand {{
+      0%, 50%, 100% {{ transform: rotate(0deg); }}
+      10% {{ transform: rotate(16deg); }}
+      20% {{ transform: rotate(-10deg); }}
+      30% {{ transform: rotate(16deg); }}
+      40% {{ transform: rotate(-6deg); }}
+    }}
+  </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
-    <div class="welcomeMsg" id="welcomeMsg" onclick="goToMySchedule()" title="انقر للذهاب لجدولك"></div>
-    <h1 id="pageTitle">📥 Import Duty Roster</h1>
+    <h1 id="pageTitle">Import Duty Roster</h1>
     <div class="datePickerWrapper">
       <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 {date_label}</button>
       <input id="datePicker" type="date" value="{date_iso}" min="{parsed['year']}-{parsed['month']:02d}-01" max="{parsed['year']}-{parsed['month']:02d}-31" tabindex="-1" aria-hidden="true" />
@@ -364,13 +475,91 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
 
   {''.join(cards)}
 
-  <div class="btnWrap">
-    <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 View Full Duty Roster</a>
+  <div class="importBottom">
+    <div class="quickActions">
+      <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
+      <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
+    </div>
+    {footer}
   </div>
 
-  {footer}
-
 </div>
+
+<script>
+// Hard-guaranteed import page behavior (independent from other scripts).
+(function() {{
+  function reorderImportDepartments() {{
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    if (!cards.length) return;
+    var parent = cards[0].parentElement;
+    if (!parent) return;
+    var bottom = document.querySelector('.importBottom');
+
+    function getName(card) {{
+      var t = card.querySelector('.deptTitle');
+      return (t && t.textContent ? t.textContent : '').trim().toLowerCase();
+    }}
+
+    var desired = [
+      'supervisors',
+      'documentation',
+      'import checkers',
+      'release control',
+      'import operators',
+      'flight dispatch (import)',
+      'flight dispatch (export)'
+    ];
+
+    desired.forEach(function(dep) {{
+      var card = cards.find(function(c) {{ return getName(c) === dep; }});
+      if (card) {{
+        if (bottom) parent.insertBefore(card, bottom);
+        else parent.appendChild(card);
+      }}
+    }});
+  }}
+
+  function syncImportHeaderDate() {{
+    var picker = document.getElementById('datePicker');
+    var tag = document.getElementById('dateTag');
+    if (!picker || !tag) return;
+
+    function toLabel(iso) {{
+      var d = new Date(iso + 'T00:00:00');
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
+    }}
+
+    var path = window.location.pathname || '/';
+    var m = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
+    if (m) {{
+      picker.value = m[1] + '-' + m[2] + '-' + m[3];
+    }}
+    if (picker.value) {{
+      tag.textContent = '📅 ' + toLabel(picker.value);
+    }}
+    picker.addEventListener('change', function() {{
+      if (picker.value) tag.textContent = '📅 ' + toLabel(picker.value);
+    }});
+  }}
+
+  reorderImportDepartments();
+  syncImportHeaderDate();
+
+  // Keep footer "Last Updated" fresh on page load.
+  var lastUpdatedEl = document.getElementById('importLastUpdated');
+  if (lastUpdatedEl) {{
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var day = String(muscat.getDate()).padStart(2, '0');
+    var mon = muscat.toLocaleString('en-US', {{ month: 'short' }}).toUpperCase();
+    var year = muscat.getFullYear();
+    var hh = String(muscat.getHours()).padStart(2, '0');
+    var mm = String(muscat.getMinutes()).padStart(2, '0');
+    lastUpdatedEl.textContent = (day + mon + year + ' / ' + hh + ':' + mm).toUpperCase();
+  }}
+}})();
+</script>
 
 <script>
 {script}
@@ -385,10 +574,80 @@ function _importBase() {{
 
 function goToMySchedule(event) {{
   if(event) event.preventDefault();
-  var id = localStorage.getItem('savedEmpId');
+  var id = localStorage.getItem('importSavedEmpId');
   var base = _importBase() + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }}
+
+function goToExport(event) {{
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/'
+    : origin + '/';
+  location.href = target;
+}}
+
+function goToRosterDiff(event) {{
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/roster-diff/index.html'
+    : origin + '/roster-diff/index.html';
+  location.href = target;
+}}
+
+(function bindFlightSwitchIcons() {{
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  var iconUrl = root + '/assets/icons/flight.png';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {{
+    img.src = iconUrl;
+  }});
+}})();
+
+(function loadLocalEnhancements() {{
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  function addScript(src) {{
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }}
+  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+  var m = (location.pathname || '').match(/\/date\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
+  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+  addScript(root + '/banner-changer.js');
+  if (eidDays.indexOf(activeIso) !== -1) {{
+    addScript(root + '/eid-overlayxx.js');
+  }}
+}})();
+
+(function showWelcomeChip() {{
+  var empId = localStorage.getItem('importSavedEmpId');
+  if (!empId) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
+  var origin = location.origin;
+  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  fetch(base + 'import/schedules/' + empId + '.json')
+    .then(function(r) {{ return r.ok ? r.json() : null; }})
+    .then(function(d) {{
+      if (!d || !d.name) return;
+      if (chip && nameEl) {{
+        nameEl.textContent = d.name.split(' ')[0];
+        chip.classList.add('visible');
+      }}
+    }})
+    .catch(function() {{}});
+}})();
 
 // Override the BASE placeholder for links that were hardcoded in Export HTML
 (function() {{
@@ -396,6 +655,68 @@ function goToMySchedule(event) {{
   document.querySelectorAll('a[href^="{{BASE}}"]').forEach(function(a) {{
     a.href = a.getAttribute('href').replace('{{BASE}}', base);
   }});
+}})();
+
+// Force Import header text (shared export script may override it).
+(function() {{
+  if (typeof T !== 'undefined') {{
+    if (T.en) T.en.title = 'Import Duty Roster';
+    if (T.ar) T.ar.title = 'جدول الوارد';
+  }}
+  if (typeof applyLang === 'function' && typeof LANG !== 'undefined') {{
+    applyLang(LANG);
+  }} else {{
+    var titleEl = document.getElementById('pageTitle');
+    if (titleEl) titleEl.textContent = 'Import Duty Roster';
+  }}
+}})();
+
+/* ===== Import UX fixes ===== */
+(function() {{
+  // Keep Supervisors at top even for previously generated card order.
+  var cards = Array.from(document.querySelectorAll('.deptCard'));
+  if (cards.length) {{
+    var supCard = cards.find(function(card) {{
+      var t = card.querySelector('.deptTitle');
+      var name = (t && t.textContent ? t.textContent : '').trim().toLowerCase();
+      return name === 'supervisors' || name === 'المشرفون';
+    }});
+    if (supCard && cards[0] !== supCard) {{
+      var parent = supCard.parentElement;
+      if (parent) parent.insertBefore(supCard, cards[0]);
+    }}
+  }}
+
+  // Sync header date with active page date (same behavior style as export).
+  var picker = document.getElementById('datePicker');
+  if (!picker) return;
+
+  function getMuscatTodayIso() {{
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscatTime.getFullYear() + '-' +
+      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscatTime.getDate()).padStart(2, '0');
+  }}
+
+  function formatIsoLabel(iso) {{
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
+  }}
+
+  function syncHeaderDate(iso) {{
+    var tag = document.getElementById('dateTag');
+    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
+  }}
+
+  var path = window.location.pathname || '/';
+  var pageDateMatch = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
+  var effectiveIso = pageDateMatch
+    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
+    : getMuscatTodayIso();
+  picker.value = effectiveIso;
+  syncHeaderDate(effectiveIso);
 }})();
 
 </script>
@@ -770,23 +1091,30 @@ def get_source_filename() -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate Import roster pages")
+    parser.add_argument("--excel-file", help="Use local Import Excel file instead of IMPORT_EXCEL_URL")
+    parser.add_argument("--source-name", help="Optional source filename override for display")
+    args = parser.parse_args()
+
     repo_root = Path(__file__).resolve().parent
     out_root = repo_root / "docs" / "import"
     out_root.mkdir(parents=True, exist_ok=True)
 
-    url = os.getenv("IMPORT_EXCEL_URL", "").strip()
-    if not url:
-        raise SystemExit("Missing env IMPORT_EXCEL_URL")
-
-    # Get original filename from source_name.txt
-    source_filename = get_source_filename()
+    # Get original filename from source_name.txt (or CLI override)
+    source_filename = (args.source_name or "").strip() or get_source_filename()
     print(f"Source filename: {source_filename or '(not set)'}")
 
-    # Download to temp
+    # Load Excel from local file or URL
     tmp_dir = repo_root / ".tmp_import"
     tmp_dir.mkdir(exist_ok=True)
     xlsx_path = tmp_dir / "import.xlsx"
-    data = download_excel(url)
+    if args.excel_file:
+        data = Path(args.excel_file).read_bytes()
+    else:
+        url = os.getenv("IMPORT_EXCEL_URL", "").strip()
+        if not url:
+            raise SystemExit("Missing IMPORT_EXCEL_URL (or use --excel-file)")
+        data = download_excel(url)
     xlsx_path.write_bytes(data)
 
     today = muscat_today()
@@ -795,6 +1123,7 @@ def main() -> None:
     parsed["source_filename"] = source_filename
 
     style, export_script = load_export_ui_template(repo_root)
+    export_script = sanitize_export_script_for_import(export_script)
 
     # Generate duty roster page (today)
     duty_html = build_duty_html(style, export_script, parsed, today, repo_base_path="/import")
@@ -804,6 +1133,26 @@ def main() -> None:
     now_dir = out_root / "now"
     now_dir.mkdir(parents=True, exist_ok=True)
     (now_dir / "index.html").write_text(duty_html, encoding="utf-8")
+
+    # Generate daily pages for the whole month in BOTH formats:
+    # - /import/YYYY-MM-DD/
+    # - /import/date/YYYY-MM-DD/  (export-like path alias)
+    year = parsed["year"]
+    month = parsed["month"]
+    _, days_in_month = calendar.monthrange(year, month)
+    date_alias_root = out_root / "date"
+    for day in range(1, days_in_month + 1):
+        d = dt.date(year, month, day)
+        iso = d.strftime("%Y-%m-%d")
+        day_html = build_duty_html(style, export_script, parsed, d, repo_base_path="/import")
+
+        day_dir = out_root / iso
+        day_dir.mkdir(parents=True, exist_ok=True)
+        (day_dir / "index.html").write_text(day_html, encoding="utf-8")
+
+        alias_day_dir = date_alias_root / iso
+        alias_day_dir.mkdir(parents=True, exist_ok=True)
+        (alias_day_dir / "index.html").write_text(day_html, encoding="utf-8")
 
     # Generate schedules JSON
     sched_dir = out_root / "schedules"

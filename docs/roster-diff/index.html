@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Roster Versions Auto Diff — Pro UI</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      margin:0; padding:0;
+      min-height:100dvh;
+      background:#eef1f7;
+      font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+    }
+    * { box-sizing:border-box; }
+    .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+    .header {
+      background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color:#fff;
+      padding:26px 18px 24px;
+      border-radius:20px;
+      text-align:center;
+      box-shadow:0 8px 28px rgba(30,64,175,.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute;
+      top:-30px; right:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .header::after {
+      content:''; position:absolute;
+      bottom:-50px; left:-30px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,.06);
+    }
+    .header h1 { margin:0; font-size:24px; font-weight:800; position:relative; z-index:1; letter-spacing:-.3px; }
+    .langToggle {
+      position:absolute; top:14px; right:16px; z-index:10;
+      background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
+      border-radius:50%; width:26px; height:26px;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:10px; font-weight:800; cursor:pointer;
+      transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
+    }
+    .datePickerWrapper { position:relative; display:inline-block; margin-top:14px; z-index:1; }
+    .header .dateTag {
+      display:inline-block;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
+      border:2px solid rgba(255,255,255,.2);
+      direction:ltr;
+    }
+    .summaryBar {
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      gap:12px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    a.summaryChip:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
+    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
+    a.summaryChip.gamesChip .chipVal { color:#7c3aed; }
+    a.summaryChip.gamesChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    .summaryChip {
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      border-radius:14px;
+      padding:10px 12px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      transition:all .25s ease;
+      min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
+    .summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+    .summaryChip .chipLabel {
+      font-size:9.5px;
+      font-weight:600;
+      color:#64748b;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      margin-top:4px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+    .welcomeChip { display:none; text-decoration:none; cursor:pointer; }
+    .quickActions {
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn {
+      display:inline-block;
+      padding:11px 18px;
+      border-radius:16px;
+      background:linear-gradient(135deg, #1e40af, #1976d2);
+      color:#fff !important;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      box-shadow:0 6px 20px rgba(30,64,175,.3);
+      min-width:170px;
+      text-align:center;
+      white-space:nowrap;
+      border:none;
+      cursor:pointer;
+    }
+    .card {
+      margin-top: 0;
+      background: #f8fafc;
+      border: 1px solid #dbe4f3;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(15,23,42,.08);
+    }
+    h1 { margin: 0 0 10px; font-size: 24px; color: #1e40af; }
+    .muted { color: #64748b; font-size: 13px; margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .field { flex: 1 1 280px; }
+    label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #334155; }
+    input[type="file"], input[type="text"] { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; }
+    .btn { margin-top: 10px; border: none; background: linear-gradient(135deg, #1e40af, #1976d2); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    .pill { display: inline-block; margin-top: 8px; background: #eaf2ff; color: #1e3a8a; border: 1px solid #d6e4ff; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; }
+    .warn { color: #b91c1c; font-weight: 700; }
+    .pageNote {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      padding: 8px 4px 2px;
+    }
+    .diffList {
+      margin-top: 10px;
+      display: grid;
+      gap: 9px;
+    }
+    .deptFold {
+      border:1px solid #cfdbf6;
+      border-radius: 14px;
+      background:#edf3ff;
+      overflow: hidden;
+    }
+    .deptFold > summary {
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-weight:900;
+      color:#1f3b8f;
+      gap:10px;
+    }
+    .deptFold > summary::-webkit-details-marker { display:none; }
+    .deptRows { padding:0 8px 8px; display:grid; gap:8px; }
+    .empFold {
+      border:1px solid #d7e0f2;
+      border-radius: 14px;
+      background:#f9fbff;
+      overflow: hidden;
+    }
+    .empFold > summary {
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-weight:800;
+      color:#0f172a;
+      gap:10px;
+    }
+    .empFold > summary::-webkit-details-marker { display:none; }
+    .empLeft { display:flex; align-items:center; gap:10px; min-width:0; }
+    .empArrow { color:#64748b; font-size:10px; transition:transform .2s ease; }
+    .empFold[open] .empArrow { transform:rotate(90deg); }
+    .empNameText { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .empCount {
+      min-width:30px;
+      height:30px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+      font-weight:900;
+      border:1px solid #bfdbfe;
+      color:#1d4ed8;
+      background:#dbeafe;
+      flex-shrink:0;
+    }
+    .changeRows { padding:0 10px 10px; display:grid; gap:8px; }
+    .changeRow {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border:1px solid #ccd9fb;
+      background:#f1f5ff;
+      color:#312e81;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:700;
+    }
+    .changeDay {
+      width:36px;
+      height:28px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#1d4ed8;
+      background:#dbeafe;
+      border:1px solid #bfdbfe;
+      flex-shrink:0;
+    }
+    .changeFlow { white-space:nowrap; }
+    .changeDate {
+      flex:1;
+      text-align:center;
+      color:#475569;
+      font-weight:700;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .changeOld { color:#991b1b; }
+    .changeNew { color:#065f46; }
+    .diffTabs {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      background: linear-gradient(180deg, #4457bb 0%, #3f51b5 100%);
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(63,81,181,.20);
+      border: 1px solid #5e71cf;
+      border-bottom: none;
+    }
+    .diffTab {
+      border: none;
+      border-bottom: 3px solid transparent;
+      border-right: 1px solid rgba(255,255,255,.12);
+      background: transparent;
+      color: rgba(255,255,255,.55);
+      padding: 12px 8px 10px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+    }
+    .diffTab:last-child { border-right: none; }
+    .diffTab:hover {
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.05);
+    }
+    .diffTab.active {
+      color: #ffffff;
+      border-bottom-color: #29b6f6;
+      background: rgba(255,255,255,.06);
+    }
+  
+    /* Unified visual weight for all top action icons */
+    .summaryBar {
+      align-items: stretch;
+    }
+    .summaryChip {
+      width: 82px;
+      min-height: 66px;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      gap: 4px;
+    }
+    .summaryChip .chipVal {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      min-height: 42px;
+      border-radius: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0;
+      line-height:1;
+      background:linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+      border:1px solid rgba(15,23,42,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 2px 6px rgba(15,23,42,.07);
+    }
+    .summaryChip .chipIcon,
+    .summaryChip .chipIcon.diffIcon {
+      width:30px;
+      height:30px;
+      display:block;
+      object-fit:contain;
+      margin:0 auto;
+      filter:drop-shadow(0 1px 1px rgba(15,23,42,.16));
+    }
+    .summaryChip:hover .chipIcon {
+      transform:scale(1.04);
+    }
+    .summaryChip .chipIcon {
+      transition:transform .2s ease;
+    }
+    @media (max-width: 480px) {
+      .summaryBar { gap:8px; }
+      .summaryChip {
+        width: calc(33.333% - 8px);
+        min-width: 0;
+        padding: 9px 6px;
+      }
+      .summaryChip .chipLabel {
+        font-size: 8.5px;
+        white-space: normal;
+      }
+    }
+
+  
+    /* =========================================================
+       PRO DESIGN SYSTEM UPGRADE
+       Unified icon weight + polished app-like layout
+       ========================================================= */
+    :root {
+      --bg-1:#eef4ff;
+      --bg-2:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --blue:#1e40af;
+      --blue-2:#1976d2;
+      --cyan:#0ea5e9;
+      --line:#dbe7fb;
+      --shadow-soft:0 10px 30px rgba(15,23,42,.09);
+      --shadow-card:0 8px 24px rgba(30,64,175,.10);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(14,165,233,.14), transparent 34%),
+        radial-gradient(circle at top right, rgba(30,64,175,.10), transparent 30%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 58%, #ffffff 100%);
+      color:var(--text);
+    }
+
+    .wrap {
+      max-width:720px;
+      padding:calc(18px + var(--safe-top)) 14px calc(32px + var(--safe-bottom));
+    }
+
+    .header {
+      min-height:142px;
+      padding:28px 18px 26px;
+      border-radius:var(--radius-xl);
+      background:
+        radial-gradient(circle at 84% 12%, rgba(255,255,255,.26), transparent 18%),
+        radial-gradient(circle at 14% 108%, rgba(255,255,255,.18), transparent 25%),
+        linear-gradient(135deg, #1d4ed8 0%, #2563eb 44%, #0ea5e9 100%);
+      box-shadow:0 16px 40px rgba(37,99,235,.24);
+      border:1px solid rgba(255,255,255,.28);
+    }
+
+    .header h1 {
+      font-size:27px;
+      letter-spacing:-.7px;
+      text-shadow:0 2px 10px rgba(15,23,42,.18);
+    }
+
+    .header .dateTag {
+      padding:7px 18px;
+      border-radius:999px;
+      background:rgba(255,255,255,.20);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+      backdrop-filter:blur(10px);
+    }
+
+    .langToggle {
+      width:30px;
+      height:30px;
+      top:14px;
+      right:16px;
+      border-radius:999px;
+      box-shadow:0 6px 16px rgba(15,23,42,.16);
+    }
+
+    .summaryBar {
+      margin-top:16px;
+      gap:12px;
+      align-items:stretch;
+    }
+
+    .summaryChip {
+      width:86px;
+      min-width:86px;
+      min-height:76px;
+      padding:11px 8px 9px;
+      border-radius:18px;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(148,163,184,.28);
+      box-shadow:var(--shadow-card);
+      color:inherit;
+      text-decoration:none;
+      cursor:pointer;
+      gap:5px;
+      backdrop-filter:blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .summaryChip::before {
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0));
+      pointer-events:none;
+    }
+
+    .summaryChip:hover {
+      transform:translateY(-4px);
+      box-shadow:0 14px 28px rgba(15,23,42,.14);
+      border-color:rgba(59,130,246,.28);
+    }
+
+    .summaryChip:active {
+      transform:translateY(-1px) scale(.99);
+    }
+
+    .summaryChip .chipVal {
+      width:44px;
+      height:44px;
+      min-width:44px;
+      min-height:44px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0;
+      line-height:1;
+      background:linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+      border:1px solid rgba(15,23,42,.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.9),
+        inset 0 -8px 18px rgba(30,64,175,.04),
+        0 4px 10px rgba(15,23,42,.08);
+      position:relative;
+      z-index:1;
+    }
+
+    .summaryChip .chipIcon,
+    .summaryChip .chipIcon.diffIcon {
+      width:31px;
+      height:31px;
+      display:block;
+      object-fit:contain;
+      margin:0 auto;
+      filter:drop-shadow(0 1.5px 1.5px rgba(15,23,42,.18));
+      transition:transform .2s ease;
+    }
+
+    .summaryChip:hover .chipIcon {
+      transform:scale(1.06);
+    }
+
+    .summaryChip .chipLabel {
+      margin-top:3px;
+      font-size:9px;
+      font-weight:800;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.35px;
+      white-space:nowrap;
+      position:relative;
+      z-index:1;
+    }
+
+    .diffTabs {
+      margin-top:18px;
+      border-radius:18px 18px 0 0;
+      background:linear-gradient(135deg, #1e3a8a 0%, #3b4cca 100%);
+      border:1px solid rgba(99,102,241,.35);
+      box-shadow:0 10px 24px rgba(30,58,138,.18);
+    }
+
+    .diffTab {
+      padding:14px 8px 12px;
+      font-size:12px;
+      letter-spacing:.55px;
+    }
+
+    .diffTab.active {
+      border-bottom-color:#38bdf8;
+      background:rgba(255,255,255,.10);
+    }
+
+    .card {
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-top:none;
+      border-radius:0 0 20px 20px;
+      padding:16px;
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:blur(14px);
+    }
+
+    .pill {
+      margin-top:0;
+      background:linear-gradient(135deg, #eff6ff, #e0f2fe);
+      color:#1e3a8a;
+      border-color:#bfdbfe;
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:800;
+    }
+
+    .deptFold,
+    .empFold {
+      border-radius:18px;
+      box-shadow:0 4px 14px rgba(15,23,42,.05);
+    }
+
+    .deptFold {
+      background:linear-gradient(135deg, #eef5ff, #f8fbff);
+      border-color:#cfe0ff;
+    }
+
+    .deptFold > summary,
+    .empFold > summary {
+      padding:13px 14px;
+    }
+
+    .empCount {
+      width:auto;
+      min-width:32px;
+      height:32px;
+      padding:0 10px;
+      border-radius:999px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .changeRow {
+      border-color:#d8e4ff;
+      background:linear-gradient(135deg, #f8fbff, #eef4ff);
+      border-radius:14px;
+      box-shadow:0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .changeDay {
+      border-radius:10px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .pageNote {
+      color:#94a3b8;
+      font-weight:600;
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding-left:10px; padding-right:10px; }
+      .header { min-height:132px; padding:25px 14px 22px; }
+      .header h1 { font-size:23px; }
+      .summaryBar { gap:9px; }
+      .summaryChip {
+        width:calc(33.333% - 6px);
+        min-width:0;
+        min-height:72px;
+        padding:10px 6px 8px;
+      }
+      .summaryChip .chipVal {
+        width:42px;
+        height:42px;
+        min-width:42px;
+        min-height:42px;
+      }
+      .summaryChip .chipIcon,
+      .summaryChip .chipIcon.diffIcon {
+        width:29px;
+        height:29px;
+      }
+      .summaryChip .chipLabel {
+        font-size:8.2px;
+        white-space:normal;
+        line-height:1.1;
+      }
+      .changeRow {
+        align-items:flex-start;
+        flex-wrap:wrap;
+      }
+      .changeDate {
+        order:3;
+        width:100%;
+        text-align:left;
+      }
+      body[dir="rtl"] .changeDate {
+        text-align:right;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition:none !important; scroll-behavior:auto !important; }
+    }
+
+  </style>
+
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-export" viewBox="0 0 64 64">
+      <rect x="8" y="10" width="48" height="44" rx="12" fill="#EAF2FF" stroke="#1E40AF" stroke-width="3"/>
+      <path d="M20 36h20" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round"/>
+      <path d="M34 26l10 10-10 10" fill="none" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M20 23h13" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-training" viewBox="0 0 64 64">
+      <rect x="16" y="10" width="30" height="40" rx="5" fill="#34D399" stroke="#0F172A" stroke-width="3"/>
+      <rect x="21" y="16" width="30" height="40" rx="5" fill="#FBBF24" stroke="#0F172A" stroke-width="3"/>
+      <rect x="26" y="22" width="30" height="34" rx="5" fill="#60A5FA" stroke="#0F172A" stroke-width="3"/>
+      <path d="M31 31h18M31 39h14" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-calendar" viewBox="0 0 64 64">
+      <rect x="10" y="14" width="44" height="40" rx="10" fill="#DBEAFE" stroke="#1E40AF" stroke-width="3"/>
+      <path d="M10 25h44" stroke="#1E40AF" stroke-width="3"/>
+      <path d="M22 10v10M42 10v10" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/>
+      <rect x="18" y="31" width="8" height="8" rx="2" fill="#0EA5E9"/>
+      <rect x="30" y="31" width="8" height="8" rx="2" fill="#1E40AF"/>
+      <rect x="42" y="31" width="8" height="8" rx="2" fill="#60A5FA"/>
+      <rect x="18" y="43" width="8" height="8" rx="2" fill="#93C5FD"/>
+      <rect x="30" y="43" width="8" height="8" rx="2" fill="#BFDBFE"/>
+    </symbol>
+    <symbol id="icon-import" viewBox="0 0 64 64">
+      <rect x="8" y="10" width="48" height="44" rx="12" fill="#EFF6FF" stroke="#0F766E" stroke-width="3"/>
+      <path d="M44 28H24" stroke="#14B8A6" stroke-width="5" stroke-linecap="round"/>
+      <path d="M30 18L20 28l10 10" fill="none" stroke="#14B8A6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M31 43h13" stroke="#0F766E" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-diff" viewBox="0 0 64 64">
+      <rect x="9" y="12" width="46" height="42" rx="10" fill="#FEF3C7" stroke="#0F172A" stroke-width="3"/>
+      <path d="M9 24h46" stroke="#0F172A" stroke-width="3"/>
+      <path d="M22 9v10M42 9v10" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/>
+      <path d="M32 31v16" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
+      <path d="M32 36c-5-8-10-8-16-8" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
+      <path d="M16 28l7-6M16 28l7 6" fill="none" stroke="#F59E0B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M32 36c5-8 10-8 16-8" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
+      <path d="M48 28l-7-6M48 28l-7 6" fill="none" stroke="#EF4444" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-games" viewBox="0 0 64 64">
+      <rect x="10" y="25" width="44" height="24" rx="12" fill="#EDE9FE" stroke="#6D28D9" stroke-width="3"/>
+      <path d="M22 33v10M17 38h10" stroke="#6D28D9" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="42" cy="35" r="3" fill="#F43F5E"/>
+      <circle cx="48" cy="41" r="3" fill="#0EA5E9"/>
+      <path d="M28 25l4-8 4 8" fill="none" stroke="#6D28D9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <button class="langToggle" type="button">ع</button>
+      <h1 id="pageTitle">Export Auto Diff</h1>
+      <div class="datePickerWrapper">
+        <div class="dateTag" id="dateTag"></div>
+      </div>
+    </div>
+
+    <div class="summaryBar">
+      <a href="#" id="exportBtn" class="summaryChip" aria-label="Export">
+        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-export"></use></svg></div>
+        <div class="chipLabel">Export</div>
+      </a>
+      <a href="#" id="trainingBtn" class="summaryChip" aria-label="Training">
+        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-training"></use></svg></div>
+        <div class="chipLabel">Training</div>
+      </a>
+      <a href="#" id="myScheduleBtn" class="summaryChip" aria-label="My Schedule">
+        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-calendar"></use></svg></div>
+        <div class="chipLabel">My Schedule</div>
+      </a>
+      <a href="#" id="importBtn" class="summaryChip importChip" aria-label="Import">
+        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-import"></use></svg></div>
+        <div class="chipLabel">Import</div>
+      </a>
+      <a href="#" id="compareChipBtn" class="summaryChip" aria-label="Diff">
+        <div class="chipVal" id="compareChipIcon"><svg class="chipIcon" id="compareChipSvg" role="img" aria-hidden="true"><use href="#icon-diff"></use></svg></div>
+        <div class="chipLabel" id="compareChipLabel">Diff</div>
+      </a>
+      <a href="https://dgr-exp.netlify.app" class="summaryChip gamesChip" aria-label="Games">
+        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-games"></use></svg></div>
+        <div class="chipLabel">Games</div>
+      </a>
+    </div>
+    <div class="diffTabs">
+      <button class="diffTab" id="tabRosterDiff" type="button">Roster Diff</button>
+      <button class="diffTab" id="tabAbsence" type="button">Absence</button>
+    </div>
+
+    <div class="card">
+      <div class="pill" id="summary">No diff loaded yet.</div>
+      <div id="errors" class="warn" style="margin-top:8px;"></div>
+      <div id="diffList" class="diffList"></div>
+    </div>
+    <div class="pageNote">Automatic comparison between latest and previous version of the same month. No manual upload required.</div>
+  </div>
+
+  <script>
+    let currentDiffKind = 'export';
+    let currentPanel = 'diff';
+    let lastDiffData = null;
+    let currentLang = localStorage.getItem('rosterDiffLang') === 'ar' ? 'ar' : 'en';
+    let latestIsoDate = '';
+    let lastSummaryStats = null;
+
+    const I18N = {
+      en: {
+        tabDiff: 'ROSTER DIFF',
+        tabAbsence: 'ABSENCE',
+        titleExport: 'Export Auto Diff',
+        titleImport: 'Import Auto Diff',
+        chipExpDiff: 'Exp Diff',
+        chipImpDiff: 'Imp Diff',
+        switchDiff: 'Switch Diff',
+        noDiffLoaded: 'No diff loaded yet.',
+        note: 'Automatic comparison between latest and previous version of the same month. No manual upload required.',
+        noDiffFound: 'No differences found between previous and current versions.',
+        summaryStats: '{changes} changes across {employees} employees in {departments} departments',
+        noSavedEmp: 'No saved employee ID found for this section.',
+        noAbsence: 'No recorded absences for this employee.',
+        absent: 'Absent',
+        recorded: 'Recorded',
+        dayFallback: 'Day {day}',
+        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.'
+      },
+      ar: {
+        tabDiff: 'فروقات الروستر',
+        tabAbsence: 'الغياب',
+        titleExport: 'فروقات الصادر',
+        titleImport: 'فروقات الوارد',
+        chipExpDiff: 'فرق الصادر',
+        chipImpDiff: 'فرق الوارد',
+        switchDiff: 'تبديل نوع الفروقات',
+        noDiffLoaded: 'لا توجد فروقات محملة بعد.',
+        note: 'مقارنة تلقائية بين أحدث نسخة والنسخة السابقة لنفس الشهر بدون رفع يدوي.',
+        noDiffFound: 'لا توجد فروقات بين النسخة السابقة والحالية.',
+        summaryStats: '{changes} تغييرات بين {employees} موظفين في {departments} أقسام',
+        noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
+        noAbsence: 'لا توجد أيام غياب مسجلة لهذا الموظف.',
+        absent: 'غياب',
+        recorded: 'مسجل',
+        dayFallback: 'اليوم {day}',
+        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.'
+      }
+    };
+
+    function t(key, vars) {
+      const dict = I18N[currentLang] || I18N.en;
+      let text = dict[key] || I18N.en[key] || key;
+      if (vars) {
+        Object.keys(vars).forEach((k) => {
+          text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(vars[k]));
+        });
+      }
+      return text;
+    }
+
+    function updateSummaryText() {
+      const summary = document.getElementById('summary');
+      if (!summary) return;
+      if (!lastSummaryStats) {
+        summary.textContent = t('noDiffLoaded');
+        return;
+      }
+      summary.textContent = t('summaryStats', lastSummaryStats);
+    }
+
+    function updateDateTag() {
+      if (!latestIsoDate) return;
+      const dateTag = document.getElementById('dateTag');
+      if (!dateTag) return;
+      const dt = new Date(`${latestIsoDate}T00:00:00`);
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      const formatted = dt.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
+      dateTag.textContent = `📅 ${formatted}`;
+    }
+
+    function applyLanguageUi() {
+      document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+      document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      const note = document.querySelector('.pageNote');
+      if (tabRosterDiff) tabRosterDiff.textContent = t('tabDiff');
+      if (tabAbsence) tabAbsence.textContent = t('tabAbsence');
+      if (note) note.textContent = t('note');
+      updateSummaryText();
+      updateDateTag();
+      applyDiffModeUi(currentDiffKind);
+    }
+
+    function applyDiffModeUi(kind) {
+      currentDiffKind = kind === 'import' ? 'import' : 'export';
+      const nextKind = currentDiffKind === 'export' ? 'import' : 'export';
+      const title = document.getElementById('pageTitle');
+      const compareChipLabel = document.getElementById('compareChipLabel');
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      title.textContent = currentDiffKind === 'export' ? t('titleExport') : t('titleImport');
+      compareChipLabel.textContent = nextKind === 'export' ? t('chipExpDiff') : t('chipImpDiff');
+      if (tabRosterDiff && tabAbsence) {
+        tabRosterDiff.classList.toggle('active', currentPanel === 'diff');
+        tabAbsence.classList.toggle('active', currentPanel === 'absence');
+      }
+    }
+
+    async function activatePanel(panel) {
+      currentPanel = panel === 'absence' ? 'absence' : 'diff';
+      applyDiffModeUi(currentDiffKind);
+      if (currentPanel === 'absence') {
+        await renderAbsencePanel(currentDiffKind);
+      } else if (lastDiffData) {
+        await renderDiffRows(lastDiffData, currentDiffKind);
+      }
+    }
+
+    (function wireTopNav() {
+      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const today = new Date();
+      const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      latestIsoDate = isoDate;
+      const importEmpId = (localStorage.getItem('importSavedEmpId') || '').trim();
+      const exportEmpId = (localStorage.getItem('exportSavedEmpId') || '').trim();
+      const initialKind = importEmpId && !exportEmpId ? 'import' : 'export';
+      document.getElementById('exportBtn').href = `${root}/date/${isoDate}/`;
+      document.getElementById('trainingBtn').href = `${root}/training/`;
+      document.getElementById('myScheduleBtn').href = `${root}/my-schedules/`;
+      document.getElementById('importBtn').href = `${root}/import/date/${isoDate}/`;
+      const langBtn = document.querySelector('.langToggle');
+      const compareBtn = document.getElementById('compareChipBtn');
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      compareBtn.href = '#';
+      compareBtn.onclick = (e) => {
+        e.preventDefault();
+        loadDiff(currentDiffKind === 'export' ? 'import' : 'export');
+      };
+      applyDiffModeUi(initialKind);
+      compareBtn.title = t('switchDiff');
+      tabRosterDiff.onclick = () => activatePanel('diff');
+      tabAbsence.onclick = () => activatePanel('absence');
+      if (langBtn) {
+        langBtn.textContent = currentLang === 'ar' ? 'EN' : 'ع';
+        langBtn.onclick = () => {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          localStorage.setItem('rosterDiffLang', currentLang);
+          langBtn.textContent = currentLang === 'ar' ? 'EN' : 'ع';
+          applyLanguageUi();
+          if (currentPanel === 'absence') {
+            renderAbsencePanel(currentDiffKind);
+          } else if (lastDiffData) {
+            renderDiffRows(lastDiffData, currentDiffKind);
+          }
+        };
+      }
+      applyLanguageUi();
+    })();
+
+    function formatDiffDate(day, monthKey) {
+      const m = String(monthKey || '').match(/^(\d{4})-(\d{2})$/);
+      if (!m) return t('dayFallback', { day });
+      const year = Number(m[1]);
+      const month = Number(m[2]) - 1;
+      const d = Number(day);
+      const dt = new Date(year, month, d);
+      if (Number.isNaN(dt.getTime())) return `Day ${day}`;
+      return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function normalizeId(v) {
+      return String(v || '').replace(/\D+/g, '').trim();
+    }
+
+    function idsMatch(a, b) {
+      const na = normalizeId(a);
+      const nb = normalizeId(b);
+      if (!na || !nb) return false;
+      return na === nb || na.includes(nb) || nb.includes(na);
+    }
+
+    function normalizeName(v) {
+      return String(v || '')
+        .replace(/-\s*\d+\s*$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\u0600-\u06ff]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    async function getDeptLookup(kind) {
+      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const candidates = kind === 'import'
+        ? [`${root}/import/schedules/index.json`, `${root}/schedules/index.json`]
+        : [`${root}/schedules/index.json`];
+      for (const url of candidates) {
+        try {
+          const res = await fetch(`${url}?ts=${Date.now()}`);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const idToDept = new Map();
+          const nameToDept = new Map();
+          ((json && json.employees) || []).forEach((e) => {
+            const empId = String((e && e.id) || '').trim();
+            const dep = String((e && e.department) || '').trim();
+            const nm = normalizeName((e && e.name) || '');
+            if (empId && dep && !idToDept.has(empId)) idToDept.set(empId, dep);
+            if (nm && dep && !nameToDept.has(nm)) nameToDept.set(nm, dep);
+          });
+          return { idToDept, nameToDept };
+        } catch (_) {}
+      }
+      return { idToDept: new Map(), nameToDept: new Map() };
+    }
+
+    function resolveDepartment(empId, employeeName, lookup) {
+      const id = normalizeId(empId);
+      if (id && lookup.idToDept.has(id)) return lookup.idToDept.get(id);
+      const nameKey = normalizeName(employeeName);
+      if (nameKey && lookup.nameToDept.has(nameKey)) return lookup.nameToDept.get(nameKey);
+      return 'Other';
+    }
+
+    async function renderDiffRows(data, kind) {
+      const err = document.getElementById('errors');
+      const summary = document.getElementById('summary');
+      const diffList = document.getElementById('diffList');
+      const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
+      const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
+      const savedEmpId = (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || '').trim();
+      err.textContent = '';
+      diffList.innerHTML = '';
+      const rows = (data && data.changes) || [];
+      summary.textContent = '';
+      if (!rows.length) {
+        err.textContent = t('noDiffFound');
+        lastSummaryStats = null;
+        updateSummaryText();
+        return;
+      }
+
+      const lookup = await getDeptLookup(kind);
+      const grouped = new Map();
+      rows.forEach((x) => {
+        const key = `${x.emp_id || ''}||${x.name || '-'}`;
+        if (!grouped.has(key)) grouped.set(key, []);
+        grouped.get(key).push(x);
+      });
+      const groups = Array.from(grouped.entries()).map(([key, changes]) => {
+        const [empId, name] = key.split('||');
+        const employeeName = (name || '-').trim();
+        const idLike = (empId || '').replace(/^name:/, '').trim();
+        const matchSaved = !!savedEmpId && (idsMatch(empId, savedEmpId) || idsMatch(idLike, savedEmpId) || employeeName.includes(savedEmpId));
+        const department = resolveDepartment(empId, employeeName, lookup);
+        return { empId, employeeName, changes, matchSaved, department };
+      });
+      const byDept = new Map();
+      groups.forEach((g) => {
+        if (!byDept.has(g.department)) byDept.set(g.department, []);
+        byDept.get(g.department).push(g);
+      });
+      const deptGroups = Array.from(byDept.entries()).map(([department, employees]) => ({
+        department,
+        employees,
+        hasSaved: employees.some(e => e.matchSaved),
+        totalChanges: employees.reduce((n, e) => n + e.changes.length, 0)
+      }));
+      deptGroups.sort((a, b) => {
+        if (a.hasSaved && !b.hasSaved) return -1;
+        if (!a.hasSaved && b.hasSaved) return 1;
+        return a.department.localeCompare(b.department);
+      });
+      lastSummaryStats = { changes: rows.length, employees: groups.length, departments: deptGroups.length };
+      updateSummaryText();
+
+      deptGroups.forEach((d, deptIdx) => {
+        d.employees.sort((a, b) => {
+          if (a.matchSaved && !b.matchSaved) return -1;
+          if (!a.matchSaved && b.matchSaved) return 1;
+          return a.employeeName.localeCompare(b.employeeName);
+        });
+        const deptDetails = document.createElement('details');
+        deptDetails.className = 'deptFold';
+        if ((savedEmpId && d.hasSaved) || (!savedEmpId && deptIdx === 0)) deptDetails.open = true;
+
+        const deptRows = document.createElement('div');
+        deptRows.className = 'deptRows';
+        d.employees.forEach((g, empIdx) => {
+          const details = document.createElement('details');
+          details.className = 'empFold';
+          if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+          const rowsHtml = g.changes
+            .sort((a, b) => Number(a.day) - Number(b.day))
+            .map((c) => `<div class="changeRow"><span class="changeDay">${c.day}</span><span class="changeDate">${formatDiffDate(c.day, data.month)}</span><span class="changeFlow"><span class="changeOld">${c.v1 || '-'}</span> → <span class="changeNew">${c.v2 || '-'}</span></span></div>`)
+            .join('');
+          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${g.employeeName}</span></span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+          deptRows.appendChild(details);
+        });
+        deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${d.department}</span></span><span class="empCount">${d.totalChanges}</span></summary>`;
+        deptDetails.appendChild(deptRows);
+        diffList.appendChild(deptDetails);
+      });
+    }
+
+    function nameMatch(a, b) {
+      const na = String(a || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, ' ').replace(/\s+/g, ' ').trim();
+      const nb = String(b || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!na || !nb) return false;
+      if (na === nb) return true;
+      const wa = na.split(' ').filter(x => x.length > 3);
+      const wb = nb.split(' ').filter(x => x.length > 3);
+      return wa.filter(w => wb.includes(w)).length >= 2;
+    }
+
+    async function renderAbsencePanel(kind) {
+      const err = document.getElementById('errors');
+      const summary = document.getElementById('summary');
+      const diffList = document.getElementById('diffList');
+      err.textContent = '';
+      summary.textContent = '';
+      diffList.innerHTML = '';
+      try {
+        const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+        const empId = (localStorage.getItem(kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId') || '').trim();
+        if (!empId) {
+          err.textContent = t('noSavedEmp');
+          return;
+        }
+        const schedulePath = kind === 'import' ? `import/schedules/${encodeURIComponent(empId)}.json` : `schedules/${encodeURIComponent(empId)}.json`;
+        const [empRes, absRes] = await Promise.all([
+          fetch(`${root}/${schedulePath}?ts=${Date.now()}`),
+          fetch(`${root}/absence-data.json?ts=${Date.now()}`)
+        ]);
+        if (!empRes.ok || !absRes.ok) throw new Error('Could not load absence data.');
+        const emp = await empRes.json();
+        const absData = await absRes.json();
+        const records = (absData && absData.records) || [];
+        const cleanName = String((emp && emp.name) || '').replace(/-\s*\d+\s*$/, '').trim();
+        const dates = [];
+        records.forEach((rec) => {
+          let matched = false;
+          if (rec && Array.isArray(rec.empNos) && rec.empNos.includes(String(empId))) matched = true;
+          if (!matched && cleanName && Array.isArray(rec.names)) matched = rec.names.some((n) => nameMatch(cleanName, n));
+          if (matched && rec && rec.date) dates.push(rec.date);
+        });
+        const uniqDates = Array.from(new Set(dates)).sort();
+        if (!uniqDates.length) {
+          err.textContent = t('noAbsence');
+          return;
+        }
+        const details = document.createElement('details');
+        details.className = 'empFold';
+        details.open = true;
+        const rowsHtml = uniqDates.map((d, i) => `<div class="changeRow"><span class="changeDay">${i + 1}</span><span class="changeDate">${d}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`).join('');
+        details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${(emp && emp.name) || empId}</span></span><span class="empCount">${uniqDates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+        diffList.appendChild(details);
+      } catch (e) {
+        err.textContent = e.message || String(e);
+      }
+    }
+
+    async function loadDiff(kind) {
+      applyDiffModeUi(kind);
+      try {
+        const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+        const res = await fetch(`${root}/roster-diff/data/${kind}-latest.json?ts=${Date.now()}`);
+        if (!res.ok) throw new Error(t('noAutoDiff', { kind }));
+        lastDiffData = await res.json();
+        if (currentPanel === 'absence') {
+          await renderAbsencePanel(kind);
+        } else {
+          await renderDiffRows(lastDiffData, kind);
+        }
+      } catch (e) {
+        const err = document.getElementById('errors');
+        err.textContent = e.message || String(e);
+      }
+    }
+
+    (function loadBannerChanger(){
+      const root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+      const s = document.createElement('script');
+      s.src = `${root}/banner-changer.js?v=20260428`;
+      s.defer = true;
+      document.body.appendChild(s);
+    })();
+
+    loadDiff(currentDiffKind);
+  </script>
+</body>
+</html>

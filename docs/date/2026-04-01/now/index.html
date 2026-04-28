@@ -1,0 +1,1568 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Duty Roster</title>
+  <style>
+    /* ═══════ RESET ═══════ */
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
+      width:100%;
+      overflow-x:hidden;
+    }
+    body {
+      margin:0; padding:0;
+      min-height:100dvh;
+      background:#eef1f7;
+      font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+    }
+    * { box-sizing:border-box; }
+
+    /* ═══════ WRAP ═══════ */
+    .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+
+    /* ═══════ HEADER ═══════ */
+    .header {
+      background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color:#fff;
+      padding:26px 18px 24px;
+      border-radius:20px;
+      text-align:center;
+      box-shadow:0 8px 28px rgba(30,64,175,.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute;
+      top:-30px; right:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .header::after {
+      content:''; position:absolute;
+      bottom:-50px; left:-30px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,.06);
+    }
+    .header h1 { margin:0; font-size:24px; font-weight:800; position:relative; z-index:1; letter-spacing:-.3px; }
+
+    /* زر اللغة */
+    .langToggle {
+      position:absolute; top:14px; right:16px; z-index:10;
+      background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
+      border-radius:50%; width:26px; height:26px;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:10px; font-weight:800; cursor:pointer;
+      transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
+    }
+    .langToggle:hover { background:rgba(255,255,255,.30); transform:scale(1.08); }
+    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
+    .empRow, .empName, .empStatus { direction:ltr !important; unicode-bidi:embed; text-align:left !important; }
+
+    .welcomeChip {
+      display:none;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .welcomeChip.visible {
+      display:flex;
+    }
+    .welcomeChip .chipLabel {
+      max-width:88px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .waveHand {
+      display:inline-block;
+      transform-origin:70% 70%;
+      animation:waveHand 1.8s ease-in-out infinite;
+    }
+    @keyframes waveHand {
+      0%, 50%, 100% { transform:rotate(0deg); }
+      10% { transform:rotate(16deg); }
+      20% { transform:rotate(-10deg); }
+      30% { transform:rotate(16deg); }
+      40% { transform:rotate(-6deg); }
+    }
+
+    /* Date Picker Wrapper */
+    .datePickerWrapper {
+      position:relative;
+      display:inline-block;
+      margin-top:14px;
+      z-index:1;
+    }
+    .header .dateTag {
+      display:inline-block;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
+      cursor:pointer;
+      transition:all .3s;
+      border:2px solid rgba(255,255,255,.2);
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      -webkit-user-select:none;
+      direction:ltr;
+    }
+    .header .dateTag:hover {
+      background:rgba(255,255,255,.25);
+      transform:translateY(-1px);
+    }
+    /* الـ input مخفي تماماً - لا يُرى ولا يُضغط عليه */
+#datePicker {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  font-size: 16px;   /* مهم جداً لمنع zoom على iOS */
+  border: none;
+  /* ← أضف هذا: */
+  -webkit-appearance: none;
+}
+
+
+    /* ═══════ SUMMARY BAR ═══════ */
+    .summaryBar { 
+      display:flex; 
+      justify-content:center; 
+      align-items:stretch;
+      gap:12px; 
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    a.summaryChip:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
+    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
+    a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
+    a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.diffChip .chipVal { color:#ef4444; }
+    a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
+    .summaryChip {
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      border-radius:14px;
+      padding:10px 12px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      transition:all .25s ease;
+      min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
+    .summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
+    #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
+    .summaryChip .chipLabel { 
+      font-size:9.5px;
+      font-weight:600; 
+      color:#64748b; 
+      text-transform:uppercase; 
+      letter-spacing:.4px; 
+      margin-top:4px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    /* ═══════ SHIFT FILTER BUTTONS AS CHIPS ═══════ */
+    button.summaryChip.shiftFilterBtn {
+      border:2px solid transparent;
+      position:relative;
+      overflow:hidden;
+      padding:10px 14px; /* padding أصغر للأزرار */
+    }
+    button.summaryChip.shiftFilterBtn:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    button.summaryChip.shiftFilterBtn.active {
+      border-color:currentColor;
+      box-shadow:0 6px 16px rgba(15,23,42,.18);
+    }
+    button.summaryChip.shiftFilterBtn.active::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background:currentColor;
+      opacity:.06;
+    }
+    
+    /* ألوان الورديات */
+    button.shiftFilterBtn.morning {
+      color:#f59e0b;
+    }
+    button.shiftFilterBtn.morning .chipVal { color:#f59e0b; }
+    button.shiftFilterBtn.morning .chipLabel { color:#92400e; }
+    
+    button.shiftFilterBtn.afternoon {
+      color:#f97316;
+    }
+    button.shiftFilterBtn.afternoon .chipVal { color:#f97316; }
+    button.shiftFilterBtn.afternoon .chipLabel { color:#9a3412; }
+    
+    button.shiftFilterBtn.night {
+      color:#8b5cf6;
+    }
+    button.shiftFilterBtn.night .chipVal { color:#8b5cf6; }
+    button.shiftFilterBtn.night .chipLabel { color:#5b21b6; }
+    
+    button.shiftFilterBtn.all {
+      color:#1e40af;
+    }
+    button.shiftFilterBtn.all .chipVal { color:#1e40af; }
+    button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
+    
+    /* للشاشات المتوسطة */
+    @media (max-width:900px){
+      .summaryBar { flex-wrap:wrap; } /* السماح بالانتقال للصف الثاني */
+    }
+    
+    /* للموبايل */
+    @media (max-width:600px){
+      .summaryBar { gap:6px; }
+      .summaryChip { padding:8px 8px; min-width:60px; }
+      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
+    }
+
+
+    /* ═══════ DEPARTMENT CARD ═══════ */
+    .deptCard {
+      margin-top:18px;
+      background:#fff;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(15,23,42,.07);
+      box-shadow:0 4px 18px rgba(15,23,42,.08);
+    }
+    .deptHead {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      background:#fff;
+    }
+    .deptIcon {
+      width:40px; height:40px;
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
+    .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+
+    /* ═══════ SHIFT STACK ═══════ */
+    .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+    /* ═══════ SHIFT CARD — <details> ═══════ */
+    .shiftCard {
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .shiftSummary {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 14px;
+      cursor:pointer;
+      list-style:none;
+      -webkit-appearance:none;
+      appearance:none;
+      user-select:none;
+    }
+    .shiftSummary::-webkit-details-marker { display:none; }
+    .shiftSummary::marker              { display:none; }
+
+    .shiftIcon  { font-size:20px; line-height:1; flex-shrink:0; }
+    .shiftLabel { font-size:15px; font-weight:800; flex:1; letter-spacing:-.1px; }
+    .shiftCount {
+      font-size:13px; font-weight:800;
+      padding:3px 10px; border-radius:20px;
+      flex-shrink:0;
+    }
+
+    /* chevron يدور لما يفتح */
+    .shiftSummary::after {
+      content:'▾';
+      font-size:14px;
+      color:#94a3b8;
+      transition:transform .2s;
+      flex-shrink:0;
+    }
+    .shiftCard[open] .shiftSummary::after {
+      transform:rotate(180deg);
+    }
+
+    .shiftBody { background:rgba(255,255,255,.7); }
+
+    /* ── employee row ── */
+    .empRow {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:9px 16px;
+      border-top:1px solid rgba(15,23,42,.06);
+    }
+    .empRowAlt { background:rgba(15,23,42,.02); }
+    .empName  { font-size:15px; font-weight:700; color:#1e293b; }
+    .empStatus { font-size:13px; font-weight:600; }
+
+    /* ═══════ QUICK ACTIONS ═══════ */
+    .quickActions {
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn {
+      display:inline-block;
+      padding:11px 18px;
+      border-radius:16px;
+      background:linear-gradient(135deg, #1e40af, #1976d2);
+      color:#fff !important;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      box-shadow:0 6px 20px rgba(30,64,175,.3);
+      min-width:170px;
+      text-align:center;
+      white-space:nowrap;
+    }
+
+    /* ═══════ FOOTER ═══════ */
+    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
+    .footer strong { color:#64748b; }
+
+    /* ═══════ MOBILE ═══════ */
+    @media (max-width:480px){
+      .wrap            { padding:12px 10px 22px; }
+      .header h1       { font-size:21px; }
+      .deptTitle       { font-size:16px; }
+      .empName         { font-size:14px; }
+      .empStatus       { font-size:12px; }
+      .shiftLabel      { font-size:14px; }
+      .summaryBar      { gap:8px; }
+      .summaryChip     { padding:8px 14px; }
+      .summaryChip .chipVal { font-size:19px; }
+    }
+
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ════ HEADER ════ -->
+  <div class="header">
+    <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
+    <h1 id="pageTitle">Export Duty Roster</h1>
+    <div class="datePickerWrapper">
+      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 01 April 2026</button>
+      <input id="datePicker" type="date" value="2026-04-01" min="2026-03-01" max="2026-05-31" tabindex="-1" aria-hidden="true" />
+    </div>
+  </div>
+
+  
+
+  <!-- ════ SUMMARY CHIPS ════ -->
+  <div class="summaryBar">
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">77</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
+    </div>
+    <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+      <div class="chipVal">🗓️</div>
+      <div class="chipLabel" data-key="mySchedule">My Schedule</div>
+    </a>
+    <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;" onclick="goToImport(event)">
+      <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Import" src="" /></div>
+      <div class="chipLabel" data-key="importRoster">Import</div>
+    </a>
+    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+      <div class="chipVal"><span class="waveHand">👋</span></div>
+      <div class="chipLabel" id="welcomeName"></div>
+    </a>
+    <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
+      <div class="chipVal">📚</div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="#" id="diffChipBtn" class="summaryChip diffChip" style="cursor:pointer;text-decoration:none;" onclick="goToRosterDiff(event)">
+      <div class="chipVal"><img class="chipIcon diffIcon" id="diffChipIcon" alt="Diff" src="" /></div>
+      <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
+    
+    <button class="summaryChip shiftFilterBtn morning" data-shift="Morning" style="cursor:pointer;">
+      <div class="chipVal">☀️</div>
+      <div class="chipLabel" data-key="morning">Morning</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn afternoon" data-shift="Afternoon" style="cursor:pointer;">
+      <div class="chipVal">🌤️</div>
+      <div class="chipLabel" data-key="afternoon">Afternoon</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn night" data-shift="Night" style="cursor:pointer;">
+      <div class="chipVal">🌙</div>
+      <div class="chipLabel" data-key="night">Night</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn all active" data-shift="All" style="cursor:pointer;">
+      <div class="chipVal">📋</div>
+      <div class="chipLabel" data-key="allShifts">All Shifts</div>
+    </button>
+    
+  </div>
+
+  <!-- ════ DEPARTMENT CARDS ════ -->
+  
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
+        <div class="deptIcon" style="background:#2563eb15; color:#2563eb;">
+          
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+  <rect x="9" y="14" width="2" height="3"/>
+  <rect x="13" y="14" width="2" height="3"/>
+</svg>
+
+        </div>
+        <div class="deptTitle">Officers</div>
+        <div class="deptBadge" style="background:#2563eb15; color:#2563eb; border:1px solid #2563eb18;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">4</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Rodolfo Magcaling - 80235</span>
+       <span class="empStatus" style="color:#92400e;">ME07</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Adil Al Balushi - 81392</span>
+       <span class="empStatus" style="color:#92400e;">ME07</span>
+     </div><div class="empRow">
+       <span class="empName">Salim Al Masroori - 8926</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Rajaram - 8899</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 13)</span>
+     </div>
+      </div>
+    </details>
+            
+      </div>
+    </div>
+    
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #0891b2, #0891b2cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #0891b218;">
+        <div class="deptIcon" style="background:#0891b215; color:#0891b2;">
+          
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+  <rect x="9" y="14" width="2" height="3"/>
+  <rect x="13" y="14" width="2" height="3"/>
+</svg>
+
+        </div>
+        <div class="deptTitle">Supervisors</div>
+        <div class="deptBadge" style="background:#0891b215; color:#0891b2; border:1px solid #0891b218;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">6</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mohamed Al Amri - 81404</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Said Al Amri - 990737</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mohamed Al Kalbani - 82593</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Jay Macalino - 80250</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Talal Al Balushi - 81300</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Saleh Al Rashdi - 82546</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 2)</span>
+     </div>
+      </div>
+    </details>
+            
+      </div>
+    </div>
+    
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #059669, #059669cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #05966918;">
+        <div class="deptIcon" style="background:#05966915; color:#059669;">
+          
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+  <rect x="9" y="14" width="2" height="3"/>
+  <rect x="13" y="14" width="2" height="3"/>
+</svg>
+
+        </div>
+        <div class="deptTitle">Load Control</div>
+        <div class="deptBadge" style="background:#05966915; color:#059669; border:1px solid #05966918;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">15</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Hamed Al Fulaiti - 82596</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Jaafar Al Balushi - 81258</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
+       <span class="empName">Mohamed Al Siyabi - 81402</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mubarak Al Nofli - 82114</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Mudathir Al Hajri - 82441</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName">Saleh Al Aufi - 82550</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Omar Al Obaidi - 82551</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Assad Al Omairi - 81348</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow">
+       <span class="empName">Bushra Al Wahiebi - 82657</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Habib Al Balushi - 82600</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Al Muthana Al Shamfari - 82445</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Ahmed Al Muqaini - 82548</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ahmed Al Kharusi - 82575</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Marwan Al Difai - 82437</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 5)</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Sick Leave" style="border:1px solid #ef444444; background:#fee2e2">
+      <summary class="shiftSummary" style="background:#fee2e2; border-bottom:1px solid #ef444433;">
+        <span class="shiftIcon">🤒</span>
+        <span class="shiftLabel" style="color:#991b1b;">Sick Leave</span>
+        <span class="shiftCount" style="background:#ef444422; color:#991b1b;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Qasim Al Maqbali - 81409</span>
+       <span class="empStatus" style="color:#991b1b;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 3)</span>
+     </div>
+      </div>
+    </details>
+            
+      </div>
+    </div>
+    
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #dc2626, #dc2626cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #dc262618;">
+        <div class="deptIcon" style="background:#dc262615; color:#dc2626;">
+          
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+  <rect x="9" y="14" width="2" height="3"/>
+  <rect x="13" y="14" width="2" height="3"/>
+</svg>
+
+        </div>
+        <div class="deptTitle">Export Checker</div>
+        <div class="deptBadge" style="background:#dc262615; color:#dc2626; border:1px solid #dc262618;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">33</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">5</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Khalil Al Hinai - 82671</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ali Al Farsi - 81393</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
+       <span class="empName">Mohamed Al Mamari - 82674</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Riyadh Al Sulti - 82424</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
+       <span class="empName">Ahmed Al Hashmi - 82616</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">7</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Khalifa Al Maqbali - 82673</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Waleed Al Hadabi - 80482</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName">Mohamed Al Maskari - 82666</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Mazin Al Hajri - 82547</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName">Ghaith Al Habsi - 82439</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Mohamed Al Maskari - 82661</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName">Mohamed Al Subhi - 82592 (Inventory)</span>
+       <span class="empStatus" style="color:#9a3412;">MN12</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">6</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Wissam Al Kharusi - 82464</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Dawood Al Siyabi - 82672</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow">
+       <span class="empName">Fahim Al Hashni - 8930</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Abdullah Al Shukeili - 82645</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow">
+       <span class="empName">Ali Al Marjubi - 82577</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Khalid Al Raqadi - 8715</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">9</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Abdulfatah Al Shukeili - 990465</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ammar Al Hashmi - 82659</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Ahmed Al Mawali - 82283</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Yousuf Al Balushi - 82587</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Ali Al Mamari - 82574</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Raad Al Farsi - 82578</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Hosni Al Sulti - 80695</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Adil Al Zadjali - 8584</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Riyadh Al Jabri - 82555</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">6</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mohamed Al Mazroie - 82658</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 6)</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Saif Al Mahrizi - 82649</span>
+       <span class="empStatus" style="color:#065f46;">AL</span>
+     </div><div class="empRow">
+       <span class="empName">Rashid Al Farsi - 82615</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 5)</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Marlon Esmilla - 80270</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 15)</span>
+     </div><div class="empRow">
+       <span class="empName">Ali Yousuf Al Balushi - 990752</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 6)</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ahmed Al Bakari - 81832</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 4)</span>
+     </div>
+      </div>
+    </details>
+            
+      </div>
+    </div>
+    
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #7c3aed18;">
+        <div class="deptIcon" style="background:#7c3aed15; color:#7c3aed;">
+          
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+  <rect x="9" y="14" width="2" height="3"/>
+  <rect x="13" y="14" width="2" height="3"/>
+</svg>
+
+        </div>
+        <div class="deptTitle">Export Operators</div>
+        <div class="deptBadge" style="background:#7c3aed15; color:#7c3aed; border:1px solid #7c3aed18;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">19</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mohamed Al Amri - 81224</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ahmed Al Balushi - 82415</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
+       <span class="empName">Issa Al Douyani - 8647</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Khamis Al Hinai - 82467</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Salim Sulieman - 8722</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName">Zakariya Al Balushi - 82429</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Jamal Al Hadi - 82565</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mazin Al Siyabi - 81223</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Adil Al Oraimi - 8941</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow">
+       <span class="empName">Badar Al Fulaiti - 82468</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Mohana Al Subhi - 8714</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Ghassan Al Tarsi - 82588</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Mohamed Al Falahi - 8762</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Muadh Al Qasimi - 82534</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow">
+       <span class="empName">Faisal Al Balushi - 82656</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Said Al Fahkri - 8744</span>
+       <span class="empStatus" style="color:#3730a3;">OFF</span>
+     </div>
+      </div>
+    </details>
+            
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName">Badar Al Hamadani - 81307</span>
+       <span class="empStatus" style="color:#065f46;">AL</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName">Salim Al Harassi - 8542</span>
+       <span class="empStatus" style="color:#065f46;">AL</span>
+     </div><div class="empRow">
+       <span class="empName">Ahmed Al Sabii - 82653</span>
+       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 2)</span>
+     </div>
+      </div>
+    </details>
+            
+      </div>
+    </div>
+    
+
+  <!-- ════ CTA ════ -->
+<div class="quickActions">
+  <a class="btn" id="ctaBtn" href="#">📋 Full Roster</a>
+  <a href="#" class="btn" id="subscribeBtn">📩 Subscribe</a>
+  <a href="#" class="btn" id="compareBtn" onclick="goToRosterDiff(event)">📊 Compare</a>
+</div>
+
+  <!-- ════ FOOTER ════ -->
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">01APR2026 / 00:00</strong>
+    <br>Total: <strong>77 employees</strong>
+     &nbsp;·&nbsp; Source: <strong>2026-04-v5.xlsx</strong>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var picker = document.getElementById('datePicker');
+  if(!picker) return;
+
+  function getMuscatTodayIso() {
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscatTime.getFullYear() + '-' +
+      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscatTime.getDate()).padStart(2, '0');
+  }
+
+  function formatIsoLabel(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function syncHeaderDate(iso) {
+    var tag = document.getElementById('dateTag');
+    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
+  }
+
+  var path = window.location.pathname || '/';
+  var pageDateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+  var effectiveIso = pageDateMatch
+    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
+    : getMuscatTodayIso();
+  picker.value = effectiveIso;
+  syncHeaderDate(effectiveIso);
+
+  // ═══════════════════════════════════════════════════
+  // فتح الـ date picker - يعمل على Desktop + iOS + Android
+  // ═══════════════════════════════════════════════════
+window.openDatePicker = function() {
+  var picker = document.getElementById('datePicker');
+  if (!picker) return;
+
+  // احسب موقع زر التاريخ وضع العنصر المخفي تحته مباشرة
+  var btn = document.getElementById('dateTag');
+  if (btn) {
+    var rect = btn.getBoundingClientRect();
+    var btnCenterX = rect.left + rect.width / 2;
+    var btnBottom  = rect.bottom + 6; // 6px تحت الزر
+
+    // تأكد أن النافذة لن تخرج من يمين الشاشة
+    var pickerWidth = 280; // تقدير عرض نافذة التقويم
+    var leftPos = Math.min(btnCenterX - pickerWidth / 2, window.innerWidth - pickerWidth - 10);
+    leftPos = Math.max(leftPos, 10);
+
+    picker.style.position = 'fixed';
+    picker.style.top  = btnBottom + 'px';
+    picker.style.left = (btnCenterX) + 'px';
+    picker.style.transform = 'translateX(-50%)';
+  } else {
+    // fallback: وسط الشاشة
+    picker.style.position = 'fixed';
+    picker.style.top = '50%';
+    picker.style.left = '50%';
+    picker.style.transform = 'translate(-50%, -50%)';
+  }
+
+  picker.style.width = '1px';
+  picker.style.height = '1px';
+  picker.style.opacity = '0';
+  picker.style.pointerEvents = 'auto';
+  picker.style.zIndex = '9999';
+
+  picker.focus();
+
+  if (typeof picker.showPicker === 'function') {
+    try { picker.showPicker(); } catch(e) {}
+  } else {
+    picker.click();
+  }
+
+  function restore() {
+    picker.style.position = 'absolute';
+    picker.style.top = '100%';
+    picker.style.left = '50%';
+    picker.style.transform = '';
+    picker.style.width = '1px';
+    picker.style.height = '1px';
+    picker.style.opacity = '0';
+    picker.style.pointerEvents = 'none';
+    picker.style.zIndex = '';
+    picker.removeEventListener('change', restore);
+    picker.removeEventListener('blur', restore);
+  }
+
+  picker.addEventListener('change', restore);
+  picker.addEventListener('blur', restore);
+};
+
+  // ═══════════════════════════════════════════════════
+  // التحقق من التاريخ وإعادة التوجيه للـ today
+  // ═══════════════════════════════════════════════════
+  function checkAndRedirectToToday() {
+    var isNowPage = path.includes('/now');
+    var isReload = false;
+    try {
+      if (performance && performance.getEntriesByType) {
+        var navEntries = performance.getEntriesByType('navigation');
+        if (navEntries && navEntries.length) {
+          isReload = navEntries[0].type === 'reload';
+        }
+      }
+    } catch(e) {}
+
+    // Root pages should always jump to today's (or nearest available) date page.
+    var isRootLike = !path.includes('/date/');
+    if (isRootLike) {
+      var baseRoot = path
+        .replace(/\/now\/?$/, '/')
+        .replace(/\/+$/, '');
+      window.location.href = baseRoot + '/date/' + effectiveIso + '/' + (isNowPage ? 'now/' : '');
+      return true;
+    }
+
+    // On explicit refresh of a date page, go back to today's page.
+    var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (dateMatch && isReload) {
+      var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+      var todayIso = getMuscatTodayIso();
+      if (pageIso !== todayIso) {
+        var basePath = path
+          .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+          .replace(/\/now\/.*$/, '/')
+          .replace(/\/+$/, '');
+        window.location.href = basePath + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '');
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  if (checkAndRedirectToToday()) return;
+
+  // ═══════════════════════════════════════════════════
+  // عند تغيير التاريخ → انتقل للصفحة المناسبة
+  // ═══════════════════════════════════════════════════
+  picker.addEventListener('change', function() {
+    if (!picker.value) return;
+
+    sessionStorage.removeItem('pageLoaded');
+
+    var path = window.location.pathname || '/';
+    var isNowPage = path.includes('/now');
+    var base = path
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/now\/.*$/, '/')
+      .replace(/\/+$/, '');
+
+    var target = base + '/date/' + picker.value + '/';
+    if (isNowPage) target += 'now/';
+
+    window.location.href = target;
+  });
+
+})();
+
+// ═══════════════════════════════════════════════════
+// Shift Filter (NOW PAGE ONLY)
+// ═══════════════════════════════════════════════════
+(function(){
+  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
+  if(!filterBtns.length) return; // Not a /now/ page
+  
+  var allShiftCards = document.querySelectorAll('.shiftCard');
+  
+  // Group shift cards by shift type
+  var shiftGroups = {};
+  allShiftCards.forEach(function(card){
+    var shiftType = card.dataset.shift;
+    if(!shiftType) return;
+    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
+    shiftGroups[shiftType].push(card);
+  });
+  
+  // Determine current shift based on time
+  function getCurrentShift(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+  
+  // Set active shift on load - default to current shift
+  var currentShift = getCurrentShift();
+  filterBtns.forEach(function(btn){
+    if(btn.dataset.shift === currentShift){
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Filter function
+  function filterShifts(selectedShift){
+    var totalEmployees = 0;
+    
+    if(selectedShift === 'All'){
+      // Show all shifts
+      allShiftCards.forEach(function(card){
+        card.style.display = '';
+        var count = card.querySelector('.shiftCount');
+        if(count) totalEmployees += parseInt(count.textContent) || 0;
+      });
+    } else {
+      // Hide all cards first
+      allShiftCards.forEach(function(card){ card.style.display = 'none'; });
+      
+      // Show only selected shift cards and count employees
+      if(shiftGroups[selectedShift]){
+        shiftGroups[selectedShift].forEach(function(card){
+          card.style.display = '';
+          // Auto-open the selected shift
+          card.setAttribute('open', '');
+          // Count employees in this card
+          var count = card.querySelector('.shiftCount');
+          if(count) totalEmployees += parseInt(count.textContent) || 0;
+        });
+      }
+      
+      // Also show Off Day, Leave, Training, Standby in all shifts
+      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
+      alwaysShow.forEach(function(type){
+        if(shiftGroups[type]){
+          shiftGroups[type].forEach(function(card){
+            card.style.display = '';
+            // لا تحسب Off Day/Leave في عداد الفترة المختارة
+          });
+        }
+      });
+    }
+    
+    // Update employee count in summary
+    window.__summaryCounts = window.__summaryCounts || {};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    
+    // Update button states
+    filterBtns.forEach(function(btn){
+      if(btn.dataset.shift === selectedShift){
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  
+  // Add click handlers
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterShifts(this.dataset.shift);
+    });
+  });
+  
+  // Auto-filter on page load - show current shift
+  filterShifts(currentShift);
+})();
+
+// ══════════════════════════════════════════════════
+// Language Toggle
+// ══════════════════════════════════════════════════
+var LANG = localStorage.getItem('rosterLang') || 'en';
+window.__summaryCounts = window.__summaryCounts || { employees: 77, departments: 5 };
+window.__summarySwitchMode = 'employees';
+var T = {
+  en: {
+    title:'Export Duty Roster', langBtn:'ع',
+    employees:'Emp.', departments:'Depts.', total:'Total',
+    morning:'Morning', afternoon:'Afternoon', night:'Night',
+    offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
+    training:'Training', standby:'Standby', other:'Other',
+    from:'FROM', to:'TO',
+    viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare',
+    officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
+    exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+  },
+  ar: {
+    title:'جدول الصادر', langBtn:'EN',
+    employees:'الموظفون', departments:'الأقسام', total:'المجموع',
+    morning:'صباح', afternoon:'ظهر', night:'ليل',
+    offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
+    training:'تدريب', standby:'احتياط', other:'أخرى',
+    from:'من', to:'إلى',
+    viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة',
+    officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+  }
+};
+
+function updateSummarySwitchChip() {
+  var val = document.getElementById('summarySwitchVal');
+  var lbl = document.getElementById('summarySwitchLabel');
+  if(!val || !lbl) return;
+  var t = T[LANG] || T.en;
+  var mode = window.__summarySwitchMode || 'employees';
+  var counts = window.__summaryCounts || {};
+  if(mode === 'departments') {
+    val.style.color = '#059669';
+    val.textContent = counts.departments != null ? counts.departments : 5;
+    lbl.textContent = t.departments;
+    lbl.dataset.key = 'departments';
+  } else {
+    val.style.color = '';
+    val.textContent = counts.employees != null ? counts.employees : 77;
+    lbl.textContent = t.employees;
+    lbl.dataset.key = 'employees';
+  }
+}
+
+function startSummarySwitchLoop() {
+  if(window.__summarySwitchTimer) return;
+  window.__summarySwitchTimer = setInterval(function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateSummarySwitchChip();
+  }, 2200);
+}
+
+function applyLang(lang) {
+  var t=T[lang], isAr=lang==='ar';
+  document.body.classList.toggle('ar',isAr);
+  document.documentElement.setAttribute('lang',lang);
+  var el=document.getElementById('pageTitle'); if(el) el.textContent=t.title;
+  var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;
+  document.querySelectorAll('.chipLabel').forEach(function(el) {
+    var k=el.dataset.key;
+    if(k==='employees') el.textContent=t.employees;
+    else if(k==='departments') el.textContent=t.departments;
+    else if(k==='morning') el.textContent=t.morning2;
+    else if(k==='afternoon') el.textContent=t.afternoon2;
+    else if(k==='night') el.textContent=t.night2;
+    else if(k==='allShifts') el.textContent=t.allShifts;
+    else if(k==='mySchedule') el.textContent=t.mySchedule;
+    else if(k==='importRoster') el.textContent=t.importRoster;
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='diffPage') el.textContent=t.diffPage;
+  });
+  document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
+  var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
+  document.querySelectorAll('.deptTitle').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
+  });
+  var shiftMap={'Morning':t.morning,'Afternoon':t.afternoon,'Night':t.night,
+    'Off Day':t.offday,'Annual Leave':t.annualLeave,'Sick Leave':t.sickLeave,
+    'Training':t.training,'Standby':t.standby,'Other':t.other};
+  document.querySelectorAll('.shiftLabel').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(shiftMap[el.dataset.key]) el.textContent=shiftMap[el.dataset.key];
+  });
+  document.querySelectorAll('.empStatus span').forEach(function(el) {
+    var txt=el.textContent.trim();
+    if(txt==='FROM'||txt==='من') el.textContent=t.from;
+    if(txt==='TO'||txt==='إلى') el.textContent=t.to;
+  });
+  var c1=document.getElementById('ctaBtn'); if(c1) c1.textContent=t.viewFull;
+  var c2=document.getElementById('subscribeBtn'); if(c2) c2.textContent=t.subscribe;
+  var c3=document.getElementById('compareBtn'); if(c3) c3.textContent=t.compare;
+  var footer=document.querySelector('.footer');
+  if(footer) {
+    var h=footer.innerHTML;
+    if(isAr) {
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Total:','المجموع:');
+      h=h.replace(' employees',' موظف'); h=h.replace('Source:','المصدر:');
+    } else {
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المجموع:','Total:');
+      h=h.replace(' موظف',' employees'); h=h.replace('المصدر:','Source:');
+    }
+    footer.innerHTML=h;
+  }
+  localStorage.setItem('rosterLang',lang);
+  LANG=lang;
+  updateSummarySwitchChip();
+}
+function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
+
+function setLocalCtaLinks() {
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
+  if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
+}
+function goToTraining(e) {
+  if (e) e.preventDefault();
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  location.href = root + '/training/';
+}
+function setDiffChipIcon() {
+  var icon = document.getElementById('diffChipIcon');
+  if(!icon) return;
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  icon.src = root + '/assets/icons/diff-calendar.png';
+}
+setLocalCtaLinks();
+setDiffChipIcon();
+applyLang(LANG);
+startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
+// ═══════════════════════════════════════════════════
+(function() {
+  function getExportEmpId() {
+    var id = localStorage.getItem('exportSavedEmpId');
+    if (id) return id;
+    var legacy = localStorage.getItem('savedEmpId');
+    if (legacy) {
+      localStorage.setItem('exportSavedEmpId', legacy);
+      return legacy;
+    }
+    return '';
+  }
+  var empId = getExportEmpId();
+  if (!empId) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
+  // استخدام مسار مطلق يعمل من أي صفحة
+  var origin = location.origin;
+  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  fetch(base + 'schedules/' + empId + '.json')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(d) {
+      if (!d || !d.name) return;
+      var firstName = d.name.split(' ')[0];
+      if (chip && nameEl) {
+        nameEl.textContent = firstName;
+        chip.classList.add('visible');
+      }
+    }).catch(function() {});
+})();
+
+function goToMySchedule(event) {
+  if (event) event.preventDefault();
+  var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+  var origin = location.origin;
+  var base = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/my-schedules/index.html'
+    : origin + '/my-schedules/index.html';
+  location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
+}
+
+function goToImport(event) {
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/import/'
+    : origin + '/import/';
+  location.href = target;
+}
+
+function goToRosterDiff(event) {
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/roster-diff/index.html'
+    : origin + '/roster-diff/index.html';
+  location.href = target;
+}
+
+(function bindFlightSwitchIcons() {
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  var iconUrl = root + '/assets/icons/flight.png';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
+    img.src = iconUrl;
+  });
+})();
+
+(function loadLocalEnhancements() {
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  var ver = '20260427b';
+  addScript(root + '/change-alert.js?v=' + ver);
+  addScript(root + '/banner-changer.js?v=' + ver);
+  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+  var m = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+  if (eidDays.indexOf(activeIso) !== -1) {
+    addScript(root + '/eid-overlayxx.js');
+  }
+})();
+</script>
+
+</body>
+</html>

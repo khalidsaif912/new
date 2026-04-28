@@ -1,328 +1,45 @@
 import os
 import re
-import json
 import calendar
 import argparse
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from io import BytesIO
 
-import requests
 from openpyxl import load_workbook
-import smtplib
-from email.mime.text import MIMEText
+from roster_app.cache_io import (
+    add_months,
+    cache_paths,
+    cached_source_name,
+    download_excel,
+    get_source_name,
+    infer_pages_base_url,
+    month_key_from_filename,
+    try_load_cached_workbook,
+    write_bytes,
+    write_json,
+)
+from roster_app.email_service import send_email
+from roster_app.settings import (
+    AUTO_OPEN_ACTIVE_SHIFT_IN_FULL,
+    DAYS,
+    DEPARTMENTS,
+    EXCEL_URL,
+    GROUP_ORDER,
+    PAGES_BASE_URL,
+    SHIFT_MAP,
+    TZ,
+)
+from roster_app.text_utils import (
+    clean,
+    current_shift_key,
+    looks_like_employee_name,
+    looks_like_shift_code,
+    looks_like_time,
+    map_shift,
+    norm,
+    to_western_digits,
+)
 
-
-# =========================
-# Settings / Secrets
-# =========================
-EXCEL_URL = os.environ.get("EXCEL_URL", "").strip()
-
-# Optional: a plain-text file containing the original roster filename
-# (used to display the source name on the website).
-SOURCE_NAME_URL = os.environ.get("SOURCE_NAME_URL", "").strip()
-SOURCE_NAME_FALLBACK = os.environ.get("SOURCE_NAME_FALLBACK", "latest.xlsx").strip()
-
-
-SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
-SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-SMTP_USER = os.environ.get("SMTP_USER", "").strip()
-SMTP_PASS = os.environ.get("SMTP_PASS", "").strip()
-MAIL_FROM = os.environ.get("MAIL_FROM", "").strip()
-MAIL_TO = os.environ.get("MAIL_TO", "").strip()
-
-PAGES_BASE_URL = os.environ.get("PAGES_BASE_URL", "").strip()  # optional
-TZ = ZoneInfo("Asia/Muscat")
-AUTO_OPEN_ACTIVE_SHIFT_IN_FULL = True
-
-# Local cache directory inside repo (committed by actions)
-ROSTERS_DIR = os.environ.get("ROSTERS_DIR", "rosters").strip() or "rosters"
-# Excel sheets
-DEPARTMENTS = [
-    ("Officers", "Officers"),
-    ("Supervisors", "Supervisors"),
-    ("Load Control", "Load Control"),
-    ("Export Checker", "Export Checker"),
-    ("Export Operators", "Export Operators"),
-    ("Unassigned", "Unassigned"),  # ← القسم الجديد
-]
-
-# For day-row matching only
-DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
-
-SHIFT_MAP = {
-    "MN06": ("MN06", "Morning"),
-    "ME06": ("ME06", "Morning"),
-    "ME07": ("ME07", "Morning"),
-    "MN12": ("MN12", "Afternoon"),
-    "AN13": ("AN13", "Afternoon"),
-    "AE14": ("AE14", "Afternoon"),
-    "NN21": ("NN21", "Night"),
-    "NE22": ("NE22", "Night"),
-}
-
-# تم تحويل كل الأسماء للإنجليزية
-GROUP_ORDER = ["Morning", "Afternoon", "Night", "Standby", "Off Day", "Annual Leave", "Sick Leave", "Training", "Other"]
-
-
-# =========================
-# Helpers
-# =========================
-def clean(v) -> str:
-    if v is None:
-        return ""
-    return re.sub(r"\s+", " ", str(v).replace("\u00A0", " ")).strip()
-
-def to_western_digits(s: str) -> str:
-    if s is None:
-        return ""
-    s = str(s)
-    arabic = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'}
-    farsi  = {'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'}
-    mp = {**arabic, **farsi}
-    return "".join(mp.get(ch, ch) for ch in s)
-
-def norm(s) -> str:
-    return clean(to_western_digits(s))
-
-def looks_like_time(s: str) -> bool:
-    up = norm(s).upper()
-    return bool(
-        re.match(r"^\d{3,4}\s*H?\s*-\s*\d{3,4}\s*H?$", up)
-        or re.match(r"^\d{3,4}\s*H$", up)
-        or re.match(r"^\d{3,4}$", up)
-    )
-
-def looks_like_employee_name(s: str) -> bool:
-    v = norm(s)
-    if not v:
-        return False
-    up = v.upper()
-    if looks_like_time(up):
-        return False
-    if re.search(r"(ANNUAL\s*LEAVE|SICK\s*LEAVE|REST\/OFF\s*DAY|REST|OFF\s*DAY|TRAINING|STANDBY)", up):
-        return False
-    # قوي: اسم - رقم
-    if re.search(r"-\s*\d{3,}", v) and re.search(r"[A-Za-z\u0600-\u06FF]", v):
-        return True
-    # بديل: كلمتين أو أكثر
-    parts = [p for p in v.split(" ") if p]
-    return bool(re.search(r"[A-Za-z\u0600-\u06FF]", v) and len(parts) >= 2)
-
-def looks_like_shift_code(s: str) -> bool:
-    v = norm(s).upper()
-    if not v:
-        return False
-    if looks_like_time(v):
-        return False
-    if v in ["OFF", "O", "LV", "TR", "ST", "SL", "AL", "STM", "STN", "STNE22", "STME06", "STMN06", "STAE14", "OT"]:
-        return True
-    if re.match(r"^(MN|AN|NN|NT|ME|AE|NE)\d{1,2}", v):
-        return True
-    if re.search(r"(ANNUAL\s*LEAVE|SICK\s*LEAVE|REST\/OFF\s*DAY|REST|OFF\s*DAY|TRAINING|STANDBY)", v):
-        return True
-    # ← إضافة: أي كود غريب مثل STAR14 يعتبر shift code
-    if len(v) >= 3 and re.search(r"[A-Z]", v):
-        return True
-    return False
-
-def map_shift(code: str):
-    c0 = norm(code)
-    c = c0.upper()
-    if not c or c == "0":
-        return ("-", "Other")
-
-    # ✅ Leave types (separated)
-    if c == "AL" or c == "LV" or "ANNUAL LEAVE" in c:
-        return ("AL", "Annual Leave")
-
-    if c == "SL" or "SICK LEAVE" in c:
-        return ("SL", "Sick Leave")
-
-    # Training
-    if c in ["TR"] or "TRAINING" in c:
-        return ("TR", "Training")
-
-    # 🔹 Standby - إظهار الكود الأصلي
-    if c in ["ST", "STM", "STN", "STNE22", "STME06", "STMN06", "STAE14"] or "STANDBY" in c:
-        return (c0, "Standby")
-
-    if c == "OT" or c.startswith("OT"):
-        return (c0, "Standby")
-
-    if c in ["OFF", "O"] or re.search(r"(REST|OFF\s*DAY|REST\/OFF)", c):
-        return ("OFF", "Off Day")
-
-    if c in SHIFT_MAP:
-        return SHIFT_MAP[c]
-
-    return (c0, "Other")
-
-def current_shift_key(now: datetime) -> str:
-    # 21:00–04:59 Night, 13:00–20:59 Afternoon, else Morning
-    t = now.hour * 60 + now.minute
-    if t >= 21 * 60 or t < 5 * 60:
-        return "Night"
-    if t >= 13 * 60:
-        return "Afternoon"
-    return "Morning"
-
-def download_excel(url: str) -> bytes:
-    """Download the Excel file bytes.
-
-    Notes for OneDrive/SharePoint:
-    - Share links often return an HTML preview unless `download=1` is present.
-    - We also validate the response to avoid crashing openpyxl on non-xlsx content.
-    """
-    if not url:
-        raise ValueError("EXCEL_URL is empty")
-
-    # Force direct download for common OneDrive/SharePoint share links
-    try:
-        from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
-
-        u = urlparse(url)
-        host = (u.netloc or "").lower()
-        if ("onedrive.live.com" in host) or ("1drv.ms" in host) or ("sharepoint.com" in host):
-            qs = dict(parse_qsl(u.query, keep_blank_values=True))
-            if "download" not in qs:
-                qs["download"] = "1"
-                u = u._replace(query=urlencode(qs, doseq=True))
-                url = urlunparse(u)
-    except Exception:
-        pass
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (GitHub Actions) roster-site",
-        "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*",
-    }
-    r = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
-    r.raise_for_status()
-
-    ctype = (r.headers.get("Content-Type") or "").lower()
-    data = r.content or b""
-
-    # Basic validation: xlsx is a ZIP container and starts with PK
-    if not data.startswith(b"PK"):
-        # Help debugging: show a short hint
-        hint = ""
-        if "text/html" in ctype:
-            hint = " (got HTML preview page; check OneDrive link/download=1)"
-        elif ctype.startswith("image/"):
-            hint = " (got an image; EXCEL_URL points to wrong file)"
-        raise ValueError(f"Downloaded file is not a valid .xlsx (Content-Type: {ctype or 'unknown'}){hint}")
-
-    return data
-
-
-def download_text(url: str) -> str:
-    """Download a small text file (e.g., source_name.txt)."""
-    r = requests.get(url, timeout=30)
-    r.raise_for_status()
-    return r.text.strip()
-
-def get_source_name() -> str:
-    """Return the original roster file name for display on the website."""
-    if SOURCE_NAME_URL:
-        try:
-            name = download_text(SOURCE_NAME_URL)
-            if name:
-                return name
-        except Exception:
-            pass
-    return SOURCE_NAME_FALLBACK or "latest.xlsx"
-
-def infer_pages_base_url():
-    return "https://khalidsaif912.github.io/roster-site"
-
-
-
-# =========================
-# Month parsing + local cache (repo)
-# =========================
-MONTH_NAME_TO_NUM = {
-    "january": 1, "jan": 1,
-    "february": 2, "feb": 2,
-    "march": 3, "mar": 3,
-    "april": 4, "apr": 4,
-    "may": 5,
-    "june": 6, "jun": 6,
-    "july": 7, "jul": 7,
-    "august": 8, "aug": 8,
-    "september": 9, "sep": 9, "sept": 9,
-    "october": 10, "oct": 10,
-    "november": 11, "nov": 11,
-    "december": 12, "dec": 12,
-}
-
-def month_key_from_filename(name: str) -> str | None:
-    """Extract YYYY-MM from roster attachment file name (e.g., 'February 2026')."""
-    if not name:
-        return None
-    n = name.lower()
-    n = re.sub(r"[\._\-]+", " ", n)
-    n = re.sub(r"\s+", " ", n).strip()
-    m = re.search(
-        r"\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|sept|october|oct|november|nov|december|dec)\b\s+(\d{4})\b",
-        n,
-    )
-    if not m:
-        return None
-    mon_name, year_s = m.group(1), m.group(2)
-    mon = MONTH_NAME_TO_NUM.get(mon_name)
-    if not mon:
-        return None
-    return f"{int(year_s):04d}-{mon:02d}"
-
-def add_months(year: int, month: int, delta: int) -> tuple[int, int]:
-    y = year
-    m = month + delta
-    while m <= 0:
-        y -= 1
-        m += 12
-    while m > 12:
-        y += 1
-        m -= 12
-    return y, m
-
-def cache_paths(month_key: str) -> tuple[str, str]:
-    os.makedirs(ROSTERS_DIR, exist_ok=True)
-    return (
-        os.path.join(ROSTERS_DIR, f"{month_key}.xlsx"),
-        os.path.join(ROSTERS_DIR, f"{month_key}.meta.json"),
-    )
-
-def write_bytes(path: str, data: bytes):
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "wb") as f:
-        f.write(data)
-
-def read_json(path: str) -> dict | None:
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return None
-
-def write_json(path: str, obj: dict):
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-
-def try_load_cached_workbook(month_key: str):
-    xlsx_path, _ = cache_paths(month_key)
-    if not os.path.exists(xlsx_path):
-        return None
-    try:
-        with open(xlsx_path, "rb") as f:
-            return load_workbook(BytesIO(f.read()), data_only=True)
-    except Exception:
-        return None
-
-def cached_source_name(month_key: str) -> str:
-    _, meta_path = cache_paths(month_key)
-    meta = read_json(meta_path) or {}
-    return (meta.get("original_filename") or meta.get("source_name") or "").strip()
 
 # =========================
 # Detect rows/cols (Days row + Date numbers row)
@@ -696,7 +413,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
                      dept_cards_html: str, cta_url: str, sent_time: str, source_name: str = "", last_updated: str = "", is_now_page: bool = False,
                      min_date: str = "", max_date: str = "", notice_html: str = "") -> str:
 
-    # ⬅️ أضف هذا السطر
     pages_base = (PAGES_BASE_URL or infer_pages_base_url()).rstrip("/")
     min_attr = f'min="{min_date}"' if min_date else ""
     max_attr = f'max="{max_date}"' if max_date else ""
@@ -705,13 +421,22 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
+    :root {{
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }}
+    html, body {{
+      width:100%;
+      overflow-x:hidden;
+    }}
     body {{
       margin:0; padding:0;
+      min-height:100dvh;
       background:#eef1f7;
       font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
       color:#0f172a;
@@ -720,7 +445,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     * {{ box-sizing:border-box; }}
 
     /* ═══════ WRAP ═══════ */
-    .wrap {{ max-width:680px; margin:0 auto; padding:16px 14px 28px; }}
+    .wrap {{ max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }}
 
     /* ═══════ HEADER ═══════ */
     .header {{
@@ -753,27 +478,40 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .langToggle {{
       position:absolute; top:14px; right:16px; z-index:10;
       background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
-      border-radius:50%; width:32px; height:32px;
+      border-radius:50%; width:26px; height:26px;
       display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:13px; font-weight:800; cursor:pointer;
+      color:#fff; font-size:10px; font-weight:800; cursor:pointer;
       transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
     }}
     .langToggle:hover {{ background:rgba(255,255,255,.30); transform:scale(1.08); }}
     body.ar {{ direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }}
     .empRow, .empName, .empStatus {{ direction:ltr !important; unicode-bidi:embed; text-align:left !important; }}
 
-    /* رسالة الترحيب */
-    .welcomeMsg {{
-      position:absolute; top:14px; left:16px; z-index:10;
-      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.25);
-      border-radius:20px; padding:4px 10px;
-      color:#fff; font-size:11px; font-weight:700;
-      display:none; align-items:center; gap:5px;
-      max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-      cursor:pointer; transition:all .25s;
+    .welcomeChip {{
+      display:none;
+      text-decoration:none;
+      cursor:pointer;
     }}
-    .welcomeMsg:hover {{ background:rgba(255,255,255,.28); }}
-    .welcomeMsg.visible {{ display:flex; }}
+    .welcomeChip.visible {{
+      display:flex;
+    }}
+    .welcomeChip .chipLabel {{
+      max-width:88px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }}
+    .waveHand {{
+      display:inline-block;
+      transform-origin:70% 70%;
+      animation:waveHand 1.8s ease-in-out infinite;
+    }}
+    @keyframes waveHand {{
+      0%, 50%, 100% {{ transform:rotate(0deg); }}
+      10% {{ transform:rotate(16deg); }}
+      20% {{ transform:rotate(-10deg); }}
+      30% {{ transform:rotate(16deg); }}
+      40% {{ transform:rotate(-6deg); }}
+    }}
 
     /* Date Picker Wrapper */
     .datePickerWrapper {{
@@ -832,8 +570,12 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       transform:translateY(-3px);
       box-shadow:0 8px 20px rgba(15,23,42,.12);
     }}
-    a.summaryChip.gamesChip .chipVal {{ color:#7c3aed; }}
-    a.summaryChip.gamesChip:hover {{ box-shadow:0 8px 20px rgba(124,58,237,.18); }}
+    a.summaryChip.importChip .chipVal {{ color:#0ea5e9; }}
+    a.summaryChip.importChip:hover {{ box-shadow:0 8px 20px rgba(14,165,233,.18); }}
+    a.summaryChip.trainingChip .chipVal {{ color:#7c3aed; }}
+    a.summaryChip.trainingChip:hover {{ box-shadow:0 8px 20px rgba(124,58,237,.18); }}
+    a.summaryChip.diffChip .chipVal {{ color:#ef4444; }}
+    a.summaryChip.diffChip:hover {{ box-shadow:0 8px 20px rgba(239,68,68,.18); }}
     .summaryChip {{
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -843,15 +585,24 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       box-shadow:0 2px 8px rgba(15,23,42,.06);
       transition:all .25s ease;
       min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
     }}
-    .summaryChip .chipVal {{ font-size:22px; font-weight:900; color:#1e40af; }}
+    .summaryChip .chipVal {{ font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }}
+    .summaryChip .chipIcon {{ width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }}
+    .summaryChip .chipIcon.diffIcon {{ width:35px; height:35px; }}
+    #summarySwitchChip .chipVal {{ transition:opacity .2s ease; }}
+    #summarySwitchChip .chipLabel {{ transition:opacity .2s ease; }}
     .summaryChip .chipLabel {{ 
       font-size:9.5px;
       font-weight:600; 
       color:#64748b; 
       text-transform:uppercase; 
       letter-spacing:.4px; 
-      margin-top:2px;
+      margin-top:4px;
+      line-height:1.1;
       white-space:nowrap;
     }}
 
@@ -999,18 +750,27 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .empName  {{ font-size:15px; font-weight:700; color:#1e293b; }}
     .empStatus {{ font-size:13px; font-weight:600; }}
 
-    /* ═══════ CTA ═══════ */
-    .btnWrap {{ margin-top:20px; text-align:center; }}
+    /* ═══════ QUICK ACTIONS ═══════ */
+    .quickActions {{
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }}
     .btn {{
       display:inline-block;
-      padding:14px 38px;
+      padding:11px 18px;
       border-radius:16px;
       background:linear-gradient(135deg, #1e40af, #1976d2);
       color:#fff !important;
       text-decoration:none;
       font-weight:800;
-      font-size:15px;
+      font-size:14px;
       box-shadow:0 6px 20px rgba(30,64,175,.3);
+      min-width:170px;
+      text-align:center;
+      white-space:nowrap;
     }}
 
     /* ═══════ FOOTER ═══════ */
@@ -1038,8 +798,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <!-- ════ HEADER ════ -->
   <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
-    <div class="welcomeMsg" id="welcomeMsg" onclick="goToMySchedule()" title="انقر للذهاب لجدولك"></div>
-    <h1 id="pageTitle">📋 Duty Roster</h1>
+    <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
       <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 {date_label}</button>
       <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} tabindex="-1" aria-hidden="true" />
@@ -1050,21 +809,29 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
   <!-- ════ SUMMARY CHIPS ════ -->
   <div class="summaryBar">
-    <div class="summaryChip">
-      <div class="chipVal">{employees_total}</div>
-      <div class="chipLabel" data-key="employees">Employees</div>
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">{employees_total}</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
-    <div class="summaryChip">
-      <div class="chipVal" style="color:#059669;">{departments_total}</div>
-      <div class="chipLabel" data-key="departments">Departments</div>
-    </div>
-    <a href="https://khalidsaif912.github.io/roster-site/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
       <div class="chipVal">🗓️</div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
-    <a href="https://dgr-exp.netlify.app" class="summaryChip gamesChip" style="cursor:pointer;text-decoration:none;">
-      <div class="chipVal">🎮</div>
-      <div class="chipLabel" data-key="games">Games</div>
+    <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;" onclick="goToImport(event)">
+      <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Import" src="" /></div>
+      <div class="chipLabel" data-key="importRoster">Import</div>
+    </a>
+    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+      <div class="chipVal"><span class="waveHand">👋</span></div>
+      <div class="chipLabel" id="welcomeName"></div>
+    </a>
+    <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
+      <div class="chipVal">📚</div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="#" id="diffChipBtn" class="summaryChip diffChip" style="cursor:pointer;text-decoration:none;" onclick="goToRosterDiff(event)">
+      <div class="chipVal"><img class="chipIcon diffIcon" id="diffChipIcon" alt="Diff" src="" /></div>
+      <div class="chipLabel" data-key="diffPage">Diff</div>
     </a>
     {"" if not is_now_page else '''
     <button class="summaryChip shiftFilterBtn morning" data-shift="Morning" style="cursor:pointer;">
@@ -1090,12 +857,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   {dept_cards_html}
 
   <!-- ════ CTA ════ -->
-  <div class="btnWrap">
-    <a class="btn" id="ctaBtn" href="{cta_url}">📋 View Full Duty Roster</a>
-  </div>
-
-<div class="btnWrap">
-  <a href="{pages_base}/subscribe/" class="btn" id="subscribeBtn">📩 Subscribe</a>
+<div class="quickActions">
+  <a class="btn" id="ctaBtn" href="#">📋 Full Roster</a>
+  <a href="#" class="btn" id="subscribeBtn">📩 Subscribe</a>
+  <a href="#" class="btn" id="compareBtn" onclick="goToRosterDiff(event)">📊 Compare</a>
 </div>
 
   <!-- ════ FOOTER ════ -->
@@ -1111,6 +876,33 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 (function(){{
   var picker = document.getElementById('datePicker');
   if(!picker) return;
+
+  function getMuscatTodayIso() {{
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscatTime.getFullYear() + '-' +
+      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscatTime.getDate()).padStart(2, '0');
+  }}
+
+  function formatIsoLabel(iso) {{
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
+  }}
+
+  function syncHeaderDate(iso) {{
+    var tag = document.getElementById('dateTag');
+    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
+  }}
+
+  var path = window.location.pathname || '/';
+  var pageDateMatch = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
+  var effectiveIso = pageDateMatch
+    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
+    : getMuscatTodayIso();
+  picker.value = effectiveIso;
+  syncHeaderDate(effectiveIso);
 
   // ═══════════════════════════════════════════════════
   // فتح الـ date picker - يعمل على Desktop + iOS + Android
@@ -1179,34 +971,42 @@ window.openDatePicker = function() {{
   // التحقق من التاريخ وإعادة التوجيه للـ today
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {{
-    var path = window.location.pathname || '/';
     var isNowPage = path.includes('/now');
-
-    var dateMatch = path.match(/\/date\/(\\d{{4}})-(\\d{{2}})-(\\d{{2}})\//);
-    if (dateMatch) {{
-      var pageDate = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
-
-      var now = new Date();
-      var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-      var todayStr = muscatTime.getFullYear() + '-' +
-        String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
-        String(muscatTime.getDate()).padStart(2, '0');
-
-      if (pageDate !== todayStr) {{
-        var isPageLoad = sessionStorage.getItem('pageLoaded');
-        if (isPageLoad) {{
-          sessionStorage.removeItem('pageLoaded');
-          var basePath = path
-            .replace(/\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/, '/')
-            .replace(/\/now\/.*$/, '/')
-            .replace(/\/+$/, '');
-          window.location.href = basePath + '/date/' + todayStr + '/' + (isNowPage ? 'now/' : '');
-          return true;
-        }} else {{
-          sessionStorage.setItem('pageLoaded', 'true');
+    var isReload = false;
+    try {{
+      if (performance && performance.getEntriesByType) {{
+        var navEntries = performance.getEntriesByType('navigation');
+        if (navEntries && navEntries.length) {{
+          isReload = navEntries[0].type === 'reload';
         }}
       }}
+    }} catch(e) {{}}
+
+    // Root pages should always jump to today's (or nearest available) date page.
+    var isRootLike = !path.includes('/date/');
+    if (isRootLike) {{
+      var baseRoot = path
+        .replace(/\/now\/?$/, '/')
+        .replace(/\/+$/, '');
+      window.location.href = baseRoot + '/date/' + effectiveIso + '/' + (isNowPage ? 'now/' : '');
+      return true;
     }}
+
+    // On explicit refresh of a date page, go back to today's page.
+    var dateMatch = path.match(/\/date\/(\\d{{4}})-(\\d{{2}})-(\\d{{2}})\//);
+    if (dateMatch && isReload) {{
+      var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+      var todayIso = getMuscatTodayIso();
+      if (pageIso !== todayIso) {{
+        var basePath = path
+          .replace(/\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/, '/')
+          .replace(/\/now\/.*$/, '/')
+          .replace(/\/+$/, '');
+        window.location.href = basePath + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '');
+        return true;
+      }}
+    }}
+
     return false;
   }}
 
@@ -1316,10 +1116,9 @@ window.openDatePicker = function() {{
     }}
     
     // Update employee count in summary
-    var employeeChip = document.querySelector('.summaryChip .chipVal');
-    if(employeeChip){{
-      employeeChip.textContent = totalEmployees;
-    }}
+    window.__summaryCounts = window.__summaryCounts || {{}};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
     
     // Update button states
     filterBtns.forEach(function(btn){{
@@ -1346,32 +1145,62 @@ window.openDatePicker = function() {{
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
+window.__summaryCounts = window.__summaryCounts || {{ employees: {employees_total}, departments: {departments_total} }};
+window.__summarySwitchMode = 'employees';
 var T = {{
   en: {{
-    title:'📋 Duty Roster', langBtn:'ع',
+    title:'Export Duty Roster', langBtn:'ع',
     employees:'Emp.', departments:'Depts.', total:'Total',
     morning:'Morning', afternoon:'Afternoon', night:'Night',
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'📋 View Full Duty Roster', subscribe:'📩 Subscribe',
+    viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', games:'Games',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
   }},
   ar: {{
-    title:'📋 جدول المناوبات', langBtn:'EN',
+    title:'جدول الصادر', langBtn:'EN',
     employees:'الموظفون', departments:'الأقسام', total:'المجموع',
     morning:'صباح', afternoon:'ظهر', night:'ليل',
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'📋 عرض جدول المناوبات الكامل', subscribe:'📩 اشتراك',
+    viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', games:'الألعاب',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
   }}
 }};
+
+function updateSummarySwitchChip() {{
+  var val = document.getElementById('summarySwitchVal');
+  var lbl = document.getElementById('summarySwitchLabel');
+  if(!val || !lbl) return;
+  var t = T[LANG] || T.en;
+  var mode = window.__summarySwitchMode || 'employees';
+  var counts = window.__summaryCounts || {{}};
+  if(mode === 'departments') {{
+    val.style.color = '#059669';
+    val.textContent = counts.departments != null ? counts.departments : {departments_total};
+    lbl.textContent = t.departments;
+    lbl.dataset.key = 'departments';
+  }} else {{
+    val.style.color = '';
+    val.textContent = counts.employees != null ? counts.employees : {employees_total};
+    lbl.textContent = t.employees;
+    lbl.dataset.key = 'employees';
+  }}
+}}
+
+function startSummarySwitchLoop() {{
+  if(window.__summarySwitchTimer) return;
+  window.__summarySwitchTimer = setInterval(function(){{
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateSummarySwitchChip();
+  }}, 2200);
+}}
 
 function applyLang(lang) {{
   var t=T[lang], isAr=lang==='ar';
@@ -1388,6 +1217,9 @@ function applyLang(lang) {{
     else if(k==='night') el.textContent=t.night2;
     else if(k==='allShifts') el.textContent=t.allShifts;
     else if(k==='mySchedule') el.textContent=t.mySchedule;
+    else if(k==='importRoster') el.textContent=t.importRoster;
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='diffPage') el.textContent=t.diffPage;
   }});
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) {{ el.textContent=t.total; }});
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -1410,6 +1242,7 @@ function applyLang(lang) {{
   }});
   var c1=document.getElementById('ctaBtn'); if(c1) c1.textContent=t.viewFull;
   var c2=document.getElementById('subscribeBtn'); if(c2) c2.textContent=t.subscribe;
+  var c3=document.getElementById('compareBtn'); if(c3) c3.textContent=t.compare;
   var footer=document.querySelector('.footer');
   if(footer) {{
     var h=footer.innerHTML;
@@ -1424,16 +1257,51 @@ function applyLang(lang) {{
   }}
   localStorage.setItem('rosterLang',lang);
   LANG=lang;
+  updateSummarySwitchChip();
 }}
 function toggleLang() {{ applyLang(LANG==='en'?'ar':'en'); }}
+
+function setLocalCtaLinks() {{
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
+  if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
+}}
+function goToTraining(e) {{
+  if (e) e.preventDefault();
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  location.href = root + '/training/';
+}}
+function setDiffChipIcon() {{
+  var icon = document.getElementById('diffChipIcon');
+  if(!icon) return;
+  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  icon.src = root + '/assets/icons/diff-calendar.png';
+}}
+setLocalCtaLinks();
+setDiffChipIcon();
 applyLang(LANG);
+startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
 // رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
 // ═══════════════════════════════════════════════════
 (function() {{
-  var empId = localStorage.getItem('savedEmpId');
+  function getExportEmpId() {{
+    var id = localStorage.getItem('exportSavedEmpId');
+    if (id) return id;
+    var legacy = localStorage.getItem('savedEmpId');
+    if (legacy) {{
+      localStorage.setItem('exportSavedEmpId', legacy);
+      return legacy;
+    }}
+    return '';
+  }}
+  var empId = getExportEmpId();
   if (!empId) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
   // استخدام مسار مطلق يعمل من أي صفحة
   var origin = location.origin;
   var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
@@ -1442,19 +1310,75 @@ applyLang(LANG);
     .then(function(d) {{
       if (!d || !d.name) return;
       var firstName = d.name.split(' ')[0];
-      var msg = document.getElementById('welcomeMsg');
-      if (msg) {{
-        msg.textContent = '👋 ' + firstName;
-        msg.classList.add('visible');
+      if (chip && nameEl) {{
+        nameEl.textContent = firstName;
+        chip.classList.add('visible');
       }}
     }}).catch(function() {{}});
 }})();
 
-function goToMySchedule() {{
-  var id = localStorage.getItem('savedEmpId');
-  var base = 'https://khalidsaif912.github.io/roster-site/my-schedules/index.html';
+function goToMySchedule(event) {{
+  if (event) event.preventDefault();
+  var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+  var origin = location.origin;
+  var base = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/my-schedules/index.html'
+    : origin + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }}
+
+function goToImport(event) {{
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/import/'
+    : origin + '/import/';
+  location.href = target;
+}}
+
+function goToRosterDiff(event) {{
+  if (event) event.preventDefault();
+  var origin = location.origin;
+  var target = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site/roster-diff/index.html'
+    : origin + '/roster-diff/index.html';
+  location.href = target;
+}}
+
+(function bindFlightSwitchIcons() {{
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  var iconUrl = root + '/assets/icons/flight.png';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {{
+    img.src = iconUrl;
+  }});
+}})();
+
+(function loadLocalEnhancements() {{
+  var origin = location.origin;
+  var root = location.pathname.includes('/roster-site/')
+    ? origin + '/roster-site'
+    : origin;
+  function addScript(src) {{
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }}
+  var ver = '20260427b';
+  addScript(root + '/change-alert.js?v=' + ver);
+  addScript(root + '/banner-changer.js?v=' + ver);
+  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+  var m = (location.pathname || '').match(/\/date\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
+  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+  if (eidDays.indexOf(activeIso) !== -1) {{
+    addScript(root + '/eid-overlayxx.js');
+  }}
+}})();
 </script>
 
 </body>
@@ -1618,64 +1542,6 @@ def generate_date_pages_for_month(wb, year: int, month: int, pages_base: str, so
         except Exception as e:
             print(f"Skipping {year}-{month:02d}-{day:02d}: {e}")
             continue
-
-
-# =========================
-# Email
-# =========================
-def get_subscriber_emails():
-    """
-    يقرأ قائمة الإيميلات من Google Apps Script
-    """
-    subscriber_url = os.environ.get('SUBSCRIBE_URL', '').strip()
-    
-    if not subscriber_url:
-        return os.environ.get('MAIL_TO', '').strip()
-    
-    try:
-        print(f"📥 Fetching subscriber emails...")
-        response = requests.get(subscriber_url, timeout=10)
-        response.raise_for_status()
-        
-        email_list = response.text.strip()
-        
-        if not email_list:
-            print("⚠️ No subscribers found, using MAIL_TO")
-            return os.environ.get('MAIL_TO', '').strip()
-        
-        subscriber_count = len([e for e in email_list.split(',') if e.strip()])
-        print(f"✅ Found {subscriber_count} active subscribers")
-        
-        return email_list
-        
-    except Exception as e:
-        print(f"❌ Error fetching subscribers: {e}")
-        print("⚠️ Falling back to MAIL_TO")
-        return os.environ.get('MAIL_TO', '').strip()
-
-
-def send_email(subject: str, html: str):
-    if not (SMTP_HOST and SMTP_USER and SMTP_PASS and MAIL_FROM):
-        return
-
-    recipient_list = get_subscriber_emails()
-    recipients = [x.strip() for x in recipient_list.split(",") if x.strip()]
-
-    if not recipients:
-        print("⚠️ No recipients found, skipping email")
-        return
-
-    msg = MIMEText(html, "html", "utf-8")
-    msg["Subject"] = subject
-    msg["From"] = MAIL_FROM
-    msg["To"] = MAIL_TO or MAIL_FROM  # ✅ لا تعرض قائمة المشتركين
-
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
-        s.starttls()
-        s.login(SMTP_USER, SMTP_PASS)
-        s.sendmail(MAIL_FROM, recipients, msg.as_string())
-
-    print(f"✅ Sent to {len(recipients)} subscribers")
 
 
 def build_pretty_email_html(active_shift_key: str, now: datetime, all_shifts_by_dept: list, pages_base: str) -> str:
@@ -2041,76 +1907,14 @@ def build_pretty_email_html(active_shift_key: str, now: datetime, all_shifts_by_
 
 
 # =========================
-# Email
-# =========================
-def get_subscriber_emails():
-    """
-    يقرأ قائمة الإيميلات من Google Apps Script
-    """
-    subscriber_url = os.environ.get('SUBSCRIBE_URL', '').strip()
-    
-    if not subscriber_url:
-        return os.environ.get('MAIL_TO', '').strip()
-    
-    try:
-        print(f"📥 Fetching subscriber emails...")
-        response = requests.get(subscriber_url, timeout=10)
-        response.raise_for_status()
-        
-        email_list = response.text.strip()
-        
-        if not email_list:
-            print("⚠️ No subscribers found, using MAIL_TO")
-            return os.environ.get('MAIL_TO', '').strip()
-        
-        subscriber_count = len([e for e in email_list.split(',') if e.strip()])
-        print(f"✅ Found {subscriber_count} active subscribers")
-        
-        return email_list
-        
-    except Exception as e:
-        print(f"❌ Error fetching subscribers: {e}")
-        print("⚠️ Falling back to MAIL_TO")
-        return os.environ.get('MAIL_TO', '').strip()
-
-
-def send_email(subject: str, html: str):
-    if not (SMTP_HOST and SMTP_USER and SMTP_PASS and MAIL_FROM):
-        return
-
-    recipient_list = get_subscriber_emails()
-    recipients = [x.strip() for x in recipient_list.split(",") if x.strip()]
-
-    if not recipients:
-        print("⚠️ No recipients found, skipping email")
-        return
-
-    msg = MIMEText(html, "html", "utf-8")
-    msg["Subject"] = subject
-    msg["From"] = MAIL_FROM
-    msg["To"] = MAIL_TO or MAIL_FROM  # ✅ لا تعرض قائمة المشتركين
-
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
-        s.starttls()
-        s.login(SMTP_USER, SMTP_PASS)
-        s.sendmail(MAIL_FROM, recipients, msg.as_string())
-
-    print(f"✅ Sent to {len(recipients)} subscribers")
-
-
-# =========================
-# Main
-# =========================
-
-# =========================
 # Main
 # =========================
 def main():
-    if not EXCEL_URL:
-        raise RuntimeError("EXCEL_URL missing")
-
     parser = argparse.ArgumentParser(description='Generate roster pages and send email')
     parser.add_argument('--date', help='Override roster date (YYYY-MM-DD)')
+    parser.add_argument('--no-email', action='store_true', help='Generate pages only, do not send email')
+    parser.add_argument('--excel-file', help='Use local Excel file instead of EXCEL_URL download')
+    parser.add_argument('--source-name', help='Optional source filename to display and month-detect when using --excel-file')
     args = parser.parse_args()
 
     now = datetime.now(TZ)
@@ -2135,19 +1939,26 @@ def main():
     # FIX #1: تحميل Excel - عند الفشل نكمل بالكاش (لا نخرج)
     # ─────────────────────────────────────────────────────────────
     data = None
-    try:
-        data = download_excel(EXCEL_URL)
-        print("✅ Excel downloaded successfully")
-    except Exception as e:
-        print(f"WARNING: Could not download Excel: {e}")
-        print("Will attempt to use cached rosters...")
+    if args.excel_file:
+        with open(args.excel_file, "rb") as f:
+            data = f.read()
+        print(f"Using local Excel file: {args.excel_file}")
+    elif EXCEL_URL:
+        try:
+            data = download_excel(EXCEL_URL)
+            print("✅ Excel downloaded successfully")
+        except Exception as e:
+            print(f"WARNING: Could not download Excel: {e}")
+            print("Will attempt to use cached rosters...")
+    else:
+        print("⚠️ EXCEL_URL missing; using cached rosters only.")
 
     # ─────────────────────────────────────────────────────────────
     # FIX #2: كل هذا الكود الآن خارج الـ except - يعمل دائماً
     # ─────────────────────────────────────────────────────────────
 
     # قراءة اسم الملف واستخراج الشهر
-    source_name = get_source_name()
+    source_name = (args.source_name or "").strip() or get_source_name()
     incoming_key = month_key_from_filename(source_name) if source_name else None
     print(f"📄 Source file: {source_name}")
     print(f"📅 Detected month: {incoming_key or 'unknown'}")
@@ -2428,9 +2239,12 @@ def main():
             f.write(_src)
 
     # Email: send ONLY active shift + matching Standby
-    subject = f"Duty Roster — {now.strftime('%d %B %Y')} — {active_group} Active"
-    email_html = build_pretty_email_html(active_group, now, all_shifts_by_dept, pages_base)
-    send_email(subject, email_html)
+    if args.no_email:
+        print("ℹ️ Email disabled via --no-email")
+    else:
+        subject = f"Duty Roster — {now.strftime('%d %B %Y')} — {active_group} Active"
+        email_html = build_pretty_email_html(active_group, now, all_shifts_by_dept, pages_base)
+        send_email(subject, email_html)
 
 
 if __name__ == "__main__":

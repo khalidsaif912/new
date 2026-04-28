@@ -1371,6 +1371,7 @@
       <div class="topbar-right">
         <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
         <button class="ghost-btn" onclick="toggleLang()" id="langBtn">English</button>
+        <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
         <div class="brand-mark">
           <div class="brand-swap" aria-label="Help" title="Help">
             <button class="brand-sq brand-cal show" id="brandCal" type="button" onclick="openTips()" aria-label="Help">📅</button>
@@ -1662,6 +1663,10 @@
       if(document.referrer&&document.referrer.includes(location.host)) history.back();
       else location.href=base;
     }
+    function goToRosterDiff(){
+      const base=location.pathname.includes('/roster-site/')?'/roster-site/':'/';
+      location.href=base+'roster-diff/index.html';
+    }
 
     function openTips(){ document.getElementById('tipsModal').classList.add('open'); }
     function closeTips(){ document.getElementById('tipsModal').classList.remove('open'); }
@@ -1680,13 +1685,16 @@
           <div class="state-desc">${lang==='ar'?'انتظر لحظات…':'Please wait a moment…'}</div>
         </div>`;
       try{
-        const res=await fetch(`../schedules/${id}.json`);
+        const res=await fetch(`../schedules/${id}.json?ts=${Date.now()}`, { cache:'no-store' });
         if(!res.ok) throw new Error('not found');
         data=await res.json();
-        months=Object.keys(data.schedules||{}).sort();
+        months=Object.keys(data.schedules||{})
+          .filter(m=>/^\d{4}-\d{2}$/.test(m))
+          .sort((a,b)=>a.localeCompare(b));
         if(!months.length) throw new Error('empty');
-        const savedId=localStorage.getItem('savedEmpId');
+        const savedId=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
         if(!savedId) showSaveToast(id,data.name);
+        // Prefer current month; if unavailable, pick latest available month.
         const now=new Date();
         const cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
         month=months.includes(cur)?cur:months[months.length-1];
@@ -1724,7 +1732,7 @@
         </div>`;
       setTimeout(()=>dismissToast(),10000);
     }
-    function confirmSave(id){ localStorage.setItem('savedEmpId',id); dismissToast(); if(data) renderSchedule(); }
+    function confirmSave(id){ localStorage.setItem('exportSavedEmpId',id); localStorage.removeItem('savedEmpId'); dismissToast(); if(data) renderSchedule(); }
     function dismissToast(){ const m=document.getElementById('toastMount'); m.innerHTML=''; m.style.display='none'; }
     function changeMyId(){ openIdActionModal('change'); }
     
@@ -1755,11 +1763,22 @@
     }
     function confirmIdAction(){
       if(_pendingIdAction==='change'){
+        localStorage.removeItem('exportSavedEmpId');
         localStorage.removeItem('savedEmpId');
         closeIdActionModal();
+        // If page opened with ?emp=..., remove it so ID doesn't look "stuck".
+        try{
+          const u=new URL(location.href);
+          if(u.searchParams.has('emp')){
+            u.searchParams.delete('emp');
+            history.replaceState({},'',u.pathname+(u.search?u.search:'')+u.hash);
+          }
+        }catch(_){}
+        const inp=document.getElementById('empId');
+        if(inp) inp.value='';
         if(data) renderSchedule();
       }else if(_pendingIdAction==='pin'){
-        if(data&&data.id){ localStorage.setItem('savedEmpId',data.id); }
+        if(data&&data.id){ localStorage.setItem('exportSavedEmpId',data.id); localStorage.removeItem('savedEmpId'); }
         closeIdActionModal();
         if(data) renderSchedule();
       }else{
@@ -1860,7 +1879,7 @@
         }).join('')+
         '</div>';
 
-      const savedId=localStorage.getItem('savedEmpId');
+      const savedId=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
       const isMyId=savedId===data.id;
       const changeBtn=isMyId
         ?`<button class="change-btn" onclick="changeMyId()" title="${t('changeId')}">✏️</button>`
@@ -1913,7 +1932,7 @@
       if(avatarEl){ avatarEl.textContent=initials; }
       if(avatarWrap){ avatarWrap.style.display='flex'; }
       if(changeSearchBtn){
-        const savedId=localStorage.getItem('savedEmpId');
+        const savedId=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
         if(savedId===data.id){
           changeSearchBtn.textContent='✏️';
           changeSearchBtn.title=t('changeId');
@@ -2138,8 +2157,15 @@
     /* Init */
     applyLangUI();
     const p=new URLSearchParams(location.search).get('emp');
-    if(p){document.getElementById('empId').value=p;loadSchedule(p);}
-    else{const saved=localStorage.getItem('savedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
+    if(p){
+      // Visiting my-schedules with ?emp=... should establish active employee
+      // so home/date pages can consistently show change alerts.
+      localStorage.setItem('exportSavedEmpId', String(p).trim());
+      localStorage.removeItem('savedEmpId');
+      document.getElementById('empId').value=p;
+      loadSchedule(p);
+    }
+    else{const saved=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
 
     // Load source name for footer
     (function(){
@@ -2159,6 +2185,24 @@
           }).catch(()=>tryFetch(i+1));
       }
       tryFetch(0);
+    })();
+
+    // Local enhancement scripts (alerts/banners)
+    (function loadLocalEnhancements(){
+      const origin = location.origin;
+      const root = location.pathname.includes('/roster-site/')
+        ? origin + '/roster-site'
+        : origin;
+      function addScript(src){
+        if(document.querySelector('script[data-local-src=\"' + src + '\"]')) return;
+        const s = document.createElement('script');
+        s.src = src;
+        s.defer = true;
+        s.setAttribute('data-local-src', src);
+        document.body.appendChild(s);
+      }
+      addScript(root + '/change-alert.js');
+      addScript(root + '/banner-changer.js');
     })();
   </script>
 </body>
