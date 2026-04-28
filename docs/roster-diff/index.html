@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Roster Versions Auto Diff — Pro UI</title>
+  <title>Roster Versions Auto Diff</title>
   <style>
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
@@ -293,398 +293,7 @@
       border-bottom-color: #29b6f6;
       background: rgba(255,255,255,.06);
     }
-  
-    /* Unified visual weight for all top action icons */
-    .summaryBar {
-      align-items: stretch;
-    }
-    .summaryChip {
-      width: 82px;
-      min-height: 66px;
-      text-decoration: none;
-      color: inherit;
-      cursor: pointer;
-      gap: 4px;
-    }
-    .summaryChip .chipVal {
-      width: 42px;
-      height: 42px;
-      min-width: 42px;
-      min-height: 42px;
-      border-radius: 14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:0;
-      line-height:1;
-      background:linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
-      border:1px solid rgba(15,23,42,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 2px 6px rgba(15,23,42,.07);
-    }
-    .summaryChip .chipIcon,
-    .summaryChip .chipIcon.diffIcon {
-      width:30px;
-      height:30px;
-      display:block;
-      object-fit:contain;
-      margin:0 auto;
-      filter:drop-shadow(0 1px 1px rgba(15,23,42,.16));
-    }
-    .summaryChip:hover .chipIcon {
-      transform:scale(1.04);
-    }
-    .summaryChip .chipIcon {
-      transition:transform .2s ease;
-    }
-    @media (max-width: 480px) {
-      .summaryBar { gap:8px; }
-      .summaryChip {
-        width: calc(33.333% - 8px);
-        min-width: 0;
-        padding: 9px 6px;
-      }
-      .summaryChip .chipLabel {
-        font-size: 8.5px;
-        white-space: normal;
-      }
-    }
-
-  
-    /* =========================================================
-       PRO DESIGN SYSTEM UPGRADE
-       Unified icon weight + polished app-like layout
-       ========================================================= */
-    :root {
-      --bg-1:#eef4ff;
-      --bg-2:#f8fafc;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --blue:#1e40af;
-      --blue-2:#1976d2;
-      --cyan:#0ea5e9;
-      --line:#dbe7fb;
-      --shadow-soft:0 10px 30px rgba(15,23,42,.09);
-      --shadow-card:0 8px 24px rgba(30,64,175,.10);
-      --radius-xl:24px;
-      --radius-lg:18px;
-      --radius-md:14px;
-    }
-
-    body {
-      background:
-        radial-gradient(circle at top left, rgba(14,165,233,.14), transparent 34%),
-        radial-gradient(circle at top right, rgba(30,64,175,.10), transparent 30%),
-        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 58%, #ffffff 100%);
-      color:var(--text);
-    }
-
-    .wrap {
-      max-width:720px;
-      padding:calc(18px + var(--safe-top)) 14px calc(32px + var(--safe-bottom));
-    }
-
-    .header {
-      min-height:142px;
-      padding:28px 18px 26px;
-      border-radius:var(--radius-xl);
-      background:
-        radial-gradient(circle at 84% 12%, rgba(255,255,255,.26), transparent 18%),
-        radial-gradient(circle at 14% 108%, rgba(255,255,255,.18), transparent 25%),
-        linear-gradient(135deg, #1d4ed8 0%, #2563eb 44%, #0ea5e9 100%);
-      box-shadow:0 16px 40px rgba(37,99,235,.24);
-      border:1px solid rgba(255,255,255,.28);
-    }
-
-    .header h1 {
-      font-size:27px;
-      letter-spacing:-.7px;
-      text-shadow:0 2px 10px rgba(15,23,42,.18);
-    }
-
-    .header .dateTag {
-      padding:7px 18px;
-      border-radius:999px;
-      background:rgba(255,255,255,.20);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
-      backdrop-filter:blur(10px);
-    }
-
-    .langToggle {
-      width:30px;
-      height:30px;
-      top:14px;
-      right:16px;
-      border-radius:999px;
-      box-shadow:0 6px 16px rgba(15,23,42,.16);
-    }
-
-    .summaryBar {
-      margin-top:16px;
-      gap:12px;
-      align-items:stretch;
-    }
-
-    .summaryChip {
-      width:86px;
-      min-width:86px;
-      min-height:76px;
-      padding:11px 8px 9px;
-      border-radius:18px;
-      background:rgba(255,255,255,.88);
-      border:1px solid rgba(148,163,184,.28);
-      box-shadow:var(--shadow-card);
-      color:inherit;
-      text-decoration:none;
-      cursor:pointer;
-      gap:5px;
-      backdrop-filter:blur(12px);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .summaryChip::before {
-      content:'';
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0));
-      pointer-events:none;
-    }
-
-    .summaryChip:hover {
-      transform:translateY(-4px);
-      box-shadow:0 14px 28px rgba(15,23,42,.14);
-      border-color:rgba(59,130,246,.28);
-    }
-
-    .summaryChip:active {
-      transform:translateY(-1px) scale(.99);
-    }
-
-    .summaryChip .chipVal {
-      width:44px;
-      height:44px;
-      min-width:44px;
-      min-height:44px;
-      border-radius:16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:0;
-      line-height:1;
-      background:linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
-      border:1px solid rgba(15,23,42,.08);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.9),
-        inset 0 -8px 18px rgba(30,64,175,.04),
-        0 4px 10px rgba(15,23,42,.08);
-      position:relative;
-      z-index:1;
-    }
-
-    .summaryChip .chipIcon,
-    .summaryChip .chipIcon.diffIcon {
-      width:31px;
-      height:31px;
-      display:block;
-      object-fit:contain;
-      margin:0 auto;
-      filter:drop-shadow(0 1.5px 1.5px rgba(15,23,42,.18));
-      transition:transform .2s ease;
-    }
-
-    .summaryChip:hover .chipIcon {
-      transform:scale(1.06);
-    }
-
-    .summaryChip .chipLabel {
-      margin-top:3px;
-      font-size:9px;
-      font-weight:800;
-      color:#334155;
-      text-transform:uppercase;
-      letter-spacing:.35px;
-      white-space:nowrap;
-      position:relative;
-      z-index:1;
-    }
-
-    .diffTabs {
-      margin-top:18px;
-      border-radius:18px 18px 0 0;
-      background:linear-gradient(135deg, #1e3a8a 0%, #3b4cca 100%);
-      border:1px solid rgba(99,102,241,.35);
-      box-shadow:0 10px 24px rgba(30,58,138,.18);
-    }
-
-    .diffTab {
-      padding:14px 8px 12px;
-      font-size:12px;
-      letter-spacing:.55px;
-    }
-
-    .diffTab.active {
-      border-bottom-color:#38bdf8;
-      background:rgba(255,255,255,.10);
-    }
-
-    .card {
-      background:rgba(255,255,255,.92);
-      border:1px solid var(--line);
-      border-top:none;
-      border-radius:0 0 20px 20px;
-      padding:16px;
-      box-shadow:var(--shadow-soft);
-      backdrop-filter:blur(14px);
-    }
-
-    .pill {
-      margin-top:0;
-      background:linear-gradient(135deg, #eff6ff, #e0f2fe);
-      color:#1e3a8a;
-      border-color:#bfdbfe;
-      border-radius:999px;
-      padding:8px 12px;
-      font-weight:800;
-    }
-
-    .deptFold,
-    .empFold {
-      border-radius:18px;
-      box-shadow:0 4px 14px rgba(15,23,42,.05);
-    }
-
-    .deptFold {
-      background:linear-gradient(135deg, #eef5ff, #f8fbff);
-      border-color:#cfe0ff;
-    }
-
-    .deptFold > summary,
-    .empFold > summary {
-      padding:13px 14px;
-    }
-
-    .empCount {
-      width:auto;
-      min-width:32px;
-      height:32px;
-      padding:0 10px;
-      border-radius:999px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
-    }
-
-    .changeRow {
-      border-color:#d8e4ff;
-      background:linear-gradient(135deg, #f8fbff, #eef4ff);
-      border-radius:14px;
-      box-shadow:0 2px 8px rgba(15,23,42,.04);
-    }
-
-    .changeDay {
-      border-radius:10px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
-    }
-
-    .pageNote {
-      color:#94a3b8;
-      font-weight:600;
-    }
-
-    @media (max-width: 560px) {
-      .wrap { padding-left:10px; padding-right:10px; }
-      .header { min-height:132px; padding:25px 14px 22px; }
-      .header h1 { font-size:23px; }
-      .summaryBar { gap:9px; }
-      .summaryChip {
-        width:calc(33.333% - 6px);
-        min-width:0;
-        min-height:72px;
-        padding:10px 6px 8px;
-      }
-      .summaryChip .chipVal {
-        width:42px;
-        height:42px;
-        min-width:42px;
-        min-height:42px;
-      }
-      .summaryChip .chipIcon,
-      .summaryChip .chipIcon.diffIcon {
-        width:29px;
-        height:29px;
-      }
-      .summaryChip .chipLabel {
-        font-size:8.2px;
-        white-space:normal;
-        line-height:1.1;
-      }
-      .changeRow {
-        align-items:flex-start;
-        flex-wrap:wrap;
-      }
-      .changeDate {
-        order:3;
-        width:100%;
-        text-align:left;
-      }
-      body[dir="rtl"] .changeDate {
-        text-align:right;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition:none !important; scroll-behavior:auto !important; }
-    }
-
   </style>
-
-  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="icon-export" viewBox="0 0 64 64">
-      <rect x="8" y="10" width="48" height="44" rx="12" fill="#EAF2FF" stroke="#1E40AF" stroke-width="3"/>
-      <path d="M20 36h20" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round"/>
-      <path d="M34 26l10 10-10 10" fill="none" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M20 23h13" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="icon-training" viewBox="0 0 64 64">
-      <rect x="16" y="10" width="30" height="40" rx="5" fill="#34D399" stroke="#0F172A" stroke-width="3"/>
-      <rect x="21" y="16" width="30" height="40" rx="5" fill="#FBBF24" stroke="#0F172A" stroke-width="3"/>
-      <rect x="26" y="22" width="30" height="34" rx="5" fill="#60A5FA" stroke="#0F172A" stroke-width="3"/>
-      <path d="M31 31h18M31 39h14" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="icon-calendar" viewBox="0 0 64 64">
-      <rect x="10" y="14" width="44" height="40" rx="10" fill="#DBEAFE" stroke="#1E40AF" stroke-width="3"/>
-      <path d="M10 25h44" stroke="#1E40AF" stroke-width="3"/>
-      <path d="M22 10v10M42 10v10" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/>
-      <rect x="18" y="31" width="8" height="8" rx="2" fill="#0EA5E9"/>
-      <rect x="30" y="31" width="8" height="8" rx="2" fill="#1E40AF"/>
-      <rect x="42" y="31" width="8" height="8" rx="2" fill="#60A5FA"/>
-      <rect x="18" y="43" width="8" height="8" rx="2" fill="#93C5FD"/>
-      <rect x="30" y="43" width="8" height="8" rx="2" fill="#BFDBFE"/>
-    </symbol>
-    <symbol id="icon-import" viewBox="0 0 64 64">
-      <rect x="8" y="10" width="48" height="44" rx="12" fill="#EFF6FF" stroke="#0F766E" stroke-width="3"/>
-      <path d="M44 28H24" stroke="#14B8A6" stroke-width="5" stroke-linecap="round"/>
-      <path d="M30 18L20 28l10 10" fill="none" stroke="#14B8A6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M31 43h13" stroke="#0F766E" stroke-width="4" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="icon-diff" viewBox="0 0 64 64">
-      <rect x="9" y="12" width="46" height="42" rx="10" fill="#FEF3C7" stroke="#0F172A" stroke-width="3"/>
-      <path d="M9 24h46" stroke="#0F172A" stroke-width="3"/>
-      <path d="M22 9v10M42 9v10" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/>
-      <path d="M32 31v16" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
-      <path d="M32 36c-5-8-10-8-16-8" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
-      <path d="M16 28l7-6M16 28l7 6" fill="none" stroke="#F59E0B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M32 36c5-8 10-8 16-8" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
-      <path d="M48 28l-7-6M48 28l-7 6" fill="none" stroke="#EF4444" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-    </symbol>
-    <symbol id="icon-games" viewBox="0 0 64 64">
-      <rect x="10" y="25" width="44" height="24" rx="12" fill="#EDE9FE" stroke="#6D28D9" stroke-width="3"/>
-      <path d="M22 33v10M17 38h10" stroke="#6D28D9" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="42" cy="35" r="3" fill="#F43F5E"/>
-      <circle cx="48" cy="41" r="3" fill="#0EA5E9"/>
-      <path d="M28 25l4-8 4 8" fill="none" stroke="#6D28D9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    </symbol>
-  </svg>
-
 </head>
 <body>
   <div class="wrap">
@@ -697,28 +306,28 @@
     </div>
 
     <div class="summaryBar">
-      <a href="#" id="exportBtn" class="summaryChip" aria-label="Export">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-export"></use></svg></div>
+      <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Export" src="" /></div>
         <div class="chipLabel">Export</div>
       </a>
-      <a href="#" id="trainingBtn" class="summaryChip" aria-label="Training">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-training"></use></svg></div>
+      <a href="#" id="trainingBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal">📚</div>
         <div class="chipLabel">Training</div>
       </a>
-      <a href="#" id="myScheduleBtn" class="summaryChip" aria-label="My Schedule">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-calendar"></use></svg></div>
+      <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal">🗓️</div>
         <div class="chipLabel">My Schedule</div>
       </a>
-      <a href="#" id="importBtn" class="summaryChip importChip" aria-label="Import">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-import"></use></svg></div>
+      <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Import" src="" /></div>
         <div class="chipLabel">Import</div>
       </a>
-      <a href="#" id="compareChipBtn" class="summaryChip" aria-label="Diff">
-        <div class="chipVal" id="compareChipIcon"><svg class="chipIcon" id="compareChipSvg" role="img" aria-hidden="true"><use href="#icon-diff"></use></svg></div>
+      <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal" id="compareChipIcon"><img class="chipIcon diffIcon" id="compareChipImg" alt="Diff" src="" /></div>
         <div class="chipLabel" id="compareChipLabel">Diff</div>
       </a>
-      <a href="https://dgr-exp.netlify.app" class="summaryChip gamesChip" aria-label="Games">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-games"></use></svg></div>
+      <a href="https://dgr-exp.netlify.app" class="summaryChip gamesChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal">🎮</div>
         <div class="chipLabel">Games</div>
       </a>
     </div>
@@ -868,6 +477,7 @@
       document.getElementById('importBtn').href = `${root}/import/date/${isoDate}/`;
       const langBtn = document.querySelector('.langToggle');
       const compareBtn = document.getElementById('compareChipBtn');
+      const compareChipImg = document.getElementById('compareChipImg');
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
       compareBtn.href = '#';
@@ -879,6 +489,7 @@
       compareBtn.title = t('switchDiff');
       tabRosterDiff.onclick = () => activatePanel('diff');
       tabAbsence.onclick = () => activatePanel('absence');
+      if (compareChipImg) compareChipImg.src = `${root}/assets/icons/diff-calendar.png`;
       if (langBtn) {
         langBtn.textContent = currentLang === 'ar' ? 'EN' : 'ع';
         langBtn.onclick = () => {
@@ -893,6 +504,9 @@
           }
         };
       }
+      document.querySelectorAll('.flightSwitchIcon').forEach((img) => {
+        img.src = `${root}/assets/icons/flight.png`;
+      });
       applyLanguageUi();
     })();
 
