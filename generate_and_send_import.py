@@ -604,7 +604,7 @@ function goToRosterDiff(event) {{
 
 (function bindFlightSwitchIcons() {{
   var root = getSiteRootUrl();
-  var iconUrl = root + '/assets/icons/flight.png';
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {{
     img.src = iconUrl;
   }});

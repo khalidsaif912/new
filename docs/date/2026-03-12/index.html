@@ -1534,7 +1534,7 @@ function setDiffChipIcon() {
   var icon = document.getElementById('diffChipIcon');
   if(!icon) return;
   var root = getSiteRootPath();
-  icon.src = root + '/assets/icons/diff-calendar.png';
+  icon.src = root + '/assets/icons/diff-calendar.png?v=20260428d';
 }
 setLocalCtaLinks();
 setDiffChipIcon();
@@ -1594,7 +1594,7 @@ function goToRosterDiff(event) {
 
 (function bindFlightSwitchIcons() {
   var root = getSiteRootUrl();
-  var iconUrl = root + '/assets/icons/flight.png';
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
     img.src = iconUrl;
   });
