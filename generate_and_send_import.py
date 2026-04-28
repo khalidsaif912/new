@@ -565,11 +565,23 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
 {script}
 
 /* ===== Import path overrides ===== */
+function getSiteRootPath() {{
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {{
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }}
+  return '';
+}}
+
+function getSiteRootUrl() {{
+  return location.origin + getSiteRootPath();
+}}
+
 function _importBase() {{
-  // Works for local file and GitHub Pages
-  var origin = location.origin;
-  var root = (location.pathname.includes('/roster-site/') ? origin + '/roster-site' : origin);
-  return root + '{repo_base_path}';
+  return getSiteRootUrl() + '{repo_base_path}';
 }}
 
 function goToMySchedule(event) {{
@@ -581,27 +593,17 @@ function goToMySchedule(event) {{
 
 function goToExport(event) {{
   if (event) event.preventDefault();
-  var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/'
-    : origin + '/';
-  location.href = target;
+  location.href = getSiteRootUrl() + '/';
 }}
 
 function goToRosterDiff(event) {{
   if (event) event.preventDefault();
-  var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/roster-diff/index.html'
-    : origin + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }}
 
 (function bindFlightSwitchIcons() {{
-  var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   var iconUrl = root + '/assets/icons/flight.png';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {{
     img.src = iconUrl;
@@ -609,10 +611,7 @@ function goToRosterDiff(event) {{
 }})();
 
 (function loadLocalEnhancements() {{
-  var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   function addScript(src) {{
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -635,8 +634,7 @@ function goToRosterDiff(event) {{
   if (!empId) return;
   var chip = document.getElementById('welcomeChip');
   var nameEl = document.getElementById('welcomeName');
-  var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  var base = getSiteRootUrl() + '/';
   fetch(base + 'import/schedules/' + empId + '.json')
     .then(function(r) {{ return r.ok ? r.json() : null; }})
     .then(function(d) {{

@@ -1666,18 +1666,14 @@ function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
   var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/my-schedules/index.html'
-    : origin + '/my-schedules/index.html';
+  var base = getSiteRootUrl() + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }
 
 function goToImport(event) {
   if (event) event.preventDefault();
   var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/import/'
-    : origin + '/import/';
+  var target = getSiteRootUrl() + '/import/';
   location.href = target;
 }
 
