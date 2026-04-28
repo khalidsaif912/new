@@ -732,8 +732,7 @@ applyLang(LANG);
   var empId = localStorage.getItem('savedEmpId');
   if (!empId) return;
   // استخدام مسار مطلق يعمل من أي صفحة
-  var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  var base = getSiteRootUrl() + '/';
   fetch(base + 'schedules/' + empId + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {

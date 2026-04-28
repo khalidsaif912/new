@@ -1434,7 +1434,7 @@ function applyLang(lang) {
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 
 function setLocalCtaLinks() {
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
   var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
@@ -1442,13 +1442,13 @@ function setLocalCtaLinks() {
 }
 function goToTraining(e) {
   if (e) e.preventDefault();
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   location.href = root + '/training/';
 }
 function setDiffChipIcon() {
   var icon = document.getElementById('diffChipIcon');
   if(!icon) return;
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   icon.src = root + '/assets/icons/diff-calendar.png';
 }
 setLocalCtaLinks();

@@ -1728,10 +1728,15 @@ function goToRosterDiff(event) {
 
 /* ===== Import path overrides ===== */
 function _importBase() {
-  // Works for local file and GitHub Pages
-  var origin = location.origin;
-  var root = (location.pathname.includes('/roster-site/') ? origin + '/roster-site' : origin);
-  return root + '/import';
+  var path = location.pathname || '/';
+  var repoRoot = '';
+  if (path.includes('/roster-site/')) {
+    repoRoot = '/roster-site';
+  } else if (location.hostname && location.hostname.endsWith('github.io')) {
+    var seg = path.split('/').filter(Boolean)[0];
+    repoRoot = seg ? '/' + seg : '';
+  }
+  return location.origin + repoRoot + '/import';
 }
 
 function goToMySchedule(event) {
@@ -1743,11 +1748,15 @@ function goToMySchedule(event) {
 
 function goToExport(event) {
   if (event) event.preventDefault();
-  var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/'
-    : origin + '/';
-  location.href = target;
+  var path = location.pathname || '/';
+  var repoRoot = '';
+  if (path.includes('/roster-site/')) {
+    repoRoot = '/roster-site';
+  } else if (location.hostname && location.hostname.endsWith('github.io')) {
+    var seg = path.split('/').filter(Boolean)[0];
+    repoRoot = seg ? '/' + seg : '';
+  }
+  location.href = location.origin + repoRoot + '/';
 }
 
 function goToRosterDiff(event) {

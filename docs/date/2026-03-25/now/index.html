@@ -1486,8 +1486,23 @@ function applyLang(lang) {
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 
+function getSiteRootPath() {
+  if (location.protocol === 'file:') return '';
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var seg = path.split('/').filter(Boolean)[0];
+    return seg ? '/' + seg : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
 function setLocalCtaLinks() {
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
   var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
@@ -1495,13 +1510,13 @@ function setLocalCtaLinks() {
 }
 function goToTraining(e) {
   if (e) e.preventDefault();
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   location.href = root + '/training/';
 }
 function setDiffChipIcon() {
   var icon = document.getElementById('diffChipIcon');
   if(!icon) return;
-  var root = location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+  var root = getSiteRootPath();
   icon.src = root + '/assets/icons/diff-calendar.png';
 }
 setLocalCtaLinks();
@@ -1528,8 +1543,7 @@ startSummarySwitchLoop();
   var chip = document.getElementById('welcomeChip');
   var nameEl = document.getElementById('welcomeName');
   // استخدام مسار مطلق يعمل من أي صفحة
-  var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/') ? origin + '/roster-site/' : origin + '/';
+  var base = getSiteRootUrl() + '/';
   fetch(base + 'schedules/' + empId + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
@@ -1545,36 +1559,24 @@ startSummarySwitchLoop();
 function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
-  var origin = location.origin;
-  var base = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/my-schedules/index.html'
-    : origin + '/my-schedules/index.html';
+  var base = getSiteRootUrl() + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }
 
 function goToImport(event) {
   if (event) event.preventDefault();
-  var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/import/'
-    : origin + '/import/';
+  var target = getSiteRootUrl() + '/import/';
   location.href = target;
 }
 
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
-  var origin = location.origin;
-  var target = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site/roster-diff/index.html'
-    : origin + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }
 
 (function bindFlightSwitchIcons() {
-  var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   var iconUrl = root + '/assets/icons/flight.png';
   document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
     img.src = iconUrl;
@@ -1582,10 +1584,7 @@ function goToRosterDiff(event) {
 })();
 
 (function loadLocalEnhancements() {
-  var origin = location.origin;
-  var root = location.pathname.includes('/roster-site/')
-    ? origin + '/roster-site'
-    : origin;
+  var root = getSiteRootUrl();
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
