@@ -173,7 +173,7 @@
     }
     .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
     .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
-    .summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+    .summaryChip .chipIcon.diffIcon { width:35px; height:35px; }
     #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
@@ -382,7 +382,7 @@
     <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
       <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 09 May 2026</button>
-      <input id="datePicker" type="date" value="2026-05-09" min="2026-03-01" max="2026-05-31" tabindex="-1" aria-hidden="true" />
+      <input id="datePicker" type="date" value="2026-05-09" min="2026-04-01" max="2026-06-30" tabindex="-1" aria-hidden="true" />
     </div>
   </div>
 
@@ -431,12 +431,23 @@
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">09MAY2026 / 00:00</strong>
     <br>Total: <strong>0 employees</strong>
-     &nbsp;·&nbsp; Source: <strong>2026-04-v5.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong>2026-04.xlsx</strong>
   </div>
 
 </div>
 
 <script>
+function goToEmployeeSchedule(empName) {
+  var match = empName.match(/-\s*(\d{3,})/);
+  var base = 'https://khalidsaif912.github.io/roster-site/my-schedules/index.html';
+
+  if (match) {
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }
+}
+
 (function(){
   var picker = document.getElementById('datePicker');
   if(!picker) return;

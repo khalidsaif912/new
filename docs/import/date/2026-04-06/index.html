@@ -153,8 +153,10 @@
     }
     a.summaryChip.importChip .chipVal { color:#0ea5e9; }
     a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
-    a.summaryChip.gamesChip .chipVal { color:#7c3aed; }
-    a.summaryChip.gamesChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
+    a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.diffChip .chipVal { color:#ef4444; }
+    a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -171,6 +173,9 @@
     }
     .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
     .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
+    .summaryChip .chipIcon.diffIcon { width:35px; height:35px; }
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
+    #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
       font-size:9.5px;
       font-weight:600; 
@@ -466,7 +471,7 @@
       <div class="chipVal" style="color:#059669;">7</div>
       <div class="chipLabel" data-key="departments">Departments</div>
     </div>
-    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="{BASE}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
       <div class="chipVal">🗓️</div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
@@ -510,7 +515,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">FRITZ - 80269</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FRITZ - 80269")'>FRITZ - 80269</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -524,7 +529,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">UDUGAMA - 8901</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("UDUGAMA - 8901")'>UDUGAMA - 8901</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -538,7 +543,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MOHAMMED SAID - 81032</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED SAID - 81032")'>MOHAMMED SAID - 81032</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -552,10 +557,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">SAMEER MAHMOOD - 990896</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAMEER MAHMOOD - 990896")'>SAMEER MAHMOOD - 990896</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">FROILAN - 80535</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FROILAN - 80535")'>FROILAN - 80535</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -592,16 +597,16 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">WAFAA SALIM - 81021</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("WAFAA SALIM - 81021")'>WAFAA SALIM - 81021</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ALA AL WAHAIBI - 82473</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALA AL WAHAIBI - 82473")'>ALA AL WAHAIBI - 82473</span>
        <span class="empStatus" style="color:#92400e;">ME07</span>
      </div><div class="empRow">
-       <span class="empName">GLENDO - 80215</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("GLENDO - 80215")'>GLENDO - 80215</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">HAIFA AL BALUSHI - 82664</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAIFA AL BALUSHI - 82664")'>HAIFA AL BALUSHI - 82664</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
@@ -615,13 +620,13 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MAHMOOD AL HADIDI - 82452</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL HADIDI - 82452")'>MAHMOOD AL HADIDI - 82452</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">AHMED ALRUJAIBI - 82476</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED ALRUJAIBI - 82476")'>AHMED ALRUJAIBI - 82476</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow">
-       <span class="empName">JAMAL AL SINANI - 81399</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("JAMAL AL SINANI - 81399")'>JAMAL AL SINANI - 81399</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -635,10 +640,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MOHAMMED AL YAARUBI - 82444</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL YAARUBI - 82444")'>MOHAMMED AL YAARUBI - 82444</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">YOUSUF AL WAHEEDI - 82100</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YOUSUF AL WAHEEDI - 82100")'>YOUSUF AL WAHEEDI - 82100</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -652,16 +657,16 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">IBRAHIM AL QUTAITI - 81351</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("IBRAHIM AL QUTAITI - 81351")'>IBRAHIM AL QUTAITI - 81351</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MOHAMMED AL WAHAIBI - 82541</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL WAHAIBI - 82541")'>MOHAMMED AL WAHAIBI - 82541</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">MAHAMAD AL MAHARBI - 82460</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHAMAD AL MAHARBI - 82460")'>MAHAMAD AL MAHARBI - 82460</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MAHANAD AL HADI - 82665</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHANAD AL HADI - 82665")'>MAHANAD AL HADI - 82665</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -698,19 +703,19 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">SALIM AL MAAWALI - 80481</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SALIM AL MAAWALI - 80481")'>SALIM AL MAAWALI - 80481</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ABDULLAH AL SINAWI - 82663</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ABDULLAH AL SINAWI - 82663")'>ABDULLAH AL SINAWI - 82663</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow">
-       <span class="empName">KHALID AL BALUSHI - 8336</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL BALUSHI - 8336")'>KHALID AL BALUSHI - 8336</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ADIL AL BULUSHI - 82457</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ADIL AL BULUSHI - 82457")'>ADIL AL BULUSHI - 82457</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow">
-       <span class="empName">MAJID AL GHAFRI - 82049</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAJID AL GHAFRI - 82049")'>MAJID AL GHAFRI - 82049</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -724,16 +729,16 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">BADAR AL SHEHHI - 82583</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL SHEHHI - 82583")'>BADAR AL SHEHHI - 82583</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">JABER AL JULANDANI - 81983</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("JABER AL JULANDANI - 81983")'>JABER AL JULANDANI - 81983</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow">
-       <span class="empName">IBRAHIM AL HADHRAMI - 82668</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("IBRAHIM AL HADHRAMI - 82668")'>IBRAHIM AL HADHRAMI - 82668</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">HISHAM AL MAHARBI - 82454</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HISHAM AL MAHARBI - 82454")'>HISHAM AL MAHARBI - 82454</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -747,19 +752,19 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">ANWAR AL HABSI - 82496</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ANWAR AL HABSI - 82496")'>ANWAR AL HABSI - 82496</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">AHMED AL FARSI - 82456</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL FARSI - 82456")'>AHMED AL FARSI - 82456</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow">
-       <span class="empName">WAHEB AL BARAIDAI - 82470</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("WAHEB AL BARAIDAI - 82470")'>WAHEB AL BARAIDAI - 82470</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MOHAMMED AL MAWALI - 82614</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL MAWALI - 82614")'>MOHAMMED AL MAWALI - 82614</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow">
-       <span class="empName">SANAD AL HARTHI - 82642</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SANAD AL HARTHI - 82642")'>SANAD AL HARTHI - 82642</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -773,25 +778,25 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">OMAR AL FUTAISI - 82107</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("OMAR AL FUTAISI - 82107")'>OMAR AL FUTAISI - 82107</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">NASSER AL MAAMARI - 82590</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("NASSER AL MAAMARI - 82590")'>NASSER AL MAAMARI - 82590</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">SULEIMAN AL MAHARBI - 80833</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SULEIMAN AL MAHARBI - 80833")'>SULEIMAN AL MAHARBI - 80833</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MAHMOOD AL SHAMSI - 82286</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL SHAMSI - 82286")'>MAHMOOD AL SHAMSI - 82286</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">AHMED AL HUSAINI - 82455</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL HUSAINI - 82455")'>AHMED AL HUSAINI - 82455</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MOOSA AL BALUSHI - 82667</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL BALUSHI - 82667")'>MOOSA AL BALUSHI - 82667</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">HILAL AL SHAMAKHI - 81991</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HILAL AL SHAMAKHI - 81991")'>HILAL AL SHAMAKHI - 81991</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -828,7 +833,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">QASIM AL GHARIBI - 82412</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("QASIM AL GHARIBI - 82412")'>QASIM AL GHARIBI - 82412</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -842,7 +847,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MOHAMMED AL KULAIBI - 81079</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL KULAIBI - 81079")'>MOHAMMED AL KULAIBI - 81079</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -856,7 +861,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MAHIR AL BALUSHI - 82422</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHIR AL BALUSHI - 82422")'>MAHIR AL BALUSHI - 82422</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -870,10 +875,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">HISHAM AL SIYABI - 82434</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HISHAM AL SIYABI - 82434")'>HISHAM AL SIYABI - 82434</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MOOSA AL HADI - 82536</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL HADI - 82536")'>MOOSA AL HADI - 82536</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -910,10 +915,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">SAID AL AMRI - 80834</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL AMRI - 80834")'>SAID AL AMRI - 80834</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">QAIS AL MUKHAINI - 82435</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("QAIS AL MUKHAINI - 82435")'>QAIS AL MUKHAINI - 82435</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -927,10 +932,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MOHD AL HADDABI - 990895</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHD AL HADDABI - 990895")'>MOHD AL HADDABI - 990895</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">FARIZ AL BALUSHI - 80478</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FARIZ AL BALUSHI - 80478")'>FARIZ AL BALUSHI - 80478</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -944,13 +949,13 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">AHMED AL AMRI - 81080</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL AMRI - 81080")'>AHMED AL AMRI - 81080</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">SAID AL HADI - 81152</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL HADI - 81152")'>SAID AL HADI - 81152</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow">
-       <span class="empName">HAMED AL FAKHRI - 8836</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAMED AL FAKHRI - 8836")'>HAMED AL FAKHRI - 8836</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -964,25 +969,25 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">ALI AL RIYAMI - 82459</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALI AL RIYAMI - 82459")'>ALI AL RIYAMI - 82459</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">KHALID AL ZADJALI - 82458</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL ZADJALI - 82458")'>KHALID AL ZADJALI - 82458</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">JUMA AL HABSI - 81151</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("JUMA AL HABSI - 81151")'>JUMA AL HABSI - 81151</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">YASIR AL GHARABI - 990786</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YASIR AL GHARABI - 990786")'>YASIR AL GHARABI - 990786</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">MOHAMED AL MAAWALI - 82535</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMED AL MAAWALI - 82535")'>MOHAMED AL MAAWALI - 82535</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">KHAMIS AL KASBI - 990751</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHAMIS AL KASBI - 990751")'>KHAMIS AL KASBI - 990751</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">MOHAMMED AL BALUCHI - 82330</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL BALUCHI - 82330")'>MOHAMMED AL BALUCHI - 82330</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1019,10 +1024,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">YOUNIS AL SIYABI - 80480</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YOUNIS AL SIYABI - 80480")'>YOUNIS AL SIYABI - 80480</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ANWAR AL AMRI - 82566</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ANWAR AL AMRI - 82566")'>ANWAR AL AMRI - 82566</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -1036,7 +1041,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">NASSER AL OMAIRI - 82416</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("NASSER AL OMAIRI - 82416")'>NASSER AL OMAIRI - 82416</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -1050,10 +1055,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">SAID AL SADI - 82410</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL SADI - 82410")'>SAID AL SADI - 82410</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">TALAL AL HUSEINI - 82417</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("TALAL AL HUSEINI - 82417")'>TALAL AL HUSEINI - 82417</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -1067,16 +1072,16 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">ABDULLAH AL MAHARBI - 82428</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ABDULLAH AL MAHARBI - 82428")'>ABDULLAH AL MAHARBI - 82428</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">YAARAB AL RAQADI - 82571</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YAARAB AL RAQADI - 82571")'>YAARAB AL RAQADI - 82571</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">SAMI AL HADABI - 80479</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAMI AL HADABI - 80479")'>SAMI AL HADABI - 80479</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">BADAR AL BURTAMANI - 82423</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BURTAMANI - 82423")'>BADAR AL BURTAMANI - 82423</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1113,10 +1118,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">HAITHAM AL BALUSHI - 82419</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAITHAM AL BALUSHI - 82419")'>HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ALI AL SHAMSI - 82425</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALI AL SHAMSI - 82425")'>ALI AL SHAMSI - 82425</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -1130,10 +1135,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">MAHMOOD AL BALUSHI - 82431</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL BALUSHI - 82431")'>MAHMOOD AL BALUSHI - 82431</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">ISMAIL AL MAHARBI - 82331</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ISMAIL AL MAHARBI - 82331")'>ISMAIL AL MAHARBI - 82331</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -1147,7 +1152,7 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">AHMED AL HADI - 82654</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL HADI - 82654")'>AHMED AL HADI - 82654</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -1161,13 +1166,13 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName">BADAR AL BUSAIDI - 82414</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BUSAIDI - 82414")'>BADAR AL BUSAIDI - 82414</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName">MOHAMMED AL SAADI - 82420</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL SAADI - 82420")'>MOHAMMED AL SAADI - 82420</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName">KHALIFA AL SAADI - 82537</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALIFA AL SAADI - 82537")'>KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1179,14 +1184,14 @@
 
   <div class="importBottom">
     <div class="quickActions">
-      <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
+      <a class="btn" id="ctaBtn" href="{BASE}/now/">📋 Full Roster</a>
       <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">28APR2026 / 11:50</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">30APR2026 / 23:19</strong>
     <br>Total: <strong id="importTotalEmployees">75 employees</strong>
-     &nbsp;·&nbsp; Source: <strong id="importSourceName">2026-04.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">Sheet1</strong>
   </div>
 
   </div>
@@ -1270,6 +1275,17 @@
 </script>
 
 <script>
+
+function goToEmployeeSchedule(empName) {
+  var match = empName.match(/-\s*(\d{3,})/);
+  var base = 'https://khalidsaif912.github.io/roster-site/my-schedules/index.html';
+
+  if (match) {
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }
+}
 
 (function(){
   var picker = document.getElementById('datePicker');
@@ -1514,10 +1530,9 @@ window.openDatePicker = function() {
     }
     
     // Update employee count in summary
-    var employeeChip = document.querySelector('.summaryChip .chipVal');
-    if(employeeChip){
-      employeeChip.textContent = totalEmployees;
-    }
+    window.__summaryCounts = window.__summaryCounts || {};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
     
     // Update button states
     filterBtns.forEach(function(btn){
@@ -1544,6 +1559,8 @@ window.openDatePicker = function() {
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
+window.__summaryCounts = window.__summaryCounts || { employees: 77, departments: 5 };
+window.__summarySwitchMode = 'employees';
 var T = {
   en: {
     title:'Export Duty Roster', langBtn:'ع',
@@ -1555,7 +1572,7 @@ var T = {
     viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', games:'Games',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
   },
   ar: {
     title:'جدول الصادر', langBtn:'EN',
@@ -1567,9 +1584,37 @@ var T = {
     viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', games:'الألعاب',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
   }
 };
+
+function updateSummarySwitchChip() {
+  var val = document.getElementById('summarySwitchVal');
+  var lbl = document.getElementById('summarySwitchLabel');
+  if(!val || !lbl) return;
+  var t = T[LANG] || T.en;
+  var mode = window.__summarySwitchMode || 'employees';
+  var counts = window.__summaryCounts || {};
+  if(mode === 'departments') {
+    val.style.color = '#059669';
+    val.textContent = counts.departments != null ? counts.departments : 5;
+    lbl.textContent = t.departments;
+    lbl.dataset.key = 'departments';
+  } else {
+    val.style.color = '';
+    val.textContent = counts.employees != null ? counts.employees : 77;
+    lbl.textContent = t.employees;
+    lbl.dataset.key = 'employees';
+  }
+}
+
+function startSummarySwitchLoop() {
+  if(window.__summarySwitchTimer) return;
+  window.__summarySwitchTimer = setInterval(function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateSummarySwitchChip();
+  }, 2200);
+}
 
 function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
@@ -1587,7 +1632,8 @@ function applyLang(lang) {
     else if(k==='allShifts') el.textContent=t.allShifts;
     else if(k==='mySchedule') el.textContent=t.mySchedule;
     else if(k==='importRoster') el.textContent=t.importRoster;
-    else if(k==='games') el.textContent=t.games;
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='diffPage') el.textContent=t.diffPage;
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -1625,9 +1671,48 @@ function applyLang(lang) {
   }
   localStorage.setItem('rosterLang',lang);
   LANG=lang;
+  updateSummarySwitchChip();
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
+
+function getSiteRootPath() {
+  if (location.protocol === 'file:') return '';
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
+function setLocalCtaLinks() {
+  var root = getSiteRootPath();
+  var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
+  if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
+}
+function goToTraining(e) {
+  if (e) e.preventDefault();
+  var root = getSiteRootPath();
+  location.href = root + '/training/';
+}
+function setDiffChipIcon() {
+  var icon = document.getElementById('diffChipIcon');
+  if(!icon) return;
+  var root = getSiteRootPath();
+  icon.src = root + '/assets/icons/diff-calendar.png?v=20260428d';
+}
+setLocalCtaLinks();
+setDiffChipIcon();
 applyLang(LANG);
+startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
 // رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
@@ -1710,6 +1795,7 @@ function goToRosterDiff(event) {
 })();
 
 
+/* ===== Import path overrides ===== */
 function getSiteRootPath() {
   var path = location.pathname || '/';
   if (path.includes('/roster-site/')) return '/roster-site';
@@ -1725,18 +1811,8 @@ function getSiteRootUrl() {
   return location.origin + getSiteRootPath();
 }
 
-/* ===== Import path overrides ===== */
 function _importBase() {
-  var path = location.pathname || '/';
-  var segs = path.split('/').filter(Boolean);
-  var repoRoot = '';
-  if (path.includes('/roster-site/')) {
-    repoRoot = '/roster-site';
-  } else if (location.hostname && location.hostname.endsWith('github.io')) {
-    if (segs.length >= 2 && segs[1] === 'docs') repoRoot = '/' + segs[0] + '/docs';
-    else repoRoot = segs.length ? '/' + segs[0] : '';
-  }
-  return location.origin + repoRoot + '/import';
+  return getSiteRootUrl() + '/import';
 }
 
 function goToMySchedule(event) {
@@ -1746,18 +1822,20 @@ function goToMySchedule(event) {
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }
 
+function goToEmployeeSchedule(empName) {
+  var match = empName.match(/-\s*(\d(3,))/);
+  var base = _importBase() + '/my-schedules/index.html';
+
+  if (match) {
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }
+}
+
 function goToExport(event) {
   if (event) event.preventDefault();
-  var path = location.pathname || '/';
-  var segs = path.split('/').filter(Boolean);
-  var repoRoot = '';
-  if (path.includes('/roster-site/')) {
-    repoRoot = '/roster-site';
-  } else if (location.hostname && location.hostname.endsWith('github.io')) {
-    if (segs.length >= 2 && segs[1] === 'docs') repoRoot = '/' + segs[0] + '/docs';
-    else repoRoot = segs.length ? '/' + segs[0] : '';
-  }
-  location.href = location.origin + repoRoot + '/';
+  location.href = getSiteRootUrl() + '/';
 }
 
 function goToRosterDiff(event) {

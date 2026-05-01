@@ -323,7 +323,7 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
             for idx, (name, empid, code) in enumerate(rows):
                 alt = " empRowAlt" if idx % 2 == 1 else ""
                 emp_rows.append(f"""<div class="empRow{alt}">
-       <span class="empName">{name} - {empid}</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule({json.dumps(f"{name} - {empid}")})'>{name} - {empid}</span>
        <span class="empStatus" style="color:{info['text']};">{code}</span>
      </div>""")
             shift_blocks.append(f"""
@@ -589,6 +589,17 @@ function goToMySchedule(event) {{
   var id = localStorage.getItem('importSavedEmpId');
   var base = _importBase() + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
+}}
+
+function goToEmployeeSchedule(empName) {{
+  var match = empName.match(/-\s*(\d{3,})/);
+  var base = _importBase() + '/my-schedules/index.html';
+
+  if (match) {{
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  }} else {{
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }}
 }}
 
 function goToExport(event) {{
@@ -1089,6 +1100,30 @@ def get_source_filename() -> str:
         return ""
 
 
+def pick_export_roster_filename(raw_source_name: str) -> str:
+    """Pick the correct Export roster file name when multiple names are provided."""
+    if not raw_source_name:
+        return ""
+
+    # Some sources provide more than one filename in one payload.
+    candidates = [line.strip() for line in re.split(r"[\r\n,;]+", raw_source_name) if line.strip()]
+    if not candidates:
+        return ""
+
+    for source_name in candidates:
+        name_lower = source_name.lower()
+        if "export staff roster changes" in name_lower:
+            print(f"⏭️ Skipping changes file: {source_name}")
+            continue
+        if "export roster" not in name_lower:
+            print(f"⏭️ Skipping non-roster file: {source_name}")
+            continue
+        return source_name
+
+    print("⚠️ No matching export roster file found in provided source names.")
+    return candidates[0]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate Import roster pages")
     parser.add_argument("--excel-file", help="Use local Import Excel file instead of IMPORT_EXCEL_URL")
@@ -1100,7 +1135,8 @@ def main() -> None:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Get original filename from source_name.txt (or CLI override)
-    source_filename = (args.source_name or "").strip() or get_source_filename()
+    source_filename_raw = (args.source_name or "").strip() or get_source_filename()
+    source_filename = pick_export_roster_filename(source_filename_raw)
     print(f"Source filename: {source_filename or '(not set)'}")
 
     # Load Excel from local file or URL

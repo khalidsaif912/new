@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import calendar
 import argparse
 from datetime import datetime
@@ -363,7 +364,7 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
         for i, e in enumerate(emps):
             alt = " empRowAlt" if i % 2 == 1 else ""
             rows_html += f"""<div class="empRow{alt}">
-       <span class="empName">{e['name']}</span>
+      <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule({json.dumps(e["name"])})'>{e['name']}</span>
        <span class="empStatus" style="color:{colors['status_color']};">{e['shift']}</span>
      </div>"""
 
@@ -873,6 +874,17 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 </div>
 
 <script>
+function goToEmployeeSchedule(empName) {{
+  var match = empName.match(/-\s*(\d{{3,}})/);
+  var base = 'https://khalidsaif912.github.io/roster-site/my-schedules/index.html';
+
+  if (match) {{
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  }} else {{
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }}
+}}
+
 (function(){{
   var picker = document.getElementById('datePicker');
   if(!picker) return;
