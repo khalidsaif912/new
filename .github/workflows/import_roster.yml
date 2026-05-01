@@ -1,4 +1,5 @@
-name: Import Roster Site (WO/Export)
+name: Import Roster Site
+
 on:
   workflow_dispatch: {}
   schedule:
@@ -10,6 +11,7 @@ permissions:
 jobs:
   build_import:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -20,7 +22,7 @@ jobs:
           python-version: "3.11"
 
       - name: Cache pip packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -30,146 +32,129 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check if Import Excel file changed
-        id: check_import_changes
+      - name: Check if Excel file changed
+        id: check_excel_changes
         env:
-          IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
+          EXCEL_URL: ${{ secrets.EXCEL_URL }}
         run: |
           python << 'EOF'
           import os
+          import sys
+          import hashlib
           import requests
           from pathlib import Path
-          import sys
           from datetime import datetime, timezone, timedelta
 
           def main():
-              try:
-                  source_url = os.getenv('IMPORT_SOURCE_NAME_URL')
-                  if not source_url:
-                      print("IMPORT_SOURCE_NAME_URL not found")
-                      sys.exit(1)
+              excel_url = os.getenv("EXCEL_URL")
 
-                  print(f"Checking: {source_url}")
-                  response = requests.get(source_url, timeout=15)
-                  response.raise_for_status()
-                  current_filename = response.text.strip()
-
-                  if not current_filename:
-                      print("source_name.txt is empty")
-                      sys.exit(1)
-
-                  print(f"Current file: {current_filename}")
-
-                  cache_file = "import_last_filename.txt"
-                  changed = True
-                  old_filename = "none"
-
-                  if Path(cache_file).exists():
-                      with open(cache_file, 'r', encoding='utf-8') as f:
-                          old_filename = f.read().strip()
-                      if old_filename:
-                          print(f"Previous file: {old_filename}")
-                          if old_filename == current_filename:
-                              print("No changes detected")
-                              changed = False
-                          else:
-                              print(f"Change detected: {old_filename} -> {current_filename}")
-                  else:
-                      print("First run")
-
-                  with open(cache_file, 'w', encoding='utf-8') as f:
-                      f.write(current_filename)
-
-                  # Muscat time (UTC+4)
-                  muscat_tz = timezone(timedelta(hours=4))
-                  now = datetime.now(muscat_tz)
-                  current_hour = now.hour
-                  current_minute = now.minute
-                  print(f"Muscat time: {now.strftime('%H:%M')}")
-
-                  # ساعات التحديث الإجباري
-                  mandatory_update_hours = [0, 5, 6, 13, 14, 20, 21]
-
-                  is_mandatory_update = (current_hour in mandatory_update_hours)
-                  should_process = changed or is_mandatory_update
-
-                  print(f"File changed: {changed}")
-                  print(f"Mandatory update hour: {is_mandatory_update}")
-                  print(f"Should process: {should_process}")
-
-                  with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-                      f.write(f"changed={str(changed).lower()}\n")
-                      f.write(f"should_process={str(should_process).lower()}\n")
-                      f.write(f"filename={current_filename}\n")
-                      f.write(f"old_filename={old_filename}\n")
-
-                  print("=" * 60)
-                  print(f"  File changed:     {changed}")
-                  print(f"  Mandatory update: {is_mandatory_update}")
-                  print(f"  Should process:   {should_process}")
-                  print("=" * 60)
-
-              except requests.exceptions.Timeout:
-                  print("Connection timeout")
+              if not excel_url:
+                  print("ERROR: EXCEL_URL secret is missing")
                   sys.exit(1)
-              except requests.exceptions.RequestException as e:
-                  print(f"Request error: {e}")
+
+              print("Downloading Excel file...")
+              response = requests.get(excel_url, timeout=30)
+              response.raise_for_status()
+
+              excel_bytes = response.content
+
+              if not excel_bytes:
+                  print("ERROR: Excel file is empty")
                   sys.exit(1)
-              except Exception as e:
-                  print(f"Unexpected error: {e}")
-                  import traceback
-                  traceback.print_exc()
-                  sys.exit(1)
+
+              current_hash = hashlib.sha256(excel_bytes).hexdigest()
+              cache_file = Path("import_last_excel_hash.txt")
+
+              old_hash = "none"
+              changed = True
+
+              if cache_file.exists():
+                  old_hash = cache_file.read_text(encoding="utf-8").strip()
+                  if old_hash == current_hash:
+                      changed = False
+
+              cache_file.write_text(current_hash, encoding="utf-8")
+
+              muscat_tz = timezone(timedelta(hours=4))
+              now = datetime.now(muscat_tz)
+
+              mandatory_update_hours = [0, 5, 6, 13, 14, 20, 21]
+              is_mandatory_update = now.hour in mandatory_update_hours
+              should_process = changed or is_mandatory_update
+
+              print(f"Muscat time: {now.strftime('%H:%M')}")
+              print(f"File changed: {changed}")
+              print(f"Mandatory update hour: {is_mandatory_update}")
+              print(f"Should process: {should_process}")
+              print(f"Current hash: {current_hash[:12]}")
+              print(f"Previous hash: {old_hash[:12] if old_hash != 'none' else 'none'}")
+
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write(f"changed={str(changed).lower()}\n")
+                  f.write(f"should_process={str(should_process).lower()}\n")
+                  f.write(f"current_hash={current_hash[:12]}\n")
+                  f.write(f"old_hash={old_hash[:12] if old_hash != 'none' else 'none'}\n")
 
           if __name__ == "__main__":
-              main()
+              try:
+                  main()
+              except Exception as e:
+                  print(f"ERROR: {e}")
+                  sys.exit(1)
           EOF
 
       - name: Display change info
         run: |
           echo "========================================"
-          echo "Import Check Report:"
+          echo "Import Check Report"
           echo "========================================"
-          echo "File changed:   ${{ steps.check_import_changes.outputs.changed }}"
-          echo "Should process: ${{ steps.check_import_changes.outputs.should_process }}"
-          echo "Current file:   ${{ steps.check_import_changes.outputs.filename }}"
-          echo "Previous file:  ${{ steps.check_import_changes.outputs.old_filename }}"
+          echo "File changed:   ${{ steps.check_excel_changes.outputs.changed }}"
+          echo "Should process: ${{ steps.check_excel_changes.outputs.should_process }}"
+          echo "Current hash:   ${{ steps.check_excel_changes.outputs.current_hash }}"
+          echo "Previous hash:  ${{ steps.check_excel_changes.outputs.old_hash }}"
           echo "========================================"
 
-      - name: Generate Import pages
-        if: steps.check_import_changes.outputs.should_process == 'true'
+      - name: Generate Import pages and send mail
+        if: steps.check_excel_changes.outputs.should_process == 'true'
         env:
-          IMPORT_EXCEL_URL: ${{ secrets.IMPORT_EXCEL_URL }}
-          IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
+          EXCEL_URL: ${{ secrets.EXCEL_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
           PAGES_BASE_URL: ${{ secrets.PAGES_BASE_URL }}
         run: |
-          echo "Generating /docs/import ..."
+          echo "Generating import pages..."
           python generate_and_send_import.py
           echo "Done!"
 
       - name: Commit updated Import docs
-        if: steps.check_import_changes.outputs.should_process == 'true'
+        if: steps.check_excel_changes.outputs.should_process == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/import import_last_filename.txt
+
+          git add docs/import import_last_excel_hash.txt
+
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            if [ "${{ steps.check_import_changes.outputs.changed }}" == "true" ]; then
-              git commit -m "Update IMPORT roster: ${{ steps.check_import_changes.outputs.filename }}"
+            if [ "${{ steps.check_excel_changes.outputs.changed }}" = "true" ]; then
+              git commit -m "Update IMPORT roster"
             else
               git commit -m "Scheduled IMPORT update"
             fi
+
             git pull --rebase
             git push
             echo "Pushed!"
           fi
 
       - name: Skip - No action needed
-        if: steps.check_import_changes.outputs.should_process == 'false'
+        if: steps.check_excel_changes.outputs.should_process == 'false'
         run: |
           echo "========================================"
           echo "No action needed"
-          echo "Current file: ${{ steps.check_import_changes.outputs.filename }}"
           echo "========================================"
