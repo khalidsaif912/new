@@ -170,7 +170,8 @@ jobs:
       - name: Generate page + send email
         if: steps.check_changes.outputs.should_process == 'true'
         env:
-          EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL }}
+          # Prefer EXPORT_EXCEL_URL; fall back to EXCEL_URL if repos use the shorter name.
+          EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
           SOURCE_NAME_URL: ${{ secrets.EXPORT_SOURCE_NAME_URL }}
           PAGES_BASE_URL: ${{ secrets.PAGES_BASE_URL }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -193,8 +194,8 @@ jobs:
       - name: Generate employee schedules
         if: steps.check_changes.outputs.should_process == 'true'
         env:
-          EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL }}
-          EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL }}
+          EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
+          EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
           ROSTER_FILENAME: ${{ steps.check_changes.outputs.filename }}
         run: |
           if [ -f "generate_employee_schedules.py" ]; then
