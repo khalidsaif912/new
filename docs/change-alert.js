@@ -908,6 +908,13 @@ function boot() {
     setTimeout(boot, 3500);
   }
 
+  window.addEventListener('storage', function (e) {
+    if (e.key !== FLOAT_DOTS_KEY) return;
+    var empId = getEmployeeId();
+    if (!empId || !onHomePage()) return;
+    renderForEmployee(empId);
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {

@@ -56,7 +56,7 @@
       hideDot: "إخفاء كل شيء حتى التحديث القادم",
       hideDotSub: "لن يظهر التنبيه إلا عند وجود غياب جديد",
       floatDotsOpt: "إظهار الأيقونة العائمة للتنبيهات",
-      floatDotsOptSub: "ظهور ظرف الغياب 📩 وأيقونة تغيّر الروستر في الصفحة الرئيسية. عند التفعيل بعد الإيقاف قد تحتاج تحديث الصفحة لظهور الأيقونة.",
+      floatDotsOptSub: "بعد التفعيل من النافذة: يظهر الظرف تلقائياً. من صفحة الفروقات: حدّث الرئيسية.",
       absSourceTitle: "من أين تأتي بيانات الغياب؟",
       absSourceParaBefore: "الموقع يحمّل ملف ",
       absSourceParaAfter:
@@ -89,7 +89,7 @@
       hideDot: "Hide everything until the next update",
       hideDotSub: "No alert will appear unless there is a new absence",
       floatDotsOpt: "Show floating alert icons",
-      floatDotsOptSub: "Shows the absence envelope 📩 and the roster-change icon on the home roster page. If you turn it back on, refresh the page for the icon to appear.",
+      floatDotsOptSub: "After enabling here, the envelope appears automatically. From the diff page, refresh roster home.",
       absSourceTitle: "Where does absence data come from?",
       absSourceParaBefore: "The site loads ",
       absSourceParaAfter:
@@ -594,34 +594,31 @@
     });
   }
 
-  function buildUI() {
+  function mountAbsenceDotAndCard() {
+    if (document.getElementById("abs-dot")) return;
     const dict = t();
     const count = mState.absences.length;
-    const isModalDismissed = localStorage.getItem("absDismissed_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-    const isDotHidden = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-    const floatOn = floatingDotsEnabled();
 
-    if (floatOn) {
-      const dot = applyLangMeta(document.createElement("div"));
-      dot.id = "abs-dot";
-      dot.className = "abs-r";
-      dot.innerHTML = `
+    const dot = applyLangMeta(document.createElement("div"));
+    dot.id = "abs-dot";
+    dot.className = "abs-r";
+    dot.innerHTML = `
       <span class="abs-dot-emoji">📩</span>
       <span class="abs-dot-badge">${dict.daysAbsence(count)}</span>
     `;
-      document.body.appendChild(dot);
+    document.body.appendChild(dot);
 
-      const card = applyLangMeta(document.createElement("div"));
-      card.id = "abs-card";
-      card.className = "abs-r";
+    const card = applyLangMeta(document.createElement("div"));
+    card.id = "abs-card";
+    card.className = "abs-r";
 
-      const cardRows = mState.absences.map(a =>
-        `<div class="abs-card-row">📅 ${a.date}</div>`
-      ).join("");
+    const cardRows = mState.absences.map(a =>
+      `<div class="abs-card-row">📅 ${a.date}</div>`
+    ).join("");
 
-      const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
+    const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
 
-      card.innerHTML = `
+    card.innerHTML = `
       <div class="abs-card-top">
         <span class="abs-card-title">${dict.recordedAbsence}</span>
         <button class="abs-card-x" id="abs-card-x" aria-label="${dict.closeLabel}">✕</button>
@@ -630,23 +627,14 @@
       ${cardRows}
       <button class="abs-card-btn" id="abs-card-detail">${dict.detailsBtn}</button>
     `;
-      document.body.appendChild(card);
-    }
+    document.body.appendChild(card);
+  }
 
-    if (isDotHidden) return;
-
-    if (!isModalDismissed) {
-      showMainModal();
-      return;
-    }
-
-    if (!floatOn) return;
-
+  function wireAbsenceDotCard() {
     const dot = document.getElementById("abs-dot");
     const card = document.getElementById("abs-card");
-    if (!dot || !card) return;
-
-    dot.classList.add("abs-on");
+    if (!dot || !card || dot.dataset.absWired === "1") return;
+    dot.dataset.absWired = "1";
 
     dot.onclick = () => {
       card.classList.toggle("abs-open");
@@ -662,6 +650,32 @@
       card.classList.remove("abs-open");
       showMainModal();
     };
+  }
+
+  function buildUI() {
+    const dict = t();
+    const isModalDismissed = localStorage.getItem("absDismissed_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+    const isDotHidden = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+    const floatOn = floatingDotsEnabled();
+
+    if (floatOn) {
+      mountAbsenceDotAndCard();
+    }
+
+    if (isDotHidden) return;
+
+    if (!isModalDismissed) {
+      showMainModal();
+      return;
+    }
+
+    if (!floatOn) return;
+
+    const dot = document.getElementById("abs-dot");
+    if (!dot) return;
+
+    wireAbsenceDotCard();
+    dot.classList.add("abs-on");
   }
 
   function showMainModal() {
@@ -775,16 +789,27 @@
     ov.style.opacity = "0";
     setTimeout(() => {
       ov.remove();
-      const dot = document.getElementById("abs-dot");
+      const isDotHiddenFlag = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+
       if (hideDot) {
         localStorage.setItem("absHideDot_" + mState.empId + "_" + PAGE_KEY, mState.hash);
-        if (dot) dot.style.display = "none";
-      } else if (hideModal) {
-        localStorage.setItem("absDismissed_" + mState.empId + "_" + PAGE_KEY, mState.hash);
-        if (dot) dot.classList.add("abs-on");
-      } else {
-        if (dot) dot.classList.add("abs-on");
+        const dotH = document.getElementById("abs-dot");
+        if (dotH) dotH.style.display = "none";
+        return;
       }
+
+      if (hideModal) {
+        localStorage.setItem("absDismissed_" + mState.empId + "_" + PAGE_KEY, mState.hash);
+      }
+
+      const wantFloat = floatingDotsEnabled() && !isDotHiddenFlag && mState.absences && mState.absences.length;
+      if (wantFloat) {
+        mountAbsenceDotAndCard();
+        wireAbsenceDotCard();
+      }
+
+      const dot = document.getElementById("abs-dot");
+      if (dot) dot.classList.add("abs-on");
     }, 220);
   }
 
@@ -823,6 +848,11 @@
       console.error("absence-alert init failed:", err);
     });
   }
+
+  window.addEventListener("storage", (e) => {
+    if (e.key !== FLOAT_DOTS_KEY) return;
+    if (mState.absences && mState.absences.length) rerenderUI();
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => setTimeout(init, 500));

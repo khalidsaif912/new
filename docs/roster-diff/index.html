@@ -294,36 +294,39 @@
       background: rgba(255,255,255,.06);
     }
     .alertPrefRow {
-      margin-top: 12px;
+      margin-top: 6px;
       background: #fff;
-      border: 1px solid #dbe4f3;
-      border-radius: 12px;
-      padding: 12px 14px;
-      box-shadow: 0 2px 8px rgba(15,23,42,.06);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 8px 6px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.04);
     }
     .alertPrefLabel {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 6px;
       cursor: pointer;
-      font-weight: 800;
-      font-size: 13px;
-      color: #334155;
+      font-weight: 600;
+      font-size: 10px;
+      color: #475569;
       margin: 0;
+      line-height: 1.35;
     }
     .alertPrefLabel input {
-      margin-top: 3px;
+      margin-top: 1px;
       accent-color: #1e40af;
-      width: 18px;
-      height: 18px;
+      width: 13px;
+      height: 13px;
       flex-shrink: 0;
     }
-    .alertPrefHint {
-      margin: 8px 0 0;
-      padding-inline-start: 28px;
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1.45;
+    .alertPrefTextWrap { display: block; min-width: 0; }
+    .alertPrefSub {
+      display: block;
+      margin-top: 2px;
+      font-size: 8.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      line-height: 1.3;
     }
   </style>
 </head>
@@ -371,9 +374,11 @@
     <div class="alertPrefRow" id="alertPrefRow">
       <label class="alertPrefLabel" for="floatingDotsToggle">
         <input type="checkbox" id="floatingDotsToggle" checked />
-        <span id="floatingDotsLabel"></span>
+        <span class="alertPrefTextWrap">
+          <span id="floatingDotsLabel"></span>
+          <span id="floatingDotsHint" class="alertPrefSub"></span>
+        </span>
       </label>
-      <p class="alertPrefHint" id="floatingDotsHint"></p>
     </div>
 
     <div class="card">
@@ -411,8 +416,8 @@
         recorded: 'Recorded',
         dayFallback: 'Day {day}',
         noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.',
-        floatDotsPref: 'Show floating alert icons on roster home',
-        floatDotsHint: 'Turns the absence envelope and roster-change icon on or off (same setting as the absence modal and the home alert card). Refresh an open roster tab to apply immediately.'
+        floatDotsPref: 'Home floating alert icons',
+        floatDotsHint: 'Same as absence / change card. Refresh roster home if it is already open.'
       },
       ar: {
         tabDiff: 'فروقات الروستر',
@@ -432,8 +437,8 @@
         recorded: 'مسجل',
         dayFallback: 'اليوم {day}',
         noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.',
-        floatDotsPref: 'إظهار الأيقونة العائمة للتنبيهات في الصفحة الرئيسية للروستر',
-        floatDotsHint: 'تتحكم في ظهور ظرف الغياب 📩 وأيقونة تغيّر الروستر (نفس الإعداد في نافذة الغياب وبطاقة التنبيه في الرئيسية). حدّث تبويب الروستر المفتوح ليُطبَّق فوراً.'
+        floatDotsPref: 'أيقونات التنبيه في الرئيسية',
+        floatDotsHint: 'نفس إعداد الغياب/التغيير. حدّث صفحة الروستر إن كانت مفتوحة.'
       }
     };
 
