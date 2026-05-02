@@ -21,83 +21,103 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check if file changed
-        id: check_changes
+      - name: Check if Excel file changed
+        id: check_excel_changes
         env:
-          IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
+          EXCEL_URL: ${{ secrets.EXCEL_URL }}
         run: |
           python << 'EOF'
-          import os, requests, sys
+          import os
+          import sys
+          import hashlib
+          import requests
           from pathlib import Path
           from datetime import datetime, timezone, timedelta
 
-          url = os.getenv("IMPORT_SOURCE_NAME_URL")
+          def main():
+              excel_url = os.getenv("EXCEL_URL")
 
-          if not url:
-              print("Missing IMPORT_SOURCE_NAME_URL")
-              sys.exit(1)
+              if not excel_url:
+                  print("ERROR: EXCEL_URL secret is missing")
+                  sys.exit(1)
 
-          print(f"Checking: {url}")
+              print("Downloading Excel file...")
+              response = requests.get(excel_url, timeout=30)
+              response.raise_for_status()
 
-          r = requests.get(url, timeout=15)
-          r.raise_for_status()
+              excel_bytes = response.content
 
-          # هنا لازم يكون نص فقط
-          current_name = r.text.strip()
+              if not excel_bytes:
+                  print("ERROR: Excel file is empty")
+                  sys.exit(1)
 
-          if not current_name:
-              print("Empty response")
-              sys.exit(1)
+              current_hash = hashlib.sha256(excel_bytes).hexdigest()
+              cache_file = Path("import_last_excel_hash.txt")
 
-          print(f"Current file: {current_name}")
+              old_hash = "none"
+              changed = True
 
-          cache = Path("last_name.txt")
-          old_name = "none"
-          changed = True
+              if cache_file.exists():
+                  old_hash = cache_file.read_text(encoding="utf-8").strip()
+                  if old_hash == current_hash:
+                      changed = False
 
-          if cache.exists():
-              old_name = cache.read_text().strip()
-              if old_name == current_name:
-                  changed = False
+              cache_file.write_text(current_hash, encoding="utf-8")
 
-          cache.write_text(current_name)
+              muscat_tz = timezone(timedelta(hours=4))
+              now = datetime.now(muscat_tz)
 
-          # توقيت مسقط
-          muscat = timezone(timedelta(hours=4))
-          now = datetime.now(muscat)
+              mandatory_update_hours = [0, 5, 6, 13, 14, 20, 21]
+              is_mandatory_update = now.hour in mandatory_update_hours
+              should_process = changed or is_mandatory_update
 
-          mandatory_hours = [0, 5, 6, 13, 14, 20, 21]
-          force = now.hour in mandatory_hours
+              print(f"Muscat time: {now.strftime('%H:%M')}")
+              print(f"File changed: {changed}")
+              print(f"Mandatory update hour: {is_mandatory_update}")
+              print(f"Should process: {should_process}")
+              print(f"Current hash: {current_hash[:12]}")
+              print(f"Previous hash: {old_hash[:12] if old_hash != 'none' else 'none'}")
 
-          should = changed or force
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write(f"changed={str(changed).lower()}\n")
+                  f.write(f"should_process={str(should_process).lower()}\n")
+                  f.write(f"current_hash={current_hash[:12]}\n")
+                  f.write(f"old_hash={old_hash[:12] if old_hash != 'none' else 'none'}\n")
 
-          print(f"Muscat time: {now.strftime('%H:%M')}")
-          print(f"Changed: {changed}")
-          print(f"Force: {force}")
-          print(f"Should run: {should}")
-
-          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"changed={str(changed).lower()}\n")
-              f.write(f"should_process={str(should).lower()}\n")
-              f.write(f"name={current_name}\n")
-              f.write(f"old={old_name}\n")
+          if __name__ == "__main__":
+              try:
+                  main()
+              except Exception as e:
+                  print(f"ERROR: {e}")
+                  sys.exit(1)
           EOF
 
-      - name: Show info
+      - name: Display change info
         run: |
-          echo "Changed: ${{ steps.check_changes.outputs.changed }}"
-          echo "Should: ${{ steps.check_changes.outputs.should_process }}"
-          echo "Name:   ${{ steps.check_changes.outputs.name }}"
+          echo "========================================"
+          echo "Import Check Report"
+          echo "========================================"
+          echo "File changed:   ${{ steps.check_excel_changes.outputs.changed }}"
+          echo "Should process: ${{ steps.check_excel_changes.outputs.should_process }}"
+          echo "Current hash:   ${{ steps.check_excel_changes.outputs.current_hash }}"
+          echo "Previous hash:  ${{ steps.check_excel_changes.outputs.old_hash }}"
+          echo "========================================"
 
-      - name: Run script
-        if: steps.check_changes.outputs.should_process == 'true'
+      - name: Generate Import pages and send mail
+        if: steps.check_excel_changes.outputs.should_process == 'true'
         env:
-          IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
+          EXCEL_URL: ${{ secrets.EXCEL_URL }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
@@ -106,24 +126,35 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
           PAGES_BASE_URL: ${{ secrets.PAGES_BASE_URL }}
         run: |
+          echo "Generating import pages..."
           python generate_and_send_import.py
+          echo "Done!"
 
-      - name: Commit
-        if: steps.check_changes.outputs.should_process == 'true'
+      - name: Commit updated Import docs
+        if: steps.check_excel_changes.outputs.should_process == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add docs/import last_name.txt
+          git add docs/import import_last_excel_hash.txt
 
           if git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes to commit"
           else
-            git commit -m "Update import"
+            if [ "${{ steps.check_excel_changes.outputs.changed }}" = "true" ]; then
+              git commit -m "Update IMPORT roster"
+            else
+              git commit -m "Scheduled IMPORT update"
+            fi
+
             git pull --rebase
             git push
+            echo "Pushed!"
           fi
 
-      - name: Skip
-        if: steps.check_changes.outputs.should_process == 'false'
-        run: echo "No action needed"
+      - name: Skip - No action needed
+        if: steps.check_excel_changes.outputs.should_process == 'false'
+        run: |
+          echo "========================================"
+          echo "No action needed"
+          echo "========================================"
