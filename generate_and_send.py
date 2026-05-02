@@ -874,6 +874,22 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 </div>
 
 <script>
+function getSiteRootPath() {{
+  if (location.protocol === 'file:') return '';
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {{
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }}
+  return '';
+}}
+
+function getSiteRootUrl() {{
+  return location.origin + getSiteRootPath();
+}}
+
 function goToEmployeeSchedule(empName) {{
   var match = empName.match(/-\s*(\d{{3,}})/);
   var base = getSiteRootUrl() + '/my-schedules/index.html';
@@ -1272,22 +1288,6 @@ function applyLang(lang) {{
   updateSummarySwitchChip();
 }}
 function toggleLang() {{ applyLang(LANG==='en'?'ar':'en'); }}
-
-function getSiteRootPath() {{
-  if (location.protocol === 'file:') return '';
-  var path = location.pathname || '/';
-  if (path.includes('/roster-site/')) return '/roster-site';
-  if (location.hostname && location.hostname.endsWith('github.io')) {{
-    var segs = path.split('/').filter(Boolean);
-    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
-    return segs.length ? '/' + segs[0] : '';
-  }}
-  return '';
-}}
-
-function getSiteRootUrl() {{
-  return location.origin + getSiteRootPath();
-}}
 
 function setLocalCtaLinks() {{
   var root = getSiteRootPath();
