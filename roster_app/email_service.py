@@ -35,7 +35,8 @@ def get_subscriber_emails() -> str:
 def send_email(subject: str, html: str) -> None:
     """Send an HTML email to active subscribers."""
     smtp_host = os.environ.get("SMTP_HOST", "").strip()
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    # Secret may exist but be empty — getenv default only applies when key is missing.
+    smtp_port = int((os.environ.get("SMTP_PORT") or "").strip() or "587")
     smtp_user = os.environ.get("SMTP_USER", "").strip()
     smtp_pass = os.environ.get("SMTP_PASS", "").strip()
     mail_from = os.environ.get("MAIL_FROM", "").strip()
