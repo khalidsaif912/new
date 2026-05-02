@@ -1693,7 +1693,9 @@
           .sort((a,b)=>a.localeCompare(b));
         if(!months.length) throw new Error('empty');
         const savedId=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
-        if(!savedId) showSaveToast(id,data.name);
+        const skipSavePrompt=sessionStorage.getItem('myScheduleSkipSavePrompt')==='1';
+        if(skipSavePrompt) sessionStorage.removeItem('myScheduleSkipSavePrompt');
+        if(!savedId && !skipSavePrompt) showSaveToast(id,data.name);
         // Prefer current month; if unavailable, pick latest available month.
         const now=new Date();
         const cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
@@ -2158,12 +2160,12 @@
     applyLangUI();
     const p=new URLSearchParams(location.search).get('emp');
     if(p){
-      // Visiting my-schedules with ?emp=... should establish active employee
-      // so home/date pages can consistently show change alerts.
-      localStorage.setItem('exportSavedEmpId', String(p).trim());
-      localStorage.removeItem('savedEmpId');
-      document.getElementById('empId').value=p;
-      loadSchedule(p);
+      // Deep-link (?emp=): show that employee's schedule only. Do not overwrite
+      // exportSavedEmpId — the user keeps their own ID until they confirm Save / Pin.
+      const trimmed = String(p).trim();
+      sessionStorage.setItem('myScheduleSkipSavePrompt','1');
+      document.getElementById('empId').value = trimmed;
+      loadSchedule(trimmed);
     }
     else{const saved=localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
 
