@@ -822,11 +822,141 @@ def build_site(data: dict, out_dir: Path) -> None:
         (archive / f'{month["month_id"]}.html').write_text(render_month_page(data, month["month_id"], in_archive=True), encoding="utf-8")
 
 
+def collect_gallery_images(images_dir: Path) -> list[str]:
+    allowed = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+    names = [p.name for p in images_dir.glob("*") if p.is_file() and p.suffix.lower() in allowed]
+    return sorted(names)
+
+
+def render_local_gallery_page(title: str, image_names: list[str]) -> str:
+    names_js = json.dumps(image_names, ensure_ascii=False)
+    safe_title = title.strip() or "A Cup of Book"
+    return """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Sora:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{{--bg:#eef1f7;--text:#18243a;--muted:#6d7b97;--line:rgba(17,24,39,.08);--blue:#1e40af;--blue2:#1976d2}}
+    *{{box-sizing:border-box;margin:0;padding:0}}
+    body{{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;min-height:100dvh}}
+    .wrap{{max-width:760px;margin:0 auto;padding:16px 14px 34px}}
+    .header{{position:relative;overflow:hidden;padding:26px 18px 20px;border-radius:20px;background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);box-shadow:0 8px 28px rgba(30,64,175,.25)}}
+    .header::before{{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 84% 18%,rgba(255,255,255,.18) 0%,transparent 34%),radial-gradient(circle at 14% 90%,rgba(255,255,255,.10) 0%,transparent 28%)}}
+    .hero{{position:relative;z-index:1}}
+    .hero h1{{font:900 26px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em}}
+    .hero p{{margin-top:6px;color:rgba(255,255,255,.78);font-size:12px}}
+    .topDock{{position:relative;z-index:1;display:grid;grid-template-columns:1fr 96px;gap:10px;align-items:stretch;margin-top:14px}}
+    .dockCard{{padding:10px 8px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.1);box-shadow:0 2px 8px rgba(15,23,42,.06)}}
+    .sourceCard{{display:flex;align-items:center;justify-content:center;padding:0 16px;min-height:72px}}
+    .sourceText{{font-size:14px;font-weight:800;color:#234;white-space:nowrap}}
+    .backCard{{display:block;text-decoration:none;color:inherit}}
+    .backInner{{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;width:100%;gap:6px}}
+    .backIcon{{font-size:34px;line-height:1}}
+    .backLabel{{font-size:9px;font-weight:800;line-height:1.12;color:var(--blue2);white-space:nowrap;text-align:center}}
+    .contentWrap{{margin-top:14px;background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 18px rgba(15,23,42,.08);overflow:hidden}}
+    .contentTop{{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fbfdff}}
+    .contentTitle{{font:800 14px/1.1 'Sora',sans-serif;color:var(--text)}}
+    .trainWrap{{position:relative;padding:12px 12px 4px;background:#f8fbff;border-bottom:1px solid var(--line)}}
+    .trainTrack{{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}}
+    .trainTrack::-webkit-scrollbar{{height:6px}}
+    .trainTrack::-webkit-scrollbar-thumb{{background:#c7d2fe;border-radius:999px}}
+    .car{{min-width:120px;max-width:120px;scroll-snap-align:start;border-radius:12px;border:2px solid transparent;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.06);cursor:pointer;transition:.2s}}
+    .car.active{{border-color:#1e40af;transform:translateY(-2px);box-shadow:0 8px 18px rgba(30,64,175,.2)}}
+    .car img{{display:block;width:100%;height:76px;object-fit:cover;border-radius:10px 10px 0 0}}
+    .carCap{{padding:6px 8px;font-size:10px;font-weight:800;color:#475569;text-align:center}}
+    .viewerBox{{padding:12px}}
+    .viewerFrame{{background:#0f172a;border-radius:12px;border:1px solid #0b1220;min-height:360px;display:flex;align-items:center;justify-content:center;padding:8px}}
+    .viewerFrame img{{max-width:100%;max-height:70vh;width:auto;height:auto;border-radius:8px;display:block}}
+    .viewerNote{{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}}
+    .emptyMsg{{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="hero">
+      <h1>{title}</h1>
+      <p>Local reading gallery</p>
+    </div>
+    <div class="topDock">
+      <div class="dockCard sourceCard"><div class="sourceText">Book Cars</div></div>
+      <a class="dockCard backCard" href="../training/" aria-label="Back to training">
+        <div class="backInner"><div class="backIcon">📚</div><div class="backLabel">Training</div></div>
+      </a>
+    </div>
+  </div>
+  <div class="contentWrap">
+    <div class="contentTop"><div class="contentTitle">Book Cars</div></div>
+    <div class="trainWrap"><div id="trainTrack" class="trainTrack"></div></div>
+    <div id="viewerBox" class="viewerBox" style="display:none;">
+      <div class="viewerFrame"><img id="viewerImg" alt="Selected page"></div>
+      <div id="viewerNote" class="viewerNote"></div>
+    </div>
+    <div id="emptyMsg" class="emptyMsg" style="display:none;">No images found in local gallery.</div>
+  </div>
+</div>
+<script>
+  (function(){{
+    var names = {names_js};
+    var base = 'images/';
+    var track = document.getElementById('trainTrack');
+    var empty = document.getElementById('emptyMsg');
+    var viewerBox = document.getElementById('viewerBox');
+    var viewerImg = document.getElementById('viewerImg');
+    var viewerNote = document.getElementById('viewerNote');
+    if (!names.length) {{
+      empty.style.display = '';
+      return;
+    }}
+    function selectAt(i){{
+      var cars = Array.from(track.querySelectorAll('.car'));
+      cars.forEach(function(c, idx){{ c.classList.toggle('active', idx === i); }});
+      var src = base + names[i];
+      viewerImg.src = src;
+      viewerNote.textContent = 'Book ' + String(i + 1).padStart(2, '0');
+      viewerBox.style.display = '';
+    }}
+    names.forEach(function(n, idx){{
+      var src = base + n;
+      var car = document.createElement('button');
+      car.type = 'button';
+      car.className = 'car';
+      car.innerHTML = '<img src="' + src + '" alt="Book ' + (idx + 1) + '"><div class="carCap">CAR ' + String(idx + 1).padStart(2, '0') + '</div>';
+      car.onclick = function(){{ selectAt(idx); }};
+      track.appendChild(car);
+    }});
+    selectAt(0);
+  }})();
+</script>
+</body>
+</html>
+""".format(title=safe_title, names_js=names_js)
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate archive pages site")
-    parser.add_argument("data_file", type=Path)
+    parser = argparse.ArgumentParser(description="Generate archive pages site / A Cup of Book gallery")
+    parser.add_argument("data_file", type=Path, nargs="?")
     parser.add_argument("-o", "--output-dir", type=Path, default=Path("."))
+    parser.add_argument("--images-dir", type=Path, default=None, help="Directory containing cup_of_book images")
+    parser.add_argument("--title", default="A Cup of Book", help="Gallery page title")
     args = parser.parse_args()
+
+    if args.images_dir is not None:
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        names = collect_gallery_images(args.images_dir)
+        html = render_local_gallery_page(args.title, names)
+        (args.output_dir / "index.html").write_text(html, encoding="utf-8")
+        print(f"[OK] built gallery page in {args.output_dir.resolve()} with {len(names)} image(s)")
+        return
+
+    if args.data_file is None:
+        parser.error("data_file is required unless --images-dir is provided")
+
     data = load_data(args.data_file)
     build_site(data, args.output_dir)
     print(f"[OK] built site in {args.output_dir.resolve()}")
