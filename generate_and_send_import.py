@@ -327,7 +327,7 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
        <span class="empStatus" style="color:{info['text']};">{code}</span>
      </div>""")
             shift_blocks.append(f"""
-    <details class="shiftCard" data-shift="{key}" style="border:1px solid {info['accent']}44; background:{info['bg']}" {'open' if key=='Afternoon' else ''}>
+    <details class="shiftCard" data-shift="{key}" style="border:1px solid {info['accent']}44; background:{info['bg']}">
       <summary class="shiftSummary" style="background:{info['bg']}; border-bottom:1px solid {info['accent']}33;">
         <span class="shiftIcon">{info['icon']}</span>
         <span class="shiftLabel" style="color:{info['text']};">{key}</span>
@@ -543,8 +543,29 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
     }});
   }}
 
+  // Match Export roster logic (Muscat UTC+4): Night 21:00–04:59, Afternoon from 13:00, else Morning.
+  function getImportCurrentShiftGroup() {{
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var t = muscat.getHours() * 60 + muscat.getMinutes();
+    if (t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if (t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }}
+
+  function syncImportShiftDetailsOpen() {{
+    var shift = getImportCurrentShiftGroup();
+    document.querySelectorAll('details.shiftCard').forEach(function(d) {{
+      d.removeAttribute('open');
+    }});
+    document.querySelectorAll('details.shiftCard[data-shift="' + shift + '"]').forEach(function(d) {{
+      d.setAttribute('open', '');
+    }});
+  }}
+
   reorderImportDepartments();
   syncImportHeaderDate();
+  syncImportShiftDetailsOpen();
 
   // Keep footer "Last Updated" fresh on page load.
   var lastUpdatedEl = document.getElementById('importLastUpdated');
