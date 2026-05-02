@@ -612,13 +612,13 @@ function goToMySchedule(event) {{
 }}
 
 function goToEmployeeSchedule(empName) {{
-  var match = empName.match(/-\s*(\d{3,})/);
+  var s = String(empName || '').trim();
   var base = _importBase() + '/my-schedules/index.html';
-
-  if (match) {{
-    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  var m = s.match(/-\\s*(\\d+)\\s*$/);
+  if (m) {{
+    location.href = base + '?emp=' + encodeURIComponent(m[1]);
   }} else {{
-    location.href = base + '?name=' + encodeURIComponent(empName);
+    location.href = base + '?name=' + encodeURIComponent(s);
   }}
 }}
 
@@ -1029,9 +1029,25 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+  function deployBasePath(){
+    if (location.protocol === 'file:') return '';
+    var path = location.pathname || '/';
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
+  function siteRootUrl(){
+    var origin = location.origin || '';
+    var p = deployBasePath();
+    if (!p) return origin + '/';
+    return origin + p + (p.charAt(p.length - 1) === '/' ? '' : '/');
+  }
   function schedulesUrl(id){
-    var base=location.pathname.includes('/roster-site/')?'/roster-site':'';
-    return base+'/import/schedules/'+encodeURIComponent(id)+'.json';
+    return siteRootUrl() + 'import/schedules/' + encodeURIComponent(id) + '.json';
   }
   var data=null,month=null,months=[],lang='ar',theme='dark';
   (function(){var sl=localStorage.getItem('importPrefLang'),st=localStorage.getItem('importPrefTheme');if(sl==='en'||sl==='ar')lang=sl;if(st==='light'||st==='dark')theme=st;if(theme==='light')document.body.classList.add('light');if(lang==='en'){document.documentElement.lang='en';document.documentElement.dir='ltr';}})();
@@ -1043,7 +1059,7 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
   function applyLangUI(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('ar',lang==='ar');document.getElementById('ttl').textContent=t('title');document.getElementById('sub').textContent=t('sub');document.getElementById('langBtn').textContent=t('langBtn');document.getElementById('empId').placeholder=t('ph');document.getElementById('sbtn').textContent=t('sbtn');var e1=document.getElementById('e1'),e2=document.getElementById('e2');if(e1)e1.textContent=t('e1');if(e2)e2.textContent=t('e2');document.getElementById('tipsTitleModal').textContent=t('tipsTitle');document.getElementById('tipsSub').textContent=t('tipsSub');document.getElementById('miTitle').textContent=t('heroTitle');document.getElementById('miDesc').textContent=t('heroDesc');document.getElementById('tip1').textContent=lang==='ar'?'احفظ رقمك مرة واحدة — وسيظهر تلقائياً في المرة القادمة.':'Save your Employee ID once — it will load automatically next time.';document.getElementById('tip2').textContent=lang==='ar'?'حفظ الصورة ينتج بطاقة مرتبة بالتقويم والإحصائيات.':'Image export produces a clean card with calendar and stats.';document.getElementById('tip3').textContent=lang==='ar'?'استخدم تصدير ICS لإضافة المناوبات إلى تقويم Apple/Google/Outlook.':'Use ICS export to add shifts to Apple/Google/Outlook calendars.';document.getElementById('tipsOk').textContent='OK';var fc=document.getElementById('footerCredit');if(fc)fc.textContent=lang==='ar'?'تصميم: خالد الرقادي':'Design: KHALID ALRAQADI';if(data)renderSchedule();}
   function toggleTheme(){theme=theme==='dark'?'light':'dark';document.body.classList.toggle('light',theme==='light');document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';localStorage.setItem('importPrefTheme',theme);}
   function toggleLang(){lang=lang==='en'?'ar':'en';localStorage.setItem('importPrefLang',lang);applyLangUI();}
-  function goBack(){var base=location.pathname.includes('/roster-site/')?'/roster-site':'';if(document.referrer&&document.referrer.includes(location.host))history.back();else location.href=base+'/import/';}
+  function goBack(){var root=siteRootUrl();if(document.referrer&&document.referrer.includes(location.host))history.back();else location.href=root+'import/';}
   function openTips(){document.getElementById('tipsModal').classList.add('open');}
   function closeTips(){document.getElementById('tipsModal').classList.remove('open');}
   document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();var id=document.getElementById('empId').value.trim();if(id)loadSchedule(id);});
@@ -1071,12 +1087,20 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
   async function dlIMG(){try{var canvas=await captureExportCanvas();var a=document.createElement('a');a.download='import-'+data.id+'-'+month+'.png';a.href=canvas.toDataURL('image/png');a.click();}catch(e){alert(lang==='ar'?'تعذر حفظ الصورة.':'Image export failed.');}}
   async function dlPDF(){try{var canvas=await captureExportCanvas();var imgData=canvas.toDataURL('image/png');var jsPDF=window.jspdf.jsPDF;var pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});var pageW=210,pageH=297,margin=10,imgW=pageW-margin*2,imgH=(canvas.height*imgW)/canvas.width;pdf.addImage(imgData,'PNG',margin,margin,imgW,imgH);var rem=imgH-(pageH-margin*2);while(rem>0){pdf.addPage();pdf.addImage(imgData,'PNG',margin,margin-(imgH-rem),imgW,imgH);rem-=(pageH-margin*2);}pdf.save('import-'+data.id+'-'+month+'.pdf');}catch(e){alert(lang==='ar'?'تعذر حفظ PDF.':'PDF export failed.');}}
   function dlICS(){var sched=data.schedules[month]||[];var parts=month.split('-');var yr=parseInt(parts[0]),mo=parseInt(parts[1]);var pad=function(n){return String(n).padStart(2,'0');};var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ImportMySchedule//EN','CALSCALE:GREGORIAN'];sched.forEach(function(d){var dt2=yr+''+pad(mo)+''+pad(d.day);var dn=new Date(yr,mo-1,d.day+1);var dtE=dn.getFullYear()+''+pad(dn.getMonth()+1)+''+pad(dn.getDate());lines.push('BEGIN:VEVENT','DTSTART;VALUE=DATE:'+dt2,'DTEND;VALUE=DATE:'+dtE,'SUMMARY:'+(d.shift_code||d.shift_group),'UID:'+dt2+'-'+data.id+'@import','END:VEVENT');});lines.push('END:VCALENDAR');var blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='import-'+data.id+'-'+month+'.ics';a.click();URL.revokeObjectURL(a.href);}
-  function shareS(){var base=location.pathname.includes('/roster-site/')?'/roster-site':'';var url=location.origin+base+'/import/my-schedules/?emp='+encodeURIComponent(data.id);if(navigator.share)navigator.share({title:'Import - My Schedule',text:'Schedule: '+data.name,url:url});else{navigator.clipboard.writeText(url);alert(lang==='ar'?'تم نسخ الرابط ✅':'Link copied ✅');}}
+  function shareS(){var url=siteRootUrl()+'import/my-schedules/?emp='+encodeURIComponent(data.id);if(navigator.share)navigator.share({title:'Import - My Schedule',text:'Schedule: '+data.name,url:url});else{navigator.clipboard.writeText(url);alert(lang==='ar'?'تم نسخ الرابط ✅':'Link copied ✅');}}
   (function(){var cal=document.getElementById('brandCal'),q=document.getElementById('brandQ');if(!cal||!q)return;var sc=true;setInterval(function(){sc=!sc;cal.classList.toggle('show',sc);q.classList.toggle('show',!sc);},2600);})();
   (function(){var topbar=document.querySelector('.topbar'),aI=document.getElementById('auroraBarInner'),aB=document.getElementById('auroraBar');if(!topbar)return;function sp(){var h=topbar.offsetHeight||62;if(aB)aB.style.top=h+'px';}window.addEventListener('scroll',function(){if(aI)aI.classList.toggle('visible',window.scrollY>5);},{passive:true});setTimeout(sp,100);window.addEventListener('resize',sp);})();
   applyLangUI();
-  var p=new URLSearchParams(location.search).get('emp');
-  if(p){document.getElementById('empId').value=p;loadSchedule(p);}
+  var qs=new URLSearchParams(location.search);
+  var pEmp=qs.get('emp');
+  var pName=qs.get('name');
+  if(pEmp){document.getElementById('empId').value=pEmp;loadSchedule(pEmp);}
+  else if(pName){
+    var dec=decodeURIComponent(pName).split('+').join(' ').trim();
+    var mx=dec.match(/-\s*(\d+)\s*$/);
+    if(mx){document.getElementById('empId').value=mx[1];loadSchedule(mx[1]);}
+    else{document.getElementById('empId').value=dec;}
+  }
   else{var saved=localStorage.getItem('importSavedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
 </script>
 <script>
