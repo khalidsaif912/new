@@ -1830,13 +1830,13 @@ function goToMySchedule(event) {
 }
 
 function goToEmployeeSchedule(empName) {
-  var match = empName.match(/-\s*(\d(3,))/);
+  var s = String(empName || '').trim();
   var base = _importBase() + '/my-schedules/index.html';
-
-  if (match) {
-    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  var m = s.match(/-\s*(\d+)\s*$/);
+  if (m) {
+    location.href = base + '?emp=' + encodeURIComponent(m[1]);
   } else {
-    location.href = base + '?name=' + encodeURIComponent(empName);
+    location.href = base + '?name=' + encodeURIComponent(s);
   }
 }
 
