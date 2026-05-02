@@ -5,9 +5,11 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 
@@ -30,54 +32,153 @@ def onedrive_to_download_url(url: str) -> str:
       https://onedrive.live.com/...
       https://<tenant>.sharepoint.com/:u:/...
     """
-    import re
+    if "download=1" in url.lower():
+        return url
 
     # SharePoint / OneDrive for Business
     # مثال: https://company.sharepoint.com/:u:/g/personal/.../AbcXyz?e=token
-    # نبدّل /:u:/ أو /:x:/ إلى /download ونُبقي الـ query string
-    sp_match = re.match(r'(https://[^/]+\.sharepoint\.com/)(:[\w]+:/[^?]+)(\?.*)?', url)
+    sp_match = re.match(r"(https://[^/]+\.sharepoint\.com/)(:[\w]+:/[^?]+)(\?.*)?", url)
     if sp_match:
-        base = sp_match.group(1)
-        path = sp_match.group(2)
-        query = sp_match.group(3) or ''
-        # نُضيف download=1 إلى query string
-        sep = '&' if query else '?'
-        return url + sep + 'download=1'
+        sep = "&" if "?" in url else "?"
+        return url + sep + "download=1"
 
     # OneDrive personal short links (1drv.ms) أو onedrive.live.com
-    if '1drv.ms' in url or 'onedrive.live.com' in url:
-        sep = '&' if '?' in url else '?'
-        return url + sep + 'download=1'
+    if "1drv.ms" in url or "onedrive.live.com" in url:
+        sep = "&" if "?" in url else "?"
+        return url + sep + "download=1"
 
     # إذا كان الرابط يحتوي على download=1 بالفعل أو رابط مباشر
     return url
 
 
-def download_shared_html(share_url: str) -> bytes:
-    download_url = onedrive_to_download_url(share_url)
-
-    response = requests.get(
-        download_url,
-        headers={"Accept": "text/html, text/plain, */*", "User-Agent": "training-page-sync/training-root"},
-        timeout=120,
-        allow_redirects=True,
+def sharepoint_download_aspx_candidates(share_url: str) -> list[str]:
+    """
+    روابط المشاركة من نوع :u:/g/personal/USER/ITEM غالباً تحتاج download.aspx
+    مع باراميتر share= الرابط الكامل مشفّر.
+    """
+    out: list[str] = []
+    m = re.match(
+        r"(https://[^/]+\.sharepoint\.com)/:u:/g/personal/([^/]+)/([^/?]+)(\?[^#]*)?",
+        share_url,
+        re.I,
     )
-    response.raise_for_status()
+    if not m:
+        return out
+    host = m.group(1)
+    user_seg = m.group(2)
+    enc = quote(share_url, safe="")
+    out.append(f"{host}/personal/{user_seg}/_layouts/15/download.aspx?share={enc}")
+    out.append(f"{host}/personal/{user_seg}/_layouts/15/download.aspx?SourceUrl={enc}")
+    return out
 
-    # تحقق أن المحتوى هو HTML حقيقي وليس صفحة OneDrive
-    content = response.content
-    content_type = response.headers.get('Content-Type', '')
-    text_preview = content[:500].decode('utf-8', errors='replace').lower()
 
-    # إذا كان الـ response صفحة OneDrive وليس الملف
-    if 'onedrive' in text_preview and '<table' not in text_preview:
-        raise RuntimeError(
-            f"الرابط يُعيد صفحة OneDrive وليس الملف مباشرة.\n"
-            f"URL المستخدم: {download_url}\n"
-            f"Content-Type: {content_type}\n"
-            f"تأكد أن الرابط في TRAINING_PAGE_SOURCE_URL هو رابط تنزيل مباشر."
-        )
+def looks_like_auth_or_shell_html(html: str) -> bool:
+    low = html.lower()
+    if "<table" in low:
+        return False
+    markers = (
+        'name="login"',
+        "sign in to your account",
+        "pickredirect",
+        "you need permission",
+        "access denied",
+        "donthavesharepointaccess",
+        "session expired",
+        "id=\"login_form\"",
+        "logon.microsoftonline.com",
+    )
+    return any(m in low for m in markers)
 
+
+def fetch_training_html_candidates(share_url: str) -> tuple[bytes, str]:
+    """
+    يجرّب عدة روابط (download=1، download.aspx، إلخ) مع جلسة طلبات
+    لتحسين احتمال الحصول على HTML الملف وليس واجهة SharePoint.
+    """
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def add(u: str) -> None:
+        u = u.strip()
+        if u and u not in seen:
+            seen.add(u)
+            candidates.append(u)
+
+    add(share_url)
+    add(onedrive_to_download_url(share_url))
+    for u in sharepoint_download_aspx_candidates(share_url):
+        add(u)
+
+    session = requests.Session()
+    session.headers.update(
+        {
+            "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 training-page-sync"
+            ),
+        }
+    )
+
+    errors: list[str] = []
+    try:
+        seed = session.get(share_url, timeout=90, allow_redirects=True)
+        if seed.status_code >= 400:
+            errors.append(f"seed GET {share_url!r} -> HTTP {seed.status_code}")
+    except requests.RequestException as exc:
+        errors.append(f"seed GET failed: {exc}")
+
+    last_body: bytes = b""
+    last_url = ""
+
+    for url in candidates:
+        last_url = url
+        try:
+            response = session.get(url, timeout=120, allow_redirects=True)
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            errors.append(f"{url!r}: {exc}")
+            continue
+
+        content = response.content
+        last_body = content
+        text = content.decode("utf-8", errors="replace")
+
+        if looks_like_auth_or_shell_html(text):
+            errors.append(f"{url!r}: appears to be login/shell HTML (no <table>)")
+            continue
+
+        try:
+            parsed = parse_source_html(text)
+        except Exception as exc:
+            errors.append(f"{url!r}: parse failed: {exc}")
+            continue
+
+        if parsed.get("months"):
+            print(f"[INFO] training source fetched from: {url}")
+            return content, url
+
+        if "<table" in text.lower():
+            print(f"[INFO] training HTML (has <table>) fetched from: {url}")
+            return content, url
+
+        errors.append(f"{url!r}: parsed months=0 and no <table> in body")
+
+    preview = last_body[:800].decode("utf-8", errors="replace")
+    err_lines = "\n".join(f"  - {line}" for line in errors[:12])
+    raise RuntimeError(
+        "تعذّر تنزيل HTML التدريب من OneDrive/SharePoint.\n"
+        f"آخر URL جُرّب: {last_url}\n"
+        "جرّب أحد الخيارات التالية في TRAINING_PAGE_SOURCE_URL:\n"
+        "  • رابط مشاركة «Anyone with the link can view» للملف نفسه (.htm/.html).\n"
+        "  • أو ارفع نسخة HTML إلى مسار عام (مثل raw.githubusercontent.com) وضع رابطها المباشر.\n"
+        f"تفاصيل المحاولات:\n{err_lines}\n"
+        f"بداية الاستجابة الأخيرة:\n{preview!r}\n"
+    )
+
+
+def download_shared_html(share_url: str) -> bytes:
+    content, used_url = fetch_training_html_candidates(share_url)
     return content
 
 
