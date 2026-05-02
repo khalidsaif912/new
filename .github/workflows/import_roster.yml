@@ -21,80 +21,94 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check if file changed
+      - name: Check if Excel file changed
         id: check_changes
         env:
           IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
         run: |
           python << 'EOF'
-          import os, requests, sys
+          import os
+          import sys
+          import hashlib
+          import requests
           from pathlib import Path
           from datetime import datetime, timezone, timedelta
 
           url = os.getenv("IMPORT_SOURCE_NAME_URL")
 
           if not url:
-              print("Missing IMPORT_SOURCE_NAME_URL")
+              print("ERROR: IMPORT_SOURCE_NAME_URL secret is missing")
               sys.exit(1)
 
-          print(f"Checking: {url}")
+          print("Downloading Excel file...")
 
-          r = requests.get(url, timeout=15)
-          r.raise_for_status()
+          response = requests.get(url, timeout=30)
+          response.raise_for_status()
 
-          # هنا لازم يكون نص فقط
-          current_name = r.text.strip()
+          file_bytes = response.content
 
-          if not current_name:
-              print("Empty response")
+          if not file_bytes:
+              print("ERROR: Downloaded Excel file is empty")
               sys.exit(1)
 
-          print(f"Current file: {current_name}")
+          current_hash = hashlib.sha256(file_bytes).hexdigest()
 
-          cache = Path("last_name.txt")
-          old_name = "none"
+          cache_file = Path("import_last_hash.txt")
+          old_hash = "none"
           changed = True
 
-          if cache.exists():
-              old_name = cache.read_text().strip()
-              if old_name == current_name:
+          if cache_file.exists():
+              old_hash = cache_file.read_text(encoding="utf-8").strip()
+              if old_hash == current_hash:
                   changed = False
 
-          cache.write_text(current_name)
+          cache_file.write_text(current_hash, encoding="utf-8")
 
-          # توقيت مسقط
           muscat = timezone(timedelta(hours=4))
           now = datetime.now(muscat)
 
           mandatory_hours = [0, 5, 6, 13, 14, 20, 21]
-          force = now.hour in mandatory_hours
+          mandatory_update = now.hour in mandatory_hours
 
-          should = changed or force
+          should_process = changed or mandatory_update
 
           print(f"Muscat time: {now.strftime('%H:%M')}")
-          print(f"Changed: {changed}")
-          print(f"Force: {force}")
-          print(f"Should run: {should}")
+          print(f"File changed: {changed}")
+          print(f"Mandatory update: {mandatory_update}")
+          print(f"Should process: {should_process}")
+          print(f"Current hash: {current_hash[:12]}")
+          print(f"Old hash: {old_hash[:12] if old_hash != 'none' else 'none'}")
 
-          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
               f.write(f"changed={str(changed).lower()}\n")
-              f.write(f"should_process={str(should).lower()}\n")
-              f.write(f"name={current_name}\n")
-              f.write(f"old={old_name}\n")
+              f.write(f"should_process={str(should_process).lower()}\n")
+              f.write(f"current_hash={current_hash[:12]}\n")
+              f.write(f"old_hash={old_hash[:12] if old_hash != 'none' else 'none'}\n")
           EOF
 
-      - name: Show info
+      - name: Display check info
         run: |
-          echo "Changed: ${{ steps.check_changes.outputs.changed }}"
-          echo "Should: ${{ steps.check_changes.outputs.should_process }}"
-          echo "Name:   ${{ steps.check_changes.outputs.name }}"
+          echo "========================================"
+          echo "Import Check Report"
+          echo "========================================"
+          echo "File changed:   ${{ steps.check_changes.outputs.changed }}"
+          echo "Should process: ${{ steps.check_changes.outputs.should_process }}"
+          echo "Current hash:   ${{ steps.check_changes.outputs.current_hash }}"
+          echo "Previous hash:  ${{ steps.check_changes.outputs.old_hash }}"
+          echo "========================================"
 
-      - name: Run script
+      - name: Generate Import pages and send mail
         if: steps.check_changes.outputs.should_process == 'true'
         env:
           IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
@@ -106,24 +120,35 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
           PAGES_BASE_URL: ${{ secrets.PAGES_BASE_URL }}
         run: |
+          echo "Generating import pages..."
           python generate_and_send_import.py
+          echo "Done!"
 
-      - name: Commit
+      - name: Commit updated Import docs
         if: steps.check_changes.outputs.should_process == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add docs/import last_name.txt
+          git add docs/import import_last_hash.txt
 
           if git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes to commit"
           else
-            git commit -m "Update import"
+            if [ "${{ steps.check_changes.outputs.changed }}" = "true" ]; then
+              git commit -m "Update IMPORT roster"
+            else
+              git commit -m "Scheduled IMPORT update"
+            fi
+
             git pull --rebase
             git push
+            echo "Pushed!"
           fi
 
-      - name: Skip
+      - name: Skip - No action needed
         if: steps.check_changes.outputs.should_process == 'false'
-        run: echo "No action needed"
+        run: |
+          echo "========================================"
+          echo "No action needed"
+          echo "========================================"
