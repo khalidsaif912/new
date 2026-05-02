@@ -1,6 +1,16 @@
 (function () {
   const BANNER_KEY = 'roster_banner_choice';
-  const BANNERS_PATH = 'https://khalidsaif912.github.io/roster-site/assets/banners/';
+  function getSiteRootPath() {
+    const path = location.pathname || '/';
+    if (path.includes('/roster-site/')) return '/roster-site';
+    if (location.hostname && location.hostname.endsWith('github.io')) {
+      const segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
+  const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
 
   // عدّل هذه القائمة بأسماء الصور الفعلية في مجلد assets/banners/
   const availableBanners = [
@@ -41,8 +51,9 @@
   function applyBanner(name) {
     const targets = getBannerTargets();
     if (!targets.length) return;
+    const bannerUrl = BANNERS_PATH + name;
     targets.forEach(function(el) {
-      el.style.backgroundImage = "url('" + BANNERS_PATH + name + "')";
+      el.style.backgroundImage = "url('" + bannerUrl + "')";
       el.style.backgroundSize = 'cover';
       el.style.backgroundPosition = 'center';
       el.style.backgroundRepeat = 'no-repeat';
@@ -169,7 +180,12 @@
 
   function init() {
     const saved = getSavedBanner();
-    if (saved) applyBanner(saved);
+    if (saved) {
+      // Warm cache first to avoid visual flash on repeated visits.
+      const pre = new Image();
+      pre.src = BANNERS_PATH + saved;
+      applyBanner(saved);
+    }
     createChangerBtn();
   }
 
