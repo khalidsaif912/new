@@ -1175,7 +1175,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">02MAY2026 / 10:14</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">02MAY2026 / 16:12</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1721,9 +1721,6 @@ setDiffChipIcon();
 applyLang(LANG);
 startSummarySwitchLoop();
 
-// ═══════════════════════════════════════════════════
-// رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
-// ═══════════════════════════════════════════════════
 function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
