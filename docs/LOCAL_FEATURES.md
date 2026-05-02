@@ -23,7 +23,7 @@ This file documents where each major local site feature is implemented.
 
 ## Floating alert icons (optional)
 - Preference key (localStorage): `rosterFloatingAlertDots` — value `"0"` hides the floating envelope (`absence-alert.js`) and the floating change icon (`change-alert.js`) on roster home pages. Any other value or unset = show.
-- Toggles appear in the absence modal and in the roster-change card on the home page.
+- Toggles appear in the absence modal, in the roster-change card on the home page, and on `docs/roster-diff/index.html`.
 
 ## Schedule Change Alert (Compared to Previous Version)
 - Frontend script: `docs/change-alert.js`
