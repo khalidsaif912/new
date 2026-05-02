@@ -1746,35 +1746,6 @@ startSummarySwitchLoop();
 // ═══════════════════════════════════════════════════
 // رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
 // ═══════════════════════════════════════════════════
-(function() {
-  function getExportEmpId() {
-    var id = localStorage.getItem('exportSavedEmpId');
-    if (id) return id;
-    var legacy = localStorage.getItem('savedEmpId');
-    if (legacy) {
-      localStorage.setItem('exportSavedEmpId', legacy);
-      return legacy;
-    }
-    return '';
-  }
-  var empId = getExportEmpId();
-  if (!empId) return;
-  var chip = document.getElementById('welcomeChip');
-  var nameEl = document.getElementById('welcomeName');
-  // استخدام مسار مطلق يعمل من أي صفحة
-  var base = getSiteRootUrl() + '/';
-  fetch(base + 'schedules/' + empId + '.json')
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(d) {
-      if (!d || !d.name) return;
-      var firstName = d.name.split(' ')[0];
-      if (chip && nameEl) {
-        nameEl.textContent = firstName;
-        chip.classList.add('visible');
-      }
-    }).catch(function() {});
-})();
-
 function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');

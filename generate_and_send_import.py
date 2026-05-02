@@ -233,12 +233,32 @@ def load_export_ui_template(repo_root: Path) -> Tuple[str, str]:
     return style, script
 
 
+_EXPORT_WELCOME_CHIP_RE = re.compile(
+    r"\r?\n// ?═+\r?\n"
+    r"// ?رسالة الترحيب[^\r\n]+\r?\n"
+    r"// ?═+\r?\n"
+    r"\(function\(\) \{[\s\S]*?\}\)\(\);\s*\r?\n"
+    r"(?=function goToMySchedule)",
+)
+
+
 def sanitize_export_script_for_import(script: str) -> str:
     """
     Import uses the same floating UI as export via change-alert.js (shift + absence in one card).
     Do not load absence-alert.js here — it would duplicate the absence FAB.
+    Strip the export-only welcome chip IIFE (exportSavedEmpId + /schedules/); import pages use
+    showWelcomeChip with importSavedEmpId + /import/schedules/ in the appended override block.
     """
     script = re.sub(r"addScript\(root \+ ['/\\\"]\/absence-alert\.js['/\\\"]\);\s*", "", script)
+    script, n = _EXPORT_WELCOME_CHIP_RE.subn("\n", script, count=1)
+    if not n:
+        # Older templates: drop by unique getExportEmpId marker
+        script = re.sub(
+            r"\r?\n\(function\(\) \{\s*function getExportEmpId\(\) \{[\s\S]*?\}\)\(\);\s*\r?\n(?=function goToMySchedule)",
+            "\n",
+            script,
+            count=1,
+        )
     return script
 
 
