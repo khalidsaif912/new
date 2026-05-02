@@ -26,8 +26,15 @@ from openpyxl import load_workbook
 # =========================
 # Settings
 # =========================
-EXCEL_URL = os.environ.get("EXCEL_URL", "").strip()
 TZ = ZoneInfo("Asia/Muscat")
+
+
+def excel_url_from_env() -> str:
+    """Resolve roster Excel URL at runtime (not at import) for CI/subprocess correctness."""
+    return (
+        os.environ.get("EXCEL_URL", "").strip()
+        or os.environ.get("EXPORT_EXCEL_URL", "").strip()
+    )
 
 DEPARTMENTS = [
     ("Officers", "Officers"),
@@ -494,13 +501,17 @@ def main():
     print("=" * 60)
 
     # تحميل Excel
+    excel_url = excel_url_from_env()
     if args.excel_file:
         print(f"📥 Loading local Excel: {args.excel_file}")
         wb = load_workbook(args.excel_file, data_only=True)
     else:
-        if not EXCEL_URL:
-            raise RuntimeError("❌ EXCEL_URL environment variable is missing (or use --excel-file)")
-        data = download_excel(EXCEL_URL)
+        if not excel_url:
+            raise RuntimeError(
+                "❌ EXCEL_URL (or EXPORT_EXCEL_URL) environment variable is missing — "
+                "set Actions secret EXPORT_EXCEL_URL, or use --excel-file"
+            )
+        data = download_excel(excel_url)
         wb = load_workbook(BytesIO(data), data_only=True)
 
     if args.month:
@@ -529,7 +540,7 @@ def main():
                 print(f"⚠️  Using current month: {year}-{month:02d}")
     else:
         # ── بدون filename: محاولة من URL ثم المحتوى ────────────
-        source_for_detect = EXCEL_URL if EXCEL_URL else (args.excel_file or "")
+        source_for_detect = excel_url if excel_url else (args.excel_file or "")
         detected = detect_month_from_url(source_for_detect)
         if detected:
             year, month = detected
