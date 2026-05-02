@@ -4,6 +4,15 @@
   const PAGE_KEY = (location.pathname || "").indexOf("/import/") !== -1 ? "import" : "export";
   const STORAGE_EMP_ID = PAGE_KEY === "import" ? "importSavedEmpId" : "exportSavedEmpId";
   const STORAGE_LANG = "appLang";
+  /** Shared with change-alert.js: "0" hides floating alert controls (envelope + home change icon). */
+  const FLOAT_DOTS_KEY = "rosterFloatingAlertDots";
+  /** Human-facing workbook (attendance / absence); JSON on site is built from the automated download URL. */
+  const ABSENCE_SHAREPOINT_SOURCE =
+    "https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG";
+
+  function floatingDotsEnabled() {
+    return localStorage.getItem(FLOAT_DOTS_KEY) !== "0";
+  }
 
   function deployBasePath() {
     if (location.protocol === "file:") return "";
@@ -46,6 +55,13 @@
       hideModalSub: "ستبقى أيقونة التنبيه ظاهرة",
       hideDot: "إخفاء كل شيء حتى التحديث القادم",
       hideDotSub: "لن يظهر التنبيه إلا عند وجود غياب جديد",
+      floatDotsOpt: "إظهار الأيقونة العائمة للتنبيهات",
+      floatDotsOptSub: "ظهور ظرف الغياب 📩 وأيقونة تغيّر الروستر في الصفحة الرئيسية. عند التفعيل بعد الإيقاف قد تحتاج تحديث الصفحة لظهور الأيقونة.",
+      absSourceTitle: "من أين تأتي بيانات الغياب؟",
+      absSourceParaBefore: "الموقع يحمّل ملف ",
+      absSourceParaAfter:
+        " من نفس الموقع؛ يُحدَّث من تقرير Excel على SharePoint عند نشر الموقع أو تشغيل المعالجة. رابط النسخة المرجعية للفريق:",
+      absSourceLink: "فتح ملف SharePoint",
       ok: "حسناً، فهمت ✓",
       subject: (name) => `تنبيه غياب — ${name}`,
       adminMailBody: (name, empId, dates) =>
@@ -72,6 +88,13 @@
       hideModalSub: "The alert icon will remain visible",
       hideDot: "Hide everything until the next update",
       hideDotSub: "No alert will appear unless there is a new absence",
+      floatDotsOpt: "Show floating alert icons",
+      floatDotsOptSub: "Shows the absence envelope 📩 and the roster-change icon on the home roster page. If you turn it back on, refresh the page for the icon to appear.",
+      absSourceTitle: "Where does absence data come from?",
+      absSourceParaBefore: "The site loads ",
+      absSourceParaAfter:
+        " from this site; it is rebuilt from the SharePoint Excel report when the site is published or the processing script runs. Reference workbook:",
+      absSourceLink: "Open SharePoint file",
       ok: "OK, got it ✓",
       subject: (name) => `Absence Alert — ${name}`,
       adminMailBody: (name, empId, dates) =>
@@ -419,6 +442,24 @@
         border-inline-start: 3px solid #991b1b;
       }
 
+      .abs-source-box {
+        font-size: 10px;
+        color: #475569;
+        line-height: 1.55;
+        padding: 9px 10px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+      }
+      .abs-source-box strong { color: #334155; display: block; margin-bottom: 4px; font-size: 11px; }
+      .abs-source-box code {
+        font-size: 10px;
+        background: #e2e8f0;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .abs-source-box a { color: #1d4ed8; font-weight: 800; }
+
       .ab-row {
         display: flex;
         align-items: center;
@@ -556,27 +597,31 @@
   function buildUI() {
     const dict = t();
     const count = mState.absences.length;
+    const isModalDismissed = localStorage.getItem("absDismissed_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+    const isDotHidden = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+    const floatOn = floatingDotsEnabled();
 
-    const dot = applyLangMeta(document.createElement("div"));
-    dot.id = "abs-dot";
-    dot.className = "abs-r";
-    dot.innerHTML = `
+    if (floatOn) {
+      const dot = applyLangMeta(document.createElement("div"));
+      dot.id = "abs-dot";
+      dot.className = "abs-r";
+      dot.innerHTML = `
       <span class="abs-dot-emoji">📩</span>
       <span class="abs-dot-badge">${dict.daysAbsence(count)}</span>
     `;
-    document.body.appendChild(dot);
+      document.body.appendChild(dot);
 
-    const card = applyLangMeta(document.createElement("div"));
-    card.id = "abs-card";
-    card.className = "abs-r";
+      const card = applyLangMeta(document.createElement("div"));
+      card.id = "abs-card";
+      card.className = "abs-r";
 
-    const cardRows = mState.absences.map(a =>
-      `<div class="abs-card-row">📅 ${a.date}</div>`
-    ).join("");
+      const cardRows = mState.absences.map(a =>
+        `<div class="abs-card-row">📅 ${a.date}</div>`
+      ).join("");
 
-    const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
+      const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
 
-    card.innerHTML = `
+      card.innerHTML = `
       <div class="abs-card-top">
         <span class="abs-card-title">${dict.recordedAbsence}</span>
         <button class="abs-card-x" id="abs-card-x" aria-label="${dict.closeLabel}">✕</button>
@@ -585,18 +630,23 @@
       ${cardRows}
       <button class="abs-card-btn" id="abs-card-detail">${dict.detailsBtn}</button>
     `;
-    document.body.appendChild(card);
-
-    const isModalDismissed = localStorage.getItem("absDismissed_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-    const isDotHidden = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
+      document.body.appendChild(card);
+    }
 
     if (isDotHidden) return;
 
-    if (isModalDismissed) {
-      dot.classList.add("abs-on");
-    } else {
+    if (!isModalDismissed) {
       showMainModal();
+      return;
     }
+
+    if (!floatOn) return;
+
+    const dot = document.getElementById("abs-dot");
+    const card = document.getElementById("abs-card");
+    if (!dot || !card) return;
+
+    dot.classList.add("abs-on");
 
     dot.onclick = () => {
       card.classList.toggle("abs-open");
@@ -652,6 +702,13 @@
 
         <div id="abs-mbody">
           <div class="abs-reason">${dict.reason}</div>
+          <div class="abs-source-box">
+            <strong>${dict.absSourceTitle}</strong>
+            <p style="margin:6px 0 0">
+              ${dict.absSourceParaBefore}<code>absence-data.json</code>${dict.absSourceParaAfter}
+              <a href="${ABSENCE_SHAREPOINT_SOURCE}" target="_blank" rel="noopener noreferrer">${dict.absSourceLink}</a>.
+            </p>
+          </div>
           <div>${dateRows}</div>
 
           <div class="abs-contact-row">
@@ -679,6 +736,10 @@
               <input type="checkbox" id="abs-hide-dot">
               <div class="abs-opt-t">${dict.hideDot}<span>${dict.hideDotSub}</span></div>
             </label>
+            <label class="abs-opt">
+              <input type="checkbox" id="abs-float-enable" ${floatingDotsEnabled() ? "checked" : ""}>
+              <div class="abs-opt-t">${dict.floatDotsOpt}<span>${dict.floatDotsOptSub}</span></div>
+            </label>
           </div>
 
           <button id="abs-ok">${dict.ok}</button>
@@ -699,20 +760,30 @@
   }
 
   function closeModal(ov, hideModal, hideDot) {
+    const floatEl = document.getElementById("abs-float-enable");
+    const floatOn = floatEl ? floatEl.checked : floatingDotsEnabled();
+    if (floatEl) {
+      localStorage.setItem(FLOAT_DOTS_KEY, floatOn ? "1" : "0");
+      if (!floatOn) {
+        const card = document.getElementById("abs-card");
+        if (card) card.remove();
+        const dotRm = document.getElementById("abs-dot");
+        if (dotRm) dotRm.remove();
+      }
+    }
     ov.style.transition = "opacity 0.2s ease";
     ov.style.opacity = "0";
     setTimeout(() => {
       ov.remove();
       const dot = document.getElementById("abs-dot");
-      if (!dot) return;
       if (hideDot) {
         localStorage.setItem("absHideDot_" + mState.empId + "_" + PAGE_KEY, mState.hash);
-        dot.style.display = "none";
+        if (dot) dot.style.display = "none";
       } else if (hideModal) {
         localStorage.setItem("absDismissed_" + mState.empId + "_" + PAGE_KEY, mState.hash);
-        dot.classList.add("abs-on");
+        if (dot) dot.classList.add("abs-on");
       } else {
-        dot.classList.add("abs-on");
+        if (dot) dot.classList.add("abs-on");
       }
     }, 220);
   }

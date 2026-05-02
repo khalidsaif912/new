@@ -16,9 +16,14 @@ This file documents where each major local site feature is implemented.
 
 ## Absence Alert (Recorded Absence Modal)
 - Frontend script: `docs/absence-alert.js`
-- Data source JSON: `docs/absence-data.json`
+- Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
 - Data builder script: `process_absence.py`
-- External source variable: `ABSENCE_EXCEL_URL`
+- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — direct download link for the `.xlsb` absence report (SharePoint/OneDrive style URL; the script may append `download=1`).
+- Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG)
+
+## Floating alert icons (optional)
+- Preference key (localStorage): `rosterFloatingAlertDots` — value `"0"` hides the floating envelope (`absence-alert.js`) and the floating change icon (`change-alert.js`) on roster home pages. Any other value or unset = show.
+- Toggles appear in the absence modal and in the roster-change card on the home page.
 
 ## Schedule Change Alert (Compared to Previous Version)
 - Frontend script: `docs/change-alert.js`

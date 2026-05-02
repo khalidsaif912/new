@@ -5,6 +5,12 @@
   var HOME_CARD_ID = 'chg-card';
   var PAGE_BANNER_ID = 'chg-page-banner';
   var STYLE_ID = 'chg-styles';
+  /** Same key as absence-alert.js — "0" hides floating alert icons on roster home. */
+  var FLOAT_DOTS_KEY = 'rosterFloatingAlertDots';
+
+  function floatingAlertDotsEnabled() {
+    return localStorage.getItem(FLOAT_DOTS_KEY) !== '0';
+  }
 
   function getLang() {
     var path = window.location.pathname || '';
@@ -33,7 +39,8 @@
         noDetails: 'يوجد تحديث في جدولك.',
         updated: 'تحديث',
         changedToday: 'تم تعديل هذا اليوم',
-        changedDates: 'الأيام المتغيرة'
+        changedDates: 'الأيام المتغيرة',
+        floatDotsOpt: 'إظهار الأيقونة العائمة للتنبيهات (غياب / تغيّر الروستر)'
       },
       en: {
         changed: 'Your schedule changed',
@@ -46,7 +53,8 @@
         noDetails: 'Your roster has been updated.',
         updated: 'Update',
         changedToday: 'This day was changed',
-        changedDates: 'Changed dates'
+        changedDates: 'Changed dates',
+        floatDotsOpt: 'Show floating alert icons (absence / roster changes)'
       }
     };
     return (dict[lang] && dict[lang][key]) || key;
@@ -636,14 +644,23 @@
       '<div class="chg-options">' +
         '<label class="chg-opt"><input type="checkbox" id="chgOptDismiss"> ' + (lang === 'ar' ? 'إخفاء تام (النافذة + الأيقونة)' : 'Hide completely (card + icon)') + '</label>' +
         '<label class="chg-opt"><input type="checkbox" id="chgOptMin"> ' + (lang === 'ar' ? 'تصغير (إخفاء النافذة فقط)' : 'Minimize (hide card only)') + '</label>' +
+        '<label class="chg-opt"><input type="checkbox" id="chgFloatingDots" ' + (floatingAlertDotsEnabled() ? 'checked' : '') + '> ' + t('floatDotsOpt', lang) + '</label>' +
       '</div>' +
       '<div class="chg-card-actions">' +
         '<button class="chg-btn chg-btn-muted" data-act="openDiff">' + (lang === 'ar' ? 'صفحة التنبيهات' : 'Alerts Page') + '</button>' +
         '<button class="chg-btn chg-btn-primary" data-act="apply">' + (lang === 'ar' ? 'تطبيق' : 'Apply') + '</button>' +
       '</div>';
 
-    icon.hidden = false;
-    card.hidden = isMinimized(empId, alert);
+    if (!floatingAlertDotsEnabled()) {
+      icon.hidden = true;
+      if (isMinimized(empId, alert)) {
+        clearMinimized(empId, alert);
+      }
+      card.hidden = false;
+    } else {
+      icon.hidden = false;
+      card.hidden = isMinimized(empId, alert);
+    }
 
     var optDismiss = card.querySelector('#chgOptDismiss');
     var optMin = card.querySelector('#chgOptMin');
@@ -661,6 +678,10 @@
       if (!act) return;
 
       if (act === 'apply') {
+        var floatCb = card.querySelector('#chgFloatingDots');
+        if (floatCb) {
+          localStorage.setItem(FLOAT_DOTS_KEY, floatCb.checked ? '1' : '0');
+        }
         var doDismiss = !!(optDismiss && optDismiss.checked);
         var doMin = !!(optMin && optMin.checked);
         if (doDismiss) {
@@ -670,7 +691,12 @@
           return;
         }
         if (doMin || (!doDismiss && !doMin)) {
-          // Default behavior when nothing is selected: minimize card, keep icon.
+          if (!floatingAlertDotsEnabled()) {
+            clearMinimized(empId, alert);
+            card.hidden = false;
+            icon.hidden = true;
+            return;
+          }
           markMinimized(empId, alert);
           card.hidden = true;
           icon.hidden = false;
@@ -678,7 +704,7 @@
         }
         clearMinimized(empId, alert);
         card.hidden = false;
-        icon.hidden = false;
+        icon.hidden = !floatingAlertDotsEnabled();
         return;
       }
       if (act === 'openDiff') {

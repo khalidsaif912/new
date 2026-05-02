@@ -39,6 +39,7 @@ The script reads these variables:
 - `MAIL_FROM` (required): sender address
 - `MAIL_TO` (optional fallback): fallback recipient when subscribers are unavailable
 - `PAGES_BASE_URL` (optional): base URL for generated page links
+- `ABSENCE_EXCEL_URL` (optional, for CI / `process_absence.py`): direct-download URL for the absence `.xlsb` report. The live site only reads static `docs/absence-data.json`; that JSON is regenerated when the processing script runs against the Excel source. The team workbook on SharePoint (reference): [link](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG).
 
 ## Local Run
 

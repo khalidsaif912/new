@@ -5,7 +5,10 @@ process_absence.py
 ويولّد docs/absence-data.json
 
 المتغيرات المطلوبة في GitHub Secrets:
-  ABSENCE_EXCEL_URL  ← رابط مشاركة ملف الـ xlsb من OneDrive
+  ABSENCE_EXCEL_URL  ← رابط تنزيل مباشر لملف الـ xlsb (مثلاً من رابط مشاركة SharePoint/OneDrive مع download=1)
+
+رابط نسخة العمل على SharePoint (للمرجع البشري؛ التشغيل الآلي يستخدم ABSENCE_EXCEL_URL):
+  https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG
 ──────────────────────────────────────────────────────────────────────────────
 """
 
