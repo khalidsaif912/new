@@ -876,7 +876,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 <script>
 function goToEmployeeSchedule(empName) {{
   var match = empName.match(/-\s*(\d{{3,}})/);
-  var base = 'https://khalidsaif912.github.io/roster-site/my-schedules/index.html';
+  var base = getSiteRootUrl() + '/my-schedules/index.html';
 
   if (match) {{
     location.href = base + '?emp=' + encodeURIComponent(match[1]);
