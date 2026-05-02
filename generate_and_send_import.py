@@ -235,11 +235,10 @@ def load_export_ui_template(repo_root: Path) -> Tuple[str, str]:
 
 def sanitize_export_script_for_import(script: str) -> str:
     """
-    Import pages must not load export-specific alert scripts.
-    Keep shared UI behavior, but strip absence/change alert loaders.
+    Import uses the same floating UI as export via change-alert.js (shift + absence in one card).
+    Do not load absence-alert.js here — it would duplicate the absence FAB.
     """
     script = re.sub(r"addScript\(root \+ ['/\\\"]\/absence-alert\.js['/\\\"]\);\s*", "", script)
-    script = re.sub(r"addScript\(root \+ ['/\\\"]\/change-alert\.js['/\\\"]\);\s*", "", script)
     return script
 
 
@@ -1079,6 +1078,28 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
   var p=new URLSearchParams(location.search).get('emp');
   if(p){document.getElementById('empId').value=p;loadSchedule(p);}
   else{var saved=localStorage.getItem('importSavedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
+</script>
+<script>
+(function(){
+  function deployBase(){
+    if (location.protocol === 'file:') return '';
+    var path = location.pathname || '/';
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
+  var p = deployBase();
+  var base = (location.origin||'') + p + (p && p.charAt(p.length-1) !== '/' ? '/' : '');
+  var u = base + 'change-alert.js?v=20260502b';
+  if (document.querySelector('script[data-chg-alert]')) return;
+  var s = document.createElement('script');
+  s.src = u; s.defer = true; s.setAttribute('data-chg-alert','1');
+  document.body.appendChild(s);
+})();
 </script>
 </body>
 </html>"""

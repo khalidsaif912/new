@@ -7,7 +7,17 @@
   var STYLE_ID = 'chg-styles';
 
   function getLang() {
-    return localStorage.getItem('rosterLang') || 'en';
+    var path = window.location.pathname || '';
+    if (path.indexOf('/import/') !== -1) {
+      return localStorage.getItem('importPrefLang')
+        || localStorage.getItem('rosterLang')
+        || localStorage.getItem('appLang')
+        || 'en';
+    }
+    return localStorage.getItem('rosterLang')
+      || localStorage.getItem('importPrefLang')
+      || localStorage.getItem('appLang')
+      || 'en';
   }
 
   function t(key, lang) {
@@ -64,10 +74,25 @@
     return '';
   }
 
+  /** Match generate_and_send.py getSiteRootPath() so /new/docs, /roster-site/, etc. resolve correctly. */
+  function getDeployBasePath() {
+    if (typeof location === 'undefined') return '';
+    if (location.protocol === 'file:') return '';
+    var path = location.pathname || '/';
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
+
   function getBase() {
     var origin = window.location.origin || '';
-    var isRepoPath = (window.location.pathname || '').indexOf('/roster-site/') !== -1;
-    return isRepoPath ? (origin + '/roster-site/') : (origin + '/');
+    var p = getDeployBasePath();
+    if (!p) return origin + '/';
+    return origin + p + (p.charAt(p.length - 1) === '/' ? '' : '/');
   }
 
   function onHomePage() {
@@ -267,17 +292,18 @@
     style.textContent = `
       #${HOME_ICON_ID} {
         position: fixed;
-        left: 12px;
-        bottom: 98px;
-        width: 42px;
-        height: 42px;
+        left: 16px;
+        bottom: 24px;
+        width: 48px;
+        height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        z-index: 9998;
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(15,23,42,.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(15,23,42,.14);
+        z-index: 100020;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         padding: 0;
@@ -288,11 +314,11 @@
       }
 
       #${HOME_ICON_ID} .chg-dot-icon {
-        width: 42px;
-        height: 42px;
+        width: 34px;
+        height: 34px;
         object-fit: contain;
         display: block;
-        filter: drop-shadow(0 3px 8px rgba(0,0,0,.28));
+        filter: drop-shadow(0 2px 6px rgba(0,0,0,.22));
         animation: chgIconPulse 1.8s ease-in-out infinite;
       }
       @keyframes chgIconPulse {
@@ -311,7 +337,7 @@
         border: 1px solid rgba(15,23,42,.08);
         border-radius: 16px;
         box-shadow: 0 18px 40px rgba(15,23,42,.18);
-        z-index: 9999;
+        z-index: 100040;
         overflow: hidden;
       }
 
@@ -656,11 +682,7 @@
         return;
       }
       if (act === 'openDiff') {
-        var origin = location.origin;
-        var target = location.pathname.indexOf('/roster-site/') !== -1
-          ? origin + '/roster-site/roster-diff/index.html'
-          : origin + '/roster-diff/index.html';
-        window.location.href = target;
+        window.location.href = getBase() + 'roster-diff/index.html';
         return;
       }
       if (act === 'tab:shift' || act === 'tab:absence') {
@@ -758,6 +780,7 @@ function renderForEmployee(empId) {
   if (!empId) return;
 
   var lang = getLang();
+  if (document.body) document.body.classList.toggle('ar', lang === 'ar');
   var path = window.location.pathname || '';
   var url = path.indexOf('/import/') !== -1
     ? (getBase() + 'import/schedules/' + encodeURIComponent(empId) + '.json')

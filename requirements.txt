@@ -1,5 +1,6 @@
 pandas
 openpyxl
+pyxlsb
 requests
 jinja2
 python-dateutil

@@ -1,16 +1,27 @@
 (function () {
   "use strict";
 
-  const PATH_ROSTER = "/roster-site/";
-  const PATH_IMPORT = "/roster-site/import";
-  const PAGE_KEY = location.pathname.includes(PATH_IMPORT) ? "import" : "export";
+  const PAGE_KEY = (location.pathname || "").indexOf("/import/") !== -1 ? "import" : "export";
   const STORAGE_EMP_ID = PAGE_KEY === "import" ? "importSavedEmpId" : "exportSavedEmpId";
   const STORAGE_LANG = "appLang";
 
+  function deployBasePath() {
+    if (location.protocol === "file:") return "";
+    const path = location.pathname || "/";
+    if (path.indexOf("/roster-site/") !== -1) return "/roster-site";
+    if (location.hostname && location.hostname.indexOf("github.io") !== -1) {
+      const segs = path.split("/").filter(Boolean);
+      if (segs.length >= 2 && segs[1] === "docs") return "/" + segs[0] + "/docs";
+      return segs.length ? "/" + segs[0] : "";
+    }
+    return "";
+  }
+
   const DATA_URL = (function () {
     const origin = location.origin;
-    const base = location.pathname.includes(PATH_ROSTER) ? origin + PATH_ROSTER : origin;
-    return base + "/absence-data.json";
+    const p = deployBasePath();
+    const base = origin + p + (p && p.charAt(p.length - 1) !== "/" ? "/" : "");
+    return base + "absence-data.json";
   })();
 
   let mState = { empName: "", absences: [], empId: "", hash: "" };

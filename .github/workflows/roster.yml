@@ -166,6 +166,13 @@ jobs:
           echo "Current file:      ${{ steps.check_changes.outputs.filename }}"
           echo "Previous file:     ${{ steps.check_changes.outputs.old_filename }}"
           echo "========================================"
+
+      # Same idea as scripts/export/load_local_month.ps1: keep "previous" xlsx before regen.
+      - name: Stage export roster baseline for auto-diff
+        if: steps.check_changes.outputs.should_process == 'true'
+        env:
+          ROSTER_FILENAME: ${{ steps.check_changes.outputs.filename }}
+        run: python scripts/ci_export_diff_snapshots.py before
       
       - name: Generate page + send email
         if: steps.check_changes.outputs.should_process == 'true'
@@ -206,19 +213,38 @@ jobs:
             echo "generate_employee_schedules.py not found, skipping..."
           fi
 
-      - name: Commit updated docs
+      - name: Build export roster auto-diff (same month, previous vs current file)
         if: steps.check_changes.outputs.should_process == 'true'
+        env:
+          ROSTER_FILENAME: ${{ steps.check_changes.outputs.filename }}
+        run: python scripts/ci_export_diff_snapshots.py after
+
+      # Builds docs/absence-data.json from ABSENCE_EXCEL_URL (see process_absence.py).
+      # Runs even when the roster Excel did not change, so absence-only updates still publish.
+      - name: Process absence report
+        if: success()
+        env:
+          ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
+        run: python process_absence.py
+
+      - name: Commit updated docs
+        if: success()
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add docs rosters last_filename.txt
+          if [ -f last_absence_hash.txt ]; then git add last_absence_hash.txt; fi
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
-              git commit -m "Update roster: ${{ steps.check_changes.outputs.filename }}"
+            if [ "${{ steps.check_changes.outputs.should_process }}" == "true" ]; then
+              if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
+                git commit -m "Update roster: ${{ steps.check_changes.outputs.filename }}"
+              else
+                git commit -m "Scheduled update"
+              fi
             else
-              git commit -m "Scheduled update"
+              git commit -m "Update absence data"
             fi
             git push
             echo "Pushed!"
