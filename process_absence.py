@@ -50,7 +50,7 @@ def download_xlsb(url):
     headers = {"User-Agent": "Mozilla/5.0 (GitHub Actions) roster-site", "Accept": "application/octet-stream,*/*"}
     r = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
     r.raise_for_status()
-    return r.content
+    return r.content, (r.headers.get("Content-Type") or "").lower(), r.url
 
 def clean_date(raw):
     if not raw:
@@ -78,6 +78,68 @@ def _normalize_cell(value):
         pass
     return value
 
+def _extract_rows_with_pandas(data, engine):
+    df = pd.read_excel(BytesIO(data), sheet_name=0, header=None, engine=engine)
+    return [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
+
+def _extract_rows(data, content_type):
+    rows = []
+    errors = []
+
+    if open_workbook is not None:
+        try:
+            with open_workbook(BytesIO(data)) as wb:
+                sheet_name = wb.sheets[0]
+                with wb.get_sheet(sheet_name) as ws:
+                    for row in ws.rows():
+                        rows.append([c.v for c in row])
+            if rows:
+                return rows
+        except Exception as e:
+            errors.append(f"pyxlsb: {e}")
+    else:
+        errors.append("pyxlsb: not installed")
+
+    for engine in ("openpyxl", "pyxlsb"):
+        try:
+            rows = _extract_rows_with_pandas(data, engine=engine)
+            if rows:
+                return rows
+        except Exception as e:
+            errors.append(f"pandas[{engine}]: {e}")
+
+    looks_like_html = (
+        "text/html" in content_type
+        or "application/xhtml+xml" in content_type
+        or b"<html" in data[:4096].lower()
+        or b"<!doctype html" in data[:4096].lower()
+    )
+    if looks_like_html:
+        try:
+            tables = pd.read_html(BytesIO(data))
+            if tables:
+                df = tables[0]
+                rows = [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
+                if rows:
+                    return rows
+        except Exception as e:
+            errors.append(f"read_html: {e}")
+
+    try:
+        df = pd.read_csv(BytesIO(data), sep=None, engine="python", header=None)
+        rows = [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
+        if rows:
+            return rows
+    except Exception as e:
+        errors.append(f"read_csv: {e}")
+
+    signature = data[:24].hex()
+    preview = data[:160].decode("utf-8", errors="replace").replace("\n", " ").replace("\r", " ")
+    raise ValueError(
+        f"unable to parse downloaded file; content-type={content_type or 'unknown'}; "
+        f"signature={signature}; preview={preview!r}; attempts={'; '.join(errors)}"
+    )
+
 def main():
     if not ABSENCE_URL:
         print("ABSENCE_EXCEL_URL not set — skipping")
@@ -85,8 +147,11 @@ def main():
 
     print(f"Downloading absence report...")
     try:
-        data = download_xlsb(ABSENCE_URL)
+        data, content_type, final_url = download_xlsb(ABSENCE_URL)
         print(f"  Downloaded: {len(data):,} bytes")
+        if content_type:
+            print(f"  Content-Type: {content_type}")
+        print(f"  Final URL host: {final_url.split('/')[2] if '://' in final_url else final_url}")
     except Exception as e:
         print(f"  Failed to download: {e}")
         sys.exit(1)
@@ -110,29 +175,7 @@ def main():
     processed = 0
 
     try:
-        rows = []
-        xlsb_error = None
-
-        if open_workbook is not None:
-            try:
-                with open_workbook(BytesIO(data)) as wb:
-                    sheet_name = wb.sheets[0]
-                    with wb.get_sheet(sheet_name) as ws:
-                        for row in ws.rows():
-                            rows.append([c.v for c in row])
-            except Exception as e:
-                xlsb_error = e
-        else:
-            xlsb_error = RuntimeError("pyxlsb not installed")
-
-        if not rows:
-            if data.lstrip().startswith(b"<"):
-                raise ValueError("downloaded content looks like HTML (likely a login or sharing page, not an Excel file)")
-            try:
-                df = pd.read_excel(BytesIO(data), sheet_name=0, header=None)
-                rows = [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
-            except Exception as e:
-                raise ValueError(f"{xlsb_error}; fallback read_excel failed: {e}") from e
+        rows = _extract_rows(data, content_type)
 
         for i, vals in enumerate(rows):
             if i < 2:
