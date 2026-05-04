@@ -48,22 +48,9 @@ def normalize_sharepoint_download_url(url):
     if "sharepoint.com" not in host and "onedrive.live.com" not in host and "1drv.ms" not in host:
         return url
 
-    normalized = url
-    normalized = _add_or_replace_query_param(normalized, "download", "1")
+    normalized = _add_or_replace_query_param(url, "download", "1")
     normalized = _add_or_replace_query_param(normalized, "web", "0")
-
-    # روابط العرض في SharePoint يمكن تحويلها إلى Endpoint التنزيل المباشر.
-    if "/:x:/" in normalized:
-        direct = normalized.replace("/:x:/", "/:x:/r/")
-        normalized = _add_or_replace_query_param(direct, "download", "1")
-        normalized = _add_or_replace_query_param(normalized, "web", "0")
-
     return normalized
-
-def remove_sharepoint_r_segment(url):
-    if "/:x:/r/" in url:
-        return url.replace("/:x:/r/", "/:x:/")
-    return url
 
 def get_file_signature(data):
     head = data[:16]
@@ -109,15 +96,6 @@ def download_xlsb(url):
 
     redirect_urls = [resp.url for resp in r.history] + [r.url]
     final_host = (urlparse(r.url).netloc or "").lower()
-
-    # إذا انتهى المسار إلى صفحة تسجيل الدخول، جرّب نسخة أخرى بدون /r/.
-    if "login.microsoftonline.com" in final_host:
-        alternate_url = remove_sharepoint_r_segment(download_url)
-        if alternate_url != download_url:
-            r_alt = session.get(alternate_url, headers=headers, allow_redirects=True, timeout=60)
-            r_alt.raise_for_status()
-            redirect_urls = [resp.url for resp in r_alt.history] + [r_alt.url]
-            r = r_alt
 
     return (
         r.content,
