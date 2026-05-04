@@ -18,6 +18,7 @@ from io import BytesIO
 from pathlib import Path
 import requests
 import pandas as pd
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 
 try:
     from pyxlsb import open_workbook
@@ -27,30 +28,63 @@ except ImportError:
 ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
 HASH_FILE   = "last_absence_hash.txt"
+DEBUG_RESPONSE_PATH = "debug_sharepoint_response.png"
 COL_EMP_NO  = 1
 COL_NAME    = 2
 COL_SECTION = 3
 COL_DATE    = 4
 
+def _add_or_replace_query_param(url, key, value):
+    u = urlparse(url)
+    qs = dict(parse_qsl(u.query, keep_blank_values=True))
+    qs[key] = value
+    return urlunparse(u._replace(query=urlencode(qs, doseq=True)))
+
+def normalize_sharepoint_download_url(url):
+    if not url:
+        return url
+    u = urlparse(url)
+    host = (u.netloc or "").lower()
+    if "sharepoint.com" not in host and "onedrive.live.com" not in host and "1drv.ms" not in host:
+        return url
+
+    normalized = url
+    normalized = _add_or_replace_query_param(normalized, "download", "1")
+    normalized = _add_or_replace_query_param(normalized, "web", "0")
+
+    # روابط العرض في SharePoint يمكن تحويلها إلى Endpoint التنزيل المباشر.
+    if "/:x:/" in normalized:
+        direct = normalized.replace("/:x:/", "/:x:/r/")
+        normalized = _add_or_replace_query_param(direct, "download", "1")
+        normalized = _add_or_replace_query_param(normalized, "web", "0")
+
+    return normalized
+
+def get_file_signature(data):
+    head = data[:16]
+    return head.hex(), head
+
+def detect_file_kind(data):
+    lower_head = data[:512].lower()
+    hex16, head = get_file_signature(data)
+    if head.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png", hex16
+    if head.startswith(b"PK\x03\x04"):
+        return "zip_excel", hex16
+    if head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"):
+        return "ole_compound", hex16
+    if b"<html" in lower_head or b"<!doctype html" in lower_head:
+        return "html", hex16
+    return "unknown", hex16
+
 def download_xlsb(url):
     if not url:
         raise ValueError("ABSENCE_EXCEL_URL is empty")
-    try:
-        from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
-        u = urlparse(url)
-        host = (u.netloc or "").lower()
-        if "onedrive.live.com" in host or "1drv.ms" in host or "sharepoint.com" in host:
-            qs = dict(parse_qsl(u.query, keep_blank_values=True))
-            if "download" not in qs:
-                qs["download"] = "1"
-                u = u._replace(query=urlencode(qs, doseq=True))
-                url = urlunparse(u)
-    except Exception:
-        pass
+    url = normalize_sharepoint_download_url(url)
     headers = {"User-Agent": "Mozilla/5.0 (GitHub Actions) roster-site", "Accept": "application/octet-stream,*/*"}
     r = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
     r.raise_for_status()
-    return r.content, (r.headers.get("Content-Type") or "").lower(), r.url
+    return r.content, (r.headers.get("Content-Type") or "").lower(), r.url, url
 
 def clean_date(raw):
     if not raw:
@@ -147,11 +181,20 @@ def main():
 
     print(f"Downloading absence report...")
     try:
-        data, content_type, final_url = download_xlsb(ABSENCE_URL)
+        data, content_type, final_url, requested_url = download_xlsb(ABSENCE_URL)
         print(f"  Downloaded: {len(data):,} bytes")
-        if content_type:
-            print(f"  Content-Type: {content_type}")
-        print(f"  Final URL host: {final_url.split('/')[2] if '://' in final_url else final_url}")
+        file_kind, first16_hex = detect_file_kind(data)
+        print(f"  Requested URL: {requested_url}")
+        print(f"  Final URL: {final_url}")
+        print(f"  Content-Type: {content_type or 'unknown'}")
+        print(f"  First 16 bytes hex: {first16_hex}")
+        print(f"  File size: {len(data):,} bytes")
+        if file_kind == "png":
+            with open(DEBUG_RESPONSE_PATH, "wb") as f:
+                f.write(data)
+            raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
+        if file_kind not in ("zip_excel", "ole_compound"):
+            raise ValueError(f"Downloaded file is not recognized as Excel payload (kind={file_kind}).")
     except Exception as e:
         print(f"  Failed to download: {e}")
         sys.exit(1)
