@@ -60,6 +60,11 @@ def normalize_sharepoint_download_url(url):
 
     return normalized
 
+def remove_sharepoint_r_segment(url):
+    if "/:x:/r/" in url:
+        return url.replace("/:x:/r/", "/:x:/")
+    return url
+
 def get_file_signature(data):
     head = data[:16]
     return head.hex(), head
@@ -80,11 +85,47 @@ def detect_file_kind(data):
 def download_xlsb(url):
     if not url:
         raise ValueError("ABSENCE_EXCEL_URL is empty")
-    url = normalize_sharepoint_download_url(url)
-    headers = {"User-Agent": "Mozilla/5.0 (GitHub Actions) roster-site", "Accept": "application/octet-stream,*/*"}
-    r = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
+    session = requests.Session()
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,"
+            "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*;q=0.8"
+        ),
+        "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
+    }
+
+    # طلب تمهيدي لجلب الكوكيز من رابط المشاركة الأصلي.
+    warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
+    warmup.raise_for_status()
+
+    # طلب التحميل الفعلي بعد تطبيع الرابط.
+    download_url = normalize_sharepoint_download_url(url)
+    r = session.get(download_url, headers=headers, allow_redirects=True, timeout=60)
     r.raise_for_status()
-    return r.content, (r.headers.get("Content-Type") or "").lower(), r.url, url
+
+    redirect_urls = [resp.url for resp in r.history] + [r.url]
+    final_host = (urlparse(r.url).netloc or "").lower()
+
+    # إذا انتهى المسار إلى صفحة تسجيل الدخول، جرّب نسخة أخرى بدون /r/.
+    if "login.microsoftonline.com" in final_host:
+        alternate_url = remove_sharepoint_r_segment(download_url)
+        if alternate_url != download_url:
+            r_alt = session.get(alternate_url, headers=headers, allow_redirects=True, timeout=60)
+            r_alt.raise_for_status()
+            redirect_urls = [resp.url for resp in r_alt.history] + [r_alt.url]
+            r = r_alt
+
+    return (
+        r.content,
+        (r.headers.get("Content-Type") or "").lower(),
+        r.url,
+        download_url,
+        redirect_urls,
+    )
 
 def clean_date(raw):
     if not raw:
@@ -181,14 +222,20 @@ def main():
 
     print(f"Downloading absence report...")
     try:
-        data, content_type, final_url, requested_url = download_xlsb(ABSENCE_URL)
+        data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
         print(f"  Downloaded: {len(data):,} bytes")
         file_kind, first16_hex = detect_file_kind(data)
         print(f"  Requested URL: {requested_url}")
         print(f"  Final URL: {final_url}")
+        print("  Redirect chain:")
+        for idx, u in enumerate(redirect_urls, start=1):
+            print(f"    {idx}. {u}")
         print(f"  Content-Type: {content_type or 'unknown'}")
         print(f"  First 16 bytes hex: {first16_hex}")
         print(f"  File size: {len(data):,} bytes")
+        final_host = (urlparse(final_url).netloc or "").lower()
+        if "login.microsoftonline.com" in final_host:
+            raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
         if file_kind == "png":
             with open(DEBUG_RESPONSE_PATH, "wb") as f:
                 f.write(data)

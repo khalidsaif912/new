@@ -2,48 +2,123 @@ import json
 import os
 import re
 from io import BytesIO
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 from openpyxl import load_workbook
 
 from roster_app.settings import ROSTERS_DIR, SOURCE_NAME_FALLBACK, SOURCE_NAME_URL
 
+DEBUG_SHAREPOINT_RESPONSE_PATH = "debug_sharepoint_response.png"
+
+
+def _add_or_replace_query_param(url: str, key: str, value: str) -> str:
+    u = urlparse(url)
+    qs = dict(parse_qsl(u.query, keep_blank_values=True))
+    qs[key] = value
+    return urlunparse(u._replace(query=urlencode(qs, doseq=True)))
+
+
+def _normalize_sharepoint_download_url(url: str) -> str:
+    if not url:
+        return url
+    u = urlparse(url)
+    host = (u.netloc or "").lower()
+    if ("sharepoint.com" not in host) and ("onedrive.live.com" not in host) and ("1drv.ms" not in host):
+        return url
+
+    out = _add_or_replace_query_param(url, "download", "1")
+    out = _add_or_replace_query_param(out, "web", "0")
+    if "/:x:/r/" not in out and "/:x:/" in out:
+        out = out.replace("/:x:/", "/:x:/r/")
+        out = _add_or_replace_query_param(out, "download", "1")
+        out = _add_or_replace_query_param(out, "web", "0")
+    return out
+
+
+def _remove_r_segment(url: str) -> str:
+    return url.replace("/:x:/r/", "/:x:/") if "/:x:/r/" in url else url
+
+
+def _file_signature_hex16(data: bytes) -> str:
+    return (data[:16] or b"").hex()
+
+
+def _is_excel_signature(data: bytes) -> bool:
+    head = data[:8] or b""
+    # xlsx/zip
+    if data.startswith(b"PK\x03\x04"):
+        return True
+    # xls (OLE compound)
+    if head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"):
+        return True
+    return False
+
+
+def _is_png_signature(data: bytes) -> bool:
+    return (data[:8] or b"").startswith(b"\x89PNG\r\n\x1a\n")
+
 
 def download_excel(url: str) -> bytes:
-    """Download Excel bytes and validate xlsx payload."""
+    """Download Excel bytes from SharePoint with browser-like session flow."""
     if not url:
         raise ValueError("EXCEL_URL is empty")
-
-    try:
-        from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
-
-        u = urlparse(url)
-        host = (u.netloc or "").lower()
-        if ("onedrive.live.com" in host) or ("1drv.ms" in host) or ("sharepoint.com" in host):
-            qs = dict(parse_qsl(u.query, keep_blank_values=True))
-            if "download" not in qs:
-                qs["download"] = "1"
-                u = u._replace(query=urlencode(qs, doseq=True))
-                url = urlunparse(u)
-    except Exception:
-        pass
-
+    session = requests.Session()
     headers = {
-        "User-Agent": "Mozilla/5.0 (GitHub Actions) roster-site",
-        "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*",
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,"
+            "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*;q=0.8"
+        ),
+        "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
     }
-    r = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
+
+    warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
+    warmup.raise_for_status()
+
+    requested_url = _normalize_sharepoint_download_url(url)
+    r = session.get(requested_url, headers=headers, allow_redirects=True, timeout=60)
     r.raise_for_status()
 
-    ctype = (r.headers.get("Content-Type") or "").lower()
+    redirect_urls = [resp.url for resp in r.history] + [r.url]
+    final_host = (urlparse(r.url).netloc or "").lower()
+    if "login.microsoftonline.com" in final_host:
+        alt_url = _remove_r_segment(requested_url)
+        if alt_url != requested_url:
+            r_alt = session.get(alt_url, headers=headers, allow_redirects=True, timeout=60)
+            r_alt.raise_for_status()
+            r = r_alt
+            redirect_urls = [resp.url for resp in r.history] + [r.url]
+            final_host = (urlparse(r.url).netloc or "").lower()
+
     data = r.content or b""
-    if not data.startswith(b"PK"):
-        hint = ""
-        if "text/html" in ctype:
-            hint = " (got HTML preview page; check OneDrive link/download=1)"
-        elif ctype.startswith("image/"):
-            hint = " (got an image; EXCEL_URL points to wrong file)"
-        raise ValueError(f"Downloaded file is not a valid .xlsx (Content-Type: {ctype or 'unknown'}){hint}")
+    ctype = (r.headers.get("Content-Type") or "").lower()
+    sig16 = _file_signature_hex16(data)
+
+    print(f"  Requested URL: {requested_url}")
+    print(f"  Final URL: {r.url}")
+    print("  Redirect chain:")
+    for idx, u in enumerate(redirect_urls, start=1):
+        print(f"    {idx}. {u}")
+    print(f"  Content-Type: {ctype or 'unknown'}")
+    print(f"  First 16 bytes hex: {sig16}")
+    print(f"  File size: {len(data):,} bytes")
+
+    if "login.microsoftonline.com" in final_host:
+        raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
+
+    if _is_png_signature(data):
+        with open(DEBUG_SHAREPOINT_RESPONSE_PATH, "wb") as f:
+            f.write(data)
+        raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
+
+    if not _is_excel_signature(data):
+        raise ValueError(
+            f"Downloaded file is not recognized as Excel payload (Content-Type: {ctype or 'unknown'}; signature: {sig16})"
+        )
 
     return data
 

@@ -21,6 +21,7 @@ from collections import defaultdict
 
 import requests
 from openpyxl import load_workbook
+from roster_app.cache_io import download_excel as shared_download_excel
 
 
 # =========================
@@ -155,10 +156,9 @@ def map_shift(code: str):
 
 def download_excel(url: str) -> bytes:
     print(f"📥 Downloading Excel from: {url[:50]}...")
-    r = requests.get(url, timeout=60)
-    r.raise_for_status()
+    data = shared_download_excel(url)
     print("✅ Excel downloaded successfully")
-    return r.content
+    return data
 
 
 def _row_values(ws, r: int):
