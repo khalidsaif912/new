@@ -17,12 +17,12 @@ from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 import requests
+import pandas as pd
 
 try:
     from pyxlsb import open_workbook
 except ImportError:
-    print("ERROR: pyxlsb not installed — add pyxlsb to requirements.txt")
-    sys.exit(1)
+    open_workbook = None
 
 ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
@@ -68,6 +68,16 @@ def clean_name(raw):
         return None
     return re.sub(r"^(Mr\.|Ms\.|Mrs\.|Dr\.|Eng\.)\s*", "", str(raw).strip(), flags=re.IGNORECASE).strip()
 
+def _normalize_cell(value):
+    if value is None:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    return value
+
 def main():
     if not ABSENCE_URL:
         print("ABSENCE_EXCEL_URL not set — skipping")
@@ -96,38 +106,54 @@ def main():
     else:
         print("  First run — generating...")
 
-    # احفظ الـ hash الجديد
-    with open(HASH_FILE, "w") as f:
-        f.write(current_hash)
-
     records_by_date = {}
     processed = 0
 
     try:
-        with open_workbook(BytesIO(data)) as wb:
-            sheet_name = wb.sheets[0]
-            with wb.get_sheet(sheet_name) as ws:
-                for i, row in enumerate(ws.rows()):
-                    vals = [c.v for c in row]
-                    if i < 2:
-                        continue
-                    if len(vals) < 5 or vals[COL_EMP_NO] is None:
-                        continue
-                    if str(vals[COL_EMP_NO]).strip().lower() in ("employee no", "emp no", "empno"):
-                        continue
-                    date    = clean_date(vals[COL_DATE])
-                    name    = clean_name(vals[COL_NAME])
-                    emp_no  = str(int(vals[COL_EMP_NO])) if vals[COL_EMP_NO] else None
-                    section = (vals[COL_SECTION] or "").strip()
-                    if not date or not name:
-                        continue
-                    if date not in records_by_date:
-                        records_by_date[date] = {"names": [], "empNos": [], "sections": []}
-                    if emp_no not in records_by_date[date]["empNos"]:
-                        records_by_date[date]["names"].append(name)
-                        records_by_date[date]["empNos"].append(emp_no)
-                        records_by_date[date]["sections"].append(section)
-                        processed += 1
+        rows = []
+        xlsb_error = None
+
+        if open_workbook is not None:
+            try:
+                with open_workbook(BytesIO(data)) as wb:
+                    sheet_name = wb.sheets[0]
+                    with wb.get_sheet(sheet_name) as ws:
+                        for row in ws.rows():
+                            rows.append([c.v for c in row])
+            except Exception as e:
+                xlsb_error = e
+        else:
+            xlsb_error = RuntimeError("pyxlsb not installed")
+
+        if not rows:
+            if data.lstrip().startswith(b"<"):
+                raise ValueError("downloaded content looks like HTML (likely a login or sharing page, not an Excel file)")
+            try:
+                df = pd.read_excel(BytesIO(data), sheet_name=0, header=None)
+                rows = [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
+            except Exception as e:
+                raise ValueError(f"{xlsb_error}; fallback read_excel failed: {e}") from e
+
+        for i, vals in enumerate(rows):
+            if i < 2:
+                continue
+            if len(vals) < 5 or vals[COL_EMP_NO] is None:
+                continue
+            if str(vals[COL_EMP_NO]).strip().lower() in ("employee no", "emp no", "empno"):
+                continue
+            date = clean_date(vals[COL_DATE])
+            name = clean_name(vals[COL_NAME])
+            emp_no = str(int(vals[COL_EMP_NO])) if vals[COL_EMP_NO] else None
+            section = str(vals[COL_SECTION] or "").strip()
+            if not date or not name:
+                continue
+            if date not in records_by_date:
+                records_by_date[date] = {"names": [], "empNos": [], "sections": []}
+            if emp_no not in records_by_date[date]["empNos"]:
+                records_by_date[date]["names"].append(name)
+                records_by_date[date]["empNos"].append(emp_no)
+                records_by_date[date]["sections"].append(section)
+                processed += 1
     except Exception as e:
         print(f"  Failed to parse xlsb: {e}")
         sys.exit(1)
@@ -141,6 +167,10 @@ def main():
     os.makedirs("docs", exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump({"generated_at": datetime.now().isoformat(), "total_records": processed, "records": records}, f, ensure_ascii=False, indent=2)
+
+    # احفظ الـ hash الجديد فقط بعد نجاح المعالجة
+    with open(HASH_FILE, "w") as f:
+        f.write(current_hash)
 
     print(f"  {processed} records | {len(records)} unique dates -> {OUTPUT_PATH}")
     if records:
