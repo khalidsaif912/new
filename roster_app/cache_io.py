@@ -29,15 +29,7 @@ def _normalize_sharepoint_download_url(url: str) -> str:
 
     out = _add_or_replace_query_param(url, "download", "1")
     out = _add_or_replace_query_param(out, "web", "0")
-    if "/:x:/r/" not in out and "/:x:/" in out:
-        out = out.replace("/:x:/", "/:x:/r/")
-        out = _add_or_replace_query_param(out, "download", "1")
-        out = _add_or_replace_query_param(out, "web", "0")
     return out
-
-
-def _remove_r_segment(url: str) -> str:
-    return url.replace("/:x:/r/", "/:x:/") if "/:x:/r/" in url else url
 
 
 def _file_signature_hex16(data: bytes) -> str:
@@ -85,14 +77,6 @@ def download_excel(url: str) -> bytes:
 
     redirect_urls = [resp.url for resp in r.history] + [r.url]
     final_host = (urlparse(r.url).netloc or "").lower()
-    if "login.microsoftonline.com" in final_host:
-        alt_url = _remove_r_segment(requested_url)
-        if alt_url != requested_url:
-            r_alt = session.get(alt_url, headers=headers, allow_redirects=True, timeout=60)
-            r_alt.raise_for_status()
-            r = r_alt
-            redirect_urls = [resp.url for resp in r.history] + [r.url]
-            final_host = (urlparse(r.url).netloc or "").lower()
 
     data = r.content or b""
     ctype = (r.headers.get("Content-Type") or "").lower()
