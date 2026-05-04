@@ -18,7 +18,7 @@ from io import BytesIO
 from pathlib import Path
 import requests
 import pandas as pd
-from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, urlsplit, urlunsplit, quote
 
 try:
     from pyxlsb import open_workbook
@@ -69,6 +69,18 @@ def detect_file_kind(data):
         return "html", hex16
     return "unknown", hex16
 
+def build_sharepoint_download_url(final_url):
+    parts = urlsplit(final_url)
+    clean_file_url = urlunsplit((
+        parts.scheme,
+        parts.netloc,
+        parts.path,
+        "",
+        ""
+    ))
+    encoded = quote(clean_file_url, safe="")
+    return f"{parts.scheme}://{parts.netloc}/_layouts/15/download.aspx?SourceUrl={encoded}"
+
 def download_xlsb(url):
     if not url:
         raise ValueError("ABSENCE_EXCEL_URL is empty")
@@ -118,12 +130,17 @@ def download_xlsb(url):
         url_no_ga = urlunparse(final_u._replace(query=urlencode(no_ga_qs, doseq=True)))
         candidate_urls.append(_add_or_replace_query_param(url_no_ga, "download", "1"))
         candidate_urls.append(url_no_ga)
+        candidate_urls.append(build_sharepoint_download_url(r.url))
 
         binary_headers = dict(headers)
         binary_headers["Accept"] = "application/octet-stream,*/*"
 
         for idx, candidate in enumerate(candidate_urls, start=1):
-            print(f"  Retry attempt {idx}: {candidate}")
+            is_download_aspx = "/_layouts/15/download.aspx" in candidate
+            if is_download_aspx:
+                print(f"  Retry attempt download.aspx: {candidate}")
+            else:
+                print(f"  Retry attempt {idx}: {candidate}")
             r2 = session.get(candidate, headers=binary_headers, allow_redirects=True, timeout=60)
             r2.raise_for_status()
             data2 = r2.content or b""
