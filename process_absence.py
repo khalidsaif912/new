@@ -97,8 +97,46 @@ def download_xlsb(url):
     redirect_urls = [resp.url for resp in r.history] + [r.url]
     final_host = (urlparse(r.url).netloc or "").lower()
 
+    data = r.content or b""
+    file_kind, _ = detect_file_kind(data)
+
+    # إذا انتهى إلى رابط ملف xlsb مع ga=1 لكن الحمولة Preview (PNG/HTML)،
+    # أعد المحاولة على نفس الملف بعد إزالة ga وإضافة download=1.
+    final_u = urlparse(r.url)
+    final_path_l = (final_u.path or "").lower()
+    final_qs = dict(parse_qsl(final_u.query, keep_blank_values=True))
+    is_ga_preview_case = (
+        final_path_l.endswith(".xlsb")
+        and final_qs.get("ga") == "1"
+        and file_kind in ("png", "html")
+    )
+
+    if is_ga_preview_case:
+        candidate_urls = []
+        no_ga_qs = dict(final_qs)
+        no_ga_qs.pop("ga", None)
+        url_no_ga = urlunparse(final_u._replace(query=urlencode(no_ga_qs, doseq=True)))
+        candidate_urls.append(_add_or_replace_query_param(url_no_ga, "download", "1"))
+        candidate_urls.append(url_no_ga)
+
+        binary_headers = dict(headers)
+        binary_headers["Accept"] = "application/octet-stream,*/*"
+
+        for idx, candidate in enumerate(candidate_urls, start=1):
+            print(f"  Retry attempt {idx}: {candidate}")
+            r2 = session.get(candidate, headers=binary_headers, allow_redirects=True, timeout=60)
+            r2.raise_for_status()
+            data2 = r2.content or b""
+            kind2, _ = detect_file_kind(data2)
+            # نجاح فقط إذا لم يكن PNG/HTML وكان توقيعه Excel.
+            if kind2 in ("zip_excel", "ole_compound"):
+                r = r2
+                data = data2
+                redirect_urls = [resp.url for resp in r.history] + [r.url]
+                break
+
     return (
-        r.content,
+        data,
         (r.headers.get("Content-Type") or "").lower(),
         r.url,
         download_url,
