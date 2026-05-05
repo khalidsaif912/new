@@ -69,6 +69,10 @@ def detect_file_kind(data):
         return "html", hex16
     return "unknown", hex16
 
+def is_excel_signature(data):
+    head = data[:8] or b""
+    return data.startswith(b"PK") or head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
+
 def build_sharepoint_download_url(final_url):
     parts = urlsplit(final_url)
     clean_file_url = urlunsplit((
@@ -101,63 +105,75 @@ def download_xlsb(url):
     warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
     warmup.raise_for_status()
 
-    # طلب التحميل الفعلي بعد تطبيع الرابط.
+    binary_headers = dict(headers)
+    binary_headers["Accept"] = "application/octet-stream,*/*"
+
+    def run_attempt(tag, candidate_url, hdrs):
+        print(f"  {tag} URL: {candidate_url}")
+        resp = session.get(candidate_url, headers=hdrs, allow_redirects=True, timeout=60)
+        resp.raise_for_status()
+        body = resp.content or b""
+        ctype = (resp.headers.get("Content-Type") or "").lower()
+        kind, hex16 = detect_file_kind(body)
+        print(f"    Final URL: {resp.url}")
+        print(f"    Content-Type: {ctype or 'unknown'}")
+        print(f"    First 16 bytes: {hex16}")
+        print(f"    File size: {len(body):,} bytes")
+        return resp, body, kind
+
+    # المحاولة الأولى: الرابط المطبّع من رابط المشاركة.
     download_url = normalize_sharepoint_download_url(url)
-    r = session.get(download_url, headers=headers, allow_redirects=True, timeout=60)
-    r.raise_for_status()
+    r, data, file_kind = run_attempt("Attempt 1", download_url, headers)
+    if is_excel_signature(data):
+        return data, (r.headers.get("Content-Type") or "").lower(), r.url, download_url, [resp.url for resp in r.history] + [r.url]
 
-    redirect_urls = [resp.url for resp in r.history] + [r.url]
-    final_host = (urlparse(r.url).netloc or "").lower()
-
-    data = r.content or b""
-    file_kind, _ = detect_file_kind(data)
-
-    # إذا انتهى إلى رابط ملف xlsb مع ga=1 لكن الحمولة Preview (PNG/HTML)،
-    # أعد المحاولة على نفس الملف بعد إزالة ga وإضافة download=1.
+    # تجهيز قائمة محاولات إضافية.
+    candidate_urls = []
     final_u = urlparse(r.url)
-    final_path_l = (final_u.path or "").lower()
     final_qs = dict(parse_qsl(final_u.query, keep_blank_values=True))
-    is_ga_preview_case = (
-        final_path_l.endswith(".xlsb")
-        and final_qs.get("ga") == "1"
-        and file_kind in ("png", "html")
-    )
-
-    if is_ga_preview_case:
-        candidate_urls = []
+    if (final_u.path or "").lower().endswith(".xlsb") and final_qs.get("ga") == "1":
         no_ga_qs = dict(final_qs)
         no_ga_qs.pop("ga", None)
         url_no_ga = urlunparse(final_u._replace(query=urlencode(no_ga_qs, doseq=True)))
-        candidate_urls.append(_add_or_replace_query_param(url_no_ga, "download", "1"))
-        candidate_urls.append(url_no_ga)
-        candidate_urls.append(build_sharepoint_download_url(r.url))
+        candidate_urls.append(("Retry attempt 1", _add_or_replace_query_param(url_no_ga, "download", "1")))
+        candidate_urls.append(("Retry attempt 2", url_no_ga))
+        candidate_urls.append(("Retry attempt download.aspx", build_sharepoint_download_url(r.url)))
 
-        binary_headers = dict(headers)
-        binary_headers["Accept"] = "application/octet-stream,*/*"
+    # محاولة إضافية بالرابط الأصلي كما هو، ثم بإجبار download=1.
+    candidate_urls.append(("Retry attempt original", url))
+    candidate_urls.append(("Retry attempt original+download", _add_or_replace_query_param(url, "download", "1")))
 
-        for idx, candidate in enumerate(candidate_urls, start=1):
-            is_download_aspx = "/_layouts/15/download.aspx" in candidate
-            if is_download_aspx:
-                print(f"  Retry attempt download.aspx: {candidate}")
-            else:
-                print(f"  Retry attempt {idx}: {candidate}")
-            r2 = session.get(candidate, headers=binary_headers, allow_redirects=True, timeout=60)
-            r2.raise_for_status()
-            data2 = r2.content or b""
-            kind2, _ = detect_file_kind(data2)
-            # نجاح فقط إذا لم يكن PNG/HTML وكان توقيعه Excel.
-            if kind2 in ("zip_excel", "ole_compound"):
-                r = r2
-                data = data2
-                redirect_urls = [resp.url for resp in r.history] + [r.url]
-                break
+    seen = {download_url}
+    last_resp = r
+    last_data = data
+    png_only = (file_kind == "png")
+
+    for tag, candidate in candidate_urls:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        r2, data2, kind2 = run_attempt(tag, candidate, binary_headers)
+        last_resp = r2
+        last_data = data2
+        png_only = png_only and (kind2 == "png")
+        if is_excel_signature(data2):
+            return (
+                data2,
+                (r2.headers.get("Content-Type") or "").lower(),
+                r2.url,
+                candidate,
+                [resp.url for resp in r2.history] + [r2.url],
+            )
+
+    if png_only:
+        raise ValueError("The SharePoint link returns a preview PNG, not the Excel binary. The URL must be changed to a real direct download URL.")
 
     return (
-        data,
-        (r.headers.get("Content-Type") or "").lower(),
-        r.url,
+        last_data,
+        (last_resp.headers.get("Content-Type") or "").lower(),
+        last_resp.url,
         download_url,
-        redirect_urls,
+        [resp.url for resp in last_resp.history] + [last_resp.url],
     )
 
 def clean_date(raw):
