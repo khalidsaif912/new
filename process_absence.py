@@ -5,7 +5,8 @@ process_absence.py
 ويولّد docs/absence-data.json
 
 المتغيرات المطلوبة في GitHub Secrets:
-  ABSENCE_EXCEL_URL  ← رابط تنزيل مباشر لملف الـ xlsb (مثلاً من رابط مشاركة SharePoint/OneDrive مع download=1)
+  ABSENCE_EXCEL_URL   ← رابط تنزيل مباشر لملف الـ xlsb
+  ABSENCE_EXCEL_FILE  ← اختياري: مسار ملف محلي داخل GitHub Actions عند الرغبة بتجاوز التحميل
 
 رابط نسخة العمل على SharePoint (للمرجع البشري؛ التشغيل الآلي يستخدم ABSENCE_EXCEL_URL):
   https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG
@@ -26,6 +27,7 @@ except ImportError:
     open_workbook = None
 
 ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
+ABSENCE_LOCAL_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
 HASH_FILE   = "last_absence_hash.txt"
 DEBUG_RESPONSE_PATH = "debug_sharepoint_response.png"
@@ -264,35 +266,65 @@ def _extract_rows(data, content_type):
         f"signature={signature}; preview={preview!r}; attempts={'; '.join(errors)}"
     )
 
+
+def read_local_xlsb(path):
+    if not path:
+        return None
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"ABSENCE_EXCEL_FILE does not exist: {path}")
+    data = p.read_bytes()
+    file_kind, first16_hex = detect_file_kind(data)
+    print(f"Using local absence file: {path}")
+    print(f"  Local file kind: {file_kind}")
+    print(f"  First 16 bytes hex: {first16_hex}")
+    print(f"  File size: {len(data):,} bytes")
+    if file_kind == "png":
+        raise ValueError("ABSENCE_EXCEL_FILE points to a PNG preview, not the Excel file.")
+    if file_kind not in ("zip_excel", "ole_compound"):
+        raise ValueError(f"ABSENCE_EXCEL_FILE is not recognized as Excel payload (kind={file_kind}).")
+    return data
+
 def main():
-    if not ABSENCE_URL:
-        print("ABSENCE_EXCEL_URL not set — skipping")
+    if not ABSENCE_URL and not ABSENCE_LOCAL_FILE:
+        print("ABSENCE_EXCEL_URL not set and ABSENCE_EXCEL_FILE not set — skipping")
         return
 
-    print(f"Downloading absence report...")
+    content_type = "application/vnd.ms-excel.sheet.binary.macroenabled.12"
+    final_url = requested_url = ""
+    redirect_urls = []
+
     try:
-        data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
-        print(f"  Downloaded: {len(data):,} bytes")
-        file_kind, first16_hex = detect_file_kind(data)
-        print(f"  Requested URL: {requested_url}")
-        print(f"  Final URL: {final_url}")
-        print("  Redirect chain:")
-        for idx, u in enumerate(redirect_urls, start=1):
-            print(f"    {idx}. {u}")
-        print(f"  Content-Type: {content_type or 'unknown'}")
-        print(f"  First 16 bytes hex: {first16_hex}")
-        print(f"  File size: {len(data):,} bytes")
-        final_host = (urlparse(final_url).netloc or "").lower()
-        if "login.microsoftonline.com" in final_host:
-            raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
-        if file_kind == "png":
-            with open(DEBUG_RESPONSE_PATH, "wb") as f:
-                f.write(data)
-            raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
-        if file_kind not in ("zip_excel", "ole_compound"):
-            raise ValueError(f"Downloaded file is not recognized as Excel payload (kind={file_kind}).")
+        if ABSENCE_LOCAL_FILE:
+            data = read_local_xlsb(ABSENCE_LOCAL_FILE)
+        else:
+            print(f"Downloading absence report...")
+            data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
+            print(f"  Downloaded: {len(data):,} bytes")
+            file_kind, first16_hex = detect_file_kind(data)
+            print(f"  Requested URL: {requested_url}")
+            print(f"  Final URL: {final_url}")
+            print("  Redirect chain:")
+            for idx, u in enumerate(redirect_urls, start=1):
+                print(f"    {idx}. {u}")
+            print(f"  Content-Type: {content_type or 'unknown'}")
+            print(f"  First 16 bytes hex: {first16_hex}")
+            print(f"  File size: {len(data):,} bytes")
+            final_host = (urlparse(final_url).netloc or "").lower()
+            if "login.microsoftonline.com" in final_host:
+                raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
+            if file_kind == "png":
+                with open(DEBUG_RESPONSE_PATH, "wb") as f:
+                    f.write(data)
+                raise ValueError(
+                    "SharePoint returned a preview PNG, not the Excel binary. "
+                    "Replace ABSENCE_EXCEL_URL with a real direct download link, "
+                    "or set ABSENCE_EXCEL_FILE to a local .xlsb file in the workflow."
+                )
+            if file_kind not in ("zip_excel", "ole_compound"):
+                raise ValueError(f"Downloaded file is not recognized as Excel payload (kind={file_kind}).")
     except Exception as e:
-        print(f"  Failed to download: {e}")
+        print(f"  Failed to load absence report: {e}")
         sys.exit(1)
 
     # ✅ تحقق من التغيير عبر hash
