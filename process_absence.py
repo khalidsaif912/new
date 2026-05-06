@@ -53,6 +53,12 @@ def normalize_sharepoint_download_url(url):
     normalized = _add_or_replace_query_param(normalized, "web", "0")
     return normalized
 
+def _looks_like_sharepoint_direct_personal_path(url):
+    u = urlparse(url)
+    host = (u.netloc or "").lower()
+    path = (u.path or "").lower()
+    return ("sharepoint.com" in host) and ("/personal/" in path) and path.endswith((".xlsb", ".xlsx", ".xls", ".xlsm"))
+
 def get_file_signature(data):
     head = data[:16]
     return head.hex(), head
@@ -349,7 +355,14 @@ def main():
         if file_kind == "png":
             with open(DEBUG_RESPONSE_PATH, "wb") as f:
                 f.write(data)
-            raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
+            hint = ""
+            if _looks_like_sharepoint_direct_personal_path(final_url):
+                hint = (
+                    " Final URL is a SharePoint personal file path (typically requires authenticated cookies). "
+                    "Use the original share link (/:x:/... or :b:/...) with its token (?e=...), "
+                    "or set ABSENCE_EXCEL_FILE to a local .xlsb in CI."
+                )
+            raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link." + hint)
         if file_kind not in ("zip_excel", "ole_compound"):
             raise ValueError(f"Downloaded file is not recognized as Excel payload (kind={file_kind}).")
     except Exception as e:
