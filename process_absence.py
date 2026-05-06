@@ -282,15 +282,24 @@ def _extract_rows(data, content_type):
     )
 
 def main():
-    if not ABSENCE_URL and not ABSENCE_FILE:
-        print("ABSENCE_EXCEL_URL and ABSENCE_EXCEL_FILE not set — skipping")
+    # Check for local file in uploads directory first
+    local_file = "/mnt/user-data/uploads/absence-report.xlsb"
+    if Path(local_file).exists():
+        print(f"Found local file: {local_file}")
+        ABSENCE_FILE_TO_USE = local_file
+    elif ABSENCE_FILE:
+        ABSENCE_FILE_TO_USE = ABSENCE_FILE
+    elif ABSENCE_URL:
+        ABSENCE_FILE_TO_USE = None
+    else:
+        print("No absence file found — skipping")
         return
 
-    print(f"Downloading absence report...")
+    print(f"Loading absence report...")
     try:
-        if ABSENCE_FILE:
-            print(f"  Loading absence report from local file: {ABSENCE_FILE}")
-            data, content_type, final_url, requested_url, redirect_urls = load_absence_from_file(ABSENCE_FILE)
+        if ABSENCE_FILE_TO_USE:
+            print(f"  Loading absence report from local file: {ABSENCE_FILE_TO_USE}")
+            data, content_type, final_url, requested_url, redirect_urls = load_absence_from_file(ABSENCE_FILE_TO_USE)
         else:
             data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
         print(f"  Downloaded: {len(data):,} bytes")
