@@ -222,6 +222,7 @@ jobs:
       # Builds docs/absence-data.json from ABSENCE_EXCEL_URL (see process_absence.py).
       # Runs even when the roster Excel did not change, so absence-only updates still publish.
       - name: Prefetch absence file to local path
+        id: prefetch_absence
         if: success()
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
@@ -235,22 +236,35 @@ jobs:
           url = (os.getenv("ABSENCE_EXCEL_URL") or "").strip()
           if not url:
               print("ABSENCE_EXCEL_URL is empty; skipping prefetch.")
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write("absence_ready=false\n")
               sys.exit(0)
 
           out_path = Path("tmp") / "absence-report.xlsb"
           out_path.parent.mkdir(parents=True, exist_ok=True)
           print(f"Prefetching absence report from: {url[:80]}...")
-          data = download_excel(url)
-          out_path.write_bytes(data)
-          print(f"Saved local absence file: {out_path} ({len(data):,} bytes)")
+          try:
+              data = download_excel(url)
+              out_path.write_bytes(data)
+              print(f"Saved local absence file: {out_path} ({len(data):,} bytes)")
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write("absence_ready=true\n")
+          except Exception as e:
+              print(f"::warning::Absence prefetch failed, skipping absence processing in this run: {e}")
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write("absence_ready=false\n")
           EOF
 
       - name: Process absence report
-        if: success()
+        if: success() && steps.prefetch_absence.outputs.absence_ready == 'true'
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
           ABSENCE_EXCEL_FILE: tmp/absence-report.xlsb
         run: python process_absence.py
+
+      - name: Skip absence report (unavailable)
+        if: success() && steps.prefetch_absence.outputs.absence_ready != 'true'
+        run: echo "Absence file unavailable from SharePoint in this run; skipping absence processing."
 
       - name: Commit updated docs
         if: success()
