@@ -157,7 +157,13 @@ def download_xlsb(url):
     seen = {download_url}
     last_resp = r
     last_data = data
+    last_kind = file_kind
     png_only = (file_kind == "png")
+
+    # احتفظ بأفضل محاولة غير-HTML حتى لا ننتهي برسالة AccessDenied كملف نهائي.
+    best_resp = r
+    best_data = data
+    best_kind = file_kind
 
     for tag, candidate in candidate_urls:
         if candidate in seen:
@@ -166,7 +172,12 @@ def download_xlsb(url):
         r2, data2, kind2 = run_attempt(tag, candidate, binary_headers)
         last_resp = r2
         last_data = data2
+        last_kind = kind2
         png_only = png_only and (kind2 == "png")
+        if best_kind in ("html", "unknown") and kind2 in ("png", "zip_excel", "ole_compound"):
+            best_resp = r2
+            best_data = data2
+            best_kind = kind2
         if is_excel_signature(data2):
             return (
                 data2,
@@ -178,6 +189,16 @@ def download_xlsb(url):
 
     if png_only:
         raise ValueError("The SharePoint link returns a preview PNG, not the Excel binary. The URL must be changed to a real direct download URL.")
+
+    # إذا كانت آخر محاولة HTML/unknown لكن وجدنا PNG، ارجع PNG ليظهر سبب الفشل الحقيقي بوضوح.
+    if last_kind in ("html", "unknown") and best_kind == "png":
+        return (
+            best_data,
+            (best_resp.headers.get("Content-Type") or "").lower(),
+            best_resp.url,
+            download_url,
+            [resp.url for resp in best_resp.history] + [best_resp.url],
+        )
 
     return (
         last_data,
