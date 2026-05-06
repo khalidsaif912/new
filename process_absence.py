@@ -26,6 +26,7 @@ except ImportError:
     open_workbook = None
 
 ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
+ABSENCE_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
 HASH_FILE   = "last_absence_hash.txt"
 DEBUG_RESPONSE_PATH = "debug_sharepoint_response.png"
@@ -176,6 +177,22 @@ def download_xlsb(url):
         [resp.url for resp in last_resp.history] + [last_resp.url],
     )
 
+def load_absence_from_file(file_path):
+    p = Path(file_path).expanduser()
+    if not p.exists():
+        raise ValueError(f"ABSENCE_EXCEL_FILE does not exist: {p}")
+    if not p.is_file():
+        raise ValueError(f"ABSENCE_EXCEL_FILE is not a file: {p}")
+    data = p.read_bytes()
+    if not data:
+        raise ValueError(f"ABSENCE_EXCEL_FILE is empty: {p}")
+    suffix = p.suffix.lower()
+    if suffix in (".xlsb", ".xls", ".xlsx", ".xlsm"):
+        content_type = "application/vnd.ms-excel.sheet.binary.macroenabled.12"
+    else:
+        content_type = "application/octet-stream"
+    return data, content_type, p.resolve().as_uri(), str(p.resolve()), [str(p.resolve())]
+
 def clean_date(raw):
     if not raw:
         return None
@@ -265,13 +282,17 @@ def _extract_rows(data, content_type):
     )
 
 def main():
-    if not ABSENCE_URL:
-        print("ABSENCE_EXCEL_URL not set — skipping")
+    if not ABSENCE_URL and not ABSENCE_FILE:
+        print("ABSENCE_EXCEL_URL and ABSENCE_EXCEL_FILE not set — skipping")
         return
 
     print(f"Downloading absence report...")
     try:
-        data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
+        if ABSENCE_FILE:
+            print(f"  Loading absence report from local file: {ABSENCE_FILE}")
+            data, content_type, final_url, requested_url, redirect_urls = load_absence_from_file(ABSENCE_FILE)
+        else:
+            data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
         print(f"  Downloaded: {len(data):,} bytes")
         file_kind, first16_hex = detect_file_kind(data)
         print(f"  Requested URL: {requested_url}")
