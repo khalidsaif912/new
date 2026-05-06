@@ -102,10 +102,6 @@ def download_xlsb(url):
         "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
     }
 
-    # طلب تمهيدي لجلب الكوكيز من رابط المشاركة الأصلي.
-    warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
-    warmup.raise_for_status()
-
     binary_headers = dict(headers)
     binary_headers["Accept"] = "application/octet-stream,*/*"
 
@@ -122,9 +118,23 @@ def download_xlsb(url):
         print(f"    File size: {len(body):,} bytes")
         return resp, body, kind
 
-    # المحاولة الأولى: الرابط المطبّع من رابط المشاركة.
-    download_url = normalize_sharepoint_download_url(url)
-    r, data, file_kind = run_attempt("Attempt 1", download_url, headers)
+    # التحقق من نوع الرابط
+    is_share_link = "/:x:/p/" in url or "/:b:/p/" in url or "/:u:/p/" in url
+    
+    if is_share_link:
+        # رابط مشاركة SharePoint - استخدمه مباشرة مع download=1
+        print(f"  Detected SharePoint share link")
+        if "download=1" not in url:
+            download_url = _add_or_replace_query_param(url, "download", "1")
+        else:
+            download_url = url
+        r, data, file_kind = run_attempt("Share link", download_url, binary_headers)
+    else:
+        # رابط مباشر تقليدي - استخدم المنطق القديم
+        warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
+        warmup.raise_for_status()
+        download_url = normalize_sharepoint_download_url(url)
+        r, data, file_kind = run_attempt("Attempt 1", download_url, headers)
     if is_excel_signature(data):
         return data, (r.headers.get("Content-Type") or "").lower(), r.url, download_url, [resp.url for resp in r.history] + [r.url]
 
