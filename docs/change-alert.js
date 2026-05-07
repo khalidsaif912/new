@@ -12,6 +12,32 @@
     return localStorage.getItem(FLOAT_DOTS_KEY) !== '0';
   }
 
+  function toggleWelcomeVsScheduleChip() {
+    try {
+      var path = window.location.pathname || '';
+      var isImport = path.indexOf('/import/') !== -1;
+      var empId = '';
+      if (isImport) {
+        empId = (localStorage.getItem('importSavedEmpId') || '').trim();
+      } else {
+        empId = (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
+      }
+
+      var welcomeChip = document.getElementById('welcomeChip');
+      var myScheduleBtn = document.getElementById('myScheduleBtn');
+      if (!welcomeChip && !myScheduleBtn) return;
+
+      if (!empId) {
+        if (welcomeChip) welcomeChip.classList.remove('visible');
+        if (myScheduleBtn) myScheduleBtn.hidden = false;
+        return;
+      }
+
+      if (welcomeChip) welcomeChip.classList.add('visible');
+      if (myScheduleBtn) myScheduleBtn.hidden = true;
+    } catch (_) {}
+  }
+
   function getLang() {
     var path = window.location.pathname || '';
     if (path.indexOf('/import/') !== -1) {
@@ -619,6 +645,21 @@
     `;
     document.head.appendChild(style);
   }
+
+  // Keep chips in sync across pages (export/import/home/date/now).
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      toggleWelcomeVsScheduleChip();
+    });
+  } else {
+    toggleWelcomeVsScheduleChip();
+  }
+  window.addEventListener('storage', function (e) {
+    if (!e || !e.key) return;
+    if (e.key === 'exportSavedEmpId' || e.key === 'savedEmpId' || e.key === 'importSavedEmpId') {
+      toggleWelcomeVsScheduleChip();
+    }
+  });
 
   function shortDaysHtml(alert) {
     var days = (alert.days || []).slice(0, 3);
