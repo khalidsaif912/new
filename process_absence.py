@@ -1,7 +1,7 @@
 """
 process_absence.py
 ──────────────────────────────────────────────────────────────────────────────
-يحمّل ملف absence-report.xlsx من OneDrive/SharePoint
+يحمّل ملف absence-report.xlsb من OneDrive/SharePoint
 ويولّد docs/absence-data.json
 
 المتغيرات المطلوبة في GitHub Secrets:
@@ -256,7 +256,7 @@ def archive_absence_file(data, content_type, source_hint, final_url, requested_u
     file_name = f"absence-report-{ts}-{digest[:10]}{ext}"
     out_path = ARCHIVE_DIR / file_name
     out_path.write_bytes(data)
-    latest_path = ARCHIVE_DIR / "absence-report.xlsx"
+    latest_path = ARCHIVE_DIR / "absence-report.xlsb"
     latest_path.write_bytes(data)
     meta = {
         "archived_at": datetime.now().isoformat(),
@@ -364,7 +364,7 @@ def _extract_rows(data, content_type):
 
 def main():
     # Check for local file in uploads directory first
-    local_file = "/mnt/user-data/uploads/absence-report.xlsx"
+    local_file = "/mnt/user-data/uploads/absence-report.xlsb"
     if Path(local_file).exists():
         print(f"Found local file: {local_file}")
         ABSENCE_FILE_TO_USE = local_file
@@ -414,7 +414,7 @@ def main():
                 hint = (
                     " Final URL is a SharePoint personal file path (typically requires authenticated cookies). "
                     "Use the original share link (/:x:/... or :b:/...) with its token (?e=...), "
-                    "or set ABSENCE_EXCEL_FILE to a local .xlsx in CI."
+                    "or set ABSENCE_EXCEL_FILE to a local .xlsb in CI."
                 )
             raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link." + hint)
         if file_kind not in ("zip_excel", "ole_compound"):
@@ -464,7 +464,12 @@ def main():
                 continue
             date = clean_date(vals[COL_DATE])
             name = clean_name(vals[COL_NAME])
-            emp_no = str(int(vals[COL_EMP_NO])) if vals[COL_EMP_NO] else None
+            raw_emp_no = vals[COL_EMP_NO]
+            try:
+                emp_no = str(int(raw_emp_no)) if raw_emp_no else None
+            except Exception:
+                # Skip title/footer rows where Employee No column is not numeric.
+                continue
             section = str(vals[COL_SECTION] or "").strip()
             if not date or not name:
                 continue
