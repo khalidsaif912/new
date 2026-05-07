@@ -379,6 +379,12 @@
         display: none !important;
       }
 
+      /* Keep top chips consistent across pages:
+         if welcomeChip is visible => hide My Schedule (schedule container). */
+      html:has(#welcomeChip.visible) #myScheduleBtn {
+        display: none !important;
+      }
+
       .chg-card-head {
         position: relative;
         padding: 14px 14px 10px;
