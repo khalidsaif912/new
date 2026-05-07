@@ -49,7 +49,9 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/absence-data.json last_absence_hash.txt absence-archive
+          if [ -f "docs/absence-data.json" ]; then git add docs/absence-data.json; fi
+          if [ -f "last_absence_hash.txt" ]; then git add last_absence_hash.txt; fi
+          if [ -d "absence-archive" ]; then git add absence-archive; fi
           if git diff --staged --quiet; then
             echo "No absence changes to commit"
           else
