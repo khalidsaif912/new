@@ -412,6 +412,7 @@
         summaryStats: '{changes} changes across {employees} employees in {departments} departments',
         noSavedEmp: 'No saved employee ID found for this section.',
         noAbsence: 'No recorded absences for this employee.',
+        absenceSummary: '{days} absence records across {months} months',
         absent: 'Absent',
         recorded: 'Recorded',
         dayFallback: 'Day {day}',
@@ -433,6 +434,7 @@
         summaryStats: '{changes} تغييرات بين {employees} موظفين في {departments} أقسام',
         noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
         noAbsence: 'لا توجد أيام غياب مسجلة لهذا الموظف.',
+        absenceSummary: '{days} سجلات غياب ضمن {months} أشهر',
         absent: 'غياب',
         recorded: 'مسجل',
         dayFallback: 'اليوم {day}',
@@ -602,6 +604,24 @@
       const dt = new Date(year, month, d);
       if (Number.isNaN(dt.getTime())) return `Day ${day}`;
       return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatAbsenceDate(dateStr) {
+      const m = String(dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return String(dateStr || '-');
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      if (Number.isNaN(dt.getTime())) return String(dateStr || '-');
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatAbsenceMonth(monthKey) {
+      const m = String(monthKey || '').match(/^(\d{4})-(\d{2})$/);
+      if (!m) return String(monthKey || '-');
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, 1);
+      if (Number.isNaN(dt.getTime())) return String(monthKey || '-');
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     }
 
     function normalizeId(v) {
@@ -784,12 +804,30 @@
           err.textContent = t('noAbsence');
           return;
         }
-        const details = document.createElement('details');
-        details.className = 'empFold';
-        details.open = true;
-        const rowsHtml = uniqDates.map((d, i) => `<div class="changeRow"><span class="changeDay">${i + 1}</span><span class="changeDate">${d}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`).join('');
-        details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${(emp && emp.name) || empId}</span></span><span class="empCount">${uniqDates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
-        diffList.appendChild(details);
+        const groupedByMonth = new Map();
+        uniqDates.forEach((d) => {
+          const key = String(d || '').match(/^\d{4}-\d{2}-\d{2}$/) ? String(d).slice(0, 7) : 'unknown';
+          if (!groupedByMonth.has(key)) groupedByMonth.set(key, []);
+          groupedByMonth.get(key).push(String(d));
+        });
+        const monthKeys = Array.from(groupedByMonth.keys()).sort((a, b) => {
+          if (a === 'unknown') return 1;
+          if (b === 'unknown') return -1;
+          return b.localeCompare(a);
+        });
+        summary.textContent = t('absenceSummary', { days: uniqDates.length, months: monthKeys.length });
+        monthKeys.forEach((monthKey, idx) => {
+          const monthDetails = document.createElement('details');
+          monthDetails.className = 'deptFold';
+          if (idx === 0) monthDetails.open = true;
+          const monthDates = (groupedByMonth.get(monthKey) || []).slice().sort((a, b) => b.localeCompare(a));
+          const rowsHtml = monthDates
+            .map((d, i) => `<div class="changeRow"><span class="changeDay">${i + 1}</span><span class="changeDate">${formatAbsenceDate(d)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`)
+            .join('');
+          const monthTitle = monthKey === 'unknown' ? 'Unknown' : formatAbsenceMonth(monthKey);
+          monthDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${monthTitle}</span></span><span class="empCount">${monthDates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+          diffList.appendChild(monthDetails);
+        });
       } catch (e) {
         err.textContent = e.message || String(e);
       }
