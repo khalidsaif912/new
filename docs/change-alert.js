@@ -28,13 +28,27 @@
       if (!welcomeChip && !myScheduleBtn) return;
 
       if (!empId) {
-        if (welcomeChip) welcomeChip.classList.remove('visible');
-        if (myScheduleBtn) myScheduleBtn.hidden = false;
+        if (welcomeChip) {
+          welcomeChip.classList.remove('visible');
+          welcomeChip.hidden = true;
+          welcomeChip.style.display = 'none';
+        }
+        if (myScheduleBtn) {
+          myScheduleBtn.hidden = false;
+          myScheduleBtn.style.display = '';
+        }
         return;
       }
 
-      if (welcomeChip) welcomeChip.classList.add('visible');
-      if (myScheduleBtn) myScheduleBtn.hidden = true;
+      if (welcomeChip) {
+        welcomeChip.hidden = false;
+        welcomeChip.style.display = '';
+        welcomeChip.classList.add('visible');
+      }
+      if (myScheduleBtn) {
+        myScheduleBtn.hidden = true;
+        myScheduleBtn.style.display = 'none';
+      }
     } catch (_) {}
   }
 
