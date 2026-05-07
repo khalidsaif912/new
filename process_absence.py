@@ -445,7 +445,7 @@ def main():
             print("  No changes detected in absence file — skipping")
             return
         else:
-            print(f"  Change detected! Old: {old_hash} → New: {current_hash}")
+            print(f"  Change detected! Old: {old_hash} -> New: {current_hash}")
     else:
         print("  First run — generating...")
 
