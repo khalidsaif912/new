@@ -26,38 +26,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Download absence file from SharePoint
+      - name: Process absence report (SharePoint with archive fallback)
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
+          ABSENCE_EXCEL_FILE: ""
         run: |
           if [ -z "${ABSENCE_EXCEL_URL}" ]; then
             echo "::error::Missing secret ABSENCE_EXCEL_URL"
             exit 1
           fi
-          mkdir -p tmp
-          curl -L --fail --retry 3 --retry-delay 5 \
-            -o tmp/absence-report.xlsb \
-            "${ABSENCE_EXCEL_URL}"
-
-      - name: Validate payload is Excel (not HTML/PNG)
-        run: |
-          python - << 'PY'
-          from pathlib import Path
-          p = Path("tmp/absence-report.xlsb")
-          data = p.read_bytes()
-          head = data[:8]
-          is_excel = data.startswith(b"PK\x03\x04") or head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
-          if not is_excel:
-              print("Invalid payload signature:", data[:16].hex())
-              raise SystemExit(1)
-          print("Excel signature OK:", data[:16].hex())
-          print("Size bytes:", len(data))
-          PY
-
-      - name: Process absence report
-        env:
-          ABSENCE_EXCEL_FILE: tmp/absence-report.xlsb
-        run: python process_absence.py
+          python process_absence.py
 
       - name: Commit and push absence updates
         run: |
@@ -75,7 +53,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: absence-source-file
-          path: tmp/absence-report.xlsb
+          path: absence-archive/latest.xlsb
+          if-no-files-found: ignore
 
       - name: Upload generated absence JSON
         uses: actions/upload-artifact@v4
