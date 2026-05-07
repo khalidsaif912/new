@@ -377,24 +377,42 @@
         padding: 12px 14px;
       }
       .chg-tabs {
-        display: flex;
-        gap: 6px;
-        padding: 0 14px 10px;
+        margin: 0 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: stretch;
+        background: linear-gradient(180deg, #4457bb 0%, #3f51b5 100%);
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(63,81,181,.20);
+        border: 1px solid #5e71cf;
+        border-bottom: none;
       }
       .chg-tab {
-        border: 1px solid rgba(15,23,42,.12);
-        background: #f8fafc;
-        color: #475569;
-        border-radius: 999px;
-        padding: 6px 10px;
-        font-size: 11px;
+        border: none;
+        border-bottom: 3px solid transparent;
+        border-right: 1px solid rgba(255,255,255,.12);
+        background: transparent;
+        color: rgba(255,255,255,.55);
+        padding: 12px 8px 10px;
+        font-size: 12px;
         font-weight: 800;
+        letter-spacing: .3px;
+        text-transform: uppercase;
         cursor: pointer;
+        transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+      }
+      .chg-tab:last-child {
+        border-right: none;
+      }
+      .chg-tab:hover {
+        color: rgba(255,255,255,.85);
+        background: rgba(255,255,255,.05);
       }
       .chg-tab.active {
-        background: #1d4ed8;
-        color: #fff;
-        border-color: #1d4ed8;
+        color: #ffffff;
+        border-bottom-color: #29b6f6;
+        background: rgba(255,255,255,.06);
       }
 
       .chg-days {
