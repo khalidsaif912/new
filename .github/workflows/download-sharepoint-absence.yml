@@ -60,11 +60,11 @@ jobs:
           fi
 
       - name: Upload downloaded absence file
+        if: hashFiles('absence-archive/latest.xlsb') != ''
         uses: actions/upload-artifact@v4
         with:
           name: absence-source-file
           path: absence-archive/latest.xlsb
-          if-no-files-found: ignore
 
       - name: Upload SharePoint debug payload
         if: always()
