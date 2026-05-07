@@ -240,7 +240,7 @@ jobs:
                   f.write("absence_ready=false\n")
               sys.exit(0)
 
-          out_path = Path("tmp") / "absence-report.xlsb"
+          out_path = Path("tmp") / "absence-report.xlsx"
           out_path.parent.mkdir(parents=True, exist_ok=True)
           print(f"Prefetching absence report from: {url[:80]}...")
           try:
@@ -259,7 +259,7 @@ jobs:
         if: success() && steps.prefetch_absence.outputs.absence_ready == 'true'
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
-          ABSENCE_EXCEL_FILE: tmp/absence-report.xlsb
+          ABSENCE_EXCEL_FILE: tmp/absence-report.xlsx
         run: python process_absence.py
 
       - name: Skip absence report (unavailable)

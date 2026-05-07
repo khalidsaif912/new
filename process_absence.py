@@ -1,7 +1,7 @@
 """
 process_absence.py
 ──────────────────────────────────────────────────────────────────────────────
-يحمّل ملف absence-report.xlsb من OneDrive/SharePoint
+يحمّل ملف absence-report.xlsx من OneDrive/SharePoint
 ويولّد docs/absence-data.json
 
 المتغيرات المطلوبة في GitHub Secrets:
@@ -253,10 +253,10 @@ def archive_absence_file(data, content_type, source_hint, final_url, requested_u
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     ext = _archive_file_extension(content_type, source_hint)
-    file_name = f"absence-{ts}-{digest[:10]}{ext}"
+    file_name = f"absence-report-{ts}-{digest[:10]}{ext}"
     out_path = ARCHIVE_DIR / file_name
     out_path.write_bytes(data)
-    latest_path = ARCHIVE_DIR / f"latest{ext}"
+    latest_path = ARCHIVE_DIR / "absence-report.xlsx"
     latest_path.write_bytes(data)
     meta = {
         "archived_at": datetime.now().isoformat(),
@@ -364,7 +364,7 @@ def _extract_rows(data, content_type):
 
 def main():
     # Check for local file in uploads directory first
-    local_file = "/mnt/user-data/uploads/absence-report.xlsb"
+    local_file = "/mnt/user-data/uploads/absence-report.xlsx"
     if Path(local_file).exists():
         print(f"Found local file: {local_file}")
         ABSENCE_FILE_TO_USE = local_file
@@ -414,7 +414,7 @@ def main():
                 hint = (
                     " Final URL is a SharePoint personal file path (typically requires authenticated cookies). "
                     "Use the original share link (/:x:/... or :b:/...) with its token (?e=...), "
-                    "or set ABSENCE_EXCEL_FILE to a local .xlsb in CI."
+                    "or set ABSENCE_EXCEL_FILE to a local .xlsx in CI."
                 )
             raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link." + hint)
         if file_kind not in ("zip_excel", "ole_compound"):
