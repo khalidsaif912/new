@@ -1,0 +1,84 @@
+name: Download SharePoint Absence File
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  download-and-process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download absence file from SharePoint
+        env:
+          ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
+        run: |
+          if [ -z "${ABSENCE_EXCEL_URL}" ]; then
+            echo "::error::Missing secret ABSENCE_EXCEL_URL"
+            exit 1
+          fi
+          mkdir -p tmp
+          curl -L --fail --retry 3 --retry-delay 5 \
+            -o tmp/absence-report.xlsb \
+            "${ABSENCE_EXCEL_URL}"
+
+      - name: Validate payload is Excel (not HTML/PNG)
+        run: |
+          python - << 'PY'
+          from pathlib import Path
+          p = Path("tmp/absence-report.xlsb")
+          data = p.read_bytes()
+          head = data[:8]
+          is_excel = data.startswith(b"PK\x03\x04") or head.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
+          if not is_excel:
+              print("Invalid payload signature:", data[:16].hex())
+              raise SystemExit(1)
+          print("Excel signature OK:", data[:16].hex())
+          print("Size bytes:", len(data))
+          PY
+
+      - name: Process absence report
+        env:
+          ABSENCE_EXCEL_FILE: tmp/absence-report.xlsb
+        run: python process_absence.py
+
+      - name: Commit and push absence updates
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/absence-data.json last_absence_hash.txt absence-archive
+          if git diff --staged --quiet; then
+            echo "No absence changes to commit"
+          else
+            git commit -m "Update absence data"
+            git push
+          fi
+
+      - name: Upload downloaded absence file
+        uses: actions/upload-artifact@v4
+        with:
+          name: absence-source-file
+          path: tmp/absence-report.xlsb
+
+      - name: Upload generated absence JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: absence-data-json
+          path: docs/absence-data.json

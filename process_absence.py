@@ -30,6 +30,7 @@ ABSENCE_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
 HASH_FILE   = "last_absence_hash.txt"
 DEBUG_RESPONSE_PATH = "debug_sharepoint_response.png"
+ARCHIVE_DIR = Path("absence-archive")
 COL_EMP_NO  = 1
 COL_NAME    = 2
 COL_SECTION = 3
@@ -108,9 +109,6 @@ def download_xlsb(url):
         "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
     }
 
-    binary_headers = dict(headers)
-    binary_headers["Accept"] = "application/octet-stream,*/*"
-
     def run_attempt(tag, candidate_url, hdrs):
         print(f"  {tag} URL: {candidate_url}")
         resp = session.get(candidate_url, headers=hdrs, allow_redirects=True, timeout=60)
@@ -128,13 +126,12 @@ def download_xlsb(url):
     is_share_link = "/:x:/p/" in url or "/:b:/p/" in url or "/:u:/p/" in url
     
     if is_share_link:
-        # رابط مشاركة SharePoint - استخدمه مباشرة مع download=1
+        # Share links behave better with the same warmup flow used by roster downloads.
+        warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
+        warmup.raise_for_status()
         print(f"  Detected SharePoint share link")
-        if "download=1" not in url:
-            download_url = _add_or_replace_query_param(url, "download", "1")
-        else:
-            download_url = url
-        r, data, file_kind = run_attempt("Share link", download_url, binary_headers)
+        download_url = normalize_sharepoint_download_url(url)
+        r, data, file_kind = run_attempt("Share link", download_url, headers)
     else:
         # رابط مباشر تقليدي - استخدم المنطق القديم
         warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
@@ -175,7 +172,7 @@ def download_xlsb(url):
         if candidate in seen:
             continue
         seen.add(candidate)
-        r2, data2, kind2 = run_attempt(tag, candidate, binary_headers)
+        r2, data2, kind2 = run_attempt(tag, candidate, headers)
         last_resp = r2
         last_data = data2
         last_kind = kind2
@@ -229,6 +226,53 @@ def load_absence_from_file(file_path):
     else:
         content_type = "application/octet-stream"
     return data, content_type, p.resolve().as_uri(), str(p.resolve()), [str(p.resolve())]
+
+def _archive_file_extension(content_type, source_hint):
+    hint = (source_hint or "").lower()
+    ctype = (content_type or "").lower()
+    if hint.endswith(".xlsx") or "openxmlformats-officedocument.spreadsheetml.sheet" in ctype:
+        return ".xlsx"
+    if hint.endswith(".xlsm"):
+        return ".xlsm"
+    if hint.endswith(".xls"):
+        return ".xls"
+    return ".xlsb"
+
+def get_latest_archived_absence_file():
+    if not ARCHIVE_DIR.exists():
+        return None
+    candidates = []
+    for ext in ("*.xlsb", "*.xlsx", "*.xlsm", "*.xls"):
+        candidates.extend(ARCHIVE_DIR.glob(ext))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+    return candidates[0]
+
+def archive_absence_file(data, content_type, source_hint, final_url, requested_url, digest):
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    ext = _archive_file_extension(content_type, source_hint)
+    file_name = f"absence-{ts}-{digest[:10]}{ext}"
+    out_path = ARCHIVE_DIR / file_name
+    out_path.write_bytes(data)
+    latest_path = ARCHIVE_DIR / f"latest{ext}"
+    latest_path.write_bytes(data)
+    meta = {
+        "archived_at": datetime.now().isoformat(),
+        "file": file_name,
+        "size_bytes": len(data),
+        "md5": digest,
+        "content_type": content_type or "",
+        "source_hint": source_hint or "",
+        "requested_url": requested_url or "",
+        "final_url": final_url or "",
+    }
+    (ARCHIVE_DIR / f"{file_name}.meta.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return out_path
 
 def clean_date(raw):
     if not raw:
@@ -332,13 +376,23 @@ def main():
         print("No absence file found — skipping")
         return
 
+    download_from_remote = not ABSENCE_FILE_TO_USE and bool(ABSENCE_URL)
     print(f"Loading absence report...")
     try:
         if ABSENCE_FILE_TO_USE:
             print(f"  Loading absence report from local file: {ABSENCE_FILE_TO_USE}")
             data, content_type, final_url, requested_url, redirect_urls = load_absence_from_file(ABSENCE_FILE_TO_USE)
         else:
-            data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
+            try:
+                data, content_type, final_url, requested_url, redirect_urls = download_xlsb(ABSENCE_URL)
+            except Exception as remote_err:
+                archived = get_latest_archived_absence_file()
+                if not archived:
+                    raise remote_err
+                print(f"  Remote download failed: {remote_err}")
+                print(f"  Falling back to latest archived file: {archived}")
+                data, content_type, final_url, requested_url, redirect_urls = load_absence_from_file(str(archived))
+                download_from_remote = False
         print(f"  Downloaded: {len(data):,} bytes")
         file_kind, first16_hex = detect_file_kind(data)
         print(f"  Requested URL: {requested_url}")
@@ -372,6 +426,17 @@ def main():
     # ✅ تحقق من التغيير عبر hash
     current_hash = hashlib.md5(data).hexdigest()
     print(f"  Current hash: {current_hash}")
+
+    if download_from_remote:
+        archived_path = archive_absence_file(
+            data=data,
+            content_type=content_type,
+            source_hint=final_url,
+            final_url=final_url,
+            requested_url=requested_url,
+            digest=current_hash,
+        )
+        print(f"  Archived source file: {archived_path}")
 
     if Path(HASH_FILE).exists():
         with open(HASH_FILE, "r") as f:

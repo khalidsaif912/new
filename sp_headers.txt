@@ -1,0 +1,59 @@
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Length: 196
+Content-Type: text/html; charset=utf-8
+Location: /personal/8715_hq_omanair_com/Documents/AbsenceReports/absence-report.xlsb?ga=1
+P3P: CP="ALL IND DSP COR ADM CONo CUR CUSo IVAo IVDo PSA PSD TAI TELo OUR SAMo CNT COM INT NAV ONL PHY PRE PUR UNI"
+Set-Cookie: FedAuth=77u/PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48U1A+VjE1LDBoLmZ8bWVtYmVyc2hpcHx1cm4lM2FzcG8lM2F0ZW5hbnRhbm9uIzQ1NmNlZWUzLTdmZWQtNDRlOC1hMzk5LWNkNDExMTk4ODEzNywwIy5mfG1lbWJlcnNoaXB8dXJuJTNhc3BvJTNhdGVuYW50YW5vbiM0NTZjZWVlMy03ZmVkLTQ0ZTgtYTM5OS1jZDQxMTE5ODgxMzcsMTM0MjI2MDA3NzYwMDAwMDAwLDAsMTM0MjI2ODY4NzYyNTk0NTc3LDAuMC4wLjAsMjU4LDQ1NmNlZWUzLTdmZWQtNDRlOC1hMzk5LWNkNDExMTk4ODEzNywsLGJjMmMxMWEyLTAwNjQtMDAwMS01YTg5LThmYTQzNGM3NGM2YSxiYzJjMTFhMi0wMDY0LTAwMDEtNWE4OS04ZmE0MzRjNzRjNmEsaXJxam1VTUJOVW1aWnQ5bmVESDNmZywwLDAsMCwsLCwyNjUwNDY3NzQzOTk5OTk5OTk5LDAsLCwsLCwsMCwsMTkwMTA2LEU5VDItNDE4X2JTZjl5N1R6dzNnX2JNLUJJdywsMCwsZWFMeGpzU0hiZmxFY2dTdXY3a2xjY2hyVENmRUs3UVdzbTNOcFFhN2FkcWhNOEhFMmFuRmhQMFIvZGNSZVBBbkNIQmRwWGIzWGxVYU9jY3FCWElneU5aWlQwelhudksrUXQwMzFLa3RiYysxYnExWjQ5RDhzWGkvNldJQURXVFlWRVNlZVNuYWNzSzFQWm1COUlaYzlZcEJFMmFzc1NsM1JGKzk1UGRxb3pOdXFqcWlQbmR2NUQrTGlQNW1MNWV4MHA0bWgzSjRxTm5rRVFuS3p1SlI3MFhZODJyWlhjQ2NxUXF1eTBHcjZubG9BcW5LZ28vVFdvMWFDazgwN2lKYVpSdDBqZnRYYzd2ZHgxMzMrTDN6cTY2bXE2M3NRQ3ZvaUxZNThoRmd4VDNOK3ZZUTk0bWNpeGZoZk16UHZLSTQrSWhOd2tZYW5iK2pMNUczb0l2cm9nPT08L1NQPg==; path=/; SameSite=None; secure; HttpOnly
+X-NetworkStatistics: 0,0,0,0,0,0,0,0
+X-SharePointHealthScore: 0
+X-MS-SPO-CookieValidator: eaLxjsSHbflEcgSuv7klcchrTCfEK7QWsm3NpQa7adqhM8HE2anFhP0R/dcRePAnCHBdpXb3XlUaOccqBXIgyNZZT0zXnvK+Qt031Kktbc+1bq1Z49D8sXi/6WIADWTYVESeeSnacsK1PZmB9IZc9YpBE2assSl3RF+95PdqozNuqjqiPndv5D+LiP5mL5ex0p4mh3J4qNnkEQnKzuJR70XY82rZXcCcqQquy0Gr6nloAqnKgo/TWo1aCk807iJaZRt0jftXc7vdx133+L3zq66mq63sQCvoiLY58hFgxT3N+vYQ94mcixfhfMzPvKI4+IhNwkYanb+jL5G3oIvrog==
+X-AspNet-Version: 4.0.30319
+IsOCDI: 0
+X-DataBoundary: EU
+X-1DSCollectorUrl: https://eu-mobile.events.data.microsoft.com/OneCollector/1.0/
+X-AriaCollectorURL: https://eu-mobile.events.data.microsoft.com/Collector/3.0/
+SPRequestGuid: bc2c11a2-605d-0001-5a89-8f60812c3bf8
+request-id: bc2c11a2-605d-0001-5a89-8f60812c3bf8
+MS-CV: ohEsvF1gAQBaiY9ggSw7+A.0
+SPLogId: bc2c11a2-605d-0001-5a89-8f60812c3bf8
+Alt-Svc: h3=":443";ma=86400
+Strict-Transport-Security: max-age=31536000
+X-FRAME-OPTIONS: SAMEORIGIN
+Content-Security-Policy: frame-ancestors 'self' teams.microsoft.com *.teams.microsoft.com *.skype.com *.teams.microsoft.us local.teams.office.com teams.cloud.microsoft *.office365.com goals.cloud.microsoft *.powerapps.com *.powerbi.com *.yammer.com engage.cloud.microsoft word.cloud.microsoft excel.cloud.microsoft powerpoint.cloud.microsoft *.officeapps.live.com *.office.com *.microsoft365.com m365.cloud.microsoft *.cloud.microsoft *.stream.azure-test.net *.dynamics.com *.microsoft.com onedrive.live.com *.onedrive.live.com teams.microsoft.com *.teams.microsoft.com securebroker.sharepointonline.com;
+SPRequestDuration: 184
+SPIisLatency: 3
+X-Powered-By: ASP.NET
+MicrosoftSharePointTeamServices: 16.0.0.27222
+X-Content-Type-Options: nosniff
+X-MS-InvokeApp: 1; RequireReadOnly
+X-Cache: CONFIG_NOCACHE
+X-MSEdge-Ref: Ref A: 5D2E46D266AC44D3925485A23CDF9B19 Ref B: DXB251051107036 Ref C: 2026-05-07T04:07:56Z
+Date: Thu, 07 May 2026 04:07:56 GMT
+
+HTTP/1.1 403 FORBIDDEN
+Content-Length: 13
+Content-Type: text/plain; charset=utf-8
+P3P: CP="ALL IND DSP COR ADM CONo CUR CUSo IVAo IVDo PSA PSD TAI TELo OUR SAMo CNT COM INT NAV ONL PHY PRE PUR UNI"
+X-NetworkStatistics: 1,62977,0,0,3094422,279765,279765,112946
+X-SharePointHealthScore: 0
+IsOCDI: 0
+X-DataBoundary: EU
+X-1DSCollectorUrl: https://eu-mobile.events.data.microsoft.com/OneCollector/1.0/
+X-AriaCollectorURL: https://eu-mobile.events.data.microsoft.com/Collector/3.0/
+SPRequestGuid: bc2c11a2-4072-0001-5a89-835f090e162d
+request-id: bc2c11a2-4072-0001-5a89-835f090e162d
+MS-CV: ohEsvHJAAQBaiYNfCQ4WLQ.0
+SPLogId: bc2c11a2-4072-0001-5a89-835f090e162d
+X-Forms_Based_Auth_Required: https://omanair-my.sharepoint.com/_forms/default.aspx?ReturnUrl=/_layouts/15/error.aspx&Source=%2fpersonal%2f8715_hq_omanair_com%2fDocuments%2fAbsenceReports%2fabsence-report.xlsb%3fga%3d1
+X-Forms_Based_Auth_Return_Url: https://omanair-my.sharepoint.com/_layouts/15/error.aspx
+X-MSDAVEXT_Error: 917656; Access+denied.+Before+opening+files+in+this+location%2c+you+must+first+browse+to+the+web+site+and+select+the+option+to+login+automatically.
+X-IDCRL_AUTH_PARAMS_V1: IDCRL Type="BPOSIDCRL", EndPoint="/personal/8715_hq_omanair_com/_vti_bin/idcrl.svc/", RootDomain="sharepoint.com", Policy="MBI"
+X-Powered-By: ASP.NET
+MicrosoftSharePointTeamServices: 16.0.0.27222
+X-Content-Type-Options: nosniff
+X-MS-InvokeApp: 1; RequireReadOnly
+X-Cache: CONFIG_NOCACHE
+X-MSEdge-Ref: Ref A: 35CCDDCF65B14E53B62E6E43A82444CB Ref B: DXB251051107036 Ref C: 2026-05-07T04:07:56Z
+Date: Thu, 07 May 2026 04:07:56 GMT
+
