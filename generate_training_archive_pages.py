@@ -130,10 +130,28 @@ body{
 .statsValue{font-size:22px;font-weight:900;line-height:1;background:linear-gradient(135deg,#2d5cef 0%,#0a9f83 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Sora',sans-serif}
 .statsLabel{margin-top:0;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:0}
 .otherPageInner{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;width:100%;padding-inline:2px}
+.otherPageInner .bookCupIcon{display:none !important}
+.otherPageInner::before{
+  content:'📚';
+  position:absolute;
+  left:50%;
+  top:46%;
+  transform:translate(-50%,-50%);
+  font-size:30px;
+  line-height:1;
+}
 .rosterCard{display:block;text-decoration:none;color:inherit}
 .rosterInner{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:50px;width:100%}
-.rosterIcon{width:26px;height:26px;object-fit:contain;display:block;transform:translateY(1px);transition:transform .3s cubic-bezier(.22,.7,.2,1)}
-.rosterCard:hover .rosterIcon{transform:translateY(-2px) scale(1.08)}
+.dockEmoji{
+  font-size:30px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transform:translateY(1px);
+  transition:transform .3s cubic-bezier(.22,.7,.2,1);
+}
+.rosterCard:hover .dockEmoji{transform:translateY(-2px) scale(1.08)}
 .rosterLabel{color:var(--blue2);overflow:hidden;text-overflow:ellipsis}
 .bookCupIcon{width:68px;height:68px;display:block;object-fit:contain;position:absolute;left:50%;top:46%;transform:translate(-50%,-50%)}
 .otherPageLabel{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);color:#5b3517;padding-inline:2px;font-size:11px !important;font-weight:900 !important;text-shadow:-1px -1px 0 rgba(255,255,255,.96),1px -1px 0 rgba(255,255,255,.96),-1px 1px 0 rgba(255,255,255,.96),1px 1px 0 rgba(255,255,255,.96),0 2px 4px rgba(255,255,255,.85)}
@@ -254,7 +272,7 @@ body{
     .otherPageInner{min-height:50px}
   .bookCupIcon{width:58px;height:58px}
   .otherPageLabel{bottom:8px}
-.rosterIcon{width:22px;height:22px}
+.dockEmoji{font-size:24px}
   .courseHead{grid-template-columns:34px minmax(0,1fr) auto}
   .courseIcon{width:34px;height:34px;font-size:17px}
   .courseTitle{font-size:14px}
@@ -274,7 +292,7 @@ body{
   .statsLabel{font-size:10px}
   .searchGlyph{font-size:28px}
   .bookCupIcon{width:54px;height:54px}
-  .rosterIcon{width:20px;height:20px}
+  .dockEmoji{font-size:22px}
   .savedIcon{width:28px;height:28px;font-size:14px}
     .miniMeta{font-size:9px}
   .badge{padding:4px 8px;font-size:9px}
@@ -304,7 +322,6 @@ PAGE_JS = r"""
   const statsFaces = Array.from(document.querySelectorAll('.statsFace'));
   const otherPageBtn = document.getElementById('otherPageBtn');
   const rosterHomeBtn = document.getElementById('rosterHomeBtn');
-  const rosterFlightIcon = document.getElementById('rosterFlightIcon');
 
   function norm(v){ return (v || '').toLowerCase().trim(); }
   function firstName(name){
@@ -423,10 +440,6 @@ PAGE_JS = r"""
     const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
     window.location.href = root + '/';
   });
-  if (rosterFlightIcon) {
-    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
-    rosterFlightIcon.src = root + '/assets/icons/flight.png';
-  }
   otherPageBtn?.addEventListener('click', () => {
     const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
     window.location.href = root + '/a-cup-of-book/';
@@ -486,6 +499,16 @@ def date_label(iso_value: str) -> str:
     return f"{day} {MONTH_NAMES_AR[int(month)-1]}"
 
 
+def date_range_label(start_iso: str, end_iso: str | None) -> str:
+    if not end_iso or end_iso == start_iso:
+        return date_label(start_iso)
+    _, month_s, day_s = start_iso.split("-")
+    _, month_e, day_e = end_iso.split("-")
+    if month_s == month_e:
+        return f"{day_s}–{day_e} {MONTH_NAMES_AR[int(month_e)-1]}"
+    return f"{day_s} {MONTH_NAMES_AR[int(month_s)-1]} – {day_e} {MONTH_NAMES_AR[int(month_e)-1]}"
+
+
 def load_data(path: Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     if "months" not in data or not isinstance(data["months"], list):
@@ -533,7 +556,8 @@ def render_course(course: dict, today_iso: str) -> str:
         rows.append(
             f'<div class="empRow{alt}"><span class="empNo">{i}</span><span class="empCode">{member["no"]}</span><span class="empName">{member["name"]}</span></div>'
         )
-    is_today = course["date"] == today_iso
+    course_end = course.get("date_end", course["date"])
+    is_today = course["date"] <= today_iso <= course_end
     past_cls = " is-past" if course["date"] < today_iso else ""
     today_badge = '<span class="badge todayBadge">Today</span>' if is_today else ""
     open_attr = " open" if is_today else ""
@@ -553,7 +577,7 @@ def render_course(course: dict, today_iso: str) -> str:
     </div>
     <div class="courseBadges">
       {today_badge}
-      <span class="badge dateBadge">{date_label(course["date"])}</span>
+      <span class="badge dateBadge">{date_range_label(course["date"], course_end)}</span>
       <span class="badge peopleBadge">👥 {len(course.get("staff", []))}</span>
     </div>
   </summary>
@@ -583,7 +607,7 @@ def build_top_dock(month_courses: list[dict]) -> str:
   </div>
   <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
     <div class="rosterInner">
-      <img class="rosterIcon" id="rosterFlightIcon" src="" alt="Export">
+      <div class="dockEmoji" aria-hidden="true">🛫</div>
       <span class="rosterLabel">Roster</span>
     </div>
   </button>

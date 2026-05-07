@@ -350,7 +350,8 @@
           ]
         },
         {
-          "date": "2026-05-14",
+          "date": "2026-05-13",
+          "date_end": "2026-05-14",
           "code": "",
           "title": "Cargo Warehouse Operations (CWO) (refresher)",
           "icon": "✈️",

@@ -8,128 +8,212 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Sora:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#eef1f7;--text:#18243a;--muted:#6d7b97;--line:rgba(17,24,39,.08);--blue:#1e40af;--blue2:#1976d2}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;min-height:100dvh}
-    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 34px}
-    .header{position:relative;overflow:hidden;padding:26px 18px 20px;border-radius:20px;background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);box-shadow:0 8px 28px rgba(30,64,175,.25)}
-    .header::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 84% 18%,rgba(255,255,255,.18) 0%,transparent 34%),radial-gradient(circle at 14% 90%,rgba(255,255,255,.10) 0%,transparent 28%)}
-    .hero{position:relative;z-index:1}
-    .hero h1{font:900 26px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em}
-    .hero p{margin-top:6px;color:rgba(255,255,255,.78);font-size:12px}
-    .topDock{position:relative;z-index:1;display:grid;grid-template-columns:1fr 96px;gap:10px;align-items:stretch;margin-top:14px}
-    .dockCard{padding:10px 8px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.1);box-shadow:0 2px 8px rgba(15,23,42,.06)}
-    .sourceCard{display:flex;align-items:center;justify-content:center;padding:0 16px;min-height:72px}
-    .sourceText{font-size:14px;font-weight:800;color:#234;white-space:nowrap}
-    .backCard{display:block;text-decoration:none;color:inherit}
-    .backInner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;width:100%;gap:6px}
-    .backIcon{font-size:34px;line-height:1}
-    .backLabel{font-size:9px;font-weight:800;line-height:1.12;color:var(--blue2);white-space:nowrap;text-align:center}
-    .contentWrap{margin-top:14px;background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 18px rgba(15,23,42,.08);overflow:hidden}
-    .contentTop{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fbfdff}
-    .contentTitle{font:800 14px/1.1 'Sora',sans-serif;color:var(--text)}
-    .trainWrap{position:relative;padding:12px 12px 4px;background:#f8fbff;border-bottom:1px solid var(--line)}
-    .trainTrack{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-    .trainTrack::-webkit-scrollbar{height:6px}
-    .trainTrack::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:999px}
-    .car{min-width:120px;max-width:120px;scroll-snap-align:start;border-radius:12px;border:2px solid transparent;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.06);cursor:pointer;transition:.2s}
-    .car.active{border-color:#1e40af;transform:translateY(-2px);box-shadow:0 8px 18px rgba(30,64,175,.2)}
-    .car img{display:block;width:100%;height:76px;object-fit:cover;border-radius:10px 10px 0 0}
-    .carCap{padding:6px 8px;font-size:10px;font-weight:800;color:#475569;text-align:center}
-    .viewerBox{padding:12px}
-    .viewerFrame{background:#0f172a;border-radius:12px;border:1px solid #0b1220;min-height:360px;display:flex;align-items:center;justify-content:center;padding:8px}
-    .viewerFrame img{max-width:100%;max-height:68vh;width:auto;height:auto;object-fit:contain;border-radius:8px;background:#fff}
-    .viewerNote{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
-    .emptyMsg{padding:20px;text-align:center;color:var(--muted);font-size:13px}
-    @media(max-width:720px){
-      .wrap{padding:12px 10px 28px}
-      .header{padding:22px 16px 18px;border-radius:20px}
-      .hero h1{font-size:22px}
-      .topDock{grid-template-columns:1fr 86px;gap:8px}
-      .sourceCard{min-height:64px}
-      .sourceText{font-size:13px}
-      .backInner{min-height:64px}
-      .backIcon{font-size:30px}
-      .car{min-width:106px;max-width:106px}
-      .car img{height:68px}
-      .viewerFrame{min-height:280px}
+    body{background:#eef1f7;color:#18243a;font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;min-height:100dvh}
+    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 36px}
+
+    /* ── Header ── */
+    .header{
+      position:relative;overflow:hidden;
+      padding:22px 18px 18px;border-radius:20px;
+      background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);
+      box-shadow:0 8px 28px rgba(30,64,175,.25);
+    }
+    .header::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(circle at 84% 18%,rgba(255,255,255,.18) 0%,transparent 34%),
+                 radial-gradient(circle at 14% 90%,rgba(255,255,255,.10) 0%,transparent 28%);
+    }
+    .hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
+    .hCircle1{width:200px;height:200px;right:-60px;top:-70px}
+    .hCircle2{width:120px;height:120px;right:70px;bottom:-50px}
+
+    /* ── Header text ── */
+    .heroText{position:relative;z-index:1;}
+    .heroText h1{font:900 28px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em;margin:0}
+    .heroText p{margin:5px 0 0;font-size:12px;color:rgba(255,255,255,.78);font-weight:700}
+
+    /* ── Train strip (inside header) ── */
+    .trainStrip{
+      position:relative;z-index:1;
+      margin-top:14px;
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    }
+    .car-btn{
+      width:60px;height:60px;padding:3px;
+      border-radius:10px;border:2px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.10);
+      cursor:pointer;transition:.18s;overflow:hidden;flex-shrink:0;
+    }
+    .car-btn img{
+      width:100%;height:100%;object-fit:cover;
+      border-radius:7px;display:block;
+    }
+    .car-btn.active{
+      border-color:#fff;
+      transform:scale(1.12) translateY(-2px);
+      box-shadow:0 6px 18px rgba(0,0,0,.30);
+    }
+    .car-btn:hover:not(.active){
+      border-color:rgba(255,255,255,.55);
+      transform:scale(1.06);
+    }
+
+    /* ── Back button (small, inside header) ── */
+    .back-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      margin-top:12px;position:relative;z-index:1;
+      padding:6px 14px;border-radius:999px;
+      background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+      color:rgba(255,255,255,.92);font-size:11px;font-weight:800;
+      text-decoration:none;transition:.2s;
+    }
+    .back-btn:hover{background:rgba(255,255,255,.25)}
+
+    /* ── Viewer ── */
+    .viewer{
+      margin-top:14px;border-radius:16px;overflow:hidden;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow:0 8px 24px rgba(15,23,42,.12);
+    }
+    .viewer-screen{
+      background:#0c1222;
+      display:flex;align-items:center;justify-content:center;
+      min-height:400px;padding:16px;
+    }
+    .viewer-screen img{
+      max-width:100%;max-height:74vh;
+      width:auto;height:auto;
+      object-fit:contain;border-radius:8px;
+      display:block;
+    }
+    .viewer-bar{
+      background:#fff;
+      padding:10px 14px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      border-top:1px solid rgba(0,0,0,.08);
+    }
+    .viewer-label{font-size:13px;font-weight:700;color:#6b7a96}
+    .viewer-nav{display:flex;gap:8px}
+    .nav-btn{
+      padding:5px 14px;border-radius:8px;font-size:12px;font-weight:800;
+      border:1px solid rgba(0,0,0,.12);background:#f1f5ff;color:#1e40af;
+      cursor:pointer;transition:.15s;
+    }
+    .nav-btn:hover{background:#dce7ff}
+
+    /* ── Empty ── */
+    .empty{
+      margin-top:14px;padding:28px;text-align:center;
+      color:#6b7a96;font-size:13px;border-radius:16px;
+      background:rgba(255,255,255,.7);border:1px dashed rgba(0,0,0,.12);
+      display:none;
+    }
+
+    @media(max-width:480px){
+      .car-btn{width:52px;height:52px}
+      .heroText h1{font-size:22px}
+      .viewer-screen{min-height:280px;padding:10px}
     }
   </style>
 </head>
 <body>
 <div class="wrap">
+
   <div class="header">
-    <div class="hero">
-      <div>
-        <h1>A Cup of Book</h1>
-        <p>Select a train car to view large image below</p>
+    <div class="hCircle hCircle1"></div>
+    <div class="hCircle hCircle2"></div>
+
+    <div class="heroText">
+      <h1>A Cup of Book</h1>
+      <p>Tap a cover to read</p>
+    </div>
+
+    <!-- Train strip of thumbnails -->
+    <div class="trainStrip" id="trainStrip"></div>
+
+    <a class="back-btn" href="../training/">
+      📚 Training schedule
+    </a>
+  </div>
+
+  <!-- Large viewer -->
+  <div class="viewer" id="viewer" style="display:none">
+    <div class="viewer-screen">
+      <img id="bigImg" src="" alt="Book page">
+    </div>
+    <div class="viewer-bar">
+      <span class="viewer-label" id="viewerLabel"></span>
+      <div class="viewer-nav">
+        <button class="nav-btn" onclick="nav(-1)">◀ Prev</button>
+        <button class="nav-btn" onclick="nav(1)">Next ▶</button>
       </div>
     </div>
-    <div class="topDock">
-      <div class="dockCard sourceCard"><div class="sourceText">Local reading gallery</div></div>
-      <a class="dockCard backCard" href="../training/" aria-label="Back to training">
-        <div class="backInner">
-          <div class="backIcon">📚</div>
-          <div class="backLabel">Training</div>
-        </div>
-      </a>
-    </div>
   </div>
-  <div class="contentWrap">
-    <div class="contentTop"><div class="contentTitle">Book Cars</div></div>
-    <div class="trainWrap"><div id="trainTrack" class="trainTrack"></div></div>
-    <div id="viewerBox" class="viewerBox" style="display:none;">
-      <div class="viewerFrame"><img id="viewerImg" alt="Selected page"></div>
-      <div id="viewerNote" class="viewerNote"></div>
-    </div>
-    <div id="emptyMsg" class="emptyMsg" style="display:none;">No images found in local gallery.</div>
-  </div>
+
+  <div class="empty" id="empty">No images found in the local gallery.</div>
+
 </div>
+
 <script>
-  (function(){
-    var names = ['cup_of_book_01.jpg','cup_of_book_02.jpg','cup_of_book_03.jpg','cup_of_book_04.jpg'];
-    var base = 'images/';
-    var track = document.getElementById('trainTrack');
-    var empty = document.getElementById('emptyMsg');
-    var viewerBox = document.getElementById('viewerBox');
-    var viewerImg = document.getElementById('viewerImg');
-    var viewerNote = document.getElementById('viewerNote');
-    var good = [];
-    function selectAt(i){
-      var cars = Array.from(track.querySelectorAll('.car'));
-      cars.forEach(function(c, idx){ c.classList.toggle('active', idx === i); });
-      var item = good[i];
-      if (!item) return;
-      viewerImg.src = item.src;
-      viewerNote.textContent = 'Book ' + String(i + 1).padStart(2, '0') + ' · suitable size for reading';
-      viewerBox.style.display = '';
-    }
-    names.forEach(function(n){
-      var src = base + n;
-      var test = new Image();
-      test.onload = function(){
-        good.push({src: src});
-        var idx = good.length - 1;
-        var car = document.createElement('button');
-        car.type = 'button';
-        car.className = 'car';
-        car.innerHTML = '<img src="' + src + '" alt="Book ' + (idx + 1) + '"><div class="carCap">CAR ' + String(idx + 1).padStart(2, '0') + '</div>';
-        car.onclick = function(){ selectAt(idx); };
-        track.appendChild(car);
-        if (idx === 0) selectAt(0);
-      };
-      test.onerror = function(){
-        if ((good.length + 1) === 0) empty.style.display = '';
-      };
-      test.src = src;
+(function(){
+  var FILES = [
+    'cup_of_book_01.jpg',
+    'cup_of_book_02.jpg',
+    'cup_of_book_03.jpg',
+    'cup_of_book_04.jpg'
+  ];
+  var BASE = 'images/';
+  var loaded = [];
+  var cur = 0;
+
+  var strip   = document.getElementById('trainStrip');
+  var viewer  = document.getElementById('viewer');
+  var bigImg  = document.getElementById('bigImg');
+  var lbl     = document.getElementById('viewerLabel');
+  var empty   = document.getElementById('empty');
+
+  function selectIdx(i) {
+    cur = i;
+    strip.querySelectorAll('.car-btn').forEach(function(b, idx) {
+      b.classList.toggle('active', idx === i);
     });
-    setTimeout(function(){
-      if (!good.length){
-        empty.style.display = '';
-        viewerBox.style.display = 'none';
-      }
-    }, 1200);
-  })();
+    bigImg.src = loaded[i].src;
+    lbl.textContent = 'Book ' + String(i + 1).padStart(2, '0') + ' of ' + loaded.length;
+    viewer.style.display = '';
+  }
+
+  window.nav = function(dir) {
+    if (!loaded.length) return;
+    selectIdx((cur + dir + loaded.length) % loaded.length);
+  };
+
+  FILES.forEach(function(name) {
+    var src = BASE + name;
+    var probe = new Image();
+    probe.onload = function() {
+      var idx = loaded.length;
+      loaded.push({ src: src });
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'car-btn';
+      btn.title = 'Book ' + (idx + 1);
+      btn.innerHTML = '<img src="' + src + '" alt="Book ' + (idx + 1) + '">';
+      btn.addEventListener('click', (function(i){ return function(){ selectIdx(i); }; })(idx));
+      strip.appendChild(btn);
+
+      if (idx === 0) selectIdx(0);
+    };
+    probe.src = src;
+  });
+
+  setTimeout(function() {
+    if (!loaded.length) {
+      empty.style.display = '';
+    }
+  }, 1400);
+})();
 </script>
 </body>
 </html>

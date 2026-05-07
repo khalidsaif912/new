@@ -38,20 +38,35 @@ def extract_style_value(style_text: str, prop: str) -> str:
     return m.group(1).strip() if m else ""
 
 
-def parse_date_text(text: str) -> str:
+def parse_date_text(text: str) -> tuple[str, str]:
     cleaned = clean_text(text)
     cleaned = re.sub(r"(?i)\bdate\s*:\s*", "", cleaned)
     cleaned = re.sub(r"\b(\d{1,2})\s*(st|nd|rd|th)\b", r"\1", cleaned, flags=re.I)
     cleaned = clean_text(cleaned)
-    # Accept forms like 06 April 2026
-    m = re.search(r"(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})", cleaned)
-    if not m:
+    # Accept range forms:
+    # - 13 to 14 May 2026
+    # - 13-14 May 2026
+    m_range = re.search(r"(\d{1,2})\s*(?:to|-|–)\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})", cleaned, re.I)
+    if m_range:
+        start_day = int(m_range.group(1))
+        end_day = int(m_range.group(2))
+        month_name = m_range.group(3).lower()
+        year = int(m_range.group(4))
+        month = MONTHS[month_name]
+        start_iso = f"{year:04d}-{month:02d}-{start_day:02d}"
+        end_iso = f"{year:04d}-{month:02d}-{end_day:02d}"
+        return start_iso, end_iso
+
+    # Accept single-date form: 06 April 2026
+    m_single = re.search(r"(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})", cleaned)
+    if not m_single:
         raise ValueError(f"Could not parse date from: {text!r}")
-    day = int(m.group(1))
-    month_name = m.group(2).lower()
-    year = int(m.group(3))
+    day = int(m_single.group(1))
+    month_name = m_single.group(2).lower()
+    year = int(m_single.group(3))
     month = MONTHS[month_name]
-    return f"{year:04d}-{month:02d}-{day:02d}"
+    iso = f"{year:04d}-{month:02d}-{day:02d}"
+    return iso, iso
 
 
 TITLE_PATTERNS = [
@@ -124,13 +139,16 @@ def extract_course_header(table) -> dict[str, str] | None:
 
     title = ""
     date_value = ""
+    date_end_value = ""
     venue = ""
     time_value = ""
 
     for line in lines:
         low = line.lower()
         if low.startswith("date"):
-            date_value = parse_date_text(line)
+            start_date, end_date = parse_date_text(line)
+            date_value = start_date
+            date_end_value = end_date
         elif low.startswith("venue"):
             venue = clean_text(re.sub(r"(?i)^venue\s*:\s*", "", line))
         elif low.startswith("time"):
@@ -144,6 +162,7 @@ def extract_course_header(table) -> dict[str, str] | None:
     return {
         "title": title,
         "date": date_value,
+        "date_end": date_end_value or date_value,
         "venue": venue,
         "time": time_value,
     }
@@ -199,6 +218,7 @@ def parse_source_html(html_text: str) -> dict[str, Any]:
 
         course = {
             "date": header["date"],
+            "date_end": header.get("date_end", header["date"]),
             "code": "",
             "title": title,
             "icon": pick_icon(title),
