@@ -653,12 +653,18 @@
   }
 
   // Keep chips in sync across pages (export/import/home/date/now).
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      toggleWelcomeVsScheduleChip();
-    });
-  } else {
+  function enforceChipVisibility() {
+    // Apply once immediately, then re-apply after short delays.
+    // Reason: some pages add the "visible" class asynchronously (fetch-based welcome chip).
     toggleWelcomeVsScheduleChip();
+    setTimeout(toggleWelcomeVsScheduleChip, 800);
+    setTimeout(toggleWelcomeVsScheduleChip, 2000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enforceChipVisibility);
+  } else {
+    enforceChipVisibility();
   }
   window.addEventListener('storage', function (e) {
     if (!e || !e.key) return;
