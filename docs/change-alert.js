@@ -354,9 +354,42 @@
       }
 
       .chg-card-head {
+        position: relative;
         padding: 14px 14px 10px;
         background: linear-gradient(135deg, #fff7ed, #fef2f2);
         border-bottom: 1px solid rgba(15,23,42,.06);
+      }
+
+      .chg-card-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        border: 1px solid rgba(15,23,42,.12);
+        background: rgba(255,255,255,.75);
+        color: #7f1d1d;
+        font-size: 16px;
+        font-weight: 900;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
+      }
+      .chg-card-close:hover {
+        background: rgba(255,255,255,.95);
+        border-color: rgba(15,23,42,.18);
+        transform: translateY(-1px);
+      }
+      .chg-card-close:active {
+        transform: translateY(0);
+      }
+      body.ar .chg-card-close {
+        right: auto;
+        left: 10px;
       }
 
       .chg-card-title {
@@ -652,6 +685,7 @@
 
     card.innerHTML =
       '<div class="chg-card-head">' +
+        '<button class="chg-card-close" type="button" aria-label="Close" data-act="close">×</button>' +
         '<div class="chg-card-title">⚠️ ' + t('changed', lang) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || ((lang === 'ar' ? 'تنبيه تحديث للموظف: ' : 'Update alert for: ') + (empName || empId))) + '</p>' +
       '</div>' +
@@ -723,6 +757,17 @@
         clearMinimized(empId, alert);
         card.hidden = false;
         icon.hidden = !floatingAlertDotsEnabled();
+        return;
+      }
+      if (act === 'close') {
+        // Close hides the card (minimize) but keeps the alert icon available.
+        if (!floatingAlertDotsEnabled()) {
+          card.hidden = true;
+          return;
+        }
+        markMinimized(empId, alert);
+        card.hidden = true;
+        icon.hidden = false;
         return;
       }
       if (act === 'openDiff') {

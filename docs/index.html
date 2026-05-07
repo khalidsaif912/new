@@ -1498,6 +1498,27 @@ startSummarySwitchLoop();
     }).catch(function() {});
 })();
 
+// Toggle "👋" welcome chip vs "My Schedule" chip based on saved employee id.
+(function () {
+  var exportId = localStorage.getItem('exportSavedEmpId');
+  var legacyId = localStorage.getItem('savedEmpId');
+  var empId = exportId || legacyId || '';
+
+  var welcomeChip = document.getElementById('welcomeChip');
+  var myScheduleBtn = document.getElementById('myScheduleBtn');
+
+  // If no employee id is saved, hide waving container and show schedule container.
+  if (!empId) {
+    if (welcomeChip) welcomeChip.classList.remove('visible');
+    if (myScheduleBtn) myScheduleBtn.hidden = false;
+    return;
+  }
+
+  // If employee id is saved, show waving chip and hide schedule button.
+  if (welcomeChip) welcomeChip.classList.add('visible');
+  if (myScheduleBtn) myScheduleBtn.hidden = true;
+})();
+
 function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
