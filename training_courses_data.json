@@ -7,6 +7,7 @@
       "courses": [
         {
           "date": "2026-04-29",
+          "date_end": "2026-04-29",
           "code": "",
           "title": "DGR-CBTA-OPS",
           "icon": "📦",
@@ -61,6 +62,7 @@
       "courses": [
         {
           "date": "2026-05-03",
+          "date_end": "2026-05-03",
           "code": "",
           "title": "Airside Safety (refresher)",
           "icon": "🦺",
@@ -104,6 +106,7 @@
         },
         {
           "date": "2026-05-04",
+          "date_end": "2026-05-04",
           "code": "",
           "title": "Forklift (refresher)",
           "icon": "🚜",
@@ -147,6 +150,7 @@
         },
         {
           "date": "2026-05-06",
+          "date_end": "2026-05-06",
           "code": "",
           "title": "Forklift (refresher)",
           "icon": "🚜",
@@ -190,6 +194,7 @@
         },
         {
           "date": "2026-05-07",
+          "date_end": "2026-05-07",
           "code": "",
           "title": "SMS (initial)",
           "icon": "🛡️",
@@ -237,6 +242,7 @@
         },
         {
           "date": "2026-05-10",
+          "date_end": "2026-05-10",
           "code": "",
           "title": "Human Factors (refresher)",
           "icon": "🧠",
@@ -268,6 +274,7 @@
         },
         {
           "date": "2026-05-12",
+          "date_end": "2026-05-12",
           "code": "",
           "title": "LAR (refresher)",
           "icon": "📘",
