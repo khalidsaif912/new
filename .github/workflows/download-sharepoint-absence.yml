@@ -27,6 +27,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Process absence report (SharePoint with archive fallback)
+        id: process_absence
+        continue-on-error: true
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
           ABSENCE_EXCEL_FILE: ""
@@ -36,6 +38,12 @@ jobs:
             exit 1
           fi
           python process_absence.py
+
+      - name: Warn when SharePoint download is blocked
+        if: steps.process_absence.outcome != 'success'
+        run: |
+          echo "::warning::Absence processing failed because SharePoint returned non-Excel payload (preview/auth wall)."
+          echo "::warning::No new absence data was generated in this run."
 
       - name: Commit and push absence updates
         run: |
@@ -54,6 +62,14 @@ jobs:
         with:
           name: absence-source-file
           path: absence-archive/latest.xlsb
+          if-no-files-found: ignore
+
+      - name: Upload SharePoint debug payload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharepoint-debug-response
+          path: debug_sharepoint_response.png
           if-no-files-found: ignore
 
       - name: Upload generated absence JSON
