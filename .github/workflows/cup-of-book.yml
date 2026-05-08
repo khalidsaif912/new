@@ -1,0 +1,51 @@
+name: Download A Cup of Book Image
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  download-cup-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pillow
+
+      - name: Download and process image
+        env:
+          CUP_OF_BOOK_IMAGE_URL: ${{ secrets.CUP_OF_BOOK_IMAGE_URL }}
+        run: |
+          if [ -z "${CUP_OF_BOOK_IMAGE_URL}" ]; then
+            echo "::error::Missing secret CUP_OF_BOOK_IMAGE_URL"
+            exit 1
+          fi
+          # Secret value example:
+          # https://omanair-my.sharepoint.com/:i:/p/8715_hq/IQB6aolNRYdaR5fV0AABcwUjAQPCToO53rlTJrZWjvyHCbM?e=l173pX&download=1&web=0
+          python process_cup_of_book.py
+
+      - name: Commit and push image updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/a-cup-of-book/images/
+          if git diff --staged --quiet; then
+            echo "No image changes to commit."
+            exit 0
+          fi
+          git commit -m "Add latest A Cup of Book image"
+          git push
