@@ -25,6 +25,9 @@
     .backInner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;width:100%;gap:6px}
     .backIcon{font-size:34px;line-height:1}
     .backLabel{font-size:9px;font-weight:800;line-height:1.12;color:var(--blue2);white-space:nowrap;text-align:center}
+    .quickLinks{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+    .quickBtn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11px;font-weight:800;text-decoration:none;transition:.2s}
+    .quickBtn:hover{background:rgba(255,255,255,.26)}
     .contentWrap{margin-top:14px;background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 18px rgba(15,23,42,.08);overflow:hidden}
     .contentTop{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fbfdff}
     .contentTitle{font:800 14px/1.1 'Sora',sans-serif;color:var(--text)}
@@ -55,6 +58,11 @@
       <a class="dockCard backCard" href="../training/" aria-label="Back to training">
         <div class="backInner"><div class="backIcon">📚</div><div class="backLabel">Training</div></div>
       </a>
+    </div>
+    <div class="quickLinks">
+      <a class="quickBtn" href="../training/">📚 Training schedule</a>
+      <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر">🛫 الصادر</a>
+      <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد">🛬 الوارد</a>
     </div>
   </div>
   <div class="contentWrap">
