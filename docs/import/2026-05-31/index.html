@@ -264,7 +264,16 @@
       gap:12px;
       padding:14px 16px;
       background:#fff;
+      cursor:pointer;
     }
+    .deptHead::after {
+      content:'▾';
+      color:#94a3b8;
+      font-size:14px;
+      margin-inline-start:6px;
+      transition:transform .2s ease;
+    }
+    .deptCard:not(.collapsed) .deptHead::after { transform:rotate(180deg); }
     .deptIcon {
       width:40px; height:40px;
       border-radius:12px;
@@ -273,6 +282,8 @@
     }
     .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
     .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+    .deptCard.collapsed .deptHead { border-bottom:none !important; }
+    .deptCard.collapsed .shiftStack { display:none; }
 
     /* ═══════ SHIFT STACK ═══════ */
     .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
@@ -357,6 +368,31 @@
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
+
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
+      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+    }
+    .captureSheet.open { display:flex; }
+    .captureSheetCard {
+      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
+    .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn { margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+    }
+    .captureBusy.open { display:block; }
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
@@ -1197,7 +1233,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">08MAY2026 / 10:59</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">08MAY2026 / 17:16</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1319,6 +1355,105 @@ function getSiteRootPath() {
 
 function getSiteRootUrl() {
   return location.origin + getSiteRootPath();
+}
+
+function setCaptureBusy(isBusy) {
+  var busy = document.getElementById('captureBusy');
+  if(!busy) return;
+  busy.classList.toggle('open', !!isBusy);
+}
+
+function saveBlobFile(blob, fileName) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+}
+
+function openCaptureSheet(blob, fileName) {
+  var sheet = document.getElementById('captureSheet');
+  var shareBtn = document.getElementById('captureShareBtn');
+  var saveBtn = document.getElementById('captureSaveBtn');
+  var cancelBtn = document.getElementById('captureCancelBtn');
+  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+
+  var file = new File([blob], fileName, { type:'image/png' });
+  var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
+  shareBtn.style.display = shareSupported ? '' : 'none';
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    shareBtn.onclick = null;
+    saveBtn.onclick = null;
+    cancelBtn.onclick = null;
+    sheet.onclick = null;
+  }
+
+  saveBtn.onclick = function() {
+    saveBlobFile(blob, fileName);
+    closeSheet();
+  };
+  shareBtn.onclick = async function() {
+    try {
+      await navigator.share({ files:[file], title:'Duty Roster Snapshot' });
+    } catch(e) {
+      // User may cancel share dialog.
+    }
+    closeSheet();
+  };
+  cancelBtn.onclick = closeSheet;
+  sheet.onclick = function(e) { if(e.target === sheet) closeSheet(); };
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+async function captureRosterElement(target, fileNamePrefix) {
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = '680px';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    var targetClone = target.cloneNode(true);
+    targetClone.style.marginTop = '0';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
 }
 
 function goToEmployeeSchedule(empName) {
@@ -1492,6 +1627,66 @@ window.openDatePicker = function() {
     window.location.href = target;
   });
 
+})();
+
+// ═══════════════════════════════════════════════════
+// Long-press capture for section / shift
+// ═══════════════════════════════════════════════════
+(function(){
+  var LONG_PRESS_MS = 550;
+  var suppressNextClick = false;
+
+  function bindLongPress(el, onLongPress){
+    if(!el) return;
+    var timer = null;
+    var moved = false;
+
+    function clear(){
+      if(timer) clearTimeout(timer);
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', function(e){
+      moved = false;
+      clear();
+      timer = setTimeout(function(){
+        suppressNextClick = true;
+        onLongPress(e);
+      }, LONG_PRESS_MS);
+    });
+    el.addEventListener('pointermove', function(){ moved = true; clear(); });
+    el.addEventListener('pointerup', clear);
+    el.addEventListener('pointercancel', clear);
+    el.addEventListener('pointerleave', function(){ if(moved) clear(); });
+    el.addEventListener('click', function(e){
+      if(suppressNextClick){
+        e.preventDefault();
+        e.stopPropagation();
+        suppressNextClick = false;
+      }
+    }, true);
+  }
+
+  document.querySelectorAll('.deptHead').forEach(function(head){
+    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });
+  });
+
+  document.querySelectorAll('.shiftSummary').forEach(function(summary){
+    bindLongPress(summary, function(){
+      var shiftCard = summary.closest('.shiftCard');
+      if(!shiftCard) return;
+      shiftCard.setAttribute('open', '');
+      captureRosterElement(shiftCard, 'shift');
+    });
+  });
 })();
 
 // ═══════════════════════════════════════════════════
@@ -1742,6 +1937,94 @@ setLocalCtaLinks();
 setDiffChipIcon();
 applyLang(LANG);
 startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// Department accordion (collapsed by default)
+// ═══════════════════════════════════════════════════
+(function(){
+  var deptCards = Array.from(document.querySelectorAll('.deptCard'));
+  if(!deptCards.length) return;
+  var savedEmpId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+  var savedEmpName = (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || '').trim().toLowerCase();
+
+  function getCurrentShiftForMuscat(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function openMatchingShift(card){
+    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
+    if(!shiftCards.length) return;
+    shiftCards.forEach(function(shiftCard){
+      shiftCard.style.display = '';
+      shiftCard.removeAttribute('open');
+    });
+    var currentShift = getCurrentShiftForMuscat();
+    var target = shiftCards.find(function(shiftCard){
+      return shiftCard.dataset.shift === currentShift;
+    }) || shiftCards[0];
+    if(target) target.setAttribute('open', '');
+  }
+
+  function collapseAll(exceptCard){
+    deptCards.forEach(function(card){
+      if(card === exceptCard) return;
+      card.classList.add('collapsed');
+    });
+  }
+
+  function cardHasSavedEmployee(card){
+    var rows = Array.from(card.querySelectorAll('.empName'));
+    if(!rows.length) return false;
+    return rows.some(function(row){
+      var txt = (row.textContent || '').trim();
+      if(!txt) return false;
+      if(savedEmpId) {
+        if(txt.indexOf(savedEmpId) !== -1) return true;
+      }
+      if(savedEmpName) {
+        return txt.toLowerCase().indexOf(savedEmpName) !== -1;
+      }
+      return false;
+    });
+  }
+
+  deptCards.forEach(function(card){
+    card.classList.add('collapsed');
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.addEventListener('click', function(){
+      var isCollapsed = card.classList.contains('collapsed');
+      if(isCollapsed){
+        collapseAll(card);
+        card.classList.remove('collapsed');
+        openMatchingShift(card);
+      } else {
+        card.classList.add('collapsed');
+      }
+    });
+  });
+
+  // If a saved employee exists, move their department to top and open it.
+  if(savedEmpId || savedEmpName){
+    var targetCard = deptCards.find(cardHasSavedEmployee);
+    if(targetCard && targetCard.parentElement){
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
+      collapseAll(targetCard);
+      targetCard.classList.remove('collapsed');
+      openMatchingShift(targetCard);
+    }
+  }
+})();
 
 function goToMySchedule(event) {
   if (event) event.preventDefault();
