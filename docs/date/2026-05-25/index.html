@@ -1547,8 +1547,7 @@ startSummarySwitchLoop();
       var txt = (row.textContent || '').trim();
       if(!txt) return false;
       if(savedEmpId) {
-        var idRe = new RegExp('(?:^|\D)' + savedEmpId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\D|$)');
-        if(idRe.test(txt)) return true;
+        if(txt.indexOf(savedEmpId) !== -1) return true;
       }
       if(savedEmpName) {
         return txt.toLowerCase().indexOf(savedEmpName) !== -1;

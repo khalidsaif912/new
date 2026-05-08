@@ -1031,7 +1031,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:44</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:49</strong>
     <br>Total: <strong>77 employees</strong>
      &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 2.xlsx</strong>
   </div>
@@ -1525,8 +1525,7 @@ startSummarySwitchLoop();
       var txt = (row.textContent || '').trim();
       if(!txt) return false;
       if(savedEmpId) {
-        var idRe = new RegExp('(?:^|\D)' + savedEmpId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\D|$)');
-        if(idRe.test(txt)) return true;
+        if(txt.indexOf(savedEmpId) !== -1) return true;
       }
       if(savedEmpName) {
         return txt.toLowerCase().indexOf(savedEmpName) !== -1;
