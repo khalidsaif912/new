@@ -1048,7 +1048,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:36</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:44</strong>
     <br>Total: <strong>46 employees</strong>
      &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 2.xlsx</strong>
   </div>
@@ -1500,6 +1500,8 @@ startSummarySwitchLoop();
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
   if(!deptCards.length) return;
+  var savedEmpId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+  var savedEmpName = (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || '').trim().toLowerCase();
 
   function getCurrentShiftForMuscat(){
     var now = new Date();
@@ -1533,6 +1535,23 @@ startSummarySwitchLoop();
     });
   }
 
+  function cardHasSavedEmployee(card){
+    var rows = Array.from(card.querySelectorAll('.empName'));
+    if(!rows.length) return false;
+    return rows.some(function(row){
+      var txt = (row.textContent || '').trim();
+      if(!txt) return false;
+      if(savedEmpId) {
+        var idRe = new RegExp('(?:^|\D)' + savedEmpId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\D|$)');
+        if(idRe.test(txt)) return true;
+      }
+      if(savedEmpName) {
+        return txt.toLowerCase().indexOf(savedEmpName) !== -1;
+      }
+      return false;
+    });
+  }
+
   deptCards.forEach(function(card){
     card.classList.add('collapsed');
     var head = card.querySelector('.deptHead');
@@ -1548,6 +1567,17 @@ startSummarySwitchLoop();
       }
     });
   });
+
+  // If a saved employee exists, move their department to top and open it.
+  if(savedEmpId || savedEmpName){
+    var targetCard = deptCards.find(cardHasSavedEmployee);
+    if(targetCard && targetCard.parentElement){
+      targetCard.parentElement.insertBefore(targetCard, targetCard.parentElement.firstElementChild);
+      collapseAll(targetCard);
+      targetCard.classList.remove('collapsed');
+      openMatchingShift(targetCard);
+    }
+  }
 })();
 
 // ═══════════════════════════════════════════════════
