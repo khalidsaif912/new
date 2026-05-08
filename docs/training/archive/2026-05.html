@@ -674,7 +674,8 @@ body{
   });
   otherPageBtn?.addEventListener('click', () => {
     const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
-    window.location.href = root + '/a-cup-of-book/';
+    const trainingBase = window.location.pathname.includes('/new/docs/') ? '/new/docs' : '';
+    window.location.href = root + trainingBase + '/a-cup-of-book/';
   });
   if(statsFaces.length){
     let idx = 0;
