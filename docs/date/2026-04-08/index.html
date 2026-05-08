@@ -369,6 +369,31 @@
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
 
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
+      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+    }
+    .captureSheet.open { display:flex; }
+    .captureSheetCard {
+      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
+    .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn { margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+    }
+    .captureBusy.open { display:block; }
+
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
       .wrap            { padding:12px 10px 22px; }
@@ -1071,6 +1096,19 @@
 
 </div>
 
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 function getSiteRootPath() {
   if (location.protocol === 'file:') return '';
@@ -1086,6 +1124,105 @@ function getSiteRootPath() {
 
 function getSiteRootUrl() {
   return location.origin + getSiteRootPath();
+}
+
+function setCaptureBusy(isBusy) {
+  var busy = document.getElementById('captureBusy');
+  if(!busy) return;
+  busy.classList.toggle('open', !!isBusy);
+}
+
+function saveBlobFile(blob, fileName) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+}
+
+function openCaptureSheet(blob, fileName) {
+  var sheet = document.getElementById('captureSheet');
+  var shareBtn = document.getElementById('captureShareBtn');
+  var saveBtn = document.getElementById('captureSaveBtn');
+  var cancelBtn = document.getElementById('captureCancelBtn');
+  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+
+  var file = new File([blob], fileName, { type:'image/png' });
+  var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
+  shareBtn.style.display = shareSupported ? '' : 'none';
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    shareBtn.onclick = null;
+    saveBtn.onclick = null;
+    cancelBtn.onclick = null;
+    sheet.onclick = null;
+  }
+
+  saveBtn.onclick = function() {
+    saveBlobFile(blob, fileName);
+    closeSheet();
+  };
+  shareBtn.onclick = async function() {
+    try {
+      await navigator.share({ files:[file], title:'Duty Roster Snapshot' });
+    } catch(e) {
+      // User may cancel share dialog.
+    }
+    closeSheet();
+  };
+  cancelBtn.onclick = closeSheet;
+  sheet.onclick = function(e) { if(e.target === sheet) closeSheet(); };
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+async function captureRosterElement(target, fileNamePrefix) {
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = '680px';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    var targetClone = target.cloneNode(true);
+    targetClone.style.marginTop = '0';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
 }
 
 function goToEmployeeSchedule(empName) {
@@ -1259,6 +1396,66 @@ window.openDatePicker = function() {
     window.location.href = target;
   });
 
+})();
+
+// ═══════════════════════════════════════════════════
+// Long-press capture for section / shift
+// ═══════════════════════════════════════════════════
+(function(){
+  var LONG_PRESS_MS = 550;
+  var suppressNextClick = false;
+
+  function bindLongPress(el, onLongPress){
+    if(!el) return;
+    var timer = null;
+    var moved = false;
+
+    function clear(){
+      if(timer) clearTimeout(timer);
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', function(e){
+      moved = false;
+      clear();
+      timer = setTimeout(function(){
+        suppressNextClick = true;
+        onLongPress(e);
+      }, LONG_PRESS_MS);
+    });
+    el.addEventListener('pointermove', function(){ moved = true; clear(); });
+    el.addEventListener('pointerup', clear);
+    el.addEventListener('pointercancel', clear);
+    el.addEventListener('pointerleave', function(){ if(moved) clear(); });
+    el.addEventListener('click', function(e){
+      if(suppressNextClick){
+        e.preventDefault();
+        e.stopPropagation();
+        suppressNextClick = false;
+      }
+    }, true);
+  }
+
+  document.querySelectorAll('.deptHead').forEach(function(head){
+    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });
+  });
+
+  document.querySelectorAll('.shiftSummary').forEach(function(summary){
+    bindLongPress(summary, function(){
+      var shiftCard = summary.closest('.shiftCard');
+      if(!shiftCard) return;
+      shiftCard.setAttribute('open', '');
+      captureRosterElement(shiftCard, 'shift');
+    });
+  });
 })();
 
 // ═══════════════════════════════════════════════════
