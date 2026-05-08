@@ -264,7 +264,16 @@
       gap:12px;
       padding:14px 16px;
       background:#fff;
+      cursor:pointer;
     }
+    .deptHead::after {
+      content:'▾';
+      color:#94a3b8;
+      font-size:14px;
+      margin-inline-start:6px;
+      transition:transform .2s ease;
+    }
+    .deptCard:not(.collapsed) .deptHead::after { transform:rotate(180deg); }
     .deptIcon {
       width:40px; height:40px;
       border-radius:12px;
@@ -273,6 +282,8 @@
     }
     .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
     .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+    .deptCard.collapsed .deptHead { border-bottom:none !important; }
+    .deptCard.collapsed .shiftStack { display:none; }
 
     /* ═══════ SHIFT STACK ═══════ */
     .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
@@ -381,7 +392,7 @@
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
-      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 4 May 2026</button>
+      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 04 May 2026</button>
       <input id="datePicker" type="date" value="2026-05-04" min="2026-04-01" max="2026-06-30" tabindex="-1" aria-hidden="true" />
     </div>
   </div>
@@ -1493,6 +1504,62 @@ setLocalCtaLinks();
 setDiffChipIcon();
 applyLang(LANG);
 startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// Department accordion (collapsed by default)
+// ═══════════════════════════════════════════════════
+(function(){
+  var deptCards = Array.from(document.querySelectorAll('.deptCard'));
+  if(!deptCards.length) return;
+
+  function getCurrentShiftForMuscat(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function openMatchingShift(card){
+    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
+    if(!shiftCards.length) return;
+    shiftCards.forEach(function(shiftCard){
+      shiftCard.style.display = '';
+      shiftCard.removeAttribute('open');
+    });
+    var currentShift = getCurrentShiftForMuscat();
+    var target = shiftCards.find(function(shiftCard){
+      return shiftCard.dataset.shift === currentShift;
+    }) || shiftCards[0];
+    if(target) target.setAttribute('open', '');
+  }
+
+  function collapseAll(exceptCard){
+    deptCards.forEach(function(card){
+      if(card === exceptCard) return;
+      card.classList.add('collapsed');
+    });
+  }
+
+  deptCards.forEach(function(card){
+    card.classList.add('collapsed');
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.addEventListener('click', function(){
+      var isCollapsed = card.classList.contains('collapsed');
+      if(isCollapsed){
+        collapseAll(card);
+        card.classList.remove('collapsed');
+        openMatchingShift(card);
+      } else {
+        card.classList.add('collapsed');
+      }
+    });
+  });
+})();
 
 // ═══════════════════════════════════════════════════
 // رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
