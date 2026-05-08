@@ -1048,7 +1048,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:49</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">08MAY2026 / 19:52</strong>
     <br>Total: <strong>46 employees</strong>
      &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 2.xlsx</strong>
   </div>
@@ -1571,7 +1571,10 @@ startSummarySwitchLoop();
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
-      targetCard.parentElement.insertBefore(targetCard, targetCard.parentElement.firstElementChild);
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
       collapseAll(targetCard);
       targetCard.classList.remove('collapsed');
       openMatchingShift(targetCard);

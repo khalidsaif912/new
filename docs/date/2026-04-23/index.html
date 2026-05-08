@@ -1554,7 +1554,10 @@ startSummarySwitchLoop();
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
-      targetCard.parentElement.insertBefore(targetCard, targetCard.parentElement.firstElementChild);
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
       collapseAll(targetCard);
       targetCard.classList.remove('collapsed');
       openMatchingShift(targetCard);
