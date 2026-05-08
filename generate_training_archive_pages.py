@@ -817,22 +817,14 @@ def render_cup_of_book_page() -> str:
       display:flex;flex-wrap:wrap;align-items:center;gap:8px;
       margin-top:12px;position:relative;z-index:1;
     }
-    .back-btn{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:6px 14px;border-radius:999px;
-      background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-      color:rgba(255,255,255,.92);font-size:11px;font-weight:800;
-      text-decoration:none;transition:.2s;
-    }
-    .back-btn:hover{background:rgba(255,255,255,.25)}
-    .mini-btn{
+    .quickBtn{
       display:inline-flex;align-items:center;gap:6px;
       padding:6px 12px;border-radius:999px;
       background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
       color:rgba(255,255,255,.92);font-size:11px;font-weight:800;
       text-decoration:none;transition:.2s;
     }
-    .mini-btn:hover{background:rgba(255,255,255,.25)}
+    .quickBtn:hover{background:rgba(255,255,255,.25)}
 
     /* ── Viewer ── */
     .viewer{
@@ -897,9 +889,9 @@ def render_cup_of_book_page() -> str:
     <div class="trainStrip" id="trainStrip"></div>
 
     <div class="quickLinks">
-      <a class="back-btn" href="../training/">📚 Training schedule</a>
-      <a class="mini-btn" href="../" aria-label="العودة إلى الروستر الصادر">🛫 الصادر</a>
-      <a class="mini-btn" href="../import/" aria-label="الذهاب إلى الروستر الوارد">🛬 الوارد</a>
+      <a class="quickBtn" href="../training/">📚 Training schedule</a>
+      <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر">🛫 الصادر</a>
+      <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد">🛬 الوارد</a>
     </div>
   </div>
 
