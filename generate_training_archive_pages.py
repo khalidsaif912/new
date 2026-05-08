@@ -438,7 +438,8 @@ PAGE_JS = r"""
   monthPicker?.addEventListener('change', () => { if(monthPicker.value) window.location.href = monthPicker.value; });
   rosterHomeBtn?.addEventListener('click', () => {
     const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
-    window.location.href = root + '/';
+    const trainingBase = window.location.pathname.includes('/new/docs/') ? '/new/docs' : '';
+    window.location.href = root + trainingBase + '/';
   });
   otherPageBtn?.addEventListener('click', () => {
     const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
