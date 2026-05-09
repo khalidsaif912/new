@@ -264,7 +264,16 @@
       gap:12px;
       padding:14px 16px;
       background:#fff;
+      cursor:pointer;
     }
+    .deptHead::after {
+      content:'▾';
+      color:#94a3b8;
+      font-size:14px;
+      margin-inline-start:6px;
+      transition:transform .2s ease;
+    }
+    .deptCard:not(.collapsed) .deptHead::after { transform:rotate(180deg); }
     .deptIcon {
       width:40px; height:40px;
       border-radius:12px;
@@ -273,6 +282,8 @@
     }
     .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
     .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+    .deptCard.collapsed .deptHead { border-bottom:none !important; }
+    .deptCard.collapsed .shiftStack { display:none; }
 
     /* ═══════ SHIFT STACK ═══════ */
     .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
@@ -357,6 +368,31 @@
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
+
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
+      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+    }
+    .captureSheet.open { display:flex; }
+    .captureSheetCard {
+      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
+    .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn { margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+    }
+    .captureBusy.open { display:block; }
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
@@ -456,8 +492,8 @@
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Import Duty Roster</h1>
     <div class="datePickerWrapper">
-      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 08 May 2026</button>
-      <input id="datePicker" type="date" value="2026-05-08" min="2026-05-01" max="2026-05-31" tabindex="-1" aria-hidden="true" />
+      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 09 May 2026</button>
+      <input id="datePicker" type="date" value="2026-05-09" min="2026-05-01" max="2026-05-31" tabindex="-1" aria-hidden="true" />
     </div>
   </div>
 
@@ -511,10 +547,13 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAMEER MAHMOOD - 990896")'>SAMEER MAHMOOD - 990896</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FROILAN - 80535")'>FROILAN - 80535</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -553,13 +592,10 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAMEER MAHMOOD - 990896")'>SAMEER MAHMOOD - 990896</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED SAID - 81032")'>MOHAMMED SAID - 81032</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
@@ -597,11 +633,11 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHAMAD AL MAHARBI - 82460")'>MAHAMAD AL MAHARBI - 82460</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL WAHAIBI - 82541")'>MOHAMMED AL WAHAIBI - 82541</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHANAD AL HADI - 82665")'>MAHANAD AL HADI - 82665</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAIFA AL BALUSHI - 82664")'>HAIFA AL BALUSHI - 82664</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
@@ -610,15 +646,18 @@
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("GLENDO - 80215")'>GLENDO - 80215</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAIFA AL BALUSHI - 82664")'>HAIFA AL BALUSHI - 82664</span>
-       <span class="empStatus" style="color:#9a3412;">AE13</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHAMAD AL MAHARBI - 82460")'>MAHAMAD AL MAHARBI - 82460</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHANAD AL HADI - 82665")'>MAHANAD AL HADI - 82665</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
     </details>
@@ -647,7 +686,7 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
@@ -657,17 +696,25 @@
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALA AL WAHAIBI - 82473")'>ALA AL WAHAIBI - 82473</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("IBRAHIM AL QUTAITI - 81351")'>IBRAHIM AL QUTAITI - 81351</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL WAHAIBI - 82541")'>MOHAMMED AL WAHAIBI - 82541</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL YAARUBI - 82444")'>MOHAMMED AL YAARUBI - 82444</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YOUSUF AL WAHEEDI - 82100")'>YOUSUF AL WAHEEDI - 82100</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Other" style="border:1px solid #64748b44; background:#f1f5f9">
+      <summary class="shiftSummary" style="background:#f1f5f9; border-bottom:1px solid #64748b33;">
+        <span class="shiftIcon">•</span>
+        <span class="shiftLabel" style="color:#334155;">Other</span>
+        <span class="shiftCount" style="background:#64748b22; color:#334155;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("IBRAHIM AL QUTAITI - 81351")'>IBRAHIM AL QUTAITI - 81351</span>
+       <span class="empStatus" style="color:#334155;">LV</span>
      </div>
       </div>
     </details>
@@ -699,20 +746,26 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">5</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">7</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("NASSER AL MAAMARI - 82590")'>NASSER AL MAAMARI - 82590</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("OMAR AL FUTAISI - 82107")'>OMAR AL FUTAISI - 82107</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("NASSER AL MAAMARI - 82590")'>NASSER AL MAAMARI - 82590</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SULEIMAN AL MAHARBI - 80833")'>SULEIMAN AL MAHARBI - 80833</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL SHAMSI - 82286")'>MAHMOOD AL SHAMSI - 82286</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL HUSAINI - 82455")'>AHMED AL HUSAINI - 82455</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL BALUSHI - 8336")'>KHALID AL BALUSHI - 8336</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL BALUSHI - 82667")'>MOOSA AL BALUSHI - 82667</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HILAL AL SHAMAKHI - 81991")'>HILAL AL SHAMAKHI - 81991</span>
@@ -735,7 +788,7 @@
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ABDULLAH AL SINAWI - 82663")'>ABDULLAH AL SINAWI - 82663</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ADIL AL BULUSHI - 82457")'>ADIL AL BULUSHI - 82457</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL BALUSHI - 8336")'>KHALID AL BALUSHI - 8336</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAJID AL GHAFRI - 82049")'>MAJID AL GHAFRI - 82049</span>
@@ -748,7 +801,7 @@
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">5</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
@@ -761,10 +814,7 @@
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HISHAM AL MAHARBI - 82454")'>HISHAM AL MAHARBI - 82454</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL FARSI - 82456")'>AHMED AL FARSI - 82456</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("WAHEB AL BARAIDAI - 82470")'>WAHEB AL BARAIDAI - 82470</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ADIL AL BULUSHI - 82457")'>ADIL AL BULUSHI - 82457</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -774,25 +824,22 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("OMAR AL FUTAISI - 82107")'>OMAR AL FUTAISI - 82107</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ANWAR AL HABSI - 82496")'>ANWAR AL HABSI - 82496</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL FARSI - 82456")'>AHMED AL FARSI - 82456</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL SHAMSI - 82286")'>MAHMOOD AL SHAMSI - 82286</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("WAHEB AL BARAIDAI - 82470")'>WAHEB AL BARAIDAI - 82470</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL BALUSHI - 82667")'>MOOSA AL BALUSHI - 82667</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL MAWALI - 82614")'>MOHAMMED AL MAWALI - 82614</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
+     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SANAD AL HARTHI - 82642")'>SANAD AL HARTHI - 82642</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
@@ -844,8 +891,22 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL HADI - 82536")'>MOOSA AL HADI - 82536</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HISHAM AL SIYABI - 82434")'>HISHAM AL SIYABI - 82434</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOOSA AL HADI - 82536")'>MOOSA AL HADI - 82536</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
     </details>
@@ -868,13 +929,10 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HISHAM AL SIYABI - 82434")'>HISHAM AL SIYABI - 82434</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHIR AL BALUSHI - 82422")'>MAHIR AL BALUSHI - 82422</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
@@ -922,14 +980,20 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YASIR AL GHARABI - 990786")'>YASIR AL GHARABI - 990786</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL ZADJALI - 82458")'>KHALID AL ZADJALI - 82458</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMED AL MAAWALI - 82535")'>MOHAMED AL MAAWALI - 82535</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("JUMA AL HABSI - 81151")'>JUMA AL HABSI - 81151</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHAMIS AL KASBI - 990751")'>KHAMIS AL KASBI - 990751</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL BALUCHI - 82330")'>MOHAMMED AL BALUCHI - 82330</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -939,17 +1003,20 @@
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALI AL RIYAMI - 82459")'>ALI AL RIYAMI - 82459</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL AMRI - 80834")'>SAID AL AMRI - 80834</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YASIR AL GHARABI - 990786")'>YASIR AL GHARABI - 990786</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("QAIS AL MUKHAINI - 82435")'>QAIS AL MUKHAINI - 82435</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMED AL MAAWALI - 82535")'>MOHAMED AL MAAWALI - 82535</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -963,10 +1030,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FARIZ AL BALUSHI - 80478")'>FARIZ AL BALUSHI - 80478</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL AMRI - 80834")'>SAID AL AMRI - 80834</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL AMRI - 81080")'>AHMED AL AMRI - 81080</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("FARIZ AL BALUSHI - 80478")'>FARIZ AL BALUSHI - 80478</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -976,26 +1043,17 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">3</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALID AL ZADJALI - 82458")'>KHALID AL ZADJALI - 82458</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL AMRI - 81080")'>AHMED AL AMRI - 81080</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("JUMA AL HABSI - 81151")'>JUMA AL HABSI - 81151</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL HADI - 81152")'>SAID AL HADI - 81152</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAMED AL FAKHRI - 8836")'>HAMED AL FAKHRI - 8836</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHAMIS AL KASBI - 990751")'>KHAMIS AL KASBI - 990751</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL BALUCHI - 82330")'>MOHAMMED AL BALUCHI - 82330</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAMED AL FAKHRI - 8836")'>HAMED AL FAKHRI - 8836</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1042,11 +1100,20 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YAARAB AL RAQADI - 82571")'>YAARAB AL RAQADI - 82571</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YOUNIS AL SIYABI - 80480")'>YOUNIS AL SIYABI - 80480</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAMI AL HADABI - 80479")'>SAMI AL HADABI - 80479</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BURTAMANI - 82423")'>BADAR AL BURTAMANI - 82423</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -1070,13 +1137,10 @@
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">2</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL SADI - 82410")'>SAID AL SADI - 82410</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("NASSER AL OMAIRI - 82416")'>NASSER AL OMAIRI - 82416</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1087,20 +1151,14 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YAARAB AL RAQADI - 82571")'>YAARAB AL RAQADI - 82571</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("SAID AL SADI - 82410")'>SAID AL SADI - 82410</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("YOUNIS AL SIYABI - 80480")'>YOUNIS AL SIYABI - 80480</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("TALAL AL HUSEINI - 82417")'>TALAL AL HUSEINI - 82417</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BURTAMANI - 82423")'>BADAR AL BURTAMANI - 82423</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1137,10 +1195,10 @@
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BUSAIDI - 82414")'>BADAR AL BUSAIDI - 82414</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL SAADI - 82420")'>MOHAMMED AL SAADI - 82420</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MOHAMMED AL SAADI - 82420")'>MOHAMMED AL SAADI - 82420</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALIFA AL SAADI - 82537")'>KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -1157,7 +1215,7 @@
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("HAITHAM AL BALUSHI - 82419")'>HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALI AL SHAMSI - 82425")'>ALI AL SHAMSI - 82425</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("BADAR AL BUSAIDI - 82414")'>BADAR AL BUSAIDI - 82414</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -1167,13 +1225,16 @@
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">2</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL BALUSHI - 82431")'>MAHMOOD AL BALUSHI - 82431</span>
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ALI AL SHAMSI - 82425")'>ALI AL SHAMSI - 82425</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt">
+       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("MAHMOOD AL BALUSHI - 82431")'>MAHMOOD AL BALUSHI - 82431</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("ISMAIL AL MAHARBI - 82331")'>ISMAIL AL MAHARBI - 82331</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1184,14 +1245,11 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow">
        <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("AHMED AL HADI - 82654")'>AHMED AL HADI - 82654</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule("KHALIFA AL SAADI - 82537")'>KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -1208,7 +1266,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">08MAY2026 / 10:59</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">09MAY2026 / 10:41</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1330,6 +1388,105 @@ function getSiteRootPath() {
 
 function getSiteRootUrl() {
   return location.origin + getSiteRootPath();
+}
+
+function setCaptureBusy(isBusy) {
+  var busy = document.getElementById('captureBusy');
+  if(!busy) return;
+  busy.classList.toggle('open', !!isBusy);
+}
+
+function saveBlobFile(blob, fileName) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+}
+
+function openCaptureSheet(blob, fileName) {
+  var sheet = document.getElementById('captureSheet');
+  var shareBtn = document.getElementById('captureShareBtn');
+  var saveBtn = document.getElementById('captureSaveBtn');
+  var cancelBtn = document.getElementById('captureCancelBtn');
+  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+
+  var file = new File([blob], fileName, { type:'image/png' });
+  var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
+  shareBtn.style.display = shareSupported ? '' : 'none';
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    shareBtn.onclick = null;
+    saveBtn.onclick = null;
+    cancelBtn.onclick = null;
+    sheet.onclick = null;
+  }
+
+  saveBtn.onclick = function() {
+    saveBlobFile(blob, fileName);
+    closeSheet();
+  };
+  shareBtn.onclick = async function() {
+    try {
+      await navigator.share({ files:[file], title:'Duty Roster Snapshot' });
+    } catch(e) {
+      // User may cancel share dialog.
+    }
+    closeSheet();
+  };
+  cancelBtn.onclick = closeSheet;
+  sheet.onclick = function(e) { if(e.target === sheet) closeSheet(); };
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+async function captureRosterElement(target, fileNamePrefix) {
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = '680px';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    var targetClone = target.cloneNode(true);
+    targetClone.style.marginTop = '0';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
 }
 
 function goToEmployeeSchedule(empName) {
@@ -1503,6 +1660,66 @@ window.openDatePicker = function() {
     window.location.href = target;
   });
 
+})();
+
+// ═══════════════════════════════════════════════════
+// Long-press capture for section / shift
+// ═══════════════════════════════════════════════════
+(function(){
+  var LONG_PRESS_MS = 550;
+  var suppressNextClick = false;
+
+  function bindLongPress(el, onLongPress){
+    if(!el) return;
+    var timer = null;
+    var moved = false;
+
+    function clear(){
+      if(timer) clearTimeout(timer);
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', function(e){
+      moved = false;
+      clear();
+      timer = setTimeout(function(){
+        suppressNextClick = true;
+        onLongPress(e);
+      }, LONG_PRESS_MS);
+    });
+    el.addEventListener('pointermove', function(){ moved = true; clear(); });
+    el.addEventListener('pointerup', clear);
+    el.addEventListener('pointercancel', clear);
+    el.addEventListener('pointerleave', function(){ if(moved) clear(); });
+    el.addEventListener('click', function(e){
+      if(suppressNextClick){
+        e.preventDefault();
+        e.stopPropagation();
+        suppressNextClick = false;
+      }
+    }, true);
+  }
+
+  document.querySelectorAll('.deptHead').forEach(function(head){
+    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });
+  });
+
+  document.querySelectorAll('.shiftSummary').forEach(function(summary){
+    bindLongPress(summary, function(){
+      var shiftCard = summary.closest('.shiftCard');
+      if(!shiftCard) return;
+      shiftCard.setAttribute('open', '');
+      captureRosterElement(shiftCard, 'shift');
+    });
+  });
 })();
 
 // ═══════════════════════════════════════════════════
@@ -1753,6 +1970,94 @@ setLocalCtaLinks();
 setDiffChipIcon();
 applyLang(LANG);
 startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// Department accordion (collapsed by default)
+// ═══════════════════════════════════════════════════
+(function(){
+  var deptCards = Array.from(document.querySelectorAll('.deptCard'));
+  if(!deptCards.length) return;
+  var savedEmpId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+  var savedEmpName = (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || '').trim().toLowerCase();
+
+  function getCurrentShiftForMuscat(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function openMatchingShift(card){
+    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
+    if(!shiftCards.length) return;
+    shiftCards.forEach(function(shiftCard){
+      shiftCard.style.display = '';
+      shiftCard.removeAttribute('open');
+    });
+    var currentShift = getCurrentShiftForMuscat();
+    var target = shiftCards.find(function(shiftCard){
+      return shiftCard.dataset.shift === currentShift;
+    }) || shiftCards[0];
+    if(target) target.setAttribute('open', '');
+  }
+
+  function collapseAll(exceptCard){
+    deptCards.forEach(function(card){
+      if(card === exceptCard) return;
+      card.classList.add('collapsed');
+    });
+  }
+
+  function cardHasSavedEmployee(card){
+    var rows = Array.from(card.querySelectorAll('.empName'));
+    if(!rows.length) return false;
+    return rows.some(function(row){
+      var txt = (row.textContent || '').trim();
+      if(!txt) return false;
+      if(savedEmpId) {
+        if(txt.indexOf(savedEmpId) !== -1) return true;
+      }
+      if(savedEmpName) {
+        return txt.toLowerCase().indexOf(savedEmpName) !== -1;
+      }
+      return false;
+    });
+  }
+
+  deptCards.forEach(function(card){
+    card.classList.add('collapsed');
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.addEventListener('click', function(){
+      var isCollapsed = card.classList.contains('collapsed');
+      if(isCollapsed){
+        collapseAll(card);
+        card.classList.remove('collapsed');
+        openMatchingShift(card);
+      } else {
+        card.classList.add('collapsed');
+      }
+    });
+  });
+
+  // If a saved employee exists, move their department to top and open it.
+  if(savedEmpId || savedEmpName){
+    var targetCard = deptCards.find(cardHasSavedEmployee);
+    if(targetCard && targetCard.parentElement){
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
+      collapseAll(targetCard);
+      targetCard.classList.remove('collapsed');
+      openMatchingShift(targetCard);
+    }
+  }
+})();
 
 function goToMySchedule(event) {
   if (event) event.preventDefault();
