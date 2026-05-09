@@ -1703,7 +1703,7 @@ applyLang(LANG);
 startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
-// Department accordion (collapsed by default)
+// Department layout: all sections open + time-based shift open
 // ═══════════════════════════════════════════════════
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
@@ -1736,46 +1736,25 @@ startSummarySwitchLoop();
     if(target) target.setAttribute('open', '');
   }
 
-  function collapseAll(exceptCard){
-    deptCards.forEach(function(card){
-      if(card === exceptCard) return;
-      card.classList.add('collapsed');
-    });
-  }
-
   function cardHasSavedEmployee(card){
     var rows = Array.from(card.querySelectorAll('.empName'));
     if(!rows.length) return false;
     return rows.some(function(row){
       var txt = (row.textContent || '').trim();
       if(!txt) return false;
-      if(savedEmpId) {
-        if(txt.indexOf(savedEmpId) !== -1) return true;
-      }
-      if(savedEmpName) {
-        return txt.toLowerCase().indexOf(savedEmpName) !== -1;
-      }
+      if(savedEmpId && txt.indexOf(savedEmpId) !== -1) return true;
+      if(savedEmpName && txt.toLowerCase().indexOf(savedEmpName) !== -1) return true;
       return false;
     });
   }
 
+  // Keep all department sections visible/open.
   deptCards.forEach(function(card){
-    card.classList.add('collapsed');
-    var head = card.querySelector('.deptHead');
-    if(!head) return;
-    head.addEventListener('click', function(){
-      var isCollapsed = card.classList.contains('collapsed');
-      if(isCollapsed){
-        collapseAll(card);
-        card.classList.remove('collapsed');
-        openMatchingShift(card);
-      } else {
-        card.classList.add('collapsed');
-      }
-    });
+    card.classList.remove('collapsed');
+    openMatchingShift(card);
   });
 
-  // If a saved employee exists, move their department to top and open it.
+  // If a saved employee exists, move their department to top.
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
@@ -1783,8 +1762,6 @@ startSummarySwitchLoop();
       if(firstDeptCard && firstDeptCard !== targetCard){
         targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
       }
-      collapseAll(targetCard);
-      targetCard.classList.remove('collapsed');
       openMatchingShift(targetCard);
     }
   }
