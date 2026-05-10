@@ -488,7 +488,7 @@
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
-      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 9 April 2026</button>
+      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 09 April 2026</button>
       <input id="datePicker" type="date" value="2026-04-09" min="2026-04-01" max="2026-06-30" tabindex="-1" aria-hidden="true" />
     </div>
   </div>
@@ -1157,7 +1157,7 @@
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">09APR2026 / 00:00</strong>
     <br>Total: <strong>77 employees</strong>
-     &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 2.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong>latest.xlsx</strong>
   </div>
 
 </div>
@@ -1971,12 +1971,20 @@ function goToRosterDiff(event) {
     tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
   }
 
+  function cancelHideTooltip() {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
   function hideTooltipSoon() {
-    if (hideTimer) clearTimeout(hideTimer);
+    cancelHideTooltip();
     hideTimer = setTimeout(function() {
       tooltip.classList.remove('show');
       activeEl = null;
-    }, 80);
+      hideTimer = null;
+    }, 120);
   }
 
   function parseEmployeeId(nameText) {
@@ -2042,6 +2050,7 @@ function goToRosterDiff(event) {
 
   function showPreviewForRow(rowEl, ev) {
     if (!rowEl) return;
+    cancelHideTooltip();
     activeEl = rowEl;
     var label = empNameFromRow(rowEl);
     if (tooltipEmp) tooltipEmp.textContent = label || '-';
@@ -2068,7 +2077,14 @@ function goToRosterDiff(event) {
       showPreviewForRow(rowEl, ev);
     });
     rowEl.addEventListener('mousemove', moveTooltip);
-    rowEl.addEventListener('mouseleave', hideTooltipSoon);
+    rowEl.addEventListener('mouseleave', function(ev) {
+      var to = ev.relatedTarget;
+      if (to && typeof to.closest === 'function' && to.closest('.deptCard .empRow')) {
+        cancelHideTooltip();
+        return;
+      }
+      hideTooltipSoon();
+    });
 
     rowEl.addEventListener('pointerdown', function(ev) {
       if (ev.pointerType !== 'touch') return;

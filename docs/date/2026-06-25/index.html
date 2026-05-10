@@ -538,7 +538,7 @@
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">25JUN2026 / 00:00</strong>
     <br>Total: <strong>0 employees</strong>
-     &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 2.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong>latest.xlsx</strong>
   </div>
 
 </div>
@@ -1352,12 +1352,20 @@ function goToRosterDiff(event) {
     tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
   }
 
+  function cancelHideTooltip() {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
   function hideTooltipSoon() {
-    if (hideTimer) clearTimeout(hideTimer);
+    cancelHideTooltip();
     hideTimer = setTimeout(function() {
       tooltip.classList.remove('show');
       activeEl = null;
-    }, 80);
+      hideTimer = null;
+    }, 120);
   }
 
   function parseEmployeeId(nameText) {
@@ -1423,6 +1431,7 @@ function goToRosterDiff(event) {
 
   function showPreviewForRow(rowEl, ev) {
     if (!rowEl) return;
+    cancelHideTooltip();
     activeEl = rowEl;
     var label = empNameFromRow(rowEl);
     if (tooltipEmp) tooltipEmp.textContent = label || '-';
@@ -1449,7 +1458,14 @@ function goToRosterDiff(event) {
       showPreviewForRow(rowEl, ev);
     });
     rowEl.addEventListener('mousemove', moveTooltip);
-    rowEl.addEventListener('mouseleave', hideTooltipSoon);
+    rowEl.addEventListener('mouseleave', function(ev) {
+      var to = ev.relatedTarget;
+      if (to && typeof to.closest === 'function' && to.closest('.deptCard .empRow')) {
+        cancelHideTooltip();
+        return;
+      }
+      hideTooltipSoon();
+    });
 
     rowEl.addEventListener('pointerdown', function(ev) {
       if (ev.pointerType !== 'touch') return;
