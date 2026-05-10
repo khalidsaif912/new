@@ -3,7 +3,7 @@ name: Download A Cup of Book Image
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 */3 * * *"
 
 permissions:
   contents: write
