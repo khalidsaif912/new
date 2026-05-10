@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import sys
@@ -16,8 +17,10 @@ import requests
 from PIL import Image, UnidentifiedImageError
 
 IMAGE_DIR = Path("docs/a-cup-of-book/images")
-ENV_URL_KEY = "CUP_OF_BOOK_IMAGE_URL"
+INDEX_HTML = Path("docs/a-cup-of-book/index.html")
+ENV_URL_KEY = "A_CUP_OF_BOOK"
 NAME_RE = re.compile(r"^cup_of_book_(\d+)\.(?:jpe?g|png|webp)$", re.IGNORECASE)
+FILES_BLOCK_RE = re.compile(r"var\s+FILES\s*=\s*\[[\s\S]*?\]\s*;", re.MULTILINE)
 ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
@@ -82,6 +85,11 @@ def existing_image_files(image_dir: Path) -> Iterable[Path]:
     )
 
 
+def cup_sequence(name: str) -> int:
+    m = NAME_RE.match(name)
+    return int(m.group(1)) if m else 10**9
+
+
 def next_target_path(image_dir: Path) -> Path:
     max_num = 0
     for p in existing_image_files(image_dir):
@@ -90,6 +98,50 @@ def next_target_path(image_dir: Path) -> Path:
             continue
         max_num = max(max_num, int(m.group(1)))
     return image_dir / f"cup_of_book_{max_num + 1:02d}.jpg"
+
+
+def remove_duplicate_cup_images(image_dir: Path) -> int:
+    """Drop files that have identical bytes to an earlier cup_of_book_* image (keep lowest sequence)."""
+    files = sorted(existing_image_files(image_dir), key=lambda p: (cup_sequence(p.name), p.name.lower()))
+    by_hash: dict[str, list[Path]] = {}
+    for p in files:
+        h = file_sha256(p)
+        by_hash.setdefault(h, []).append(p)
+
+    removed = 0
+    for paths in by_hash.values():
+        if len(paths) <= 1:
+            continue
+        keep = min(paths, key=lambda p: (cup_sequence(p.name), p.name.lower()))
+        for p in paths:
+            if p == keep:
+                continue
+            p.unlink(missing_ok=True)
+            removed += 1
+            print(f"Removed duplicate image (same as {keep.name}): {p.name}")
+    return removed
+
+
+def gallery_filenames(image_dir: Path) -> list[str]:
+    files = sorted(existing_image_files(image_dir), key=lambda p: (cup_sequence(p.name), p.name.lower()))
+    return [p.name for p in files]
+
+
+def sync_index_html_files_list(index_path: Path, image_dir: Path) -> bool:
+    """Rewrite `var FILES = [...]` in the gallery page to match files on disk."""
+    if not index_path.is_file():
+        return False
+    text = index_path.read_text(encoding="utf-8")
+    if not FILES_BLOCK_RE.search(text):
+        return False
+    names = gallery_filenames(image_dir)
+    new_block = "var FILES = " + json.dumps(names, ensure_ascii=False) + ";"
+    updated = FILES_BLOCK_RE.sub(new_block, text, count=1)
+    if updated == text:
+        return False
+    index_path.write_text(updated, encoding="utf-8")
+    print(f"Updated gallery list in {index_path.as_posix()} ({len(names)} file(s))")
+    return True
 
 
 def convert_to_jpeg_bytes(payload: bytes) -> bytes:
@@ -134,7 +186,7 @@ def download_image(url: str) -> tuple[bytes, str, str]:
 
 
 def main() -> int:
-    raw_url = os.getenv(ENV_URL_KEY, "").strip()
+    raw_url = (os.getenv(ENV_URL_KEY) or "").strip()
     if not raw_url:
         print(f"Missing required environment variable: {ENV_URL_KEY}", file=sys.stderr)
         return 1
@@ -142,34 +194,43 @@ def main() -> int:
     normalized_url = ensure_download_params(raw_url)
     print(f"Downloading from: {normalized_url}")
 
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+    remove_duplicate_cup_images(IMAGE_DIR)
+
     try:
         payload, content_type, final_url = download_image(normalized_url)
     except requests.RequestException as exc:
         print(f"Download failed: {exc}", file=sys.stderr)
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
         return 1
     except DownloadValidationError as exc:
         print(str(exc), file=sys.stderr)
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
         return 1
 
-    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     existing_files = list(existing_image_files(IMAGE_DIR))
     existing_hashes = {file_sha256(p) for p in existing_files}
 
     original_hash = bytes_sha256(payload)
     if original_hash in existing_hashes:
-        print("Image already exists, skipping")
+        print("Image already exists (same file bytes), skipping new file")
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
         return 0
 
     jpg_payload = convert_to_jpeg_bytes(payload)
     jpg_hash = bytes_sha256(jpg_payload)
     if jpg_hash in existing_hashes:
-        print("Image already exists, skipping")
+        print("Image already exists (same content after JPEG normalize), skipping new file")
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
         return 0
 
     target_path = next_target_path(IMAGE_DIR)
     target_path.write_bytes(jpg_payload)
+    print(f"Saved new image: {target_path.as_posix()}")
 
-    print(f"Saved: {target_path.as_posix()}")
+    remove_duplicate_cup_images(IMAGE_DIR)
+    sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
+
     print(f"Content-Type: {content_type}")
     print(f"Final URL: {final_url}")
     return 0

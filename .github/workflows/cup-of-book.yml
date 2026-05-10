@@ -28,10 +28,10 @@ jobs:
 
       - name: Download and process image
         env:
-          CUP_OF_BOOK_IMAGE_URL: ${{ secrets.CUP_OF_BOOK_IMAGE_URL }}
+          A_CUP_OF_BOOK: ${{ secrets.A_CUP_OF_BOOK }}
         run: |
-          if [ -z "${CUP_OF_BOOK_IMAGE_URL}" ]; then
-            echo "::error::Missing secret CUP_OF_BOOK_IMAGE_URL"
+          if [ -z "${A_CUP_OF_BOOK}" ]; then
+            echo "::error::Missing secret A_CUP_OF_BOOK"
             exit 1
           fi
           # Secret value example:
@@ -42,9 +42,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/a-cup-of-book/images/
+          git add docs/a-cup-of-book/images/ docs/a-cup-of-book/index.html
           if git diff --staged --quiet; then
-            echo "No image changes to commit."
+            echo "No image or gallery list changes to commit."
             exit 0
           fi
           git commit -m "Add latest A Cup of Book image"
