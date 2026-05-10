@@ -160,6 +160,43 @@
       color: #64748b;
       padding: 8px 4px 2px;
     }
+    .sourceMeta {
+      margin-top: 8px;
+      padding: 8px 10px 2px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    .sourceMetaRow {
+      margin: 2px 0;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .sourceBadge {
+      display: inline-block;
+      min-width: 46px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-inline-end: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+    }
+    .sourceBadgeNew {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .sourceFileName { font-weight: 700; color: #334155; }
+    .sourceMetaHint {
+      margin-top: 4px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
     .diffList {
       margin-top: 10px;
       display: grid;
@@ -387,6 +424,11 @@
       <div id="diffList" class="diffList"></div>
     </div>
     <div class="pageNote">Automatic comparison between latest and previous version of the same month. No manual upload required.</div>
+    <div class="sourceMeta" id="sourceMeta">
+      <div class="sourceMetaRow"><span class="sourceBadge sourceBadgeNew">الجديد</span><span id="newSourceName" class="sourceFileName">-</span></div>
+      <div class="sourceMetaRow"><span class="sourceBadge">السابق</span><span id="oldSourceName" class="sourceFileName">-</span></div>
+      <div class="sourceMetaHint" id="sourceMetaHint">مصدر المقارنة يظهر من ملفي الإكسل المستخدمين في حساب الفروقات.</div>
+    </div>
   </div>
 
   <script>
@@ -409,6 +451,9 @@
         noDiffLoaded: 'No diff loaded yet.',
         note: 'Automatic comparison between latest and previous version of the same month. No manual upload required.',
         noDiffFound: 'No differences found between previous and current versions.',
+        sourceNew: 'NEW',
+        sourceOld: 'PREVIOUS',
+        sourceHint: 'Comparison source is shown from the two Excel files used to compute this diff.',
         summaryStats: '{changes} changes across {employees} employees in {departments} departments',
         noSavedEmp: 'No saved employee ID found for this section.',
         noAbsence: 'No recorded absences for this employee.',
@@ -431,6 +476,9 @@
         noDiffLoaded: 'لا توجد فروقات محملة بعد.',
         note: 'مقارنة تلقائية بين أحدث نسخة والنسخة السابقة لنفس الشهر بدون رفع يدوي.',
         noDiffFound: 'لا توجد فروقات بين النسخة السابقة والحالية.',
+        sourceNew: 'الجديد',
+        sourceOld: 'السابق',
+        sourceHint: 'مصدر المقارنة يظهر من ملفي الإكسل المستخدمين في حساب الفروقات.',
         summaryStats: '{changes} تغييرات بين {employees} موظفين في {departments} أقسام',
         noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
         noAbsence: 'لا توجد أيام غياب مسجلة لهذا الموظف.',
@@ -492,9 +540,15 @@
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
       const note = document.querySelector('.pageNote');
+      const sourceHint = document.getElementById('sourceMetaHint');
+      const newBadge = document.querySelector('.sourceBadgeNew');
+      const oldBadge = document.querySelector('#sourceMeta .sourceBadge:not(.sourceBadgeNew)');
       if (tabRosterDiff) tabRosterDiff.textContent = t('tabDiff');
       if (tabAbsence) tabAbsence.textContent = t('tabAbsence');
       if (note) note.textContent = t('note');
+      if (sourceHint) sourceHint.textContent = t('sourceHint');
+      if (newBadge) newBadge.textContent = t('sourceNew');
+      if (oldBadge) oldBadge.textContent = t('sourceOld');
       const floatLbl = document.getElementById('floatingDotsLabel');
       const floatHint = document.getElementById('floatingDotsHint');
       if (floatLbl) floatLbl.textContent = t('floatDotsPref');
@@ -503,6 +557,16 @@
       updateSummaryText();
       updateDateTag();
       applyDiffModeUi(currentDiffKind);
+    }
+
+    function updateSourceMeta(data) {
+      const newEl = document.getElementById('newSourceName');
+      const oldEl = document.getElementById('oldSourceName');
+      if (!newEl || !oldEl) return;
+      const newFile = (data && data.new_file) ? String(data.new_file) : '-';
+      const oldFile = (data && data.old_file) ? String(data.old_file) : '-';
+      newEl.textContent = newFile;
+      oldEl.textContent = oldFile;
     }
 
     function applyDiffModeUi(kind) {
@@ -840,12 +904,14 @@
         const res = await fetch(`${root}/roster-diff/data/${kind}-latest.json?ts=${Date.now()}`);
         if (!res.ok) throw new Error(t('noAutoDiff', { kind }));
         lastDiffData = await res.json();
+        updateSourceMeta(lastDiffData);
         if (currentPanel === 'absence') {
           await renderAbsencePanel(kind);
         } else {
           await renderDiffRows(lastDiffData, kind);
         }
       } catch (e) {
+        updateSourceMeta(null);
         const err = document.getElementById('errors');
         err.textContent = e.message || String(e);
       }

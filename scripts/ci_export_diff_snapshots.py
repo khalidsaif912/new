@@ -27,6 +27,8 @@ if str(ROOT) not in sys.path:
 from roster_app.cache_io import month_key_from_filename  # noqa: E402
 
 PRE_RUN_OLD = "_pre_run_old.xlsx"
+PRE_RUN_OLD_SOURCE_NAME = "_pre_run_old_source_name.txt"
+LAST_SOURCE_NAME = "last_source_name.txt"
 
 
 def _month_key() -> str | None:
@@ -48,6 +50,10 @@ def _paths(month: str) -> tuple[Path, Path, Path, Path, Path]:
     )
 
 
+def _name_paths(backup: Path) -> tuple[Path, Path]:
+    return backup / LAST_SOURCE_NAME, backup / PRE_RUN_OLD_SOURCE_NAME
+
+
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -58,13 +64,17 @@ def _sha256_file(path: Path) -> str:
 
 def before_generate() -> int:
     month = _month_key()
+    current_source_name = (os.environ.get("ROSTER_FILENAME") or "").strip()
     if not month:
         print("[ci_export_diff] before: no month from ROSTER_FILENAME — skip")
         return 0
     rosters, backup, last_ingested, _last_hash, pre_old = _paths(month)
+    last_source_name_file, pre_old_source_name_file = _name_paths(backup)
     backup.mkdir(parents=True, exist_ok=True)
     if pre_old.exists():
         pre_old.unlink()
+    if pre_old_source_name_file.exists():
+        pre_old_source_name_file.unlink()
     target = rosters / f"{month}.xlsx"
     if last_ingested.is_file():
         shutil.copy2(last_ingested, pre_old)
@@ -74,15 +84,28 @@ def before_generate() -> int:
         print(f"[ci_export_diff] before: staged {target.name} -> {pre_old.name}")
     else:
         print("[ci_export_diff] before: no baseline (first run for this month)")
+
+    previous_source_name = ""
+    if last_source_name_file.is_file():
+        previous_source_name = last_source_name_file.read_text(encoding="utf-8").strip()
+    if previous_source_name:
+        pre_old_source_name_file.write_text(previous_source_name, encoding="utf-8")
+        print(f"[ci_export_diff] before: staged previous source name -> {pre_old_source_name_file.name}")
+    elif current_source_name:
+        # Fallback for first metadata-enabled run.
+        pre_old_source_name_file.write_text(current_source_name, encoding="utf-8")
+        print(f"[ci_export_diff] before: seeded source name fallback -> {pre_old_source_name_file.name}")
     return 0
 
 
 def after_generate() -> int:
     month = _month_key()
+    current_source_name = (os.environ.get("ROSTER_FILENAME") or "").strip()
     if not month:
         print("[ci_export_diff] after: no month from ROSTER_FILENAME — skip")
         return 0
     rosters, backup, last_ingested, last_hash_f, pre_old = _paths(month)
+    last_source_name_file, pre_old_source_name_file = _name_paths(backup)
     backup.mkdir(parents=True, exist_ok=True)
     new_path = rosters / f"{month}.xlsx"
     if not new_path.is_file():
@@ -100,6 +123,9 @@ def after_generate() -> int:
     if pre_old.is_file() and not same_as_last:
         build_py = ROOT / "scripts" / "build_roster_diff.py"
         out_dir = ROOT / "docs" / "roster-diff" / "data"
+        old_source_label = ""
+        if pre_old_source_name_file.is_file():
+            old_source_label = pre_old_source_name_file.read_text(encoding="utf-8").strip()
         cmd = [
             sys.executable,
             str(build_py),
@@ -107,6 +133,10 @@ def after_generate() -> int:
             str(pre_old),
             "--new",
             str(new_path),
+            "--old-label",
+            old_source_label or pre_old.name,
+            "--new-label",
+            current_source_name or new_path.name,
             "--kind",
             "export",
             "--month",
@@ -127,6 +157,10 @@ def after_generate() -> int:
 
     if pre_old.exists():
         pre_old.unlink()
+    if pre_old_source_name_file.exists():
+        pre_old_source_name_file.unlink()
+    if current_source_name:
+        last_source_name_file.write_text(current_source_name, encoding="utf-8")
 
     return 0
 

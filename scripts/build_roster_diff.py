@@ -149,6 +149,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Build roster diff JSON from old/new xlsx")
     p.add_argument("--old", required=True)
     p.add_argument("--new", required=True)
+    p.add_argument("--old-label", default="", help="Display label for old source file")
+    p.add_argument("--new-label", default="", help="Display label for new source file")
     p.add_argument("--kind", choices=["export", "import"], required=True)
     p.add_argument("--month", required=True, help="YYYY-MM")
     p.add_argument("--out-dir", default="docs/roster-diff/data")
@@ -169,8 +171,8 @@ def main() -> None:
         "kind": args.kind,
         "month": args.month,
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "old_file": old_path.name,
-        "new_file": new_path.name,
+        "old_file": (args.old_label or "").strip() or old_path.name,
+        "new_file": (args.new_label or "").strip() or new_path.name,
         "total_changes": len(changes),
         "changes": changes,
     }
