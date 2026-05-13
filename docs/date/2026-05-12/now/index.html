@@ -653,7 +653,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -667,7 +667,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -755,7 +755,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -775,7 +775,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -890,7 +890,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -922,7 +922,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1072,7 +1072,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -1095,7 +1095,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1423,15 +1423,6 @@ window.openDatePicker = function() {
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {
     var isNowPage = path.includes('/now');
-    var isReload = false;
-    try {
-      if (performance && performance.getEntriesByType) {
-        var navEntries = performance.getEntriesByType('navigation');
-        if (navEntries && navEntries.length) {
-          isReload = navEntries[0].type === 'reload';
-        }
-      }
-    } catch(e) {}
 
     // Root pages should always jump to today's (or nearest available) date page.
     var isRootLike = !path.includes('/date/');
@@ -1443,9 +1434,9 @@ window.openDatePicker = function() {
       return true;
     }
 
-    // On explicit refresh of a date page, go back to today's page.
+    // Keep /now pages always synced to today's date without manual refresh.
     var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
-    if (dateMatch && isReload) {
+    if (dateMatch && isNowPage) {
       var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
       var todayIso = getMuscatTodayIso();
       if (pageIso !== todayIso) {
