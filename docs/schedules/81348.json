@@ -1268,9 +1268,9 @@
         "day": 20,
         "day_name_ar": "الأربعاء",
         "day_name_en": "Wednesday",
-        "shift_code": "AN13",
-        "shift_label": "🌆 Afternoon (AN13)",
-        "shift_group": "Afternoon"
+        "shift_code": "MN06",
+        "shift_label": "🌅 Morning (MN06)",
+        "shift_group": "Morning"
       },
       {
         "date": "2026-05-21",
@@ -1331,9 +1331,9 @@
         "day": 27,
         "day_name_ar": "الأربعاء",
         "day_name_en": "Wednesday",
-        "shift_code": "AN13",
-        "shift_label": "🌆 Afternoon (AN13)",
-        "shift_group": "Afternoon"
+        "shift_code": "MN06",
+        "shift_label": "🌅 Morning (MN06)",
+        "shift_group": "Morning"
       },
       {
         "date": "2026-05-28",
