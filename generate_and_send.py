@@ -1434,15 +1434,6 @@ window.openDatePicker = function() {{
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {{
     var isNowPage = path.includes('/now');
-    var isReload = false;
-    try {{
-      if (performance && performance.getEntriesByType) {{
-        var navEntries = performance.getEntriesByType('navigation');
-        if (navEntries && navEntries.length) {{
-          isReload = navEntries[0].type === 'reload';
-        }}
-      }}
-    }} catch(e) {{}}
 
     // Root pages should always jump to today's (or nearest available) date page.
     var isRootLike = !path.includes('/date/');
@@ -1454,9 +1445,9 @@ window.openDatePicker = function() {{
       return true;
     }}
 
-    // On explicit refresh of a date page, go back to today's page.
+    // Keep /now pages always synced to today's date without manual refresh.
     var dateMatch = path.match(/\/date\/(\\d{{4}})-(\\d{{2}})-(\\d{{2}})\//);
-    if (dateMatch && isReload) {{
+    if (dateMatch && isNowPage) {{
       var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
       var todayIso = getMuscatTodayIso();
       if (pageIso !== todayIso) {{
