@@ -1,6 +1,47 @@
 (function () {
   let deferredPrompt = null;
 
+  const PWA_VER = '11';
+
+  function pwaSiteRoot() {
+    if (location.protocol === 'file:') return '';
+    const path = location.pathname || '/';
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.endsWith('github.io')) {
+      const segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
+
+  function pwaBaseUrl() {
+    const p = pwaSiteRoot();
+    if (!p) return location.origin + '/';
+    return location.origin + p + (p.charAt(p.length - 1) === '/' ? '' : '/');
+  }
+
+  (function wirePwaManifestLink() {
+    const base = pwaBaseUrl();
+    const isImport = (location.pathname || '').indexOf('/import/') !== -1;
+    const href = base + (isImport ? 'import/manifest.json' : 'manifest.json') + '?v=' + PWA_VER;
+    let link = document.querySelector('link[rel="manifest"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = href;
+    let touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/flight.png';
+  })();
+
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone =
     window.matchMedia('(display-mode: standalone)').matches ||
@@ -169,13 +210,14 @@
         <div style="color:#c7b384;font-size:13px;line-height:1.9">
           1) افتح زر المشاركة في المتصفح<br>
           2) اختر <b style="color:#f3e6c1">Add to Home Screen</b><br>
-          3) اضغط <b style="color:#f3e6c1">Add</b>
+          3) اضغط <b style="color:#f3e6c1">Add</b><br>
+          <span style="opacity:.9">بعدها افتح الموقع من الأيقونة على الشاشة الرئيسية ليظهر بدون شريط عنوان المتصفح.</span>
         </div>
       `
       : `
         <div style="color:#c7b384;font-size:13px;line-height:1.9">
           إذا لم تظهر نافذة التثبيت تلقائيًا، أضف الصفحة إلى الشاشة الرئيسية من خيارات المتصفح.<br>
-          بعض المتصفحات لا تعرض نافذة التثبيت المباشرة دائمًا.
+          <span style="opacity:.9">شريط العنوان يبقى ظاهرًا أثناء التصفح داخل المتصفح؛ بعد التثبيت افتح الموقع من أيقونة التطبيق ليظهر بدون شريط عنوان.</span>
         </div>
       `;
 
@@ -254,6 +296,8 @@
   });
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/roster-site/sw.js?v=9');
+    navigator.serviceWorker
+      .register(pwaBaseUrl() + 'sw.js?v=' + PWA_VER)
+      .catch(function () {});
   }
 })();

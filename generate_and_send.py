@@ -42,6 +42,52 @@ from roster_app.text_utils import (
     to_western_digits,
 )
 
+# PWA: manifest + iOS meta; paths resolve for /roster-site/ and GitHub Pages /user/docs/
+ROSTER_PWA_HEAD_SNIPPET = """
+  <meta name="theme-color" content="#1e40af">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <script>
+  (function () {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var p = siteRoot();
+    var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
+    if (!p) base = location.origin + '/';
+    var pv = '11';
+    var imp = (location.pathname || '').indexOf('/import/') !== -1;
+    var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
+    var mlinks = document.querySelectorAll('link[rel="manifest"]');
+    var link = mlinks.length ? mlinks[0] : null;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = man;
+    for (var i = 1; i < mlinks.length; i++) mlinks[i].remove();
+    var touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/flight.png';
+  })();
+  </script>
+"""
+
 
 # =========================
 # Detect rows/cols (Days row + Date numbers row)
@@ -1117,7 +1163,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .summaryChip .chipVal {{ font-size:19px; }}
     }}
 
-  </style>
+  </style>{ROSTER_PWA_HEAD_SNIPPET}
 </head>
 <body>
 <div class="wrap">
@@ -1991,6 +2037,7 @@ function goToRosterDiff(event) {{
     document.body.appendChild(s);
   }}
   var ver = '20260514b';
+  addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js?v=' + ver);
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];

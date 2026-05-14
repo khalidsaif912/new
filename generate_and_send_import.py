@@ -34,6 +34,52 @@ import requests
 import pandas as pd
 
 
+IMPORT_PWA_HEAD_SNIPPET = """
+  <meta name="theme-color" content="#1e40af">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <script>
+  (function () {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var p = siteRoot();
+    var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
+    if (!p) base = location.origin + '/';
+    var pv = '11';
+    var imp = (location.pathname || '').indexOf('/import/') !== -1;
+    var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
+    var mlinks = document.querySelectorAll('link[rel="manifest"]');
+    var link = mlinks.length ? mlinks[0] : null;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = man;
+    for (var i = 1; i < mlinks.length; i++) mlinks[i].remove();
+    var touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/flight.png';
+  })();
+  </script>
+"""
+
+
 # =========================
 # CONFIG
 # =========================
@@ -476,7 +522,7 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
       30% {{ transform: rotate(16deg); }}
       40% {{ transform: rotate(-6deg); }}
     }}
-  </style>
+  </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
 <body>
 <div class="wrap">
@@ -671,10 +717,12 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
+  var ver = '11';
+  addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/banner-changer.js');
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
   var m = (location.pathname || '').match(/\/date\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
   var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-  addScript(root + '/banner-changer.js');
   if (eidDays.indexOf(activeIso) !== -1) {{
     addScript(root + '/eid-overlayxx.js');
   }}
@@ -942,7 +990,7 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
     .toast-text p{font-size:12.5px;color:var(--muted);line-height:1.55;font-weight:500}.toast-text strong{color:var(--ink)}
     .toast-btns{display:flex;gap:8px;margin-top:10px}
     @media print{.topbar,.search-section,.toast-container,.modal,.actions-card{display:none!important}body{background:#fff;color:#000}}
-  </style>
+  </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
 <body>
 
@@ -1138,11 +1186,17 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
   }
   var p = deployBase();
   var base = (location.origin||'') + p + (p && p.charAt(p.length-1) !== '/' ? '/' : '');
-  var u = base + 'change-alert.js?v=20260502b';
+  if (!p) base = (location.origin||'') + '/';
+  var u = base + 'change-alert.js?v=20260514b';
   if (document.querySelector('script[data-chg-alert]')) return;
   var s = document.createElement('script');
   s.src = u; s.defer = true; s.setAttribute('data-chg-alert','1');
   document.body.appendChild(s);
+  var u2 = base + 'install-pwa.js?v=11';
+  if (document.querySelector('script[data-install-pwa]')) return;
+  var s2 = document.createElement('script');
+  s2.src = u2; s2.defer = true; s2.setAttribute('data-install-pwa','1');
+  document.body.appendChild(s2);
 })();
 </script>
 </body>
