@@ -1270,6 +1270,23 @@ function rosterSnapshotLayoutWidth() {
   return Math.min(Math.max(iw - 28, 280), 430);
 }
 
+function buildDeptBannerForSnapshot(deptCard) {
+  if (!deptCard) return null;
+  var stack = deptCard.querySelector('.shiftStack');
+  if (!stack) return null;
+  var banner = document.createElement('div');
+  var el = deptCard.firstElementChild;
+  while (el && el !== stack) {
+    banner.appendChild(el.cloneNode(true));
+    el = el.nextElementSibling;
+  }
+  if (!banner.children.length) return null;
+  banner.style.marginBottom = '8px';
+  banner.style.width = '100%';
+  banner.style.boxSizing = 'border-box';
+  return banner;
+}
+
 async function captureRosterElement(target, fileNamePrefix, opts) {
   opts = opts || {};
   if(!target || typeof html2canvas !== 'function') return;
@@ -1298,6 +1315,9 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
     }
     var targetClone = target.cloneNode(true);
     targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
     wrap.appendChild(targetClone);
     document.body.appendChild(wrap);
 
@@ -1540,8 +1560,8 @@ window.openDatePicker = function() {
       if(!shiftCard) return;
       shiftCard.setAttribute('open', '');
       var deptCard = shiftCard.closest('.deptCard');
-      var deptHead = deptCard ? deptCard.querySelector('.deptHead') : null;
-      captureRosterElement(shiftCard, 'shift', deptHead ? { prependClone: deptHead } : {});
+      var deptBanner = buildDeptBannerForSnapshot(deptCard);
+      captureRosterElement(shiftCard, 'shift', deptBanner ? { prependClone: deptBanner } : {});
     });
   });
 })();

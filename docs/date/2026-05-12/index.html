@@ -450,6 +450,10 @@
       width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
       border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
     }
+    .capturePreviewImg {
+      display:block; width:100%; max-width:100%; height:auto; border-radius:12px;
+      border:1px solid #e2e8f0; margin:0 0 10px; background:#f8fafc;
+    }
     .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
     .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     .captureSheetBtn {
@@ -1182,6 +1186,7 @@
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
   <div class="captureSheetCard">
     <div class="captureSheetTitle">Share or save image</div>
+    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
     <div class="captureSheetActions">
       <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
       <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
@@ -1230,11 +1235,24 @@ function openCaptureSheet(blob, fileName) {
   var shareBtn = document.getElementById('captureShareBtn');
   var saveBtn = document.getElementById('captureSaveBtn');
   var cancelBtn = document.getElementById('captureCancelBtn');
+  var preview = document.getElementById('capturePreview');
   if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
 
   var file = new File([blob], fileName, { type:'image/png' });
   var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
   shareBtn.style.display = shareSupported ? '' : 'none';
+
+  var previewUrl = null;
+  if (preview) {
+    if (preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+    }
+    previewUrl = URL.createObjectURL(blob);
+    preview.src = previewUrl;
+    preview.dataset.revokeUrl = previewUrl;
+    preview.style.display = '';
+  }
 
   function closeSheet() {
     sheet.classList.remove('open');
@@ -1243,6 +1261,11 @@ function openCaptureSheet(blob, fileName) {
     saveBtn.onclick = null;
     cancelBtn.onclick = null;
     sheet.onclick = null;
+    if (preview && preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+      preview.removeAttribute('src');
+    }
   }
 
   saveBtn.onclick = function() {
@@ -1264,7 +1287,30 @@ function openCaptureSheet(blob, fileName) {
   sheet.setAttribute('aria-hidden', 'false');
 }
 
-async function captureRosterElement(target, fileNamePrefix) {
+function rosterSnapshotLayoutWidth() {
+  var iw = window.innerWidth || 400;
+  return Math.min(Math.max(iw - 28, 280), 430);
+}
+
+function buildDeptBannerForSnapshot(deptCard) {
+  if (!deptCard) return null;
+  var stack = deptCard.querySelector('.shiftStack');
+  if (!stack) return null;
+  var banner = document.createElement('div');
+  var el = deptCard.firstElementChild;
+  while (el && el !== stack) {
+    banner.appendChild(el.cloneNode(true));
+    el = el.nextElementSibling;
+  }
+  if (!banner.children.length) return null;
+  banner.style.marginBottom = '8px';
+  banner.style.width = '100%';
+  banner.style.boxSizing = 'border-box';
+  return banner;
+}
+
+async function captureRosterElement(target, fileNamePrefix, opts) {
+  opts = opts || {};
   if(!target || typeof html2canvas !== 'function') return;
   setCaptureBusy(true);
   try {
@@ -1273,7 +1319,8 @@ async function captureRosterElement(target, fileNamePrefix) {
     wrap.style.position = 'fixed';
     wrap.style.left = '-10000px';
     wrap.style.top = '0';
-    wrap.style.width = '680px';
+    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.boxSizing = 'border-box';
     wrap.style.background = '#eef1f7';
     wrap.style.padding = '14px';
     wrap.style.zIndex = '9998';
@@ -1283,8 +1330,16 @@ async function captureRosterElement(target, fileNamePrefix) {
       headerClone.style.marginBottom = '10px';
       wrap.appendChild(headerClone);
     }
+    if (opts.prependClone && opts.prependClone.nodeType === 1) {
+      var pre = opts.prependClone.cloneNode(true);
+      pre.style.marginBottom = '8px';
+      wrap.appendChild(pre);
+    }
     var targetClone = target.cloneNode(true);
     targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
     wrap.appendChild(targetClone);
     document.body.appendChild(wrap);
 
@@ -1526,7 +1581,9 @@ window.openDatePicker = function() {
       var shiftCard = summary.closest('.shiftCard');
       if(!shiftCard) return;
       shiftCard.setAttribute('open', '');
-      captureRosterElement(shiftCard, 'shift');
+      var deptCard = shiftCard.closest('.deptCard');
+      var deptBanner = buildDeptBannerForSnapshot(deptCard);
+      captureRosterElement(shiftCard, 'shift', deptBanner ? { prependClone: deptBanner } : {});
     });
   });
 })();
