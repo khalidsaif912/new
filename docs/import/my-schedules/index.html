@@ -158,7 +158,7 @@
     .toast-text p{font-size:12.5px;color:var(--muted);line-height:1.55;font-weight:500}.toast-text strong{color:var(--ink)}
     .toast-btns{display:flex;gap:8px;margin-top:10px}
     @media print{.topbar,.search-section,.toast-container,.modal,.actions-card{display:none!important}body{background:#fff;color:#000}}
-  </style>
+  </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
 <body>
 
@@ -354,11 +354,17 @@
   }
   var p = deployBase();
   var base = (location.origin||'') + p + (p && p.charAt(p.length-1) !== '/' ? '/' : '');
-  var u = base + 'change-alert.js?v=20260502b';
+  if (!p) base = (location.origin||'') + '/';
+  var u = base + 'change-alert.js?v=20260514b';
   if (document.querySelector('script[data-chg-alert]')) return;
   var s = document.createElement('script');
   s.src = u; s.defer = true; s.setAttribute('data-chg-alert','1');
   document.body.appendChild(s);
+  var u2 = base + 'install-pwa.js?v=11';
+  if (document.querySelector('script[data-install-pwa]')) return;
+  var s2 = document.createElement('script');
+  s2.src = u2; s2.defer = true; s2.setAttribute('data-install-pwa','1');
+  document.body.appendChild(s2);
 })();
 </script>
 </body>
