@@ -247,6 +247,25 @@
     };
   }
 
+  /** When the diff workbook has changes but none match this employee, still surface an org-wide notice on home. */
+  function buildOrgWideAlertFromDiff(diffData, lang) {
+    var rows = (diffData && diffData.changes) || [];
+    if (!rows.length) return null;
+    var n = Number(diffData.total_changes);
+    if (!n || n !== n) n = rows.length;
+    var summaryText = lang === 'ar'
+      ? ('تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التنبيهات.')
+      : ('A roster update was published (' + n + ' change(s)). Check your schedule or the alerts page.');
+    return {
+      is_active: true,
+      force_show: true,
+      change_hash: 'orgdiff_' + String((diffData && diffData.generated_at) || '') + '_' + n,
+      total_changed_days: 0,
+      summary: { ar: summaryText, en: summaryText },
+      days: []
+    };
+  }
+
   function normName(s) {
     return String(s || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, ' ').replace(/\s+/g, ' ').trim();
   }
@@ -684,6 +703,9 @@
     if (!e || !e.key) return;
     if (e.key === 'exportSavedEmpId' || e.key === 'savedEmpId' || e.key === 'importSavedEmpId') {
       toggleWelcomeVsScheduleChip();
+      var id = getEmployeeId();
+      if (id) renderForEmployee(id);
+      else renderGlobalGuestAlerts();
     }
   });
 
@@ -931,6 +953,82 @@
 
 var lastRenderedEmpId = '';
 var lastRenderedHash = '';
+var GUEST_EMP_ID = 'guest';
+
+function mergeGuestSummary(a, b) {
+  var sa = (a && a.summary) || {};
+  var sb = (b && b.summary) || {};
+  return {
+    ar: String(sa.ar || '').trim() + '\n\n' + String(sb.ar || '').trim(),
+    en: String(sa.en || '').trim() + '\n\n' + String(sb.en || '').trim()
+  };
+}
+
+function renderGlobalGuestAlerts() {
+  if (getEmployeeId()) return;
+  if (!onHomePage()) return;
+
+  var lang = getLang();
+  if (document.body) document.body.classList.toggle('ar', lang === 'ar');
+  var path = window.location.pathname || '';
+  var isImport = path.indexOf('/import/') !== -1;
+  var kind = isImport ? 'import' : 'export';
+  var base = getBase();
+  var diffUrl = base + 'roster-diff/data/' + kind + '-latest.json';
+
+  Promise.all([
+    fetchJson(diffUrl).catch(function () { return null; }),
+    fetchJson(base + 'absence-data.json?ts=' + Date.now()).catch(function () { return null; })
+  ]).then(function (arr) {
+    if (getEmployeeId()) return;
+    var diffData = arr[0];
+    var absData = arr[1];
+    var orgAlert = buildOrgWideAlertFromDiff(diffData, lang);
+    var absCount = (absData && absData.records && absData.records.length) || 0;
+    var guestAbsAlert = null;
+    if (absCount) {
+      guestAbsAlert = {
+        is_active: true,
+        force_show: true,
+        change_hash: 'guestabs_' + String((absData && absData.generated_at) || absCount),
+        total_changed_days: 0,
+        summary: {
+          ar: 'توجد غيابات مسجّلة في النظام. عيّن رقمك من «جدولي» لعرض تفاصيلك إن وُجدت.',
+          en: 'Recorded absences exist in the system. Set your employee ID in My Schedule to see yours if any.'
+        },
+        days: []
+      };
+    }
+    var alert = null;
+    if (orgAlert && guestAbsAlert) {
+      var merged = mergeGuestSummary(orgAlert, guestAbsAlert);
+      alert = {
+        is_active: true,
+        force_show: true,
+        change_hash: 'guestcombo_' + orgAlert.change_hash + '_' + guestAbsAlert.change_hash,
+        total_changed_days: 0,
+        summary: merged,
+        days: []
+      };
+    } else {
+      alert = orgAlert || guestAbsAlert;
+    }
+
+    if (!alert || !alert.is_active) {
+      clearHomeUI();
+      return;
+    }
+    if (isDismissed(GUEST_EMP_ID, alert)) {
+      clearHomeUI();
+      return;
+    }
+    lastRenderedEmpId = GUEST_EMP_ID;
+    lastRenderedHash = alert.change_hash || '';
+    ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '');
+  }).catch(function (err) {
+    console.warn('change-alert guest fetch failed:', err);
+  });
+}
 
 function renderForEmployee(empId) {
   if (!empId) return;
@@ -961,7 +1059,11 @@ function renderForEmployee(empId) {
       var diffUrl = base + 'roster-diff/data/' + kind + '-latest.json';
       var diffPromise = alert && alert.is_active
         ? Promise.resolve(alert)
-        : fetchJson(diffUrl).then(function (diffData) { return buildAlertFromDiff(empId, diffData, lang); }).catch(function () { return null; });
+        : fetchJson(diffUrl).then(function (diffData) {
+          var personal = buildAlertFromDiff(empId, diffData, lang);
+          if (personal) return personal;
+          return buildOrgWideAlertFromDiff(diffData, lang);
+        }).catch(function () { return null; });
       var absPromise = fetchJson(base + 'absence-data.json?ts=' + Date.now())
         .then(function (absData) { return findAbsenceDates(empId, empName, absData); })
         .catch(function () { return []; });
@@ -984,28 +1086,33 @@ function renderForEmployee(empId) {
         return;
       }
 
+      if (!alert || !alert.is_active) {
+        if (!absences.length) {
+          if (currentEmpId === empId) clearHomeUI();
+          return;
+        }
+        alert = {
+          is_active: true,
+          force_show: true,
+          change_hash: 'absence_' + absences.join('|'),
+          total_changed_days: absences.length,
+          summary: {
+            ar: 'لديك أيام غياب مسجلة.',
+            en: 'You have recorded absence days.'
+          },
+          days: []
+        };
+      }
+
       lastRenderedEmpId = empId;
       lastRenderedHash = alert.change_hash || '';
 
-      if (alert && isDismissed(empId, alert)) {
+      if (isDismissed(empId, alert)) {
         clearHomeUI();
         return;
       }
 
       if (onHomePage()) {
-        if (!alert) {
-          alert = {
-            is_active: true,
-            force_show: true,
-            change_hash: 'absence_' + absences.join('|'),
-            total_changed_days: absences.length,
-            summary: {
-              ar: 'لديك أيام غياب مسجلة.',
-              en: 'You have recorded absence days.'
-            },
-            days: []
-          };
-        }
         ensureHomeUI(empId, alert, lang, absences, empName);
       }
 
@@ -1028,8 +1135,11 @@ function renderForEmployee(empId) {
 function boot() {
   injectStyles();
   var empId = getEmployeeId();
-  if (!empId) return;
-  renderForEmployee(empId);
+  if (empId) {
+    renderForEmployee(empId);
+  } else {
+    renderGlobalGuestAlerts();
+  }
 }
 
   function start() {
@@ -1040,9 +1150,10 @@ function boot() {
 
   window.addEventListener('storage', function (e) {
     if (e.key !== FLOAT_DOTS_KEY) return;
+    if (!onHomePage()) return;
     var empId = getEmployeeId();
-    if (!empId || !onHomePage()) return;
-    renderForEmployee(empId);
+    if (empId) renderForEmployee(empId);
+    else renderGlobalGuestAlerts();
   });
 
   if (document.readyState === 'loading') {
