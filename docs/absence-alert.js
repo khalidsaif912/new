@@ -4,15 +4,9 @@
   const PAGE_KEY = (location.pathname || "").indexOf("/import/") !== -1 ? "import" : "export";
   const STORAGE_EMP_ID = PAGE_KEY === "import" ? "importSavedEmpId" : "exportSavedEmpId";
   const STORAGE_LANG = "appLang";
-  /** Shared with change-alert.js: "0" hides floating alert controls (envelope + home change icon). */
-  const FLOAT_DOTS_KEY = "rosterFloatingAlertDots";
   /** Human-facing workbook (attendance / absence); JSON on site is built from the automated download URL. */
   const ABSENCE_SHAREPOINT_SOURCE =
     "https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG";
-
-  function floatingDotsEnabled() {
-    return localStorage.getItem(FLOAT_DOTS_KEY) !== "0";
-  }
 
   function deployBasePath() {
     if (location.protocol === "file:") return "";
@@ -653,28 +647,18 @@
   }
 
   function buildUI() {
-    const dict = t();
     const isModalDismissed = localStorage.getItem("absDismissed_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-    const isDotHidden = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-    const floatOn = floatingDotsEnabled();
 
-    if (floatOn) {
-      mountAbsenceDotAndCard();
-    }
-
-    if (isDotHidden) return;
+    mountAbsenceDotAndCard();
 
     if (!isModalDismissed) {
       showMainModal();
-      return;
     }
-
-    if (!floatOn) return;
 
     const dot = document.getElementById("abs-dot");
     if (!dot) return;
-
     wireAbsenceDotCard();
+    dot.style.display = "";
     dot.classList.add("abs-on");
   }
 
@@ -746,14 +730,6 @@
               <input type="checkbox" id="abs-hide-check">
               <div class="abs-opt-t">${dict.hideModal}<span>${dict.hideModalSub}</span></div>
             </label>
-            <label class="abs-opt">
-              <input type="checkbox" id="abs-hide-dot">
-              <div class="abs-opt-t">${dict.hideDot}<span>${dict.hideDotSub}</span></div>
-            </label>
-            <label class="abs-opt">
-              <input type="checkbox" id="abs-float-enable" ${floatingDotsEnabled() ? "checked" : ""}>
-              <div class="abs-opt-t">${dict.floatDotsOpt}<span>${dict.floatDotsOptSub}</span></div>
-            </label>
           </div>
 
           <button id="abs-ok">${dict.ok}</button>
@@ -765,51 +741,30 @@
       e.stopPropagation();
       toggleLang();
     };
-    document.getElementById("abs-xbtn").onclick = () => closeModal(ov, false, false);
+    document.getElementById("abs-xbtn").onclick = () => closeModal(ov, false);
     document.getElementById("abs-ok").onclick = () => closeModal(
       ov,
-      document.getElementById("abs-hide-check").checked,
-      document.getElementById("abs-hide-dot").checked
+      document.getElementById("abs-hide-check").checked
     );
   }
 
-  function closeModal(ov, hideModal, hideDot) {
-    const floatEl = document.getElementById("abs-float-enable");
-    const floatOn = floatEl ? floatEl.checked : floatingDotsEnabled();
-    if (floatEl) {
-      localStorage.setItem(FLOAT_DOTS_KEY, floatOn ? "1" : "0");
-      if (!floatOn) {
-        const card = document.getElementById("abs-card");
-        if (card) card.remove();
-        const dotRm = document.getElementById("abs-dot");
-        if (dotRm) dotRm.remove();
-      }
-    }
+  function closeModal(ov, hideModal) {
     ov.style.transition = "opacity 0.2s ease";
     ov.style.opacity = "0";
     setTimeout(() => {
       ov.remove();
-      const isDotHiddenFlag = localStorage.getItem("absHideDot_" + mState.empId + "_" + PAGE_KEY) === mState.hash;
-
-      if (hideDot) {
-        localStorage.setItem("absHideDot_" + mState.empId + "_" + PAGE_KEY, mState.hash);
-        const dotH = document.getElementById("abs-dot");
-        if (dotH) dotH.style.display = "none";
-        return;
-      }
-
       if (hideModal) {
         localStorage.setItem("absDismissed_" + mState.empId + "_" + PAGE_KEY, mState.hash);
       }
-
-      const wantFloat = floatingDotsEnabled() && !isDotHiddenFlag && mState.absences && mState.absences.length;
-      if (wantFloat) {
+      if (mState.absences && mState.absences.length) {
         mountAbsenceDotAndCard();
         wireAbsenceDotCard();
       }
-
       const dot = document.getElementById("abs-dot");
-      if (dot) dot.classList.add("abs-on");
+      if (dot) {
+        dot.style.display = "";
+        dot.classList.add("abs-on");
+      }
     }, 220);
   }
 
@@ -848,11 +803,6 @@
       console.error("absence-alert init failed:", err);
     });
   }
-
-  window.addEventListener("storage", (e) => {
-    if (e.key !== FLOAT_DOTS_KEY) return;
-    if (mState.absences && mState.absences.length) rerenderUI();
-  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => setTimeout(init, 500));

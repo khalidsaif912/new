@@ -5,13 +5,6 @@
   var HOME_CARD_ID = 'chg-card';
   var PAGE_BANNER_ID = 'chg-page-banner';
   var STYLE_ID = 'chg-styles';
-  /** Same key as absence-alert.js — "0" hides floating alert icons on roster home. */
-  var FLOAT_DOTS_KEY = 'rosterFloatingAlertDots';
-
-  function floatingAlertDotsEnabled() {
-    return localStorage.getItem(FLOAT_DOTS_KEY) !== '0';
-  }
-
   function toggleWelcomeVsScheduleChip() {
     try {
       var path = window.location.pathname || '';
@@ -79,8 +72,7 @@
         noDetails: 'يوجد تحديث في جدولك.',
         updated: 'تحديث',
         changedToday: 'تم تعديل هذا اليوم',
-        changedDates: 'الأيام المتغيرة',
-        floatDotsOpt: 'إظهار الأيقونة العائمة للتنبيهات (غياب / تغيّر الروستر)'
+        changedDates: 'الأيام المتغيرة'
       },
       en: {
         changed: 'Your schedule changed',
@@ -93,8 +85,7 @@
         noDetails: 'Your roster has been updated.',
         updated: 'Update',
         changedToday: 'This day was changed',
-        changedDates: 'Changed dates',
-        floatDotsOpt: 'Show floating alert icons (absence / roster changes)'
+        changedDates: 'Changed dates'
       }
     };
     return (dict[lang] && dict[lang][key]) || key;
@@ -305,9 +296,6 @@
     return Array.from(new Set(out.filter(Boolean))).sort();
   }
 
-  function dismissKey(empId, alert) {
-    return 'chgDismissed_' + empId + '_' + ((alert && alert.change_hash) || 'none');
-  }
   function pageDismissKey(empId, alert) {
     return 'chgPageDismissed_' + empId + '_' + ((alert && alert.change_hash) || 'none');
   }
@@ -316,9 +304,6 @@
     return 'chgMinimized_' + empId + '_' + ((alert && alert.change_hash) || 'none');
   }
 
-  function isDismissed(empId, alert) {
-    return localStorage.getItem(dismissKey(empId, alert)) === '1';
-  }
   function isPageDismissed(empId, alert) {
     return localStorage.getItem(pageDismissKey(empId, alert)) === '1';
   }
@@ -327,10 +312,6 @@
     return localStorage.getItem(minimizeKey(empId, alert)) === '1';
   }
 
-  function markDismissed(empId, alert) {
-    localStorage.setItem(dismissKey(empId, alert), '1');
-    localStorage.removeItem(minimizeKey(empId, alert));
-  }
   function markPageDismissed(empId, alert) {
     localStorage.setItem(pageDismissKey(empId, alert), '1');
   }
@@ -783,30 +764,18 @@
         '<div id="chg-tab-body">' + bodyHtml + '</div>' +
       '</div>' +
       '<div class="chg-options">' +
-        '<label class="chg-opt"><input type="checkbox" id="chgOptDismiss"> ' + (lang === 'ar' ? 'إخفاء تام (النافذة + الأيقونة)' : 'Hide completely (card + icon)') + '</label>' +
         '<label class="chg-opt"><input type="checkbox" id="chgOptMin"> ' + (lang === 'ar' ? 'تصغير (إخفاء النافذة فقط)' : 'Minimize (hide card only)') + '</label>' +
-        '<label class="chg-opt"><input type="checkbox" id="chgFloatingDots" ' + (floatingAlertDotsEnabled() ? 'checked' : '') + '> ' + t('floatDotsOpt', lang) + '</label>' +
       '</div>' +
       '<div class="chg-card-actions">' +
         '<button class="chg-btn chg-btn-muted" data-act="openDiff">' + (lang === 'ar' ? 'صفحة التنبيهات' : 'Alerts Page') + '</button>' +
         '<button class="chg-btn chg-btn-primary" data-act="apply">' + (lang === 'ar' ? 'تطبيق' : 'Apply') + '</button>' +
       '</div>';
 
-    if (!floatingAlertDotsEnabled()) {
-      icon.hidden = true;
-      if (isMinimized(empId, alert)) {
-        clearMinimized(empId, alert);
-      }
-      card.hidden = false;
-    } else {
-      icon.hidden = false;
-      card.hidden = isMinimized(empId, alert);
-    }
+    icon.hidden = false;
+    card.hidden = isMinimized(empId, alert);
 
-    var optDismiss = card.querySelector('#chgOptDismiss');
     var optMin = card.querySelector('#chgOptMin');
     var tabBody = card.querySelector('#chg-tab-body');
-    if (optDismiss) optDismiss.checked = isDismissed(empId, alert);
     if (optMin) optMin.checked = isMinimized(empId, alert);
 
     icon.onclick = function () {
@@ -819,41 +788,18 @@
       if (!act) return;
 
       if (act === 'apply') {
-        var floatCb = card.querySelector('#chgFloatingDots');
-        if (floatCb) {
-          localStorage.setItem(FLOAT_DOTS_KEY, floatCb.checked ? '1' : '0');
-        }
-        var doDismiss = !!(optDismiss && optDismiss.checked);
         var doMin = !!(optMin && optMin.checked);
-        if (doDismiss) {
-          markDismissed(empId, alert);
-          card.hidden = true;
-          icon.hidden = true;
-          return;
-        }
-        if (doMin || (!doDismiss && !doMin)) {
-          if (!floatingAlertDotsEnabled()) {
-            clearMinimized(empId, alert);
-            card.hidden = false;
-            icon.hidden = true;
-            return;
-          }
+        if (doMin) {
           markMinimized(empId, alert);
           card.hidden = true;
-          icon.hidden = false;
-          return;
+        } else {
+          clearMinimized(empId, alert);
+          card.hidden = false;
         }
-        clearMinimized(empId, alert);
-        card.hidden = false;
-        icon.hidden = !floatingAlertDotsEnabled();
+        icon.hidden = false;
         return;
       }
       if (act === 'close') {
-        // Close hides the card (minimize) but keeps the alert icon available.
-        if (!floatingAlertDotsEnabled()) {
-          card.hidden = true;
-          return;
-        }
         markMinimized(empId, alert);
         card.hidden = true;
         icon.hidden = false;
@@ -1018,10 +964,6 @@ function renderGlobalGuestAlerts() {
       clearHomeUI();
       return;
     }
-    if (isDismissed(GUEST_EMP_ID, alert)) {
-      clearHomeUI();
-      return;
-    }
     lastRenderedEmpId = GUEST_EMP_ID;
     lastRenderedHash = alert.change_hash || '';
     ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '');
@@ -1107,11 +1049,6 @@ function renderForEmployee(empId) {
       lastRenderedEmpId = empId;
       lastRenderedHash = alert.change_hash || '';
 
-      if (isDismissed(empId, alert)) {
-        clearHomeUI();
-        return;
-      }
-
       if (onHomePage()) {
         ensureHomeUI(empId, alert, lang, absences, empName);
       }
@@ -1147,14 +1084,6 @@ function boot() {
     setTimeout(boot, 1200);
     setTimeout(boot, 3500);
   }
-
-  window.addEventListener('storage', function (e) {
-    if (e.key !== FLOAT_DOTS_KEY) return;
-    if (!onHomePage()) return;
-    var empId = getEmployeeId();
-    if (empId) renderForEmployee(empId);
-    else renderGlobalGuestAlerts();
-  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);

@@ -330,41 +330,6 @@
       border-bottom-color: #29b6f6;
       background: rgba(255,255,255,.06);
     }
-    .alertPrefRow {
-      margin-top: 6px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 5px 8px 6px;
-      box-shadow: 0 1px 4px rgba(15,23,42,.04);
-    }
-    .alertPrefLabel {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 10px;
-      color: #475569;
-      margin: 0;
-      line-height: 1.35;
-    }
-    .alertPrefLabel input {
-      margin-top: 1px;
-      accent-color: #1e40af;
-      width: 13px;
-      height: 13px;
-      flex-shrink: 0;
-    }
-    .alertPrefTextWrap { display: block; min-width: 0; }
-    .alertPrefSub {
-      display: block;
-      margin-top: 2px;
-      font-size: 8.5px;
-      font-weight: 500;
-      color: #94a3b8;
-      line-height: 1.3;
-    }
   </style>
 </head>
 <body>
@@ -406,16 +371,6 @@
     <div class="diffTabs">
       <button class="diffTab" id="tabRosterDiff" type="button">Roster Diff</button>
       <button class="diffTab" id="tabAbsence" type="button">Absence</button>
-    </div>
-
-    <div class="alertPrefRow" id="alertPrefRow">
-      <label class="alertPrefLabel" for="floatingDotsToggle">
-        <input type="checkbox" id="floatingDotsToggle" checked />
-        <span class="alertPrefTextWrap">
-          <span id="floatingDotsLabel"></span>
-          <span id="floatingDotsHint" class="alertPrefSub"></span>
-        </span>
-      </label>
     </div>
 
     <div class="card">
@@ -461,9 +416,7 @@
         absent: 'Absent',
         recorded: 'Recorded',
         dayFallback: 'Day {day}',
-        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.',
-        floatDotsPref: 'Home floating alert icons',
-        floatDotsHint: 'Same as absence / change card. Refresh roster home if it is already open.'
+        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.'
       },
       ar: {
         tabDiff: 'فروقات الروستر',
@@ -486,22 +439,9 @@
         absent: 'غياب',
         recorded: 'مسجل',
         dayFallback: 'اليوم {day}',
-        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.',
-        floatDotsPref: 'أيقونات التنبيه في الرئيسية',
-        floatDotsHint: 'نفس إعداد الغياب/التغيير. حدّث صفحة الروستر إن كانت مفتوحة.'
+        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.'
       }
     };
-
-    const FLOAT_DOTS_KEY = 'rosterFloatingAlertDots';
-
-    function floatingAlertDotsEnabled() {
-      return localStorage.getItem(FLOAT_DOTS_KEY) !== '0';
-    }
-
-    function syncFloatingDotsToggle() {
-      const el = document.getElementById('floatingDotsToggle');
-      if (el) el.checked = floatingAlertDotsEnabled();
-    }
 
     function t(key, vars) {
       const dict = I18N[currentLang] || I18N.en;
@@ -549,11 +489,6 @@
       if (sourceHint) sourceHint.textContent = t('sourceHint');
       if (newBadge) newBadge.textContent = t('sourceNew');
       if (oldBadge) oldBadge.textContent = t('sourceOld');
-      const floatLbl = document.getElementById('floatingDotsLabel');
-      const floatHint = document.getElementById('floatingDotsHint');
-      if (floatLbl) floatLbl.textContent = t('floatDotsPref');
-      if (floatHint) floatHint.textContent = t('floatDotsHint');
-      syncFloatingDotsToggle();
       updateSummaryText();
       updateDateTag();
       applyDiffModeUi(currentDiffKind);
@@ -649,13 +584,6 @@
       document.querySelectorAll('.flightSwitchIcon').forEach((img) => {
         img.src = `${root}/assets/icons/flight.png`;
       });
-      const floatToggle = document.getElementById('floatingDotsToggle');
-      if (floatToggle && !floatToggle.dataset.wired) {
-        floatToggle.dataset.wired = '1';
-        floatToggle.addEventListener('change', () => {
-          localStorage.setItem(FLOAT_DOTS_KEY, floatToggle.checked ? '1' : '0');
-        });
-      }
       applyLanguageUi();
     })();
 
