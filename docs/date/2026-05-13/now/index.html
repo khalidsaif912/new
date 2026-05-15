@@ -369,13 +369,35 @@
     .nextShiftTooltip.show {
       opacity: 1;
       transform: translateY(0);
+      pointer-events: auto;
     }
     .nextShiftHead {
       padding: 8px 10px;
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       border-bottom: 1px solid rgba(15, 23, 42, 0.12);
       color: #fff;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
     }
+    .nextShiftHeadText { flex: 1; min-width: 0; }
+    .nextShiftClose {
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .nextShiftClose:hover { background: rgba(255, 255, 255, 0.32); }
     .nextShiftEmp {
       font-size: 12px; font-weight: 800; line-height: 1.2;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1624,14 +1646,30 @@ window.openDatePicker = function() {
       card.classList.remove('collapsed');
       var shifts = card.querySelectorAll('details.shiftCard');
       if (!shifts.length) return;
-      var anyClosed = false;
-      shifts.forEach(function(d) {
-        if (!d.open) anyClosed = true;
-      });
-      shifts.forEach(function(d) {
-        if (anyClosed) d.setAttribute('open', '');
-        else d.removeAttribute('open');
-      });
+      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
+      if (isNaN(step) || step < 0 || step > 2) step = 0;
+      if (step === 0) {
+        shifts.forEach(function(d) { d.setAttribute('open', ''); });
+        card.dataset.deptShiftStep = '1';
+      } else if (step === 1) {
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        card.dataset.deptShiftStep = '2';
+      } else {
+        var now = new Date();
+        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+        var hour = muscatTime.getHours();
+        var minute = muscatTime.getMinutes();
+        var tt = hour * 60 + minute;
+        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        var target = null;
+        shifts.forEach(function(d) {
+          if (d.dataset.shift === currentShift) target = d;
+        });
+        if (!target) target = shifts[0];
+        if (target) target.setAttribute('open', '');
+        card.dataset.deptShiftStep = '0';
+      }
     });
   });
 
@@ -2046,12 +2084,14 @@ function goToRosterDiff(event) {
 (function initEmployeeNextShiftPreview() {
   var tooltip = document.createElement('div');
   tooltip.className = 'nextShiftTooltip';
-  tooltip.innerHTML = '<div class="nextShiftHead"><div id="nextShiftEmp" class="nextShiftEmp">-</div><div class="nextShiftTitle">Upcoming 5 shifts</div></div><div id="nextShiftBody" class="nextShiftBody"></div>';
+  tooltip.innerHTML = '<div class="nextShiftHead"><div class="nextShiftHeadText"><div id="nextShiftEmp" class="nextShiftEmp">-</div><div class="nextShiftTitle">Upcoming 5 shifts</div></div><button type="button" class="nextShiftClose" id="nextShiftClose" aria-label="Close">&times;</button></div><div id="nextShiftBody" class="nextShiftBody"></div>';
   document.body.appendChild(tooltip);
   var tooltipBody = tooltip.querySelector('#nextShiftBody');
   var tooltipEmp = tooltip.querySelector('#nextShiftEmp');
+  var tooltipClose = tooltip.querySelector('#nextShiftClose');
 
   var scheduleCache = {};
+  var tooltipPinned = false;
   var activeEl = null;
   var hideTimer = null;
   var longPressTimer = null;
@@ -2068,6 +2108,8 @@ function goToRosterDiff(event) {
   function getReferenceIsoDate() {
     var pathMatch = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
     if (pathMatch) return pathMatch[1];
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
     var now = new Date();
     var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
     return muscat.getFullYear() + '-' +
@@ -2102,7 +2144,15 @@ function goToRosterDiff(event) {
     }
   }
 
+  function hideTooltipNow() {
+    cancelHideTooltip();
+    tooltipPinned = false;
+    tooltip.classList.remove('show');
+    activeEl = null;
+  }
+
   function hideTooltipSoon() {
+    if (tooltipPinned) return;
     cancelHideTooltip();
     hideTimer = setTimeout(function() {
       tooltip.classList.remove('show');
@@ -2175,6 +2225,7 @@ function goToRosterDiff(event) {
   function showPreviewForRow(rowEl, ev) {
     if (!rowEl) return;
     cancelHideTooltip();
+    tooltipPinned = !ev || (ev && ev.pointerType === 'touch');
     activeEl = rowEl;
     var label = empNameFromRow(rowEl);
     if (tooltipEmp) tooltipEmp.textContent = label || '-';
@@ -2203,9 +2254,15 @@ function goToRosterDiff(event) {
     rowEl.addEventListener('mousemove', moveTooltip);
     rowEl.addEventListener('mouseleave', function(ev) {
       var to = ev.relatedTarget;
-      if (to && typeof to.closest === 'function' && to.closest('.deptCard .empRow')) {
-        cancelHideTooltip();
-        return;
+      if (to && typeof to.closest === 'function') {
+        if (to.closest('.nextShiftTooltip')) {
+          cancelHideTooltip();
+          return;
+        }
+        if (to.closest('.deptCard .empRow')) {
+          cancelHideTooltip();
+          return;
+        }
       }
       hideTooltipSoon();
     });
@@ -2233,7 +2290,6 @@ function goToRosterDiff(event) {
         ev.preventDefault();
         ev.stopPropagation();
         suppressClickFor = null;
-        hideTooltipSoon();
         return;
       }
       ev.preventDefault();
@@ -2247,6 +2303,23 @@ function goToRosterDiff(event) {
       }
     });
   }
+
+  if (tooltipClose) {
+    tooltipClose.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      hideTooltipNow();
+    });
+  }
+  tooltip.addEventListener('mouseenter', cancelHideTooltip);
+  tooltip.addEventListener('mouseleave', function(ev) {
+    var to = ev.relatedTarget;
+    if (to && typeof to.closest === 'function' && to.closest('.deptCard .empRow')) {
+      cancelHideTooltip();
+      return;
+    }
+    hideTooltipSoon();
+  });
 
   document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);
 })();
