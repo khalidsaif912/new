@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Import Duty Roster</title>
+  
+  <script>
+  (function () {
+    var path = location.pathname || '';
+    if (path.indexOf('/roster-site/import') === -1) return;
+    var base = 'https://khalidsaif912.github.io/new/docs/import/';
+    var rest = path.replace(/^.*\/roster-site\/import\/?/, '');
+    if (rest) {
+      rest = rest.replace(/\/?$/, '/');
+      location.replace(base + rest + location.search + location.hash);
+    } else {
+      location.replace(base + location.search + location.hash);
+    }
+  })();
+  </script>
+
   <style>
     /* ═══════ RESET ═══════ */
     :root {
@@ -692,10 +708,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAMEER MAHMOOD - 990896" role="button" tabindex="0">
        <span class="empName">SAMEER MAHMOOD - 990896</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="FROILAN - 80535" role="button" tabindex="0">
        <span class="empName">FROILAN - 80535</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -709,7 +725,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="FRITZ - 80269" role="button" tabindex="0">
        <span class="empName">FRITZ - 80269</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -723,7 +739,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="UDUGAMA - 8901" role="button" tabindex="0">
        <span class="empName">UDUGAMA - 8901</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -737,7 +753,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MOHAMMED SAID - 81032" role="button" tabindex="0">
        <span class="empName">MOHAMMED SAID - 81032</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -780,10 +796,10 @@
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow" data-emp-name="HAIFA AL BALUSHI - 82664" role="button" tabindex="0">
        <span class="empName">HAIFA AL BALUSHI - 82664</span>
-       <span class="empStatus" style="color:#92400e;">ME06</span>
+       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHAMAD AL MAHARBI - 82460" role="button" tabindex="0">
        <span class="empName">MAHAMAD AL MAHARBI - 82460</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -797,7 +813,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="GLENDO - 80215" role="button" tabindex="0">
        <span class="empName">GLENDO - 80215</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHANAD AL HADI - 82665" role="button" tabindex="0">
        <span class="empName">MAHANAD AL HADI - 82665</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
@@ -817,10 +833,10 @@
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt" data-emp-name="AHMED ALRUJAIBI - 82476" role="button" tabindex="0">
        <span class="empName">AHMED ALRUJAIBI - 82476</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
        <span class="empName">JAMAL AL SINANI - 81399</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 21 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -834,16 +850,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
        <span class="empName">WAFAA SALIM - 81021</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
        <span class="empName">ALA AL WAHAIBI - 82473</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="MOHAMMED AL YAARUBI - 82444" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL YAARUBI - 82444</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="YOUSUF AL WAHEEDI - 82100" role="button" tabindex="0">
        <span class="empName">YOUSUF AL WAHEEDI - 82100</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -880,25 +896,25 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
        <span class="empName">OMAR AL FUTAISI - 82107</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
        <span class="empName">NASSER AL MAAMARI - 82590</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
        <span class="empName">SULEIMAN AL MAHARBI - 80833</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL SHAMSI - 82286</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
      </div><div class="empRow" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
        <span class="empName">AHMED AL HUSAINI - 82455</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
        <span class="empName">MOOSA AL BALUSHI - 82667</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
        <span class="empName">HILAL AL SHAMAKHI - 81991</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
       </div>
     </details>
@@ -912,16 +928,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SALIM AL MAAWALI - 80481" role="button" tabindex="0">
        <span class="empName">SALIM AL MAAWALI - 80481</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
        <span class="empName">ABDULLAH AL SINAWI - 82663</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="KHALID AL BALUSHI - 8336" role="button" tabindex="0">
        <span class="empName">KHALID AL BALUSHI - 8336</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAJID AL GHAFRI - 82049" role="button" tabindex="0">
        <span class="empName">MAJID AL GHAFRI - 82049</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -935,16 +951,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="BADAR AL SHEHHI - 82583" role="button" tabindex="0">
        <span class="empName">BADAR AL SHEHHI - 82583</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
        <span class="empName">JABER AL JULANDANI - 81983</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
        <span class="empName">HISHAM AL MAHARBI - 82454</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
        <span class="empName">ADIL AL BULUSHI - 82457</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
      </div>
       </div>
     </details>
@@ -958,33 +974,33 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ANWAR AL HABSI - 82496" role="button" tabindex="0">
        <span class="empName">ANWAR AL HABSI - 82496</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
        <span class="empName">AHMED AL FARSI - 82456</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
        <span class="empName">WAHEB AL BARAIDAI - 82470</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL MAWALI - 82614</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="SANAD AL HARTHI - 82642" role="button" tabindex="0">
        <span class="empName">SANAD AL HARTHI - 82642</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
 
-    <details class="shiftCard" data-shift="Other" style="border:1px solid #64748b44; background:#f1f5f9">
-      <summary class="shiftSummary" style="background:#f1f5f9; border-bottom:1px solid #64748b33;">
-        <span class="shiftIcon">•</span>
-        <span class="shiftLabel" style="color:#334155;">Other</span>
-        <span class="shiftCount" style="background:#64748b22; color:#334155;">1</span>
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="IBRAHIM AL HADHRAMI - 82668" role="button" tabindex="0">
        <span class="empName">IBRAHIM AL HADHRAMI - 82668</span>
-       <span class="empStatus" style="color:#334155;">LV</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1021,10 +1037,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
        <span class="empName">HISHAM AL SIYABI - 82434</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL HADI - 82536" role="button" tabindex="0">
        <span class="empName">MOOSA AL HADI - 82536</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1038,7 +1054,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
        <span class="empName">QASIM AL GHARIBI - 82412</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1052,7 +1068,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MOHAMMED AL KULAIBI - 81079" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL KULAIBI - 81079</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1066,7 +1082,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
        <span class="empName">MAHIR AL BALUSHI - 82422</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1103,16 +1119,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
        <span class="empName">KHALID AL ZADJALI - 82458</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
        <span class="empName">JUMA AL HABSI - 81151</span>
-       <span class="empStatus" style="color:#92400e;">ME06</span>
+       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="KHAMIS AL KASBI - 990751" role="button" tabindex="0">
        <span class="empName">KHAMIS AL KASBI - 990751</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL BALUCHI - 82330</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
      </div>
       </div>
     </details>
@@ -1126,16 +1142,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" role="button" tabindex="0">
        <span class="empName">ALI AL RIYAMI - 82459</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="YASIR AL GHARABI - 990786" role="button" tabindex="0">
        <span class="empName">YASIR AL GHARABI - 990786</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
        <span class="empName">QAIS AL MUKHAINI - 82435</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
        <span class="empName">MOHAMED AL MAAWALI - 82535</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
       </div>
     </details>
@@ -1149,13 +1165,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
        <span class="empName">SAID AL AMRI - 80834</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
        <span class="empName">MOHD AL HADDABI - 990895</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="FARIZ AL BALUSHI - 80478" role="button" tabindex="0">
        <span class="empName">FARIZ AL BALUSHI - 80478</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1169,13 +1185,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="AHMED AL AMRI - 81080" role="button" tabindex="0">
        <span class="empName">AHMED AL AMRI - 81080</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
        <span class="empName">SAID AL HADI - 81152</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
        <span class="empName">HAMED AL FAKHRI - 8836</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1215,10 +1231,10 @@
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
        <span class="empName">YOUNIS AL SIYABI - 80480</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
        <span class="empName">BADAR AL BURTAMANI - 82423</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
      </div>
       </div>
     </details>
@@ -1232,7 +1248,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ANWAR AL AMRI - 82566" role="button" tabindex="0">
        <span class="empName">ANWAR AL AMRI - 82566</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
        <span class="empName">SAMI AL HADABI - 80479</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
@@ -1249,24 +1265,24 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
        <span class="empName">SAID AL SADI - 82410</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
        <span class="empName">TALAL AL HUSEINI - 82417</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
 
-    <details class="shiftCard" data-shift="Other" style="border:1px solid #64748b44; background:#f1f5f9">
-      <summary class="shiftSummary" style="background:#f1f5f9; border-bottom:1px solid #64748b33;">
-        <span class="shiftIcon">•</span>
-        <span class="shiftLabel" style="color:#334155;">Other</span>
-        <span class="shiftCount" style="background:#64748b22; color:#334155;">1</span>
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
        <span class="empName">NASSER AL OMAIRI - 82416</span>
-       <span class="empStatus" style="color:#334155;">LV</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1303,10 +1319,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
        <span class="empName">BADAR AL BUSAIDI - 82414</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="KHALIFA AL SAADI - 82537" role="button" tabindex="0">
        <span class="empName">KHALIFA AL SAADI - 82537</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
+       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
       </div>
     </details>
@@ -1320,10 +1336,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
        <span class="empName">HAITHAM AL BALUSHI - 82419</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL SAADI - 82420" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL SAADI - 82420</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
+       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
       </div>
     </details>
@@ -1337,13 +1353,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" role="button" tabindex="0">
        <span class="empName">ALI AL SHAMSI - 82425</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL BALUSHI - 82431" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL BALUSHI - 82431</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div><div class="empRow" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
        <span class="empName">ISMAIL AL MAHARBI - 82331</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1357,7 +1373,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
        <span class="empName">AHMED AL HADI - 82654</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
+       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 23)</span>
      </div>
       </div>
     </details>
@@ -1373,7 +1389,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">15MAY2026 / 01:32</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">15MAY2026 / 17:09</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1381,6 +1397,7 @@
   </div>
 
 </div>
+
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -1488,31 +1505,6 @@
       .catch(function() { reorderImportDepartments(); });
   }
 
-  function syncImportHeaderDate() {
-    var picker = document.getElementById('datePicker');
-    var tag = document.getElementById('dateTag');
-    if (!picker || !tag) return;
-
-    function toLabel(iso) {
-      var d = new Date(iso + 'T00:00:00');
-      if (isNaN(d.getTime())) return iso;
-      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    var path = window.location.pathname || '/';
-    var m = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
-    if (m) {
-      picker.value = m[1] + '-' + m[2] + '-' + m[3];
-    }
-    if (picker.value) {
-      tag.textContent = '📅 ' + toLabel(picker.value);
-    }
-    picker.addEventListener('change', function() {
-      if (picker.value) tag.textContent = '📅 ' + toLabel(picker.value);
-    });
-  }
-
-
   function repartitionLeaveRowsInDeptCards() {
     document.querySelectorAll('.deptCard').forEach(function(card) {
       var other = card.querySelector('details.shiftCard[data-shift="Other"]');
@@ -1555,7 +1547,6 @@
     });
   }
 
-
   // Match Export roster logic (Muscat UTC+4): Night 21:00–04:59, Afternoon from 13:00, else Morning.
   function getImportCurrentShiftGroup() {
     var now = new Date();
@@ -1581,13 +1572,11 @@
 
   repartitionLeaveRowsInDeptCards();
   applySavedEmployeeDepartmentFirst();
-  repartitionLeaveRowsInDeptCards();
   syncImportShiftDetailsOpen();
 
   window.addEventListener('storage', function(e) {
     if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {
-      repartitionLeaveRowsInDeptCards();
-  applySavedEmployeeDepartmentFirst();
+      applySavedEmployeeDepartmentFirst();
     }
   });
 
