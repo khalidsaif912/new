@@ -1396,35 +1396,92 @@
 <script>
 // Hard-guaranteed import page behavior (independent from other scripts).
 (function() {
-  function reorderImportDepartments() {
+  var IMPORT_DEPT_ORDER = [
+    'supervisors',
+    'documentation',
+    'import checkers',
+    'release control',
+    'import operators',
+    'flight dispatch (import)',
+    'flight dispatch (export)'
+  ];
+
+  function deptTitleNorm(card) {
+    var t = card.querySelector('.deptTitle');
+    return (t && t.textContent ? t.textContent : '').trim().toLowerCase();
+  }
+
+  function findDeptCardByName(deptName) {
+    var target = String(deptName || '').trim().toLowerCase();
+    if (!target) return null;
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    return cards.find(function(c) { return deptTitleNorm(c) === target; }) || null;
+  }
+
+  function pinDepartmentCardFirst(deptName) {
+    var card = findDeptCardByName(deptName);
+    if (!card) return false;
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    if (!cards.length || cards[0] === card) return true;
+    var parent = card.parentElement;
+    if (parent) parent.insertBefore(card, cards[0]);
+    return true;
+  }
+
+  function reorderImportDepartments(preferredDept) {
     var cards = Array.from(document.querySelectorAll('.deptCard'));
     if (!cards.length) return;
     var parent = cards[0].parentElement;
     if (!parent) return;
     var bottom = document.querySelector('.importBottom');
+    var preferred = String(preferredDept || '').trim().toLowerCase();
 
-    function getName(card) {
-      var t = card.querySelector('.deptTitle');
-      return (t && t.textContent ? t.textContent : '').trim().toLowerCase();
+    if (preferred) {
+      pinDepartmentCardFirst(preferred);
+      cards = Array.from(document.querySelectorAll('.deptCard'));
     }
 
-    var desired = [
-      'supervisors',
-      'documentation',
-      'import checkers',
-      'release control',
-      'import operators',
-      'flight dispatch (import)',
-      'flight dispatch (export)'
-    ];
+    var order = IMPORT_DEPT_ORDER.slice();
+    if (preferred && order.indexOf(preferred) === -1) {
+      order.unshift(preferred);
+    }
 
-    desired.forEach(function(dep) {
-      var card = cards.find(function(c) { return getName(c) === dep; });
+    order.forEach(function(dep) {
+      if (preferred && dep === preferred) return;
+      var card = cards.find(function(c) { return deptTitleNorm(c) === dep; });
       if (card) {
         if (bottom) parent.insertBefore(card, bottom);
         else parent.appendChild(card);
       }
     });
+
+    if (preferred) pinDepartmentCardFirst(preferred);
+  }
+
+  function applySavedEmployeeDepartmentFirst() {
+    var empId = localStorage.getItem('importSavedEmpId');
+    if (!empId) {
+      reorderImportDepartments();
+      return;
+    }
+    var base = (function() {
+      if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();
+      var p = location.pathname || '';
+      if (p.indexOf('/roster-site/') !== -1) return location.origin + '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = p.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return location.origin + '/' + segs[0] + '/docs';
+        return location.origin + (segs.length ? '/' + segs[0] : '');
+      }
+      return location.origin + '/';
+    })();
+    fetch(base + '/import/schedules/' + encodeURIComponent(empId) + '.json')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(d) {
+        if (d && d.department) reorderImportDepartments(d.department);
+        else reorderImportDepartments();
+      })
+      .catch(function() { reorderImportDepartments(); });
   }
 
   function syncImportHeaderDate() {
@@ -1471,9 +1528,18 @@
     });
   }
 
-  reorderImportDepartments();
+  window.reorderImportDepartments = reorderImportDepartments;
+  window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
+
+  applySavedEmployeeDepartmentFirst();
   syncImportHeaderDate();
   syncImportShiftDetailsOpen();
+
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {
+      applySavedEmployeeDepartmentFirst();
+    }
+  });
 
   // Keep footer "Last Updated" fresh on page load.
   var lastUpdatedEl = document.getElementById('importLastUpdated');
@@ -1622,6 +1688,9 @@ function goToRosterDiff(event) {
         nameEl.textContent = d.name.split(' ')[0];
         chip.classList.add('visible');
       }
+      if (d.department && typeof window.reorderImportDepartments === 'function') {
+        window.reorderImportDepartments(d.department);
+      }
     })
     .catch(function() {});
 })();
@@ -1651,20 +1720,6 @@ function goToRosterDiff(event) {
 
 /* ===== Import UX fixes ===== */
 (function() {
-  // Keep Supervisors at top even for previously generated card order.
-  var cards = Array.from(document.querySelectorAll('.deptCard'));
-  if (cards.length) {
-    var supCard = cards.find(function(card) {
-      var t = card.querySelector('.deptTitle');
-      var name = (t && t.textContent ? t.textContent : '').trim().toLowerCase();
-      return name === 'supervisors' || name === 'المشرفون';
-    });
-    if (supCard && cards[0] !== supCard) {
-      var parent = supCard.parentElement;
-      if (parent) parent.insertBefore(supCard, cards[0]);
-    }
-  }
-
   // Sync header date with active page date (same behavior style as export).
   var picker = document.getElementById('datePicker');
   if (!picker) return;
