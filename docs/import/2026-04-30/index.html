@@ -1331,12 +1331,14 @@
   window.reorderImportDepartments = reorderImportDepartments;
   window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
 
+  repartitionLeaveRowsInDeptCards();
   applySavedEmployeeDepartmentFirst();
   repartitionLeaveRowsInDeptCards();
 
   window.addEventListener('storage', function(e) {
     if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {
-      applySavedEmployeeDepartmentFirst();
+      repartitionLeaveRowsInDeptCards();
+  applySavedEmployeeDepartmentFirst();
     }
   });
 

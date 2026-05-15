@@ -107,8 +107,51 @@ def upgrade_emp_rows(html: str) -> str:
     return EMP_ROW_ONCLICK.sub(repl, html)
 
 
+def patch_reference_date(html: str) -> str:
+    old = "if (pathMatch) return pathMatch[1];\n    var now = new Date();"
+    new = (
+        "if (pathMatch) return pathMatch[1];\n"
+        "    var picker = document.getElementById('datePicker');\n"
+        "    if (picker && picker.value) return picker.value;\n"
+        "    var now = new Date();"
+    )
+    if "picker && picker.value) return picker.value" in html:
+        return html
+    if old not in html:
+        return html
+    return html.replace(old, new, 1)
+
+
+def patch_flatten_future_shifts(html: str) -> str:
+    if "Array.isArray(data.days)" in html:
+        return html
+    flatten_old = """  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data || !data.schedules) return out;"""
+    flatten_new = """  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
+      if (mp) {
+        var y = mp[1], mo = mp[2];
+        data.days.forEach(function(d) {
+          if (!d || !d.day) return;
+          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
+        });
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;"""
+    if flatten_old not in html:
+        return html
+    return html.replace(flatten_old, flatten_new, 1)
+
+
 def inject_capture_shell(html: str) -> str:
-    if "captureBusy" in html:
+    if 'id="captureBusy"' in html:
         return html
     needle = "</div>\n\n<script>\n// Hard-guaranteed import page behavior"
     if needle not in html:
@@ -176,6 +219,8 @@ def patch_file(path: Path, export_script: str) -> bool:
         return False
     updated = text
     updated = inject_capture_shell(updated)
+    updated = patch_flatten_future_shifts(updated)
+    updated = patch_reference_date(updated)
     updated = upgrade_emp_rows(updated)
     updated = inject_repartition(updated)
     updated = replace_export_script(updated, export_script)

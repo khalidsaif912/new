@@ -410,6 +410,10 @@ def prepare_export_script_for_import(script: str) -> str:
             "var pathMatch = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
         ),
         (
+            "if (pathMatch) return pathMatch[1];\n    var now = new Date();",
+            "if (pathMatch) return pathMatch[1];\n    var picker = document.getElementById('datePicker');\n    if (picker && picker.value) return picker.value;\n    var now = new Date();",
+        ),
+        (
             "path.match(/\\/date\\/(\\d{4})-(\\d{2})-(\\d{2})\\//)",
             "path.match(/\\/(?:import\\/date|import)\\/(\\d{4})-(\\d{2})-(\\d{2})\\//)",
         ),
@@ -428,6 +432,31 @@ def prepare_export_script_for_import(script: str) -> str:
     ]
     for old, new in subs:
         script = script.replace(old, new)
+
+    # Import schedules use { month, days: [{day, code}] } not export schedules{} shape.
+    flatten_old = """  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data || !data.schedules) return out;"""
+    flatten_new = """  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
+      if (mp) {
+        var y = mp[1], mo = mp[2];
+        data.days.forEach(function(d) {
+          if (!d || !d.day) return;
+          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
+        });
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;"""
+    if flatten_old in script:
+        script = script.replace(flatten_old, flatten_new, 1)
+
     return script
 
 

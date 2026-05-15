@@ -1396,6 +1396,21 @@
 
 </div>
 
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script>
 // Hard-guaranteed import page behavior (independent from other scripts).
 (function() {
@@ -1578,13 +1593,15 @@
   window.reorderImportDepartments = reorderImportDepartments;
   window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
 
+  repartitionLeaveRowsInDeptCards();
   applySavedEmployeeDepartmentFirst();
   repartitionLeaveRowsInDeptCards();
   syncImportShiftDetailsOpen();
 
   window.addEventListener('storage', function(e) {
     if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {
-      applySavedEmployeeDepartmentFirst();
+      repartitionLeaveRowsInDeptCards();
+  applySavedEmployeeDepartmentFirst();
     }
   });
 
@@ -2388,6 +2405,8 @@ function goToRosterDiff(event) {
   function getReferenceIsoDate() {
     var pathMatch = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
     if (pathMatch) return pathMatch[1];
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
     var now = new Date();
     var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
     return muscat.getFullYear() + '-' +
@@ -2438,7 +2457,21 @@ function goToRosterDiff(event) {
 
   function flattenFutureShifts(data, fromIso) {
     var out = [];
-    if (!data || !data.schedules) return out;
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\d{4})-(\d{2})$/);
+      if (mp) {
+        var y = mp[1], mo = mp[2];
+        data.days.forEach(function(d) {
+          if (!d || !d.day) return;
+          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
+        });
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;
     Object.keys(data.schedules).forEach(function(monthKey) {
       var rows = data.schedules[monthKey] || [];
       rows.forEach(function(r) {
