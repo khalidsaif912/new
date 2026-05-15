@@ -32,6 +32,7 @@ from typing import Dict, Any, List, Tuple
 
 import requests
 import pandas as pd
+from html import escape as html_escape
 
 
 CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
@@ -172,11 +173,81 @@ def shift_bucket(code: str) -> Tuple[str, str, str, str, str]:
         return ("Standby", "🧍", "#9e9e9e", "#f0f0f0", "#555555")
     if "SICK" in s or s.startswith(("SL",)):
         return ("Sick Leave", "🤒", "#ef4444", "#fee2e2", "#991b1b")
-    if "ANNUAL" in s or s.startswith(("AL",)):
+    if s in {"LV"} or "ANNUAL" in s or s.startswith(("AL",)):
         return ("Annual Leave", "✈️", "#10b981", "#d1fae5", "#065f46")
     if "TR" in s or "TRAIN" in s:
         return ("Training", "🎓", "#0ea5e9", "#e0f2fe", "#075985")
     return ("Other", "•", "#64748b", "#f1f5f9", "#334155")
+
+
+def _norm_cell(val: Any) -> str:
+    return str(val or "").strip()
+
+
+def range_suffix_for_day(day: int, daynum_to_raw: dict, code_key: str) -> str:
+    """If day is part of a contiguous leave/training block, return (FROM x TO y)."""
+    sorted_days = sorted(daynum_to_raw.keys())
+    if day not in sorted_days:
+        return ""
+
+    up_key = _norm_cell(code_key).upper()
+    acceptable_codes: List[str] = []
+    if up_key in ["AL", "LV"] or "ANNUAL" in up_key:
+        acceptable_codes = ["AL", "LV", "ANNUAL LEAVE"]
+    elif up_key == "SL" or "SICK" in up_key:
+        acceptable_codes = ["SL", "SICK LEAVE"]
+    elif up_key == "TR" or "TRAINING" in up_key:
+        acceptable_codes = ["TR", "TRAINING"]
+    else:
+        acceptable_codes = [up_key]
+
+    def is_same_type(val: str) -> bool:
+        if not val:
+            return False
+        val_upper = val.upper()
+        return any(code in val_upper or val_upper == code for code in acceptable_codes)
+
+    start = day
+    end = day
+    current = day - 1
+    while current in sorted_days:
+        val = _norm_cell(daynum_to_raw.get(current, ""))
+        if is_same_type(val):
+            start = current
+            current -= 1
+        else:
+            break
+    current = day + 1
+    while current in sorted_days:
+        val = _norm_cell(daynum_to_raw.get(current, ""))
+        if is_same_type(val):
+            end = current
+            current += 1
+        else:
+            break
+
+    if start == end:
+        return ""
+    return (
+        f"(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> {start} "
+        f"<span style='font-size:0.75em;opacity:0.8;'>TO</span> {end})"
+    )
+
+
+CAPTURE_DOM_HTML = """
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+"""
 
 
 def parse_month_sheet(xlsx_path: str, sheet_name: str) -> Dict[str, Any]:
@@ -277,8 +348,8 @@ def parse_month_sheet(xlsx_path: str, sheet_name: str) -> Dict[str, Any]:
 
 def load_export_ui_template(repo_root: Path) -> Tuple[str, str]:
     """
-    We reuse the Export UI look by reading docs/index.html (or any provided template).
-    If not found, we fallback to a minimal embedded template.
+    Reuse Export roster CSS and the main inline script bundle from docs/index.html.
+    Skips the small PWA <head> script; takes the largest inline <script> block (roster UX).
     """
     candidates = [
         repo_root / "docs" / "index.html",
@@ -288,14 +359,16 @@ def load_export_ui_template(repo_root: Path) -> Tuple[str, str]:
         if c.exists():
             html = c.read_text(encoding="utf-8", errors="ignore")
             style_m = re.search(r"<style>(.*?)</style>", html, re.DOTALL)
-            script_m = re.search(r"<script>(.*?)</script>", html, re.DOTALL)
-            if style_m and script_m:
-                return style_m.group(1), script_m.group(1)
+            inline_scripts = re.findall(
+                r"<script(?![^>]*\ssrc=)[^>]*>(.*?)</script>",
+                html,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+            if style_m and inline_scripts:
+                return style_m.group(1), max(inline_scripts, key=len)
 
-    # Minimal fallback (should not happen in your repo)
     style = "body{font-family:system-ui;background:#eef1f7;color:#0f172a}"
-    script = ""
-    return style, script
+    return style, ""
 
 
 _EXPORT_WELCOME_CHIP_RE = re.compile(
@@ -327,6 +400,37 @@ def sanitize_export_script_for_import(script: str) -> str:
     return script
 
 
+def prepare_export_script_for_import(script: str) -> str:
+    """Adapt export roster JS for /import/ paths and schedules."""
+    script = sanitize_export_script_for_import(script)
+    subs = [
+        ("getSiteRootUrl() + '/schedules/'", "getSiteRootUrl() + '/import/schedules/'"),
+        (
+            "var pathMatch = (location.pathname || '').match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
+            "var pathMatch = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
+        ),
+        (
+            "path.match(/\\/date\\/(\\d{4})-(\\d{2})-(\\d{2})\\//)",
+            "path.match(/\\/(?:import\\/date|import)\\/(\\d{4})-(\\d{2})-(\\d{2})\\//)",
+        ),
+        (
+            "var isRootLike = !path.includes('/date/');",
+            "var isRootLike = !path.includes('/date/') && !path.match(/\\/import\\/\\d{4}-\\d{2}-\\d{2}\\//);",
+        ),
+        (
+            ".replace(/\\/date\\/\\d{4}-\\d{2}-\\d{2}\\/.*$/, '/')\n      .replace(/\\/now\\/",
+            ".replace(/\\/date\\/\\d{4}-\\d{2}-\\d{2}\\/.*$/, '/')\n      .replace(/\\/\\d{4}-\\d{2}-\\d{2}\\/.*$/, '/')\n      .replace(/\\/now\\/",
+        ),
+        (
+            "var m = (location.pathname || '').match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
+            "var m = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
+        ),
+    ]
+    for old, new in subs:
+        script = script.replace(old, new)
+    return script
+
+
 def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: dt.date, repo_base_path: str) -> str:
     day = date_obj.day
     date_label = date_obj.strftime("%d %B %Y")
@@ -344,7 +448,9 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
         dept = emp["dept_name"]
         bucket, icon, accent, bg, text = shift_bucket(code)
         dept_map.setdefault(dept, {}).setdefault(bucket, {"icon": icon, "accent": accent, "bg": bg, "text": text, "rows": []})
-        dept_map[dept][bucket]["rows"].append((emp["name"], emp["id"], code))
+        dept_map[dept][bucket]["rows"].append(
+            {"name": emp["name"], "id": emp["id"], "code": code, "shifts": emp["shifts"]}
+        )
 
     # Strict Import department order requested by product owner.
     import_order = [
@@ -404,11 +510,16 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
             info = buckets[key]
             rows = info["rows"]
             emp_rows = []
-            for idx, (name, empid, code) in enumerate(rows):
+            for idx, row in enumerate(rows):
+                name, empid, code = row["name"], row["id"], row["code"]
+                label = f"{name} - {empid}"
+                suffix = range_suffix_for_day(day, row["shifts"], code)
+                status_html = f"{code} {suffix}" if suffix else code
+                name_attr = html_escape(label, quote=True)
                 alt = " empRowAlt" if idx % 2 == 1 else ""
-                emp_rows.append(f"""<div class="empRow{alt}">
-       <span class="empName" style="cursor:pointer;" onclick='goToEmployeeSchedule({json.dumps(f"{name} - {empid}")})'>{name} - {empid}</span>
-       <span class="empStatus" style="color:{info['text']};">{code}</span>
+                emp_rows.append(f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
+       <span class="empName">{label}</span>
+       <span class="empStatus" style="color:{info['text']};">{status_html}</span>
      </div>""")
             shift_blocks.append(f"""
     <details class="shiftCard" data-shift="{key}" style="border:1px solid {info['accent']}44; background:{info['bg']}">
@@ -570,6 +681,9 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
 
 </div>
 
+{CAPTURE_DOM_HTML}
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script>
 // Hard-guaranteed import page behavior (independent from other scripts).
 (function() {{
@@ -661,27 +775,45 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
       .catch(function() {{ reorderImportDepartments(); }});
   }}
 
-  function syncImportHeaderDate() {{
-    var picker = document.getElementById('datePicker');
-    var tag = document.getElementById('dateTag');
-    if (!picker || !tag) return;
-
-    function toLabel(iso) {{
-      var d = new Date(iso + 'T00:00:00');
-      if (isNaN(d.getTime())) return iso;
-      return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
-    }}
-
-    var path = window.location.pathname || '/';
-    var m = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
-    if (m) {{
-      picker.value = m[1] + '-' + m[2] + '-' + m[3];
-    }}
-    if (picker.value) {{
-      tag.textContent = '📅 ' + toLabel(picker.value);
-    }}
-    picker.addEventListener('change', function() {{
-      if (picker.value) tag.textContent = '📅 ' + toLabel(picker.value);
+  function repartitionLeaveRowsInDeptCards() {{
+    document.querySelectorAll('.deptCard').forEach(function(card) {{
+      var other = card.querySelector('details.shiftCard[data-shift="Other"]');
+      if (!other) return;
+      var toMove = [];
+      other.querySelectorAll('.empRow').forEach(function(row) {{
+        var st = row.querySelector('.empStatus');
+        if (!st) return;
+        var raw = (st.textContent || '').trim().toUpperCase();
+        var code = raw.split(/\\s+/)[0];
+        if (code === 'LV' || code === 'AL' || raw.indexOf('ANNUAL') >= 0) toMove.push(row);
+      }});
+      if (!toMove.length) return;
+      var annual = card.querySelector('details.shiftCard[data-shift="Annual Leave"]');
+      if (!annual) {{
+        var template = card.querySelector('details.shiftCard[data-shift="Off Day"]');
+        if (!template) return;
+        annual = template.cloneNode(true);
+        annual.setAttribute('data-shift', 'Annual Leave');
+        annual.style.border = '1px solid #10b98144';
+        annual.style.background = '#d1fae5';
+        var sum = annual.querySelector('.shiftSummary');
+        if (sum) {{ sum.style.background = '#d1fae5'; sum.style.borderBottom = '1px solid #10b98133'; }}
+        var label = annual.querySelector('.shiftLabel');
+        if (label) {{ label.textContent = 'Annual Leave'; label.style.color = '#065f46'; }}
+        var icon = annual.querySelector('.shiftIcon');
+        if (icon) icon.textContent = '✈️';
+        var emptyBody = annual.querySelector('.shiftBody');
+        if (emptyBody) emptyBody.innerHTML = '';
+        other.parentNode.insertBefore(annual, other);
+      }}
+      var body = annual.querySelector('.shiftBody');
+      toMove.forEach(function(row) {{ body.appendChild(row); }});
+      var oc = other.querySelector('.shiftCount');
+      var left = other.querySelectorAll('.empRow').length;
+      if (oc) oc.textContent = String(left);
+      if (!left) other.remove();
+      var ac = annual.querySelector('.shiftCount');
+      if (ac) ac.textContent = String(annual.querySelectorAll('.empRow').length);
     }});
   }}
 
@@ -708,8 +840,8 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
   window.reorderImportDepartments = reorderImportDepartments;
   window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
 
+  repartitionLeaveRowsInDeptCards();
   applySavedEmployeeDepartmentFirst();
-  syncImportHeaderDate();
   syncImportShiftDetailsOpen();
 
   window.addEventListener('storage', function(e) {{
@@ -803,11 +935,12 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
-  var ver = '11';
+  var ver = '20260514b';
   addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js');
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-  var m = (location.pathname || '').match(/\/date\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
+  var m = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
   var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
   if (eidDays.indexOf(activeIso) !== -1) {{
     addScript(root + '/eid-overlayxx.js');
@@ -856,40 +989,6 @@ function goToRosterDiff(event) {{
     var titleEl = document.getElementById('pageTitle');
     if (titleEl) titleEl.textContent = 'Import Duty Roster';
   }}
-}})();
-
-/* ===== Import UX fixes ===== */
-(function() {{
-  // Sync header date with active page date (same behavior style as export).
-  var picker = document.getElementById('datePicker');
-  if (!picker) return;
-
-  function getMuscatTodayIso() {{
-    var now = new Date();
-    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    return muscatTime.getFullYear() + '-' +
-      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
-      String(muscatTime.getDate()).padStart(2, '0');
-  }}
-
-  function formatIsoLabel(iso) {{
-    var d = new Date(iso + 'T00:00:00');
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
-  }}
-
-  function syncHeaderDate(iso) {{
-    var tag = document.getElementById('dateTag');
-    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
-  }}
-
-  var path = window.location.pathname || '/';
-  var pageDateMatch = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
-  var effectiveIso = pageDateMatch
-    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
-    : getMuscatTodayIso();
-  picker.value = effectiveIso;
-  syncHeaderDate(effectiveIso);
 }})();
 
 </script>
@@ -1405,7 +1504,7 @@ def main() -> None:
     parsed["source_filename"] = source_filename
 
     style, export_script = load_export_ui_template(repo_root)
-    export_script = sanitize_export_script_for_import(export_script)
+    export_script = prepare_export_script_for_import(export_script)
 
     # Generate duty roster page (today)
     duty_html = build_duty_html(style, export_script, parsed, today, repo_base_path="/import")
