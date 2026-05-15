@@ -34,6 +34,25 @@ import requests
 import pandas as pd
 
 
+CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
+
+LEGACY_ROSTER_SITE_IMPORT_REDIRECT = f"""
+  <script>
+  (function () {{
+    var path = location.pathname || '';
+    if (path.indexOf('/roster-site/import') === -1) return;
+    var base = '{CANONICAL_IMPORT_BASE}';
+    var rest = path.replace(/^.*\\/roster-site\\/import\\/?/, '');
+    if (rest) {{
+      rest = rest.replace(/\\/?$/, '/');
+      location.replace(base + rest + location.search + location.hash);
+    }} else {{
+      location.replace(base + location.search + location.hash);
+    }}
+  }})();
+  </script>
+"""
+
 IMPORT_PWA_HEAD_SNIPPET = """
   <meta name="theme-color" content="#1e40af">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -446,6 +465,7 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Import Duty Roster</title>
+  {LEGACY_ROSTER_SITE_IMPORT_REDIRECT}
   <style>{style}</style>
   <style>
     html, body {{ min-height: 100%; width:100%; overflow-x:hidden; }}
@@ -1240,6 +1260,38 @@ def get_source_filename() -> str:
         return ""
 
 
+def write_legacy_roster_site_import_redirect(repo_root: Path) -> None:
+    """Minimal page for the old GitHub Pages path /roster-site/import/ (separate roster-site repo)."""
+    dest = repo_root / "legacy-redirects" / "roster-site" / "import" / "index.html"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(
+        f"""<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Import Duty Roster</title>
+  <link rel="canonical" href="{CANONICAL_IMPORT_BASE}">
+  <meta http-equiv="refresh" content="0; url={CANONICAL_IMPORT_BASE}">
+  <script>
+  (function () {{
+    var path = location.pathname || '';
+    var base = '{CANONICAL_IMPORT_BASE}';
+    var rest = path.replace(/^.*\\/roster-site\\/import\\/?/, '');
+    var target = base + (rest ? rest.replace(/\\/?$/, '/') : '') + location.search + location.hash;
+    location.replace(target);
+  }})();
+  </script>
+</head>
+<body>
+  <p style="font-family:sans-serif;text-align:center;padding:40px;">جاري التوجيه...</p>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
 def pick_export_roster_filename(raw_source_name: str) -> str:
     """Pick the correct Export roster file name when multiple names are provided."""
     if not raw_source_name:
@@ -1350,7 +1402,9 @@ def main() -> None:
     }
     (out_root / "import_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
+    write_legacy_roster_site_import_redirect(repo_root)
     print("OK: Generated Import pages in docs/import/")
+    print(f"OK: Legacy redirect stub -> legacy-redirects/roster-site/import/index.html -> {CANONICAL_IMPORT_BASE}")
 
 
 if __name__ == "__main__":

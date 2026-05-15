@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Import Duty Roster</title>
+  <script>
+  (function () {
+    var path = location.pathname || '';
+    if (path.indexOf('/roster-site/import') === -1) return;
+    var base = 'https://khalidsaif912.github.io/new/docs/import/';
+    var rest = path.replace(/^.*\/roster-site\/import\/?/, '');
+    if (rest) {
+      rest = rest.replace(/\/?$/, '/');
+      location.replace(base + rest + location.search + location.hash);
+    } else {
+      location.replace(base + location.search + location.hash);
+    }
+  })();
+  </script>
   <style>
     /* ═══════ RESET ═══════ */
     :root {
