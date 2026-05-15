@@ -1597,6 +1597,25 @@ window.openDatePicker = function() {
       });
       captureRosterElement(card, 'department');
     });
+
+    if (head.dataset.deptShiftToggleBound === '1') return;
+    head.dataset.deptShiftToggleBound = '1';
+    head.addEventListener('click', function() {
+      if (suppressNextClick) return;
+      var card = head.closest('.deptCard');
+      if (!card) return;
+      card.classList.remove('collapsed');
+      var shifts = card.querySelectorAll('details.shiftCard');
+      if (!shifts.length) return;
+      var anyClosed = false;
+      shifts.forEach(function(d) {
+        if (!d.open) anyClosed = true;
+      });
+      shifts.forEach(function(d) {
+        if (anyClosed) d.setAttribute('open', '');
+        else d.removeAttribute('open');
+      });
+    });
   });
 
   document.querySelectorAll('.shiftSummary').forEach(function(summary){
