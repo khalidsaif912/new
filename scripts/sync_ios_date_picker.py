@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Patch roster pages for reliable date picking on iOS Safari."""
+"""Patch roster pages for cross-platform date picking (iOS, Android, Windows)."""
 
 from __future__ import annotations
 
@@ -10,13 +10,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 
-OLD_CSS = re.compile(
-    r"/\*\s*(?:الـ input مخفي تماماً[^\n]*|Date input overlays label[^\n]*)\s*\*/\s*"
-    r"(?:\.datePickerWrapper\s+)?#datePicker\s*\{[^}]+\}",
+DATE_PICKER_CSS = re.compile(
+    r"/\*\s*(?:الـ input مخفي تماماً[^\n]*|Date input overlays[^\n]*|Transparent date input[^\n]*)\s*\*/\s*"
+    r"\.datePickerWrapper\s+#datePicker\s*\{[^}]+\}"
+    r"(?:\s*@supports\s*\(-webkit-touch-callout:\s*none\)\s*\{[^}]+\})?",
     re.DOTALL,
 )
 
-NEW_CSS = """/* Date input overlays label — direct tap opens picker on iOS Safari */
+NEW_CSS = """/* Transparent date input over #dateTag — iOS, Android, desktop */
 .datePickerWrapper #datePicker {
   position: absolute;
   inset: 0;
@@ -24,137 +25,147 @@ NEW_CSS = """/* Date input overlays label — direct tap opens picker on iOS Saf
   height: 100%;
   margin: 0;
   padding: 0;
-  opacity: 0;
+  opacity: 0.01;
   cursor: pointer;
   font-size: 16px;
   border: none;
   z-index: 2;
-  -webkit-appearance: none;
-  appearance: none;
   color: transparent;
   background: transparent;
-}"""
+}
+@supports (-webkit-touch-callout: none) {
+  .datePickerWrapper #datePicker {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+    .header .dateTag {
+      pointer-events: none;
+    }"""
+
+DATE_TAG_LABEL = re.compile(
+    r'<label\s+class="dateTag"\s+id="dateTag"\s+for="datePicker">(.*?)</label>',
+    re.IGNORECASE | re.DOTALL,
+)
 
 DATE_TAG_BTN = re.compile(
     r'<button\s+class="dateTag"\s+id="dateTag"\s+onclick="openDatePicker\(\)"\s+type="button">(.*?)</button>',
     re.IGNORECASE | re.DOTALL,
 )
 
-OPEN_DATE_PICKER_FN = re.compile(
-    r"\n\s*// ═+\s*\n\s*// فتح الـ date picker[\s\S]*?"
-    r"picker\.addEventListener\('blur', restore\);\s*\n\};\s*\n",
-    re.MULTILINE,
+IOS_ONLY_COMMENT = re.compile(
+    r"\n\s*// Date picker: transparent input overlays[^\n]*\n",
 )
 
-OPEN_DATE_PICKER_FN_ALT = re.compile(
-    r"\nwindow\.openDatePicker\s*=\s*function\s*\(\)\s*\{[\s\S]*?"
-    r"picker\.addEventListener\('blur', restore\);\s*\n\};\s*\n",
-    re.MULTILINE,
-)
+CROSS_PLATFORM_JS = """
+  window.openDatePicker = function() {
+    if (!picker) return;
+    try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); return; } catch (e) {}
+    }
+    try { picker.click(); } catch (e2) {}
+  };
 
-OLD_IMPORT_INPUT = re.compile(
-    r'(<input\s+id="datePicker"[^>]*)\s+aria-hidden="true"',
-    re.IGNORECASE,
-)
-
-INLINE_IMPORT_INPUT = re.compile(
-    r'(<input\s+id="datePicker"[^>]*style="[^"]*)pointer-events:\s*none;?',
-    re.IGNORECASE,
-)
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {
+    dateWrap.addEventListener('click', function(e) {
+      if (e.target === picker) return;
+      openDatePicker();
+    });
+  }
+  picker.addEventListener('click', function() {
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); } catch (e) {}
+    }
+  });
+"""
 
 DATE_BTN_LEGACY = re.compile(
     r'<button\s+class="date-btn"\s+onclick="openDatePicker\(\)"\s+type="button">',
     re.IGNORECASE,
 )
 
-OPEN_DATE_PICKER_ONELINER = re.compile(
-    r"function openDatePicker\(\)\{var p=document\.getElementById\('datePicker'\);"
-    r"if\(!p\)return;try\{p\.showPicker\(\)\}catch\(e\)\{p\.click\(\)\}"
-    r"p\.onchange=function\(\)\{if\(!p\.value\)return;sessionStorage\.setItem\('manualNav','1'\);"
-    r"location\.href=_importBase\(\)\+'/'\+p\.value\+'/';}; \}",
+LEGACY_INLINE = re.compile(
+    r'(<input\s+id="datePicker"[^>]*style=")position:absolute;[^"]*(")',
+    re.IGNORECASE,
 )
+
+LEGACY_INLINE_GOOD = "inset:0;width:100%;height:100%"
 
 
 def patch_html(text: str) -> tuple[str, list[str]]:
     notes: list[str] = []
-    if 'id="datePicker"' not in text and "id='datePicker'" not in text:
+    if 'id="datePicker"' not in text:
         return text, notes
 
-    if DATE_TAG_BTN.search(text):
-        text = DATE_TAG_BTN.sub(
-            r'<label class="dateTag" id="dateTag" for="datePicker">\1</label>',
-            text,
-        )
-        notes.append("dateTag->label")
+    if DATE_TAG_LABEL.search(text):
+        text = DATE_TAG_LABEL.sub(r'<span class="dateTag" id="dateTag">\1</span>', text)
+        notes.append("label->span")
+    elif DATE_TAG_BTN.search(text):
+        text = DATE_TAG_BTN.sub(r'<span class="dateTag" id="dateTag">\1</span>', text)
+        notes.append("button->span")
 
     if DATE_BTN_LEGACY.search(text):
         text = DATE_BTN_LEGACY.sub(
-            '<label class="date-btn" for="datePicker" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">',
+            '<span class="date-btn" id="dateTagVisual" style="pointer-events:none;display:inline-flex;align-items:center;gap:6px;">',
             text,
         )
-        # close tag: first </button> after date-btn label
         text = re.sub(
-            r'(<label class="date-btn" for="datePicker"[^>]*>[\s\S]*?)</button>',
-            r"\1</label>",
+            r'(<span class="date-btn" id="dateTagVisual"[^>]*>[\s\S]*?)</button>',
+            r"\1</span>",
             text,
             count=1,
         )
-        notes.append("date-btn->label")
+        notes.append("legacy-date-btn")
 
-    if OLD_CSS.search(text):
-        text = OLD_CSS.sub(NEW_CSS, text, count=1)
+    if DATE_PICKER_CSS.search(text):
+        text = DATE_PICKER_CSS.sub(NEW_CSS, text, count=1)
         notes.append("css")
-    elif "#datePicker" in text and "inset: 0" not in text:
+    elif "opacity: 0.01" not in text and "#datePicker" in text:
         wrapper = ".datePickerWrapper {"
-        if wrapper in text and NEW_CSS not in text:
+        if wrapper in text:
             text = text.replace(wrapper, NEW_CSS + "\n    " + wrapper, 1)
             notes.append("css-injected")
 
-    text2, n = OPEN_DATE_PICKER_FN.subn(
-        "\n  // Date picker: transparent input overlays #dateTag (label) for iOS.\n\n",
+    if "pointer-events: none" not in text and ".header .dateTag" in text:
+        text = text.replace(
+            ".header .dateTag:hover {",
+            ".header .dateTag {\n      pointer-events: none;\n    }\n    .header .dateTag:hover {",
+            1,
+        )
+        notes.append("pointer-events")
+
+    text = re.sub(
+        r'(<input\s+id="datePicker"[^>]*)\s+tabindex="-1"',
+        r'\1 aria-label="Select roster date"',
         text,
         count=1,
     )
-    if n:
-        text = text2
-        notes.append("removed-openDatePicker-block")
-    else:
-        text2, n = OPEN_DATE_PICKER_FN_ALT.subn(
-            "\n  // Date picker: transparent input overlays #dateTag (label) for iOS.\n\n",
-            text,
-            count=1,
-        )
-        if n:
-            text = text2
-            notes.append("removed-openDatePicker-alt")
-
-    if OPEN_DATE_PICKER_ONELINER.search(text):
-        text = OPEN_DATE_PICKER_ONELINER.sub(
-            "/* date picker: label+input overlay; navigation via change listener */",
-            text,
-            count=1,
-        )
-        notes.append("removed-oneliner-openDatePicker")
-
-    text, n = OLD_IMPORT_INPUT.subn(r"\1", text)
-    if n:
-        notes.append("aria-hidden")
-
-    text, n = INLINE_IMPORT_INPUT.subn(r"\1", text)
-    if n:
-        notes.append("inline-pointer-events")
-
-    # Fix inline 1x1 hidden input on legacy import pages
-    legacy_inline = re.compile(
-        r'(<input\s+id="datePicker"[^>]*style=")position:absolute;opacity:0;(?:pointer-events:\s*none;)?width:1px;height:1px(")',
-        re.IGNORECASE,
-    )
-    text, n = legacy_inline.subn(
-        r"\1position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;z-index:2;cursor:pointer\2",
+    text = re.sub(
+        r'(<input\s+id="datePicker"[^>]*)\s+aria-hidden="true"',
+        r'\1 aria-label="Select roster date"',
         text,
+        count=1,
     )
-    if n:
-        notes.append("legacy-inline-input")
+
+    if LEGACY_INLINE.search(text) and LEGACY_INLINE_GOOD not in text:
+        text = LEGACY_INLINE.sub(
+            r"\1position:absolute;inset:0;width:100%;height:100%;opacity:0.01;font-size:16px;z-index:2;cursor:pointer\2",
+            text,
+            count=1,
+        )
+        notes.append("legacy-inline")
+
+    text = IOS_ONLY_COMMENT.sub(CROSS_PLATFORM_JS, text, count=1)
+
+    if "window.openDatePicker" not in text and "syncHeaderDate(effectiveIso)" in text:
+        text = text.replace(
+            "syncHeaderDate(effectiveIso);",
+            "syncHeaderDate(effectiveIso);" + CROSS_PLATFORM_JS,
+            1,
+        )
+        notes.append("js-injected")
 
     legacy_nav_marker = "/* date picker: label+input overlay; navigation via change listener */"
     if legacy_nav_marker in text and "p.dataset.navBound" not in text:
@@ -175,7 +186,7 @@ def patch_html(text: str) -> tuple[str, list[str]]:
   });
 })();"""
         text = text.replace(legacy_nav_marker, inject, 1)
-        notes.append("legacy-nav-listener")
+        notes.append("legacy-nav")
 
     return text, notes
 
@@ -189,7 +200,7 @@ def main() -> int:
         if 'id="datePicker"' not in raw:
             continue
         updated, notes = patch_html(raw)
-        if notes and updated != raw:
+        if updated != raw:
             path.write_text(updated, encoding="utf-8", newline="\n")
             changed += 1
             if changed <= 5 or "--verbose" in sys.argv:

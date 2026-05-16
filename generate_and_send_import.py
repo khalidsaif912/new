@@ -691,8 +691,8 @@ def build_duty_html(style: str, script: str, parsed: Dict[str, Any], date_obj: d
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Import Duty Roster</h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker">📅 {date_label}</label>
-      <input id="datePicker" type="date" value="{date_iso}" min="{parsed['year']}-{parsed['month']:02d}-01" max="{parsed['year']}-{parsed['month']:02d}-31" tabindex="-1" />
+      <span class="dateTag" id="dateTag">📅 {date_label}</span>
+      <input id="datePicker" type="date" value="{date_iso}" min="{parsed['year']}-{parsed['month']:02d}-01" max="{parsed['year']}-{parsed['month']:02d}-31" aria-label="Select roster date" />
     </div>
   </div>
 

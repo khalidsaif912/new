@@ -99,7 +99,7 @@
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Date input overlays label — direct tap opens picker on iOS Safari */
+    /* Transparent date input over #dateTag — iOS, Android, desktop */
 .datePickerWrapper #datePicker {
   position: absolute;
   inset: 0;
@@ -107,16 +107,23 @@
   height: 100%;
   margin: 0;
   padding: 0;
-  opacity: 0;
+  opacity: 0.01;
   cursor: pointer;
   font-size: 16px;
   border: none;
   z-index: 2;
-  -webkit-appearance: none;
-  appearance: none;
   color: transparent;
   background: transparent;
 }
+@supports (-webkit-touch-callout: none) {
+  .datePickerWrapper #datePicker {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+    .header .dateTag {
+      pointer-events: none;
+    }
 
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -341,8 +348,8 @@
     <div class="welcomeMsg" id="welcomeMsg" onclick="goToMySchedule()" title="انقر للذهاب لجدولك"></div>
     <h1 id="pageTitle">📋 Duty Roster</h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker">📅 10 February 2026</label>
-      <input id="datePicker" type="date" value="2026-02-10" min="2026-01-01" max="2026-03-31" tabindex="-1" />
+      <span class="dateTag" id="dateTag">📅 10 February 2026</span>
+      <input id="datePicker" type="date" value="2026-02-10" min="2026-01-01" max="2026-03-31" aria-label="Select roster date" />
     </div>
   </div>
 
@@ -1055,7 +1062,27 @@
 (function(){
   var picker = document.getElementById('datePicker');
   if(!picker) return;
-  // Date picker: transparent input overlays #dateTag (label) for iOS.
+  window.openDatePicker = function() {
+    if (!picker) return;
+    try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); return; } catch (e) {}
+    }
+    try { picker.click(); } catch (e2) {}
+  };
+
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {
+    dateWrap.addEventListener('click', function(e) {
+      if (e.target === picker) return;
+      openDatePicker();
+    });
+  }
+  picker.addEventListener('click', function() {
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); } catch (e) {}
+    }
+  });
 
   // ═══════════════════════════════════════════════════
   // التحقق من التاريخ وإعادة التوجيه للـ today

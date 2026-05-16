@@ -832,12 +832,13 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
+      pointer-events:none;
     }}
     .header .dateTag:hover {{
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }}
-    /* Date input overlays label — direct tap opens picker on iOS Safari */
+    /* Transparent date input over #dateTag — works on iOS, Android, and desktop */
 .datePickerWrapper #datePicker {{
   position: absolute;
   inset: 0;
@@ -845,15 +846,19 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   height: 100%;
   margin: 0;
   padding: 0;
-  opacity: 0;
+  opacity: 0.01;
   cursor: pointer;
   font-size: 16px;
   border: none;
   z-index: 2;
-  -webkit-appearance: none;
-  appearance: none;
   color: transparent;
   background: transparent;
+}}
+@supports (-webkit-touch-callout: none) {{
+  .datePickerWrapper #datePicker {{
+    -webkit-appearance: none;
+    appearance: none;
+  }}
 }}
 
 
@@ -1232,8 +1237,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker">📅 {date_label}</label>
-      <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} tabindex="-1" />
+      <span class="dateTag" id="dateTag">📅 {date_label}</span>
+      <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} aria-label="Select roster date" />
     </div>
   </div>
 
@@ -1528,7 +1533,27 @@ function goToEmployeeSchedule(empName) {{
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
 
-  // Date picker: transparent input overlays #dateTag (label) for reliable iOS taps.
+  window.openDatePicker = function() {{
+    if (!picker) return;
+    try {{ picker.focus({{ preventScroll: true }}); }} catch (e) {{ picker.focus(); }}
+    if (typeof picker.showPicker === 'function') {{
+      try {{ picker.showPicker(); return; }} catch (e) {{}}
+    }}
+    try {{ picker.click(); }} catch (e2) {{}}
+  }};
+
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {{
+    dateWrap.addEventListener('click', function(e) {{
+      if (e.target === picker) return;
+      openDatePicker();
+    }});
+  }}
+  picker.addEventListener('click', function() {{
+    if (typeof picker.showPicker === 'function') {{
+      try {{ picker.showPicker(); }} catch (e) {{}}
+    }}
+  }});
 
   // ═══════════════════════════════════════════════════
   // التحقق من التاريخ وإعادة التوجيه للـ today
