@@ -837,21 +837,23 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }}
-    /* الـ input مخفي تماماً - لا يُرى ولا يُضغط عليه */
-#datePicker {{
+    /* Date input overlays label — direct tap opens picker on iOS Safari */
+.datePickerWrapper #datePicker {{
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  height: 1px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   opacity: 0;
-  pointer-events: none;
-  font-size: 16px;   /* مهم جداً لمنع zoom على iOS */
+  cursor: pointer;
+  font-size: 16px;
   border: none;
-  /* ← أضف هذا: */
+  z-index: 2;
   -webkit-appearance: none;
   appearance: none;
+  color: transparent;
+  background: transparent;
 }}
 
 
@@ -1230,8 +1232,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
     <h1 id="pageTitle">Export Duty Roster</h1>
     <div class="datePickerWrapper">
-      <button class="dateTag" id="dateTag" onclick="openDatePicker()" type="button">📅 {date_label}</button>
-      <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} tabindex="-1" aria-hidden="true" />
+      <label class="dateTag" id="dateTag" for="datePicker">📅 {date_label}</label>
+      <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} tabindex="-1" />
     </div>
   </div>
 
@@ -1526,68 +1528,7 @@ function goToEmployeeSchedule(empName) {{
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
 
-  // ═══════════════════════════════════════════════════
-  // فتح الـ date picker - يعمل على Desktop + iOS + Android
-  // ═══════════════════════════════════════════════════
-window.openDatePicker = function() {{
-  var picker = document.getElementById('datePicker');
-  if (!picker) return;
-
-  // احسب موقع زر التاريخ وضع العنصر المخفي تحته مباشرة
-  var btn = document.getElementById('dateTag');
-  if (btn) {{
-    var rect = btn.getBoundingClientRect();
-    var btnCenterX = rect.left + rect.width / 2;
-    var btnBottom  = rect.bottom + 6; // 6px تحت الزر
-
-    // تأكد أن النافذة لن تخرج من يمين الشاشة
-    var pickerWidth = 280; // تقدير عرض نافذة التقويم
-    var leftPos = Math.min(btnCenterX - pickerWidth / 2, window.innerWidth - pickerWidth - 10);
-    leftPos = Math.max(leftPos, 10);
-
-    picker.style.position = 'fixed';
-    picker.style.top  = btnBottom + 'px';
-    picker.style.left = (btnCenterX) + 'px';
-    picker.style.transform = 'translateX(-50%)';
-  }} else {{
-    // fallback: وسط الشاشة
-    picker.style.position = 'fixed';
-    picker.style.top = '50%';
-    picker.style.left = '50%';
-    picker.style.transform = 'translate(-50%, -50%)';
-  }}
-
-  picker.style.width = '1px';
-  picker.style.height = '1px';
-  picker.style.opacity = '0';
-  picker.style.pointerEvents = 'auto';
-  picker.style.zIndex = '9999';
-
-  picker.focus();
-
-  if (typeof picker.showPicker === 'function') {{
-    try {{ picker.showPicker(); }} catch(e) {{}}
-  }} else {{
-    picker.click();
-  }}
-
-  function restore() {{
-    picker.style.position = 'absolute';
-    picker.style.top = '100%';
-    picker.style.left = '50%';
-    picker.style.transform = '';
-    picker.style.width = '1px';
-    picker.style.height = '1px';
-    picker.style.opacity = '0';
-    picker.style.pointerEvents = 'none';
-    picker.style.zIndex = '';
-    picker.removeEventListener('change', restore);
-    picker.removeEventListener('blur', restore);
-  }}
-
-  picker.addEventListener('change', restore);
-  picker.addEventListener('blur', restore);
-}};
+  // Date picker: transparent input overlays #dateTag (label) for reliable iOS taps.
 
   // ═══════════════════════════════════════════════════
   // التحقق من التاريخ وإعادة التوجيه للـ today

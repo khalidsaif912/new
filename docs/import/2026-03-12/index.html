@@ -300,10 +300,10 @@ body:not(.light) .emp-code{filter:brightness(1.4)}
         <div id="hdrWelcome" style="font-size:13px;font-weight:600;color:rgba(255,255,255,.65);margin-bottom:6px;min-height:20px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:6px"><span class="hdr-wave" id="hdrWave"></span><span id="hdrGreet"></span></div>
         <div class="hdr-title" id="pageTitle">Import Duty Roster</div>
         <div style="position:relative;display:inline-block">
-          <button class="date-btn" onclick="openDatePicker()" type="button">
+          <label class="date-btn" for="datePicker" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
             <span>📅</span><span>12 March 2026</span>
-          </button>
-          <input id="datePicker" type="date" value="2026-03-12" min="2026-03-01" max="2026-04-30" tabindex="-1" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
+          </label>
+          <input id="datePicker" type="date" value="2026-03-12" min="2026-03-01" max="2026-04-30" tabindex="-1" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;z-index:2;cursor:pointer"/>
         </div>
       </div>
     </div>
@@ -726,7 +726,22 @@ body:not(.light) .emp-code{filter:brightness(1.4)}
 <script>
 function _importBase(){var o=location.origin,r=location.pathname.includes('/roster-site/')?o+'/roster-site':o;return r+'/import';}
 var _avail=["2026-03", "2026-04"];
-function openDatePicker(){var p=document.getElementById('datePicker');if(!p)return;try{p.showPicker()}catch(e){p.click()}p.onchange=function(){if(!p.value)return;sessionStorage.setItem('manualNav','1');location.href=_importBase()+'/'+p.value+'/';}; }
+/* date picker: label+input overlay; navigation via change listener */
+(function(){
+  var p=document.getElementById('datePicker');
+  if(!p||p.dataset.navBound)return;
+  p.dataset.navBound='1';
+  p.addEventListener('change',function(){
+    if(!p.value)return;
+    sessionStorage.setItem('manualNav','1');
+    var path=location.pathname||'/';
+    if(path.indexOf('/import/date/')>=0){
+      location.href=_importBase()+'/date/'+p.value+'/';
+    }else{
+      location.href=_importBase()+'/'+p.value+'/';
+    }
+  });
+})();
 function goToMySchedule(e){if(e)e.preventDefault();var id=localStorage.getItem('importSavedEmpId');location.href=_importBase()+'/my-schedules/index.html'+(id?'?emp='+encodeURIComponent(id):'');}
 function toggleTheme(){var isLight=document.body.classList.toggle('light');localStorage.setItem('importTheme',isLight?'light':'dark');var btn=document.getElementById('themeBtn');if(btn)btn.textContent=isLight?'☀️':'🌙';}
 // Toggle btn alternates between 👋 and 📅
