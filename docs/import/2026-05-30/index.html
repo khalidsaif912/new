@@ -684,15 +684,15 @@
 
   <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
-        <h1 id="pageTitle" class="bannerTitle">
+    <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
       <span class="dateTag" id="dateTag">📅 30 May 2026</span>
-      <input id="datePicker" type="date" value="2026-05-30" min="2026-03-01" max="2026-05-31" aria-label="Select roster date" />
+      <input id="datePicker" type="date" value="2026-05-30" min="2026-03-01" max="2026-05-31" aria-label="Select roster date" title="Pick day" />
     </div>
-</div>
+  </div>
 
   
   <div class="summaryBar">
@@ -1463,7 +1463,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">16MAY2026 / 10:35</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">16MAY2026 / 16:31</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1960,59 +1960,6 @@ function goToEmployeeSchedule(empName) {
     window.location.href = target;
   });
 
-})();
-// Import roster catalog: only months/dates with a published roster file (import_meta.json).
-window.importDateIsPublished = function(iso) {
-  if (!iso) return false;
-  var dates = window.__importPublishedDates;
-  if (Array.isArray(dates) && dates.length) return dates.indexOf(iso) >= 0;
-  var months = window.__importAvailableMonths;
-  if (Array.isArray(months) && months.length) return months.indexOf(String(iso).slice(0, 7)) >= 0;
-  return true;
-};
-
-(function applyImportDateRange() {
-  var picker = document.getElementById('datePicker');
-  if (!picker) return;
-  function base() {
-    if (typeof _importBase === 'function') return _importBase();
-    var path = window.location.pathname || '/';
-    return path
-      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
-      .replace(/\/+$/, '');
-  }
-  fetch(base() + '/import_meta.json', { cache: 'no-store' })
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(meta) {
-      if (!meta) return;
-      if (meta.date_min) picker.min = meta.date_min;
-      if (meta.date_max) picker.max = meta.date_max;
-      if (Array.isArray(meta.published_dates)) window.__importPublishedDates = meta.published_dates.slice();
-      if (Array.isArray(meta.available_months) && meta.available_months.length) {
-        window.__importAvailableMonths = meta.available_months.slice();
-        window._avail = meta.available_months.slice();
-      }
-    })
-    .catch(function() {});
-})();
-
-(function guardImportDateChange() {
-  var picker = document.getElementById('datePicker');
-  if (!picker || picker.dataset.importGuard === '1') return;
-  picker.dataset.importGuard = '1';
-  picker.addEventListener('change', function(ev) {
-    if (!picker.value) return;
-    if (typeof importDateIsPublished === 'function' && !importDateIsPublished(picker.value)) {
-      ev.stopImmediatePropagation();
-      var ar = (document.documentElement.lang || '') === 'ar';
-      alert(ar ? 'لا يوجد ملف روستر منشور لهذا التاريخ.' : 'No published roster file for this date.');
-      var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
-      if (m) picker.value = m[1];
-      return false;
-    }
-  }, true);
 })();
 
 // ═══════════════════════════════════════════════════
@@ -2570,27 +2517,17 @@ function goToRosterDiff(event) {
   function flattenFutureShifts(data, fromIso) {
     var out = [];
     if (!data) return out;
-    if (Array.isArray(data.days) && data.month) {
-      var mp = String(data.month).match(/^(\d{4})-(\d{2})$/);
-      if (mp) {
-        var y = mp[1], mo = mp[2];
-        data.days.forEach(function(d) {
-          if (!d || !d.day) return;
-          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
-          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
-        });
-        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
-        return out.slice(0, 5);
-      }
-    }
     if (!data.schedules) return out;
     Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
       var rows = data.schedules[monthKey] || [];
       rows.forEach(function(r) {
         if (!r) return;
         var iso = String(r.date || '').trim();
         if (!iso && r.day != null && r.day !== '') {
-          iso = monthKey + '-' + String(r.day).padStart(2, '0');
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
         }
         if (!iso || iso < fromIso) return;
         out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
@@ -2738,6 +2675,61 @@ function goToRosterDiff(event) {
   document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);
 })();
 
+
+
+// Import roster catalog: only months/dates with a published roster file (import_meta.json).
+window.importDateIsPublished = function(iso) {
+  if (!iso) return false;
+  var dates = window.__importPublishedDates;
+  if (Array.isArray(dates) && dates.length) return dates.indexOf(iso) >= 0;
+  var months = window.__importAvailableMonths;
+  if (Array.isArray(months) && months.length) return months.indexOf(String(iso).slice(0, 7)) >= 0;
+  return true;
+};
+
+(function applyImportDateRange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker) return;
+  function base() {
+    if (typeof _importBase === 'function') return _importBase();
+    var path = window.location.pathname || '/';
+    return path
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/now\/.*$/, '/')
+      .replace(/\/+$/, '');
+  }
+  fetch(base() + '/import_meta.json', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(meta) {
+      if (!meta) return;
+      if (meta.date_min) picker.min = meta.date_min;
+      if (meta.date_max) picker.max = meta.date_max;
+      if (Array.isArray(meta.published_dates)) window.__importPublishedDates = meta.published_dates.slice();
+      if (Array.isArray(meta.available_months) && meta.available_months.length) {
+        window.__importAvailableMonths = meta.available_months.slice();
+        window._avail = meta.available_months.slice();
+      }
+    })
+    .catch(function() {});
+})();
+
+(function guardImportDateChange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker || picker.dataset.importGuard === '1') return;
+  picker.dataset.importGuard = '1';
+  picker.addEventListener('change', function(ev) {
+    if (!picker.value) return;
+    if (typeof importDateIsPublished === 'function' && !importDateIsPublished(picker.value)) {
+      ev.stopImmediatePropagation();
+      var ar = (document.documentElement.lang || '') === 'ar';
+      alert(ar ? 'لا يوجد ملف روستر منشور لهذا التاريخ.' : 'No published roster file for this date.');
+      var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) picker.value = m[1];
+      return false;
+    }
+  }, true);
+})();
 
 
 /* ===== Import path overrides ===== */
