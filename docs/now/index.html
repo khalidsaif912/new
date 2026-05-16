@@ -116,12 +116,13 @@
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
+      pointer-events:none;
     }
     .header .dateTag:hover {
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — iOS, Android, desktop */
+    /* Transparent date input over #dateTag — works on iOS, Android, and desktop */
 .datePickerWrapper #datePicker {
   position: absolute;
   inset: 0;
@@ -143,9 +144,6 @@
     appearance: none;
   }
 }
-    .header .dateTag {
-      pointer-events: none;
-    }
 
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -576,7 +574,7 @@
   <!-- ════ SUMMARY CHIPS ════ -->
   <div class="summaryBar">
     <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">45</div>
+      <div class="chipVal" id="summarySwitchVal">44</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
     <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
@@ -643,7 +641,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -657,7 +655,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -714,7 +712,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -731,7 +729,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -802,7 +800,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -822,7 +820,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -917,7 +915,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -949,7 +947,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -1097,7 +1095,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1120,7 +1118,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
@@ -1222,8 +1220,8 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">16MAY2026 / 05:19</strong>
-    <br>Total: <strong>45 employees</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">16MAY2026 / 14:07</strong>
+    <br>Total: <strong>44 employees</strong>
      &nbsp;·&nbsp; Source: <strong>Export Roster May 2026 Version 3.xlsx</strong>
   </div>
 
@@ -1452,6 +1450,7 @@ function goToEmployeeSchedule(empName) {
     : getMuscatTodayIso();
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
+
   window.openDatePicker = function() {
     if (!picker) return;
     try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
@@ -1740,7 +1739,7 @@ function goToEmployeeSchedule(empName) {
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
-window.__summaryCounts = window.__summaryCounts || { employees: 45, departments: 5 };
+window.__summaryCounts = window.__summaryCounts || { employees: 44, departments: 5 };
 window.__summarySwitchMode = 'employees';
 var T = {
   en: {
@@ -1783,7 +1782,7 @@ function updateSummarySwitchChip() {
     lbl.dataset.key = 'departments';
   } else {
     val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 45;
+    val.textContent = counts.employees != null ? counts.employees : 44;
     lbl.textContent = t.employees;
     lbl.dataset.key = 'employees';
   }
