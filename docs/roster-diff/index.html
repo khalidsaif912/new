@@ -80,10 +80,6 @@
       transform:translateY(-3px);
       box-shadow:0 8px 20px rgba(15,23,42,.12);
     }
-    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
-    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
-    a.summaryChip.gamesChip .chipVal { color:#7c3aed; }
-    a.summaryChip.gamesChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -355,17 +351,9 @@
         <div class="chipVal">🗓️</div>
         <div class="chipLabel">My Schedule</div>
       </a>
-      <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Import" src="" /></div>
-        <div class="chipLabel">Import</div>
-      </a>
       <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
         <div class="chipVal" id="compareChipIcon"><img class="chipIcon diffIcon" id="compareChipImg" alt="Diff" src="" /></div>
         <div class="chipLabel" id="compareChipLabel">Diff</div>
-      </a>
-      <a href="https://dgr-exp.netlify.app" class="summaryChip gamesChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal">🎮</div>
-        <div class="chipLabel">Games</div>
       </a>
     </div>
     <div class="diffTabs">
@@ -551,7 +539,6 @@
       document.getElementById('exportBtn').href = `${root}/date/${isoDate}/`;
       document.getElementById('trainingBtn').href = `${root}/training/`;
       document.getElementById('myScheduleBtn').href = `${root}/my-schedules/`;
-      document.getElementById('importBtn').href = `${root}/import/date/${isoDate}/`;
       const langBtn = document.querySelector('.langToggle');
       const compareBtn = document.getElementById('compareChipBtn');
       const compareChipImg = document.getElementById('compareChipImg');
