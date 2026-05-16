@@ -2434,7 +2434,7 @@ function goToRosterDiff(event) {
   }
 })();
 
-// Employee row: tap → schedule; long-press (touch) → next 5 shifts preview
+// Employee row: tap → schedule; long-press → next 5 shifts preview
 (function initEmployeeNextShiftPreview() {
   var tooltip = document.createElement('div');
   tooltip.className = 'nextShiftTooltip';
@@ -2450,6 +2450,9 @@ function goToRosterDiff(event) {
   var hideTimer = null;
   var longPressTimer = null;
   var suppressClickFor = null;
+  var longPressRow = null;
+  var longPressMoved = false;
+  var LONG_PRESS_MS = 550;
 
   function empNameFromRow(rowEl) {
     if (!rowEl) return '';
@@ -2597,7 +2600,7 @@ function goToRosterDiff(event) {
   function showPreviewForRow(rowEl, ev) {
     if (!rowEl) return;
     cancelHideTooltip();
-    tooltipPinned = !ev || (ev && ev.pointerType === 'touch');
+    tooltipPinned = true;
     activeEl = rowEl;
     var label = empNameFromRow(rowEl);
     if (tooltipEmp) tooltipEmp.textContent = label || '-';
@@ -2620,41 +2623,36 @@ function goToRosterDiff(event) {
     if (!rowEl || rowEl.dataset.nextShiftBound === '1') return;
     rowEl.dataset.nextShiftBound = '1';
 
-    rowEl.addEventListener('mouseenter', function(ev) {
-      showPreviewForRow(rowEl, ev);
-    });
-    rowEl.addEventListener('mousemove', moveTooltip);
-    rowEl.addEventListener('mouseleave', function(ev) {
-      var to = ev.relatedTarget;
-      if (to && typeof to.closest === 'function') {
-        if (to.closest('.nextShiftTooltip')) {
-          cancelHideTooltip();
-          return;
-        }
-        if (to.closest('.deptCard .empRow')) {
-          cancelHideTooltip();
-          return;
-        }
-      }
-      hideTooltipSoon();
-    });
-
     rowEl.addEventListener('pointerdown', function(ev) {
-      if (ev.pointerType !== 'touch') return;
+      if (ev.button !== 0 && ev.button !== undefined) return;
+      longPressRow = rowEl;
+      longPressMoved = false;
       if (longPressTimer) clearTimeout(longPressTimer);
       longPressTimer = setTimeout(function() {
+        longPressTimer = null;
+        if (longPressRow !== rowEl || longPressMoved) return;
         suppressClickFor = rowEl;
         showPreviewForRow(rowEl, null);
-      }, 450);
+      }, LONG_PRESS_MS);
     });
-    rowEl.addEventListener('pointerup', function(ev) {
-      if (ev.pointerType !== 'touch') return;
+    rowEl.addEventListener('pointermove', function(ev) {
+      if (longPressRow !== rowEl) return;
+      if (typeof ev.movementX === 'number' && (Math.abs(ev.movementX) > 8 || Math.abs(ev.movementY) > 8)) {
+        longPressMoved = true;
+      }
+    });
+    rowEl.addEventListener('pointerup', function() {
       if (longPressTimer) clearTimeout(longPressTimer);
       longPressTimer = null;
+      longPressRow = null;
     });
     rowEl.addEventListener('pointercancel', function() {
       if (longPressTimer) clearTimeout(longPressTimer);
       longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('contextmenu', function(ev) {
+      if (suppressClickFor === rowEl) ev.preventDefault();
     });
 
     rowEl.addEventListener('click', function(ev) {
