@@ -717,34 +717,60 @@
       background:var(--surface);
       border:1px solid var(--border2);
       border-radius:var(--r-lg);
-      width:100%;max-width:560px;
+      width:100%;max-width:min(400px,96vw);
+      max-height:min(88dvh,720px);
       box-shadow:0 24px 64px rgba(0,0,0,.5);
       animation:popIn .2s cubic-bezier(.22,1,.36,1);
       overflow:hidden;
+      display:flex;flex-direction:column;
     }
     .stats-modal-head{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 16px;
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:8px;padding:12px 14px;
       border-bottom:1px solid var(--border);
-      font-size:14px;font-weight:700;color:var(--ink);
+      flex:0 0 auto;
     }
+    .stats-modal-head-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}
+    .stats-modal-head-sub{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
     .stats-modal-close{
-      width:28px;height:28px;
+      width:26px;height:26px;
       background:rgba(255,255,255,.06);
       border:1px solid var(--border2);
       border-radius:7px;
-      color:var(--muted);font-size:12px;
+      color:var(--muted);font-size:11px;
       display:grid;place-items:center;
       cursor:pointer;transition:all .15s;
+      flex:0 0 auto;
     }
     .stats-modal-close:hover{background:rgba(255,255,255,.12);color:var(--ink)}
     .stats-modal-body{
-      padding:16px;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
+      padding:10px;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      flex:1 1 auto;
     }
-    @media(max-width:400px){.stats-modal-body{grid-template-columns:repeat(2,1fr)}}
+    .stats-modal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+    @media(max-width:360px){.stats-modal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .stats-modal .stat-card.stat-sq{
+      aspect-ratio:1;padding:5px 3px;border-radius:9px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1px;min-height:0;min-width:0;
+    }
+    .stats-modal .stat-card.stat-sq::after{height:2px;border-radius:9px 9px 0 0}
+    .stats-modal .stat-card.stat-sq:hover{transform:none;box-shadow:none}
+    .stats-modal .stat-card.stat-sq .stat-ico{font-size:16px;margin:0;line-height:1}
+    .stats-modal .stat-card.stat-sq .stat-val{font-size:17px;font-weight:800;line-height:1.05;font-family:'DM Mono',monospace}
+    .stats-modal .stat-card.stat-sq .stat-lbl{
+      font-size:9px;margin-top:2px;line-height:1.2;font-weight:700;
+      max-width:100%;overflow:hidden;text-overflow:ellipsis;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+      white-space:normal;padding:0 2px;
+    }
+    .stats-modal .stat-card.stat-sq .stat-sub{
+      font-size:8.5px;color:var(--muted);font-weight:600;margin-top:1px;
+      line-height:1.15;font-family:'DM Mono',monospace;
+    }
+    .stats-modal .stat-card.stat-sq.is-zero{opacity:.38}
     .state-view{
       background:var(--surface);
       border:1px solid var(--border);
@@ -1543,14 +1569,20 @@
       Other:         {icon:'❓', dot:'#8b949e'}
     };
 
-    const STAT_META=[
-      {k:'work',     icon:'💼', c:'c-blue',   label_en:'Work Days',  label_ar:'أيام عمل'},
-      {k:'off',      icon:'🛌', c:'c-gray',   label_en:'Days Off',   label_ar:'أيام راحة'},
-      {k:'morning',  icon:'☀️', c:'c-amber',  label_en:'Morning',    label_ar:'صباحي'},
-      {k:'afternoon',icon:'🌤️', c:'c-orange', label_en:'Afternoon',  label_ar:'مسائي'},
-      {k:'night',    icon:'🌙', c:'c-purple', label_en:'Night',      label_ar:'ليلي'},
-      {k:'standby',  icon:'🧍', c:'c-pink',   label_en:'Standby',    label_ar:'احتياطي'},
-      {k:'leaves',   icon:'✈️', c:'c-green',  label_en:'Leaves',     label_ar:'إجازات'},
+    const SHIFT_HOURS_PER_DAY=9;
+    const STAT_MODAL=[
+      {k:'workHours',icon:'⏱️',c:'c-blue',label_en:'Work hrs',label_ar:'ساعات عمل',hrsOnly:1},
+      {k:'work',icon:'💼',c:'c-blue',label_en:'Work',label_ar:'عمل',hrsKey:'workHours'},
+      {k:'off',icon:'🛌',c:'c-gray',label_en:'Off',label_ar:'راحة'},
+      {k:'morning',icon:'☀️',c:'c-amber',label_en:'Morning',label_ar:'صباحي',hrsKey:'morningHours'},
+      {k:'afternoon',icon:'🌤️',c:'c-orange',label_en:'Afternoon',label_ar:'مسائي',hrsKey:'afternoonHours'},
+      {k:'night',icon:'🌙',c:'c-purple',label_en:'Night',label_ar:'ليلي',hrsKey:'nightHours'},
+      {k:'annualLeave',icon:'✈️',c:'c-green',label_en:'Annual',label_ar:'سنوية'},
+      {k:'sickLeave',icon:'🤒',c:'c-green',label_en:'Sick',label_ar:'مرضية'},
+      {k:'training',icon:'🎓',c:'c-blue',label_en:'Training',label_ar:'تدريب'},
+      {k:'standby',icon:'🧍',c:'c-pink',label_en:'Standby',label_ar:'احتياطي'},
+      {k:'other',icon:'❓',c:'c-gray',label_en:'Other',label_ar:'أخرى'},
+      {k:'unrecorded',icon:'📭',c:'c-gray',label_en:'Empty',label_ar:'فارغ'},
     ];
 
     const T={
@@ -1790,18 +1822,54 @@
 
     function setAsMyId(){ openIdActionModal('pin'); }
 
-    function calcStats(s){
-      const r={work:0,off:0,morning:0,afternoon:0,night:0,standby:0,leaves:0};
+    function codeToGroup(c){
+      c=(c||'').toUpperCase().trim();
+      if(!c||c==='O'||c==='OFF'||c==='OFF DAY') return 'Off Day';
+      if(c==='LV'||c==='AL'||c.indexOf('ANNUAL')>=0) return 'Annual Leave';
+      if(c==='SL'||c.indexOf('SICK')>=0) return 'Sick Leave';
+      if(c==='TR'||c.indexOf('TRAIN')>=0) return 'Training';
+      if(c.indexOf('STANDBY')>=0||c.startsWith('SB')||c.startsWith('ST')) return 'Standby';
+      if(c.startsWith('MN')||c.startsWith('ME')) return 'Morning';
+      if(c.startsWith('AN')||c.startsWith('AE')) return 'Afternoon';
+      if(c.startsWith('NN')||c.startsWith('NE')) return 'Night';
+      return 'Other';
+    }
+    function shiftHoursForCode(code){
+      const g=codeToGroup(code);
+      if(g==='Morning'||g==='Afternoon'||g==='Night') return SHIFT_HOURS_PER_DAY;
+      return 0;
+    }
+    function fmtHours(h){
+      if(!h) return lang==='ar'?'0 س':'0h';
+      const n=Math.round(h*10)/10;
+      return lang==='ar'?(n+' س'):(n+'h');
+    }
+    function dayGroup(d){ return d.shift_group||codeToGroup(d.shift_code||''); }
+    function calcStats(s,dim){
+      const r={work:0,off:0,morning:0,afternoon:0,night:0,standby:0,annualLeave:0,sickLeave:0,training:0,other:0,unrecorded:0,workHours:0,morningHours:0,afternoonHours:0,nightHours:0,recorded:s.length};
       s.forEach(d=>{
-        if(d.shift_group==='Morning') r.morning++;
-        else if(d.shift_group==='Afternoon') r.afternoon++;
-        else if(d.shift_group==='Night') r.night++;
-        else if(d.shift_group==='Off Day') r.off++;
-        else if(d.shift_group==='Standby') r.standby++;
-        else if(d.shift_group==='Annual Leave'||d.shift_group==='Sick Leave') r.leaves++;
+        const g=dayGroup(d), code=(d.shift_code||'').toUpperCase(), hrs=shiftHoursForCode(code);
+        if(g==='Morning'){ r.morning++; r.work++; r.morningHours+=hrs; r.workHours+=hrs; }
+        else if(g==='Afternoon'){ r.afternoon++; r.work++; r.afternoonHours+=hrs; r.workHours+=hrs; }
+        else if(g==='Night'){ r.night++; r.work++; r.nightHours+=hrs; r.workHours+=hrs; }
+        else if(g==='Off Day') r.off++;
+        else if(g==='Standby') r.standby++;
+        else if(g==='Annual Leave') r.annualLeave++;
+        else if(g==='Sick Leave') r.sickLeave++;
+        else if(g==='Training') r.training++;
+        else r.other++;
       });
-      r.work=r.morning+r.afternoon+r.night;
+      if(dim) r.unrecorded=Math.max(0,dim-r.recorded);
       return r;
+    }
+    function buildStatsModalHTML(stats,mLabel){
+      return '<div class="stats-modal-grid">'+STAT_MODAL.map(m=>{
+        const n=m.hrsOnly?fmtHours(stats.workHours):(stats[m.k]||0);
+        let sub='';
+        if(m.hrsKey&&stats[m.hrsKey]&&!m.hrsOnly) sub=fmtHours(stats[m.hrsKey]);
+        const z=m.hrsOnly?!stats.workHours:!(stats[m.k]);
+        return '<div class="stat-card stat-sq '+m.c+(z?' is-zero':'')+'"><span class="stat-ico">'+m.icon+'</span><div class="stat-val">'+n+'</div><div class="stat-lbl">'+(lang==='ar'?m.label_ar:m.label_en)+'</div>'+(sub?'<div class="stat-sub">'+sub+'</div>':'')+'</div>';
+      }).join('')+'</div>';
     }
 
     function shiftClass(g){
@@ -1874,6 +1942,7 @@
 
       // Month picker popup data
       const mLabel=T[lang].months[mo-1];
+      const mLabelFull=mLabel+' '+yr;
       const popupHTML='<div class="month-popup-grid">'+
         months.map(m=>{
           const mm=parseInt(m.split('-')[1]);
@@ -1902,9 +1971,10 @@
           }else{
             rowHasDays=true;
             const dd=sched.find(s=>s.day===dc);
-            const sc=dd?shiftClass(dd.shift_group):'';
+            const grp=dd?dayGroup(dd):'';
+            const sc=grp?shiftClass(grp):'';
             const isToday=(now.getFullYear()===yr&&(now.getMonth()+1)===mo&&now.getDate()===dc);
-            const ghostCode = dd ? (dd.shift_code || (dd.shift_group==='Off Day'?'OFF':dd.shift_group==='Annual Leave'?'LV':dd.shift_group==='Sick Leave'?'SL':dd.shift_group==='Training'?'TR':dd.shift_group==='Standby'?'ST':'')) : '';
+            const ghostCode = dd ? (dd.shift_code || (grp==='Off Day'?'OFF':grp==='Annual Leave'?'LV':grp==='Sick Leave'?'SL':grp==='Training'?'TR':grp==='Standby'?'ST':'')) : '';
             const codeEl = ghostCode ? `<span class="day-code">${esc(ghostCode)}</span>` : '';
             cells+=`<div class="day ${sc} ${isToday?'today':''}">
               <span class="dnum">${dc}</span>
@@ -1917,15 +1987,9 @@
         if(dc>dim) break;
       }
 
-      const stats=calcStats(sched);
+      const stats=calcStats(sched,dim);
 
-      // Stats cards
-      const statsHTML=STAT_META.map(m=>`
-        <div class="stat-card ${m.c}">
-          <span class="stat-ico">${m.icon}</span>
-          <div class="stat-val">${stats[m.k]}</div>
-          <div class="stat-lbl">${lang==='ar'?m.label_ar:m.label_en}</div>
-        </div>`).join('');
+      const statsHTML=buildStatsModalHTML(stats,mLabelFull);
 
       // Show avatar + change button next to search input
       const avatarWrap=document.getElementById('searchAvatarWrap');
@@ -1998,7 +2062,10 @@
         <div class="stats-modal-overlay" id="statsModalOverlay" onclick="closeStatsModal()" style="display:none">
           <div class="stats-modal" onclick="event.stopPropagation()">
             <div class="stats-modal-head">
-              <span>${lang==='ar'?'الإحصائيات':'Statistics'}</span>
+              <div>
+                <div class="stats-modal-head-title">${lang==='ar'?'إحصائيات الشهر':'Monthly statistics'}</div>
+                <div class="stats-modal-head-sub">${esc(mLabelFull)} · ${esc(data.name)}</div>
+              </div>
               <button onclick="closeStatsModal()" class="stats-modal-close">✕</button>
             </div>
             <div class="stats-modal-body">${statsHTML}</div>

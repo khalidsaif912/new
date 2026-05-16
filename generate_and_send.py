@@ -458,13 +458,21 @@ EMPLOYEE_NEXT_SHIFT_PREVIEW_JS = """
 
   function flattenFutureShifts(data, fromIso) {
     var out = [];
-    if (!data || !data.schedules) return out;
+    if (!data) return out;
+    if (!data.schedules) return out;
     Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\\d{4})-(\\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
       var rows = data.schedules[monthKey] || [];
       rows.forEach(function(r) {
-        var d = String(r && r.date || '');
-        if (!d) return;
-        if (d >= fromIso) out.push(r);
+        if (!r) return;
+        var iso = String(r.date || '').trim();
+        if (!iso && r.day != null && r.day !== '') {
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+        }
+        if (!iso || iso < fromIso) return;
+        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
       });
     });
     out.sort(function(a, b) {
@@ -769,7 +777,37 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       border-radius:50%;
       background:rgba(255,255,255,.06);
     }}
-    .header h1 {{ margin:0; font-size:24px; font-weight:800; position:relative; z-index:1; letter-spacing:-.3px; }}
+    .header .bannerTitle {{
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }}
+    .header .bannerTitleEyebrow {{
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }}
+    .header .bannerTitleMain {{
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }}
+    body.ar .header .bannerTitleEyebrow {{
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }}
+    body.ar .header .bannerTitleMain {{
+      font-size:26px;
+      letter-spacing:0;
+    }}
 
     /* زر اللغة */
     .langToggle {{
@@ -1217,7 +1255,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){{
       .wrap            {{ padding:12px 10px 22px; }}
-      .header h1       {{ font-size:21px; }}
+      .header .bannerTitleMain {{ font-size:22px; }}
+      body.ar .header .bannerTitleMain {{ font-size:21px; }}
       .deptTitle       {{ font-size:16px; }}
       .empName         {{ font-size:14px; }}
       .empStatus       {{ font-size:12px; }}
@@ -1235,7 +1274,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <!-- ════ HEADER ════ -->
   <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
-    <h1 id="pageTitle">Export Duty Roster</h1>
+    <h1 id="pageTitle" class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
+      <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
+    </h1>
     <div class="datePickerWrapper">
       <span class="dateTag" id="dateTag">📅 {date_label}</span>
       <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} aria-label="Select roster date" />
@@ -1825,7 +1867,7 @@ window.__summaryCounts = window.__summaryCounts || {{ employees: {employees_tota
 window.__summarySwitchMode = 'employees';
 var T = {{
   en: {{
-    title:'Export Duty Roster', langBtn:'ع',
+    titleEyebrow:'Export', titleMain:'Duty Roster', langBtn:'ع',
     employees:'Emp.', departments:'Depts.', total:'Total',
     morning:'Morning', afternoon:'Afternoon', night:'Night',
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
@@ -1837,7 +1879,7 @@ var T = {{
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
   }},
   ar: {{
-    title:'جدول الصادر', langBtn:'EN',
+    titleEyebrow:'الصادر', titleMain:'جدول المناوبات', langBtn:'EN',
     employees:'الموظفون', departments:'الأقسام', total:'المجموع',
     morning:'صباح', afternoon:'ظهر', night:'ليل',
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
@@ -1882,7 +1924,10 @@ function applyLang(lang) {{
   var t=T[lang], isAr=lang==='ar';
   document.body.classList.toggle('ar',isAr);
   document.documentElement.setAttribute('lang',lang);
-  var el=document.getElementById('pageTitle'); if(el) el.textContent=t.title;
+  var eyebrow=document.getElementById('pageTitleEyebrow');
+  var main=document.getElementById('pageTitleMain');
+  if(eyebrow) eyebrow.textContent=t.titleEyebrow;
+  if(main) main.textContent=t.titleMain;
   var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;
   document.querySelectorAll('.chipLabel').forEach(function(el) {{
     var k=el.dataset.key;

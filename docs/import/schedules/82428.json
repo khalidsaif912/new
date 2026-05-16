@@ -1,1 +1,318 @@
-{"id": "82428", "name": "ABDULLAH AL MAHARBI", "department": "Flight Dispatch (Import)", "month": "2026-04", "monthLabel": "April 2026", "days": [{"day": 1, "weekday": "Wed", "code": "MN06"}, {"day": 2, "weekday": "Thu", "code": "AN13"}, {"day": 3, "weekday": "Fri", "code": "AN13"}, {"day": 4, "weekday": "Sat", "code": "NN21"}, {"day": 5, "weekday": "Sun", "code": "O"}, {"day": 6, "weekday": "Mon", "code": "O"}, {"day": 7, "weekday": "Tue", "code": "O"}, {"day": 8, "weekday": "Wed", "code": "MN06"}, {"day": 9, "weekday": "Thu", "code": "MN06"}, {"day": 10, "weekday": "Fri", "code": "AN13"}, {"day": 11, "weekday": "Sat", "code": "AN13"}, {"day": 12, "weekday": "Sun", "code": "NN21"}, {"day": 13, "weekday": "Mon", "code": "O"}, {"day": 14, "weekday": "Tue", "code": "O"}, {"day": 15, "weekday": "Wed", "code": "O"}, {"day": 16, "weekday": "Thu", "code": "MN06"}, {"day": 17, "weekday": "Fri", "code": "MN06"}, {"day": 18, "weekday": "Sat", "code": "AN13"}, {"day": 19, "weekday": "Sun", "code": "AN13"}, {"day": 20, "weekday": "Mon", "code": "NN21"}, {"day": 21, "weekday": "Tue", "code": "O"}, {"day": 22, "weekday": "Wed", "code": "O"}, {"day": 23, "weekday": "Thu", "code": "O"}, {"day": 24, "weekday": "Fri", "code": "MN06"}, {"day": 25, "weekday": "Sat", "code": "MN06"}, {"day": 26, "weekday": "Sun", "code": "AN13"}, {"day": 27, "weekday": "Mon", "code": "AN13"}, {"day": 28, "weekday": "Tue", "code": "NN21"}, {"day": 29, "weekday": "Wed", "code": "O"}, {"day": 30, "weekday": "Thu", "code": "O"}]}
+{
+  "id": "82428",
+  "name": "ABDULLAH AL MAHARBI",
+  "department": "Flight Dispatch (Import)",
+  "schedules": {
+    "2026-04": [
+      {
+        "day": 1,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 2,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 3,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 4,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 5,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 6,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 7,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 8,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 9,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 10,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 11,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 12,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 13,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 14,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 15,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 16,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 17,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 18,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 19,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 20,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 21,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 22,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 23,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 24,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 25,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 26,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 27,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 28,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 29,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 30,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      }
+    ],
+    "2026-03": [
+      {
+        "day": 1,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 2,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 3,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 4,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 5,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 6,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 7,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 8,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 9,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 10,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 11,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 12,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 13,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 14,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 15,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 16,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 17,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 18,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 19,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 20,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 21,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 22,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 23,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 24,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "day": 25,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 26,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "day": 27,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "day": 28,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 29,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 30,
+        "shift_code": "O",
+        "shift_group": "Off Day"
+      },
+      {
+        "day": 31,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      }
+    ]
+  },
+  "month": "2026-04",
+  "monthLabel": "2026-04"
+}

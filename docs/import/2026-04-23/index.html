@@ -53,7 +53,37 @@
       border-radius:50%;
       background:rgba(255,255,255,.06);
     }
-    .header h1 { margin:0; font-size:24px; font-weight:800; position:relative; z-index:1; letter-spacing:-.3px; }
+    .header .bannerTitle {
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }
+    .header .bannerTitleEyebrow {
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+    .header .bannerTitleMain {
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+    body.ar .header .bannerTitleEyebrow {
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }
+    body.ar .header .bannerTitleMain {
+      font-size:26px;
+      letter-spacing:0;
+    }
 
     /* زر اللغة */
     .langToggle {
@@ -371,7 +401,8 @@
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
       .wrap            { padding:12px 10px 22px; }
-      .header h1       { font-size:21px; }
+      .header .bannerTitleMain { font-size:22px; }
+      body.ar .header .bannerTitleMain { font-size:21px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
@@ -464,12 +495,15 @@
 
   <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
-    <h1 id="pageTitle">Import Duty Roster</h1>
+        <h1 id="pageTitle" class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
+      <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
+    </h1>
     <div class="datePickerWrapper">
       <span class="dateTag" id="dateTag">📅 23 April 2026</span>
-      <input id="datePicker" type="date" value="2026-04-23" min="2026-04-01" max="2026-04-31" aria-label="Select roster date" />
+      <input id="datePicker" type="date" value="2026-04-23" min="2026-03-01" max="2026-05-31" aria-label="Select roster date" />
     </div>
-  </div>
+</div>
 
   
   <div class="summaryBar">
@@ -1499,6 +1533,59 @@ function goToEmployeeSchedule(empName) {
   });
 
 })();
+// Import roster catalog: only months/dates with a published roster file (import_meta.json).
+window.importDateIsPublished = function(iso) {
+  if (!iso) return false;
+  var dates = window.__importPublishedDates;
+  if (Array.isArray(dates) && dates.length) return dates.indexOf(iso) >= 0;
+  var months = window.__importAvailableMonths;
+  if (Array.isArray(months) && months.length) return months.indexOf(String(iso).slice(0, 7)) >= 0;
+  return true;
+};
+
+(function applyImportDateRange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker) return;
+  function base() {
+    if (typeof _importBase === 'function') return _importBase();
+    var path = window.location.pathname || '/';
+    return path
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/now\/.*$/, '/')
+      .replace(/\/+$/, '');
+  }
+  fetch(base() + '/import_meta.json', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(meta) {
+      if (!meta) return;
+      if (meta.date_min) picker.min = meta.date_min;
+      if (meta.date_max) picker.max = meta.date_max;
+      if (Array.isArray(meta.published_dates)) window.__importPublishedDates = meta.published_dates.slice();
+      if (Array.isArray(meta.available_months) && meta.available_months.length) {
+        window.__importAvailableMonths = meta.available_months.slice();
+        window._avail = meta.available_months.slice();
+      }
+    })
+    .catch(function() {});
+})();
+
+(function guardImportDateChange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker || picker.dataset.importGuard === '1') return;
+  picker.dataset.importGuard = '1';
+  picker.addEventListener('change', function(ev) {
+    if (!picker.value) return;
+    if (typeof importDateIsPublished === 'function' && !importDateIsPublished(picker.value)) {
+      ev.stopImmediatePropagation();
+      var ar = (document.documentElement.lang || '') === 'ar';
+      alert(ar ? 'لا يوجد ملف روستر منشور لهذا التاريخ.' : 'No published roster file for this date.');
+      var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) picker.value = m[1];
+      return false;
+    }
+  }, true);
+})();
 
 // ═══════════════════════════════════════════════════
 // Shift Filter (NOW PAGE ONLY)
@@ -1614,7 +1701,7 @@ window.__summaryCounts = window.__summaryCounts || { employees: 77, departments:
 window.__summarySwitchMode = 'employees';
 var T = {
   en: {
-    title:'Export Duty Roster', langBtn:'ع',
+    titleEyebrow:'Import', titleMain:'Duty Roster', langBtn:'ع',
     employees:'Emp.', departments:'Depts.', total:'Total',
     morning:'Morning', afternoon:'Afternoon', night:'Night',
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
@@ -1626,7 +1713,7 @@ var T = {
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
   },
   ar: {
-    title:'جدول الصادر', langBtn:'EN',
+    titleEyebrow:'الوارد', titleMain:'جدول المناوبات', langBtn:'EN',
     employees:'الموظفون', departments:'الأقسام', total:'المجموع',
     morning:'صباح', afternoon:'ظهر', night:'ليل',
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
@@ -1671,7 +1758,10 @@ function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
   document.body.classList.toggle('ar',isAr);
   document.documentElement.setAttribute('lang',lang);
-  var el=document.getElementById('pageTitle'); if(el) el.textContent=t.title;
+  var eyebrow=document.getElementById('pageTitleEyebrow');
+  var main=document.getElementById('pageTitleMain');
+  if(eyebrow) eyebrow.textContent=t.titleEyebrow;
+  if(main) main.textContent=t.titleMain;
   var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;
   document.querySelectorAll('.chipLabel').forEach(function(el) {
     var k=el.dataset.key;
@@ -1923,17 +2013,14 @@ function goToRosterDiff(event) {
   });
 })();
 
-// Force Import header text (shared export script may override it).
+// Import banner labels (export script uses titleEyebrow + titleMain).
 (function() {
   if (typeof T !== 'undefined') {
-    if (T.en) T.en.title = 'Import Duty Roster';
-    if (T.ar) T.ar.title = 'جدول الوارد';
+    if (T.en) { T.en.titleEyebrow = 'Import'; T.en.titleMain = 'Duty Roster'; }
+    if (T.ar) { T.ar.titleEyebrow = 'الوارد'; T.ar.titleMain = 'جدول المناوبات'; }
   }
   if (typeof applyLang === 'function' && typeof LANG !== 'undefined') {
     applyLang(LANG);
-  } else {
-    var titleEl = document.getElementById('pageTitle');
-    if (titleEl) titleEl.textContent = 'Import Duty Roster';
   }
 })();
 
