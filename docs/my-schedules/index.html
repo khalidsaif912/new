@@ -1872,6 +1872,15 @@
       }).join('')+'</div>';
     }
 
+    function buildLegendHTML(){
+      const order=['Morning','Afternoon','Night','Off Day','Annual Leave','Sick Leave','Training','Standby','Other'];
+      const leg=T[lang].legend||{};
+      return `<div class="legend-card"><div class="section-label">${t('legendTitle')}</div><div class="legend-grid">${order.map(k=>{
+        const dot=(COLORS[k]||COLORS.Other).dot;
+        return `<span class="leg-item"><span class="l-dot" style="background:${dot}"></span>${esc(leg[k]||k)}</span>`;
+      }).join('')}</div></div>`;
+    }
+
     function shiftClass(g){
       return {Morning:'s-morning',Afternoon:'s-afternoon',Night:'s-night','Off Day':'s-off','Annual Leave':'s-leave','Sick Leave':'s-leave',Training:'s-training',Standby:'s-standby',Other:'s-other'}[g]||'s-other';
     }
@@ -2042,6 +2051,8 @@
           <div class="cal-head">${dayHdr}</div>
           <div class="cal-body">${cells}</div>
         </div>
+
+        ${buildLegendHTML()}
 </div>
 
         <!-- Actions -->

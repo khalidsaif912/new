@@ -1,5 +1,8 @@
 (function () {
   const BANNER_KEY = 'roster_banner_choice';
+  const SCRIM_CLASS = 'banner-readability-scrim';
+  const ACTIVE_CLASS = 'has-custom-banner';
+
   function getSiteRootPath() {
     const path = location.pathname || '/';
     if (path.includes('/roster-site/')) return '/roster-site';
@@ -12,7 +15,6 @@
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
 
-  // عدّل هذه القائمة بأسماء الصور الفعلية في مجلد assets/banners/
   const availableBanners = [
     'banner1.jpg',
     'banner2.jpg',
@@ -36,6 +38,82 @@
     'banner20.jpg'
   ];
 
+  function injectReadabilityStyles() {
+    if (document.getElementById('banner-changer-readability-css')) return;
+    const style = document.createElement('style');
+    style.id = 'banner-changer-readability-css';
+    style.textContent = [
+      '.' + ACTIVE_CLASS + '::before,.' + ACTIVE_CLASS + '::after{z-index:0!important;}',
+      '.' + SCRIM_CLASS + '{',
+      'position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;',
+      'background:linear-gradient(135deg,rgba(15,23,42,.45) 0%,rgba(25,118,210,.32) 50%,rgba(14,165,233,.24) 100%);',
+      '}',
+      '.topbar.' + ACTIVE_CLASS + ' .' + SCRIM_CLASS + '{',
+      'background:linear-gradient(180deg,rgba(3,5,11,.58) 0%,rgba(6,10,19,.48) 100%);',
+      '}',
+      '.' + ACTIVE_CLASS + ' > *:not(.' + SCRIM_CLASS + '):not(.langToggle):not(#langToggle):not(#banner-changer-btn){position:relative;z-index:2;}',
+      '.' + ACTIVE_CLASS + ' .bannerTitle,',
+      '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow,',
+      '.' + ACTIVE_CLASS + ' .bannerTitleMain,',
+      '.' + ACTIVE_CLASS + ' h1,',
+      '.' + ACTIVE_CLASS + ' .dateTag,',
+      '.' + ACTIVE_CLASS + ' .langToggle,',
+      '.' + ACTIVE_CLASS + ' #langToggle,',
+      '.' + ACTIVE_CLASS + ' .page-title,',
+      '.' + ACTIVE_CLASS + ' .page-title-eyebrow,',
+      '.' + ACTIVE_CLASS + ' .page-title-main,',
+      '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow,',
+      '.' + ACTIVE_CLASS + ' .bannerTitleMain{',
+      'color:#fff!important;',
+      'text-shadow:0 1px 3px rgba(0,0,0,.9),0 2px 10px rgba(0,0,0,.55);',
+      '}',
+      '.' + ACTIVE_CLASS + ' .langToggle,',
+      '.' + ACTIVE_CLASS + ' #langToggle{',
+      'position:absolute!important;top:14px!important;right:16px!important;left:auto!important;',
+      'width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;',
+      'padding:0!important;font-size:9px!important;line-height:1!important;z-index:10!important;',
+      'background:rgba(0,0,0,.35)!important;border:2px solid rgba(255,255,255,.35)!important;',
+      'border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;',
+      '}',
+      'body.ar .' + ACTIVE_CLASS + ' .langToggle,',
+      'body.ar .' + ACTIVE_CLASS + ' #langToggle{right:16px!important;left:auto!important;}',
+      '.' + ACTIVE_CLASS + ' .dateTag{',
+      'background:rgba(0,0,0,.32)!important;',
+      'border-color:rgba(255,255,255,.28)!important;',
+      '}',
+      '#banner-changer-btn{text-shadow:0 1px 4px rgba(0,0,0,.85);}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function ensureScrim(el) {
+    let scrim = el.querySelector('.' + SCRIM_CLASS);
+    if (!scrim) {
+      scrim = document.createElement('div');
+      scrim.className = SCRIM_CLASS;
+      scrim.setAttribute('aria-hidden', 'true');
+      el.insertBefore(scrim, el.firstChild);
+    }
+    return scrim;
+  }
+
+  function setCustomBannerActive(active) {
+    injectReadabilityStyles();
+    getBannerTargets().forEach(function (el) {
+      if (getComputedStyle(el).position === 'static') {
+        el.style.position = 'relative';
+      }
+      if (active) {
+        el.classList.add(ACTIVE_CLASS);
+        ensureScrim(el);
+      } else {
+        el.classList.remove(ACTIVE_CLASS);
+        const scrim = el.querySelector('.' + SCRIM_CLASS);
+        if (scrim) scrim.remove();
+      }
+    });
+  }
+
   function getSavedBanner() {
     return localStorage.getItem(BANNER_KEY) || null;
   }
@@ -52,23 +130,25 @@
     const targets = getBannerTargets();
     if (!targets.length) return;
     const bannerUrl = BANNERS_PATH + name;
-    targets.forEach(function(el) {
+    targets.forEach(function (el) {
       el.style.backgroundImage = "url('" + bannerUrl + "')";
       el.style.backgroundSize = 'cover';
       el.style.backgroundPosition = 'center';
       el.style.backgroundRepeat = 'no-repeat';
     });
+    setCustomBannerActive(true);
   }
 
   function clearBanner() {
     const targets = getBannerTargets();
     if (!targets.length) return;
-    targets.forEach(function(el) {
+    targets.forEach(function (el) {
       el.style.backgroundImage = '';
       el.style.backgroundSize = '';
       el.style.backgroundPosition = '';
       el.style.backgroundRepeat = '';
     });
+    setCustomBannerActive(false);
   }
 
   function createChangerBtn() {
@@ -107,7 +187,10 @@
     }
 
     targetEl.appendChild(btn);
-    btn.onclick = function(e) { e.stopPropagation(); showBannerPicker(); };
+    btn.onclick = function (e) {
+      e.stopPropagation();
+      showBannerPicker();
+    };
   }
 
   function showBannerPicker() {
@@ -152,36 +235,45 @@
 
     const grid = document.getElementById('bannerGrid');
 
-    availableBanners.forEach(function(name) {
+    availableBanners.forEach(function (name) {
       const wrap = document.createElement('div');
-      wrap.style.cssText = 'border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid ' + (name === current ? '#e0bd63' : 'transparent') + ';transition:border .15s;';
+      wrap.style.cssText =
+        'border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid ' +
+        (name === current ? '#e0bd63' : 'transparent') +
+        ';transition:border .15s;';
       const img = document.createElement('img');
       img.src = BANNERS_PATH + name;
       img.style.cssText = 'width:100%;height:70px;object-fit:cover;display:block;';
-      img.onerror = function() { wrap.style.display = 'none'; };
+      img.onerror = function () {
+        wrap.style.display = 'none';
+      };
       wrap.appendChild(img);
       grid.appendChild(wrap);
-      wrap.onclick = function() {
+      wrap.onclick = function () {
         saveBannerChoice(name);
         applyBanner(name);
         overlay.remove();
       };
     });
 
-    document.getElementById('resetBanner').onclick = function() {
+    document.getElementById('resetBanner').onclick = function () {
       localStorage.removeItem(BANNER_KEY);
       clearBanner();
       overlay.remove();
     };
 
-    document.getElementById('closePicker').onclick = function() { overlay.remove(); };
-    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    document.getElementById('closePicker').onclick = function () {
+      overlay.remove();
+    };
+    overlay.onclick = function (e) {
+      if (e.target === overlay) overlay.remove();
+    };
   }
 
   function init() {
+    injectReadabilityStyles();
     const saved = getSavedBanner();
     if (saved) {
-      // Warm cache first to avoid visual flash on repeated visits.
       const pre = new Image();
       pre.src = BANNERS_PATH + saved;
       applyBanner(saved);
@@ -190,8 +282,11 @@
   }
 
   function waitForHeader() {
-    if (document.querySelector('.header, .topbar')) { init(); return; }
-    const observer = new MutationObserver(function() {
+    if (document.querySelector('.header, .topbar')) {
+      init();
+      return;
+    }
+    const observer = new MutationObserver(function () {
       if (document.querySelector('.header, .topbar')) {
         observer.disconnect();
         init();

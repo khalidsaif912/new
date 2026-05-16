@@ -47,7 +47,37 @@
       border-radius:50%;
       background:rgba(255,255,255,.06);
     }
-    .header h1 { margin:0; font-size:24px; font-weight:800; position:relative; z-index:1; letter-spacing:-.3px; color:#fff; }
+    .header .bannerTitle {
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }
+    .header .bannerTitleEyebrow {
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+    .header .bannerTitleMain {
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+    body.ar .header .bannerTitleEyebrow {
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }
+    body.ar .header .bannerTitleMain {
+      font-size:26px;
+      letter-spacing:0;
+    }
     .langToggle {
       position:absolute; top:14px; right:16px; z-index:10;
       background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
@@ -56,6 +86,8 @@
       color:#fff; font-size:10px; font-weight:800; cursor:pointer;
       transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
     }
+    .langToggle:hover { background:rgba(255,255,255,.30); transform:scale(1.08); }
+    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .datePickerWrapper { position:relative; display:inline-block; margin-top:14px; z-index:1; }
     .header .dateTag {
       display:inline-block;
@@ -326,13 +358,21 @@
       border-bottom-color: #29b6f6;
       background: rgba(255,255,255,.06);
     }
+    @media (max-width:480px){
+      .wrap { padding:12px 10px 22px; }
+      .header .bannerTitleMain { font-size:22px; }
+      body.ar .header .bannerTitleMain { font-size:21px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="header">
-      <button class="langToggle" type="button">ع</button>
-      <h1 id="pageTitle">Export Auto Diff</h1>
+      <button class="langToggle" id="langToggle" type="button">ع</button>
+      <h1 id="pageTitle" class="bannerTitle">
+        <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
+        <span class="bannerTitleMain" id="pageTitleMain">Auto Diff</span>
+      </h1>
       <div class="datePickerWrapper">
         <div class="dateTag" id="dateTag"></div>
       </div>
@@ -386,8 +426,9 @@
       en: {
         tabDiff: 'ROSTER DIFF',
         tabAbsence: 'ABSENCE',
-        titleExport: 'Export Auto Diff',
-        titleImport: 'Import Auto Diff',
+        titleEyebrowExport: 'Export',
+        titleEyebrowImport: 'Import',
+        titleMain: 'Auto Diff',
         chipExpDiff: 'Exp Diff',
         chipImpDiff: 'Imp Diff',
         switchDiff: 'Switch Diff',
@@ -409,8 +450,9 @@
       ar: {
         tabDiff: 'فروقات الروستر',
         tabAbsence: 'الغياب',
-        titleExport: 'فروقات الصادر',
-        titleImport: 'فروقات الوارد',
+        titleEyebrowExport: 'الصادر',
+        titleEyebrowImport: 'الوارد',
+        titleMain: 'فروقات تلقائية',
         chipExpDiff: 'فرق الصادر',
         chipImpDiff: 'فرق الوارد',
         switchDiff: 'تبديل نوع الفروقات',
@@ -462,9 +504,19 @@
       dateTag.textContent = `📅 ${formatted}`;
     }
 
+    function updateBannerTitle() {
+      const eyebrow = document.getElementById('pageTitleEyebrow');
+      const main = document.getElementById('pageTitleMain');
+      const isImport = currentDiffKind === 'import';
+      if (eyebrow) eyebrow.textContent = t(isImport ? 'titleEyebrowImport' : 'titleEyebrowExport');
+      if (main) main.textContent = t('titleMain');
+    }
+
     function applyLanguageUi() {
       document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+      document.body.classList.toggle('ar', currentLang === 'ar');
       document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      updateBannerTitle();
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
       const note = document.querySelector('.pageNote');
@@ -495,11 +547,10 @@
     function applyDiffModeUi(kind) {
       currentDiffKind = kind === 'import' ? 'import' : 'export';
       const nextKind = currentDiffKind === 'export' ? 'import' : 'export';
-      const title = document.getElementById('pageTitle');
       const compareChipLabel = document.getElementById('compareChipLabel');
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
-      title.textContent = currentDiffKind === 'export' ? t('titleExport') : t('titleImport');
+      updateBannerTitle();
       compareChipLabel.textContent = nextKind === 'export' ? t('chipExpDiff') : t('chipImpDiff');
       if (tabRosterDiff && tabAbsence) {
         tabRosterDiff.classList.toggle('active', currentPanel === 'diff');
