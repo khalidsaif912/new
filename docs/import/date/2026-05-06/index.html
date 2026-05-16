@@ -132,12 +132,13 @@
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
+      pointer-events:none;
     }
     .header .dateTag:hover {
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — iOS, Android, desktop */
+    /* Transparent date input over #dateTag — works on iOS, Android, and desktop */
 .datePickerWrapper #datePicker {
   position: absolute;
   inset: 0;
@@ -159,9 +160,6 @@
     appearance: none;
   }
 }
-    .header .dateTag {
-      pointer-events: none;
-    }
 
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -1431,7 +1429,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">16MAY2026 / 09:03</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">16MAY2026 / 10:35</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1847,6 +1845,7 @@ function goToEmployeeSchedule(empName) {
     : getMuscatTodayIso();
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
+
   window.openDatePicker = function() {
     if (!picker) return;
     try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
