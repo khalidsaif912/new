@@ -657,7 +657,7 @@
     var p = siteRoot();
     var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
     if (!p) base = location.origin + '/';
-    var pv = '12';
+    var pv = '13';
     var imp = (location.pathname || '').indexOf('/import/') !== -1;
     var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
     var mlinks = document.querySelectorAll('link[rel="manifest"]');
@@ -677,6 +677,29 @@
       document.head.appendChild(touch);
     }
     touch.href = base + 'assets/icons/icon-192.png';
+    try {
+      var bn = localStorage.getItem('roster_banner_choice');
+      if (bn && /^banner\d+\.jpg$/i.test(bn)) {
+        var bUrl = base + 'assets/banners/' + bn;
+        if (!document.getElementById('banner-early-style')) {
+          var bes = document.createElement('style');
+          bes.id = 'banner-early-style';
+          bes.textContent =
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}' +
+            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{opacity:0!important}';
+          document.head.appendChild(bes);
+        }
+        if (!document.querySelector('link[data-banner-preload="1"]')) {
+          var bp = document.createElement('link');
+          bp.rel = 'preload';
+          bp.as = 'image';
+          bp.href = bUrl;
+          bp.setAttribute('data-banner-preload', '1');
+          document.head.appendChild(bp);
+        }
+        document.documentElement.classList.add('roster-banner-early');
+      }
+    } catch (bannerEarlyErr) {}
   })();
   </script>
 

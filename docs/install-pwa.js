@@ -1,7 +1,7 @@
 (function () {
   let deferredPrompt = null;
 
-  const PWA_VER = '12';
+  const PWA_VER = '13';
 
   function pwaSiteRoot() {
     if (location.protocol === 'file:') return '';
@@ -295,9 +295,33 @@
     }, { passive: true, once: true });
   });
 
+  function warmSavedBannerCache() {
+    try {
+      const name = localStorage.getItem('roster_banner_choice');
+      if (!name || !/^banner\d+\.jpg$/i.test(name)) return;
+      const url = pwaBaseUrl() + 'assets/banners/' + name;
+      if ('caches' in window) {
+        caches.open('roster-banners-v1').then(function (cache) {
+          cache.match(url).then(function (hit) {
+            if (hit) return;
+            fetch(url).then(function (res) {
+              if (res.ok) cache.put(url, res.clone());
+            });
+          });
+        });
+      }
+      navigator.serviceWorker.ready.then(function (reg) {
+        if (reg.active) reg.active.postMessage({ type: 'cache-banner', url: url });
+      }).catch(function () {});
+    } catch (_) {}
+  }
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register(pwaBaseUrl() + 'sw.js?v=' + PWA_VER)
+      .then(function () {
+        warmSavedBannerCache();
+      })
       .catch(function () {});
   }
 })();
