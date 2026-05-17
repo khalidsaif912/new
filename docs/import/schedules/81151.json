@@ -116,28 +116,28 @@
       },
       {
         "day": 23,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 24,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 25,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 26,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 27,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 28,
@@ -151,13 +151,13 @@
       },
       {
         "day": 30,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 31,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       }
     ],
     "2026-03": [
@@ -586,27 +586,27 @@
     {
       "day": 23,
       "weekday": "Sat",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 24,
       "weekday": "Sun",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 25,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "LV"
     },
     {
       "day": 26,
       "weekday": "Tue",
-      "code": "AN13"
+      "code": "LV"
     },
     {
       "day": 27,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "LV"
     },
     {
       "day": 28,
@@ -621,12 +621,12 @@
     {
       "day": 30,
       "weekday": "Sat",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 31,
       "weekday": "Sun",
-      "code": "ME06"
+      "code": "LV"
     }
   ]
 }

@@ -81,8 +81,8 @@
       },
       {
         "day": 16,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 17,
@@ -551,7 +551,7 @@
     {
       "day": 16,
       "weekday": "Sat",
-      "code": "MN06"
+      "code": "LV"
     },
     {
       "day": 17,

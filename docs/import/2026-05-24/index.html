@@ -675,30 +675,30 @@
       document.head.appendChild(touch);
     }
     touch.href = base + 'assets/icons/icon-192.png';
-    try {
+    try {{
       var bn = localStorage.getItem('roster_banner_choice');
-      if (bn && /^banner\d+\.jpg$/i.test(bn)) {
+      if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
         var bUrl = base + 'assets/banners/' + bn;
-        if (!document.getElementById('banner-early-style')) {
+        if (!document.getElementById('banner-early-style')) {{
           var bes = document.createElement('style');
           bes.id = 'banner-early-style';
           bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}' +
-            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{opacity:0!important}';
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}}' +
+            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
           document.head.appendChild(bes);
-        }
-        if (!document.querySelector('link[data-banner-preload="1"]')) {
+        }}
+        if (!document.querySelector('link[data-banner-preload="1"]')) {{
           var bp = document.createElement('link');
           bp.rel = 'preload';
           bp.as = 'image';
           bp.href = bUrl;
           bp.setAttribute('data-banner-preload', '1');
           document.head.appendChild(bp);
-        }
+        }}
         document.documentElement.classList.add('roster-banner-early');
-      }
-    } catch (bannerEarlyErr) {}
-  })();
+      }}
+    }} catch (bannerEarlyErr) {{}}
+  }})();
   </script>
 
 </head>
@@ -955,7 +955,7 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">7</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">6</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
@@ -967,16 +967,13 @@
      </div><div class="empRow" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL SHAMSI - 82286</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
-       <span class="empName">MOOSA AL BALUSHI - 82667</span>
-       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
-     </div><div class="empRow" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL MAWALI - 82614</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 24 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="SANAD AL HARTHI - 82642" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="SANAD AL HARTHI - 82642" role="button" tabindex="0">
        <span class="empName">SANAD AL HARTHI - 82642</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 24 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
-     </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
        <span class="empName">HILAL AL SHAMAKHI - 81991</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
@@ -987,7 +984,7 @@
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
@@ -996,10 +993,7 @@
      </div><div class="empRow empRowAlt" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
        <span class="empName">SULEIMAN AL MAHARBI - 80833</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
-       <span class="empName">AHMED AL HUSAINI - 82455</span>
-       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 24 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="KHALID AL BALUSHI - 8336" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="KHALID AL BALUSHI - 8336" role="button" tabindex="0">
        <span class="empName">KHALID AL BALUSHI - 8336</span>
        <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
@@ -1054,6 +1048,23 @@
      </div><div class="empRow" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
        <span class="empName">WAHEB AL BARAIDAI - 82470</span>
        <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
+       <span class="empName">AHMED AL HUSAINI - 82455</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 22 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 26)</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
+       <span class="empName">MOOSA AL BALUSHI - 82667</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
      </div>
       </div>
     </details>
@@ -1167,22 +1178,19 @@
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">5</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
        <span class="empName">KHALID AL ZADJALI - 82458</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
-       <span class="empName">JUMA AL HABSI - 81151</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
-     </div><div class="empRow" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
        <span class="empName">SAID AL HADI - 81152</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 24 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
        <span class="empName">HAMED AL FAKHRI - 8836</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 24 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 26)</span>
-     </div><div class="empRow" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL BALUCHI - 82330</span>
        <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 25)</span>
      </div>
@@ -1245,6 +1253,20 @@
      </div><div class="empRow" data-emp-name="AHMED AL AMRI - 81080" role="button" tabindex="0">
        <span class="empName">AHMED AL AMRI - 81080</span>
        <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 24)</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
+       <span class="empName">JUMA AL HABSI - 81151</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 23 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 27)</span>
      </div>
       </div>
     </details>
@@ -1442,7 +1464,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">17MAY2026 / 10:50</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">17MAY2026 / 16:35</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>

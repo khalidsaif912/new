@@ -131,33 +131,33 @@
       },
       {
         "day": 26,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 27,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 28,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 29,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 30,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 31,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       }
     ],
     "2026-03": [
@@ -601,32 +601,32 @@
     {
       "day": 26,
       "weekday": "Tue",
-      "code": "AN13"
+      "code": "LV"
     },
     {
       "day": 27,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "LV"
     },
     {
       "day": 28,
       "weekday": "Thu",
-      "code": "NN21"
+      "code": "LV"
     },
     {
       "day": 29,
       "weekday": "Fri",
-      "code": "O"
+      "code": "LV"
     },
     {
       "day": 30,
       "weekday": "Sat",
-      "code": "O"
+      "code": "LV"
     },
     {
       "day": 31,
       "weekday": "Sun",
-      "code": "MN06"
+      "code": "LV"
     }
   ]
 }
