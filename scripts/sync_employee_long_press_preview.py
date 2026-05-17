@@ -103,6 +103,52 @@ FLATTEN_NEW = """  function flattenFutureShifts(data, fromIso) {
     });"""
 
 
+DISMISS_ANCHOR = "  document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);"
+DISMISS_BLOCK = """
+  function isTooltipOpen() {
+    return tooltip.classList.contains('show');
+  }
+
+  function dismissUnlessTooltipTarget(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev && ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }
+
+  document.addEventListener('pointerdown', dismissUnlessTooltipTarget, true);
+  document.addEventListener('click', function(ev) {
+    if (suppressClickFor) return;
+    dismissUnlessTooltipTarget(ev);
+  }, true);
+
+  function dismissOnScroll() {
+    if (isTooltipOpen()) hideTooltipNow();
+  }
+  window.addEventListener('scroll', dismissOnScroll, true);
+  window.addEventListener('wheel', dismissOnScroll, { passive: true, capture: true });
+  window.addEventListener('touchmove', function(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }, { passive: true, capture: true });
+
+  document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);"""
+
+OLD_TOOLTIP_LEAVE = """  tooltip.addEventListener('mouseenter', cancelHideTooltip);
+  tooltip.addEventListener('mouseleave', function(ev) {
+    var to = ev.relatedTarget;
+    if (to && typeof to.closest === 'function' && to.closest('.deptCard .empRow')) {
+      cancelHideTooltip();
+      return;
+    }
+    hideTooltipSoon();
+  });
+
+  document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);"""
+
+
 def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     if "initEmployeeNextShiftPreview" not in text:
@@ -131,6 +177,12 @@ def patch_file(path: Path) -> bool:
             "// Employee row: tap → schedule; long-press → next 5 shifts preview",
             1,
         )
+
+    if "function isTooltipOpen" not in text:
+        if OLD_TOOLTIP_LEAVE in text:
+            text = text.replace(OLD_TOOLTIP_LEAVE, DISMISS_BLOCK, 1)
+        elif DISMISS_ANCHOR in text:
+            text = text.replace(DISMISS_ANCHOR, DISMISS_BLOCK, 1)
 
     if text == orig:
         return False

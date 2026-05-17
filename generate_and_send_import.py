@@ -55,7 +55,7 @@ LEGACY_ROSTER_SITE_IMPORT_REDIRECT = f"""
 """
 
 IMPORT_PWA_HEAD_SNIPPET = """
-  <meta name="theme-color" content="#1e40af">
+  <meta name="theme-color" content="#f4354b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
@@ -75,7 +75,7 @@ IMPORT_PWA_HEAD_SNIPPET = """
     var p = siteRoot();
     var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
     if (!p) base = location.origin + '/';
-    var pv = '11';
+    var pv = '12';
     var imp = (location.pathname || '').indexOf('/import/') !== -1;
     var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
     var mlinks = document.querySelectorAll('link[rel="manifest"]');
@@ -94,7 +94,7 @@ IMPORT_PWA_HEAD_SNIPPET = """
       touch.setAttribute('data-pwa-touch', '1');
       document.head.appendChild(touch);
     }
-    touch.href = base + 'assets/icons/flight.png';
+    touch.href = base + 'assets/icons/icon-192.png';
   })();
   </script>
 """

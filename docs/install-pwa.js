@@ -1,7 +1,7 @@
 (function () {
   let deferredPrompt = null;
 
-  const PWA_VER = '11';
+  const PWA_VER = '12';
 
   function pwaSiteRoot() {
     if (location.protocol === 'file:') return '';
@@ -39,7 +39,7 @@
       touch.setAttribute('data-pwa-touch', '1');
       document.head.appendChild(touch);
     }
-    touch.href = base + 'assets/icons/flight.png';
+    touch.href = base + 'assets/icons/icon-192.png';
   })();
 
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
