@@ -1528,7 +1528,7 @@
         </div>
         <div class="tip">
           <div class="tip-ico">🖼️</div>
-          <div class="tip-text" id="tip2">Image export produces a clean card with header, calendar, legend, and stats.</div>
+          <div class="tip-text" id="tip2">Image export produces a clean card with header, calendar, and stats.</div>
         </div>
         <div class="tip">
           <div class="tip-ico">📆</div>
@@ -1661,7 +1661,7 @@
       document.getElementById('miTitle').textContent=t('heroTitle');
       document.getElementById('miDesc').textContent=t('heroDesc');
       document.getElementById('tip1').textContent=(lang==='ar'?'احفظ رقمك مرة واحدة — وسيظهر تلقائياً في المرة القادمة.':'Save your Employee ID once — it will load automatically next time.');
-      document.getElementById('tip2').textContent=(lang==='ar'?'حفظ الصورة ينتج بطاقة مرتبة (رأس + تقويم + دليل + إحصائيات).':'Image export produces a clean card with header, calendar, legend, and stats.');
+      document.getElementById('tip2').textContent=(lang==='ar'?'حفظ الصورة ينتج بطاقة مرتبة (رأس + تقويم + إحصائيات).':'Image export produces a clean card with header, calendar, and stats.');
       document.getElementById('tip3').textContent=(lang==='ar'?'استخدم تصدير ICS لإضافة المناوبات إلى تقويم Apple/Google/Outlook.':'Use ICS export to add shifts to Apple/Google/Outlook calendars.');
       document.getElementById('tipsOk').textContent='OK';
       const fc=document.getElementById('footerCredit');
@@ -1872,15 +1872,6 @@
       }).join('')+'</div>';
     }
 
-    function buildLegendHTML(){
-      const order=['Morning','Afternoon','Night','Off Day','Annual Leave','Sick Leave','Training','Standby','Other'];
-      const leg=T[lang].legend||{};
-      return `<div class="legend-card"><div class="section-label">${t('legendTitle')}</div><div class="legend-grid">${order.map(k=>{
-        const dot=(COLORS[k]||COLORS.Other).dot;
-        return `<span class="leg-item"><span class="l-dot" style="background:${dot}"></span>${esc(leg[k]||k)}</span>`;
-      }).join('')}</div></div>`;
-    }
-
     function shiftClass(g){
       return {Morning:'s-morning',Afternoon:'s-afternoon',Night:'s-night','Off Day':'s-off','Annual Leave':'s-leave','Sick Leave':'s-leave',Training:'s-training',Standby:'s-standby',Other:'s-other'}[g]||'s-other';
     }
@@ -2052,7 +2043,6 @@
           <div class="cal-body">${cells}</div>
         </div>
 
-        ${buildLegendHTML()}
 </div>
 
         <!-- Actions -->
