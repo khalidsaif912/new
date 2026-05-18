@@ -1166,50 +1166,82 @@ function goToEmployeeSchedule(empName) {
     }
   });
 
+  
+  var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
+
+
+  function consumeUserDateNavigation() {
+    if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
+    sessionStorage.removeItem(USER_DATE_NAV_KEY);
+    return true;
+  }
+
+  function markUserDateNavigation() {
+    sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
+  }
+
+  function buildDateBasePath() {
+    var p = window.location.pathname || '/';
+    return p
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/now\/.*$/, '/')
+      .replace(/\/+$/, '');
+  }
+
+  function redirectToDate(iso, isNowPage) {
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+  }
+
   // ═══════════════════════════════════════════════════
   // التحقق من التاريخ وإعادة التوجيه للـ today
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {
+    var path = window.location.pathname || '/';
     var isNowPage = path.includes('/now');
-    var isReload = false;
-    try {
-      if (performance && performance.getEntriesByType) {
-        var navEntries = performance.getEntriesByType('navigation');
-        if (navEntries && navEntries.length) {
-          isReload = navEntries[0].type === 'reload';
-        }
-      }
-    } catch(e) {}
+    var todayIso = getMuscatTodayIso();
 
-    // Root pages should always jump to today's (or nearest available) date page.
-    var isRootLike = !path.includes('/date/');
-    if (isRootLike) {
-      var baseRoot = path
-        .replace(/\/now\/?$/, '/')
-        .replace(/\/+$/, '');
-      window.location.href = baseRoot + '/date/' + effectiveIso + '/' + (isNowPage ? 'now/' : '');
+    if (!path.includes('/date/')) {
+      var baseRoot = path.replace(/\/now\/?$/, '/').replace(/\/+$/, '');
+      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
 
-    // On explicit refresh of a date page, go back to today's page.
     var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
-    if (dateMatch && isReload) {
-      var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
-      var todayIso = getMuscatTodayIso();
-      if (pageIso !== todayIso) {
-        var basePath = path
-          .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-          .replace(/\/now\/.*$/, '/')
-          .replace(/\/+$/, '');
-        window.location.href = basePath + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '');
-        return true;
-      }
+    if (!dateMatch) return false;
+
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    if (pageIso === todayIso) {
+      sessionStorage.removeItem(USER_DATE_NAV_KEY);
+      sessionStorage.removeItem('pageLoaded');
+      return false;
     }
 
-    return false;
+    if (consumeUserDateNavigation()) return false;
+
+    redirectToDate(todayIso, isNowPage);
+    return true;
+  }
+
+  function resyncTodayIfNeeded() {
+    var path = window.location.pathname || '/';
+    if (!path.includes('/date/')) return;
+    var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (!dateMatch) return;
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    var todayIso = getMuscatTodayIso();
+    if (pageIso !== todayIso && sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') {
+      redirectToDate(todayIso, path.includes('/now'));
+    }
   }
 
   if (checkAndRedirectToToday()) return;
+
+  window.addEventListener('pageshow', function(ev) {
+    if (ev.persisted) resyncTodayIfNeeded();
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') resyncTodayIfNeeded();
+  });
 
   // ═══════════════════════════════════════════════════
   // عند تغيير التاريخ → انتقل للصفحة المناسبة
@@ -1217,6 +1249,8 @@ function goToEmployeeSchedule(empName) {
   picker.addEventListener('change', function() {
     if (!picker.value) return;
 
+
+    markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
 
     var path = window.location.pathname || '/';
