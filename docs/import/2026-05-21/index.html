@@ -1453,7 +1453,7 @@
     </div>
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">18MAY2026 / 17:14</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">18MAY2026 / 20:42</strong>
     <br>Total: <strong id="importTotalEmployees">74 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT OPS MAY 2026 REVISED.xlsx</strong>
   </div>
@@ -1892,9 +1892,7 @@ function goToEmployeeSchedule(empName) {
     }
   });
 
-  
   var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
-
 
   function consumeUserDateNavigation() {
     if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
@@ -1907,8 +1905,7 @@ function goToEmployeeSchedule(empName) {
   }
 
   function buildDateBasePath() {
-    var p = window.location.pathname || '/';
-    return p
+    return path
       .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
       .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
       .replace(/\/now\/.*$/, '/')
@@ -1923,12 +1920,10 @@ function goToEmployeeSchedule(empName) {
   // التحقق من التاريخ وإعادة التوجيه للـ today
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {
-    var path = window.location.pathname || '/';
     var isNowPage = path.includes('/now');
     var todayIso = getMuscatTodayIso();
-    var hasDateInPath = /\/(?:import\/date|import)\/\d{4}-\d{2}-\d{2}\//.test(path);
 
-    if (!hasDateInPath) {
+    if (!path.includes('/date/')) {
       var baseRoot = path.replace(/\/now\/?$/, '/').replace(/\/+$/, '');
       window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
@@ -1951,7 +1946,7 @@ function goToEmployeeSchedule(empName) {
   }
 
   function resyncTodayIfNeeded() {
-    var path = window.location.pathname || '/';
+    if (!path.includes('/date/')) return;
     var dateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
     if (!dateMatch) return;
     var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
@@ -1975,7 +1970,6 @@ function goToEmployeeSchedule(empName) {
   // ═══════════════════════════════════════════════════
   picker.addEventListener('change', function() {
     if (!picker.value) return;
-
 
     markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
@@ -2308,11 +2302,9 @@ function applyLang(lang) {
   if(footer) {
     var h=footer.innerHTML;
     if(isAr) {
-      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Total:','المجموع:');
-      h=h.replace(' employees',' موظف'); h=h.replace('Source:','المصدر:');
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
     } else {
-      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المجموع:','Total:');
-      h=h.replace(' موظف',' employees'); h=h.replace('المصدر:','Source:');
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
     }
     footer.innerHTML=h;
   }
@@ -2449,6 +2441,7 @@ function goToRosterDiff(event) {
   }
   var ver = '20260514b';
   addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js?v=' + ver);
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
