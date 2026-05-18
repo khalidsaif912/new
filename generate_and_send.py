@@ -112,6 +112,27 @@ ROSTER_PWA_HEAD_SNIPPET = """
 """
 
 
+def format_site_last_updated(dt: datetime) -> str:
+    """Readable Muscat publish time for site footer (not roster calendar day)."""
+    try:
+        day = dt.strftime("%-d")
+    except ValueError:
+        day = dt.strftime("%d").lstrip("0") or dt.strftime("%d")
+    return f"{day} {dt.strftime('%B %Y')} / {dt.strftime('%H:%M')}"
+
+
+def write_site_last_updated_json(dt: datetime) -> None:
+    display_en = format_site_last_updated(dt)
+    write_json(
+        "docs/site-last-updated.json",
+        {
+            "updated_at": dt.isoformat(),
+            "display_en": display_en,
+            "display_ar": display_en,
+        },
+    )
+
+
 # =========================
 # Detect rows/cols (Days row + Date numbers row)
 # =========================
@@ -1385,7 +1406,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">{last_updated}</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">{last_updated}</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
   </div>
 
@@ -2216,6 +2237,7 @@ function goToRosterDiff(event) {{
   }}
   var ver = '20260514b';
   addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js?v=' + ver);
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
@@ -2232,7 +2254,16 @@ function goToRosterDiff(event) {{
 </html>"""
 
 
-def generate_date_pages_for_month(wb, year: int, month: int, pages_base: str, source_name: str = "", min_date: str = "", max_date: str = ""):
+def generate_date_pages_for_month(
+    wb,
+    year: int,
+    month: int,
+    pages_base: str,
+    source_name: str = "",
+    min_date: str = "",
+    max_date: str = "",
+    site_last_updated: str = "",
+):
     """
     Generate static pages for each day of the given month.
     Used by the date picker to navigate to different dates.
@@ -2339,7 +2370,7 @@ def generate_date_pages_for_month(wb, year: int, month: int, pages_base: str, so
 
             iso_date = date_obj.strftime("%Y-%m-%d")
             sent_time = date_obj.strftime("%H:%M")
-            last_updated = date_obj.strftime("%d%b%Y / %H:%M").upper()
+            last_updated = site_last_updated
 
             full_url = f"{pages_base}/"
             now_url = f"{pages_base}/now/"
@@ -2565,7 +2596,7 @@ def build_pretty_email_html(active_shift_key: str, now: datetime, all_shifts_by_
     dept_html = "".join(dept_cards)
     sent_time = now.strftime("%H:%M")
     date_str = now.strftime("%d %B %Y")
-    last_updated = now.strftime("%d%b%Y / %H:%M").upper()
+    last_updated = format_site_last_updated(now)
 
     # Translate active_shift_key display
     shift_display_map = {
@@ -2782,6 +2813,9 @@ def main():
     if pages_base.endswith("/now"):
         pages_base = pages_base[:-4]
 
+    site_last_updated = format_site_last_updated(now)
+    write_site_last_updated_json(now)
+
     # ─────────────────────────────────────────────────────────────
     # FIX #1: تحميل Excel - عند الفشل نكمل بالكاش (لا نخرج)
     # ─────────────────────────────────────────────────────────────
@@ -2864,17 +2898,20 @@ def main():
     generate_date_pages_for_month(
         wb_prev, prev_y, prev_m, pages_base,
         source_name=cached_source_name(prev_key) or source_name,
-        min_date=min_date, max_date=max_date
+        min_date=min_date, max_date=max_date,
+        site_last_updated=site_last_updated,
     )
     generate_date_pages_for_month(
         wb_curr, now.year, now.month, pages_base,
         source_name=cached_source_name(curr_key) or source_name,
-        min_date=min_date, max_date=max_date
+        min_date=min_date, max_date=max_date,
+        site_last_updated=site_last_updated,
     )
     generate_date_pages_for_month(
         wb_next, next_y, next_m, pages_base,
         source_name=cached_source_name(next_key) or source_name,
-        min_date=min_date, max_date=max_date
+        min_date=min_date, max_date=max_date,
+        site_last_updated=site_last_updated,
     )
 
     # الصفحة الرئيسية تستخدم الشهر الحالي
@@ -2893,7 +2930,7 @@ def main():
             date_label = now.strftime("%d %B %Y")
 
         iso_date = now.strftime("%Y-%m-%d")
-        last_updated = now.strftime("%d%b%Y / %H:%M").upper()
+        last_updated = site_last_updated
 
         notice_html = (
             "<div class='deptCard' style='padding:14px;border:1px dashed rgba(15,23,42,.20);background:#fff;'>"
@@ -3038,7 +3075,7 @@ def main():
 
     iso_date = now.strftime("%Y-%m-%d")
     sent_time = now.strftime("%H:%M")
-    last_updated = now.strftime("%d%b%Y / %H:%M").upper()
+    last_updated = site_last_updated
 
     full_url = f"{pages_base}/"
     now_url = f"{pages_base}/now/"
@@ -3084,6 +3121,8 @@ def main():
         os.makedirs("docs/my-schedules", exist_ok=True)
         with open("docs/my-schedules/source.txt", "w", encoding="utf-8") as f:
             f.write(_src)
+
+    write_site_last_updated_json(datetime.now(TZ))
 
     # Email: send ONLY active shift + matching Standby
     if args.no_email:

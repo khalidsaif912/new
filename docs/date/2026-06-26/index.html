@@ -669,7 +669,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">26JUN2026 / 00:00</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">18 May 2026 / 22:35</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster May 2026 Version 4.xlsx</strong>
   </div>
 
@@ -1500,6 +1500,7 @@ function goToRosterDiff(event) {
   }
   var ver = '20260514b';
   addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js?v=' + ver);
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
