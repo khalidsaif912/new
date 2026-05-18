@@ -1563,9 +1563,7 @@ function goToEmployeeSchedule(empName) {
     }
   });
 
-  
   var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
-
 
   function consumeUserDateNavigation() {
     if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
@@ -1578,8 +1576,7 @@ function goToEmployeeSchedule(empName) {
   }
 
   function buildDateBasePath() {
-    var p = window.location.pathname || '/';
-    return p
+    return path
       .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
       .replace(/\/now\/.*$/, '/')
       .replace(/\/+$/, '');
@@ -1593,7 +1590,6 @@ function goToEmployeeSchedule(empName) {
   // التحقق من التاريخ وإعادة التوجيه للـ today
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {
-    var path = window.location.pathname || '/';
     var isNowPage = path.includes('/now');
     var todayIso = getMuscatTodayIso();
 
@@ -1620,7 +1616,6 @@ function goToEmployeeSchedule(empName) {
   }
 
   function resyncTodayIfNeeded() {
-    var path = window.location.pathname || '/';
     if (!path.includes('/date/')) return;
     var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
     if (!dateMatch) return;
@@ -1645,7 +1640,6 @@ function goToEmployeeSchedule(empName) {
   // ═══════════════════════════════════════════════════
   picker.addEventListener('change', function() {
     if (!picker.value) return;
-
 
     markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
