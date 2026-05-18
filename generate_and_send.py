@@ -1386,7 +1386,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <!-- ════ FOOTER ════ -->
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">{last_updated}</strong>
-    <br>Total: <strong>{employees_total} employees</strong>
      &nbsp;·&nbsp; Source: <strong>{source_name}</strong>
   </div>
 
@@ -2046,11 +2045,9 @@ function applyLang(lang) {{
   if(footer) {{
     var h=footer.innerHTML;
     if(isAr) {{
-      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Total:','المجموع:');
-      h=h.replace(' employees',' موظف'); h=h.replace('Source:','المصدر:');
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
     }} else {{
-      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المجموع:','Total:');
-      h=h.replace(' موظف',' employees'); h=h.replace('المصدر:','Source:');
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
     }}
     footer.innerHTML=h;
   }}
