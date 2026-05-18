@@ -1385,8 +1385,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">{last_updated}</strong>
-     &nbsp;·&nbsp; Source: <strong>{source_name}</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;">{last_updated}</strong><br>
+    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
   </div>
 
 </div>
