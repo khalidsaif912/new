@@ -59,6 +59,64 @@
     }
   }
 
+  function getPageDateIso() {
+    var path = location.pathname || '/';
+    var m = path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) return m[1];
+    m = path.match(/\/import\/date\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) return m[1];
+    m = path.match(/\/import\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) return m[1];
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
+    return '';
+  }
+
+  function formatDateFromIso(iso, isAr) {
+    var parts = String(iso).split('-');
+    if (parts.length !== 3) return iso;
+    var y = +parts[0];
+    var mo = +parts[1] - 1;
+    var d = +parts[2];
+    if (isAr) {
+      var arMonths = [
+        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+      ];
+      return d + ' ' + arMonths[mo] + ' ' + y;
+    }
+    var enMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return d + ' ' + enMonths[mo] + ' ' + y;
+  }
+
+  function getShareDateLabel() {
+    var tag = document.getElementById('dateTag');
+    if (tag) {
+      var fromTag = tag.textContent.replace(/^\s*📅\s*/, '').trim();
+      if (fromTag) return fromTag;
+    }
+    var iso = getPageDateIso();
+    if (!iso) return '';
+    return formatDateFromIso(iso, lang() === 'ar');
+  }
+
+  /** Message line sent with WhatsApp / system share (includes roster date). */
+  function getShareText() {
+    var dateLabel = getShareDateLabel();
+    if (dateLabel) {
+      return lang() === 'ar'
+        ? 'جدول المناوبات — ' + dateLabel
+        : 'Duty Roster — ' + dateLabel;
+    }
+    return t('shareText');
+  }
+
+  function getSharePayload() {
+    var url = getShareUrl();
+    var text = getShareText();
+    return { title: text, text: text + '\n' + url, url: url };
+  }
+
   function loadQrLib() {
     if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
       return Promise.resolve(window.QRCode);
@@ -173,17 +231,19 @@
   }
 
   function shareNative() {
-    var url = getShareUrl();
-    var payload = { title: t('shareText'), text: t('shareText'), url: url };
+    var payload = getSharePayload();
     if (navigator.share) {
       navigator.share(payload).catch(function () {});
     }
   }
 
   function shareWhatsApp() {
-    var url = getShareUrl();
-    var text = t('shareText') + '\n' + url;
-    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    var payload = getSharePayload();
+    window.open(
+      'https://api.whatsapp.com/send?text=' + encodeURIComponent(payload.text),
+      '_blank',
+      'noopener'
+    );
   }
 
   function copyLink() {
