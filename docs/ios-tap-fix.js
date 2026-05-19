@@ -11,7 +11,7 @@
   if (!isIOS) return;
 
   var TAP_SEL =
-    'a.summaryChip, a.btn, button.langToggle, button.summaryChip.shiftFilterBtn, #summarySwitchChip';
+    'a.summaryChip, a.btn, button.btn, button.langToggle, button.summaryChip.shiftFilterBtn, #summarySwitchChip';
 
   function tapTarget(el) {
     if (!el || !el.closest) return null;

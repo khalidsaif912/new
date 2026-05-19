@@ -1287,6 +1287,57 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       text-align:center;
       white-space:nowrap;
     }}
+    button.btn {{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }}
+    .btn.shareSiteBtn {{
+      background:linear-gradient(135deg, #0d9488, #14b8a6);
+      box-shadow:0 6px 20px rgba(13,148,136,.28);
+    }}
+
+    /* ═══════ SITE SHARE MODAL ═══════ */
+    .siteShareSheet {{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }}
+    .siteShareSheet.open {{ display:flex; pointer-events:auto; visibility:visible; }}
+    .siteShareCard {{
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
+    }}
+    .siteShareTitle {{ font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }}
+    .siteShareHint {{ font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }}
+    .siteShareQr {{
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
+    }}
+    .siteShareUrl {{
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
+    }}
+    .siteShareActions {{
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+    }}
+    .siteShareBtn {{
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer;
+      font:800 13px/1 'Segoe UI', system-ui, sans-serif;
+      touch-action:manipulation;
+    }}
+    .siteShareNativeBtn {{ background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }}
+    .siteShareWhatsAppBtn {{ background:#dcfce7; color:#166534; }}
+    .siteShareCopyBtn {{
+      grid-column:1 / -1; background:#e8eefc; color:#1e40af;
+    }}
+    .siteShareCloseBtn {{
+      width:100%; background:#f1f5f9; color:#475569; margin-top:4px;
+    }}
 
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
@@ -1412,6 +1463,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <a class="btn" id="ctaBtn" href="#">📋 Full Roster</a>
   <a href="#" class="btn" id="subscribeBtn">📩 Subscribe</a>
   <a href="#" class="btn" id="compareBtn" onclick="goToRosterDiff(event)">📊 Compare</a>
+  <button type="button" class="btn shareSiteBtn" id="shareSiteBtn">🔗 Share Site</button>
 </div>
 
   <!-- ════ FOOTER ════ -->
@@ -1420,6 +1472,21 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
   </div>
 
+</div>
+
+<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+    <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
+    <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
+    <div class="siteShareQr" id="siteShareQr" aria-hidden="true"></div>
+    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <div class="siteShareActions">
+      <button type="button" class="siteShareBtn siteShareNativeBtn" id="siteShareNativeBtn">Share</button>
+      <button type="button" class="siteShareBtn siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">WhatsApp</button>
+      <button type="button" class="siteShareBtn siteShareCopyBtn" id="siteShareCopyBtn">Copy link</button>
+    </div>
+    <button type="button" class="siteShareBtn siteShareCloseBtn" id="siteShareCloseBtn">Close</button>
+  </div>
 </div>
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
@@ -2002,7 +2069,7 @@ var T = {{
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare',
+    viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare', shareSite:'🔗 Share Site',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
@@ -2014,7 +2081,7 @@ var T = {{
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة',
+    viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة', shareSite:'🔗 مشاركة الموقع',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
@@ -2093,6 +2160,8 @@ function applyLang(lang) {{
   var c1=document.getElementById('ctaBtn'); if(c1) c1.textContent=t.viewFull;
   var c2=document.getElementById('subscribeBtn'); if(c2) c2.textContent=t.subscribe;
   var c3=document.getElementById('compareBtn'); if(c3) c3.textContent=t.compare;
+  var c4=document.getElementById('shareSiteBtn'); if(c4) c4.textContent=t.shareSite;
+  if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {{
     var h=footer.innerHTML;
@@ -2266,7 +2335,8 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
-  var ver = '20260519a';
+  var ver = '20260520a';
+  addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);

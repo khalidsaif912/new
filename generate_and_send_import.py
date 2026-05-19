@@ -922,6 +922,7 @@ def build_duty_html(
     <div class="quickActions">
       <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
       <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
+      <button type="button" class="btn shareSiteBtn" id="shareSiteBtn">🔗 Share Site</button>
     </div>
     {footer}
   </div>
@@ -1182,7 +1183,8 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
-  var ver = '20260519a';
+  var ver = '20260520a';
+  addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);

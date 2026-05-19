@@ -1118,6 +1118,7 @@
   <a class="btn" id="ctaBtn" href="#">📋 Full Roster</a>
   <a href="#" class="btn" id="subscribeBtn">📩 Subscribe</a>
   <a href="#" class="btn" id="compareBtn" onclick="goToRosterDiff(event)">📊 Compare</a>
+  <button type="button" class="btn shareSiteBtn" id="shareSiteBtn">🔗 Share Site</button>
 </div>
 
   <!-- ════ FOOTER ════ -->
@@ -1669,7 +1670,7 @@ function goToRosterDiff(event) {
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
-  var ver = '20260427b';
+  var ver = '20260520a';
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js?v=' + ver);
   var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
