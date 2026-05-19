@@ -1183,7 +1183,7 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
-  var ver = '20260520a';
+  var ver = '20260520c';
   addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
