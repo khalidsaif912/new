@@ -1478,7 +1478,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
     <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
     <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
-    <div class="siteShareQr" id="siteShareQr" aria-hidden="true"></div>
+    <div class="siteShareQr" id="siteShareQr"></div>
     <p class="siteShareUrl" id="siteShareUrl"></p>
     <div class="siteShareActions">
       <button type="button" class="siteShareBtn siteShareNativeBtn" id="siteShareNativeBtn">Share</button>
@@ -2335,7 +2335,7 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }}
-  var ver = '20260520a';
+  var ver = '20260520b';
   addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);

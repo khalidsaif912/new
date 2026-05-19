@@ -4,8 +4,15 @@
 (function () {
   'use strict';
 
-  var QR_CDN = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js';
+  var QR_CDN = 'https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.js';
   var qrLibPromise = null;
+
+  function qrImageUrl(url) {
+    return (
+      'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' +
+      encodeURIComponent(url)
+    );
+  }
 
   var I18N = {
     en: {
@@ -53,14 +60,20 @@
   }
 
   function loadQrLib() {
-    if (window.QRCode) return Promise.resolve(window.QRCode);
+    if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+      return Promise.resolve(window.QRCode);
+    }
     if (qrLibPromise) return qrLibPromise;
     qrLibPromise = new Promise(function (resolve, reject) {
       var s = document.createElement('script');
       s.src = QR_CDN;
       s.async = true;
       s.onload = function () {
-        resolve(window.QRCode);
+        if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+          resolve(window.QRCode);
+        } else {
+          reject(new Error('QRCode global missing'));
+        }
       };
       s.onerror = function () {
         reject(new Error('QR library failed'));
@@ -68,6 +81,20 @@
       document.head.appendChild(s);
     });
     return qrLibPromise;
+  }
+
+  function renderQrImage(wrap, url) {
+    wrap.innerHTML = '';
+    var img = document.createElement('img');
+    img.alt = 'QR code';
+    img.width = 220;
+    img.height = 220;
+    img.decoding = 'async';
+    img.style.display = 'block';
+    img.style.margin = '0 auto';
+    img.src = qrImageUrl(url);
+    wrap.appendChild(img);
+    wrap.removeAttribute('aria-hidden');
   }
 
   function applyI18n() {
@@ -93,20 +120,28 @@
   function renderQr(url) {
     var wrap = document.getElementById('siteShareQr');
     if (!wrap) return Promise.resolve();
-    wrap.innerHTML = '';
+    wrap.innerHTML =
+      '<p style="font-size:12px;color:#64748b;padding:12px;margin:0;">Loading QR…</p>';
+
     return loadQrLib()
       .then(function (QRCode) {
+        wrap.innerHTML = '';
         var canvas = document.createElement('canvas');
+        canvas.width = 220;
+        canvas.height = 220;
+        canvas.setAttribute('role', 'img');
+        canvas.setAttribute('aria-label', 'QR code');
         wrap.appendChild(canvas);
         return QRCode.toCanvas(canvas, url, {
           width: 220,
           margin: 2,
           color: { dark: '#0f172a', light: '#ffffff' },
+        }).then(function () {
+          wrap.removeAttribute('aria-hidden');
         });
       })
       .catch(function () {
-        wrap.innerHTML =
-          '<p style="font-size:12px;color:#64748b;padding:12px;">QR unavailable</p>';
+        renderQrImage(wrap, url);
       });
   }
 
@@ -240,7 +275,7 @@
         '<div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">' +
           '<h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>' +
           '<p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>' +
-          '<div class="siteShareQr" id="siteShareQr" aria-hidden="true"></div>' +
+          '<div class="siteShareQr" id="siteShareQr"></div>' +
           '<p class="siteShareUrl" id="siteShareUrl"></p>' +
           '<div class="siteShareActions">' +
             '<button type="button" class="siteShareBtn siteShareNativeBtn" id="siteShareNativeBtn">Share</button>' +
