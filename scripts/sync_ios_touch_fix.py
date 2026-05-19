@@ -35,9 +35,9 @@ NEW_DATE_INPUT_CSS = """/* Transparent date input over #dateTag — native picke
       color:transparent;
       background:transparent;
       touch-action:manipulation;
-    }
+    }"""
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn {
+CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }"""
@@ -171,6 +171,16 @@ def patch_html(text: str) -> tuple[str, list[str]]:
     if DATE_PICKER_CSS.search(text):
         text = DATE_PICKER_CSS.sub(NEW_DATE_INPUT_CSS, text, count=1)
         notes.append("date-css")
+
+    # Repair broken layout from earlier sync runs (stray } before SUMMARY BAR)
+    try:
+        from fix_summary_bar_css import patch_html as repair_summary_css
+
+        text, repaired = repair_summary_css(text)
+        if repaired:
+            notes.append("summary-css-repair")
+    except ImportError:
+        pass
     elif "opacity: 0.01" in text and ".datePickerWrapper #datePicker" in text:
         text = text.replace("opacity: 0.01", "opacity:0", 1)
         text = re.sub(
@@ -183,16 +193,12 @@ def patch_html(text: str) -> tuple[str, list[str]]:
         notes.append("date-css-fallback")
 
     if (
-        "a.summaryChip, button.summaryChip" not in text
+        CHIP_TOUCH_ONCE not in text
         and "/* ═══════ SUMMARY BAR ═══════ */" in text
     ):
         text = text.replace(
             "    /* ═══════ SUMMARY BAR ═══════ */",
-            "    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn {\n"
-            "      touch-action:manipulation;\n"
-            "      -webkit-tap-highlight-color:transparent;\n"
-            "    }\n\n"
-            "    /* ═══════ SUMMARY BAR ═══════ */",
+            CHIP_TOUCH_ONCE + "\n\n    /* ═══════ SUMMARY BAR ═══════ */",
             1,
         )
         notes.append("chip-touch")
