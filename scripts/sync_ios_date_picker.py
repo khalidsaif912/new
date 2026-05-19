@@ -17,30 +17,24 @@ DATE_PICKER_CSS = re.compile(
     re.DOTALL,
 )
 
-NEW_CSS = """/* Transparent date input over #dateTag — iOS, Android, desktop */
-.datePickerWrapper #datePicker {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  opacity: 0.01;
-  cursor: pointer;
-  font-size: 16px;
-  border: none;
-  z-index: 2;
-  color: transparent;
-  background: transparent;
-}
-@supports (-webkit-touch-callout: none) {
-  .datePickerWrapper #datePicker {
-    -webkit-appearance: none;
-    appearance: none;
-  }
-}
-    .header .dateTag {
-      pointer-events: none;
+NEW_CSS = """/* Transparent date input over #dateTag — native picker on iOS */
+    .datePickerWrapper #datePicker {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      min-height:44px;
+      margin:0;
+      padding:0;
+      opacity:0;
+      cursor:pointer;
+      font-size:16px;
+      line-height:44px;
+      border:none;
+      z-index:2;
+      color:transparent;
+      background:transparent;
+      touch-action:manipulation;
     }"""
 
 DATE_TAG_LABEL = re.compile(
@@ -58,8 +52,18 @@ IOS_ONLY_COMMENT = re.compile(
 )
 
 CROSS_PLATFORM_JS = """
+  var DATE_PICKER_BUSY_KEY = 'rosterDatePickerBusy';
+
+  function setDatePickerBusy(on) {
+    try {
+      if (on) sessionStorage.setItem(DATE_PICKER_BUSY_KEY, '1');
+      else sessionStorage.removeItem(DATE_PICKER_BUSY_KEY);
+    } catch (e) {}
+  }
+
   window.openDatePicker = function() {
     if (!picker) return;
+    setDatePickerBusy(true);
     try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
     if (typeof picker.showPicker === 'function') {
       try { picker.showPicker(); return; } catch (e) {}
@@ -67,17 +71,25 @@ CROSS_PLATFORM_JS = """
     try { picker.click(); } catch (e2) {}
   };
 
+  function onDateWrapActivate(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    openDatePicker();
+  }
+
   var dateWrap = document.querySelector('.datePickerWrapper');
   if (dateWrap) {
+    dateWrap.addEventListener('touchend', onDateWrapActivate, { passive: false });
     dateWrap.addEventListener('click', function(e) {
       if (e.target === picker) return;
-      openDatePicker();
+      onDateWrapActivate(e);
     });
   }
-  picker.addEventListener('click', function() {
-    if (typeof picker.showPicker === 'function') {
-      try { picker.showPicker(); } catch (e) {}
-    }
+  picker.addEventListener('focus', function() { setDatePickerBusy(true); });
+  picker.addEventListener('blur', function() {
+    setTimeout(function() { setDatePickerBusy(false); }, 400);
   });
 """
 
