@@ -111,10 +111,19 @@
     return t('shareText');
   }
 
-  function getSharePayload() {
-    var url = getShareUrl();
+  /** Full share body (title + link once). */
+  function getShareMessage() {
+    return getShareText() + '\n' + getShareUrl();
+  }
+
+  function getNativeSharePayload() {
     var text = getShareText();
-    return { title: text, text: text + '\n' + url, url: url };
+    var url = getShareUrl();
+    var withText = { title: text, text: text + '\n' + url };
+    if (navigator.canShare && !navigator.canShare(withText)) {
+      return { title: text, url: url };
+    }
+    return withText;
   }
 
   function loadQrLib() {
@@ -231,16 +240,13 @@
   }
 
   function shareNative() {
-    var payload = getSharePayload();
-    if (navigator.share) {
-      navigator.share(payload).catch(function () {});
-    }
+    if (!navigator.share) return;
+    navigator.share(getNativeSharePayload()).catch(function () {});
   }
 
   function shareWhatsApp() {
-    var payload = getSharePayload();
     window.open(
-      'https://api.whatsapp.com/send?text=' + encodeURIComponent(payload.text),
+      'https://api.whatsapp.com/send?text=' + encodeURIComponent(getShareMessage()),
       '_blank',
       'noopener'
     );
