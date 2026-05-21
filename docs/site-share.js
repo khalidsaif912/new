@@ -70,54 +70,43 @@
     }
   }
 
-  function getShareUrl() {
-    try {
-      var u = new URL(location.href);
-      u.hash = '';
-      return u.toString();
-    } catch (e) {
-      return location.href.split('#')[0];
-    }
-  }
-
-  function getPageDateIso() {
+  /** Same base path logic as roster pages (GitHub Pages /docs/, local /roster-site/, etc.). */
+  function getSiteRootPath() {
+    if (location.protocol === 'file:') return '';
     var path = location.pathname || '/';
-    var m = path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
-    if (m) return m[1];
-    m = path.match(/\/import\/date\/(\d{4}-\d{2}-\d{2})\//);
-    if (m) return m[1];
-    m = path.match(/\/import\/(\d{4}-\d{2}-\d{2})\//);
-    if (m) return m[1];
-    var picker = document.getElementById('datePicker');
-    if (picker && picker.value) return picker.value;
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.endsWith('github.io')) {
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
     return '';
   }
 
-  function formatDateFromIso(iso, isAr) {
-    var parts = String(iso).split('-');
-    if (parts.length !== 3) return iso;
-    var y = +parts[0];
-    var mo = +parts[1] - 1;
-    var d = +parts[2];
-    var dt = new Date(y, mo, d);
-    if (isNaN(dt.getTime())) return iso;
-    return dt.toLocaleDateString(isAr ? 'ar-OM' : 'en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
+  /** Share Site = section home URL, never the current /date/YYYY-MM-DD/ deep link. */
+  function getCanonicalSharePath() {
+    var path = location.pathname || '/';
+    if (/\/import(\/|$)/.test(path)) return '/import/';
+    if (/\/training(\/|$)/.test(path)) return '/training/';
+    if (/\/roster-diff(\/|$)/.test(path)) return '/roster-diff/';
+    if (/\/a-cup-of-book(\/|$)/.test(path)) return '/a-cup-of-book/';
+    return '/';
+  }
+
+  function getShareUrl() {
+    var root = getSiteRootPath();
+    var sub = getCanonicalSharePath();
+    try {
+      var u = new URL(root + sub, location.origin);
+      u.hash = '';
+      return u.toString();
+    } catch (e) {
+      return (location.origin || '') + root + sub;
+    }
   }
 
   function getShareMessage() {
-    var url = getShareUrl();
-    var iso = getPageDateIso();
-    var isAr = lang() === 'ar';
-    var base = t('shareText');
-    if (iso) {
-      var label = formatDateFromIso(iso, isAr);
-      return base + ' — ' + label + '\n' + url;
-    }
-    return base + '\n' + url;
+    return t('shareText') + '\n' + getShareUrl();
   }
 
   function getNativeSharePayload() {
