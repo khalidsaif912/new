@@ -5,6 +5,14 @@
   var HOME_CARD_ID = 'chg-card';
   var PAGE_BANNER_ID = 'chg-page-banner';
   var STYLE_ID = 'chg-styles';
+
+  function chgBellSvg(size) {
+    return (
+      '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" fill="none" aria-hidden="true">' +
+      '<path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>'
+    );
+  }
   function toggleWelcomeVsScheduleChip() {
     try {
       var path = window.location.pathname || '';
@@ -59,7 +67,7 @@
       || 'en';
   }
 
-  function t(key, lang) {
+  function t(key, lang, arg) {
     var dict = {
       ar: {
         changed: 'تم تعديل جدولك',
@@ -72,7 +80,23 @@
         noDetails: 'يوجد تحديث في جدولك.',
         updated: 'تحديث',
         changedToday: 'تم تعديل هذا اليوم',
-        changedDates: 'الأيام المتغيرة'
+        changedDates: 'الأيام المتغيرة',
+        recordedAbsence: 'غياب مسجّل',
+        tabShift: 'تغيّر المناوبة',
+        tabAbsence: 'أيام الغياب',
+        updateFor: 'تنبيه تحديث للموظف: ',
+        minimizeOpt: 'تصغير (إخفاء النافذة فقط)',
+        alertsPage: 'صفحة التنبيهات',
+        apply: 'تطبيق',
+        changedDaysCount: function (n) {
+          return 'لديك ' + n + ' يوم/أيام بتغييرات في الروستر.';
+        },
+        orgUpdate: function (n) {
+          return 'تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التنبيهات.';
+        },
+        absenceSummary: 'لديك أيام غياب مسجلة.',
+        guestAbsenceSummary:
+          'توجد غيابات مسجّلة في النظام. عيّن رقمك من «جدولي» لعرض تفاصيلك إن وُجدت.'
       },
       en: {
         changed: 'Your schedule changed',
@@ -85,10 +109,37 @@
         noDetails: 'Your roster has been updated.',
         updated: 'Update',
         changedToday: 'This day was changed',
-        changedDates: 'Changed dates'
+        changedDates: 'Changed dates',
+        recordedAbsence: 'Recorded absence',
+        tabShift: 'Shift changes',
+        tabAbsence: 'Absences',
+        updateFor: 'Update alert for: ',
+        minimizeOpt: 'Minimize (hide card only)',
+        alertsPage: 'Alerts page',
+        apply: 'Apply',
+        changedDaysCount: function (n) {
+          return 'You have ' + n + ' changed day(s) in the roster.';
+        },
+        orgUpdate: function (n) {
+          return 'A roster update was published (' + n + ' change(s)). Check your schedule or the alerts page.';
+        },
+        absenceSummary: 'You have recorded absence days.',
+        guestAbsenceSummary:
+          'Recorded absences exist in the system. Set your employee ID in My Schedule to see yours if any.'
       }
     };
-    return (dict[lang] && dict[lang][key]) || key;
+    var bucket = dict[lang] || dict.en;
+    var val = bucket[key];
+    if (typeof val === 'function') return val(arg);
+    return val || key;
+  }
+
+  function alertSummaryText(alert, lang) {
+    var s = alert && alert.summary;
+    if (!s) return t('noDetails', lang);
+    if (typeof s === 'string') return s;
+    var text = lang === 'ar' ? (s.ar || s.en || '') : (s.en || s.ar || '');
+    return String(text).trim() || t('noDetails', lang);
   }
 
   function escapeHtml(value) {
@@ -224,16 +275,15 @@
       };
     });
 
-    var summaryText = lang === 'ar'
-      ? ('لديك ' + days.length + ' يوم/أيام بتغييرات في الروستر.')
-      : ('You have ' + days.length + ' changed day(s) in the roster.');
-
     return {
       is_active: true,
       force_show: true,
       change_hash: 'diff_' + String((diffData && diffData.generated_at) || '') + '_' + empId,
       total_changed_days: days.length,
-      summary: { ar: summaryText, en: summaryText },
+      summary: {
+        ar: t('changedDaysCount', 'ar', days.length),
+        en: t('changedDaysCount', 'en', days.length)
+      },
       days: days
     };
   }
@@ -244,15 +294,15 @@
     if (!rows.length) return null;
     var n = Number(diffData.total_changes);
     if (!n || n !== n) n = rows.length;
-    var summaryText = lang === 'ar'
-      ? ('تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التنبيهات.')
-      : ('A roster update was published (' + n + ' change(s)). Check your schedule or the alerts page.');
     return {
       is_active: true,
       force_show: true,
       change_hash: 'orgdiff_' + String((diffData && diffData.generated_at) || '') + '_' + n,
       total_changed_days: 0,
-      summary: { ar: summaryText, en: summaryText },
+      summary: {
+        ar: t('orgUpdate', 'ar', n),
+        en: t('orgUpdate', 'en', n)
+      },
       days: []
     };
   }
@@ -362,12 +412,15 @@
       }
 
       #${HOME_ICON_ID} .chg-dot-icon {
+        line-height: 0;
+        display: block;
+        filter: drop-shadow(0 2px 6px rgba(220,38,38,.35));
+        animation: chgIconPulse 1.8s ease-in-out infinite;
+      }
+      #${HOME_ICON_ID} .chg-dot-icon svg {
+        display: block;
         width: 34px;
         height: 34px;
-        object-fit: contain;
-        display: block;
-        filter: drop-shadow(0 2px 6px rgba(0,0,0,.22));
-        animation: chgIconPulse 1.8s ease-in-out infinite;
       }
       @keyframes chgIconPulse {
         0%,100% { transform: scale(1) translateY(0); }
@@ -710,7 +763,7 @@
     var list = (dates || []).slice(0, 6);
     if (!list.length) return '';
     return '<ul class="chg-days">' + list.map(function (d) {
-      return '<li class="chg-day"><div class="chg-day-date">' + escapeHtml(d) + '</div><div class="chg-day-shifts">' + (lang === 'ar' ? 'غياب مسجّل' : 'Recorded absence') + '</div></li>';
+      return '<li class="chg-day"><div class="chg-day-date">' + escapeHtml(d) + '</div><div class="chg-day-shifts">' + escapeHtml(t('recordedAbsence', lang)) + '</div></li>';
     }).join('') + '</ul>';
   }
 
@@ -721,14 +774,20 @@
     if (card) card.hidden = true;
   }
 
+  function clearAlertState() {
+    lastAlertPayload = null;
+    lastRenderedEmpId = '';
+    lastRenderedHash = '';
+    clearHomeUI();
+  }
+
   function ensureHomeUI(empId, alert, lang, absences, empName) {
     var icon = document.getElementById(HOME_ICON_ID);
     if (!icon) {
       icon = document.createElement('button');
       icon.id = HOME_ICON_ID;
       icon.type = 'button';
-      icon.innerHTML =
-        '<img class="chg-dot-icon" src="' + getBase() + 'assets/icons/alert-message.png" alt="Alert">';
+      icon.innerHTML = '<span class="chg-dot-icon" aria-hidden="true">' + chgBellSvg(34) + '</span>';
       document.body.appendChild(icon);
     }
 
@@ -739,7 +798,7 @@
       document.body.appendChild(card);
     }
 
-    var summaryText = (alert.summary && (lang === 'ar' ? alert.summary.ar : alert.summary.en)) || t('noDetails', lang);
+    var summaryText = alertSummaryText(alert, lang);
     var hasShiftTab = !!(alert && alert.days && alert.days.length);
     var hasAbsenceTab = !!(absences && absences.length);
     var defaultTab = hasShiftTab ? 'shift' : 'absence';
@@ -747,28 +806,29 @@
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
       ? ('<div class="chg-tabs">' +
-         '<button class="chg-tab active" data-act="tab:shift">' + (lang === 'ar' ? 'تغيّر المناوبة' : 'Shift Changes') + '</button>' +
-         '<button class="chg-tab" data-act="tab:absence">' + (lang === 'ar' ? 'أيام الغياب' : 'Absences') + '</button>' +
+         '<button class="chg-tab active" data-act="tab:shift">' + escapeHtml(t('tabShift', lang)) + '</button>' +
+         '<button class="chg-tab" data-act="tab:absence">' + escapeHtml(t('tabAbsence', lang)) + '</button>' +
          '</div>')
       : '';
     var bodyHtml = (defaultTab === 'shift' ? shiftContent : absenceContent);
+    var fallbackText = t('updateFor', lang) + (empName || empId);
 
     card.innerHTML =
       '<div class="chg-card-head">' +
-        '<button class="chg-card-close" type="button" aria-label="Close" data-act="close">×</button>' +
-        '<div class="chg-card-title">⚠️ ' + t('changed', lang) + '</div>' +
-        '<p class="chg-card-text">' + escapeHtml(summaryText || ((lang === 'ar' ? 'تنبيه تحديث للموظف: ' : 'Update alert for: ') + (empName || empId))) + '</p>' +
+        '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
+        '<div class="chg-card-title">' + escapeHtml(t('changed', lang)) + '</div>' +
+        '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +
       '</div>' +
       tabsHtml +
       '<div class="chg-card-body">' +
         '<div id="chg-tab-body">' + bodyHtml + '</div>' +
       '</div>' +
       '<div class="chg-options">' +
-        '<label class="chg-opt"><input type="checkbox" id="chgOptMin"> ' + (lang === 'ar' ? 'تصغير (إخفاء النافذة فقط)' : 'Minimize (hide card only)') + '</label>' +
+        '<label class="chg-opt"><input type="checkbox" id="chgOptMin"> ' + escapeHtml(t('minimizeOpt', lang)) + '</label>' +
       '</div>' +
       '<div class="chg-card-actions">' +
-        '<button class="chg-btn chg-btn-muted" data-act="openDiff">' + (lang === 'ar' ? 'صفحة التنبيهات' : 'Alerts Page') + '</button>' +
-        '<button class="chg-btn chg-btn-primary" data-act="apply">' + (lang === 'ar' ? 'تطبيق' : 'Apply') + '</button>' +
+        '<button class="chg-btn chg-btn-muted" data-act="openDiff">' + escapeHtml(t('alertsPage', lang)) + '</button>' +
+        '<button class="chg-btn chg-btn-primary" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
       '</div>';
 
     icon.hidden = false;
@@ -782,6 +842,8 @@
       clearMinimized(empId, alert);
       card.hidden = false;
     };
+
+    setLastAlertPayload(empId, alert, absences, empName);
 
     card.onclick = function (e) {
       var act = e.target && e.target.getAttribute('data-act');
@@ -831,13 +893,13 @@
     var old = document.getElementById(PAGE_BANNER_ID);
     if (old) old.remove();
 
-    var summaryText = (alert.summary && (lang === 'ar' ? alert.summary.ar : alert.summary.en)) || t('noDetails', lang);
+    var summaryText = alertSummaryText(alert, lang);
     var box = document.createElement('div');
     box.id = PAGE_BANNER_ID;
 
     box.innerHTML =
       '<div class="chg-page-top">' +
-        '<div class="chg-page-title">⚠️ ' + t('changed', lang) + '</div>' +
+        '<div class="chg-page-title">' + escapeHtml(t('changed', lang)) + '</div>' +
         '<button class="chg-page-close" type="button" data-act="close" aria-label="' + t('close', lang) + '">✕</button>' +
       '</div>' +
       '<p class="chg-page-text">' + escapeHtml(summaryText) + '</p>' +
@@ -852,6 +914,7 @@
       );
 
     holder.insertBefore(box, holder.firstChild);
+    setLastAlertPayload(getEmployeeId() || GUEST_EMP_ID, alert, [], '');
     box.onclick = function (e) {
       if (e.target && e.target.getAttribute('data-act') === 'close') {
         markPageDismissed(getEmployeeId(), alert);
@@ -899,7 +962,56 @@
 
 var lastRenderedEmpId = '';
 var lastRenderedHash = '';
+var lastAlertPayload = null;
 var GUEST_EMP_ID = 'guest';
+
+function setLastAlertPayload(empId, alert, absences, empName) {
+  lastAlertPayload = {
+    empId: empId,
+    alert: alert,
+    absences: absences || [],
+    empName: empName || ''
+  };
+}
+
+function onAppLangChange() {
+  var lang = getLang();
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  if (document.body) document.body.classList.toggle('ar', lang === 'ar');
+  if (!lastAlertPayload) return;
+  var p = lastAlertPayload;
+  var card = document.getElementById(HOME_CARD_ID);
+  var wasCardHidden = card ? card.hidden : true;
+  if (onHomePage()) {
+    ensureHomeUI(p.empId, p.alert, lang, p.absences, p.empName);
+    card = document.getElementById(HOME_CARD_ID);
+    if (card) card.hidden = wasCardHidden;
+  }
+  if (onMySchedulePage() && document.getElementById(PAGE_BANNER_ID)) {
+    ensurePageBanner(p.alert, lang);
+  }
+}
+
+function hookRosterLangChange() {
+  if (window.__chgLangHooked) return;
+  window.__chgLangHooked = true;
+  var orig = window.applyLang;
+  if (typeof orig === 'function') {
+    window.applyLang = function (lang) {
+      orig(lang);
+      onAppLangChange();
+    };
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest && e.target.closest('#langToggle')) {
+      setTimeout(onAppLangChange, 0);
+    }
+  });
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'rosterLang' || e.key === 'appLang') onAppLangChange();
+  });
+}
 
 function mergeGuestSummary(a, b) {
   var sa = (a && a.summary) || {};
@@ -939,8 +1051,8 @@ function renderGlobalGuestAlerts() {
         change_hash: 'guestabs_' + String((absData && absData.generated_at) || absCount),
         total_changed_days: 0,
         summary: {
-          ar: 'توجد غيابات مسجّلة في النظام. عيّن رقمك من «جدولي» لعرض تفاصيلك إن وُجدت.',
-          en: 'Recorded absences exist in the system. Set your employee ID in My Schedule to see yours if any.'
+          ar: t('guestAbsenceSummary', 'ar'),
+          en: t('guestAbsenceSummary', 'en')
         },
         days: []
       };
@@ -961,7 +1073,7 @@ function renderGlobalGuestAlerts() {
     }
 
     if (!alert || !alert.is_active) {
-      clearHomeUI();
+      clearAlertState();
       return;
     }
     lastRenderedEmpId = GUEST_EMP_ID;
@@ -1023,14 +1135,14 @@ function renderForEmployee(empId) {
 
       if ((!alert || !alert.is_active) && !absences.length) {
         if (currentEmpId === empId) {
-          clearHomeUI();
+          clearAlertState();
         }
         return;
       }
 
       if (!alert || !alert.is_active) {
         if (!absences.length) {
-          if (currentEmpId === empId) clearHomeUI();
+          if (currentEmpId === empId) clearAlertState();
           return;
         }
         alert = {
@@ -1039,8 +1151,8 @@ function renderForEmployee(empId) {
           change_hash: 'absence_' + absences.join('|'),
           total_changed_days: absences.length,
           summary: {
-            ar: 'لديك أيام غياب مسجلة.',
-            en: 'You have recorded absence days.'
+            ar: t('absenceSummary', 'ar'),
+            en: t('absenceSummary', 'en')
           },
           days: []
         };
@@ -1070,6 +1182,7 @@ function renderForEmployee(empId) {
 }
 
 function boot() {
+  hookRosterLangChange();
   injectStyles();
   var empId = getEmployeeId();
   if (empId) {

@@ -86,16 +86,33 @@
       '}',
       '.' + ACTIVE_CLASS + ' .langToggle,',
       '.' + ACTIVE_CLASS + ' #langToggle{',
-      'position:absolute!important;top:14px!important;right:16px!important;left:auto!important;',
-      'width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;',
-      'padding:0!important;font-size:9px!important;line-height:1!important;z-index:10!important;',
-      'color:#fff!important;text-shadow:' + TEXT_HALO + ';',
-      'background:rgba(0,0,0,.5)!important;border:2px solid rgba(255,255,255,.4)!important;',
-      'border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;',
-      'backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);',
+      'position:absolute!important;top:12px!important;right:12px!important;left:auto!important;',
+      'width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;',
+      'padding:4px!important;font-size:0!important;line-height:1!important;z-index:30!important;',
+      'color:#fff!important;background:transparent!important;border:none!important;',
+      'border-radius:0!important;box-shadow:none!important;',
+      'backdrop-filter:none!important;-webkit-backdrop-filter:none!important;',
+      'display:inline-flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;',
+      'gap:2px!important;',
       '}',
+      '.' + ACTIVE_CLASS + ' .langToggle-icon{display:flex!important;line-height:0!important;}',
+      '.' + ACTIVE_CLASS + ' .langToggle-icon svg{width:18px!important;height:18px!important;stroke:#fff!important;',
+      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.65))!important;}',
+      '.' + ACTIVE_CLASS + ' .langToggle-label{display:block!important;font-size:10px!important;font-weight:800!important;',
+      'color:#fff!important;text-shadow:' + TEXT_HALO + ';letter-spacing:.02em;}',
       'body.ar .' + ACTIVE_CLASS + ' .langToggle,',
-      'body.ar .' + ACTIVE_CLASS + ' #langToggle{right:16px!important;left:auto!important;}',
+      'body.ar .' + ACTIVE_CLASS + ' #langToggle{right:12px!important;left:auto!important;}',
+      '#banner-changer-btn{',
+      'position:absolute!important;top:12px!important;left:12px!important;right:auto!important;z-index:30!important;',
+      'min-width:0!important;min-height:0!important;padding:4px!important;',
+      'background:transparent!important;border:none!important;border-radius:0!important;',
+      'box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;',
+      'display:inline-flex!important;align-items:center!important;justify-content:center!important;',
+      'cursor:pointer;color:#fff!important;',
+      '}',
+      '#banner-changer-btn .banner-changer-icon svg{display:block;width:20px!important;height:20px!important;stroke:#fff!important;',
+      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.65))!important;}',
+      'body.ar #banner-changer-btn{left:12px!important;right:auto!important;}',
       '.' + ACTIVE_CLASS + ' .dateTag{',
       'color:#fff!important;text-shadow:' + TEXT_HALO + ';',
       'background:rgba(255,255,255,.2)!important;',
@@ -110,7 +127,6 @@
       '.topbar.' + ACTIVE_CLASS + ' .bannerTitleMain{',
       'text-shadow:' + TEXT_HALO + ';',
       '}',
-      '#banner-changer-btn{text-shadow:0 1px 2px rgba(0,0,0,.35);opacity:.92!important;}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -179,28 +195,38 @@
 
     const btn = document.createElement('button');
     btn.id = 'banner-changer-btn';
-    btn.textContent = '🖼️';
+    btn.type = 'button';
     btn.title = 'تغيير خلفية الهيدر';
+    btn.setAttribute('aria-label', 'Change header background');
+    btn.innerHTML =
+      '<span class="banner-changer-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="3" y="5" width="18" height="14" rx="2"/>' +
+      '<circle cx="8.5" cy="10" r="1.5" fill="currentColor" stroke="none"/>' +
+      '<path d="M21 16l-4.5-4.5a2 2 0 0 0-3 0L3 17"/>' +
+      '</svg></span>';
     btn.style.cssText = [
       'position:absolute',
-      'top:8px',
-      'left:8px',
-      'z-index:999',
+      'top:12px',
+      'left:12px',
+      'z-index:30',
       'background:transparent',
       'border:none',
+      'border-radius:0',
       'color:#fff',
-      'padding:8px',
-      'font-size:16px',
+      'padding:4px',
       'cursor:pointer',
-      'line-height:1',
-      'opacity:0.85',
+      'line-height:0',
       '-webkit-tap-highlight-color:transparent',
       'touch-action:manipulation',
-      'min-width:36px',
-      'min-height:36px',
-      'display:flex',
+      'min-width:auto',
+      'min-height:auto',
+      'display:inline-flex',
       'align-items:center',
-      'justify-content:center'
+      'justify-content:center',
+      'box-shadow:none',
+      'transition:transform .2s ease, opacity .2s ease'
     ].join(';');
 
     if (getComputedStyle(targetEl).position === 'static') {

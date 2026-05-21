@@ -96,9 +96,8 @@ body{
     radial-gradient(circle at 6% 92%,rgba(255,255,255,.1) 0%,transparent 40%);
 }
 .header::after{
-  content:'✈';position:absolute;left:6%;bottom:10%;
-  font-size:clamp(48px,13vw,104px);line-height:1;opacity:.11;
-  transform:rotate(-16deg);pointer-events:none;filter:grayscale(.2);
+  content:'';position:absolute;left:6%;bottom:10%;
+  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);opacity:.09;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;transform:rotate(-16deg);
 }
 .hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
 .hCircle1{width:240px;height:240px;right:-78px;top:-92px}
@@ -454,6 +453,25 @@ body{
   .topDock{gap:14px}
 }
 
+
+.titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.titleWithIcon .titleIcon{line-height:0;display:inline-flex}
+.titleWithIcon .titleIcon svg{display:block}
+.quickBtn{display:inline-flex;align-items:center;gap:6px}
+.quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
+.quickBtn-icon svg{display:block}
+.rosterIconWrap,.otherIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon,.courseIcon{
+  line-height:0;display:inline-flex;align-items:center;justify-content:center;
+  transition:transform .28s ease
+}
+.rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
+#otherPageBtn:hover .otherIconWrap{transform:translateY(-5px) scale(1.06)}
+.courseIcon{font-size:0;color:var(--accent,#2563eb)}
+.courseIcon svg{display:block}
+.peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
+.badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
+
+
 </style>
 </head>
 <body>
@@ -464,14 +482,14 @@ body{
     <div class="hCircle hCircle2"></div>
     <div class="hCircle hCircle3"></div>
     <div class="headerText">
-      <h1 id="pageTitle">📚 Training Courses</h1>
+      <h1 id="pageTitle" class="titleWithIcon"><span class="titleIcon"><svg class="titleIconSvg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="pageTitleText">Training Courses</span></h1>
       <p id="pageSubtitle">Archive view</p>
-      <div class="dateTag">📅 Archive</div>
+      <div class="dateTag">Archive</div>
     </div>
     <div class="headerRow"><a class="archiveBtn" href="../index.html">Latest month</a></div>
   </div>
   <div class="mainPanel">
-  <div class="archiveGrid"><a class="archiveCard" href="2026-05.html"><div class="archiveMonth">May 2026</div><div class="archiveMeta">7 sessions • 👥 59 • 1 venues</div><span class="archiveLatest">Latest</span></a><a class="archiveCard" href="2026-04.html"><div class="archiveMonth">April 2026</div><div class="archiveMeta">1 sessions • 👥 8 • 1 venues</div></a></div>
+  <div class="archiveGrid"><a class="archiveCard" href="2026-05.html"><div class="archiveMonth">May 2026</div><div class="archiveMeta">7 sessions • 59 staff • 1 venues</div><span class="archiveLatest">Latest</span></a><a class="archiveCard" href="2026-04.html"><div class="archiveMonth">April 2026</div><div class="archiveMeta">1 sessions • 8 staff • 1 venues</div></a></div>
   </div>
   <div class="footer">TRANSOM Cargo · Training Archive</div>
 </div>

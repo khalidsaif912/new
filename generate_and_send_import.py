@@ -34,6 +34,15 @@ import requests
 import pandas as pd
 from html import escape as html_escape
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from roster_cta_snippets import (  # noqa: E402
+    CHIP_EXPORT_HTML,
+    CHIP_ICON_CSS,
+    CHIP_SCHEDULE_HTML,
+    CHIP_WAVE_HTML,
+)
 
 CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
 
@@ -726,15 +735,15 @@ def build_duty_html(
       <div class="chipLabel" data-key="departments">Departments</div>
     </div>
     <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
-      <div class="chipVal">🗓️</div>
+      {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
     <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToExport(event)">
-      <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Export" src="" /></div>
+      {CHIP_EXPORT_HTML}
       <div class="chipLabel" data-key="exportRoster">Export</div>
     </a>
     <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
-      <div class="chipVal"><span class="waveHand">👋</span></div>
+      {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
   </div>
@@ -835,12 +844,9 @@ def build_duty_html(
       margin-top: auto;
       padding-top: 14px;
     }}
-    .importBottom .quickActions {{
+    .importBottom .quickActions.roster-cta {{
       margin-bottom: 6px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      margin-top: 14px;
     }}
     .footer {{
       margin-top: 0;
@@ -861,16 +867,10 @@ def build_duty_html(
       justify-content: center;
       line-height: 1;
     }}
+{CHIP_ICON_CSS}
     .summaryBar .summaryChip .chipLabel {{
       margin-top: 4px;
       line-height: 1.1;
-    }}
-    .summaryChip .chipIcon {{
-      width: 26px;
-      height: 26px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
     }}
     .welcomeChip {{
       display: none;
@@ -919,11 +919,20 @@ def build_duty_html(
   {''.join(cards)}
 
   <div class="importBottom">
-    <div class="quickActions">
-      <a class="btn" id="ctaBtn" href="{{BASE}}/now/">📋 Full Roster</a>
-      <a class="btn" id="compareBtn" href="#" onclick="goToRosterDiff(event)">📊 Compare</a>
-      <button type="button" class="btn shareSiteBtn" id="shareSiteBtn">🔗 Share Site</button>
-    </div>
+    <nav class="quickActions roster-cta roster-cta--import" aria-label="Page actions">
+      <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
+        <span class="roster-cta-icon" aria-hidden="true">📋</span>
+        <span class="roster-cta-label">Full Roster</span>
+      </a>
+      <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
+        <span class="roster-cta-icon" aria-hidden="true">🔄</span>
+        <span class="roster-cta-label">Compare</span>
+      </a>
+      <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
+        <span class="roster-cta-icon" aria-hidden="true">📤</span>
+        <span class="roster-cta-label">Share Site</span>
+      </button>
+    </nav>
     {footer}
   </div>
 

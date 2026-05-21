@@ -137,9 +137,13 @@
       align-items:center;
       justify-content:flex-start;
     }
-    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-    .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
-    .summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+.roster-icon, .chipIcon {
+      display: block;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+.summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+.summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
     .summaryChip .chipLabel {
       font-size:9.5px;
       font-weight:600;
@@ -370,7 +374,9 @@
       background: rgba(255,255,255,.06);
     }
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
+      .langToggle      { min-width:44px; min-height:44px; padding:6px 8px; }
+      .langToggle-icon svg { width:16px; height:16px; }
+      .langToggle-label { font-size:11px; }
       .wrap { padding:12px 10px 22px; }
       .header .bannerTitleMain { font-size:22px; }
       body.ar .header .bannerTitleMain { font-size:21px; }
@@ -392,15 +398,15 @@
 
     <div class="summaryBar">
       <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Export" src="" /></div>
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
         <div class="chipLabel">Export</div>
       </a>
       <a href="#" id="trainingBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal">📚</div>
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
         <div class="chipLabel">Training</div>
       </a>
       <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal">🗓️</div>
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
         <div class="chipLabel">My Schedule</div>
       </a>
       <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">

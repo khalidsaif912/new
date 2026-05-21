@@ -7,6 +7,15 @@
   var QR_CDN = 'https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.js';
   var qrLibPromise = null;
 
+  var ICONS = {
+    share:
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg>',
+    whatsapp:
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg>',
+    link:
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg>',
+  };
+
   function qrImageUrl(url) {
     return (
       'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' +
@@ -16,7 +25,7 @@
 
   var I18N = {
     en: {
-      btn: '🔗 Share Site',
+      btn: 'Share Site',
       title: 'Share this site',
       hint: 'Scan the QR code or share the link',
       share: 'Share',
@@ -27,7 +36,7 @@
       shareText: 'Duty Roster — daily schedule',
     },
     ar: {
-      btn: '🔗 مشاركة الموقع',
+      btn: 'مشاركة الموقع',
       title: 'شارك الموقع',
       hint: 'امسح رمز QR أو شارك الرابط',
       share: 'مشاركة',
@@ -47,6 +56,18 @@
   function t(key) {
     var pack = I18N[lang()] || I18N.en;
     return pack[key] || I18N.en[key] || key;
+  }
+
+  function setModalBtnLabel(id, iconKey, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var lbl = el.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = text;
+    else el.textContent = text;
+    if (iconKey && ICONS[iconKey]) {
+      var iconWrap = el.querySelector('.roster-cta-icon');
+      if (iconWrap) iconWrap.innerHTML = ICONS[iconKey];
+    }
   }
 
   function getShareUrl() {
@@ -78,85 +99,52 @@
     var y = +parts[0];
     var mo = +parts[1] - 1;
     var d = +parts[2];
-    if (isAr) {
-      var arMonths = [
-        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
-      ];
-      return d + ' ' + arMonths[mo] + ' ' + y;
-    }
-    var enMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return d + ' ' + enMonths[mo] + ' ' + y;
+    var dt = new Date(y, mo, d);
+    if (isNaN(dt.getTime())) return iso;
+    return dt.toLocaleDateString(isAr ? 'ar-OM' : 'en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
   }
 
-  function getShareDateLabel() {
-    var tag = document.getElementById('dateTag');
-    if (tag) {
-      var fromTag = tag.textContent.replace(/^\s*📅\s*/, '').trim();
-      if (fromTag) return fromTag;
-    }
-    var iso = getPageDateIso();
-    if (!iso) return '';
-    return formatDateFromIso(iso, lang() === 'ar');
-  }
-
-  /** Message line sent with WhatsApp / system share (includes roster date). */
-  function getShareText() {
-    var dateLabel = getShareDateLabel();
-    if (dateLabel) {
-      return lang() === 'ar'
-        ? 'جدول المناوبات — ' + dateLabel
-        : 'Duty Roster — ' + dateLabel;
-    }
-    return t('shareText');
-  }
-
-  /** Full share body (title + link once). */
   function getShareMessage() {
-    return getShareText() + '\n' + getShareUrl();
+    var url = getShareUrl();
+    var iso = getPageDateIso();
+    var isAr = lang() === 'ar';
+    var base = t('shareText');
+    if (iso) {
+      var label = formatDateFromIso(iso, isAr);
+      return base + ' — ' + label + '\n' + url;
+    }
+    return base + '\n' + url;
   }
 
   function getNativeSharePayload() {
-    var text = getShareText();
-    var url = getShareUrl();
-    var withText = { title: text, text: text + '\n' + url };
-    if (navigator.canShare && !navigator.canShare(withText)) {
-      return { title: text, url: url };
-    }
-    return withText;
+    return { title: t('title'), text: getShareMessage(), url: getShareUrl() };
   }
 
   function loadQrLib() {
-    if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
-      return Promise.resolve(window.QRCode);
-    }
+    if (window.QRCode) return Promise.resolve(window.QRCode);
     if (qrLibPromise) return qrLibPromise;
     qrLibPromise = new Promise(function (resolve, reject) {
       var s = document.createElement('script');
       s.src = QR_CDN;
       s.async = true;
       s.onload = function () {
-        if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
-          resolve(window.QRCode);
-        } else {
-          reject(new Error('QRCode global missing'));
-        }
+        resolve(window.QRCode);
       };
-      s.onerror = function () {
-        reject(new Error('QR library failed'));
-      };
+      s.onerror = reject;
       document.head.appendChild(s);
     });
     return qrLibPromise;
   }
 
   function renderQrImage(wrap, url) {
-    wrap.innerHTML = '';
     var img = document.createElement('img');
     img.alt = 'QR code';
     img.width = 220;
     img.height = 220;
-    img.decoding = 'async';
     img.style.display = 'block';
     img.style.margin = '0 auto';
     img.src = qrImageUrl(url);
@@ -166,21 +154,24 @@
 
   function applyI18n() {
     var btn = document.getElementById('shareSiteBtn');
-    if (btn) btn.textContent = t('btn');
+    if (btn) {
+      var lbl = btn.querySelector('.roster-cta-label');
+      if (lbl) lbl.textContent = t('btn');
+      else btn.textContent = t('btn');
+    }
     var sheet = document.getElementById('siteShareSheet');
     if (!sheet) return;
     var title = document.getElementById('siteShareTitle');
     var hint = document.getElementById('siteShareHint');
-    var nativeBtn = document.getElementById('siteShareNativeBtn');
-    var waBtn = document.getElementById('siteShareWhatsAppBtn');
-    var copyBtn = document.getElementById('siteShareCopyBtn');
-    var closeBtn = document.getElementById('siteShareCloseBtn');
     if (title) title.textContent = t('title');
     if (hint) hint.textContent = t('hint');
-    if (nativeBtn) nativeBtn.textContent = t('share');
-    if (waBtn) waBtn.textContent = t('whatsapp');
-    if (copyBtn && copyBtn.dataset.copied !== '1') copyBtn.textContent = t('copy');
-    if (closeBtn) closeBtn.textContent = t('close');
+    setModalBtnLabel('siteShareNativeBtn', 'share', t('share'));
+    setModalBtnLabel('siteShareWhatsAppBtn', 'whatsapp', t('whatsapp'));
+    var copyBtn = document.getElementById('siteShareCopyBtn');
+    if (copyBtn && copyBtn.dataset.copied !== '1') {
+      setModalBtnLabel('siteShareCopyBtn', 'link', t('copy'));
+    }
+    setModalBtnLabel('siteShareCloseBtn', null, t('close'));
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
   }
 
@@ -258,10 +249,12 @@
     function done() {
       if (!copyBtn) return;
       copyBtn.dataset.copied = '1';
-      copyBtn.textContent = t('copied');
+      var lbl = copyBtn.querySelector('.roster-cta-label');
+      if (lbl) lbl.textContent = t('copied');
+      else copyBtn.textContent = t('copied');
       setTimeout(function () {
         copyBtn.dataset.copied = '0';
-        copyBtn.textContent = t('copy');
+        setModalBtnLabel('siteShareCopyBtn', 'link', t('copy'));
       }, 2000);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -279,22 +272,17 @@
         document.execCommand('copy');
         done();
       } catch (e) {}
-      ta.remove();
+      document.body.removeChild(ta);
     }
   }
 
   function bindUi() {
-    var btn = document.getElementById('shareSiteBtn');
-    if (btn && !btn.dataset.bound) {
-      btn.dataset.bound = '1';
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        openModal();
-      });
-    }
     var sheet = document.getElementById('siteShareSheet');
-    if (!sheet || sheet.dataset.bound) return;
-    sheet.dataset.bound = '1';
+    if (!sheet) return;
+    document.getElementById('shareSiteBtn')?.addEventListener('click', function (e) {
+      e.preventDefault();
+      openModal();
+    });
     document.getElementById('siteShareNativeBtn')?.addEventListener('click', shareNative);
     document.getElementById('siteShareWhatsAppBtn')?.addEventListener('click', shareWhatsApp);
     document.getElementById('siteShareCopyBtn')?.addEventListener('click', copyLink);
@@ -311,24 +299,15 @@
 
   function injectStyles() {
     if (document.getElementById(STYLE_ID)) return;
+    if (document.querySelector('style') && document.querySelector('.siteShareSheet')) {
+      var test = getComputedStyle(document.querySelector('.siteShareSheet'));
+      if (test && test.display === 'none') return;
+    }
     var style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-      'button.btn{border:none;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}',
-      '.btn.shareSiteBtn{background:linear-gradient(135deg,#0d9488,#14b8a6)!important;box-shadow:0 6px 20px rgba(13,148,136,.28)!important}',
       '.siteShareSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);z-index:10001;padding:16px;pointer-events:none;visibility:hidden}',
       '.siteShareSheet.open{display:flex;pointer-events:auto;visibility:visible}',
-      '.siteShareCard{width:min(100%,360px);background:#fff;border-radius:18px;padding:18px 16px 14px;border:1px solid rgba(15,23,42,.1);box-shadow:0 20px 48px rgba(15,23,42,.22);text-align:center}',
-      '.siteShareTitle{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px}',
-      '.siteShareHint{font-size:12px;color:#64748b;margin:0 0 14px;line-height:1.4}',
-      '.siteShareQr{display:flex;align-items:center;justify-content:center;min-height:220px;margin:0 auto 12px;background:#f8fafc;border-radius:14px;border:1px solid #e2e8f0;padding:10px}',
-      '.siteShareUrl{font-size:11px;color:#475569;word-break:break-all;line-height:1.45;margin:0 0 14px;padding:8px 10px;background:#f1f5f9;border-radius:10px}',
-      '.siteShareActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}',
-      '.siteShareBtn{border:none;border-radius:12px;padding:11px 10px;cursor:pointer;font:800 13px/1 "Segoe UI",system-ui,sans-serif;touch-action:manipulation}',
-      '.siteShareNativeBtn{background:linear-gradient(135deg,#1e40af,#1976d2);color:#fff}',
-      '.siteShareWhatsAppBtn{background:#dcfce7;color:#166534}',
-      '.siteShareCopyBtn{grid-column:1/-1;background:#e8eefc;color:#1e40af}',
-      '.siteShareCloseBtn{width:100%;background:#f1f5f9;color:#475569;margin-top:4px}',
     ].join('');
     document.head.appendChild(style);
   }
@@ -344,27 +323,26 @@
           '<div class="siteShareQr" id="siteShareQr"></div>' +
           '<p class="siteShareUrl" id="siteShareUrl"></p>' +
           '<div class="siteShareActions">' +
-            '<button type="button" class="siteShareBtn siteShareNativeBtn" id="siteShareNativeBtn">Share</button>' +
-            '<button type="button" class="siteShareBtn siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">WhatsApp</button>' +
-            '<button type="button" class="siteShareBtn siteShareCopyBtn" id="siteShareCopyBtn">Copy link</button>' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">' +
+              '<span class="roster-cta-icon">' + ICONS.share + '</span><span class="roster-cta-label">Share</span></button>' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">' +
+              '<span class="roster-cta-icon">' + ICONS.whatsapp + '</span><span class="roster-cta-label">WhatsApp</span></button>' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">' +
+              '<span class="roster-cta-icon">' + ICONS.link + '</span><span class="roster-cta-label">Copy link</span></button>' +
           '</div>' +
-          '<button type="button" class="siteShareBtn siteShareCloseBtn" id="siteShareCloseBtn">Close</button>' +
+          '<div class="siteShareCloseWrap">' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">' +
+              '<span class="roster-cta-label">Close</span></button>' +
+          '</div>' +
         '</div>' +
       '</div>';
-    var sheet = wrap.firstElementChild;
-    document.body.appendChild(sheet);
+    document.body.appendChild(wrap.firstElementChild);
   }
 
   function injectButton() {
     if (document.getElementById('shareSiteBtn')) return;
-    var actions = document.querySelector('.quickActions');
+    var actions = document.querySelector('.quickActions.roster-cta');
     if (!actions) return;
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn shareSiteBtn';
-    btn.id = 'shareSiteBtn';
-    btn.textContent = t('btn');
-    actions.appendChild(btn);
   }
 
   function init() {

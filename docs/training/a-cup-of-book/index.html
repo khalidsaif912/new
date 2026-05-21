@@ -41,7 +41,23 @@
     .viewerFrame img{max-width:100%;max-height:70vh;width:auto;height:auto;border-radius:8px;display:block}
     .viewerNote{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
     .emptyMsg{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}
-  </style>
+  
+.titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.titleWithIcon .titleIcon{line-height:0;display:inline-flex}
+.titleWithIcon .titleIcon svg{display:block}
+.quickBtn{display:inline-flex;align-items:center;gap:6px}
+.quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
+.quickBtn-icon svg{display:block}
+.rosterIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon,.courseIcon{
+  line-height:0;display:inline-flex;align-items:center;justify-content:center
+}
+.rosterIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
+.courseIcon{font-size:0;color:var(--accent,#2563eb)}
+.courseIcon svg{display:block}
+.peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
+.badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
+
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -53,7 +69,7 @@
     <div class="topDock">
       <div class="dockCard sourceCard"><div class="sourceText">Book Cars</div></div>
       <a class="dockCard backCard" href="../training/" aria-label="Back to training">
-        <div class="backInner"><div class="backIcon">📚</div><div class="backLabel">Training</div></div>
+        <div class="backInner"><div class="backIcon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="backLabel">Training</div></div>
       </a>
     </div>
   </div>

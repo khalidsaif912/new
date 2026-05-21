@@ -1,9 +1,32 @@
 import os
 import re
 import json
+import sys
 import calendar
 import argparse
+from pathlib import Path
 from html import escape as html_escape
+
+_SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+from roster_cta_snippets import (  # noqa: E402
+    CHIP_AFTERNOON_HTML,
+    CHIP_ALL_HTML,
+    CHIP_DIFF_HTML,
+    CHIP_FLIGHT_HTML,
+    CHIP_ICON_CSS,
+    CHIP_MORNING_HTML,
+    CHIP_NIGHT_HTML,
+    CHIP_SCHEDULE_HTML,
+    CHIP_TRAINING_HTML,
+    CHIP_WAVE_HTML,
+    LANG_TOGGLE_CSS,
+    LANG_TOGGLE_HTML,
+    APPLY_LANG_LANG_BTN_NEW,
+    SITE_SHARE_MODAL_HTML,
+    export_cta_html,
+)
 from datetime import datetime
 from io import BytesIO
 
@@ -873,16 +896,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     }}
 
     /* زر اللغة */
-    .langToggle {{
-      position:absolute; top:14px; right:16px; z-index:25;
-      background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
-      border-radius:50%; width:26px; height:26px;
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:10px; font-weight:800; cursor:pointer;
-      transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
-      touch-action:manipulation;
-    }}
-    .langToggle:hover {{ background:rgba(255,255,255,.30); transform:scale(1.08); }}
+{LANG_TOGGLE_CSS}
     body.ar {{ direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }}
     .empRow, .empName, .empStatus {{ direction:ltr !important; unicode-bidi:embed; text-align:left !important; }}
 
@@ -900,7 +914,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       text-overflow:ellipsis;
     }}
     .waveHand {{
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:0;
       transform-origin:70% 70%;
       animation:waveHand 1.8s ease-in-out infinite;
     }}
@@ -964,7 +981,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       touch-action:manipulation;
     }}
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn {{
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {{
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }}
@@ -1003,8 +1020,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       justify-content:flex-start;
     }}
     .summaryChip .chipVal {{ font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }}
-    .summaryChip .chipIcon {{ width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }}
-    .summaryChip .chipIcon.diffIcon {{ width:35px; height:35px; }}
+{CHIP_ICON_CSS}
     #summarySwitchChip .chipVal {{ transition:opacity .2s ease; }}
     #summarySwitchChip .chipLabel {{ transition:opacity .2s ease; }}
     .summaryChip .chipLabel {{ 
@@ -1265,38 +1281,130 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       margin-top: 4px;
     }}
 
-    /* ═══════ QUICK ACTIONS ═══════ */
-    .quickActions {{
-      margin-top:20px;
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
+    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
+    .quickActions.roster-cta {{
+      --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --cta-gap: 10px;
+      margin-top: 22px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--cta-gap);
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
     }}
-    .btn {{
-      display:inline-block;
-      padding:11px 18px;
-      border-radius:16px;
-      background:linear-gradient(135deg, #1e40af, #1976d2);
-      color:#fff !important;
-      text-decoration:none;
-      font-weight:800;
-      font-size:14px;
-      box-shadow:0 6px 20px rgba(30,64,175,.3);
-      min-width:170px;
-      text-align:center;
-      white-space:nowrap;
+    .roster-cta-btn {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      font-family: var(--cta-font);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
     }}
-    button.btn {{
-      border:none;
-      cursor:pointer;
-      font-family:inherit;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
+    button.roster-cta-btn {{
+      appearance: none;
+      -webkit-appearance: none;
+      font: inherit;
     }}
-    .btn.shareSiteBtn {{
-      background:linear-gradient(135deg, #0d9488, #14b8a6);
-      box-shadow:0 6px 20px rgba(13,148,136,.28);
+    .roster-cta-icon {{
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 0;
+    }}
+    .roster-cta-icon svg {{ display: block; width: 18px; height: 18px; }}
+    .roster-cta-label {{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .roster-cta-btn--roster {{
+      background: #e8f1ff;
+      border-color: #b8c9f5;
+      color: #1e3a8a;
+    }}
+    .roster-cta-btn--subscribe {{
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }}
+    .roster-cta-btn--compare {{
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }}
+    .roster-cta-btn--compare .roster-cta-icon {{
+      width: 22px;
+      height: 22px;
+      background: #2563eb;
+      border-radius: 6px;
+    }}
+    .roster-cta-btn--compare .roster-cta-icon svg {{ width: 14px; height: 14px; }}
+    .roster-cta-btn--muted {{
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }}
+    .roster-cta-btn--share {{
+      grid-column: 1 / -1;
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }}
+    .roster-cta--import {{
+      grid-template-columns: 1fr 1fr;
+    }}
+    .roster-cta--import .roster-cta-btn--share {{
+      grid-column: 1 / -1;
+    }}
+    @media (hover: hover) {{
+      .roster-cta-btn:hover {{
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      }}
+      .roster-cta-btn--roster:hover {{ background: #dce8ff; }}
+      .roster-cta-btn--subscribe:hover {{ background: #faf5ff; }}
+      .roster-cta-btn--compare:hover {{ background: #fef3c7; }}
+      .roster-cta-btn--share:hover {{ background: #d1fae5; }}
+      .roster-cta-btn--muted:hover {{ background: #e2e8f0; }}
+    }}
+    .roster-cta-btn:active {{
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }}
+    .roster-cta-btn:focus-visible {{
+      outline: 2px solid rgba(37, 99, 235, 0.45);
+      outline-offset: 2px;
+    }}
+    @media (max-width: 380px) {{
+      .roster-cta-btn {{
+        padding: 9px 8px;
+        font-size: 11px;
+        gap: 5px;
+        min-height: 40px;
+      }}
+      .roster-cta-icon {{ font-size: 16px; }}
+      .roster-cta-btn--compare .roster-cta-icon {{
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+      }}
     }}
 
     /* ═══════ SITE SHARE MODAL ═══════ */
@@ -1323,21 +1431,11 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
     }}
     .siteShareActions {{
-      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
     }}
-    .siteShareBtn {{
-      border:none; border-radius:12px; padding:11px 10px; cursor:pointer;
-      font:800 13px/1 'Segoe UI', system-ui, sans-serif;
-      touch-action:manipulation;
-    }}
-    .siteShareNativeBtn {{ background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }}
-    .siteShareWhatsAppBtn {{ background:#dcfce7; color:#166534; }}
-    .siteShareCopyBtn {{
-      grid-column:1 / -1; background:#e8eefc; color:#1e40af;
-    }}
-    .siteShareCloseBtn {{
-      width:100%; background:#f1f5f9; color:#475569; margin-top:4px;
-    }}
+    .siteShareActions .roster-cta-btn--compare {{ grid-column:1 / -1; }}
+    .siteShareCloseWrap {{ margin-top:4px; }}
+    .siteShareCloseWrap .roster-cta-btn {{ width:100%; }}
 
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
@@ -1377,7 +1475,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){{
       .wrap            {{ padding:12px 10px 22px; }}
-      .langToggle      {{ width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }}
       .header .bannerTitleMain {{ font-size:22px; }}
       body.ar .header .bannerTitleMain {{ font-size:21px; }}
       .deptTitle       {{ font-size:16px; }}
@@ -1396,7 +1493,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
   <!-- ════ HEADER ════ -->
   <div class="header">
-    <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
+    {LANG_TOGGLE_HTML}
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
@@ -1416,40 +1513,40 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
     <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
-      <div class="chipVal">🗓️</div>
+      {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
     <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;" onclick="goToImport(event)">
-      <div class="chipVal"><img class="chipIcon flightSwitchIcon" alt="Import" src="" /></div>
+      {CHIP_FLIGHT_HTML}
       <div class="chipLabel" data-key="importRoster">Import</div>
     </a>
     <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
-      <div class="chipVal"><span class="waveHand">👋</span></div>
+      {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
-      <div class="chipVal">📚</div>
+      {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
     <a href="#" id="diffChipBtn" class="summaryChip diffChip" style="cursor:pointer;text-decoration:none;" onclick="goToRosterDiff(event)">
-      <div class="chipVal"><img class="chipIcon diffIcon" id="diffChipIcon" alt="Diff" src="" /></div>
+      {CHIP_DIFF_HTML}
       <div class="chipLabel" data-key="diffPage">Diff</div>
     </a>
-    {"" if not is_now_page else '''
+    {"" if not is_now_page else f'''
     <button class="summaryChip shiftFilterBtn morning" data-shift="Morning" style="cursor:pointer;">
-      <div class="chipVal">☀️</div>
+      {CHIP_MORNING_HTML}
       <div class="chipLabel" data-key="morning">Morning</div>
     </button>
     <button class="summaryChip shiftFilterBtn afternoon" data-shift="Afternoon" style="cursor:pointer;">
-      <div class="chipVal">🌤️</div>
+      {CHIP_AFTERNOON_HTML}
       <div class="chipLabel" data-key="afternoon">Afternoon</div>
     </button>
     <button class="summaryChip shiftFilterBtn night" data-shift="Night" style="cursor:pointer;">
-      <div class="chipVal">🌙</div>
+      {CHIP_NIGHT_HTML}
       <div class="chipLabel" data-key="night">Night</div>
     </button>
     <button class="summaryChip shiftFilterBtn all active" data-shift="All" style="cursor:pointer;">
-      <div class="chipVal">📋</div>
+      {CHIP_ALL_HTML}
       <div class="chipLabel" data-key="allShifts">All Shifts</div>
     </button>
     '''}
@@ -1459,12 +1556,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   {dept_cards_html}
 
   <!-- ════ CTA ════ -->
-<div class="quickActions">
-  <a class="btn" id="ctaBtn" href="#">📋 Full Roster</a>
-  <a href="#" class="btn" id="subscribeBtn">📩 Subscribe</a>
-  <a href="#" class="btn" id="compareBtn" onclick="goToRosterDiff(event)">📊 Compare</a>
-  <button type="button" class="btn shareSiteBtn" id="shareSiteBtn">🔗 Share Site</button>
-</div>
+{export_cta_html()}
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
@@ -1474,20 +1566,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
 </div>
 
-<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
-  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
-    <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
-    <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
-    <div class="siteShareQr" id="siteShareQr"></div>
-    <p class="siteShareUrl" id="siteShareUrl"></p>
-    <div class="siteShareActions">
-      <button type="button" class="siteShareBtn siteShareNativeBtn" id="siteShareNativeBtn">Share</button>
-      <button type="button" class="siteShareBtn siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">WhatsApp</button>
-      <button type="button" class="siteShareBtn siteShareCopyBtn" id="siteShareCopyBtn">Copy link</button>
-    </div>
-    <button type="button" class="siteShareBtn siteShareCloseBtn" id="siteShareCloseBtn">Close</button>
-  </div>
-</div>
+{SITE_SHARE_MODAL_HTML}
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -2069,7 +2148,7 @@ var T = {{
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'📋 Full Roster', subscribe:'📩 Subscribe', compare:'📊 Compare', shareSite:'🔗 Share Site',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
@@ -2081,7 +2160,7 @@ var T = {{
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'📋 الجدول الكامل', subscribe:'📩 اشتراك', compare:'📊 مقارنة', shareSite:'🔗 مشاركة الموقع',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
@@ -2124,7 +2203,7 @@ function applyLang(lang) {{
   var main=document.getElementById('pageTitleMain');
   if(eyebrow) eyebrow.textContent=t.titleEyebrow;
   if(main) main.textContent=t.titleMain;
-  var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;
+{APPLY_LANG_LANG_BTN_NEW.rstrip()}
   document.querySelectorAll('.chipLabel').forEach(function(el) {{
     var k=el.dataset.key;
     if(k==='employees') el.textContent=t.employees;
@@ -2157,10 +2236,17 @@ function applyLang(lang) {{
     if(txt==='FROM'||txt==='من') el.textContent=t.from;
     if(txt==='TO'||txt==='إلى') el.textContent=t.to;
   }});
-  var c1=document.getElementById('ctaBtn'); if(c1) c1.textContent=t.viewFull;
-  var c2=document.getElementById('subscribeBtn'); if(c2) c2.textContent=t.subscribe;
-  var c3=document.getElementById('compareBtn'); if(c3) c3.textContent=t.compare;
-  var c4=document.getElementById('shareSiteBtn'); if(c4) c4.textContent=t.shareSite;
+  function setCtaLabel(id, text) {{
+    var el = document.getElementById(id);
+    if (!el) return;
+    var lbl = el.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = text;
+    else el.textContent = text;
+  }}
+  setCtaLabel('ctaBtn', t.viewFull);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
+  setCtaLabel('shareSiteBtn', t.shareSite);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {{
@@ -2190,14 +2276,7 @@ function goToTraining(e) {{
   var root = getSiteRootPath();
   location.href = root + '/training/';
 }}
-function setDiffChipIcon() {{
-  var icon = document.getElementById('diffChipIcon');
-  if(!icon) return;
-  var root = getSiteRootPath();
-  icon.src = root + '/assets/icons/diff-calendar.png?v=20260428d';
-}}
 setLocalCtaLinks();
-setDiffChipIcon();
 applyLang(LANG);
 startSummarySwitchLoop();
 
@@ -2317,14 +2396,6 @@ function goToRosterDiff(event) {{
   location.href = target;
 }}
 
-(function bindFlightSwitchIcons() {{
-  var root = getSiteRootUrl();
-  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
-  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {{
-    img.src = iconUrl;
-  }});
-}})();
-
 (function loadLocalEnhancements() {{
   var root = getSiteRootUrl();
   function addScript(src) {{
@@ -2336,6 +2407,7 @@ function goToRosterDiff(event) {{
     document.body.appendChild(s);
   }}
   var ver = '20260520d';
+  addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);

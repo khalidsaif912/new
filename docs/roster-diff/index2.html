@@ -109,9 +109,13 @@
       align-items:center;
       justify-content:flex-start;
     }
-    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-    .summaryChip .chipIcon { width:26px; height:26px; object-fit:contain; display:block; margin:0 auto; }
-    .summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+.roster-icon, .chipIcon {
+      display: block;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+.summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+.summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
     .summaryChip .chipLabel {
       font-size:9.5px;
       font-weight:600;
@@ -317,6 +321,22 @@
       cursor: pointer;
       gap: 4px;
     }
+    .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
     .summaryChip .chipVal {
       width: 42px;
       height: 42px;
@@ -333,21 +353,10 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 2px 6px rgba(15,23,42,.07);
     }
     .summaryChip .chipIcon,
-    .summaryChip .chipIcon.diffIcon {
-      width:30px;
-      height:30px;
-      display:block;
-      object-fit:contain;
-      margin:0 auto;
-      filter:drop-shadow(0 1px 1px rgba(15,23,42,.16));
-    }
-    .summaryChip:hover .chipIcon {
+.summaryChip:hover .chipIcon {
       transform:scale(1.04);
     }
-    .summaryChip .chipIcon {
-      transition:transform .2s ease;
-    }
-    @media (max-width: 480px) {
+@media (max-width: 480px) {
       .summaryBar { gap:8px; }
       .summaryChip {
         width: calc(33.333% - 8px);
@@ -494,17 +503,7 @@
     }
 
     .summaryChip .chipIcon,
-    .summaryChip .chipIcon.diffIcon {
-      width:31px;
-      height:31px;
-      display:block;
-      object-fit:contain;
-      margin:0 auto;
-      filter:drop-shadow(0 1.5px 1.5px rgba(15,23,42,.18));
-      transition:transform .2s ease;
-    }
-
-    .summaryChip:hover .chipIcon {
+.summaryChip:hover .chipIcon {
       transform:scale(1.06);
     }
 
@@ -619,11 +618,7 @@
         min-height:42px;
       }
       .summaryChip .chipIcon,
-      .summaryChip .chipIcon.diffIcon {
-        width:29px;
-        height:29px;
-      }
-      .summaryChip .chipLabel {
+  .summaryChip .chipLabel {
         font-size:8.2px;
         white-space:normal;
         line-height:1.1;
@@ -709,7 +704,7 @@
 
     <div class="summaryBar">
       <a href="#" id="exportBtn" class="summaryChip" aria-label="Export">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-export"></use></svg></div>
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
         <div class="chipLabel">Export</div>
       </a>
       <a href="#" id="trainingBtn" class="summaryChip" aria-label="Training">
@@ -721,7 +716,7 @@
         <div class="chipLabel">My Schedule</div>
       </a>
       <a href="#" id="importBtn" class="summaryChip importChip" aria-label="Import">
-        <div class="chipVal"><svg class="chipIcon" role="img" aria-hidden="true"><use href="#icon-import"></use></svg></div>
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
         <div class="chipLabel">Import</div>
       </a>
       <a href="#" id="compareChipBtn" class="summaryChip" aria-label="Diff">

@@ -1,0 +1,571 @@
+"""Shared CTA bar HTML/CSS, unified PNG/SVG icons, and site-share modal."""
+
+from __future__ import annotations
+
+import re
+
+ICON_VER = "20260521b"
+ICON_DIFF = f"/assets/icons/diff-calendar.png?v={ICON_VER}"
+ICON_FLIGHT = f"/assets/icons/flight.png?v={ICON_VER}"
+
+# ── SVG icons (CTA + share modal — same on all pages) ──
+SVG_CLIPBOARD = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>'
+    '<rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>'
+)
+SVG_BELL = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">'
+    '<path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>'
+    '<path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>'
+)
+SVG_SHARE_OUT = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>'
+    '<path d="M12 3v12M8 7l4-4 4 4"/></svg>'
+)
+SVG_WHATSAPP = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">'
+    '<circle cx="12" cy="12" r="9" fill="#22c55e"/>'
+    '<path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg>'
+)
+SVG_LINK = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#b45309" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
+    '<path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/>'
+    '<path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg>'
+)
+# Compare CTA — line icon matching roster / subscribe / share (not PNG emoji)
+SVG_COMPARE = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="4" width="18" height="17" rx="2"/>'
+    '<path d="M3 9h18"/>'
+    '<path d="M8 14l-2 2 2 2"/>'
+    '<path d="M16 14l2 2-2 2"/>'
+    '</svg>'
+)
+
+
+def _chip_svg(paths: str, *, size: int = 22, stroke: str = "#1e40af") -> str:
+    return (
+        f'<svg class="chip-icon" viewBox="0 0 24 24" width="{size}" height="{size}" '
+        f'fill="none" stroke="{stroke}" stroke-width="2" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
+    )
+
+
+def _chip_val(inner: str) -> str:
+    return f'<div class="chipVal">{inner}</div>'
+
+
+# ── Summary chip icons (line SVG — same style as bottom CTA bar) ──
+SVG_CHIP_SCHEDULE = _chip_svg(
+    '<rect x="3" y="4" width="18" height="18" rx="2"/>'
+    '<path d="M16 2v4M8 2v4M3 10h18"/>'
+    '<path d="M8 14h.01M12 14h.01M16 14h.01"/>',
+    stroke="#2563eb",
+)
+SVG_CHIP_FLIGHT = _chip_svg(
+    '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>',
+    stroke="#0ea5e9",
+)
+SVG_CHIP_EXPORT = _chip_svg(
+    '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>',
+    stroke="#059669",
+)
+SVG_CHIP_WAVE = _chip_svg(
+    '<path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/>'
+    '<path d="M10 9.5V5a2 2 0 0 0-4 0v4"/><path d="M6 12v-1a2 2 0 0 0-4 0v1"/>'
+    '<path d="M6 12a6 6 0 0 0 6 6h1l2 2 2-2h1a5 5 0 0 0 5-5"/>',
+    stroke="#db2777",
+)
+SVG_CHIP_TRAINING = _chip_svg(
+    '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>'
+    '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    stroke="#7c3aed",
+)
+SVG_CHIP_DIFF = _chip_svg(
+    '<rect x="3" y="4" width="18" height="17" rx="2"/>'
+    '<path d="M3 9h18"/>'
+    '<path d="M8 14l-2 2 2 2"/>'
+    '<path d="M16 14l2 2-2 2"/>',
+    stroke="#ef4444",
+)
+SVG_CHIP_SUN = _chip_svg(
+    '<circle cx="12" cy="12" r="4"/>'
+    '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41"/>'
+    '<path d="M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    stroke="#f59e0b",
+)
+SVG_CHIP_CLOUD_SUN = _chip_svg(
+    '<path d="M17 18H8a5 5 0 1 1 2-9.5"/>'
+    '<circle cx="17" cy="8" r="3"/>',
+    stroke="#f97316",
+)
+SVG_CHIP_MOON = _chip_svg(
+    '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+    stroke="#8b5cf6",
+)
+SVG_CHIP_CLIPBOARD = _chip_svg(
+    '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>'
+    '<rect x="9" y="3" width="6" height="4" rx="1"/>',
+    stroke="#1e40af",
+)
+
+CHIP_SCHEDULE_HTML = _chip_val(SVG_CHIP_SCHEDULE)
+CHIP_FLIGHT_HTML = _chip_val(SVG_CHIP_FLIGHT)
+CHIP_EXPORT_HTML = _chip_val(SVG_CHIP_EXPORT)
+CHIP_WAVE_HTML = _chip_val(f'<span class="waveHand">{SVG_CHIP_WAVE}</span>')
+CHIP_TRAINING_HTML = _chip_val(SVG_CHIP_TRAINING)
+CHIP_DIFF_HTML = _chip_val(SVG_CHIP_DIFF)
+CHIP_MORNING_HTML = _chip_val(SVG_CHIP_SUN)
+CHIP_AFTERNOON_HTML = _chip_val(SVG_CHIP_CLOUD_SUN)
+CHIP_NIGHT_HTML = _chip_val(SVG_CHIP_MOON)
+CHIP_ALL_HTML = _chip_val(SVG_CHIP_CLIPBOARD)
+
+SVG_LANG_GLOBE = (
+    '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
+    '<circle cx="12" cy="12" r="9"/>'
+    '<path d="M3 12h18"/>'
+    '<path d="M12 3a14 14 0 0 1 0 18"/>'
+    '<path d="M12 3a14 14 0 0 0 0 18"/>'
+    '</svg>'
+)
+LANG_TOGGLE_HTML = (
+    '<button class="langToggle" id="langToggle" onclick="toggleLang()" '
+    'type="button" title="Switch language">'
+    f'<span class="langToggle-icon">{SVG_LANG_GLOBE}</span>'
+    '<span class="langToggle-label" id="langToggleLabel">ع</span>'
+    '</button>'
+)
+LANG_TOGGLE_CSS = r"""    .langToggle {
+      position:absolute; top:12px; right:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; height:auto; padding:4px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      transition:transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+    body.ar .langToggle { right:12px; left:auto; }
+    .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
+    .langToggle-icon svg {
+      display:block; width:18px; height:18px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      text-shadow:0 1px 3px rgba(0,0,0,.65);
+    }
+    #banner-changer-btn {
+      position:absolute; top:12px; left:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; min-height:auto; padding:4px;
+      color:#fff; cursor:pointer; line-height:0;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+    #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    #banner-changer-btn .banner-changer-icon svg {
+      display:block; width:20px; height:20px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    body.ar #banner-changer-btn { left:12px; right:auto; }
+    @media (max-width:720px) {
+      .langToggle { padding:6px; }
+      .langToggle-icon svg { width:20px; height:20px; }
+      .langToggle-label { font-size:11px; }
+      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+    }
+"""
+APPLY_LANG_LANG_BTN_OLD = (
+    "  var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;\n"
+)
+APPLY_LANG_LANG_BTN_NEW = (
+    "  var langLbl=document.getElementById('langToggleLabel');\n"
+    "  if(langLbl) langLbl.textContent=t.langBtn;\n"
+    "  else {{ var btn=document.getElementById('langToggle'); "
+    "if(btn) btn.textContent=t.langBtn; }}\n"
+)
+
+CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+"""
+
+CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ */
+    .quickActions.roster-cta {
+      --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --cta-gap: 10px;
+      margin-top: 22px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--cta-gap);
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .roster-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      font-family: var(--cta-font);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    button.roster-cta-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      font: inherit;
+    }
+    .roster-cta-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 0;
+    }
+    .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .roster-cta-icon .roster-icon { width: 18px; height: 18px; }
+    .roster-cta-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roster-cta-btn--roster {
+      background: #e8f1ff;
+      border-color: #b8c9f5;
+      color: #1e3a8a;
+    }
+    .roster-cta-btn--subscribe {
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }
+    .roster-cta-btn--compare {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }
+    .roster-cta-btn--share {
+      grid-column: 1 / -1;
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .roster-cta--import {
+      grid-template-columns: 1fr 1fr;
+    }
+    .roster-cta--import .roster-cta-btn--share {
+      grid-column: 1 / -1;
+    }
+    @media (hover: hover) {
+      .roster-cta-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      }
+      .roster-cta-btn--roster:hover { background: #dce8ff; }
+      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
+      .roster-cta-btn--compare:hover { background: #fef3c7; }
+      .roster-cta-btn--share:hover { background: #d1fae5; }
+      .roster-cta-btn--muted:hover { background: #e2e8f0; }
+    }
+    .roster-cta-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+    .roster-cta-btn:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.45);
+      outline-offset: 2px;
+    }
+    @media (max-width: 380px) {
+      .roster-cta-btn {
+        padding: 9px 8px;
+        font-size: 11px;
+        gap: 5px;
+        min-height: 40px;
+      }
+      .roster-cta-icon { width: 16px; height: 16px; }
+      .roster-cta-icon svg { width: 16px; height: 16px; }
+      .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
+    }
+"""
+
+CTA_CSS_PY = CTA_CSS.replace("{", "{{").replace("}", "}}")
+
+SITE_SHARE_CSS = r"""    /* ═══════ SITE SHARE MODAL ═══════ */
+    .siteShareSheet {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10001;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .siteShareSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .siteShareCard {
+      width: min(100%, 360px);
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 16px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
+    }
+    .siteShareTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteShareHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    .siteShareQr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      margin: 0 auto 12px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+    }
+    .siteShareUrl {
+      font-size: 11px;
+      color: #475569;
+      word-break: break-all;
+      line-height: 1.45;
+      margin: 0 0 14px;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .siteShareActions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .siteShareActions .roster-cta-btn--compare {
+      grid-column: 1 / -1;
+    }
+    .siteShareCloseWrap {
+      margin-top: 4px;
+    }
+    .siteShareCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
+"""
+
+SITE_SHARE_MODAL_HTML = f"""<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+    <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
+    <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
+    <div class="siteShareQr" id="siteShareQr"></div>
+    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <div class="siteShareActions">
+      <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
+        <span class="roster-cta-icon">{SVG_SHARE_OUT}</span>
+        <span class="roster-cta-label">Share</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">
+        <span class="roster-cta-icon">{SVG_WHATSAPP}</span>
+        <span class="roster-cta-label">WhatsApp</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">
+        <span class="roster-cta-icon">{SVG_LINK}</span>
+        <span class="roster-cta-label">Copy link</span>
+      </button>
+    </div>
+    <div class="siteShareCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+"""
+
+ROSTER_ICONS_SCRIPT = "addScript(root + '/roster-icons.js?v=' + ver);"
+
+
+def _btn(
+    tag: str,
+    classes: str,
+    el_id: str,
+    label: str,
+    icon: str,
+    extra: str = "",
+) -> str:
+    body = (
+        f'    <span class="roster-cta-icon">{icon}</span>\n'
+        f'    <span class="roster-cta-label">{label}</span>\n'
+    )
+    if tag == "a":
+        return f'  <a class="roster-cta-btn {classes}" id="{el_id}"{extra}>\n{body}  </a>\n'
+    return (
+        f'  <button type="button" class="roster-cta-btn {classes}" id="{el_id}"{extra}>\n'
+        f"{body}  </button>\n"
+    )
+
+
+def export_cta_html(
+    cta_href: str = "#",
+    subscribe_href: str = "#",
+    compare_onclick: str = ' onclick="goToRosterDiff(event)"',
+) -> str:
+    compare_extra = f' href="#"{compare_onclick}'
+    return (
+        '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
+        + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
+        + _btn(
+            "a",
+            "roster-cta-btn--subscribe",
+            "subscribeBtn",
+            "Subscribe",
+            SVG_BELL,
+            f' href="{subscribe_href}"',
+        )
+        + _btn(
+            "a",
+            "roster-cta-btn--compare",
+            "compareBtn",
+            "Compare",
+            SVG_COMPARE,
+            compare_extra,
+        )
+        + _btn(
+            "button",
+            "roster-cta-btn--share shareSiteBtn",
+            "shareSiteBtn",
+            "Share Site",
+            SVG_SHARE_OUT,
+        )
+        + "</nav>\n"
+    )
+
+
+def import_cta_html(cta_href: str = "{BASE}/now/") -> str:
+    return (
+        '<nav class="quickActions roster-cta roster-cta--import" aria-label="Page actions">\n'
+        + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
+        + _btn(
+            "a",
+            "roster-cta-btn--compare",
+            "compareBtn",
+            "Compare",
+            SVG_COMPARE,
+            ' href="#" onclick="goToRosterDiff(event)"',
+        )
+        + _btn(
+            "button",
+            "roster-cta-btn--share shareSiteBtn",
+            "shareSiteBtn",
+            "Share Site",
+            SVG_SHARE_OUT,
+        )
+        + "</nav>\n"
+    )
+
+
+APPLY_LANG_NEW = """  function setCtaLabel(id, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var lbl = el.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = text;
+    else el.textContent = text;
+  }
+  setCtaLabel('ctaBtn', t.viewFull);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
+  setCtaLabel('shareSiteBtn', t.shareSite);"""
+
+APPLY_LANG_BAD_LINE = re.compile(
+    r"\s*var c3=document\.getElementById\('compareBtn'\); if\(c3\) c3\.textContent=t\.compare;\s*\n",
+)
+
+CHIP_IMG_FLIGHT_RE = re.compile(
+    r'<div class="chipVal">(?:<span class="chipIconSvg chipIconSvg--flight"[^>]*>.*?</span>'
+    r'|<img[^>]*(?:flightSwitchIcon|data-roster-icon="flight")[^>]*/>)</div>',
+    re.DOTALL | re.IGNORECASE,
+)
+CHIP_IMG_DIFF_RE = re.compile(
+    r'<div class="chipVal">(?:<span class="chipIconSvg chipIconSvg--diff"[^>]*>.*?</span>'
+    r'|<img[^>]*(?:diffIcon|diffChipIcon|data-roster-icon="diff")[^>]*/>)</div>',
+    re.DOTALL | re.IGNORECASE,
+)
+
+REMOVE_ICON_JS_RE = re.compile(
+    r"function setDiffChipIcon\(\)[^}]+\}\s*"
+    r"setLocalCtaLinks\(\);\s*setDiffChipIcon\(\);\s*",
+    re.DOTALL,
+)
+REMOVE_ICON_JS_RE2 = re.compile(
+    r"\(function bindFlightSwitchIcons\(\)\s*\{.*?\}\)\(\);\s*",
+    re.DOTALL,
+)
+
+I18N_VIEWFULL_EN = "viewFull:'Full Roster'"
+I18N_VIEWFULL_AR = "viewFull:'الجدول الكامل'"
+I18N_SUB_EN = "subscribe:'Subscribe'"
+I18N_SUB_AR = "subscribe:'اشتراك'"
+I18N_CMP_EN = "compare:'Compare'"
+I18N_CMP_AR = "compare:'مقارنة'"
+I18N_SHARE_EN = "shareSite:'Share Site'"
+I18N_SHARE_AR = "shareSite:'مشاركة الموقع'"

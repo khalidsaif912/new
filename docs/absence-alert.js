@@ -3,7 +3,8 @@
 
   const PAGE_KEY = (location.pathname || "").indexOf("/import/") !== -1 ? "import" : "export";
   const STORAGE_EMP_ID = PAGE_KEY === "import" ? "importSavedEmpId" : "exportSavedEmpId";
-  const STORAGE_LANG = "appLang";
+  const STORAGE_LANG = "rosterLang";
+  const STORAGE_LANG_LEGACY = "appLang";
   /** Human-facing workbook (attendance / absence); JSON on site is built from the automated download URL. */
   const ABSENCE_SHAREPOINT_SOURCE =
     "https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG";
@@ -31,12 +32,20 @@
 
   const norm = (s) => (s || "").toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, " ").replace(/\s+/g, " ").trim();
 
+  function bellSvg(size) {
+    return (
+      '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" fill="none" aria-hidden="true">' +
+      '<path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>'
+    );
+  }
+
   const I18N = {
     ar: {
       langButton: "EN",
       daysAbsence: (n) => `${n} ${n === 1 ? "يوم غياب" : "أيام غياب"}`,
       daysOnly: (n) => `${n} ${n === 1 ? "يوم" : "أيام"}`,
-      recordedAbsence: "🔔 غياب مسجّل",
+      recordedAbsence: "غياب مسجّل",
       detailsBtn: "عرض التفاصيل والخيارات",
       hello: (name) => `مرحباً ${name} 👋`,
       systemHas: (n) => `لديك ${n} ${n === 1 ? "يوم غياب" : "أيام غياب"} مسجّلة في النظام`,
@@ -63,13 +72,14 @@
       waBody: (name, empId, dates) =>
         `السلام عليكم، أنا ${name} (رقم: ${empId})\nلديّ غياب مسجّل في التواريخ التالية:\n${dates}\nأرجو المراجعة. شكراً`,
       closeLabel: "إغلاق",
+      changeLangAria: "تغيير اللغة",
       dir: "rtl"
     },
     en: {
       langButton: "ع",
       daysAbsence: (n) => `${n} ${n === 1 ? "absence day" : "absence days"}`,
       daysOnly: (n) => `${n} ${n === 1 ? "day" : "days"}`,
-      recordedAbsence: "🔔 Recorded absence",
+      recordedAbsence: "Recorded absence",
       detailsBtn: "View details and options",
       hello: (name) => `Hello ${name} 👋`,
       systemHas: (n) => `You have ${n} ${n === 1 ? "absence day" : "absence days"} recorded in the system`,
@@ -96,25 +106,57 @@
       waBody: (name, empId, dates) =>
         `Hello, I am ${name} (ID: ${empId}).\nI have recorded absences on the following dates:\n${dates}\nPlease review. Thank you.`,
       closeLabel: "Close",
+      changeLangAria: "Change language",
       dir: "ltr"
     }
   };
 
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function getLang() {
-    const stored = localStorage.getItem(STORAGE_LANG);
+    const stored =
+      localStorage.getItem(STORAGE_LANG) ||
+      localStorage.getItem(STORAGE_LANG_LEGACY);
     if (stored === "ar" || stored === "en") return stored;
-    localStorage.setItem(STORAGE_LANG, "ar");
-    return "ar";
+    return "en";
   }
 
   function setLang(lang) {
-    localStorage.setItem(STORAGE_LANG, lang === "en" ? "en" : "ar");
+    const L = lang === "en" ? "en" : "ar";
+    localStorage.setItem(STORAGE_LANG, L);
+    localStorage.setItem(STORAGE_LANG_LEGACY, L);
+    if (typeof window.applyLang === "function") {
+      window.applyLang(L);
+      return;
+    }
     applyLang();
+    rerenderUI();
   }
 
   function toggleLang() {
     setLang(getLang() === "ar" ? "en" : "ar");
-    rerenderUI();
+  }
+
+  function hookMainLangToggle() {
+    if (window.__absLangHooked) return;
+    window.__absLangHooked = true;
+    const orig = window.applyLang;
+    if (typeof orig !== "function") return;
+    window.applyLang = function (lang) {
+      orig(lang);
+      localStorage.setItem(STORAGE_LANG_LEGACY, lang === "en" ? "en" : "ar");
+      rerenderUI();
+    };
+    window.addEventListener("storage", (e) => {
+      if (e.key === STORAGE_LANG || e.key === STORAGE_LANG_LEGACY) rerenderUI();
+    });
   }
 
   function t() {
@@ -128,6 +170,8 @@
     if (document.body) {
       document.body.classList.toggle("ar", lang === "ar");
     }
+    const langBtn = document.getElementById("abs-lang-btn");
+    if (langBtn) langBtn.textContent = t().langButton;
   }
 
   function nameMatch(a, b) {
@@ -200,13 +244,28 @@
         from { opacity: 0; transform: translateY(16px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .abs-dot-emoji {
-        font-size: 34px;
-        line-height: 1;
+      .abs-dot-icon {
+        line-height: 0;
         display: block;
         animation: envShake 3.5s ease-in-out infinite;
         transform-origin: top center;
         filter: drop-shadow(0 3px 7px rgba(153,27,27,0.4));
+      }
+      .abs-dot-icon svg {
+        display: block;
+        width: 34px;
+        height: 34px;
+      }
+      .abs-card-title-icon {
+        line-height: 0;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .abs-card-title-icon svg {
+        display: block;
+        width: 16px;
+        height: 16px;
       }
       @keyframes envShake {
         0%,100% { transform: rotate(0deg) translateY(0); }
@@ -597,7 +656,7 @@
     dot.id = "abs-dot";
     dot.className = "abs-r";
     dot.innerHTML = `
-      <span class="abs-dot-emoji">📩</span>
+      <span class="abs-dot-icon">${bellSvg(34)}</span>
       <span class="abs-dot-badge">${dict.daysAbsence(count)}</span>
     `;
     document.body.appendChild(dot);
@@ -607,14 +666,14 @@
     card.className = "abs-r";
 
     const cardRows = mState.absences.map(a =>
-      `<div class="abs-card-row">📅 ${a.date}</div>`
+      `<div class="abs-card-row">${escapeHtml(a.date)}</div>`
     ).join("");
 
     const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
 
     card.innerHTML = `
       <div class="abs-card-top">
-        <span class="abs-card-title">${dict.recordedAbsence}</span>
+        <span class="abs-card-title"><span class="abs-card-title-icon">${bellSvg(16)}</span>${dict.recordedAbsence}</span>
         <button class="abs-card-x" id="abs-card-x" aria-label="${dict.closeLabel}">✕</button>
       </div>
       <div class="abs-card-name">${firstName} — <span>${dict.daysOnly(count)}</span></div>
@@ -663,7 +722,8 @@
   }
 
   function showMainModal() {
-    if (document.getElementById("abs-overlay")) return;
+    const existing = document.getElementById("abs-overlay");
+    if (existing) existing.remove();
 
     const dict = t();
     const firstName = (mState.empName || "").split(" ")[0] || mState.empName;
@@ -678,7 +738,7 @@
 
     const dateRows = mState.absences.map(a => `
       <div class="ab-row">
-        <span class="ab-date">📅 ${a.date}</span>
+        <span class="ab-date">${escapeHtml(a.date)}</span>
         <span class="ab-tag">${dict.absenceTag}</span>
       </div>`).join("");
 
@@ -689,7 +749,7 @@
       <div id="abs-modal">
         <div id="abs-mhead">
           <div class="abs-mhead-row">
-            <button class="abs-mxbtn" id="abs-lang-btn" type="button" aria-label="Change language" style="width:auto;height:28px;padding:0 10px;border-radius:999px;font-size:11px;font-weight:800;">
+            <button class="abs-mxbtn" id="abs-lang-btn" type="button" aria-label="${dict.changeLangAria}" style="width:auto;height:28px;padding:0 10px;border-radius:999px;font-size:11px;font-weight:800;">
               ${dict.langButton}
             </button>
             <div class="abs-mtitle" style="flex:1;text-align:center;">${dict.hello(firstName)}</div>
@@ -770,13 +830,16 @@
 
   function rerenderUI() {
     applyLang();
+    const modalOpen = !!document.getElementById("abs-overlay");
     clearUI();
     if (mState.absences && mState.absences.length) {
       buildUI();
+      if (modalOpen) showMainModal();
     }
   }
 
   function init() {
+    hookMainLangToggle();
     applyLang();
     const empId = localStorage.getItem(STORAGE_EMP_ID) || (PAGE_KEY === "export" ? localStorage.getItem("savedEmpId") : "");
     if (!empId) return;

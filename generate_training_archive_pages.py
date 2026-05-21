@@ -3,8 +3,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import date, datetime
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from training_page_icons import (  # noqa: E402
+    BACK_TRAINING_CHIP,
+    DOCK_CUP_INNER,
+    DOCK_ROSTER_INNER,
+    DOCK_SAVED_ICON,
+    DOCK_SEARCH_INNER,
+    ICON_CSS,
+    PAGE_TITLE_HTML,
+    QUICK_LINKS_BLOCK,
+    SVG_COURSE_ICON,
+    SVG_PEOPLE_BADGE,
+)
 
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 
@@ -97,9 +112,11 @@ body{
     radial-gradient(circle at 6% 92%,rgba(255,255,255,.1) 0%,transparent 40%);
 }
 .header::after{
-  content:'✈';position:absolute;left:6%;bottom:10%;
-  font-size:clamp(48px,13vw,104px);line-height:1;opacity:.11;
-  transform:rotate(-16deg);pointer-events:none;filter:grayscale(.2);
+  content:'';position:absolute;left:6%;bottom:10%;
+  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);
+  opacity:.09;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  transform:rotate(-16deg);
 }
 .hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
 .hCircle1{width:240px;height:240px;right:-78px;top:-92px}
@@ -454,6 +471,7 @@ body{
   .wrap{padding-left:24px;padding-right:24px}
   .topDock{gap:14px}
 }
+""" + ICON_CSS + """
 
 """
 
@@ -714,7 +732,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
 <details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}"{open_attr}>
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">{course["icon"]}</div>
+    <div class="courseIcon">{SVG_COURSE_ICON}</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">{course["title"]}</div>
       <div class="courseSubRow">
@@ -726,7 +744,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     <div class="courseBadges">
       {today_badge}
       <span class="badge dateBadge">{date_range_label(course["date"], course_end)}</span>
-      <span class="badge peopleBadge">👥 {len(course.get("staff", []))}</span>
+      <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -748,26 +766,22 @@ def build_top_dock(month_courses: list[dict], in_archive: bool = False) -> str:
         faces.append(
             f'<div class="statsFace"><div class="statsText"><div class="statsValue">{value}</div><div class="statsLabel">{label}</div></div></div>'
         )
-    other_icon_src = "../images/a-cup-icon.png" if in_archive else "images/a-cup-icon.png"
     return f'''
 <div class="topDock">
   <div class="dockCard statsCard">
     <div class="statsTicker">{"".join(faces)}</div>
   </div>
   <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
-    <div class="rosterInner">
-      <img class="rosterIcon" src="data:image/png;base64,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" alt="" aria-hidden="true">
-      <span class="rosterLabel">Roster</span>
-    </div>
+    {DOCK_ROSTER_INNER}
   </button>
   <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
-    <div class="dockValue searchGlyph">🔎</div><div class="dockLabel">Search</div>
+    {DOCK_SEARCH_INNER}
   </button>
   <button class="dockCard dockAction" id="otherPageBtn" type="button">
-    <div class="otherPageInner"><img src="{other_icon_src}" class="otherIcon" alt="" aria-hidden="true"><div class="dockLabel otherPageLabel">A Cup of Book</div></div>
+    {DOCK_CUP_INNER}
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
-    <div class="savedIcon">👤</div>
+    {DOCK_SAVED_ICON}
     <div class="savedLines">
       <div class="savedName" id="savedName">My Staff</div>
       <div class="savedNo" id="savedNo"></div>
@@ -814,7 +828,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
     <div class="hCircle hCircle2"></div>
     <div class="hCircle hCircle3"></div>
     <div class="headerText">
-      <h1 id="pageTitle">📚 Training Courses</h1>
+      {PAGE_TITLE_HTML}
       <p id="pageSubtitle">Visual schedule</p>
       <div class="dateTag">
         {'During ' + month_range_label(courses)}
@@ -872,7 +886,7 @@ def render_archive_index(data: dict) -> str:
         courses = month.get("courses", [])
         latest_badge = '<span class="archiveLatest">Latest</span>' if month["month_id"] == latest else ''
         cards.append(
-            f'<a class="archiveCard" href="{month["month_id"]}.html"><div class="archiveMonth">{month_label(month["month_id"])}</div><div class="archiveMeta">{len(courses)} sessions • 👥 {count_staff(courses)} • {count_venues(courses)} venues</div>{latest_badge}</a>'
+            f'<a class="archiveCard" href="{month["month_id"]}.html"><div class="archiveMonth">{month_label(month["month_id"])}</div><div class="archiveMeta">{len(courses)} sessions • {count_staff(courses)} staff • {count_venues(courses)} venues</div>{latest_badge}</a>'
         )
     return f'''<!doctype html>
 <html lang="ar">
@@ -893,7 +907,7 @@ def render_archive_index(data: dict) -> str:
     <div class="hCircle hCircle2"></div>
     <div class="hCircle hCircle3"></div>
     <div class="headerText">
-      <h1 id="pageTitle">📚 Training Courses</h1>
+      {PAGE_TITLE_HTML}
       <p id="pageSubtitle">Archive view</p>
       <div class="dateTag">📅 Archive</div>
     </div>
@@ -1048,9 +1062,7 @@ def render_cup_of_book_page() -> str:
     <div class="trainStrip" id="trainStrip"></div>
 
     <div class="quickLinks">
-      <a class="quickBtn" href="../training/">📚 Training schedule</a>
-      <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر">🛫 الصادر</a>
-      <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد">🛬 الوارد</a>
+      {QUICK_LINKS_BLOCK}
     </div>
   </div>
 

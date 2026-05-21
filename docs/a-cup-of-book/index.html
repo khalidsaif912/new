@@ -9,15 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#eef1f7;color:#18243a;font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;min-height:100dvh}
-    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 36px}
+    body{
+      background:#eef1f7;color:#18243a;
+      font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;
+      min-height:100dvh;
+    }
+    .wrap{
+      width:100%;max-width:none;margin:0;padding:0;
+    }
 
     /* ── Header ── */
     .header{
-      position:relative;overflow:hidden;
-      padding:22px 18px 18px;border-radius:20px;
+      position:relative;overflow:hidden;flex-shrink:0;
+      padding:12px 12px 10px;padding-top:calc(10px + env(safe-area-inset-top,0px));
+      border-radius:0;
       background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);
-      box-shadow:0 8px 28px rgba(30,64,175,.25);
+      box-shadow:0 4px 16px rgba(30,64,175,.22);
     }
     .header::before{
       content:'';position:absolute;inset:0;pointer-events:none;
@@ -30,13 +37,13 @@
 
     /* ── Header text ── */
     .heroText{position:relative;z-index:1;}
-    .heroText h1{font:900 28px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em;margin:0}
-    .heroText p{margin:5px 0 0;font-size:12px;color:rgba(255,255,255,.78);font-weight:700}
+    .heroText h1{font:900 22px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em;margin:0}
+    .heroText p{margin:4px 0 0;font-size:11px;color:rgba(255,255,255,.78);font-weight:700}
 
     /* ── Train strip (inside header) ── */
     .trainStrip{
       position:relative;z-index:1;
-      margin-top:14px;
+      margin-top:10px;
       display:flex;gap:8px;flex-wrap:wrap;align-items:center;
     }
     .car-btn{
@@ -61,8 +68,8 @@
 
     /* ── Header quick links ── */
     .quickLinks{
-      display:flex;flex-wrap:wrap;align-items:center;gap:8px;
-      margin-top:12px;position:relative;z-index:1;
+      display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+      margin-top:8px;position:relative;z-index:1;
     }
     .quickBtn{
       display:inline-flex;align-items:center;gap:6px;
@@ -73,26 +80,29 @@
     }
     .quickBtn:hover{background:rgba(255,255,255,.25)}
 
-    /* ── Viewer ── */
+    /* ── Viewer: full width, natural height (readable) ── */
     .viewer{
-      margin-top:14px;border-radius:16px;overflow:hidden;
-      border:1px solid rgba(0,0,0,.10);
-      box-shadow:0 8px 24px rgba(15,23,42,.12);
+      width:100%;margin:0;
+      border:none;border-radius:0;box-shadow:none;
     }
     .viewer-screen{
+      width:100%;
       background:#0c1222;
-      display:flex;align-items:center;justify-content:center;
-      min-height:400px;padding:16px;
+      padding:0;
+      line-height:0;
     }
     .viewer-screen img{
-      max-width:100%;max-height:74vh;
-      width:auto;height:auto;
-      object-fit:contain;border-radius:8px;
+      width:100%;
+      height:auto;
+      max-width:100%;
       display:block;
+      margin:0 auto;
+      border-radius:0;
     }
     .viewer-bar{
+      flex-shrink:0;
       background:#fff;
-      padding:10px 14px;
+      padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       border-top:1px solid rgba(0,0,0,.08);
     }
@@ -107,18 +117,33 @@
 
     /* ── Empty ── */
     .empty{
-      margin-top:14px;padding:28px;text-align:center;
-      color:#6b7a96;font-size:13px;border-radius:16px;
-      background:rgba(255,255,255,.7);border:1px dashed rgba(0,0,0,.12);
       display:none;
+      padding:28px 16px;text-align:center;
+      color:#6b7a96;font-size:13px;
+      background:#fff;
     }
 
     @media(max-width:480px){
-      .car-btn{width:52px;height:52px}
-      .heroText h1{font-size:22px}
-      .viewer-screen{min-height:280px;padding:10px}
+      .car-btn{width:48px;height:48px}
+      .heroText h1{font-size:18px}
     }
-  </style>
+  
+.titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.titleWithIcon .titleIcon{line-height:0;display:inline-flex}
+.titleWithIcon .titleIcon svg{display:block}
+.quickBtn{display:inline-flex;align-items:center;gap:6px}
+.quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
+.quickBtn-icon svg{display:block}
+.rosterIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon,.courseIcon{
+  line-height:0;display:inline-flex;align-items:center;justify-content:center
+}
+.rosterIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
+.courseIcon{font-size:0;color:var(--accent,#2563eb)}
+.courseIcon svg{display:block}
+.peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
+.badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
+
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -136,9 +161,9 @@
     <div class="trainStrip" id="trainStrip"></div>
 
     <div class="quickLinks">
-      <a class="quickBtn" href="../training/">📚 Training schedule</a>
-      <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر">🛫 الصادر</a>
-      <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد">🛬 الوارد</a>
+      <a class="quickBtn" href="../training/"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Training schedule</span></a>
+      <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span>الصادر</span></a>
+      <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span>الوارد</span></a>
     </div>
   </div>
 
@@ -180,7 +205,7 @@
     });
     bigImg.src = loaded[i].src;
     lbl.textContent = 'Book ' + String(i + 1).padStart(2, '0') + ' of ' + loaded.length;
-    viewer.style.display = '';
+    viewer.style.display = 'block';
   }
 
   window.nav = function(dir) {
@@ -210,7 +235,7 @@
 
   setTimeout(function() {
     if (!loaded.length) {
-      empty.style.display = '';
+      empty.style.display = 'block';
     }
   }, 1400);
 })();

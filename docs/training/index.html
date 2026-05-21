@@ -96,9 +96,8 @@ body{
     radial-gradient(circle at 6% 92%,rgba(255,255,255,.1) 0%,transparent 40%);
 }
 .header::after{
-  content:'✈';position:absolute;left:6%;bottom:10%;
-  font-size:clamp(48px,13vw,104px);line-height:1;opacity:.11;
-  transform:rotate(-16deg);pointer-events:none;filter:grayscale(.2);
+  content:'';position:absolute;left:6%;bottom:10%;
+  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);opacity:.09;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;transform:rotate(-16deg);
 }
 .hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
 .hCircle1{width:240px;height:240px;right:-78px;top:-92px}
@@ -454,6 +453,25 @@ body{
   .topDock{gap:14px}
 }
 
+
+.titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.titleWithIcon .titleIcon{line-height:0;display:inline-flex}
+.titleWithIcon .titleIcon svg{display:block}
+.quickBtn{display:inline-flex;align-items:center;gap:6px}
+.quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
+.quickBtn-icon svg{display:block}
+.rosterIconWrap,.otherIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon,.courseIcon{
+  line-height:0;display:inline-flex;align-items:center;justify-content:center;
+  transition:transform .28s ease
+}
+.rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
+#otherPageBtn:hover .otherIconWrap{transform:translateY(-5px) scale(1.06)}
+.courseIcon{font-size:0;color:var(--accent,#2563eb)}
+.courseIcon svg{display:block}
+.peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
+.badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
+
+
 </style>
 </head>
 <body>
@@ -464,7 +482,7 @@ body{
     <div class="hCircle hCircle2"></div>
     <div class="hCircle hCircle3"></div>
     <div class="headerText">
-      <h1 id="pageTitle">📚 Training Courses</h1>
+      <h1 id="pageTitle" class="titleWithIcon"><span class="titleIcon"><svg class="titleIconSvg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="pageTitleText">Training Courses</span></h1>
       <p id="pageSubtitle">Visual schedule</p>
       <div class="dateTag">
         During 03 – 13 May
@@ -479,19 +497,14 @@ body{
     <div class="statsTicker"><div class="statsFace"><div class="statsText"><div class="statsValue">7</div><div class="statsLabel">Sessions</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">6</div><div class="statsLabel">Types</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">59</div><div class="statsLabel">Employees</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">1</div><div class="statsLabel">Venues</div></div></div></div>
   </div>
   <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
-    <div class="rosterInner">
-      <img class="rosterIcon" src="data:image/png;base64,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" alt="" aria-hidden="true">
-      <span class="rosterLabel">Roster</span>
-    </div>
+    <div class="rosterInner"><span class="rosterIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span class="rosterLabel">Roster</span></div>
   </button>
-  <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
-    <div class="dockValue searchGlyph">🔎</div><div class="dockLabel">Search</div>
-  </button>
+  <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false"><div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel">Search</div></button>
   <button class="dockCard dockAction" id="otherPageBtn" type="button">
-    <div class="otherPageInner"><img src="images/a-cup-icon.png" class="otherIcon" alt="" aria-hidden="true"><div class="dockLabel otherPageLabel">A Cup of Book</div></div>
+    <div class="otherPageInner"><span class="otherIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H15"/><path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/><path d="M17 8h2a2 2 0 0 1 0 4h-1"/><path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/></svg></span><div class="dockLabel otherPageLabel">A Cup of Book</div></div>
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
-    <div class="savedIcon">👤</div>
+    <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
     <div class="savedLines">
       <div class="savedName" id="savedName">My Staff</div>
       <div class="savedNo" id="savedNo"></div>
@@ -514,7 +527,7 @@ body{
 <details class="courseCard is-past pastelT0" data-search="cargo warehouse operations (cwo) (refresher)  cargo training room 08:00 to 15:00 82548 mr. ahmed hadid ramadhan al muqaimi 82437 mr. marwan khalfan khamis al difai 80270 mr. marlon manalo esmilla 990737 mr. said hamood said al amri 82456 mr. ahmed darwish abdullah al farsi 81034 mr. abid yahya ramadhan al zadjali 80591 mr. salam salim masoud al shekaili 82563 mr. amur sulaiman hamed al makarshi 80276 mr. allan vianzon tajonera" data-attendees="9">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">✈️</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Cargo Warehouse Operations (CWO) (refresher)</div>
       <div class="courseSubRow">
@@ -526,7 +539,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">13–14 May</span>
-      <span class="badge peopleBadge">👥 9</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>9</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -537,7 +550,7 @@ body{
 <details class="courseCard is-past pastelT1" data-search="lar (refresher)  cargo training room 08:00 to 15:00 82600 mr. habib mohammed janjan al balushi 81393 mr. ali suleiman ali al farsi 81300 mr. talal mahmood darwhish al balushi 81402 mr. mohammed ali salim al siyabi 82439 mr. ghaith zayed saif al habsi 8926 mr. salim mohammad hamed al masroori 81991 mr. hilal khalaf khalfan al-shammakhi 8942 mr. ali hamed ali al hashmi 990346 mr. abdulla adam ibrahim al balushi 81022 mr. faisal noor mohammad al balushi 82541 mr. mohammed marhoon rashid al wahaibi 82455 mr. ahmed hilal hamood al husaini 82544 mr. faisal mohamed rafiq shair mohamed al balushi 82614 mr. mohamed saif khalfan al mawali 990347 mr. maqbool hussian haji al balishi 81025 mr. yahya ahmed sulaiman al masoudi 82465 mr. dhaigham anees khalfan al sulaimi" data-attendees="17">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">📘</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">LAR (refresher)</div>
       <div class="courseSubRow">
@@ -549,7 +562,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">12 May</span>
-      <span class="badge peopleBadge">👥 17</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>17</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -560,7 +573,7 @@ body{
 <details class="courseCard is-past pastelT2" data-search="human factors (refresher)  cargo training room 08:00 to 15:00 80833 mr.suleiman salim saif al maharbi 80834 mr.said hamed khamis al amri 82049 mr. majid said salim al-ghafri 8195 mr.samaramannage jayantha chandranath" data-attendees="4">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">🧠</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Human Factors (refresher)</div>
       <div class="courseSubRow">
@@ -572,7 +585,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">10 May</span>
-      <span class="badge peopleBadge">👥 4</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>4</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -583,7 +596,7 @@ body{
 <details class="courseCard is-past pastelT3" data-search="sms (initial)  cargo training room 08:00 to 15:00 82578 mr. raad hassan mohamed al farsi 82600 mr. habib mohammed janjan al balushi 82645 mr. abdullah juma hashil al shekaili 82657 ms. bushra khamis mohammed al waheibi 82659 mr. ammar nasser hamed al hashmi 82456 mr. ahmed darwish abdullah al farsi 82475 mrs. zainab hamood ali al-hashimi 82664 ms. haifa yousuf al balushi" data-attendees="8">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">🛡️</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">SMS (initial)</div>
       <div class="courseSubRow">
@@ -595,7 +608,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">07 May</span>
-      <span class="badge peopleBadge">👥 8</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -606,7 +619,7 @@ body{
 <details class="courseCard is-past pastelT4" data-search="forklift (refresher)  cargo training room 08:00 to 15:00 8859 mr. sultan saif mohammad al riyami 8901 mr. dingiri bandaralage nishautha udugama 81399 mr. jamal nasser khamis al sinani 82113 mr. abdullah ali mohammed al sawaai 82476 mr. ahmed thunai masaud al rujaibi 82574 mr. ali sultan amur al mamari 990752 mr. ali yousuf yaqoob al baluchi" data-attendees="7">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">🚜</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Forklift (refresher)</div>
       <div class="courseSubRow">
@@ -618,7 +631,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">06 May</span>
-      <span class="badge peopleBadge">👥 7</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -629,7 +642,7 @@ body{
 <details class="courseCard is-past pastelT0" data-search="forklift (refresher)  cargo training room 08:00 to 15:00 8591 mr. aziz zayed mohammad al bulushi 80276 mr. allan vianzon tajonera 80482 mr. waleed khalifa khamis al haddabi 82550 mr. saleh ghuwainim mohsin said al aufi 82596 mr. hamed saif hamed al fulaiti 82658 mr. mohammed nasser said al mazroei 80591 mr. salam salim masoud al shekaili" data-attendees="7">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">🚜</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Forklift (refresher)</div>
       <div class="courseSubRow">
@@ -641,7 +654,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">04 May</span>
-      <span class="badge peopleBadge">👥 7</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
     </div>
   </summary>
   <div class="courseBody">
@@ -652,7 +665,7 @@ body{
 <details class="courseCard is-past pastelT1" data-search="airside safety (refresher)  cargo training room 08:00 to 15:00 82420 mr. mohamed rashid mabiwa al saadi 82657 ms. bushra khamis mohammed al waheibi 82658 mr. mohammed nasser said al mazroei 82661 mr. mohamed abdullah khatim al maskari 82665 mr. mahanad khalid abdullah al hadi 82666 mr. mohammed sulaiman khamis almaskari 82667 mr. mossa khamis moosa al balushi" data-attendees="7">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">🦺</div>
+    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Airside Safety (refresher)</div>
       <div class="courseSubRow">
@@ -664,7 +677,7 @@ body{
     <div class="courseBadges">
       
       <span class="badge dateBadge">03 May</span>
-      <span class="badge peopleBadge">👥 7</span>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
     </div>
   </summary>
   <div class="courseBody">
