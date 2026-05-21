@@ -80,15 +80,43 @@
       letter-spacing:0;
     }
     .langToggle {
-      position:absolute; top:14px; right:16px; z-index:25;
-      background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.25);
-      border-radius:50%; width:26px; height:26px;
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:10px; font-weight:800; cursor:pointer;
-      transition:all .25s; -webkit-tap-highlight-color:transparent; padding:0;
+      position:absolute; top:12px; right:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; height:auto; padding:4px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      transition:transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
     }
-    .langToggle:hover { background:rgba(255,255,255,.30); transform:scale(1.08); }
+    body.ar .langToggle { right:12px; left:auto; }
+    .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
+    .langToggle-icon svg {
+      display:block; width:18px; height:18px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      text-shadow:0 1px 3px rgba(0,0,0,.65);
+    }
+    #banner-changer-btn {
+      position:absolute; top:12px; left:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; min-height:auto; padding:4px;
+      color:#fff; cursor:pointer; line-height:0;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+    #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    #banner-changer-btn .banner-changer-icon svg {
+      display:block; width:20px; height:20px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    body.ar #banner-changer-btn { left:12px; right:auto; }
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .datePickerWrapper {
       position:relative;
@@ -137,13 +165,8 @@
       align-items:center;
       justify-content:flex-start;
     }
-.roster-icon, .chipIcon {
-      display: block;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
 .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-.summaryChip .chipIcon.diffIcon { width:30px; height:30px; }
+    .summaryChip .chip-icon { display:block; flex-shrink:0; }
     .summaryChip .chipLabel {
       font-size:9.5px;
       font-weight:600;
@@ -373,10 +396,14 @@
       border-bottom-color: #29b6f6;
       background: rgba(255,255,255,.06);
     }
-    @media (max-width:480px){
-      .langToggle      { min-width:44px; min-height:44px; padding:6px 8px; }
-      .langToggle-icon svg { width:16px; height:16px; }
+    @media (max-width:720px){
+      .langToggle { padding:6px; }
+      .langToggle-icon svg { width:20px; height:20px; }
       .langToggle-label { font-size:11px; }
+      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+    }
+    @media (max-width:480px){
       .wrap { padding:12px 10px 22px; }
       .header .bannerTitleMain { font-size:22px; }
       body.ar .header .bannerTitleMain { font-size:21px; }
@@ -386,7 +413,10 @@
 <body>
   <div class="wrap">
     <div class="header">
-      <button class="langToggle" id="langToggle" type="button">ع</button>
+      <button class="langToggle" id="langToggle" type="button" title="Switch language" onclick="toggleLang()">
+        <span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span class="langToggle-label" id="langToggleLabel">ع</span>
+      </button>
       <h1 id="pageTitle" class="bannerTitle">
         <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
         <span class="bannerTitleMain" id="pageTitleMain">Auto Diff</span>
@@ -410,7 +440,7 @@
         <div class="chipLabel">My Schedule</div>
       </a>
       <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal" id="compareChipIcon"><img class="chipIcon diffIcon" id="compareChipImg" alt="Diff" src="" /></div>
+        <div class="chipVal" id="compareChipIcon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
         <div class="chipLabel" id="compareChipLabel">Diff</div>
       </a>
     </div>
@@ -436,7 +466,14 @@
     let currentDiffKind = 'export';
     let currentPanel = 'diff';
     let lastDiffData = null;
-    let currentLang = localStorage.getItem('rosterDiffLang') === 'ar' ? 'ar' : 'en';
+    function readLang() {
+      const roster = localStorage.getItem('rosterLang');
+      const diff = localStorage.getItem('rosterDiffLang');
+      if (roster === 'ar' || roster === 'en') return roster;
+      if (diff === 'ar' || diff === 'en') return diff;
+      return 'en';
+    }
+    let currentLang = readLang();
     let latestIsoDate = '';
     let lastSummaryStats = null;
 
@@ -447,9 +484,13 @@
         titleEyebrowExport: 'Export',
         titleEyebrowImport: 'Import',
         titleMain: 'Auto Diff',
+        chipExport: 'Export',
+        chipTraining: 'Training',
+        chipMySchedule: 'My Schedule',
         chipExpDiff: 'Exp Diff',
         chipImpDiff: 'Imp Diff',
         switchDiff: 'Switch Diff',
+        langBtn: 'ع',
         noDiffLoaded: 'No diff loaded yet.',
         note: 'Automatic comparison between latest and previous version of the same month. No manual upload required.',
         noDiffFound: 'No differences found between previous and current versions.',
@@ -471,9 +512,13 @@
         titleEyebrowExport: 'الصادر',
         titleEyebrowImport: 'الوارد',
         titleMain: 'فروقات تلقائية',
+        chipExport: 'الصادر',
+        chipTraining: 'التدريب',
+        chipMySchedule: 'جدولي',
         chipExpDiff: 'فرق الصادر',
         chipImpDiff: 'فرق الوارد',
         switchDiff: 'تبديل نوع الفروقات',
+        langBtn: 'EN',
         noDiffLoaded: 'لا توجد فروقات محملة بعد.',
         note: 'مقارنة تلقائية بين أحدث نسخة والنسخة السابقة لنفس الشهر بدون رفع يدوي.',
         noDiffFound: 'لا توجد فروقات بين النسخة السابقة والحالية.',
@@ -519,8 +564,21 @@
       const dt = new Date(`${latestIsoDate}T00:00:00`);
       const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
       const formatted = dt.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
-      dateTag.textContent = `📅 ${formatted}`;
+      dateTag.textContent = formatted;
     }
+
+    function toggleLang() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('rosterDiffLang', currentLang);
+      localStorage.setItem('rosterLang', currentLang);
+      applyLanguageUi();
+      if (currentPanel === 'absence') {
+        renderAbsencePanel(currentDiffKind);
+      } else if (lastDiffData) {
+        renderDiffRows(lastDiffData, currentDiffKind);
+      }
+    }
+    window.toggleLang = toggleLang;
 
     function updateBannerTitle() {
       const eyebrow = document.getElementById('pageTitleEyebrow');
@@ -547,6 +605,14 @@
       if (sourceHint) sourceHint.textContent = t('sourceHint');
       if (newBadge) newBadge.textContent = t('sourceNew');
       if (oldBadge) oldBadge.textContent = t('sourceOld');
+      const langLbl = document.getElementById('langToggleLabel');
+      if (langLbl) langLbl.textContent = t('langBtn');
+      const exportLbl = document.querySelector('#exportBtn .chipLabel');
+      const trainingLbl = document.querySelector('#trainingBtn .chipLabel');
+      const scheduleLbl = document.querySelector('#myScheduleBtn .chipLabel');
+      if (exportLbl) exportLbl.textContent = t('chipExport');
+      if (trainingLbl) trainingLbl.textContent = t('chipTraining');
+      if (scheduleLbl) scheduleLbl.textContent = t('chipMySchedule');
       updateSummaryText();
       updateDateTag();
       applyDiffModeUi(currentDiffKind);
@@ -608,9 +674,7 @@
       document.getElementById('exportBtn').href = `${root}/date/${isoDate}/`;
       document.getElementById('trainingBtn').href = `${root}/training/`;
       document.getElementById('myScheduleBtn').href = `${root}/my-schedules/`;
-      const langBtn = document.querySelector('.langToggle');
       const compareBtn = document.getElementById('compareChipBtn');
-      const compareChipImg = document.getElementById('compareChipImg');
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
       compareBtn.href = '#';
@@ -622,24 +686,6 @@
       compareBtn.title = t('switchDiff');
       tabRosterDiff.onclick = () => activatePanel('diff');
       tabAbsence.onclick = () => activatePanel('absence');
-      if (compareChipImg) compareChipImg.src = `${root}/assets/icons/diff-calendar.png`;
-      if (langBtn) {
-        langBtn.textContent = currentLang === 'ar' ? 'EN' : 'ع';
-        langBtn.onclick = () => {
-          currentLang = currentLang === 'ar' ? 'en' : 'ar';
-          localStorage.setItem('rosterDiffLang', currentLang);
-          langBtn.textContent = currentLang === 'ar' ? 'EN' : 'ع';
-          applyLanguageUi();
-          if (currentPanel === 'absence') {
-            renderAbsencePanel(currentDiffKind);
-          } else if (lastDiffData) {
-            renderDiffRows(lastDiffData, currentDiffKind);
-          }
-        };
-      }
-      document.querySelectorAll('.flightSwitchIcon').forEach((img) => {
-        img.src = `${root}/assets/icons/flight.png`;
-      });
       applyLanguageUi();
     })();
 
@@ -904,7 +950,7 @@
     (function loadBannerChanger(){
       const root = getSiteRootPath();
       const s = document.createElement('script');
-      s.src = `${root}/banner-changer.js?v=20260428`;
+      s.src = `${root}/banner-changer.js?v=20260521b`;
       s.defer = true;
       document.body.appendChild(s);
     })();
