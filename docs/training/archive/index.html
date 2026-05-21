@@ -97,7 +97,10 @@ body{
 }
 .header::after{
   content:'';position:absolute;left:6%;bottom:10%;
-  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);opacity:.09;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;transform:rotate(-16deg);
+  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);
+  opacity:.09;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  transform:rotate(-16deg);
 }
 .hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
 .hCircle1{width:240px;height:240px;right:-78px;top:-92px}
@@ -453,7 +456,6 @@ body{
   .topDock{gap:14px}
 }
 
-
 .titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
 .titleWithIcon .titleIcon{line-height:0;display:inline-flex}
 .titleWithIcon .titleIcon svg{display:block}
@@ -484,7 +486,7 @@ body{
     <div class="headerText">
       <h1 id="pageTitle" class="titleWithIcon"><span class="titleIcon"><svg class="titleIconSvg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="pageTitleText">Training Courses</span></h1>
       <p id="pageSubtitle">Archive view</p>
-      <div class="dateTag">Archive</div>
+      <div class="dateTag">📅 Archive</div>
     </div>
     <div class="headerRow"><a class="archiveBtn" href="../index.html">Latest month</a></div>
   </div>
