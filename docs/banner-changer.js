@@ -39,7 +39,9 @@
     'banner22.jpg',
     'banner23.jpg',
     'banner24.jpg',
-    'banner25.jpg'
+    'banner25.jpg',
+    'banner26.jpg',
+    'banner27.jpg'
   ];
 
   function bannerUrl(name) {
@@ -72,6 +74,11 @@
     const style = document.createElement('style');
     style.id = styleId;
     style.textContent = [
+      '.header.' + ACTIVE_CLASS + ',.topbar.' + ACTIVE_CLASS + '{',
+      'background-size:cover!important;',
+      'background-repeat:no-repeat!important;',
+      'background-position:62% center!important;',
+      '}',
       '.header.' + ACTIVE_CLASS + '::before,.header.' + ACTIVE_CLASS + '::after{opacity:0!important;}',
       '.' + ACTIVE_CLASS + ' .bannerTitle,',
       '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow,',
@@ -115,7 +122,7 @@
       'filter:drop-shadow(0 1px 2px rgba(0,0,0,.65))!important;}',
       'body.ar #banner-changer-btn{left:12px!important;right:auto!important;}',
       '.' + ACTIVE_CLASS + ' .dateTag{',
-      'color:#fff!important;text-shadow:' + TEXT_HALO + ';',
+      'color:#fff!important;',
       'background:rgba(255,255,255,.2)!important;',
       'border-color:rgba(255,255,255,.28)!important;',
       'backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);',
@@ -167,7 +174,7 @@
     targets.forEach(function (el) {
       el.style.backgroundImage = "url('" + url + "')";
       el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = 'center';
+      el.style.backgroundPosition = '62% center';
       el.style.backgroundRepeat = 'no-repeat';
     });
     setCustomBannerActive(true);

@@ -173,7 +173,9 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       -webkit-tap-highlight-color:transparent;
     }
     .header .dateTag {
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       background:rgba(255,255,255,.18);
       padding:5px 18px;
       border-radius:10px;
@@ -188,6 +190,23 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       -webkit-user-select:none;
       direction:ltr;
       pointer-events:none;
+      color:#fff;
+    }
+    .dateTag-icon {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
+    }
+    .dateTag-icon svg {
+      display:block;
+      width:16px;
+      height:16px;
+    }
+    .dateTag-label {
+      line-height:1.2;
     }
     .header .dateTag:hover {
       background:rgba(255,255,255,.25);
@@ -1016,7 +1035,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <span class="dateTag" id="dateTag">📅 28 April 2026</span>
+      <span class="dateTag" id="dateTag"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">28 April 2026</span></span>
       <input id="datePicker" type="date" value="2026-04-28" min="2026-04-01" max="2026-06-30" aria-label="Select roster date" />
     </div>
   </div>
@@ -1978,7 +1997,12 @@ function goToEmployeeSchedule(empName) {
 
   function syncHeaderDate(iso) {
     var tag = document.getElementById('dateTag');
-    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
+    if (tag) {
+    var dateLbl = document.getElementById('dateTagLabel');
+    var dateText = formatIsoLabel(iso);
+    if (dateLbl) dateLbl.textContent = dateText;
+    else tag.textContent = dateText;
+  }
   }
 
   var path = window.location.pathname || '/';

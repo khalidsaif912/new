@@ -116,7 +116,7 @@ ROSTER_PWA_HEAD_SNIPPET = """
           var bes = document.createElement('style');
           bes.id = 'banner-early-style';
           bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}}' +
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
             'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
           document.head.appendChild(bes);
         }}
@@ -942,7 +942,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       -webkit-tap-highlight-color:transparent;
     }}
     .header .dateTag {{
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       background:rgba(255,255,255,.18);
       padding:5px 18px;
       border-radius:10px;
@@ -957,6 +959,23 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       -webkit-user-select:none;
       direction:ltr;
       pointer-events:none;
+      color:#fff;
+    }}
+    .dateTag-icon {{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
+    }}
+    .dateTag-icon svg {{
+      display:block;
+      width:16px;
+      height:16px;
+    }}
+    .dateTag-label {{
+      line-height:1.2;
     }}
     .header .dateTag:hover {{
       background:rgba(255,255,255,.25);
@@ -1555,7 +1574,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <span class="dateTag" id="dateTag">📅 {date_label}</span>
+      <span class="dateTag" id="dateTag"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></span>
       <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} aria-label="Select roster date" />
     </div>
   </div>
@@ -1839,7 +1858,12 @@ function goToEmployeeSchedule(empName) {{
 
   function syncHeaderDate(iso) {{
     var tag = document.getElementById('dateTag');
-    if (tag) tag.textContent = '📅 ' + formatIsoLabel(iso);
+    if (tag) {{
+      var dateLbl = document.getElementById('dateTagLabel');
+      var dateText = formatIsoLabel(iso);
+      if (dateLbl) dateLbl.textContent = dateText;
+      else tag.textContent = dateText;
+    }}
   }}
 
   var path = window.location.pathname || '/';
