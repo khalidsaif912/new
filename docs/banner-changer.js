@@ -41,7 +41,8 @@
     'banner24.jpg',
     'banner25.jpg',
     'banner26.jpg',
-    'banner27.jpg'
+    'banner27.jpg',
+    'banner28.jpg'
   ];
 
   function bannerUrl(name) {
