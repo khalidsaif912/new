@@ -24,6 +24,7 @@ from roster_cta_snippets import (  # noqa: E402
     LANG_TOGGLE_CSS,
     LANG_TOGGLE_HTML,
     APPLY_LANG_LANG_BTN_NEW,
+    SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
     export_cta_html,
 )
@@ -918,7 +919,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       align-items:center;
       justify-content:center;
       line-height:0;
-      transform-origin:70% 70%;
+      transform-origin:50% 88%;
       animation:waveHand 1.8s ease-in-out infinite;
     }}
     @keyframes waveHand {{
@@ -1288,11 +1289,26 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: var(--cta-gap);
       width: 100%;
       max-width: 100%;
       margin-inline: auto;
+    }}
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {{
+      grid-column: 1 / span 2;
+    }}
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {{
+      grid-column: 3 / span 2;
+    }}
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {{
+      grid-column: 5 / span 2;
+    }}
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {{
+      grid-column: 2 / span 2;
+    }}
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {{
+      grid-column: 4 / span 2;
     }}
     .roster-cta-btn {{
       display: inline-flex;
@@ -1362,16 +1378,17 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       color: #475569;
     }}
     .roster-cta-btn--share {{
-      grid-column: 1 / -1;
       background: #ecfdf5;
       border-color: #86efac;
       color: #166534;
     }}
+    .roster-cta-btn--apps {{
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }}
     .roster-cta--import {{
       grid-template-columns: 1fr 1fr;
-    }}
-    .roster-cta--import .roster-cta-btn--share {{
-      grid-column: 1 / -1;
     }}
     @media (hover: hover) {{
       .roster-cta-btn:hover {{
@@ -1382,6 +1399,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .roster-cta-btn--subscribe:hover {{ background: #faf5ff; }}
       .roster-cta-btn--compare:hover {{ background: #fef3c7; }}
       .roster-cta-btn--share:hover {{ background: #d1fae5; }}
+      .roster-cta-btn--apps:hover {{ background: #e0f2fe; }}
       .roster-cta-btn--muted:hover {{ background: #e2e8f0; }}
     }}
     .roster-cta-btn:active {{
@@ -1436,6 +1454,44 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .siteShareActions .roster-cta-btn--compare {{ grid-column:1 / -1; }}
     .siteShareCloseWrap {{ margin-top:4px; }}
     .siteShareCloseWrap .roster-cta-btn {{ width:100%; }}
+
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }}
+    .siteAppsSheet.open {{ display:flex; pointer-events:auto; visibility:visible; }}
+    .siteAppsCard {{
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
+    }}
+    .siteAppsTitle {{ font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }}
+    .siteAppsHint {{ font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }}
+    .siteAppsGrid {{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }}
+    .siteAppsLink {{
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
+    }}
+    .siteAppsLink-icon {{
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+    }}
+    .siteAppsLink-title {{ font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }}
+    .siteAppsLink-sub {{ font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }}
+    .siteAppsLink--games {{
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
+    }}
+    .siteAppsLink--games .siteAppsLink-text {{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }}
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub {{ text-align:start; }}
+    .siteAppsCloseWrap {{ margin-top:4px; }}
+    .siteAppsCloseWrap .roster-cta-btn {{ width:100%; }}
 
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
@@ -1567,6 +1623,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 </div>
 
 {SITE_SHARE_MODAL_HTML}
+
+{SITE_APPS_MODAL_HTML}
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -2148,7 +2206,7 @@ var T = {{
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
@@ -2160,7 +2218,7 @@ var T = {{
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
@@ -2247,7 +2305,9 @@ function applyLang(lang) {{
   setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('moreAppsBtn', t.moreApps);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
+  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {{
     var h=footer.innerHTML;
@@ -2409,6 +2469,7 @@ function goToRosterDiff(event) {{
   var ver = '20260520d';
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-share.js?v=' + ver);
+  addScript(root + '/site-apps.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);

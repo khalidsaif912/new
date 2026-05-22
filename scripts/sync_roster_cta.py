@@ -31,8 +31,12 @@ from roster_cta_snippets import (  # noqa: E402
     REMOVE_ICON_JS_RE,
     REMOVE_ICON_JS_RE2,
     ROSTER_ICONS_SCRIPT,
+    SITE_APPS_CSS,
+    SITE_APPS_MODAL_HTML,
+    SITE_APPS_SCRIPT,
     SITE_SHARE_CSS,
     SITE_SHARE_MODAL_HTML,
+    SVG_APPS_BTN,
     SVG_BELL,
     SVG_COMPARE,
     LANG_TOGGLE_CSS,
@@ -43,6 +47,8 @@ from roster_cta_snippets import (  # noqa: E402
     import_cta_html,
     I18N_CMP_AR,
     I18N_CMP_EN,
+    I18N_APPS_AR,
+    I18N_APPS_EN,
     I18N_SHARE_AR,
     I18N_SHARE_EN,
     I18N_SUB_AR,
@@ -53,19 +59,32 @@ from roster_cta_snippets import (  # noqa: E402
 
 CTA_CSS_RE = re.compile(
     r"    /\* ═══════ QUICK ACTIONS ═══════ \*/\s*.*?"
-    r"(?=    /\* ═══════ (?:SITE SHARE|FOOTER|SHARE/SAVE))",
+    r"(?=    /\* ═══════ (?:SITE SHARE|SITE APPS|FOOTER|SHARE/SAVE))",
     re.DOTALL,
 )
 
 SITE_SHARE_CSS_RE = re.compile(
     r"    /\* ═══════ SITE SHARE MODAL ═══════ \*/\s*.*?"
+    r"(?=    /\* ═══════ (?:SITE APPS|FOOTER|SHARE/SAVE))",
+    re.DOTALL,
+)
+
+SITE_APPS_CSS_RE = re.compile(
+    r"    /\* ═══════ RELATED APPS MODAL ═══════ \*/\s*.*?"
     r"(?=    /\* ═══════ (?:FOOTER|SHARE/SAVE))",
     re.DOTALL,
 )
 
-SITE_SHARE_MODAL_RE = re.compile(
-    r'<div id="siteShareSheet" class="siteShareSheet"[^>]*>.*?</div>\s*(?=<div id="captureBusy")',
+ORPHAN_SHARE_FRAGMENT_RE = re.compile(
+    r'\n<p class="siteShareUrl" id="siteShareUrl"></p>\s*'
+    r'<div class="siteShareActions">.*?</div>\s*'
+    r'<div class="siteShareCloseWrap">.*?</div>\s*</div>\s*</div>\s*',
     re.DOTALL,
+)
+
+SHARE_SITE_BTN_RE = re.compile(
+    r'<button[^>]*\bid="shareSiteBtn"[^>]*>.*?</button>',
+    re.DOTALL | re.IGNORECASE,
 )
 
 LEGACY_CTA_CSS_RE = re.compile(
@@ -208,7 +227,8 @@ CTA_LANG_APPLY_RE = re.compile(
     r"  var c1=document\.getElementById\('ctaBtn'\); if\(c1\) c1\.textContent=t\.viewFull;\s*"
     r"  var c2=document\.getElementById\('subscribeBtn'\); if\(c2\) c2\.textContent=t\.subscribe;\s*"
     r"(?:  var c3=document\.getElementById\('compareBtn'\); if\(c3\) c3\.textContent=t\.compare;\s*)?"
-    r"(?:  var c4=document\.getElementById\('shareSiteBtn'\); if\(c4\) c4\.textContent=t\.shareSite;\s*)?",
+    r"(?:  var c4=document\.getElementById\('shareSiteBtn'\); if\(c4\) c4\.textContent=t\.shareSite;\s*)?"
+    r"(?:  var c5=document\.getElementById\('moreAppsBtn'\); if\(c5\) c5\.textContent=t\.moreApps;\s*)?",
 )
 
 
@@ -229,23 +249,211 @@ def patch_apply_lang(html: str) -> str:
                 "compare:'مقارنة', shareSite:'مشاركة الموقع',",
                 1,
             )
+    if 'id="moreAppsBtn"' in html:
+        if "moreApps:" not in html:
+            html = html.replace(
+                "shareSite:'Share Site',",
+                "shareSite:'Share Site', moreApps:'Apps',",
+                1,
+            )
+            html = html.replace(
+                "shareSite:'مشاركة الموقع',",
+                "shareSite:'مشاركة الموقع', moreApps:'تطبيقات',",
+                1,
+            )
+        if "rosterSiteApps.setLang" not in html and "rosterSiteShare.setLang" in html:
+            html = html.replace(
+                "if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();",
+                "if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();\n"
+                "  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();",
+                1,
+            )
     return html
 
 
+def patch_apply_lang_more_apps(html: str) -> str:
+    if 'id="moreAppsBtn"' not in html:
+        return html
+    if "moreApps:" not in html:
+        html = html.replace(
+            "shareSite:'Share Site',",
+            "shareSite:'Share Site', moreApps:'Apps',",
+            1,
+        )
+        html = html.replace(
+            "shareSite:'مشاركة الموقع',",
+            "shareSite:'مشاركة الموقع', moreApps:'تطبيقات',",
+            1,
+        )
+    if "setCtaLabel('moreAppsBtn'" in html:
+        return html
+    inserts = [
+        (
+            "setCtaLabel('shareSiteBtn', t.shareSite);  var footer=document.querySelector('.footer');",
+            "setCtaLabel('shareSiteBtn', t.shareSite);\n"
+            "  setCtaLabel('moreAppsBtn', t.moreApps);\n"
+            "  if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();\n"
+            "  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();\n"
+            "  var footer=document.querySelector('.footer');",
+        ),
+        (
+            "setCtaLabel('shareSiteBtn', t.shareSite);\n  var footer=document.querySelector('.footer');",
+            "setCtaLabel('shareSiteBtn', t.shareSite);\n"
+            "  setCtaLabel('moreAppsBtn', t.moreApps);\n"
+            "  if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();\n"
+            "  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();\n"
+            "  var footer=document.querySelector('.footer');",
+        ),
+    ]
+    replaced = False
+    for old, new in inserts:
+        if old in html:
+            html = html.replace(old, new, 1)
+            replaced = True
+            break
+    if not replaced and "rosterSiteShare.setLang" in html and "rosterSiteApps.setLang" not in html:
+        html = html.replace(
+            "if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();",
+            "if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();\n"
+            "  setCtaLabel('moreAppsBtn', t.moreApps);\n"
+            "  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();",
+            1,
+        )
+    return html
+
+
+def _next_modal_marker(html: str, start: int) -> int:
+    """Index of the next modal block after start (apps sheet or capture overlay)."""
+    markers = ('<div id="siteAppsSheet"', '<div id="captureBusy"')
+    positions = [html.find(m, start + 1) for m in markers]
+    positions = [p for p in positions if p >= 0]
+    return min(positions) if positions else -1
+
+
+def cleanup_orphan_share_fragments(html: str) -> str:
+    while ORPHAN_SHARE_FRAGMENT_RE.search(html):
+        html = ORPHAN_SHARE_FRAGMENT_RE.sub("\n", html, count=1)
+    return html
+
+
+def replace_share_modal_block(html: str) -> str:
+    start = html.find('<div id="siteShareSheet"')
+    if start < 0:
+        return html
+    end = _next_modal_marker(html, start)
+    if end < 0:
+        return html
+    return html[:start] + SITE_SHARE_MODAL_HTML.strip() + "\n\n" + html[end:]
+
+
+def replace_apps_modal_block(html: str) -> str:
+    start = html.find('<div id="siteAppsSheet"')
+    if start < 0:
+        return html
+    end = html.find('<div id="captureBusy"', start + 1)
+    if end < 0:
+        return html
+    return html[:start] + SITE_APPS_MODAL_HTML.strip() + "\n\n" + html[end:]
+
+
 def patch_site_share(html: str) -> str:
-    if 'id="siteShareSheet"' not in html:
+    if 'id="shareSiteBtn"' not in html and 'id="siteShareSheet"' not in html:
         return html
     if "/* ═══════ SITE SHARE MODAL ═══════ */" in html:
         html = SITE_SHARE_CSS_RE.sub(SITE_SHARE_CSS, html, count=1)
-    else:
+    elif 'id="shareSiteBtn"' in html:
         html = html.replace(
             "    /* ═══════ FOOTER ═══════ */",
             SITE_SHARE_CSS + "\n    /* ═══════ FOOTER ═══════ */",
             1,
         )
-    m = SITE_SHARE_MODAL_RE.search(html)
-    if m:
-        html = SITE_SHARE_MODAL_RE.sub(SITE_SHARE_MODAL_HTML + "\n", html, count=1)
+    html = cleanup_orphan_share_fragments(html)
+    if '<div id="siteShareSheet"' in html:
+        html = replace_share_modal_block(html)
+    elif 'id="shareSiteBtn"' in html:
+        marker = '<div id="siteAppsSheet"'
+        pos = html.find(marker)
+        if pos < 0:
+            pos = html.find('<div id="captureBusy"')
+        if pos >= 0:
+            html = (
+                html[:pos]
+                + SITE_SHARE_MODAL_HTML.strip()
+                + "\n\n"
+                + html[pos:]
+            )
+    return html
+
+
+def patch_site_apps(html: str) -> str:
+    if 'id="moreAppsBtn"' not in html and 'id="shareSiteBtn"' in html:
+        apps_btn = (
+            '  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">\n'
+            f'    <span class="roster-cta-icon">{SVG_APPS_BTN}</span>\n'
+            '    <span class="roster-cta-label">Apps</span>\n'
+            "  </button>\n"
+        )
+        html = SHARE_SITE_BTN_RE.sub(lambda m: m.group(0) + "\n" + apps_btn, html, count=1)
+    if "/* ═══════ RELATED APPS MODAL ═══════ */" in html:
+        html = SITE_APPS_CSS_RE.sub(SITE_APPS_CSS, html, count=1)
+    elif 'id="siteAppsSheet"' in html or 'id="shareSiteBtn"' in html:
+        anchor = "    /* ═══════ FOOTER ═══════ */"
+        if "/* ═══════ RELATED APPS MODAL ═══════ */" not in html:
+            html = html.replace(anchor, SITE_APPS_CSS + "\n" + anchor, 1)
+    html = cleanup_orphan_share_fragments(html)
+    if '<div id="siteAppsSheet"' in html:
+        html = replace_apps_modal_block(html)
+    elif 'id="moreAppsBtn"' in html or 'id="shareSiteBtn"' in html:
+        pos = html.find('<div id="captureBusy"')
+        if pos >= 0:
+            html = (
+                html[:pos]
+                + SITE_APPS_MODAL_HTML.strip()
+                + "\n\n"
+                + html[pos:]
+            )
+    html = _fix_share_apps_grid_css(html)
+    return html
+
+
+def _fix_share_apps_grid_css(html: str) -> str:
+    html = re.sub(
+        r"\.roster-cta-btn--share\s*\{\s*grid-column:\s*1\s*/\s*-1;\s*",
+        ".roster-cta-btn--share {\n      ",
+        html,
+        count=1,
+    )
+    html = re.sub(
+        r"\.roster-cta--import\s+\.roster-cta-btn--share\s*\{\s*grid-column:\s*1\s*/\s*-1;\s*\}\s*",
+        "",
+        html,
+        count=1,
+    )
+    if ".roster-cta-btn--apps" not in html and ".roster-cta-btn--share" in html:
+        html = html.replace(
+            ".roster-cta-btn--share {",
+            ".roster-cta-btn--share {",
+            1,
+        )
+        insert = """    .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+"""
+        if ".roster-cta-btn--apps" not in html:
+            html = html.replace(
+                ".roster-cta-btn--muted {",
+                insert + "    .roster-cta-btn--muted {",
+                1,
+            )
+        hover = "      .roster-cta-btn--share:hover { background: #d1fae5; }\n"
+        if ".roster-cta-btn--apps:hover" not in html:
+            html = html.replace(
+                hover,
+                hover + "      .roster-cta-btn--apps:hover { background: #e0f2fe; }\n",
+                1,
+            )
     return html
 
 
@@ -290,7 +498,7 @@ def patch_summary_chips(html: str) -> str:
         (r'(<a[^>]*id="trainingBtn"[^>]*>\s*)<div class="chipVal">[^<]*</div>', r"\1" + CHIP_TRAINING_HTML),
         (r'(<a[^>]*id="diffChipBtn"[^>]*>\s*)<div class="chipVal">.*?</div>', r"\1" + CHIP_DIFF_HTML),
         (
-            r'(<a[^>]*id="welcomeChip"[^>]*>\s*)<div class="chipVal">(?:<span class="waveHand">[^<]*</span>|.*?)</div>',
+            r'(<a[^>]*id="welcomeChip"[^>]*>\s*)<div class="chipVal">.*?</div>',
             r"\1" + CHIP_WAVE_HTML,
         ),
         (
@@ -398,17 +606,43 @@ def patch_subscribe_bell_icon(html: str) -> str:
     return html
 
 
-def patch_roster_icons_script(html: str) -> str:
-    if "roster-icons.js" in html:
-        return html
-    needle = "addScript(root + '/site-share.js"
-    if needle in html:
-        return html.replace(
-            needle,
-            ROSTER_ICONS_SCRIPT + "\n  " + needle,
-            1,
+def patch_broken_script_lines(html: str) -> str:
+    """Repair corrupted addScript lines from a bad sync (truncated site-share.js)."""
+    broken = (
+        "addScript(root + '/site-share.js\n"
+        "  addScript(root + '/site-apps.js?v=' + ver);"
+    )
+    fixed = (
+        "addScript(root + '/site-share.js?v=' + ver);\n"
+        "  addScript(root + '/site-apps.js?v=' + ver);"
+    )
+    if broken in html:
+        html = html.replace(broken, fixed)
+    if "site-apps.js?v=' + ver);?v=" in html:
+        html = html.replace(
+            "addScript(root + '/site-apps.js?v=' + ver);?v=' + ver);",
+            "addScript(root + '/site-apps.js?v=' + ver);",
         )
     return html
+
+
+def patch_roster_icons_script(html: str) -> str:
+    html_out = patch_broken_script_lines(html)
+    share_line = "addScript(root + '/site-share.js?v=' + ver);"
+    apps_line = "addScript(root + '/site-apps.js?v=' + ver);"
+    if "roster-icons.js" not in html_out and share_line in html_out:
+        html_out = html_out.replace(
+            share_line,
+            ROSTER_ICONS_SCRIPT.strip() + "\n  " + share_line,
+            1,
+        )
+    if "site-apps.js" not in html_out and share_line in html_out:
+        html_out = html_out.replace(
+            share_line,
+            share_line + "\n  " + apps_line,
+            1,
+        )
+    return html_out
 
 
 def patch_css_and_js(html: str) -> str:
@@ -417,10 +651,12 @@ def patch_css_and_js(html: str) -> str:
     elif "/* ═══════ CTA ═══════ */" in html and 'id="ctaBtn"' in html:
         html = LEGACY_CTA_CSS_RE.sub(CTA_CSS, html, count=1)
     html = patch_site_share(html)
+    html = patch_site_apps(html)
     html = patch_summary_chips(html)
     html = patch_lang_toggle(html)
     html = patch_compare_cta_icon(html)
     html = patch_subscribe_bell_icon(html)
+    html = patch_broken_script_lines(html)
     html = patch_roster_icons_script(html)
     html = APPLY_LANG_BAD_LINE.sub("", html)
     if "setDiffChipIcon" in html:
@@ -433,6 +669,7 @@ def patch_css_and_js(html: str) -> str:
         html = html.replace(TOUCH_OLD, TOUCH_NEW)
     html = IMPORT_BOTTOM_OLD.sub(IMPORT_BOTTOM_NEW, html)
     html = patch_apply_lang(html)
+    html = patch_apply_lang_more_apps(html)
     for old, new in (
         ("viewFull:'📋 Full Roster'", I18N_VIEWFULL_EN),
         ("subscribe:'📩 Subscribe'", I18N_SUB_EN),

@@ -31,14 +31,16 @@
     'banner10.jpg',
     'banner11.jpg',
     'banner12.jpg',
-    'banner13.jpg',
     'banner14.jpg',
     'banner15.jpg',
     'banner16.jpg',
     'banner17.jpg',
-    'banner18.jpg',
     'banner19.jpg',
-    'banner20.jpg'
+    'banner22.jpg',
+    'banner23.jpg',
+    'banner24.jpg',
+    'banner25.jpg',
+    'banner26.jpg'
   ];
 
   function bannerUrl(name) {

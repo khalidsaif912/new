@@ -132,8 +132,7 @@
       #banner-changer-btn { padding:6px; }
       #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
     }
-
-    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
+body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .empRow, .empName, .empStatus { direction:ltr !important; unicode-bidi:embed; text-align:left !important; }
 
     .welcomeChip {
@@ -150,11 +149,8 @@
       text-overflow:ellipsis;
     }
     .waveHand {
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      line-height:0;
-      transform-origin:70% 70%;
+      display:inline-block;
+      transform-origin:50% 88%;
       animation:waveHand 1.8s ease-in-out infinite;
     }
     @keyframes waveHand {
@@ -197,7 +193,7 @@
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS (no -webkit-appearance reset) */
+    /* Transparent date input over #dateTag — native picker on iOS */
     .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
@@ -255,24 +251,13 @@
       align-items:center;
       justify-content:flex-start;
     }
-    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-    .summaryChip .chipVal .chip-icon {
+.roster-icon, .chipIcon {
       display: block;
-      width: 22px;
-      height: 22px;
-      margin: 0 auto;
+      object-fit: contain;
       flex-shrink: 0;
     }
-    .summaryChip .chipVal .waveHand {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-    }
-    .summaryChip .chipVal .waveHand .chip-icon {
-      margin: 0;
-    }
-
+.summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+.summaryChip .chipIcon.diffIcon { width:35px; height:35px; }
     #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
@@ -343,7 +328,23 @@
     @media (max-width:600px){
       .summaryBar { gap:6px; }
       .summaryChip { padding:8px 8px; min-width:60px; }
-      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+    .summaryChip .chipVal { font-size:18px; }
       .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
     }
 
@@ -533,7 +534,7 @@
       margin-top: 4px;
     }
 
-    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
+    /* ═══════ QUICK ACTIONS ═══════ */
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
@@ -581,6 +582,7 @@
       line-height: 0;
     }
     .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .roster-cta-icon .roster-icon { width: 18px; height: 18px; }
     .roster-cta-label {
       white-space: nowrap;
       overflow: hidden;
@@ -601,29 +603,41 @@
       border-color: #fcd34d;
       color: #1f2937;
     }
-    .roster-cta-btn--compare .roster-cta-icon {
-      width: 22px;
-      height: 22px;
-      background: #2563eb;
-      border-radius: 6px;
+    .roster-cta-btn--share {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
     }
-    .roster-cta-btn--compare .roster-cta-icon svg { width: 14px; height: 14px; }
+    .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
     .roster-cta-btn--muted {
       background: #f1f5f9;
       border-color: #cbd5e1;
       color: #475569;
     }
-    .roster-cta-btn--share {
-      grid-column: 1 / -1;
-      background: #ecfdf5;
-      border-color: #86efac;
-      color: #166534;
-    }
     .roster-cta--import {
       grid-template-columns: 1fr 1fr;
     }
-    .roster-cta--import .roster-cta-btn--share {
-      grid-column: 1 / -1;
+    .quickActions.roster-cta:not(.roster-cta--import) {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -634,6 +648,7 @@
       .roster-cta-btn--subscribe:hover { background: #faf5ff; }
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
+      .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--muted:hover { background: #e2e8f0; }
     }
     .roster-cta-btn:active {
@@ -651,43 +666,227 @@
         gap: 5px;
         min-height: 40px;
       }
-      .roster-cta-icon { font-size: 16px; }
-      .roster-cta-btn--compare .roster-cta-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
-      }
+      .roster-cta-icon { width: 16px; height: 16px; }
+      .roster-cta-icon svg { width: 16px; height: 16px; }
+      .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
     }
-
     /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
-      pointer-events:none; visibility:hidden;
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10001;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
     }
-    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteShareSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
     .siteShareCard {
-      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
-      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
-      text-align:center;
+      width: min(100%, 360px);
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 16px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
     }
-    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
-    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteShareTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteShareHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
     .siteShareQr {
-      display:flex; align-items:center; justify-content:center;
-      min-height:220px; margin:0 auto 12px;
-      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      margin: 0 auto 12px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
     }
     .siteShareUrl {
-      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
-      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
+      font-size: 11px;
+      color: #475569;
+      word-break: break-all;
+      line-height: 1.45;
+      margin: 0 0 14px;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border-radius: 10px;
     }
     .siteShareActions {
-      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
-    .siteShareCloseWrap { margin-top:4px; }
-    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+    .siteShareActions .roster-cta-btn--compare {
+      grid-column: 1 / -1;
+    }
+    .siteShareCloseWrap {
+      margin-top: 4px;
+    }
+    .siteShareCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10002;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .siteAppsSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .siteAppsCard {
+      width: min(100%, 400px);
+      max-height: min(92vh, 560px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 14px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
+    }
+    .siteAppsTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteAppsHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    .siteAppsGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+      text-align: start;
+    }
+    .siteAppsLink {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 96px;
+      padding: 12px 10px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      text-decoration: none;
+      color: #0f172a;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .siteAppsLink:active {
+      transform: scale(0.98);
+    }
+    .siteAppsLink-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+    .siteAppsLink-icon svg {
+      display: block;
+    }
+    .siteAppsLink-title {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-align: center;
+      color: #0f172a;
+    }
+    .siteAppsLink-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
+    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
+    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--games {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      min-height: 72px;
+      justify-content: flex-start;
+      padding-inline: 14px;
+      gap: 12px;
+    }
+    .siteAppsLink--games .siteAppsLink-icon {
+      background: #fdf2f8;
+      border-color: #fbcfe8;
+      flex-shrink: 0;
+    }
+    .siteAppsLink--games .siteAppsLink-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      flex: 1;
+    }
+    .siteAppsLink--games .siteAppsLink-title,
+    .siteAppsLink--games .siteAppsLink-sub {
+      text-align: start;
+    }
+    @media (hover: hover) {
+      .siteAppsLink:hover {
+        background: #fff;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+      }
+    }
+    @media (max-width: 360px) {
+      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
+      .siteAppsLink-icon { width: 40px; height: 40px; }
+      .siteAppsLink-title { font-size: 11px; }
+    }
+    .siteAppsCloseWrap {
+      margin-top: 4px;
+    }
+    .siteAppsCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
 
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
@@ -839,7 +1038,7 @@
       <div class="chipLabel" data-key="importRoster">Import</div>
     </a>
     <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
-      <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 9.5V5a2 2 0 0 0-4 0v4"/><path d="M6 12v-1a2 2 0 0 0-4 0v1"/><path d="M6 12a6 6 0 0 0 6 6h1l2 2 2-2h1a5 5 0 0 0 5-5"/></svg></span></div>
+      <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
@@ -894,7 +1093,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -965,7 +1164,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -993,7 +1192,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1053,7 +1252,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1096,7 +1295,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1168,7 +1367,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1232,7 +1431,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1348,7 +1547,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1391,7 +1590,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1482,16 +1681,20 @@
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
     <span class="roster-cta-label">Share Site</span>
   </button>
+  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+    <span class="roster-cta-label">Apps</span>
+  </button>
 </nav>
-
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">22 May 2026 / 05:51</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">19 May 2026 / 21:13</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster May 2026 Version 4.xlsx</strong>
   </div>
 
 </div>
+
 
 <div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
   <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
@@ -1521,6 +1724,46 @@
   </div>
 </div>
 
+<div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
+  <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
+    <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
+    <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
+    <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="flights">Airport board</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--calc" href="https://iammrk-8af39.web.app/calculator/" target="_blank" rel="noopener noreferrer" data-app-id="calc">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--quicklist" href="https://iammrk-8af39.web.app/QuickList/index.html" target="_blank" rel="noopener noreferrer" data-app-id="quicklist">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        </span>
+      </a>
+    </div>
+    <div class="siteAppsCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteAppsCloseBtn" id="siteAppsCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -1745,7 +1988,6 @@ function goToEmployeeSchedule(empName) {
     : getMuscatTodayIso();
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
-
   var DATE_PICKER_BUSY_KEY = 'rosterDatePickerBusy';
 
   function setDatePickerBusy(on) {
@@ -1784,6 +2026,29 @@ function goToEmployeeSchedule(empName) {
   picker.addEventListener('focus', function() { setDatePickerBusy(true); });
   picker.addEventListener('blur', function() {
     setTimeout(function() { setDatePickerBusy(false); }, 400);
+  });
+
+
+  window.openDatePicker = function() {
+    if (!picker) return;
+    try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); return; } catch (e) {}
+    }
+    try { picker.click(); } catch (e2) {}
+  };
+
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {
+    dateWrap.addEventListener('click', function(e) {
+      if (e.target === picker) return;
+      openDatePicker();
+    });
+  }
+  picker.addEventListener('click', function() {
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); } catch (e) {}
+    }
   });
 
   var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
@@ -1841,7 +2106,7 @@ function goToEmployeeSchedule(empName) {
   function resyncTodayIfNeeded() {
     if (!path.includes('/date/')) return;
     try {
-      if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
+      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
     } catch (e) {}
     var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
     if (!dateMatch) return;
@@ -2102,7 +2367,7 @@ var T = {
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
@@ -2114,7 +2379,7 @@ var T = {
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
@@ -2203,7 +2468,9 @@ function applyLang(lang) {
   setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('moreAppsBtn', t.moreApps);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
+  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {
     var h=footer.innerHTML;
@@ -2365,6 +2632,7 @@ function goToRosterDiff(event) {
   var ver = '20260520d';
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-share.js?v=' + ver);
+  addScript(root + '/site-apps.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);

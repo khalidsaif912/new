@@ -192,9 +192,23 @@
       });
   }
 
+  function closeAppsIfOpen() {
+    var apps = document.getElementById('siteAppsSheet');
+    if (apps && apps.classList.contains('open')) {
+      apps.classList.remove('open');
+      apps.setAttribute('aria-hidden', 'true');
+      if (window.rosterSiteApps && window.rosterSiteApps.close) {
+        window.rosterSiteApps.close();
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+  }
+
   function openModal() {
     var sheet = document.getElementById('siteShareSheet');
     if (!sheet) return;
+    closeAppsIfOpen();
     var url = getShareUrl();
     var urlEl = document.getElementById('siteShareUrl');
     if (urlEl) {
@@ -347,6 +361,7 @@
       applyI18n();
     },
     open: openModal,
+    close: closeModal,
   };
 
   if (document.readyState === 'loading') {

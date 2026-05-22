@@ -47,6 +47,50 @@ SVG_COMPARE = (
     '<path d="M16 14l2 2-2 2"/>'
     '</svg>'
 )
+SVG_APPS_BTN = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="3" width="7" height="7" rx="1.5"/>'
+    '<rect x="14" y="3" width="7" height="7" rx="1.5"/>'
+    '<rect x="3" y="14" width="7" height="7" rx="1.5"/>'
+    '<rect x="14" y="14" width="7" height="7" rx="1.5"/>'
+    '</svg>'
+)
+SVG_APP_FLIGHT = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>'
+    '</svg>'
+)
+SVG_APP_LABEL = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>'
+    '<path d="M7 7h.01"/>'
+    '</svg>'
+)
+SVG_APP_CALC = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="4" y="2" width="16" height="20" rx="2"/>'
+    '<path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/>'
+    '</svg>'
+)
+SVG_APP_CART = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>'
+    '<path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>'
+    '</svg>'
+)
+SVG_APP_GAME = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M6 12h4"/><path d="M8 10v4"/>'
+    '<path d="M15 13h.01"/><path d="M18 11h.01"/>'
+    '<rect x="2" y="6" width="20" height="12" rx="2"/>'
+    '</svg>'
+)
 
 
 def _chip_svg(paths: str, *, size: int = 22, stroke: str = "#1e40af") -> str:
@@ -77,9 +121,10 @@ SVG_CHIP_EXPORT = _chip_svg(
     stroke="#059669",
 )
 SVG_CHIP_WAVE = _chip_svg(
-    '<path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/>'
-    '<path d="M10 9.5V5a2 2 0 0 0-4 0v4"/><path d="M6 12v-1a2 2 0 0 0-4 0v1"/>'
-    '<path d="M6 12a6 6 0 0 0 6 6h1l2 2 2-2h1a5 5 0 0 0 5-5"/>',
+    '<path d="M18 11V6a2 2 0 0 0-4 0"/>'
+    '<path d="M14 10V4a2 2 0 0 0-4 0v2"/>'
+    '<path d="M10 10.5V6a2 2 0 0 0-4 0v8"/>'
+    '<path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
     stroke="#db2777",
 )
 SVG_CHIP_TRAINING = _chip_svg(
@@ -286,10 +331,14 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       color: #1f2937;
     }
     .roster-cta-btn--share {
-      grid-column: 1 / -1;
       background: #ecfdf5;
       border-color: #86efac;
       color: #166534;
+    }
+    .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
     }
     .roster-cta-btn--muted {
       background: #f1f5f9;
@@ -299,8 +348,23 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
     .roster-cta--import {
       grid-template-columns: 1fr 1fr;
     }
-    .roster-cta--import .roster-cta-btn--share {
-      grid-column: 1 / -1;
+    .quickActions.roster-cta:not(.roster-cta--import) {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -311,6 +375,7 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       .roster-cta-btn--subscribe:hover { background: #faf5ff; }
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
+      .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--muted:hover { background: #e2e8f0; }
     }
     .roster-cta-btn:active {
@@ -442,7 +507,194 @@ SITE_SHARE_MODAL_HTML = f"""<div id="siteShareSheet" class="siteShareSheet" aria
 </div>
 """
 
+SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10002;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .siteAppsSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .siteAppsCard {
+      width: min(100%, 400px);
+      max-height: min(92vh, 560px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 14px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
+    }
+    .siteAppsTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteAppsHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    .siteAppsGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+      text-align: start;
+    }
+    .siteAppsLink {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 96px;
+      padding: 12px 10px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      text-decoration: none;
+      color: #0f172a;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .siteAppsLink:active {
+      transform: scale(0.98);
+    }
+    .siteAppsLink-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+    .siteAppsLink-icon svg {
+      display: block;
+    }
+    .siteAppsLink-title {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-align: center;
+      color: #0f172a;
+    }
+    .siteAppsLink-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
+    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
+    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--games {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      min-height: 72px;
+      justify-content: flex-start;
+      padding-inline: 14px;
+      gap: 12px;
+    }
+    .siteAppsLink--games .siteAppsLink-icon {
+      background: #fdf2f8;
+      border-color: #fbcfe8;
+      flex-shrink: 0;
+    }
+    .siteAppsLink--games .siteAppsLink-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      flex: 1;
+    }
+    .siteAppsLink--games .siteAppsLink-title,
+    .siteAppsLink--games .siteAppsLink-sub {
+      text-align: start;
+    }
+    @media (hover: hover) {
+      .siteAppsLink:hover {
+        background: #fff;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+      }
+    }
+    @media (max-width: 360px) {
+      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
+      .siteAppsLink-icon { width: 40px; height: 40px; }
+      .siteAppsLink-title { font-size: 11px; }
+    }
+    .siteAppsCloseWrap {
+      margin-top: 4px;
+    }
+    .siteAppsCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
+"""
+
+SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
+  <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
+    <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
+    <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
+    <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
+        <span class="siteAppsLink-icon">{SVG_APP_FLIGHT}</span>
+        <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="flights">Airport board</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
+        <span class="siteAppsLink-icon">{SVG_APP_LABEL}</span>
+        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--calc" href="https://iammrk-8af39.web.app/calculator/" target="_blank" rel="noopener noreferrer" data-app-id="calc">
+        <span class="siteAppsLink-icon">{SVG_APP_CALC}</span>
+        <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--quicklist" href="https://iammrk-8af39.web.app/QuickList/index.html" target="_blank" rel="noopener noreferrer" data-app-id="quicklist">
+        <span class="siteAppsLink-icon">{SVG_APP_CART}</span>
+        <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
+        <span class="siteAppsLink-icon">{SVG_APP_GAME}</span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        </span>
+      </a>
+    </div>
+    <div class="siteAppsCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteAppsCloseBtn" id="siteAppsCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+"""
+
 ROSTER_ICONS_SCRIPT = "addScript(root + '/roster-icons.js?v=' + ver);"
+SITE_APPS_SCRIPT = "  addScript(root + '/site-apps.js?v=' + ver);"
 
 
 def _btn(
@@ -497,6 +749,13 @@ def export_cta_html(
             "Share Site",
             SVG_SHARE_OUT,
         )
+        + _btn(
+            "button",
+            "roster-cta-btn--apps moreAppsBtn",
+            "moreAppsBtn",
+            "Apps",
+            SVG_APPS_BTN,
+        )
         + "</nav>\n"
     )
 
@@ -520,6 +779,13 @@ def import_cta_html(cta_href: str = "{BASE}/now/") -> str:
             "Share Site",
             SVG_SHARE_OUT,
         )
+        + _btn(
+            "button",
+            "roster-cta-btn--apps moreAppsBtn",
+            "moreAppsBtn",
+            "Apps",
+            SVG_APPS_BTN,
+        )
         + "</nav>\n"
     )
 
@@ -534,7 +800,9 @@ APPLY_LANG_NEW = """  function setCtaLabel(id, text) {
   setCtaLabel('ctaBtn', t.viewFull);
   setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
-  setCtaLabel('shareSiteBtn', t.shareSite);"""
+  setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('moreAppsBtn', t.moreApps);
+  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();"""
 
 APPLY_LANG_BAD_LINE = re.compile(
     r"\s*var c3=document\.getElementById\('compareBtn'\); if\(c3\) c3\.textContent=t\.compare;\s*\n",
@@ -569,3 +837,5 @@ I18N_CMP_EN = "compare:'Compare'"
 I18N_CMP_AR = "compare:'مقارنة'"
 I18N_SHARE_EN = "shareSite:'Share Site'"
 I18N_SHARE_AR = "shareSite:'مشاركة الموقع'"
+I18N_APPS_EN = "moreApps:'Apps'"
+I18N_APPS_AR = "moreApps:'تطبيقات'"
