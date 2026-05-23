@@ -958,7 +958,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
-      pointer-events:none;
+      position:relative;
+      z-index:3;
+      pointer-events:auto;
       color:#fff;
     }}
     .dateTag-icon {{
@@ -968,37 +970,35 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       flex-shrink:0;
       line-height:0;
       color:#fff;
+      pointer-events:none;
     }}
     .dateTag-icon svg {{
       display:block;
       width:16px;
       height:16px;
+      pointer-events:none;
     }}
     .dateTag-label {{
       line-height:1.2;
+      pointer-events:none;
     }}
     .header .dateTag:hover {{
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }}
-    /* Transparent date input over #dateTag — native picker on iOS (no -webkit-appearance reset) */
+    /* Hidden date input — label#dateTag opens picker (Windows + iOS) */
     .datePickerWrapper #datePicker {{
       position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      min-height:44px;
-      margin:0;
+      width:1px;
+      height:1px;
       padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
       opacity:0;
-      cursor:pointer;
-      font-size:16px;
-      line-height:44px;
-      border:none;
-      z-index:2;
-      color:transparent;
-      background:transparent;
-      touch-action:manipulation;
+      pointer-events:none;
     }}
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {{
@@ -1384,13 +1384,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       border-color: #fcd34d;
       color: #1f2937;
     }}
-    .roster-cta-btn--compare .roster-cta-icon {{
-      width: 22px;
-      height: 22px;
-      background: #2563eb;
-      border-radius: 6px;
-    }}
-    .roster-cta-btn--compare .roster-cta-icon svg {{ width: 14px; height: 14px; }}
     .roster-cta-btn--muted {{
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -1437,11 +1430,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
         min-height: 40px;
       }}
       .roster-cta-icon {{ font-size: 16px; }}
-      .roster-cta-btn--compare .roster-cta-icon {{
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
-      }}
     }}
 
     /* ═══════ SITE SHARE MODAL ═══════ */
@@ -1574,7 +1562,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <span class="dateTag" id="dateTag"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></span>
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></label>
       <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} aria-label="Select roster date" />
     </div>
   </div>
@@ -1901,12 +1889,35 @@ function goToEmployeeSchedule(empName) {{
     openDatePicker();
   }}
 
+
+  var dateTagEl = document.getElementById('dateTag');
+  if (dateTagEl) {
+    dateTagEl.addEventListener('click', function(e) {
+      if (e) e.preventDefault();
+      openDatePicker();
+    });
+  }
+
   var dateWrap = document.querySelector('.datePickerWrapper');
   if (dateWrap) {{
     dateWrap.addEventListener('touchend', onDateWrapActivate, {{ passive: false }});
-    dateWrap.addEventListener('click', function(e) {{
+    dateWrap.addEventListener('click', function(e) {
       if (e.target === picker) return;
       onDateWrapActivate(e);
+    });
+    function onPickerActivate(e) {{
+      if (e) {{
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      setDatePickerBusy(true);
+      openDatePicker();
+    }}
+    picker.addEventListener('click', onPickerActivate);
+    picker.addEventListener('keydown', function(e) {{
+      if (e.key === 'Enter' || e.key === ' ') {{
+        onPickerActivate(e);
+      }}
     }});
   }}
   picker.addEventListener('focus', function() {{ setDatePickerBusy(true); }});
@@ -1926,11 +1937,21 @@ function goToEmployeeSchedule(empName) {{
     sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
   }}
 
-  function buildDateBasePath() {{
-    return path
-      .replace(/\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/, '/')
-      .replace(/\/now\\/.*$/, '/')
+  function normalizePathname(p) {{
+    return (p || '/')
+      .replace(/\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/i, '/')
+      .replace(/\/import\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/i, '/')
+      .replace(/\/import\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/i, '/')
+      .replace(/\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/i, '/')
+      .replace(/\/now\\/.*$/i, '/')
+      .replace(/\/index\\.html$/i, '')
       .replace(/\\/+$/, '');
+  }}
+
+  function buildDateBasePath() {{
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    if (root) return root;
+    return normalizePathname(path);
   }}
 
   function redirectToDate(iso, isNowPage) {{
@@ -1945,7 +1966,7 @@ function goToEmployeeSchedule(empName) {{
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {{
-      var baseRoot = path.replace(/\/now\\/?$/, '/').replace(/\\/+$/, '');
+      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\\/?$/i, '/'));
       window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }}
@@ -1998,13 +2019,8 @@ function goToEmployeeSchedule(empName) {{
     markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
 
-    var path = window.location.pathname || '/';
-    var isNowPage = path.includes('/now');
-    var base = path
-      .replace(/\/date\/\\d{{4}}-\\d{{2}}-\\d{{2}}\\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
-      .replace(/\/+$/, '');
-
+    var isNowPage = (window.location.pathname || '').includes('/now');
+    var base = buildDateBasePath();
     var target = base + '/date/' + picker.value + '/';
     if (isNowPage) target += 'now/';
 

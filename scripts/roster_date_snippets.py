@@ -16,10 +16,10 @@ SVG_DATE_TAG_ICON = (
 
 def date_tag_html(label: str) -> str:
     return (
-        '<span class="dateTag" id="dateTag">'
+        '<label class="dateTag" id="dateTag" for="datePicker">'
         f'<span class="dateTag-icon" aria-hidden="true">{SVG_DATE_TAG_ICON}</span>'
         f'<span class="dateTag-label" id="dateTagLabel">{label}</span>'
-        '</span>'
+        '</label>'
     )
 
 
@@ -40,7 +40,9 @@ DATE_TAG_CSS_PATCH = """    .header .dateTag {
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
-      pointer-events:none;
+      position:relative;
+      z-index:3;
+      pointer-events:auto;
       color:#fff;
     }
     .dateTag-icon {
@@ -58,6 +60,10 @@ DATE_TAG_CSS_PATCH = """    .header .dateTag {
     }
     .dateTag-label {
       line-height:1.2;
+      pointer-events:none;
+    }
+    .dateTag-icon {
+      pointer-events:none;
     }"""
 
 DATE_TAG_CSS_RE = re.compile(

@@ -46,6 +46,7 @@
       width:140px; height:140px;
       border-radius:50%;
       background:rgba(255,255,255,.08);
+      pointer-events:none;
     }
     .header::after {
       content:''; position:absolute;
@@ -53,6 +54,7 @@
       width:160px; height:160px;
       border-radius:50%;
       background:rgba(255,255,255,.06);
+      pointer-events:none;
     }
     .header .bannerTitle {
       margin:0;
@@ -193,7 +195,9 @@
       user-select:none;
       -webkit-user-select:none;
       direction:ltr;
-      pointer-events:none;
+      position:relative;
+      z-index:3;
+      pointer-events:auto;
       color:#fff;
     }
     .dateTag-icon {
@@ -211,29 +215,28 @@
     }
     .dateTag-label {
       line-height:1.2;
+      pointer-events:none;
+    }
+    .dateTag-icon {
+      pointer-events:none;
     }
     .header .dateTag:hover {
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS (no -webkit-appearance reset) */
+    /* Hidden date input — label#dateTag opens picker (Windows + iOS) */
     .datePickerWrapper #datePicker {
       position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      min-height:44px;
-      margin:0;
+      width:1px;
+      height:1px;
       padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
       opacity:0;
-      cursor:pointer;
-      font-size:16px;
-      line-height:44px;
-      border:none;
-      z-index:2;
-      color:transparent;
-      background:transparent;
-      touch-action:manipulation;
+      pointer-events:none;
     }
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
@@ -635,13 +638,6 @@
       border-color: #fcd34d;
       color: #1f2937;
     }
-    .roster-cta-btn--compare .roster-cta-icon {
-      width: 22px;
-      height: 22px;
-      background: #2563eb;
-      border-radius: 6px;
-    }
-    .roster-cta-btn--compare .roster-cta-icon svg { width: 14px; height: 14px; }
     .roster-cta-btn--muted {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -688,11 +684,6 @@
         min-height: 40px;
       }
       .roster-cta-icon { font-size: 16px; }
-      .roster-cta-btn--compare .roster-cta-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
-      }
     }
 
     /* ═══════ SITE SHARE MODAL ═══════ */
@@ -891,7 +882,7 @@
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <span class="dateTag" id="dateTag"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">29 June 2026</span></span>
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">29 June 2026</span></label>
       <input id="datePicker" type="date" value="2026-06-29" min="2026-04-01" max="2026-06-30" aria-label="Select roster date" />
     </div>
   </div>
@@ -1290,10 +1281,27 @@ function goToEmployeeSchedule(empName) {
     openDatePicker();
   }
 
+
+  var dateTagEl = document.getElementById('dateTag');
+  if (dateTagEl) {
+    dateTagEl.addEventListener('click', function(e) {
+      if (e) e.preventDefault();
+      openDatePicker();
+    });
+  }
+
   var dateWrap = document.querySelector('.datePickerWrapper');
   if (dateWrap) {
-    dateWrap.addEventListener('touchend', onDateWrapActivate, { passive: false });
+    dateWrap.addEventListener('touchend', function(e) {
+      if (e.target.closest && e.target.closest('#dateTag')) {
+        e.preventDefault();
+        openDatePicker();
+        return;
+      }
+      onDateWrapActivate(e);
+    }, { passive: false });
     dateWrap.addEventListener('click', function(e) {
+      if (e.target.closest && e.target.closest('#dateTag')) return;
       if (e.target === picker) return;
       onDateWrapActivate(e);
     });
@@ -1315,11 +1323,21 @@ function goToEmployeeSchedule(empName) {
     sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
   }
 
-  function buildDateBasePath() {
-    return path
-      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
+  function normalizePathname(p) {
+    return (p || '/')
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/now\/.*$/i, '/')
+      .replace(/\/index\.html$/i, '')
       .replace(/\/+$/, '');
+  }
+
+  function buildDateBasePath() {
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    if (root) return root;
+    return normalizePathname(path);
   }
 
   function redirectToDate(iso, isNowPage) {
@@ -1334,7 +1352,7 @@ function goToEmployeeSchedule(empName) {
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      var baseRoot = path.replace(/\/now\/?$/, '/').replace(/\/+$/, '');
+      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\/?$/i, '/'));
       window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
@@ -1387,13 +1405,8 @@ function goToEmployeeSchedule(empName) {
     markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
 
-    var path = window.location.pathname || '/';
-    var isNowPage = path.includes('/now');
-    var base = path
-      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
-      .replace(/\/+$/, '');
-
+    var isNowPage = (window.location.pathname || '').includes('/now');
+    var base = buildDateBasePath();
     var target = base + '/date/' + picker.value + '/';
     if (isNowPage) target += 'now/';
 
