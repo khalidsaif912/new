@@ -45,8 +45,43 @@
     'banner24.jpg',
     'banner25.jpg',
     'banner26.jpg',
-    'banner27.jpg'
+    'banner27.jpg',
+    'banner28.jpg',
+    'banner29.jpg'
   ];
+
+  /** Per-banner crop/scrim tuning (logo-left layouts, etc.). */
+  const BANNER_LAYOUT = {
+    'banner28.jpg': {
+      position: '50% 48%',
+      positionMobile: '68% center',
+      scrim:
+        'linear-gradient(105deg,rgba(8,16,40,.1) 0%,rgba(8,16,40,.35) 42%,rgba(8,16,40,.52) 100%)',
+    },
+    'banner29.jpg': {
+      position: '28% center',
+      positionMobile: '38% center',
+      scrim:
+        'linear-gradient(to right,rgba(0,0,0,.38) 0%,rgba(0,0,0,.18) 45%,transparent 72%)',
+    },
+  };
+
+  function getBannerPosition(name) {
+    const layout = BANNER_LAYOUT[name];
+    if (!layout) return '62% center';
+    if (
+      layout.positionMobile &&
+      window.matchMedia('(max-width:480px)').matches
+    ) {
+      return layout.positionMobile;
+    }
+    return layout.position || '62% center';
+  }
+
+  function getBannerScrim(name) {
+    const layout = BANNER_LAYOUT[name];
+    return layout && layout.scrim ? layout.scrim : '';
+  }
 
   function bannerUrl(name) {
     return BANNERS_PATH + name;
@@ -75,15 +110,19 @@
     const styleId = 'banner-changer-readability-css';
     const prev = document.getElementById(styleId);
     if (prev) prev.remove();
+    const bannerName = getSavedBanner() || '';
+    const bannerPos = getBannerPosition(bannerName);
+    const bannerScrim = getBannerScrim(bannerName);
     const style = document.createElement('style');
     style.id = styleId;
-    style.textContent = [
+    const rules = [
       '.header.' + ACTIVE_CLASS + ',.topbar.' + ACTIVE_CLASS + '{',
       'background-size:cover!important;',
       'background-repeat:no-repeat!important;',
-      'background-position:62% center!important;',
+      'background-position:' + bannerPos + '!important;',
       '}',
-      '.header.' + ACTIVE_CLASS + '::before,.header.' + ACTIVE_CLASS + '::after{opacity:0!important;}',
+      '.header.' + ACTIVE_CLASS + '::before,.header.' + ACTIVE_CLASS + '::after,',
+      '.topbar.' + ACTIVE_CLASS + '::before,.topbar.' + ACTIVE_CLASS + '::after{opacity:0!important;}',
       '.' + ACTIVE_CLASS + ' .bannerTitle,',
       '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow,',
       '.' + ACTIVE_CLASS + ' .bannerTitleMain,',
@@ -146,7 +185,18 @@
       '.topbar.' + ACTIVE_CLASS + ' .bannerTitleMain{',
       'text-shadow:' + TEXT_HALO + ';',
       '}',
-    ].join('');
+    ];
+    if (bannerScrim && bannerName) {
+      rules.push(
+        '.header.' + ACTIVE_CLASS + '[data-banner="' + bannerName + '"]::before,',
+        '.topbar.' + ACTIVE_CLASS + '[data-banner="' + bannerName + '"]::before{',
+        'content:""!important;position:absolute!important;inset:0!important;',
+        'opacity:1!important;border-radius:inherit!important;pointer-events:none!important;',
+        'background:' + bannerScrim + '!important;',
+        '}'
+      );
+    }
+    style.textContent = rules.join('');
     document.head.appendChild(style);
   }
 
@@ -182,10 +232,12 @@
     const targets = getBannerTargets();
     if (!targets.length) return;
     const url = bannerUrl(name);
+    const pos = getBannerPosition(name);
     targets.forEach(function (el) {
+      el.setAttribute('data-banner', name);
       el.style.backgroundImage = "url('" + url + "')";
       el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = '62% center';
+      el.style.backgroundPosition = pos;
       el.style.backgroundRepeat = 'no-repeat';
     });
     setCustomBannerActive(true);
@@ -196,6 +248,7 @@
     const targets = getBannerTargets();
     if (!targets.length) return;
     targets.forEach(function (el) {
+      el.removeAttribute('data-banner');
       el.style.backgroundImage = '';
       el.style.backgroundSize = '';
       el.style.backgroundPosition = '';
@@ -373,6 +426,19 @@
       applyBanner(saved);
     }
     createChangerBtn();
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        var active = getSavedBanner();
+        if (!active) return;
+        var pos = getBannerPosition(active);
+        getBannerTargets().forEach(function (el) {
+          el.style.backgroundPosition = pos;
+        });
+        injectReadabilityStyles();
+      }, 120);
+    });
   }
 
   function waitForHeader() {
