@@ -23,7 +23,17 @@ def date_tag_html(label: str) -> str:
     )
 
 
-DATE_TAG_CSS_PATCH = """    .header .dateTag {
+DATE_TAG_TEXT_SHADOW = (
+    "0 1px 2px rgba(0,0,0,.72),"
+    "0 0 5px rgba(0,0,0,.38),"
+    "0 0 1px rgba(255,255,255,.5)"
+)
+DATE_TAG_ICON_FILTER = (
+    "drop-shadow(0 1px 1px rgba(0,0,0,.7)) "
+    "drop-shadow(0 0 2px rgba(255,255,255,.45))"
+)
+
+DATE_TAG_CSS_PATCH = f"""    .header .dateTag {{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -44,27 +54,29 @@ DATE_TAG_CSS_PATCH = """    .header .dateTag {
       z-index:3;
       pointer-events:auto;
       color:#fff;
-    }
-    .dateTag-icon {
+      text-shadow:{DATE_TAG_TEXT_SHADOW};
+    }}
+    .dateTag-icon {{
       display:inline-flex;
       align-items:center;
       justify-content:center;
       flex-shrink:0;
       line-height:0;
       color:#fff;
-    }
-    .dateTag-icon svg {
+      pointer-events:none;
+    }}
+    .dateTag-icon svg {{
       display:block;
       width:16px;
       height:16px;
-    }
-    .dateTag-label {
+      pointer-events:none;
+      filter:{DATE_TAG_ICON_FILTER};
+    }}
+    .dateTag-label {{
       line-height:1.2;
       pointer-events:none;
-    }
-    .dateTag-icon {
-      pointer-events:none;
-    }"""
+      text-shadow:{DATE_TAG_TEXT_SHADOW};
+    }}"""
 
 DATE_TAG_CSS_RE = re.compile(
     r"    \.header \.dateTag \{[^}]+\}",

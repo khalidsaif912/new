@@ -340,6 +340,11 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       border-color: #7dd3fc;
       color: #0369a1;
     }
+    .roster-cta-btn--texture {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #5b21b6;
+    }
     .roster-cta-btn--muted {
       background: #f1f5f9;
       border-color: #cbd5e1;
@@ -376,6 +381,7 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
+      .roster-cta-btn--texture:hover { background: #ede9fe; }
       .roster-cta-btn--muted:hover { background: #e2e8f0; }
     }
     .roster-cta-btn:active {

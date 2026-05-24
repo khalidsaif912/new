@@ -3,7 +3,11 @@
   const ACTIVE_CLASS = 'has-custom-banner';
   const EARLY_CLASS = 'roster-banner-early';
   const TEXT_HALO =
-    '0 0 2px rgba(0,0,0,.95),0 1px 3px rgba(0,0,0,.9),0 2px 10px rgba(0,0,0,.75),0 0 20px rgba(0,0,0,.45)';
+    '0 1px 2px rgba(0,0,0,.42),0 2px 5px rgba(0,0,0,.22)';
+  const DATE_TAG_SHADOW =
+    '0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5)';
+  const DATE_TAG_ICON_FILTER =
+    'drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45))';
   const BANNER_NAME_RE = /^banner\d+\.jpg$/i;
 
   function getSiteRootPath() {
@@ -89,7 +93,7 @@
       '.' + ACTIVE_CLASS + ' .page-title-main{',
       'color:#fff!important;',
       'text-shadow:' + TEXT_HALO + ';',
-      '-webkit-text-stroke:0.35px rgba(0,0,0,.4);',
+      '-webkit-text-stroke:0.2px rgba(0,0,0,.22);',
       'paint-order:stroke fill;',
       '}',
       '.' + ACTIVE_CLASS + ' .langToggle,',
@@ -105,7 +109,7 @@
       '}',
       '.' + ACTIVE_CLASS + ' .langToggle-icon{display:flex!important;line-height:0!important;}',
       '.' + ACTIVE_CLASS + ' .langToggle-icon svg{width:18px!important;height:18px!important;stroke:#fff!important;',
-      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.65))!important;}',
+      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))!important;}',
       '.' + ACTIVE_CLASS + ' .langToggle-label{display:block!important;font-size:10px!important;font-weight:800!important;',
       'color:#fff!important;text-shadow:' + TEXT_HALO + ';letter-spacing:.02em;}',
       'body.ar .' + ACTIVE_CLASS + ' .langToggle,',
@@ -119,13 +123,20 @@
       'cursor:pointer;color:#fff!important;',
       '}',
       '#banner-changer-btn .banner-changer-icon svg{display:block;width:20px!important;height:20px!important;stroke:#fff!important;',
-      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.65))!important;}',
+      'filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))!important;}',
       'body.ar #banner-changer-btn{left:12px!important;right:auto!important;}',
       '.' + ACTIVE_CLASS + ' .dateTag{',
       'color:#fff!important;',
-      'background:rgba(255,255,255,.2)!important;',
-      'border-color:rgba(255,255,255,.28)!important;',
-      'backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);',
+      'background:rgba(15,23,42,.28)!important;',
+      'border-color:rgba(255,255,255,.32)!important;',
+      'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);',
+      'text-shadow:' + DATE_TAG_SHADOW + '!important;',
+      '}',
+      '.' + ACTIVE_CLASS + ' .dateTag-label{',
+      'text-shadow:' + DATE_TAG_SHADOW + '!important;',
+      '}',
+      '.' + ACTIVE_CLASS + ' .dateTag-icon svg{',
+      'filter:' + DATE_TAG_ICON_FILTER + '!important;',
       '}',
       '.topbar.' + ACTIVE_CLASS + ' .page-title,',
       '.topbar.' + ACTIVE_CLASS + ' .page-title-eyebrow,',

@@ -846,7 +846,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       padding:26px 18px 24px;
       border-radius:20px;
       text-align:center;
-      box-shadow:0 8px 28px rgba(30,64,175,.25);
+      box-shadow:0 4px 16px rgba(30,64,175,.14);
       position:relative;
       overflow:hidden;
     }}
@@ -962,6 +962,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       z-index:3;
       pointer-events:auto;
       color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }}
     .dateTag-icon {{
       display:inline-flex;
@@ -977,10 +978,12 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       width:16px;
       height:16px;
       pointer-events:none;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
     }}
     .dateTag-label {{
       line-height:1.2;
       pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }}
     .header .dateTag:hover {{
       background:rgba(255,255,255,.25);
@@ -1399,6 +1402,11 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       border-color: #7dd3fc;
       color: #0369a1;
     }}
+    .roster-cta-btn--texture {{
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #5b21b6;
+    }}
     .roster-cta--import {{
       grid-template-columns: 1fr 1fr;
     }}
@@ -1412,6 +1420,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .roster-cta-btn--compare:hover {{ background: #fef3c7; }}
       .roster-cta-btn--share:hover {{ background: #d1fae5; }}
       .roster-cta-btn--apps:hover {{ background: #e0f2fe; }}
+      .roster-cta-btn--texture:hover {{ background: #ede9fe; }}
       .roster-cta-btn--muted:hover {{ background: #e2e8f0; }}
     }}
     .roster-cta-btn:active {{
@@ -2512,6 +2521,7 @@ function goToRosterDiff(event) {{
   addScript(root + '/site-apps.js?v=' + ver);
   addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/bg-texture-shuffle.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/shift-swap.js?v=' + ver);
