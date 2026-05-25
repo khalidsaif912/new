@@ -6,158 +6,153 @@
     "2026-05": [
       {
         "day": 1,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 2,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 3,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "NE22",
+        "shift_group": "Night"
       },
       {
         "day": 4,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 5,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 6,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 7,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 8,
-        "shift_code": "O",
-        "shift_group": "Off Day"
-      },
-      {
-        "day": 9,
-        "shift_code": "MN06",
+        "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "day": 9,
+        "shift_code": "NE22",
+        "shift_group": "Night"
+      },
+      {
         "day": 10,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "NE22",
+        "shift_group": "Night"
       },
       {
         "day": 11,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 12,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 13,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 14,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 15,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 16,
-        "shift_code": "MN06",
+        "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
         "day": 17,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "NE22",
+        "shift_group": "Night"
       },
       {
         "day": 18,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 19,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 20,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 21,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 22,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "TR",
+        "shift_group": "Training"
       },
       {
         "day": 23,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "TR",
+        "shift_group": "Training"
       },
       {
         "day": 24,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "TR",
+        "shift_group": "Training"
       },
       {
         "day": 25,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 26,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 27,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 28,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "AE14",
+        "shift_group": "Afternoon"
       },
       {
         "day": 29,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 30,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
-      },
-      {
-        "day": 31,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "NE22",
+        "shift_group": "Night"
       }
     ],
     "2026-03": [
@@ -476,157 +471,152 @@
     {
       "day": 1,
       "weekday": "Fri",
-      "code": "O"
+      "code": "AE14"
     },
     {
       "day": 2,
       "weekday": "Sat",
-      "code": "MN06"
+      "code": "AE14"
     },
     {
       "day": 3,
       "weekday": "Sun",
-      "code": "AN13"
+      "code": "NE22"
     },
     {
       "day": 4,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "O"
     },
     {
       "day": 5,
       "weekday": "Tue",
-      "code": "NN21"
+      "code": "O"
     },
     {
       "day": 6,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "AE14"
     },
     {
       "day": 7,
       "weekday": "Thu",
-      "code": "O"
+      "code": "AE14"
     },
     {
       "day": 8,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 9,
       "weekday": "Sat",
-      "code": "MN06"
+      "code": "NE22"
     },
     {
       "day": 10,
       "weekday": "Sun",
-      "code": "AN13"
+      "code": "NE22"
     },
     {
       "day": 11,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "O"
     },
     {
       "day": 12,
       "weekday": "Tue",
-      "code": "NN21"
+      "code": "O"
     },
     {
       "day": 13,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "AE14"
     },
     {
       "day": 14,
       "weekday": "Thu",
-      "code": "O"
+      "code": "AE14"
     },
     {
       "day": 15,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 16,
       "weekday": "Sat",
-      "code": "MN06"
+      "code": "ME06"
     },
     {
       "day": 17,
       "weekday": "Sun",
-      "code": "AN13"
+      "code": "NE22"
     },
     {
       "day": 18,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "O"
     },
     {
       "day": 19,
       "weekday": "Tue",
-      "code": "NN21"
+      "code": "O"
     },
     {
       "day": 20,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "AE14"
     },
     {
       "day": 21,
       "weekday": "Thu",
-      "code": "O"
+      "code": "AE14"
     },
     {
       "day": 22,
       "weekday": "Fri",
-      "code": "O"
+      "code": "TR"
     },
     {
       "day": 23,
       "weekday": "Sat",
-      "code": "MN06"
+      "code": "TR"
     },
     {
       "day": 24,
       "weekday": "Sun",
-      "code": "AN13"
+      "code": "TR"
     },
     {
       "day": 25,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "O"
     },
     {
       "day": 26,
       "weekday": "Tue",
-      "code": "NN21"
+      "code": "O"
     },
     {
       "day": 27,
       "weekday": "Wed",
-      "code": "NN21"
+      "code": "AE14"
     },
     {
       "day": 28,
       "weekday": "Thu",
-      "code": "O"
+      "code": "AE14"
     },
     {
       "day": 29,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 30,
       "weekday": "Sat",
-      "code": "MN06"
-    },
-    {
-      "day": 31,
-      "weekday": "Sun",
-      "code": "MN06"
+      "code": "NE22"
     }
   ]
 }

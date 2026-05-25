@@ -6,13 +6,13 @@
     "2026-05": [
       {
         "day": 1,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 2,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 3,
@@ -26,13 +26,13 @@
       },
       {
         "day": 5,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 6,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 7,
@@ -41,13 +41,13 @@
       },
       {
         "day": 8,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 9,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 10,
@@ -61,13 +61,13 @@
       },
       {
         "day": 12,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 13,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 14,
@@ -76,13 +76,13 @@
       },
       {
         "day": 15,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 16,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 17,
@@ -96,13 +96,13 @@
       },
       {
         "day": 19,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 20,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 21,
@@ -111,13 +111,13 @@
       },
       {
         "day": 22,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 23,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 24,
@@ -131,13 +131,13 @@
       },
       {
         "day": 26,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 27,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 28,
@@ -146,16 +146,11 @@
       },
       {
         "day": 29,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 30,
-        "shift_code": "O",
-        "shift_group": "Off Day"
-      },
-      {
-        "day": 31,
         "shift_code": "ME06",
         "shift_group": "Morning"
       }
@@ -476,12 +471,12 @@
     {
       "day": 1,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 2,
       "weekday": "Sat",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 3,
@@ -496,12 +491,12 @@
     {
       "day": 5,
       "weekday": "Tue",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 6,
       "weekday": "Wed",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 7,
@@ -511,12 +506,12 @@
     {
       "day": 8,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 9,
       "weekday": "Sat",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 10,
@@ -531,12 +526,12 @@
     {
       "day": 12,
       "weekday": "Tue",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 13,
       "weekday": "Wed",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 14,
@@ -546,12 +541,12 @@
     {
       "day": 15,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 16,
       "weekday": "Sat",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 17,
@@ -566,12 +561,12 @@
     {
       "day": 19,
       "weekday": "Tue",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 20,
       "weekday": "Wed",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 21,
@@ -581,12 +576,12 @@
     {
       "day": 22,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 23,
       "weekday": "Sat",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 24,
@@ -601,12 +596,12 @@
     {
       "day": 26,
       "weekday": "Tue",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 27,
       "weekday": "Wed",
-      "code": "ME06"
+      "code": "O"
     },
     {
       "day": 28,
@@ -616,16 +611,11 @@
     {
       "day": 29,
       "weekday": "Fri",
-      "code": "O"
+      "code": "ME06"
     },
     {
       "day": 30,
       "weekday": "Sat",
-      "code": "O"
-    },
-    {
-      "day": 31,
-      "weekday": "Sun",
       "code": "ME06"
     }
   ]
