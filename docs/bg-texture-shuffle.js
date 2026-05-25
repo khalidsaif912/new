@@ -47,7 +47,12 @@
       '.bgTextureShuffleWrap .roster-cta-icon svg{width:16px;height:16px;}' +
       '.roster-cta-btn--texture{background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6;}' +
       '@media (hover:hover){.roster-cta-btn--texture:hover{background:#ede9fe;}}' +
-      'body.roster-bg-textured{background-attachment:fixed;background-repeat:repeat;}';
+      'html.roster-bg-textured,body.roster-bg-textured{background-attachment:fixed;background-repeat:repeat;}' +
+      'body.roster-bg-textured .wrap{background:transparent!important;}' +
+      'body.roster-bg-textured .importBottom{background:transparent!important;}' +
+      'body.roster-bg-textured .footer{background:rgba(255,255,255,.38)!important;' +
+      'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);' +
+      'border-top-color:rgba(148,163,184,.28)!important;}';
     document.head.appendChild(st);
   }
 
@@ -112,15 +117,17 @@
 
   function applyBg(color, slug) {
     var body = document.body;
+    var html = document.documentElement;
     if (!body) return;
+    var bgImage = slug ? 'url("' + patternUrl(slug) + '")' : '';
+    html.classList.add('roster-bg-textured');
     body.classList.add('roster-bg-textured');
+    html.style.backgroundColor = color;
     body.style.backgroundColor = color;
-    if (slug) {
-      body.style.backgroundImage = 'url("' + patternUrl(slug) + '")';
-      body.style.backgroundRepeat = 'repeat';
-    } else {
-      body.style.backgroundImage = '';
-    }
+    html.style.backgroundImage = bgImage;
+    body.style.backgroundImage = bgImage;
+    html.style.backgroundRepeat = 'repeat';
+    body.style.backgroundRepeat = 'repeat';
     try {
       localStorage.setItem(
         STORAGE_KEY,

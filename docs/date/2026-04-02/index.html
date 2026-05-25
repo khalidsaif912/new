@@ -1971,7 +1971,14 @@ function goToEmployeeSchedule(empName) {
     var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
     var p = path || location.pathname || '';
     if (isImportRosterPath(p)) {
-      return (root || normalizePathname(p)) + '/import';
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {
+        return '/import';
+      }
+      if (!/\/import$/i.test(base)) {
+        base = base.replace(/\/+$/, '') + '/import';
+      }
+      return base;
     }
     if (root) return root;
     return normalizePathname(p);

@@ -27,7 +27,14 @@ BUILD_NEW = """  function isImportRosterPath(p) {
     var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
     var p = path || location.pathname || '';
     if (isImportRosterPath(p)) {
-      return (root || normalizePathname(p)) + '/import';
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {
+        return '/import';
+      }
+      if (!/\/import$/i.test(base)) {
+        base = base.replace(/\/+$/, '') + '/import';
+      }
+      return base;
     }
     if (root) return root;
     return normalizePathname(p);
@@ -80,7 +87,14 @@ def patch_generate(text: str) -> tuple[str, list[str]]:
     var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
     var p = path || location.pathname || '';
     if (isImportRosterPath(p)) {{
-      return (root || normalizePathname(p)) + '/import';
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {{
+        return '/import';
+      }}
+      if (!/\\/import$/i.test(base)) {{
+        base = base.replace(/\\/+$/, '') + '/import';
+      }}
+      return base;
     }}
     if (root) return root;
     return normalizePathname(p);
