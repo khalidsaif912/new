@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <script src="../../ios-tap-fix.js?v=20260525b"></script>
+  <script defer src="../../ios-tap-fix.js?v=20260525c"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="x-apple-disable-message-reformatting">
   <title>Duty Roster</title>
@@ -353,7 +353,11 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     }
 
 
-    /* ═══════ DEPARTMENT CARD ═══════ */
+    /* ═══════ DEPARTMENT CARD ═══════ */    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+
     .deptCard {
       margin-top:18px;
       background:#fff;

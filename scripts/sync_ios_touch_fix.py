@@ -9,6 +9,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
+_SCRIPTS = ROOT / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from roster_cta_snippets import (  # noqa: E402
+    IOS_PERF_VER,
+    LOAD_ENHANCE_BLOCK_RE,
+    LOAD_LOCAL_ENHANCEMENTS_EXPORT,
+    LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+    PERF_RENDER_CSS,
+)
 
 DATE_PICKER_CSS = re.compile(
     r"/\*\s*(?:Transparent date input[^\n]*|الـ input[^\n]*)\s*\*/\s*"
@@ -50,7 +60,7 @@ CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, b
       cursor:pointer;
     }"""
 
-IOS_TOUCH_VER = "20260525b"
+IOS_TOUCH_VER = IOS_PERF_VER
 IOS_HEAD_SCRIPT = f'<script src="{{prefix}}/ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>'
 
 ONCLICK_CHIP_RE = re.compile(
@@ -298,9 +308,15 @@ def ios_script_src_for(path: Path) -> str:
 
 def inject_ios_head_script(text: str, html_path: Path) -> tuple[str, bool]:
     src = ios_script_src_for(html_path)
-    tag = f'<script src="{src}"></script>'
-    if tag in text or f"ios-tap-fix.js?v={IOS_TOUCH_VER}" in text:
-        return text, False
+    tag = f'<script defer src="{src}"></script>'
+    if "ios-tap-fix.js" in text:
+        updated, n = re.subn(
+            r'<script(?:\s+defer)?\s+src="[^"]*ios-tap-fix\.js[^"]*"\s*></script>',
+            tag,
+            text,
+            count=1,
+        )
+        return updated, n > 0
     marker = '<meta name="viewport"'
     if marker not in text:
         return text, False
@@ -418,45 +434,33 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
         text = text.replace(RESYNC_NEEDLE, RESYNC_GUARD, 1)
         notes.append("resync-guard")
 
-    for old_ver in (
-        "var ver = '20260514b'",
-        "var ver = '20260519a'",
-        "var ver = '20260520d'",
-        "var ver = '20260526a'",
-    ):
-        if old_ver in text:
-            text = text.replace(old_ver, f"var ver = '{IOS_TOUCH_VER}'", 1)
-            notes.append("ver-bump")
-            break
+    if "content-visibility: auto" not in text and ".deptCard {" in text:
+        text = text.replace(
+            "    /* ═══════ DEPARTMENT CARD ═══════ */",
+            "    /* ═══════ DEPARTMENT CARD ═══════ */" + PERF_RENDER_CSS,
+            1,
+        )
+        notes.append("perf-css")
 
-    if "loadLocalEnhancements" in text:
-        if LOAD_ENHANCE_DEFER_ONLY.search(text):
-            text = LOAD_ENHANCE_DEFER_ONLY.sub(LOAD_ENHANCE_SYNC_FIRST, text, count=1)
-            notes.append("ios-sync")
-        elif IOS_SCRIPT_LINE not in text:
-            text = text.replace(
-                "addScript(root + '/install-pwa.js",
-                IOS_SCRIPT_LINE + "\n  addScript(root + '/install-pwa.js",
-                1,
-            )
-            notes.append("ios-script")
-        if "function addScript(src)" in text and "function addScript(src, sync)" not in text:
-            text = text.replace(
-                "function addScript(src) {",
-                "function addScript(src, sync) {",
-                1,
-            )
-            text = text.replace(
-                "s.defer = true;",
-                "if (!sync) s.defer = true;",
-                1,
-            )
-            text = text.replace(
-                "document.body.appendChild(s);",
-                "(sync ? document.head : document.body).appendChild(s);",
-                1,
-            )
-            notes.append("addScript-sync-arg")
+    if LOAD_ENHANCE_BLOCK_RE.search(text):
+        is_import = "/import/" in text or 'id="exportBtn"' in text and 'goToExport' in text
+        replacement = (
+            LOAD_LOCAL_ENHANCEMENTS_IMPORT.strip()
+            if "function goToExport" in text
+            else LOAD_LOCAL_ENHANCEMENTS_EXPORT.strip()
+        )
+        if "requestIdleCallback" not in text:
+            text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
+            notes.append("lazy-enhance")
+
+    if "loadLocalEnhancements" in text and "ios-tap-fix.js" in text:
+        text = re.sub(
+            r"\s*addScript\(root \+ '/ios-tap-fix\.js[^']*'[^)]*\);\s*",
+            "\n",
+            text,
+            count=1,
+        )
+        notes.append("drop-dup-ios")
 
     if "function setSummaryChipHrefs" not in text and "id=\"myScheduleBtn\"" in text:
         anchor = "setLocalCtaLinks();"

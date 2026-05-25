@@ -897,3 +897,84 @@ I18N_SHARE_EN = "shareSite:'Share Site'"
 I18N_SHARE_AR = "shareSite:'مشاركة الموقع'"
 I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
+
+# ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
+IOS_PERF_VER = "20260525c"
+
+LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  var ver = '""" + IOS_PERF_VER + """';
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  addScript(root + '/roster-icons.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
+  function loadSecondary() {
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/shift-swap.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+    var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+    var m = (location.pathname || '').match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//);
+    var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+    if (eidDays.indexOf(activeIso) !== -1) {
+      addScript(root + '/eid-overlayxx.js');
+    }
+  }
+  if (window.requestIdleCallback) {
+    requestIdleCallback(loadSecondary, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
+  }
+})();"""
+
+LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  var ver = '""" + IOS_PERF_VER + """';
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  addScript(root + '/site-last-updated.js?v=' + ver);
+  function loadSecondary() {
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+    var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+    var m = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);
+    var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+    if (eidDays.indexOf(activeIso) !== -1) {
+      addScript(root + '/eid-overlayxx.js');
+    }
+  }
+  if (window.requestIdleCallback) {
+    requestIdleCallback(loadSecondary, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
+  }
+})();"""
+
+LOAD_ENHANCE_BLOCK_RE = re.compile(
+    r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);",
+)
+
+PERF_RENDER_CSS = """    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+"""

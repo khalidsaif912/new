@@ -22,7 +22,7 @@ from training_page_icons import (  # noqa: E402
 )
 
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
-IOS_TOUCH_VER = "20260525b"
+IOS_TOUCH_VER = "20260525c"
 
 CSS = """
 :root {
@@ -863,7 +863,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script src="../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
+  <script defer src="../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
   <title>دورات التدريب - {month_label(selected)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -943,7 +943,7 @@ def render_archive_index(data: dict) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script src="../../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
+  <script defer src="../../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
   <title>Training Archive</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -980,7 +980,7 @@ def render_cup_of_book_page() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script src="../../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
+  <script defer src="../../ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>
   <title>A Cup of Book</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

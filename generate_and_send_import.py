@@ -46,6 +46,9 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_SCHEDULE_HTML,
     CHIP_WAVE_HTML,
     import_cta_html,
+    IOS_PERF_VER,
+    LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+    PERF_RENDER_CSS,
 )
 
 CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
@@ -689,7 +692,7 @@ def build_duty_html(
     repo_base_path: str,
     min_date: str = "",
     max_date: str = "",
-    ios_touch_src: str = "../ios-tap-fix.js?v=20260525b",
+    ios_touch_src: str = f"../ios-tap-fix.js?v={IOS_PERF_VER}",
 ) -> str:
     day = date_obj.day
     date_label = date_obj.strftime("%d %B %Y")
@@ -839,7 +842,7 @@ def build_duty_html(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script src="{ios_touch_src}"></script>
+  <script defer src="{ios_touch_src}"></script>
   <title>Import Duty Roster</title>
   {LEGACY_ROSTER_SITE_IMPORT_REDIRECT}
   <style>{style}</style>
@@ -1194,29 +1197,7 @@ function setSummaryChipHrefs() {{
   if (welcome) welcome.href = base;
 }}
 
-(function loadLocalEnhancements() {{
-  var root = getSiteRootUrl();
-  function addScript(src, sync) {{
-    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-    var s = document.createElement('script');
-    s.src = src;
-    if (!sync) s.defer = true;
-    s.setAttribute('data-local-src', src);
-    (sync ? document.head : document.body).appendChild(s);
-  }}
-  var ver = '20260525b';
-  addScript(root + '/ios-tap-fix.js?v=' + ver, true);
-  addScript(root + '/site-share.js?v=' + ver);
-  addScript(root + '/install-pwa.js?v=' + ver);
-  addScript(root + '/change-alert.js?v=' + ver);
-  addScript(root + '/banner-changer.js');
-  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-  var m = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
-  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-  if (eidDays.indexOf(activeIso) !== -1) {{
-    addScript(root + '/eid-overlayxx.js');
-  }}
-}})();
+{LOAD_LOCAL_ENHANCEMENTS_IMPORT}
 
 (function showWelcomeChip() {{
   var empId = localStorage.getItem('importSavedEmpId');
@@ -1511,12 +1492,12 @@ def main() -> None:
         flat_html = build_duty_html(
             style, export_script, parsed, d, repo_base_path="/import",
             min_date=min_date, max_date=max_date,
-            ios_touch_src="../../ios-tap-fix.js?v=20260525b",
+            ios_touch_src=f"../../ios-tap-fix.js?v={IOS_PERF_VER}",
         )
         alias_html = build_duty_html(
             style, export_script, parsed, d, repo_base_path="/import",
             min_date=min_date, max_date=max_date,
-            ios_touch_src="../../../ios-tap-fix.js?v=20260525b",
+            ios_touch_src=f"../../../ios-tap-fix.js?v={IOS_PERF_VER}",
         )
 
         day_dir = out_root / iso

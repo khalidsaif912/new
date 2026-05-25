@@ -27,6 +27,9 @@ from roster_cta_snippets import (  # noqa: E402
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
     export_cta_html,
+    IOS_PERF_VER,
+    LOAD_LOCAL_ENHANCEMENTS_EXPORT,
+    PERF_RENDER_CSS,
 )
 from datetime import datetime
 from io import BytesIO
@@ -814,7 +817,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script src="{pages_base}/ios-tap-fix.js?v=20260525b"></script>
+  <script defer src="{pages_base}/ios-tap-fix.js?v={IOS_PERF_VER}"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -1158,6 +1161,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       border:1px solid rgba(15,23,42,.07);
       box-shadow:0 4px 18px rgba(15,23,42,.08);
     }}
+{PERF_RENDER_CSS}
     .deptHead {{
       display:flex;
       align-items:center;
@@ -2568,34 +2572,7 @@ function goToRosterDiff(event) {{
   location.href = target;
 }}
 
-(function loadLocalEnhancements() {{
-  var root = getSiteRootUrl();
-  function addScript(src, sync) {{
-    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-    var s = document.createElement('script');
-    s.src = src;
-    if (!sync) s.defer = true;
-    s.setAttribute('data-local-src', src);
-    (sync ? document.head : document.body).appendChild(s);
-  }}
-  var ver = '20260525b';
-  addScript(root + '/ios-tap-fix.js?v=' + ver, true);
-  addScript(root + '/roster-icons.js?v=' + ver);
-  addScript(root + '/site-share.js?v=' + ver);
-  addScript(root + '/site-apps.js?v=' + ver);
-  addScript(root + '/install-pwa.js?v=' + ver);
-  addScript(root + '/bg-texture-shuffle.js?v=' + ver);
-  addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/change-alert.js?v=' + ver);
-  addScript(root + '/shift-swap.js?v=' + ver);
-  addScript(root + '/banner-changer.js?v=' + ver);
-  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-  var m = (location.pathname || '').match(/\/date\/(\d{{4}}-\d{{2}}-\d{{2}})\//);
-  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-  if (eidDays.indexOf(activeIso) !== -1) {{
-    addScript(root + '/eid-overlayxx.js');
-  }}
-}})();
+{LOAD_LOCAL_ENHANCEMENTS_EXPORT}
 {EMPLOYEE_NEXT_SHIFT_PREVIEW_JS}
 </script>
 
