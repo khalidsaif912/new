@@ -243,6 +243,34 @@ APPLY_LANG_LANG_BTN_NEW = (
     "if(btn) btn.textContent=t.langBtn; }}\n"
 )
 
+IOS_TOUCH_CSS = r"""    .header::before,
+    .header::after {
+      pointer-events:none;
+    }
+    .summaryBar {
+      position:relative;
+      z-index:30;
+      isolation:isolate;
+    }
+    .summaryBar a.summaryChip,
+    .summaryBar button.summaryChip,
+    .importBottom .quickActions.roster-cta,
+    .importBottom .roster-cta-btn {
+      position:relative;
+      z-index:1;
+    }
+    .summaryBar a.summaryChip *,
+    .summaryBar button.summaryChip *,
+    .quickActions.roster-cta-btn .roster-cta-icon,
+    .quickActions.roster-cta-btn .roster-cta-label {
+      pointer-events:none;
+    }
+    .importBottom {
+      position:relative;
+      z-index:25;
+    }
+"""
+
 CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       display: block;
       width: 22px;
@@ -766,17 +794,31 @@ def export_cta_html(
     )
 
 
-def import_cta_html(cta_href: str = "{BASE}/now/") -> str:
+def import_cta_html(
+    cta_href: str = "{BASE}/now/",
+    subscribe_href: str = "{BASE}/subscribe/",
+    compare_onclick: str = ' onclick="goToRosterDiff(event)"',
+) -> str:
+    """Same 5-button grid layout as export (Full Roster / Subscribe / Compare + Share / Apps)."""
+    compare_extra = f' href="#"{compare_onclick}'
     return (
-        '<nav class="quickActions roster-cta roster-cta--import" aria-label="Page actions">\n'
+        '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
         + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
+        + _btn(
+            "a",
+            "roster-cta-btn--subscribe",
+            "subscribeBtn",
+            "Subscribe",
+            SVG_BELL,
+            f' href="{subscribe_href}"',
+        )
         + _btn(
             "a",
             "roster-cta-btn--compare",
             "compareBtn",
             "Compare",
             SVG_COMPARE,
-            ' href="#" onclick="goToRosterDiff(event)"',
+            compare_extra,
         )
         + _btn(
             "button",

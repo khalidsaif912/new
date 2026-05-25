@@ -31,16 +31,49 @@ NEW_DATE_INPUT_CSS = """/* Transparent date input over #dateTag — native picke
       font-size:16px;
       line-height:44px;
       border:none;
-      z-index:2;
+      z-index:5;
+      pointer-events:auto;
       color:transparent;
       background:transparent;
       touch-action:manipulation;
     }"""
 
-CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn {
+HIDDEN_DATE_INPUT_CSS = re.compile(
+    r"/\*\s*Hidden date input[^*]*\*/\s*"
+    r"\.datePickerWrapper\s+#datePicker\s*\{[^}]+\}",
+    re.DOTALL,
+)
+
+CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }"""
+
+SUMMARY_TOUCH_CSS = """    .header::before,
+    .header::after {
+      pointer-events:none;
+    }
+    .summaryBar {
+      position:relative;
+      z-index:30;
+      isolation:isolate;
+    }
+    .summaryBar a.summaryChip,
+    .summaryBar button.summaryChip {
+      position:relative;
+      z-index:1;
+    }
+    .summaryBar a.summaryChip *,
+    .summaryBar button.summaryChip *,
+    .quickActions.roster-cta-btn .roster-cta-icon,
+    .quickActions.roster-cta-btn .roster-cta-label {
+      pointer-events:none;
+    }
+    .importBottom {
+      position:relative;
+      z-index:25;
+    }
+"""
 
 WRAPPER_OLD = re.compile(
     r"\.datePickerWrapper\s*\{\s*"
@@ -150,7 +183,84 @@ LOAD_ENHANCE = re.compile(
     re.DOTALL,
 )
 
-IOS_SCRIPT_LINE = "addScript(root + '/ios-tap-fix.js?v=' + ver);"
+IOS_SCRIPT_LINE = "addScript(root + '/ios-tap-fix.js?v=' + ver, true);"
+
+LOAD_ENHANCE_DEFER_ONLY = re.compile(
+    r"addScript\(root \+ '/ios-tap-fix\.js\?v=' \+ ver\);\s*\n",
+)
+
+LOAD_ENHANCE_SYNC_FIRST = (
+    "addScript(root + '/ios-tap-fix.js?v=' + ver, true);\n"
+)
+
+LOAD_ENHANCE_MARKER = "(function loadLocalEnhancements()"
+
+
+def _load_enhance_score(block: str) -> int:
+    score = 0
+    if "function addScript(src, sync)" in block:
+        score += 10
+    if "ios-tap-fix.js?v=' + ver, true" in block:
+        score += 10
+    if "20260526a" in block:
+        score += 5
+    return score
+
+
+def dedupe_load_local_enhancements(text: str) -> tuple[str, bool]:
+    """Keep one loadLocalEnhancements IIFE (prefer ios-tap-fix sync in head)."""
+    spans: list[tuple[int, int, str]] = []
+    pos = 0
+    while True:
+        start = text.find(LOAD_ENHANCE_MARKER, pos)
+        if start < 0:
+            break
+        end = text.find("})();", start)
+        if end < 0:
+            break
+        end += len("})();")
+        spans.append((start, end, text[start:end]))
+        pos = end
+    if len(spans) < 2:
+        return text, False
+    best = max(spans, key=lambda s: _load_enhance_score(s[2]))
+    out = text
+    removed = False
+    for start, end, block in reversed(spans):
+        if (start, end, block) == best:
+            continue
+        out = out[:start] + out[end:]
+        removed = True
+    return out, removed
+
+
+SET_SUMMARY_HREFS_JS = """
+function setSummaryChipHrefs() {
+  var rootUrl = (typeof getSiteRootUrl === 'function') ? getSiteRootUrl() : '';
+  var rootPath = (typeof getSiteRootPath === 'function') ? getSiteRootPath() : '';
+  var importBase = (typeof _importBase === 'function') ? _importBase() : (rootUrl + '/import');
+  var my = document.getElementById('myScheduleBtn');
+  var imp = document.getElementById('importBtn');
+  var exp = document.getElementById('exportBtn');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  var welcome = document.getElementById('welcomeChip');
+  if (my) {
+    my.href = (location.pathname || '').indexOf('/import/') >= 0
+      ? importBase + '/my-schedules/index.html'
+      : rootUrl + '/my-schedules/index.html';
+  }
+  if (imp) imp.href = rootUrl + '/import/';
+  if (exp) exp.href = rootUrl + '/';
+  if (trn) trn.href = rootPath + '/training/';
+  if (diff) diff.href = rootUrl + '/roster-diff/index.html';
+  if (welcome) {
+    welcome.href = (location.pathname || '').indexOf('/import/') >= 0
+      ? importBase + '/my-schedules/index.html'
+      : rootUrl + '/my-schedules/index.html';
+  }
+}
+"""
 
 
 def patch_html(text: str) -> tuple[str, list[str]]:
@@ -171,6 +281,9 @@ def patch_html(text: str) -> tuple[str, list[str]]:
     if DATE_PICKER_CSS.search(text):
         text = DATE_PICKER_CSS.sub(NEW_DATE_INPUT_CSS, text, count=1)
         notes.append("date-css")
+    elif HIDDEN_DATE_INPUT_CSS.search(text) and "pointer-events:none" in text:
+        text = HIDDEN_DATE_INPUT_CSS.sub(NEW_DATE_INPUT_CSS, text, count=1)
+        notes.append("date-css-hidden")
 
     # Repair broken layout from earlier sync runs (stray } before SUMMARY BAR)
     try:
@@ -181,7 +294,8 @@ def patch_html(text: str) -> tuple[str, list[str]]:
             notes.append("summary-css-repair")
     except ImportError:
         pass
-    elif "opacity: 0.01" in text and ".datePickerWrapper #datePicker" in text:
+
+    if "opacity: 0.01" in text and ".datePickerWrapper #datePicker" in text:
         text = text.replace("opacity: 0.01", "opacity:0", 1)
         text = re.sub(
             r"@supports\s*\(-webkit-touch-callout:\s*none\)\s*\{\s*"
@@ -202,6 +316,15 @@ def patch_html(text: str) -> tuple[str, list[str]]:
             1,
         )
         notes.append("chip-touch")
+
+    if "pointer-events:none" not in text.split(".header::before")[1][:80] if ".header::before" in text else "":
+        if "/* ═══════ SUMMARY BAR ═══════ */" in text and "z-index:30" not in text.split(".summaryBar")[1][:120] if ".summaryBar" in text else "":
+            text = text.replace(
+                "    /* ═══════ SUMMARY BAR ═══════ */",
+                SUMMARY_TOUCH_CSS + "\n    /* ═══════ SUMMARY BAR ═══════ */",
+                1,
+            )
+            notes.append("summary-touch-css")
 
     if ".langToggle {" in text and "z-index:25" not in text:
         text = text.replace("z-index:10;", "z-index:25;", 1)
@@ -241,18 +364,61 @@ def patch_html(text: str) -> tuple[str, list[str]]:
         text = text.replace(RESYNC_NEEDLE, RESYNC_GUARD, 1)
         notes.append("resync-guard")
 
-    if "var ver = '20260514b'" in text:
-        text = text.replace("var ver = '20260514b'", "var ver = '20260519a'", 1)
-        notes.append("ver-bump")
+    for old_ver in ("var ver = '20260514b'", "var ver = '20260519a'", "var ver = '20260520d'"):
+        if old_ver in text:
+            text = text.replace(old_ver, "var ver = '20260526a'", 1)
+            notes.append("ver-bump")
+            break
 
     if "loadLocalEnhancements" in text:
-        if IOS_SCRIPT_LINE not in text:
+        if LOAD_ENHANCE_DEFER_ONLY.search(text):
+            text = LOAD_ENHANCE_DEFER_ONLY.sub(LOAD_ENHANCE_SYNC_FIRST, text, count=1)
+            notes.append("ios-sync")
+        elif IOS_SCRIPT_LINE not in text:
             text = text.replace(
                 "addScript(root + '/install-pwa.js",
                 IOS_SCRIPT_LINE + "\n  addScript(root + '/install-pwa.js",
                 1,
             )
             notes.append("ios-script")
+        if "function addScript(src)" in text and "function addScript(src, sync)" not in text:
+            text = text.replace(
+                "function addScript(src) {",
+                "function addScript(src, sync) {",
+                1,
+            )
+            text = text.replace(
+                "s.defer = true;",
+                "if (!sync) s.defer = true;",
+                1,
+            )
+            text = text.replace(
+                "document.body.appendChild(s);",
+                "(sync ? document.head : document.body).appendChild(s);",
+                1,
+            )
+            notes.append("addScript-sync-arg")
+
+    if "function setSummaryChipHrefs" not in text and "id=\"myScheduleBtn\"" in text:
+        anchor = "setLocalCtaLinks();"
+        if anchor in text:
+            text = text.replace(
+                anchor,
+                anchor + "\nsetSummaryChipHrefs();",
+                1,
+            )
+            notes.append("call-setSummaryChipHrefs")
+        insert_at = "function setLocalCtaLinks()"
+        if insert_at in text:
+            text = text.replace(insert_at, SET_SUMMARY_HREFS_JS + "\n" + insert_at, 1)
+            notes.append("setSummaryChipHrefs-fn")
+        elif "function goToMySchedule" in text:
+            text = text.replace(
+                "function goToMySchedule",
+                SET_SUMMARY_HREFS_JS + "\nfunction goToMySchedule",
+                1,
+            )
+            notes.append("setSummaryChipHrefs-fn")
     if ".captureBusy {" in text and "pointer-events:none" not in text.split(".captureBusy")[1][:200]:
         text = text.replace(
             "z-index:10000; display:none;\n    }",
@@ -260,6 +426,10 @@ def patch_html(text: str) -> tuple[str, list[str]]:
             1,
         )
         notes.append("capture-busy")
+
+    text, deduped = dedupe_load_local_enhancements(text)
+    if deduped:
+        notes.append("dedupe-loadEnhance")
 
     return text, notes
 

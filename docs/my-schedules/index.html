@@ -2267,9 +2267,9 @@
         if(document.querySelector('script[data-local-src=\"' + src + '\"]')) return;
         const s = document.createElement('script');
         s.src = src;
-        s.defer = true;
+        if (!sync) if (!sync) s.defer = true;
         s.setAttribute('data-local-src', src);
-        document.body.appendChild(s);
+        (sync ? document.head : document.body).appendChild(s);
       }
       addScript(root + '/change-alert.js');
         addScript(root + '/bg-texture-shuffle.js?v=' + ver);

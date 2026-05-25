@@ -989,24 +989,35 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }}
-    /* Hidden date input — label#dateTag opens picker (Windows + iOS) */
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
     .datePickerWrapper #datePicker {{
       position:absolute;
-      width:1px;
-      height:1px;
+      inset:0;
+      width:100%;
+      height:100%;
+      min-height:44px;
+      margin:0;
       padding:0;
-      margin:-1px;
-      overflow:hidden;
-      clip:rect(0,0,0,0);
-      white-space:nowrap;
-      border:0;
       opacity:0;
-      pointer-events:none;
+      cursor:pointer;
+      font-size:16px;
+      line-height:44px;
+      border:none;
+      z-index:5;
+      pointer-events:auto;
+      color:transparent;
+      background:transparent;
+      touch-action:manipulation;
     }}
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {{
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
+    }}
+
+    .header::before,
+    .header::after {{
+      pointer-events:none;
     }}
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -1017,6 +1028,24 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       gap:12px; 
       margin-top:14px;
       flex-wrap:wrap;
+      position:relative;
+      z-index:30;
+      isolation:isolate;
+    }}
+    .summaryBar a.summaryChip,
+    .summaryBar button.summaryChip {{
+      position:relative;
+      z-index:1;
+    }}
+    .summaryBar a.summaryChip *,
+    .summaryBar button.summaryChip *,
+    .quickActions.roster-cta-btn .roster-cta-icon,
+    .quickActions.roster-cta-btn .roster-cta-label {{
+      pointer-events:none;
+    }}
+    .importBottom {{
+      position:relative;
+      z-index:25;
     }}
     a.summaryChip:hover {{
       transform:translateY(-3px);
@@ -2394,12 +2423,27 @@ function setLocalCtaLinks() {{
   if (c1) c1.href = root + '/now/';
   if (c2) c2.href = root + '/subscribe/';
 }}
+
+function setSummaryChipHrefs() {{
+  var base = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var imp = document.getElementById('importBtn');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  var welcome = document.getElementById('welcomeChip');
+  if (my) my.href = base + '/my-schedules/index.html';
+  if (imp) imp.href = base + '/import/';
+  if (trn) trn.href = base + '/training/';
+  if (diff) diff.href = base + '/roster-diff/index.html';
+  if (welcome) welcome.href = base + '/my-schedules/index.html';
+}}
 function goToTraining(e) {{
   if (e) e.preventDefault();
   var root = getSiteRootPath();
   location.href = root + '/training/';
 }}
 setLocalCtaLinks();
+setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
 
@@ -2521,19 +2565,19 @@ function goToRosterDiff(event) {{
 
 (function loadLocalEnhancements() {{
   var root = getSiteRootUrl();
-  function addScript(src) {{
+  function addScript(src, sync) {{
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
     s.src = src;
-    s.defer = true;
+    if (!sync) s.defer = true;
     s.setAttribute('data-local-src', src);
-    document.body.appendChild(s);
+    (sync ? document.head : document.body).appendChild(s);
   }}
-  var ver = '20260520d';
+  var ver = '20260526a';
+  addScript(root + '/ios-tap-fix.js?v=' + ver, true);
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/site-apps.js?v=' + ver);
-  addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/bg-texture-shuffle.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);

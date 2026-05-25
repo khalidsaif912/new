@@ -45,6 +45,7 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_ICON_CSS,
     CHIP_SCHEDULE_HTML,
     CHIP_WAVE_HTML,
+    import_cta_html,
 )
 
 CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
@@ -414,6 +415,10 @@ _EXPORT_WELCOME_CHIP_RE = re.compile(
     r"(?=function goToMySchedule)",
 )
 
+_LOAD_ENHANCE_IIFE_RE = re.compile(
+    r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);\s*",
+)
+
 
 def sanitize_export_script_for_import(script: str) -> str:
     """
@@ -432,6 +437,8 @@ def sanitize_export_script_for_import(script: str) -> str:
             script,
             count=1,
         )
+    # Import footer block loads scripts (ios-tap-fix sync-first); drop export duplicate.
+    script, _ = _LOAD_ENHANCE_IIFE_RE.subn("", script, count=1)
     return script
 
 
@@ -846,6 +853,8 @@ def build_duty_html(
     .importBottom {{
       margin-top: auto;
       padding-top: 14px;
+      position: relative;
+      z-index: 25;
     }}
     .importBottom .quickActions.roster-cta {{
       margin-bottom: 6px;
@@ -922,20 +931,7 @@ def build_duty_html(
   {''.join(cards)}
 
   <div class="importBottom">
-    <nav class="quickActions roster-cta roster-cta--import" aria-label="Page actions">
-      <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
-        <span class="roster-cta-icon" aria-hidden="true">📋</span>
-        <span class="roster-cta-label">Full Roster</span>
-      </a>
-      <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
-        <span class="roster-cta-icon" aria-hidden="true">🔄</span>
-        <span class="roster-cta-label">Compare</span>
-      </a>
-      <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
-        <span class="roster-cta-icon" aria-hidden="true">📤</span>
-        <span class="roster-cta-label">Share Site</span>
-      </button>
-    </nav>
+    {import_cta_html(cta_href="{{BASE}}/now/", subscribe_href="{{BASE}}/subscribe/")}
     {footer}
   </div>
 
@@ -1185,19 +1181,30 @@ function goToRosterDiff(event) {{
   }});
 }})();
 
+function setSummaryChipHrefs() {{
+  var base = _importBase() + '/my-schedules/index.html';
+  var root = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var exp = document.getElementById('exportBtn');
+  var welcome = document.getElementById('welcomeChip');
+  if (my) my.href = base;
+  if (exp) exp.href = root + '/';
+  if (welcome) welcome.href = base;
+}}
+
 (function loadLocalEnhancements() {{
   var root = getSiteRootUrl();
-  function addScript(src) {{
+  function addScript(src, sync) {{
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
     s.src = src;
-    s.defer = true;
+    if (!sync) s.defer = true;
     s.setAttribute('data-local-src', src);
-    document.body.appendChild(s);
+    (sync ? document.head : document.body).appendChild(s);
   }}
-  var ver = '20260520d';
+  var ver = '20260526a';
+  addScript(root + '/ios-tap-fix.js?v=' + ver, true);
   addScript(root + '/site-share.js?v=' + ver);
-  addScript(root + '/ios-tap-fix.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
   addScript(root + '/change-alert.js?v=' + ver);
   addScript(root + '/banner-changer.js');
@@ -1237,6 +1244,7 @@ function goToRosterDiff(event) {{
     var href = a.getAttribute('href') || '';
     a.href = href.replaceAll('{{{{BASE}}}}', base).replaceAll('{{BASE}}', base);
   }});
+  setSummaryChipHrefs();
 }})();
 
 // Import banner labels (export script uses titleEyebrow + titleMain).
