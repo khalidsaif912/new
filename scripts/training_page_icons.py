@@ -76,7 +76,9 @@ SVG_DOCK_CUP = _svg(
 DOCK_CUP_INNER = (
     f'<div class="otherPageInner">'
     f'<span class="otherIconWrap">{SVG_DOCK_CUP}</span>'
-    f'<div class="dockLabel otherPageLabel">A Cup of Book</div></div>'
+    f'<div class="dockLabel otherPageLabel" aria-label="A Cup of Book">'
+    f'<span class="dockLabelLine">A Cup</span>'
+    f'<span class="dockLabelLine">of Book</span></div></div>'
 )
 
 # Course card — one style; color from --accent on .courseIcon
