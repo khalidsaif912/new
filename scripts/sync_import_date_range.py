@@ -17,22 +17,19 @@ PICKER_RE = re.compile(
 )
 
 
-def discover_range() -> tuple[str, str, list[str]]:
-    found: list[str] = []
-    for base in (IMPORT_ROOT / "date", IMPORT_ROOT):
-        if not base.is_dir():
-            continue
-        for child in base.iterdir():
-            if child.is_dir() and ISO_RE.match(child.name) and (child / "index.html").is_file():
-                found.append(child.name)
-    if not found:
-        return "2026-03-01", "2026-05-31", ["2026-03", "2026-04", "2026-05"]
-    found.sort()
-    months = sorted({d[:7] for d in found})
-    return found[0], found[-1], months
+def discover_range() -> tuple[str, str, list[str], list[str]]:
+    sys.path.insert(0, str(ROOT))
+    from generate_and_send_import import discover_import_roster_catalog
+
+    catalog = discover_import_roster_catalog(IMPORT_ROOT)
+    months = catalog["available_months"]
+    published = catalog["published_dates"]
+    if not published:
+        return "2026-03-01", "2026-05-31", months or ["2026-03", "2026-04", "2026-05"], []
+    return catalog["date_min"], catalog["date_max"], months, published
 
 
-def update_meta(min_date: str, max_date: str, months: list[str]) -> None:
+def update_meta(min_date: str, max_date: str, months: list[str], published_dates: list[str]) -> None:
     import json
 
     meta_path = IMPORT_ROOT / "import_meta.json"
@@ -45,6 +42,8 @@ def update_meta(min_date: str, max_date: str, months: list[str]) -> None:
     meta["date_min"] = min_date
     meta["date_max"] = max_date
     meta["available_months"] = months
+    if published_dates:
+        meta["published_dates"] = published_dates
     meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
 
 
@@ -60,8 +59,8 @@ def patch_file(path: Path, min_date: str, max_date: str) -> bool:
 
 
 def main() -> int:
-    min_date, max_date, months = discover_range()
-    update_meta(min_date, max_date, months)
+    min_date, max_date, months, published_dates = discover_range()
+    update_meta(min_date, max_date, months, published_dates)
     print(f"Import date range: {min_date} .. {max_date} ({len(months)} months)")
     changed = 0
     for path in sorted(IMPORT_ROOT.rglob("index.html")):

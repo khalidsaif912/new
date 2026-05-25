@@ -25,6 +25,7 @@ import re
 import json
 import hashlib
 import argparse
+import subprocess
 import calendar
 import datetime as dt
 from pathlib import Path
@@ -36,7 +37,9 @@ from html import escape as html_escape
 
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from roster_app.cache_io import month_key_from_filename  # noqa: E402
 from roster_cta_snippets import (  # noqa: E402
     CHIP_EXPORT_HTML,
     CHIP_ICON_CSS,
@@ -1423,9 +1426,33 @@ def main() -> None:
     xlsx_path.write_bytes(data)
 
     today = muscat_today()
-    sheet = find_sheet_for_date(str(xlsx_path), today)
+    sheet_hint = today
+    incoming_key = month_key_from_filename(source_filename) if source_filename else None
+    if incoming_key:
+        y, m = int(incoming_key[:4]), int(incoming_key[5:7])
+        sheet_hint = dt.date(y, m, 1)
+        print(f"Target month from filename: {incoming_key}")
+    sheet = find_sheet_for_date(str(xlsx_path), sheet_hint)
     parsed = parse_month_sheet(str(xlsx_path), sheet)
     parsed["source_filename"] = source_filename
+
+    if incoming_key:
+        file_y, file_m = int(incoming_key[:4]), int(incoming_key[5:7])
+        if parsed["year"] != file_y or parsed["month"] != file_m:
+            print(
+                f"Month from filename {incoming_key} "
+                f"(sheet/tab parsed as {parsed['year']}-{parsed['month']:02d})"
+            )
+            parsed["year"] = file_y
+            parsed["month"] = file_m
+            parsed["month_name"] = dt.date(file_y, file_m, 1).strftime("%B")
+
+    gen_ym = f"{parsed['year']}-{parsed['month']:02d}"
+    if today.year == parsed["year"] and today.month == parsed["month"]:
+        display_date = today
+    else:
+        display_date = dt.date(parsed["year"], parsed["month"], 1)
+        print(f"Generating month {gen_ym}; home page shows {display_date.isoformat()}")
 
     style, export_script = load_export_ui_template(repo_root)
     export_script = prepare_export_script_for_import(export_script)
@@ -1433,8 +1460,6 @@ def main() -> None:
     roster_catalog = discover_import_roster_catalog(out_root)
     min_date = roster_catalog["date_min"]
     max_date = roster_catalog["date_max"]
-    available_months = roster_catalog["available_months"]
-    # Include the month being generated even before day folders exist.
     gen_start = f"{parsed['year']}-{parsed['month']:02d}-01"
     _, gen_days = calendar.monthrange(parsed["year"], parsed["month"])
     gen_end = f"{parsed['year']}-{parsed['month']:02d}-{gen_days:02d}"
@@ -1442,13 +1467,10 @@ def main() -> None:
         min_date = gen_start
     if gen_end > max_date:
         max_date = gen_end
-    gen_ym = f"{parsed['year']}-{parsed['month']:02d}"
-    if gen_ym not in available_months:
-        available_months = sorted(set(available_months + [gen_ym]))
 
-    # Generate duty roster page (today)
+    # Generate duty roster page (today or first day of generated month)
     duty_html = build_duty_html(
-        style, export_script, parsed, today, repo_base_path="/import",
+        style, export_script, parsed, display_date, repo_base_path="/import",
         min_date=min_date, max_date=max_date,
     )
     (out_root / "index.html").write_text(duty_html, encoding="utf-8")
@@ -1500,19 +1522,34 @@ def main() -> None:
     my_dir.mkdir(parents=True, exist_ok=True)
     (my_dir / "index.html").write_text(build_my_schedule_html(style, repo_base_path="/import"), encoding="utf-8")
 
-    # Save a small meta file for debugging
+    # Re-scan disk so import_meta includes the month we just generated.
+    roster_catalog = discover_import_roster_catalog(out_root)
+    month_sources = dict(roster_catalog.get("month_sources") or {})
+    if source_filename:
+        month_sources[gen_ym] = source_filename
+
     meta = {
         "sheet": parsed["sheet"],
         "generated_for": str(today),
         "employees_total": len(parsed["employees"]),
         "excel_sha256": hashlib.sha256(data).hexdigest(),
-        "date_min": min_date,
-        "date_max": max_date,
-        "available_months": available_months,
-        "month_sources": roster_catalog.get("month_sources", {}),
-        "published_dates": roster_catalog.get("published_dates", []),
+        "date_min": roster_catalog["date_min"],
+        "date_max": roster_catalog["date_max"],
+        "available_months": roster_catalog["available_months"],
+        "month_sources": month_sources,
+        "published_dates": roster_catalog["published_dates"],
     }
     (out_root / "import_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    print(
+        f"import_meta: {meta['date_min']} .. {meta['date_max']} | "
+        f"months={meta['available_months']}"
+    )
+
+    sync_date_range = repo_root / "scripts" / "sync_import_date_range.py"
+    sync_catalog = repo_root / "scripts" / "sync_import_roster_catalog.py"
+    for sync_script in (sync_date_range, sync_catalog):
+        if sync_script.is_file():
+            subprocess.run([sys.executable, str(sync_script)], check=False, cwd=str(repo_root))
 
     write_legacy_roster_site_import_redirect(repo_root)
     print("OK: Generated Import pages in docs/import/")

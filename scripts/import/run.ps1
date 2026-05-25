@@ -44,6 +44,9 @@ if ($ExcelFilePath) {
         $nameForMonth = if ($SourceName) { $SourceName } else { [System.IO.Path]::GetFileName($ExcelFilePath) }
         if ($nameForMonth -match '(\d{4}-\d{2})') {
             $MonthKey = $Matches[1]
+        } else {
+            $mk = python -c "from roster_app.cache_io import month_key_from_filename; import sys; print(month_key_from_filename(sys.argv[1]) or '')" $nameForMonth 2>$null
+            if ($mk) { $MonthKey = $mk.Trim() }
         }
     }
     if ($MonthKey -match '^\d{4}-\d{2}$') {
