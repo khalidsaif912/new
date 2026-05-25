@@ -1929,20 +1929,20 @@ function goToEmployeeSchedule(empName) {{
 
 
   var dateTagEl = document.getElementById('dateTag');
-  if (dateTagEl) {
-    dateTagEl.addEventListener('click', function(e) {
+  if (dateTagEl) {{
+    dateTagEl.addEventListener('click', function(e) {{
       if (e) e.preventDefault();
       openDatePicker();
-    });
-  }
+    }});
+  }}
 
   var dateWrap = document.querySelector('.datePickerWrapper');
   if (dateWrap) {{
     dateWrap.addEventListener('touchend', onDateWrapActivate, {{ passive: false }});
-    dateWrap.addEventListener('click', function(e) {
+    dateWrap.addEventListener('click', function(e) {{
       if (e.target === picker) return;
       onDateWrapActivate(e);
-    });
+    }});
     function onPickerActivate(e) {{
       if (e) {{
         e.preventDefault();
@@ -3157,9 +3157,6 @@ def main():
     if pages_base.endswith("/now"):
         pages_base = pages_base[:-4]
 
-    site_last_updated = format_site_last_updated(now)
-    write_site_last_updated_json(now)
-
     # ─────────────────────────────────────────────────────────────
     # FIX #1: تحميل Excel - عند الفشل نكمل بالكاش (لا نخرج)
     # ─────────────────────────────────────────────────────────────
@@ -3187,6 +3184,22 @@ def main():
     incoming_key = month_key_from_filename(source_name) if source_name else None
     print(f"📄 Source file: {source_name}")
     print(f"📅 Detected month: {incoming_key or 'unknown'}")
+
+    # Anchor calendar window to the roster file month (e.g. June file while today is still May).
+    if incoming_key and not args.date and (args.excel_file or data):
+        try:
+            ay, am = [int(x) for x in incoming_key.split("-")]
+            if (ay, am) != (now.year, now.month):
+                now = datetime(ay, am, 1, now.hour, now.minute, tzinfo=TZ)
+                today_dow = (now.weekday() + 1) % 7
+                today_day = now.day
+                active_group = current_shift_key(now)
+                print(f"📅 Anchored publish month to file: {incoming_key}")
+        except Exception:
+            pass
+
+    site_last_updated = format_site_last_updated(now)
+    write_site_last_updated_json(now)
 
     # FIX #3: حفظ في الكاش فقط إذا نجح التحميل
     if data and incoming_key:
@@ -3467,6 +3480,13 @@ def main():
             f.write(_src)
 
     write_site_last_updated_json(datetime.now(TZ))
+
+    if source_name:
+        try:
+            with open("last_filename.txt", "w", encoding="utf-8") as f:
+                f.write(source_name.strip())
+        except Exception as e:
+            print(f"WARNING: could not write last_filename.txt: {e}")
 
     # Email: send ONLY active shift + matching Standby
     if args.no_email:

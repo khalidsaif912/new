@@ -1,0 +1,2276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Duty Roster</title>
+  <style>
+    /* ═══════ RESET ═══════ */
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
+      width:100%;
+      overflow-x:hidden;
+    }
+    body {
+      margin:0; padding:0;
+      min-height:100dvh;
+      background:#eef1f7;
+      font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      touch-action:manipulation;
+    }
+    * { box-sizing:border-box; }
+
+    /* ═══════ WRAP ═══════ */
+    .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+
+    /* ═══════ HEADER ═══════ */
+    .header {
+      background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color:#fff;
+      padding:26px 18px 24px;
+      border-radius:20px;
+      text-align:center;
+      box-shadow:0 4px 16px rgba(30,64,175,.14);
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute;
+      top:-30px; right:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .header::after {
+      content:''; position:absolute;
+      bottom:-50px; left:-30px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,.06);
+    }
+    .header .bannerTitle {
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }
+    .header .bannerTitleEyebrow {
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+    .header .bannerTitleMain {
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+    body.ar .header .bannerTitleEyebrow {
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }
+    body.ar .header .bannerTitleMain {
+      font-size:26px;
+      letter-spacing:0;
+    }
+
+    /* زر اللغة */
+    .langToggle {
+      position:absolute; top:12px; right:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; height:auto; padding:4px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      transition:transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+    body.ar .langToggle { right:12px; left:auto; }
+    .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
+    .langToggle-icon svg {
+      display:block; width:18px; height:18px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      text-shadow:0 1px 3px rgba(0,0,0,.65);
+    }
+    #banner-changer-btn {
+      position:absolute; top:12px; left:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; min-height:auto; padding:4px;
+      color:#fff; cursor:pointer; line-height:0;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+    #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    #banner-changer-btn .banner-changer-icon svg {
+      display:block; width:20px; height:20px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    body.ar #banner-changer-btn { left:12px; right:auto; }
+    @media (max-width:720px) {
+      .langToggle { padding:6px; }
+      .langToggle-icon svg { width:20px; height:20px; }
+      .langToggle-label { font-size:11px; }
+      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+    }
+
+    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
+    .empRow, .empName, .empStatus { direction:ltr !important; unicode-bidi:embed; text-align:left !important; }
+
+    .welcomeChip {
+      display:none;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .welcomeChip.visible {
+      display:flex;
+    }
+    .welcomeChip .chipLabel {
+      max-width:88px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .waveHand {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:0;
+      transform-origin:50% 88%;
+      animation:waveHand 1.8s ease-in-out infinite;
+    }
+    @keyframes waveHand {
+      0%, 50%, 100% { transform:rotate(0deg); }
+      10% { transform:rotate(16deg); }
+      20% { transform:rotate(-10deg); }
+      30% { transform:rotate(16deg); }
+      40% { transform:rotate(-6deg); }
+    }
+
+    /* Date Picker Wrapper */
+    .datePickerWrapper {
+      position:relative;
+      display:inline-block;
+      margin-top:14px;
+      z-index:20;
+      min-height:44px;
+      min-width:min(100%, 220px);
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .header .dateTag {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
+      cursor:pointer;
+      transition:all .3s;
+      border:2px solid rgba(255,255,255,.2);
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      -webkit-user-select:none;
+      direction:ltr;
+      position:relative;
+      z-index:3;
+      pointer-events:auto;
+      color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .dateTag-icon {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
+      pointer-events:none;
+    }
+    .dateTag-icon svg {
+      display:block;
+      width:16px;
+      height:16px;
+      pointer-events:none;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
+    }
+    .dateTag-label {
+      line-height:1.2;
+      pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .header .dateTag:hover {
+      background:rgba(255,255,255,.25);
+      transform:translateY(-1px);
+    }
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
+    .datePickerWrapper #datePicker {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      min-height:44px;
+      margin:0;
+      padding:0;
+      opacity:0;
+      cursor:pointer;
+      font-size:16px;
+      line-height:44px;
+      border:none;
+      z-index:5;
+      pointer-events:auto;
+      color:transparent;
+      background:transparent;
+      touch-action:manipulation;
+    }
+
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .header::before,
+    .header::after {
+      pointer-events:none;
+    }
+
+    /* ═══════ SUMMARY BAR ═══════ */
+    .summaryBar { 
+      display:flex; 
+      justify-content:center; 
+      align-items:stretch;
+      gap:12px; 
+      margin-top:14px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:30;
+      isolation:isolate;
+    }
+    .summaryBar a.summaryChip,
+    .summaryBar button.summaryChip {
+      position:relative;
+      z-index:1;
+    }
+    .summaryBar a.summaryChip *,
+    .summaryBar button.summaryChip *,
+    .quickActions.roster-cta-btn .roster-cta-icon,
+    .quickActions.roster-cta-btn .roster-cta-label {
+      pointer-events:none;
+    }
+    .importBottom {
+      position:relative;
+      z-index:25;
+    }
+    a.summaryChip:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
+    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
+    a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
+    a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.diffChip .chipVal { color:#ef4444; }
+    a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
+    .summaryChip {
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      border-radius:14px;
+      padding:10px 12px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      transition:all .25s ease;
+      min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
+    #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
+    .summaryChip .chipLabel { 
+      font-size:9.5px;
+      font-weight:600; 
+      color:#64748b; 
+      text-transform:uppercase; 
+      letter-spacing:.4px; 
+      margin-top:4px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    /* ═══════ SHIFT FILTER BUTTONS AS CHIPS ═══════ */
+    button.summaryChip.shiftFilterBtn {
+      border:2px solid transparent;
+      position:relative;
+      overflow:hidden;
+      padding:10px 14px; /* padding أصغر للأزرار */
+    }
+    button.summaryChip.shiftFilterBtn:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    button.summaryChip.shiftFilterBtn.active {
+      border-color:currentColor;
+      box-shadow:0 6px 16px rgba(15,23,42,.18);
+    }
+    button.summaryChip.shiftFilterBtn.active::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background:currentColor;
+      opacity:.06;
+    }
+    
+    /* ألوان الورديات */
+    button.shiftFilterBtn.morning {
+      color:#f59e0b;
+    }
+    button.shiftFilterBtn.morning .chipVal { color:#f59e0b; }
+    button.shiftFilterBtn.morning .chipLabel { color:#92400e; }
+    
+    button.shiftFilterBtn.afternoon {
+      color:#f97316;
+    }
+    button.shiftFilterBtn.afternoon .chipVal { color:#f97316; }
+    button.shiftFilterBtn.afternoon .chipLabel { color:#9a3412; }
+    
+    button.shiftFilterBtn.night {
+      color:#8b5cf6;
+    }
+    button.shiftFilterBtn.night .chipVal { color:#8b5cf6; }
+    button.shiftFilterBtn.night .chipLabel { color:#5b21b6; }
+    
+    button.shiftFilterBtn.all {
+      color:#1e40af;
+    }
+    button.shiftFilterBtn.all .chipVal { color:#1e40af; }
+    button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
+    
+    /* للشاشات المتوسطة */
+    @media (max-width:900px){
+      .summaryBar { flex-wrap:wrap; } /* السماح بالانتقال للصف الثاني */
+    }
+    
+    /* للموبايل */
+    @media (max-width:600px){
+      .summaryBar { gap:6px; }
+      .summaryChip { padding:8px 8px; min-width:60px; }
+      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
+    }
+
+
+    /* ═══════ DEPARTMENT CARD ═══════ */
+    .deptCard {
+      margin-top:18px;
+      background:#fff;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(15,23,42,.07);
+      box-shadow:0 4px 18px rgba(15,23,42,.08);
+    }
+    .deptHead {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      background:#fff;
+      cursor:pointer;
+    }
+    .deptHead::after {
+      content:'▾';
+      color:#94a3b8;
+      font-size:14px;
+      margin-inline-start:6px;
+      transition:transform .2s ease;
+    }
+    .deptCard:not(.collapsed) .deptHead::after { transform:rotate(180deg); }
+    .deptIcon {
+      width:40px; height:40px;
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
+    .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+    .deptCard.collapsed .deptHead { border-bottom:none !important; }
+    .deptCard.collapsed .shiftStack { display:none; }
+
+    /* ═══════ SHIFT STACK ═══════ */
+    .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+    /* ═══════ SHIFT CARD — <details> ═══════ */
+    .shiftCard {
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .shiftSummary {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 14px;
+      cursor:pointer;
+      list-style:none;
+      -webkit-appearance:none;
+      appearance:none;
+      user-select:none;
+    }
+    .shiftSummary::-webkit-details-marker { display:none; }
+    .shiftSummary::marker              { display:none; }
+
+    .shiftIcon  { font-size:20px; line-height:1; flex-shrink:0; }
+    .shiftLabel { font-size:15px; font-weight:800; flex:1; letter-spacing:-.1px; }
+    .shiftCount {
+      font-size:13px; font-weight:800;
+      padding:3px 10px; border-radius:20px;
+      flex-shrink:0;
+    }
+
+    /* chevron يدور لما يفتح */
+    .shiftSummary::after {
+      content:'▾';
+      font-size:14px;
+      color:#94a3b8;
+      transition:transform .2s;
+      flex-shrink:0;
+    }
+    .shiftCard[open] .shiftSummary::after {
+      transform:rotate(180deg);
+    }
+
+    .shiftBody { background:rgba(255,255,255,.7); }
+
+    /* ── employee row (tap/long-press targets whole row in JS) ── */
+    .empRow {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:9px 16px;
+      border-top:1px solid rgba(15,23,42,.06);
+      cursor:pointer;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .empRowAlt { background:rgba(15,23,42,.02); }
+    .empName  {
+      font-size:15px; font-weight:700; color:#1e293b;
+      -webkit-user-select:none;
+      user-select:none;
+      pointer-events:none;
+    }
+    .empStatus { font-size:13px; font-weight:600; }
+    .nextShiftTooltip {
+      position: fixed;
+      z-index: 12000;
+      min-width: 250px;
+      max-width: 320px;
+      background: #ffffff;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 14px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.20);
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .nextShiftTooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .nextShiftHead {
+      padding: 8px 10px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .nextShiftHeadText { flex: 1; min-width: 0; }
+    .nextShiftClose {
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .nextShiftClose:hover { background: rgba(255, 255, 255, 0.32); }
+    .nextShiftEmp {
+      font-size: 12px; font-weight: 800; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nextShiftTitle {
+      font-size: 10px; font-weight: 700; opacity: .9; margin-top: 2px;
+    }
+    .nextShiftBody {
+      padding: 8px 9px 9px; background: rgba(255, 255, 255, 0.96);
+    }
+    .nextShiftItem {
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(241, 245, 249, 0.92);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .nextShiftDay {
+      font-size: 11px; font-weight: 800; color: #334155;
+      line-height: 1.2; min-width: 36px;
+    }
+    .nextShiftDate {
+      font-size: 10px; color: #64748b; line-height: 1.2; min-width: 58px;
+    }
+    .nextShiftCode {
+      margin-inline-start: auto;
+      font-size: 12px; font-weight: 800; color: #0f172a; line-height: 1.2;
+    }
+    .nextShiftEmpty {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
+    .quickActions.roster-cta {
+      --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --cta-gap: 10px;
+      margin-top: 22px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--cta-gap);
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
+    }
+    .roster-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      font-family: var(--cta-font);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    button.roster-cta-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      font: inherit;
+    }
+    .roster-cta-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 0;
+    }
+    .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .roster-cta-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roster-cta-btn--roster {
+      background: #e8f1ff;
+      border-color: #b8c9f5;
+      color: #1e3a8a;
+    }
+    .roster-cta-btn--subscribe {
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }
+    .roster-cta-btn--compare {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }
+    .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .roster-cta-btn--share {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+    .roster-cta-btn--texture {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #5b21b6;
+    }
+    .roster-cta--import {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (hover: hover) {
+      .roster-cta-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      }
+      .roster-cta-btn--roster:hover { background: #dce8ff; }
+      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
+      .roster-cta-btn--compare:hover { background: #fef3c7; }
+      .roster-cta-btn--share:hover { background: #d1fae5; }
+      .roster-cta-btn--apps:hover { background: #e0f2fe; }
+      .roster-cta-btn--texture:hover { background: #ede9fe; }
+      .roster-cta-btn--muted:hover { background: #e2e8f0; }
+    }
+    .roster-cta-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+    .roster-cta-btn:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.45);
+      outline-offset: 2px;
+    }
+    @media (max-width: 380px) {
+      .roster-cta-btn {
+        padding: 9px 8px;
+        font-size: 11px;
+        gap: 5px;
+        min-height: 40px;
+      }
+      .roster-cta-icon { font-size: 16px; }
+    }
+
+    /* ═══════ SITE SHARE MODAL ═══════ */
+    .siteShareSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteShareCard {
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
+    }
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteShareQr {
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
+    }
+    .siteShareUrl {
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
+    }
+    .siteShareActions {
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
+    }
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteAppsCard {
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
+    }
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
+    .siteAppsLink {
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .siteAppsLink-icon {
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+    }
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
+    .siteAppsLink--games {
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
+    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
+
+    /* ═══════ FOOTER ═══════ */
+    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
+    .footer strong { color:#64748b; }
+
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
+      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+      pointer-events:none; visibility:hidden;
+    }
+    .captureSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .captureSheetCard {
+      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .capturePreviewImg {
+      display:block; width:100%; max-width:100%; height:auto; border-radius:12px;
+      border:1px solid #e2e8f0; margin:0 0 10px; background:#f8fafc;
+    }
+    .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
+    .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn { margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+      pointer-events:none;
+    }
+    .captureBusy.open { display:block; }
+
+    /* ═══════ MOBILE ═══════ */
+    @media (max-width:480px){
+      .wrap            { padding:12px 10px 22px; }
+      .header .bannerTitleMain { font-size:22px; }
+      body.ar .header .bannerTitleMain { font-size:21px; }
+      .deptTitle       { font-size:16px; }
+      .empName         { font-size:14px; }
+      .empStatus       { font-size:12px; }
+      .shiftLabel      { font-size:14px; }
+      .summaryBar      { gap:8px; }
+      .summaryChip     { padding:8px 14px; }
+      .summaryChip .chipVal { font-size:19px; }
+    }
+
+  </style>
+  <meta name="theme-color" content="#f4354b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <script>
+  (function () {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var p = siteRoot();
+    var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
+    if (!p) base = location.origin + '/';
+    var pv = '13';
+    var imp = (location.pathname || '').indexOf('/import/') !== -1;
+    var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
+    var mlinks = document.querySelectorAll('link[rel="manifest"]');
+    var link = mlinks.length ? mlinks[0] : null;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = man;
+    for (var i = 1; i < mlinks.length; i++) mlinks[i].remove();
+    var touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/icon-192.png';
+    try {{
+      var bn = localStorage.getItem('roster_banner_choice');
+      if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
+        var bUrl = base + 'assets/banners/' + bn;
+        if (!document.getElementById('banner-early-style')) {{
+          var bes = document.createElement('style');
+          bes.id = 'banner-early-style';
+          bes.textContent =
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
+            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
+          document.head.appendChild(bes);
+        }}
+        if (!document.querySelector('link[data-banner-preload="1"]')) {{
+          var bp = document.createElement('link');
+          bp.rel = 'preload';
+          bp.as = 'image';
+          bp.href = bUrl;
+          bp.setAttribute('data-banner-preload', '1');
+          document.head.appendChild(bp);
+        }}
+        document.documentElement.classList.add('roster-banner-early');
+      }}
+    }} catch (bannerEarlyErr) {{}}
+  }})();
+  </script>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ════ HEADER ════ -->
+  <div class="header">
+    <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">ع</span></button>
+    <h1 id="pageTitle" class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
+      <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
+    </h1>
+    <div class="datePickerWrapper">
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">26 July 2026</span></label>
+      <input id="datePicker" type="date" value="2026-07-26" min="2026-05-01" max="2026-07-31" aria-label="Select roster date" />
+    </div>
+  </div>
+
+  <div class='deptCard' style='padding:14px;border:1px dashed rgba(15,23,42,.20);background:#fff;'>⚠️ لا يوجد روستر لهذا الشهر بعد.</div>
+
+  <!-- ════ SUMMARY CHIPS ════ -->
+  <div class="summaryBar">
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">0</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
+    </div>
+    <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+      <div class="chipLabel" data-key="mySchedule">My Schedule</div>
+    </a>
+    <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;" onclick="goToImport(event)">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+      <div class="chipLabel" data-key="importRoster">Import</div>
+    </a>
+    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+      <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+      <div class="chipLabel" id="welcomeName"></div>
+    </a>
+    <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="#" id="diffChipBtn" class="summaryChip diffChip" style="cursor:pointer;text-decoration:none;" onclick="goToRosterDiff(event)">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
+      <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
+    
+    <button class="summaryChip shiftFilterBtn morning" data-shift="Morning" style="cursor:pointer;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41"/><path d="M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+      <div class="chipLabel" data-key="morning">Morning</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn afternoon" data-shift="Afternoon" style="cursor:pointer;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 18H8a5 5 0 1 1 2-9.5"/><circle cx="17" cy="8" r="3"/></svg></div>
+      <div class="chipLabel" data-key="afternoon">Afternoon</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn night" data-shift="Night" style="cursor:pointer;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+      <div class="chipLabel" data-key="night">Night</div>
+    </button>
+    <button class="summaryChip shiftFilterBtn all active" data-shift="All" style="cursor:pointer;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+      <div class="chipLabel" data-key="allShifts">All Shifts</div>
+    </button>
+    
+  </div>
+
+  <!-- ════ DEPARTMENT CARDS ════ -->
+  
+
+  <!-- ════ CTA ════ -->
+<nav class="quickActions roster-cta" aria-label="Page actions">
+  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="#">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
+    <span class="roster-cta-label">Full Roster</span>
+  </a>
+  <a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn" href="#">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="roster-cta-label">Subscribe</span>
+  </a>
+  <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></span>
+    <span class="roster-cta-label">Compare</span>
+  </a>
+  <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+    <span class="roster-cta-label">Share Site</span>
+  </button>
+  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+    <span class="roster-cta-label">Apps</span>
+  </button>
+</nav>
+
+
+  <!-- ════ FOOTER ════ -->
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 16:56</strong><br>
+    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026.xlsx</strong>
+  </div>
+
+</div>
+
+<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+    <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
+    <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
+    <div class="siteShareQr" id="siteShareQr"></div>
+    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <div class="siteShareActions">
+      <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span class="roster-cta-label">Share</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg></span>
+        <span class="roster-cta-label">WhatsApp</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg></span>
+        <span class="roster-cta-label">Copy link</span>
+      </button>
+    </div>
+    <div class="siteShareCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
+  <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
+    <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
+    <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
+    <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="flights">Airport board</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--calc" href="https://iammrk-8af39.web.app/calculator/" target="_blank" rel="noopener noreferrer" data-app-id="calc">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--quicklist" href="https://iammrk-8af39.web.app/QuickList/index.html" target="_blank" rel="noopener noreferrer" data-app-id="quicklist">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        </span>
+      </a>
+    </div>
+    <div class="siteAppsCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteAppsCloseBtn" id="siteAppsCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+function getSiteRootPath() {
+  if (location.protocol === 'file:') return '';
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
+function setCaptureBusy(isBusy) {
+  var busy = document.getElementById('captureBusy');
+  if(!busy) return;
+  busy.classList.toggle('open', !!isBusy);
+}
+
+function saveBlobFile(blob, fileName) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+}
+
+function openCaptureSheet(blob, fileName) {
+  var sheet = document.getElementById('captureSheet');
+  var shareBtn = document.getElementById('captureShareBtn');
+  var saveBtn = document.getElementById('captureSaveBtn');
+  var cancelBtn = document.getElementById('captureCancelBtn');
+  var preview = document.getElementById('capturePreview');
+  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+
+  var file = new File([blob], fileName, { type:'image/png' });
+  var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
+  shareBtn.style.display = shareSupported ? '' : 'none';
+
+  var previewUrl = null;
+  if (preview) {
+    if (preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+    }
+    previewUrl = URL.createObjectURL(blob);
+    preview.src = previewUrl;
+    preview.dataset.revokeUrl = previewUrl;
+    preview.style.display = '';
+  }
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    shareBtn.onclick = null;
+    saveBtn.onclick = null;
+    cancelBtn.onclick = null;
+    sheet.onclick = null;
+    if (preview && preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+      preview.removeAttribute('src');
+    }
+  }
+
+  saveBtn.onclick = function() {
+    saveBlobFile(blob, fileName);
+    closeSheet();
+  };
+  shareBtn.onclick = async function() {
+    try {
+      await navigator.share({ files:[file], title:'Duty Roster Snapshot' });
+    } catch(e) {
+      // User may cancel share dialog.
+    }
+    closeSheet();
+  };
+  cancelBtn.onclick = closeSheet;
+  sheet.onclick = function(e) { if(e.target === sheet) closeSheet(); };
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+function rosterSnapshotLayoutWidth() {
+  var iw = window.innerWidth || 400;
+  /* Same visual column as phone: narrow on desktop, full usable width on small screens (max ~430). */
+  return Math.min(Math.max(iw - 28, 280), 430);
+}
+
+/** Gradient strip + .deptHead (everything before .shiftStack) for shift snapshots. */
+function buildDeptBannerForSnapshot(deptCard) {
+  if (!deptCard) return null;
+  var stack = deptCard.querySelector('.shiftStack');
+  if (!stack) return null;
+  var banner = document.createElement('div');
+  var el = deptCard.firstElementChild;
+  while (el && el !== stack) {
+    banner.appendChild(el.cloneNode(true));
+    el = el.nextElementSibling;
+  }
+  if (!banner.children.length) return null;
+  banner.style.marginBottom = '8px';
+  banner.style.width = '100%';
+  banner.style.boxSizing = 'border-box';
+  return banner;
+}
+
+async function captureRosterElement(target, fileNamePrefix, opts) {
+  opts = opts || {};
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.boxSizing = 'border-box';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    if (opts.prependClone && opts.prependClone.nodeType === 1) {
+      var pre = opts.prependClone.cloneNode(true);
+      pre.style.marginBottom = '8px';
+      wrap.appendChild(pre);
+    }
+    var targetClone = target.cloneNode(true);
+    targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
+}
+
+function goToEmployeeSchedule(empName) {
+  var match = empName.match(/-\s*(\d{3,})/);
+  var base = getSiteRootUrl() + '/my-schedules/index.html';
+
+  if (match) {
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }
+}
+
+(function(){
+  var picker = document.getElementById('datePicker');
+  if(!picker) return;
+
+  function getMuscatTodayIso() {
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscatTime.getFullYear() + '-' +
+      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscatTime.getDate()).padStart(2, '0');
+  }
+
+  function formatIsoLabel(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function syncHeaderDate(iso) {
+    var tag = document.getElementById('dateTag');
+    if (tag) {
+      var dateLbl = document.getElementById('dateTagLabel');
+      var dateText = formatIsoLabel(iso);
+      if (dateLbl) dateLbl.textContent = dateText;
+      else tag.textContent = dateText;
+    }
+  }
+
+  var path = window.location.pathname || '/';
+  var pageDateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+  var effectiveIso = pageDateMatch
+    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
+    : getMuscatTodayIso();
+  picker.value = effectiveIso;
+  syncHeaderDate(effectiveIso);
+
+  var DATE_PICKER_BUSY_KEY = 'rosterDatePickerBusy';
+
+  function setDatePickerBusy(on) {
+    try {
+      if (on) sessionStorage.setItem(DATE_PICKER_BUSY_KEY, '1');
+      else sessionStorage.removeItem(DATE_PICKER_BUSY_KEY);
+    } catch (e) {}
+  }
+
+  window.openDatePicker = function() {
+    if (!picker) return;
+    setDatePickerBusy(true);
+    try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); return; } catch (e) {}
+    }
+    try { picker.click(); } catch (e2) {}
+  };
+
+  function onDateWrapActivate(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    openDatePicker();
+  }
+
+
+  var dateTagEl = document.getElementById('dateTag');
+  if (dateTagEl) {
+    dateTagEl.addEventListener('click', function(e) {
+      if (e) e.preventDefault();
+      openDatePicker();
+    });
+  }
+
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {
+    dateWrap.addEventListener('touchend', onDateWrapActivate, { passive: false });
+    dateWrap.addEventListener('click', function(e) {
+      if (e.target === picker) return;
+      onDateWrapActivate(e);
+    });
+    function onPickerActivate(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      setDatePickerBusy(true);
+      openDatePicker();
+    }
+    picker.addEventListener('click', onPickerActivate);
+    picker.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        onPickerActivate(e);
+      }
+    });
+  }
+  picker.addEventListener('focus', function() { setDatePickerBusy(true); });
+  picker.addEventListener('blur', function() {
+    setTimeout(function() { setDatePickerBusy(false); }, 400);
+  });
+
+  var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
+
+  function consumeUserDateNavigation() {
+    if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
+    sessionStorage.removeItem(USER_DATE_NAV_KEY);
+    return true;
+  }
+
+  function markUserDateNavigation() {
+    sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
+  }
+
+  function normalizePathname(p) {
+    return (p || '/')
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/now\/.*$/i, '/')
+      .replace(/\/index\.html$/i, '')
+      .replace(/\/+$/, '');
+  }
+
+  function isImportRosterPath(p) {
+    return /\/import(\/|$)/i.test(p || '');
+  }
+
+  function buildDateBasePath() {
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    var p = path || location.pathname || '';
+    if (isImportRosterPath(p)) {
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {
+        return '/import';
+      }
+      if (!/\/import$/i.test(base)) {
+        base = base.replace(/\/+$/, '') + '/import';
+      }
+      return base;
+    }
+    if (root) return root;
+    return normalizePathname(p);
+  }
+
+  function redirectToDate(iso, isNowPage) {
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+  }
+
+  // ═══════════════════════════════════════════════════
+  // التحقق من التاريخ وإعادة التوجيه للـ today
+  // ═══════════════════════════════════════════════════
+  function checkAndRedirectToToday() {
+    var isNowPage = path.includes('/now');
+    var todayIso = getMuscatTodayIso();
+
+    if (!path.includes('/date/')) {
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      return true;
+    }
+
+    var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (!dateMatch) return false;
+
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    if (pageIso === todayIso) {
+      sessionStorage.removeItem(USER_DATE_NAV_KEY);
+      sessionStorage.removeItem('pageLoaded');
+      return false;
+    }
+
+    if (consumeUserDateNavigation()) return false;
+
+    redirectToDate(todayIso, isNowPage);
+    return true;
+  }
+
+  function resyncTodayIfNeeded() {
+    if (!path.includes('/date/')) return;
+    try {
+      if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
+    } catch (e) {}
+    var dateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (!dateMatch) return;
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    var todayIso = getMuscatTodayIso();
+    if (pageIso !== todayIso && sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') {
+      redirectToDate(todayIso, path.includes('/now'));
+    }
+  }
+
+  if (checkAndRedirectToToday()) return;
+
+  window.addEventListener('pageshow', function(ev) {
+    if (ev.persisted) resyncTodayIfNeeded();
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') resyncTodayIfNeeded();
+  });
+
+  // ═══════════════════════════════════════════════════
+  // عند تغيير التاريخ → انتقل للصفحة المناسبة
+  // ═══════════════════════════════════════════════════
+  picker.addEventListener('change', function() {
+    if (!picker.value) return;
+
+    markUserDateNavigation();
+    sessionStorage.removeItem('pageLoaded');
+
+    var isNowPage = (window.location.pathname || '').includes('/now');
+    var base = buildDateBasePath();
+    var target = base + '/date/' + picker.value + '/';
+    if (isNowPage) target += 'now/';
+
+    window.location.href = target;
+  });
+
+})();
+
+// ═══════════════════════════════════════════════════
+// Long-press capture for section / shift
+// ═══════════════════════════════════════════════════
+(function(){
+  var LONG_PRESS_MS = 550;
+  var suppressNextClick = false;
+
+  function bindLongPress(el, onLongPress){
+    if(!el) return;
+    var timer = null;
+    var moved = false;
+
+    function clear(){
+      if(timer) clearTimeout(timer);
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', function(e){
+      moved = false;
+      clear();
+      timer = setTimeout(function(){
+        suppressNextClick = true;
+        onLongPress(e);
+      }, LONG_PRESS_MS);
+    });
+    el.addEventListener('pointermove', function(){ moved = true; clear(); });
+    el.addEventListener('pointerup', clear);
+    el.addEventListener('pointercancel', clear);
+    el.addEventListener('pointerleave', function(){ if(moved) clear(); });
+    el.addEventListener('click', function(e){
+      if(suppressNextClick){
+        e.preventDefault();
+        e.stopPropagation();
+        suppressNextClick = false;
+      }
+    }, true);
+  }
+
+  document.querySelectorAll('.deptHead').forEach(function(head){
+    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });
+
+    if (head.dataset.deptShiftToggleBound === '1') return;
+    head.dataset.deptShiftToggleBound = '1';
+    head.addEventListener('click', function() {
+      if (suppressNextClick) return;
+      var card = head.closest('.deptCard');
+      if (!card) return;
+      card.classList.remove('collapsed');
+      var shifts = card.querySelectorAll('details.shiftCard');
+      if (!shifts.length) return;
+      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
+      if (isNaN(step) || step < 0 || step > 2) step = 0;
+      if (step === 0) {
+        shifts.forEach(function(d) { d.setAttribute('open', ''); });
+        card.dataset.deptShiftStep = '1';
+      } else if (step === 1) {
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        card.dataset.deptShiftStep = '2';
+      } else {
+        var now = new Date();
+        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+        var hour = muscatTime.getHours();
+        var minute = muscatTime.getMinutes();
+        var tt = hour * 60 + minute;
+        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        var target = null;
+        shifts.forEach(function(d) {
+          if (d.dataset.shift === currentShift) target = d;
+        });
+        if (!target) target = shifts[0];
+        if (target) target.setAttribute('open', '');
+        card.dataset.deptShiftStep = '0';
+      }
+    });
+  });
+
+  document.querySelectorAll('.shiftSummary').forEach(function(summary){
+    bindLongPress(summary, function(){
+      var shiftCard = summary.closest('.shiftCard');
+      if(!shiftCard) return;
+      shiftCard.setAttribute('open', '');
+      var deptCard = shiftCard.closest('.deptCard');
+      var deptBanner = buildDeptBannerForSnapshot(deptCard);
+      captureRosterElement(shiftCard, 'shift', deptBanner ? { prependClone: deptBanner } : {});
+    });
+  });
+})();
+
+// ═══════════════════════════════════════════════════
+// Shift Filter (NOW PAGE ONLY)
+// ═══════════════════════════════════════════════════
+(function(){
+  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
+  if(!filterBtns.length) return; // Not a /now/ page
+  
+  var allShiftCards = document.querySelectorAll('.shiftCard');
+  
+  // Group shift cards by shift type
+  var shiftGroups = {};
+  allShiftCards.forEach(function(card){
+    var shiftType = card.dataset.shift;
+    if(!shiftType) return;
+    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
+    shiftGroups[shiftType].push(card);
+  });
+  
+  // Determine current shift based on time
+  function getCurrentShift(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+  
+  // Set active shift on load - default to current shift
+  var currentShift = getCurrentShift();
+  filterBtns.forEach(function(btn){
+    if(btn.dataset.shift === currentShift){
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Filter function
+  function filterShifts(selectedShift){
+    var totalEmployees = 0;
+    
+    if(selectedShift === 'All'){
+      // Show all shifts
+      allShiftCards.forEach(function(card){
+        card.style.display = '';
+        var count = card.querySelector('.shiftCount');
+        if(count) totalEmployees += parseInt(count.textContent) || 0;
+      });
+    } else {
+      // Hide all cards first
+      allShiftCards.forEach(function(card){ card.style.display = 'none'; });
+      
+      // Show only selected shift cards and count employees
+      if(shiftGroups[selectedShift]){
+        shiftGroups[selectedShift].forEach(function(card){
+          card.style.display = '';
+          // Auto-open the selected shift
+          card.setAttribute('open', '');
+          // Count employees in this card
+          var count = card.querySelector('.shiftCount');
+          if(count) totalEmployees += parseInt(count.textContent) || 0;
+        });
+      }
+      
+      // Also show Off Day, Leave, Training, Standby in all shifts
+      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
+      alwaysShow.forEach(function(type){
+        if(shiftGroups[type]){
+          shiftGroups[type].forEach(function(card){
+            card.style.display = '';
+            // لا تحسب Off Day/Leave في عداد الفترة المختارة
+          });
+        }
+      });
+    }
+    
+    // Update employee count in summary
+    window.__summaryCounts = window.__summaryCounts || {};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    
+    // Update button states
+    filterBtns.forEach(function(btn){
+      if(btn.dataset.shift === selectedShift){
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  
+  // Add click handlers
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterShifts(this.dataset.shift);
+    });
+  });
+  
+  // Auto-filter on page load - show current shift
+  filterShifts(currentShift);
+})();
+
+// ══════════════════════════════════════════════════
+// Language Toggle
+// ══════════════════════════════════════════════════
+var LANG = localStorage.getItem('rosterLang') || 'en';
+window.__summaryCounts = window.__summaryCounts || { employees: 0, departments: 0 };
+window.__summarySwitchMode = 'employees';
+var T = {
+  en: {
+    titleEyebrow:'Export', titleMain:'Duty Roster', langBtn:'ع',
+    employees:'Emp.', departments:'Depts.', total:'Total',
+    morning:'Morning', afternoon:'Afternoon', night:'Night',
+    offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
+    training:'Training', standby:'Standby', other:'Other',
+    from:'FROM', to:'TO',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
+    officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
+    exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+  },
+  ar: {
+    titleEyebrow:'الصادر', titleMain:'جدول المناوبات', langBtn:'EN',
+    employees:'الموظفون', departments:'الأقسام', total:'المجموع',
+    morning:'صباح', afternoon:'ظهر', night:'ليل',
+    offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
+    training:'تدريب', standby:'احتياط', other:'أخرى',
+    from:'من', to:'إلى',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
+    officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+  }
+};
+
+function updateSummarySwitchChip() {
+  var val = document.getElementById('summarySwitchVal');
+  var lbl = document.getElementById('summarySwitchLabel');
+  if(!val || !lbl) return;
+  var t = T[LANG] || T.en;
+  var mode = window.__summarySwitchMode || 'employees';
+  var counts = window.__summaryCounts || {};
+  if(mode === 'departments') {
+    val.style.color = '#059669';
+    val.textContent = counts.departments != null ? counts.departments : 0;
+    lbl.textContent = t.departments;
+    lbl.dataset.key = 'departments';
+  } else {
+    val.style.color = '';
+    val.textContent = counts.employees != null ? counts.employees : 0;
+    lbl.textContent = t.employees;
+    lbl.dataset.key = 'employees';
+  }
+}
+
+function startSummarySwitchLoop() {
+  if(window.__summarySwitchTimer) return;
+  window.__summarySwitchTimer = setInterval(function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateSummarySwitchChip();
+  }, 2200);
+}
+
+function applyLang(lang) {
+  var t=T[lang], isAr=lang==='ar';
+  document.body.classList.toggle('ar',isAr);
+  document.documentElement.setAttribute('lang',lang);
+  var eyebrow=document.getElementById('pageTitleEyebrow');
+  var main=document.getElementById('pageTitleMain');
+  if(eyebrow) eyebrow.textContent=t.titleEyebrow;
+  if(main) main.textContent=t.titleMain;
+  var langLbl=document.getElementById('langToggleLabel');
+  if(langLbl) langLbl.textContent=t.langBtn;
+  else {{ var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn; }}
+  document.querySelectorAll('.chipLabel').forEach(function(el) {
+    var k=el.dataset.key;
+    if(k==='employees') el.textContent=t.employees;
+    else if(k==='departments') el.textContent=t.departments;
+    else if(k==='morning') el.textContent=t.morning2;
+    else if(k==='afternoon') el.textContent=t.afternoon2;
+    else if(k==='night') el.textContent=t.night2;
+    else if(k==='allShifts') el.textContent=t.allShifts;
+    else if(k==='mySchedule') el.textContent=t.mySchedule;
+    else if(k==='importRoster') el.textContent=t.importRoster;
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='diffPage') el.textContent=t.diffPage;
+  });
+  document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
+  var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
+  document.querySelectorAll('.deptTitle').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
+  });
+  var shiftMap={'Morning':t.morning,'Afternoon':t.afternoon,'Night':t.night,
+    'Off Day':t.offday,'Annual Leave':t.annualLeave,'Sick Leave':t.sickLeave,
+    'Training':t.training,'Standby':t.standby,'Other':t.other};
+  document.querySelectorAll('.shiftLabel').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(shiftMap[el.dataset.key]) el.textContent=shiftMap[el.dataset.key];
+  });
+  document.querySelectorAll('.empStatus span').forEach(function(el) {
+    var txt=el.textContent.trim();
+    if(txt==='FROM'||txt==='من') el.textContent=t.from;
+    if(txt==='TO'||txt==='إلى') el.textContent=t.to;
+  });
+  function setCtaLabel(id, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var lbl = el.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = text;
+    else el.textContent = text;
+  }
+  setCtaLabel('ctaBtn', t.viewFull);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
+  setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('moreAppsBtn', t.moreApps);
+  if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
+  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
+  var footer=document.querySelector('.footer');
+  if(footer) {
+    var h=footer.innerHTML;
+    if(isAr) {
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
+    } else {
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
+    }
+    footer.innerHTML=h;
+  }
+  localStorage.setItem('rosterLang',lang);
+  LANG=lang;
+  updateSummarySwitchChip();
+}
+function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
+
+function setLocalCtaLinks() {
+  var root = getSiteRootPath();
+  var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
+  if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
+}
+
+function setSummaryChipHrefs() {
+  var base = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var imp = document.getElementById('importBtn');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  var welcome = document.getElementById('welcomeChip');
+  if (my) my.href = base + '/my-schedules/index.html';
+  if (imp) imp.href = base + '/import/';
+  if (trn) trn.href = base + '/training/';
+  if (diff) diff.href = base + '/roster-diff/index.html';
+  if (welcome) welcome.href = base + '/my-schedules/index.html';
+}
+function goToTraining(e) {
+  if (e) e.preventDefault();
+  var root = getSiteRootPath();
+  location.href = root + '/training/';
+}
+setLocalCtaLinks();
+setSummaryChipHrefs();
+applyLang(LANG);
+startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// Department layout: all sections open + time-based shift open
+// ═══════════════════════════════════════════════════
+(function(){
+  var deptCards = Array.from(document.querySelectorAll('.deptCard'));
+  if(!deptCards.length) return;
+  var savedEmpId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+  var savedEmpName = (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || '').trim().toLowerCase();
+
+  function getCurrentShiftForMuscat(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function openMatchingShift(card){
+    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
+    if(!shiftCards.length) return;
+    shiftCards.forEach(function(shiftCard){
+      shiftCard.style.display = '';
+      shiftCard.removeAttribute('open');
+    });
+    var currentShift = getCurrentShiftForMuscat();
+    var target = shiftCards.find(function(shiftCard){
+      return shiftCard.dataset.shift === currentShift;
+    }) || shiftCards[0];
+    if(target) target.setAttribute('open', '');
+  }
+
+  function cardHasSavedEmployee(card){
+    var rows = Array.from(card.querySelectorAll('.empName'));
+    if(!rows.length) return false;
+    return rows.some(function(row){
+      var txt = (row.textContent || '').trim();
+      if(!txt) return false;
+      if(savedEmpId && txt.indexOf(savedEmpId) !== -1) return true;
+      if(savedEmpName && txt.toLowerCase().indexOf(savedEmpName) !== -1) return true;
+      return false;
+    });
+  }
+
+  // Keep all department sections visible/open.
+  deptCards.forEach(function(card){
+    card.classList.remove('collapsed');
+    openMatchingShift(card);
+  });
+
+  // If a saved employee exists, move their department to top.
+  if(savedEmpId || savedEmpName){
+    var targetCard = deptCards.find(cardHasSavedEmployee);
+    if(targetCard && targetCard.parentElement){
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
+      openMatchingShift(targetCard);
+    }
+  }
+})();
+
+// ═══════════════════════════════════════════════════
+// رسالة الترحيب — تقرأ اسم الموظف من schedules JSON
+// ═══════════════════════════════════════════════════
+(function() {
+  function getExportEmpId() {
+    var id = localStorage.getItem('exportSavedEmpId');
+    if (id) return id;
+    var legacy = localStorage.getItem('savedEmpId');
+    if (legacy) {
+      localStorage.setItem('exportSavedEmpId', legacy);
+      return legacy;
+    }
+    return '';
+  }
+  var empId = getExportEmpId();
+  if (!empId) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
+  // استخدام مسار مطلق يعمل من أي صفحة
+  var base = getSiteRootUrl() + '/';
+  fetch(base + 'schedules/' + empId + '.json')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(d) {
+      if (!d || !d.name) return;
+      var firstName = d.name.split(' ')[0];
+      if (chip && nameEl) {
+        nameEl.textContent = firstName;
+        chip.classList.add('visible');
+      }
+    }).catch(function() {});
+})();
+
+function goToMySchedule(event) {
+  if (event) event.preventDefault();
+  var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+  var base = getSiteRootUrl() + '/my-schedules/index.html';
+  location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
+}
+
+function goToImport(event) {
+  if (event) event.preventDefault();
+  var target = getSiteRootUrl() + '/import/';
+  location.href = target;
+}
+
+function goToRosterDiff(event) {
+  if (event) event.preventDefault();
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
+  location.href = target;
+}
+
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  function addScript(src, sync) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    if (!sync) s.defer = true;
+    s.setAttribute('data-local-src', src);
+    (sync ? document.head : document.body).appendChild(s);
+  }
+  var ver = '20260526a';
+  addScript(root + '/ios-tap-fix.js?v=' + ver, true);
+  addScript(root + '/roster-icons.js?v=' + ver);
+  addScript(root + '/site-share.js?v=' + ver);
+  addScript(root + '/site-apps.js?v=' + ver);
+  addScript(root + '/install-pwa.js?v=' + ver);
+  addScript(root + '/bg-texture-shuffle.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
+  addScript(root + '/change-alert.js?v=' + ver);
+  addScript(root + '/shift-swap.js?v=' + ver);
+  addScript(root + '/banner-changer.js?v=' + ver);
+  var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
+  var m = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+  var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
+  if (eidDays.indexOf(activeIso) !== -1) {
+    addScript(root + '/eid-overlayxx.js');
+  }
+})();
+
+// Employee row: tap → schedule; long-press → next 5 shifts preview
+(function initEmployeeNextShiftPreview() {
+  var tooltip = document.createElement('div');
+  tooltip.className = 'nextShiftTooltip';
+  tooltip.innerHTML = '<div class="nextShiftHead"><div class="nextShiftHeadText"><div id="nextShiftEmp" class="nextShiftEmp">-</div><div class="nextShiftTitle">Upcoming 5 shifts</div></div><button type="button" class="nextShiftClose" id="nextShiftClose" aria-label="Close">&times;</button></div><div id="nextShiftBody" class="nextShiftBody"></div>';
+  document.body.appendChild(tooltip);
+  var tooltipBody = tooltip.querySelector('#nextShiftBody');
+  var tooltipEmp = tooltip.querySelector('#nextShiftEmp');
+  var tooltipClose = tooltip.querySelector('#nextShiftClose');
+
+  var scheduleCache = {};
+  var tooltipPinned = false;
+  var activeEl = null;
+  var hideTimer = null;
+  var longPressTimer = null;
+  var suppressClickFor = null;
+  var longPressRow = null;
+  var longPressMoved = false;
+  var LONG_PRESS_MS = 550;
+
+  function empNameFromRow(rowEl) {
+    if (!rowEl) return '';
+    var raw = rowEl.getAttribute('data-emp-name');
+    if (raw) return raw.trim();
+    var nameEl = rowEl.querySelector('.empName');
+    return nameEl ? String(nameEl.textContent || '').trim() : '';
+  }
+
+  function getReferenceIsoDate() {
+    var pathMatch = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+    if (pathMatch) return pathMatch[1];
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscat.getFullYear() + '-' +
+      String(muscat.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscat.getDate()).padStart(2, '0');
+  }
+
+  function moveTooltip(ev) {
+    if (!ev) return;
+    var x = ev.clientX + 14;
+    var y = ev.clientY + 14;
+    var maxX = window.innerWidth - tooltip.offsetWidth - 10;
+    var maxY = window.innerHeight - tooltip.offsetHeight - 10;
+    tooltip.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+    tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+  }
+  function moveTooltipToElement(el) {
+    if (!el) return;
+    var rect = el.getBoundingClientRect();
+    var x = rect.left + rect.width / 2 + 12;
+    var y = rect.top + rect.height + 12;
+    var maxX = window.innerWidth - tooltip.offsetWidth - 10;
+    var maxY = window.innerHeight - tooltip.offsetHeight - 10;
+    tooltip.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+    tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+  }
+
+  function cancelHideTooltip() {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
+  function hideTooltipNow() {
+    cancelHideTooltip();
+    tooltipPinned = false;
+    tooltip.classList.remove('show');
+    activeEl = null;
+  }
+
+  function hideTooltipSoon() {
+    if (tooltipPinned) return;
+    cancelHideTooltip();
+    hideTimer = setTimeout(function() {
+      tooltip.classList.remove('show');
+      activeEl = null;
+      hideTimer = null;
+    }, 120);
+  }
+
+  function parseEmployeeId(nameText) {
+    var match = String(nameText || '').match(/-\s*(\d{3,})/);
+    return match ? match[1] : '';
+  }
+
+  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data) return out;
+    if (!data.schedules) return out;
+    Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
+      var rows = data.schedules[monthKey] || [];
+      rows.forEach(function(r) {
+        if (!r) return;
+        var iso = String(r.date || '').trim();
+        if (!iso && r.day != null && r.day !== '') {
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+        }
+        if (!iso || iso < fromIso) return;
+        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
+      });
+    });
+    out.sort(function(a, b) {
+      return String(a.date).localeCompare(String(b.date));
+    });
+    return out.slice(0, 5);
+  }
+
+  function formatShortDateParts(isoDate) {
+    var match = String(isoDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return { dayName: '--', dateLabel: String(isoDate || '-') };
+    var d = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    if (isNaN(d.getTime())) return { dayName: '--', dateLabel: String(isoDate || '-') };
+    var dayName = d.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase();
+    var dateLabel = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    return { dayName: dayName, dateLabel: dateLabel };
+  }
+
+  function renderTooltipRows(rows) {
+    if (!rows.length) {
+      tooltipBody.innerHTML = '<div class="nextShiftEmpty">No upcoming shifts found.</div>';
+      return;
+    }
+    tooltipBody.innerHTML = rows.map(function(r) {
+      var parts = formatShortDateParts(String(r.date || ''));
+      var shiftCode = String(r.shift_code || '').trim() || '-';
+      return '<div class="nextShiftItem"><div class="nextShiftDay">' + parts.dayName + '</div><div class="nextShiftDate">' + parts.dateLabel + '</div><div class="nextShiftCode">' + shiftCode + '</div></div>';
+    }).join('');
+  }
+
+  function getScheduleRows(empId, fromIso) {
+    if (!empId) return Promise.resolve([]);
+    if (scheduleCache[empId]) {
+      return Promise.resolve(flattenFutureShifts(scheduleCache[empId], fromIso));
+    }
+    var url = getSiteRootUrl() + '/schedules/' + encodeURIComponent(empId) + '.json';
+    return fetch(url).then(function(res) {
+      if (!res.ok) throw new Error('Schedule not found');
+      return res.json();
+    }).then(function(json) {
+      scheduleCache[empId] = json;
+      return flattenFutureShifts(json, fromIso);
+    }).catch(function() {
+      return [];
+    });
+  }
+
+  function showPreviewForRow(rowEl, ev) {
+    if (!rowEl) return;
+    cancelHideTooltip();
+    tooltipPinned = true;
+    activeEl = rowEl;
+    var label = empNameFromRow(rowEl);
+    if (tooltipEmp) tooltipEmp.textContent = label || '-';
+    tooltipBody.innerHTML = '<div class="nextShiftEmpty">Loading...</div>';
+    tooltip.classList.add('show');
+    if (ev && typeof ev.clientX === 'number') moveTooltip(ev);
+    else moveTooltipToElement(rowEl);
+
+    var empId = parseEmployeeId(label);
+    var fromIso = getReferenceIsoDate();
+    getScheduleRows(empId, fromIso).then(function(rows) {
+      if (activeEl !== rowEl) return;
+      renderTooltipRows(rows);
+      if (ev && typeof ev.clientX === 'number') moveTooltip(ev);
+      else moveTooltipToElement(rowEl);
+    });
+  }
+
+  function bindEmployeeRow(rowEl) {
+    if (!rowEl || rowEl.dataset.nextShiftBound === '1') return;
+    rowEl.dataset.nextShiftBound = '1';
+
+    rowEl.addEventListener('pointerdown', function(ev) {
+      if (ev.button !== 0 && ev.button !== undefined) return;
+      longPressRow = rowEl;
+      longPressMoved = false;
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(function() {
+        longPressTimer = null;
+        if (longPressRow !== rowEl || longPressMoved) return;
+        suppressClickFor = rowEl;
+        showPreviewForRow(rowEl, null);
+      }, LONG_PRESS_MS);
+    });
+    rowEl.addEventListener('pointermove', function(ev) {
+      if (longPressRow !== rowEl) return;
+      if (typeof ev.movementX === 'number' && (Math.abs(ev.movementX) > 8 || Math.abs(ev.movementY) > 8)) {
+        longPressMoved = true;
+      }
+    });
+    rowEl.addEventListener('pointerup', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('pointercancel', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('contextmenu', function(ev) {
+      if (suppressClickFor === rowEl) ev.preventDefault();
+    });
+
+    rowEl.addEventListener('click', function(ev) {
+      if (suppressClickFor === rowEl) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        suppressClickFor = null;
+        return;
+      }
+      ev.preventDefault();
+      goToEmployeeSchedule(empNameFromRow(rowEl));
+    }, true);
+
+    rowEl.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        goToEmployeeSchedule(empNameFromRow(rowEl));
+      }
+    });
+  }
+
+  if (tooltipClose) {
+    tooltipClose.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      hideTooltipNow();
+    });
+  }
+
+  function isTooltipOpen() {
+    return tooltip.classList.contains('show');
+  }
+
+  function dismissUnlessTooltipTarget(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev && ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }
+
+  document.addEventListener('pointerdown', dismissUnlessTooltipTarget, true);
+  document.addEventListener('click', function(ev) {
+    if (suppressClickFor) return;
+    dismissUnlessTooltipTarget(ev);
+  }, true);
+
+  function dismissOnScroll() {
+    if (isTooltipOpen()) hideTooltipNow();
+  }
+  window.addEventListener('scroll', dismissOnScroll, true);
+  window.addEventListener('wheel', dismissOnScroll, { passive: true, capture: true });
+  window.addEventListener('touchmove', function(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }, { passive: true, capture: true });
+
+  document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);
+})();
+
+</script>
+
+</body>
+</html>

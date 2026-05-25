@@ -112,12 +112,14 @@ jobs:
                   
                   is_mandatory_update = (current_hour in mandatory_update_hours)
                   is_email_time = (current_hour in email_hours) and (current_minute < 20)
+                  is_manual = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
                   
-                  should_process = changed or is_mandatory_update
+                  should_process = changed or is_mandatory_update or is_manual
                   should_send_email = changed or is_email_time
                   
                   print(f"File changed: {changed}")
                   print(f"Mandatory update hour: {is_mandatory_update}")
+                  print(f"Manual dispatch: {is_manual}")
                   print(f"Email time: {is_email_time}")
                   print(f"Should process: {should_process}")
                   print(f"Should send email: {should_send_email}")
@@ -133,6 +135,7 @@ jobs:
                   print("=" * 60)
                   print(f"  File changed:     {changed}")
                   print(f"  Mandatory update: {is_mandatory_update}")
+                  print(f"  Manual dispatch:  {is_manual}")
                   print(f"  Email time:       {is_email_time}")
                   print(f"  Should process:   {should_process}")
                   print(f"  Should send email:{should_send_email}")
