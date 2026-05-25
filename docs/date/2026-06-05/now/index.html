@@ -1356,10 +1356,18 @@ function goToEmployeeSchedule(empName) {
       .replace(/\/+$/, '');
   }
 
+  function isImportRosterPath(p) {
+    return /\/import(\/|$)/i.test(p || '');
+  }
+
   function buildDateBasePath() {
     var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    var p = path || location.pathname || '';
+    if (isImportRosterPath(p)) {
+      return (root || normalizePathname(p)) + '/import';
+    }
     if (root) return root;
-    return normalizePathname(path);
+    return normalizePathname(p);
   }
 
   function redirectToDate(iso, isNowPage) {
@@ -1374,8 +1382,7 @@ function goToEmployeeSchedule(empName) {
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\/?$/i, '/'));
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
 

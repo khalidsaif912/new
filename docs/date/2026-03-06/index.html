@@ -1697,8 +1697,7 @@ function goToEmployeeSchedule(empName) {
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\/?$/i, '/'));
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
 

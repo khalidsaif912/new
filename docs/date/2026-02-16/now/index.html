@@ -1600,8 +1600,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\/?$/i, '/'));
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
 
