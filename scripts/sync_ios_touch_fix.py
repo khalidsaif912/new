@@ -44,10 +44,19 @@ HIDDEN_DATE_INPUT_CSS = re.compile(
     re.DOTALL,
 )
 
-CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
+CHIP_TOUCH_ONCE = """    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
     }"""
+
+IOS_TOUCH_VER = "20260525b"
+IOS_HEAD_SCRIPT = f'<script src="{{prefix}}/ios-tap-fix.js?v={IOS_TOUCH_VER}"></script>'
+
+ONCLICK_CHIP_RE = re.compile(
+    r'(<a\s+[^>]*class="summaryChip[^"]*"[^>]*)\s+onclick="[^"]*"',
+    re.IGNORECASE,
+)
 
 SUMMARY_TOUCH_CSS = """    .header::before,
     .header::after {
@@ -59,17 +68,29 @@ SUMMARY_TOUCH_CSS = """    .header::before,
       isolation:isolate;
     }
     .summaryBar a.summaryChip,
-    .summaryBar button.summaryChip {
+    .summaryBar button.summaryChip,
+    .quickActions.roster-cta,
+    .quickActions .roster-cta-btn,
+    .importBottom .quickActions.roster-cta,
+    .importBottom .roster-cta-btn,
+    .topDock .dockCard.dockAction,
+    .topDock .dockCard.savedChip,
+    .topDock button.dockCard {
       position:relative;
       z-index:1;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
     }
     .summaryBar a.summaryChip *,
     .summaryBar button.summaryChip *,
     .quickActions.roster-cta-btn .roster-cta-icon,
-    .quickActions.roster-cta-btn .roster-cta-label {
+    .quickActions.roster-cta-btn .roster-cta-label,
+    .topDock .dockCard * {
       pointer-events:none;
     }
-    .importBottom {
+    .importBottom,
+    .quickActions.roster-cta {
       position:relative;
       z-index:25;
     }
@@ -202,7 +223,7 @@ def _load_enhance_score(block: str) -> int:
         score += 10
     if "ios-tap-fix.js?v=' + ver, true" in block:
         score += 10
-    if "20260526a" in block:
+    if IOS_TOUCH_VER in block:
         score += 5
     return score
 
@@ -255,15 +276,48 @@ function setSummaryChipHrefs() {
   if (trn) trn.href = rootPath + '/training/';
   if (diff) diff.href = rootUrl + '/roster-diff/index.html';
   if (welcome) {
-    welcome.href = (location.pathname || '').indexOf('/import/') >= 0
+    var wid = localStorage.getItem('importSavedEmpId') || localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+    var wbase = (location.pathname || '').indexOf('/import/') >= 0
       ? importBase + '/my-schedules/index.html'
       : rootUrl + '/my-schedules/index.html';
+    welcome.href = wid ? wbase + '?emp=' + encodeURIComponent(wid) : wbase;
   }
 }
 """
 
 
-def patch_html(text: str) -> tuple[str, list[str]]:
+def ios_script_src_for(path: Path) -> str:
+    try:
+        rel = path.parent.relative_to(DOCS)
+        depth = len(rel.parts)
+    except ValueError:
+        depth = 0
+    prefix = "/".join([".."] * depth) if depth else "."
+    return f"{prefix}/ios-tap-fix.js?v={IOS_TOUCH_VER}"
+
+
+def inject_ios_head_script(text: str, html_path: Path) -> tuple[str, bool]:
+    src = ios_script_src_for(html_path)
+    tag = f'<script src="{src}"></script>'
+    if tag in text or f"ios-tap-fix.js?v={IOS_TOUCH_VER}" in text:
+        return text, False
+    marker = '<meta name="viewport"'
+    if marker not in text:
+        return text, False
+    insert = text.replace(
+        marker,
+        tag + "\n  " + marker,
+        1,
+    )
+    return insert, True
+
+
+def strip_chip_onclick(text: str) -> tuple[str, bool]:
+    updated, n = ONCLICK_CHIP_RE.subn(r"\1", text)
+    return updated, n > 0
+
+
+def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]]:
     notes: list[str] = []
 
     if 'touch-action:manipulation' not in text and "body {" in text and "min-height:100dvh" in text:
@@ -364,9 +418,14 @@ def patch_html(text: str) -> tuple[str, list[str]]:
         text = text.replace(RESYNC_NEEDLE, RESYNC_GUARD, 1)
         notes.append("resync-guard")
 
-    for old_ver in ("var ver = '20260514b'", "var ver = '20260519a'", "var ver = '20260520d'"):
+    for old_ver in (
+        "var ver = '20260514b'",
+        "var ver = '20260519a'",
+        "var ver = '20260520d'",
+        "var ver = '20260526a'",
+    ):
         if old_ver in text:
-            text = text.replace(old_ver, "var ver = '20260526a'", 1)
+            text = text.replace(old_ver, f"var ver = '{IOS_TOUCH_VER}'", 1)
             notes.append("ver-bump")
             break
 
@@ -431,6 +490,14 @@ def patch_html(text: str) -> tuple[str, list[str]]:
     if deduped:
         notes.append("dedupe-loadEnhance")
 
+    if html_path is not None:
+        text, head = inject_ios_head_script(text, html_path)
+        if head:
+            notes.append("ios-head")
+        text, stripped = strip_chip_onclick(text)
+        if stripped:
+            notes.append("chip-no-onclick")
+
     return text, notes
 
 
@@ -440,7 +507,7 @@ def main() -> int:
     for path in sorted(DOCS.rglob("*.html")):
         scanned += 1
         raw = path.read_text(encoding="utf-8")
-        updated, notes = patch_html(raw)
+        updated, notes = patch_html(raw, path)
         if updated != raw:
             path.write_text(updated, encoding="utf-8", newline="\n")
             changed += 1

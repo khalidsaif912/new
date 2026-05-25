@@ -689,6 +689,7 @@ def build_duty_html(
     repo_base_path: str,
     min_date: str = "",
     max_date: str = "",
+    ios_touch_src: str = "../ios-tap-fix.js?v=20260525b",
 ) -> str:
     day = date_obj.day
     date_label = date_obj.strftime("%d %B %Y")
@@ -744,15 +745,15 @@ def build_duty_html(
       <div class="chipVal" style="color:#059669;">{dept_count}</div>
       <div class="chipLabel" data-key="departments">Departments</div>
     </div>
-    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
-    <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToExport(event)">
+    <a href="{{BASE}}/" id="exportBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_EXPORT_HTML}
       <div class="chipLabel" data-key="exportRoster">Export</div>
     </a>
-    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+    <a href="{{BASE}}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
       {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
@@ -838,6 +839,7 @@ def build_duty_html(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
+  <script src="{ios_touch_src}"></script>
   <title>Import Duty Roster</title>
   {LEGACY_ROSTER_SITE_IMPORT_REDIRECT}
   <style>{style}</style>
@@ -1202,7 +1204,7 @@ function setSummaryChipHrefs() {{
     s.setAttribute('data-local-src', src);
     (sync ? document.head : document.body).appendChild(s);
   }}
-  var ver = '20260526a';
+  var ver = '20260525b';
   addScript(root + '/ios-tap-fix.js?v=' + ver, true);
   addScript(root + '/site-share.js?v=' + ver);
   addScript(root + '/install-pwa.js?v=' + ver);
@@ -1506,18 +1508,24 @@ def main() -> None:
     for day in range(1, days_in_month + 1):
         d = dt.date(year, month, day)
         iso = d.strftime("%Y-%m-%d")
-        day_html = build_duty_html(
+        flat_html = build_duty_html(
             style, export_script, parsed, d, repo_base_path="/import",
             min_date=min_date, max_date=max_date,
+            ios_touch_src="../../ios-tap-fix.js?v=20260525b",
+        )
+        alias_html = build_duty_html(
+            style, export_script, parsed, d, repo_base_path="/import",
+            min_date=min_date, max_date=max_date,
+            ios_touch_src="../../../ios-tap-fix.js?v=20260525b",
         )
 
         day_dir = out_root / iso
         day_dir.mkdir(parents=True, exist_ok=True)
-        (day_dir / "index.html").write_text(day_html, encoding="utf-8")
+        (day_dir / "index.html").write_text(flat_html, encoding="utf-8")
 
         alias_day_dir = date_alias_root / iso
         alias_day_dir.mkdir(parents=True, exist_ok=True)
-        (alias_day_dir / "index.html").write_text(day_html, encoding="utf-8")
+        (alias_day_dir / "index.html").write_text(alias_html, encoding="utf-8")
 
     # Generate schedules JSON
     sched_dir = out_root / "schedules"

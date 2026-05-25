@@ -814,6 +814,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
+  <script src="{pages_base}/ios-tap-fix.js?v=20260525b"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -1613,23 +1614,23 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       <div class="chipVal" id="summarySwitchVal">{employees_total}</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
-    <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;" onclick="goToMySchedule(event)">
+    <a href="{pages_base}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
-    <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;" onclick="goToImport(event)">
+    <a href="{pages_base}/import/" id="importBtn" class="summaryChip importChip" style="text-decoration:none;">
       {CHIP_FLIGHT_HTML}
       <div class="chipLabel" data-key="importRoster">Import</div>
     </a>
-    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" onclick="goToMySchedule(event)" title="Go to your schedule">
+    <a href="{pages_base}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
       {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="#" id="trainingBtn" class="summaryChip trainingChip" style="cursor:pointer;text-decoration:none;" onclick="goToTraining(event)">
+    <a href="{pages_base}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
       {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
-    <a href="#" id="diffChipBtn" class="summaryChip diffChip" style="cursor:pointer;text-decoration:none;" onclick="goToRosterDiff(event)">
+    <a href="{pages_base}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}
       <div class="chipLabel" data-key="diffPage">Diff</div>
     </a>
@@ -2435,7 +2436,11 @@ function setSummaryChipHrefs() {{
   if (imp) imp.href = base + '/import/';
   if (trn) trn.href = base + '/training/';
   if (diff) diff.href = base + '/roster-diff/index.html';
-  if (welcome) welcome.href = base + '/my-schedules/index.html';
+  if (welcome) {{
+    var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+    var wbase = base + '/my-schedules/index.html';
+    welcome.href = wid ? wbase + '?emp=' + encodeURIComponent(wid) : wbase;
+  }}
 }}
 function goToTraining(e) {{
   if (e) e.preventDefault();
@@ -2573,7 +2578,7 @@ function goToRosterDiff(event) {{
     s.setAttribute('data-local-src', src);
     (sync ? document.head : document.body).appendChild(s);
   }}
-  var ver = '20260526a';
+  var ver = '20260525b';
   addScript(root + '/ios-tap-fix.js?v=' + ver, true);
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-share.js?v=' + ver);

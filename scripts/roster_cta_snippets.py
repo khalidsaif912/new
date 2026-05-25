@@ -254,18 +254,28 @@ IOS_TOUCH_CSS = r"""    .header::before,
     }
     .summaryBar a.summaryChip,
     .summaryBar button.summaryChip,
+    .quickActions.roster-cta,
+    .quickActions .roster-cta-btn,
     .importBottom .quickActions.roster-cta,
-    .importBottom .roster-cta-btn {
+    .importBottom .roster-cta-btn,
+    .topDock .dockCard.dockAction,
+    .topDock .dockCard.savedChip,
+    .topDock button.dockCard {
       position:relative;
       z-index:1;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
     }
     .summaryBar a.summaryChip *,
     .summaryBar button.summaryChip *,
     .quickActions.roster-cta-btn .roster-cta-icon,
-    .quickActions.roster-cta-btn .roster-cta-label {
+    .quickActions.roster-cta-btn .roster-cta-label,
+    .topDock .dockCard * {
       pointer-events:none;
     }
-    .importBottom {
+    .importBottom,
+    .quickActions.roster-cta {
       position:relative;
       z-index:25;
     }

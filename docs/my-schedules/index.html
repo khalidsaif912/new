@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8"/>
+  <script src="../ios-tap-fix.js?v=20260525b"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>My Schedule</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2267,7 +2268,7 @@
         if(document.querySelector('script[data-local-src=\"' + src + '\"]')) return;
         const s = document.createElement('script');
         s.src = src;
-        if (!sync) if (!sync) s.defer = true;
+        if (!sync) if (!sync) if (!sync) s.defer = true;
         s.setAttribute('data-local-src', src);
         (sync ? document.head : document.body).appendChild(s);
       }
