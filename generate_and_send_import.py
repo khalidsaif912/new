@@ -1432,6 +1432,7 @@ def main() -> None:
             raise SystemExit("Missing IMPORT_EXCEL_URL (or use --excel-file)")
         data = download_excel(url)
     xlsx_path.write_bytes(data)
+    file_hash = hashlib.sha256(data).hexdigest()
 
     today = muscat_today()
     sheet_hint = today
@@ -1440,6 +1441,13 @@ def main() -> None:
         y, m = int(incoming_key[:4]), int(incoming_key[5:7])
         sheet_hint = dt.date(y, m, 1)
         print(f"Target month from filename: {incoming_key}")
+        cache_root = repo_root / "import-rosters"
+        cache_root.mkdir(parents=True, exist_ok=True)
+        (cache_root / f"{incoming_key}.xlsx").write_bytes(data)
+        ver_dir = cache_root / ".versions" / incoming_key
+        ver_dir.mkdir(parents=True, exist_ok=True)
+        (ver_dir / "last_hash.txt").write_text(file_hash, encoding="utf-8")
+        (ver_dir / "last_ingested.xlsx").write_bytes(data)
     sheet = find_sheet_for_date(str(xlsx_path), sheet_hint)
     parsed = parse_month_sheet(str(xlsx_path), sheet)
     parsed["source_filename"] = source_filename
@@ -1560,6 +1568,13 @@ def main() -> None:
             subprocess.run([sys.executable, str(sync_script)], check=False, cwd=str(repo_root))
 
     write_legacy_roster_site_import_redirect(repo_root)
+    if source_filename:
+        try:
+            (repo_root / "import_last_filename.txt").write_text(
+                source_filename.strip(), encoding="utf-8"
+            )
+        except OSError as e:
+            print(f"WARNING: could not write import_last_filename.txt: {e}")
     print("OK: Generated Import pages in docs/import/")
     print(f"OK: Legacy redirect stub -> legacy-redirects/roster-site/import/index.html -> {CANONICAL_IMPORT_BASE}")
 

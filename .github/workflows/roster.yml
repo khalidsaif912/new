@@ -13,174 +13,56 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
+
       - name: Cache pip packages
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
-      - name: Check if Excel file changed
+
+      - name: Detect export roster changes (name + Excel hash)
         id: check_changes
         env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           SOURCE_NAME_URL: ${{ secrets.EXPORT_SOURCE_NAME_URL }}
           EXPORT_SOURCE_NAME_URL: ${{ secrets.EXPORT_SOURCE_NAME_URL }}
-        run: |
-          python << 'EOF'
-          import os
-          import sys
-          import time
-          import requests
-          from pathlib import Path
-          from datetime import datetime, timezone, timedelta
+          EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
+          EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
+        run: python scripts/ci_roster_change_gate.py export
 
-          def http_get_text(url):
-              last_err = None
-              for attempt in range(1, 4):
-                  try:
-                      r = requests.get(url, timeout=20)
-                      r.raise_for_status()
-                      return r.text
-                  except requests.exceptions.RequestException as e:
-                      last_err = e
-                      print(f"Fetch attempt {attempt}/3 failed: {e}")
-                      if attempt < 3:
-                          time.sleep(2 * attempt)
-              raise last_err
-          
-          def main():
-              try:
-                  source_url = (
-                      os.getenv("SOURCE_NAME_URL")
-                      or os.getenv("EXPORT_SOURCE_NAME_URL")
-                      or ""
-                  ).strip()
-                  if not source_url:
-                      print("::error::Missing export source-name URL. Add Actions secret EXPORT_SOURCE_NAME_URL (URL of a plain-text file whose body is the current roster Excel filename). Empty on fork/Dependabot runs or if the secret was renamed/cleared.")
-                      sys.exit(1)
-                  
-                  print(f"Checking: {source_url}")
-                  current_filename = http_get_text(source_url).strip()
-                  
-                  if not current_filename:
-                      print("source_name.txt is empty")
-                      sys.exit(1)
-                  
-                  print(f"Current file: {current_filename}")
-                  
-                  cache_file = "last_filename.txt"
-                  changed = True
-                  old_filename = "none"
-                  
-                  if Path(cache_file).exists():
-                      with open(cache_file, 'r', encoding='utf-8') as f:
-                          old_filename = f.read().strip()
-                      if old_filename:
-                          print(f"Previous file: {old_filename}")
-                          if old_filename == current_filename:
-                              print("No changes detected")
-                              changed = False
-                          else:
-                              print(f"Change detected: {old_filename} -> {current_filename}")
-                  else:
-                      print("First run")
-                  
-                  with open(cache_file, 'w', encoding='utf-8') as f:
-                      f.write(current_filename)
-                  
-                  # Muscat time (UTC+4)
-                  muscat_tz = timezone(timedelta(hours=4))
-                  now = datetime.now(muscat_tz)
-                  current_hour = now.hour
-                  current_minute = now.minute
-                  print(f"Muscat time: {now.strftime('%H:%M')}")
-                  
-                  # ساعات التحديث الإجباري - يعمل طوال الساعة كاملة
-                  mandatory_update_hours = [0, 5, 6, 13, 14, 20, 21]
-                  # ساعات إرسال الإيميل - فقط في أول 20 دقيقة
-                  email_hours = [5, 13, 21]
-                  
-                  is_mandatory_update = (current_hour in mandatory_update_hours)
-                  is_email_time = (current_hour in email_hours) and (current_minute < 20)
-                  is_manual = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
-                  
-                  should_process = changed or is_mandatory_update or is_manual
-                  should_send_email = changed or is_email_time
-                  
-                  print(f"File changed: {changed}")
-                  print(f"Mandatory update hour: {is_mandatory_update}")
-                  print(f"Manual dispatch: {is_manual}")
-                  print(f"Email time: {is_email_time}")
-                  print(f"Should process: {should_process}")
-                  print(f"Should send email: {should_send_email}")
-                  
-                  with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-                      f.write(f"changed={str(changed).lower()}\n")
-                      f.write(f"should_process={str(should_process).lower()}\n")
-                      f.write(f"should_send_email={str(should_send_email).lower()}\n")
-                      f.write(f"is_scheduled_email={str(is_email_time).lower()}\n")
-                      f.write(f"filename={current_filename}\n")
-                      f.write(f"old_filename={old_filename}\n")
-                  
-                  print("=" * 60)
-                  print(f"  File changed:     {changed}")
-                  print(f"  Mandatory update: {is_mandatory_update}")
-                  print(f"  Manual dispatch:  {is_manual}")
-                  print(f"  Email time:       {is_email_time}")
-                  print(f"  Should process:   {should_process}")
-                  print(f"  Should send email:{should_send_email}")
-                  print("=" * 60)
-                  
-              except requests.exceptions.Timeout:
-                  print("::error::Connection timeout while fetching source name URL after retries")
-                  sys.exit(1)
-              except requests.exceptions.RequestException as e:
-                  print(f"::error::Request error after retries: {e}")
-                  sys.exit(1)
-              except Exception as e:
-                  print(f"Unexpected error: {e}")
-                  import traceback
-                  traceback.print_exc()
-                  sys.exit(1)
-          
-          if __name__ == "__main__":
-              main()
-          EOF
-      
       - name: Display change info
         run: |
           echo "========================================"
           echo "Check Report:"
           echo "========================================"
-          echo "File changed:      ${{ steps.check_changes.outputs.changed }}"
-          echo "Scheduled email:   ${{ steps.check_changes.outputs.is_scheduled_email }}"
+          echo "Name changed:      ${{ steps.check_changes.outputs.name_changed }}"
+          echo "Content changed:   ${{ steps.check_changes.outputs.content_changed }}"
           echo "Should process:    ${{ steps.check_changes.outputs.should_process }}"
           echo "Should send email: ${{ steps.check_changes.outputs.should_send_email }}"
           echo "Current file:      ${{ steps.check_changes.outputs.filename }}"
           echo "Previous file:     ${{ steps.check_changes.outputs.old_filename }}"
+          echo "Month key:         ${{ steps.check_changes.outputs.month_key }}"
           echo "========================================"
 
-      # Same idea as scripts/export/load_local_month.ps1: keep "previous" xlsx before regen.
       - name: Stage export roster baseline for auto-diff
         if: steps.check_changes.outputs.should_process == 'true'
         env:
           ROSTER_FILENAME: ${{ steps.check_changes.outputs.filename }}
         run: python scripts/ci_export_diff_snapshots.py before
-      
+
       - name: Generate page + send email
         if: steps.check_changes.outputs.should_process == 'true'
         env:
-          # Prefer EXPORT_EXCEL_URL; fall back to EXCEL_URL if repos use the shorter name.
           EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
           SOURCE_NAME_URL: ${{ secrets.EXPORT_SOURCE_NAME_URL }}
           PAGES_BASE_URL: ${{ secrets.PAGES_BASE_URL }}
@@ -193,14 +75,18 @@ jobs:
           SUBSCRIBE_URL: ${{ secrets.SUBSCRIBE_URL }}
           SUBSCRIBE_TOKEN: ${{ secrets.SUBSCRIBE_TOKEN }}
         run: |
-          if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
-            echo "Processing (change detected): ${{ steps.check_changes.outputs.filename }}"
-          else
-            echo "Processing (scheduled update): ${{ steps.check_changes.outputs.filename }}"
+          EXTRA=""
+          if [ "${{ steps.check_changes.outputs.should_send_email }}" != "true" ]; then
+            EXTRA="--no-email"
           fi
-          python generate_and_send.py
+          if [ "${{ steps.check_changes.outputs.name_changed }}" == "true" ] || [ "${{ steps.check_changes.outputs.content_changed }}" == "true" ]; then
+            echo "Processing (remote change): ${{ steps.check_changes.outputs.filename }}"
+          else
+            echo "Processing (manual refresh): ${{ steps.check_changes.outputs.filename }}"
+          fi
+          python generate_and_send.py $EXTRA
           echo "Done!"
-      
+
       - name: Generate employee schedules
         if: steps.check_changes.outputs.should_process == 'true'
         env:
@@ -222,8 +108,6 @@ jobs:
           ROSTER_FILENAME: ${{ steps.check_changes.outputs.filename }}
         run: python scripts/ci_export_diff_snapshots.py after
 
-      # Builds docs/absence-data.json from ABSENCE_EXCEL_URL (see process_absence.py).
-      # Runs even when the roster Excel did not change, so absence-only updates still publish.
       - name: Prefetch absence file to local path
         id: prefetch_absence
         if: success()
@@ -283,7 +167,7 @@ jobs:
               if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
                 git commit -m "Update roster: ${{ steps.check_changes.outputs.filename }}"
               else
-                git commit -m "Scheduled update"
+                git commit -m "Refresh export roster pages"
               fi
             else
               git commit -m "Update absence data"
@@ -291,11 +175,11 @@ jobs:
             git push
             echo "Pushed!"
           fi
-      
+
       - name: Skip - No action needed
         if: steps.check_changes.outputs.should_process == 'false'
         run: |
           echo "========================================"
-          echo "No action needed"
+          echo "No export changes detected (name + hash)"
           echo "Current file: ${{ steps.check_changes.outputs.filename }}"
           echo "========================================"

@@ -30,123 +30,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check if Import Excel file changed
+      - name: Detect import roster changes (name + Excel hash)
         id: check_import_changes
         env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           IMPORT_SOURCE_NAME_URL: ${{ secrets.IMPORT_SOURCE_NAME_URL }}
-        run: |
-          python << 'EOF'
-          import os
-          import sys
-          import time
-          import requests
-          from pathlib import Path
-          from datetime import datetime, timezone, timedelta
-
-          def http_get_text(url):
-              last_err = None
-              for attempt in range(1, 4):
-                  try:
-                      r = requests.get(url, timeout=20)
-                      r.raise_for_status()
-                      return r.text
-                  except requests.exceptions.RequestException as e:
-                      last_err = e
-                      print(f"Fetch attempt {attempt}/3 failed: {e}")
-                      if attempt < 3:
-                          time.sleep(2 * attempt)
-              raise last_err
-
-          def main():
-              try:
-                  source_url = (os.getenv("IMPORT_SOURCE_NAME_URL") or "").strip()
-                  if not source_url:
-                      print("::error::Missing IMPORT_SOURCE_NAME_URL. Add Actions secret IMPORT_SOURCE_NAME_URL (URL of a plain-text file whose body is the current import Excel filename). Empty on fork runs or if the secret was not set on this repository.")
-                      sys.exit(1)
-
-                  print(f"Checking: {source_url}")
-                  current_filename = http_get_text(source_url).strip()
-
-                  if not current_filename:
-                      print("source_name.txt is empty")
-                      sys.exit(1)
-
-                  print(f"Current file: {current_filename}")
-
-                  cache_file = "import_last_filename.txt"
-                  changed = True
-                  old_filename = "none"
-
-                  if Path(cache_file).exists():
-                      with open(cache_file, 'r', encoding='utf-8') as f:
-                          old_filename = f.read().strip()
-                      if old_filename:
-                          print(f"Previous file: {old_filename}")
-                          if old_filename == current_filename:
-                              print("No changes detected")
-                              changed = False
-                          else:
-                              print(f"Change detected: {old_filename} -> {current_filename}")
-                  else:
-                      print("First run")
-
-                  with open(cache_file, 'w', encoding='utf-8') as f:
-                      f.write(current_filename)
-
-                  # Muscat time (UTC+4)
-                  muscat_tz = timezone(timedelta(hours=4))
-                  now = datetime.now(muscat_tz)
-                  current_hour = now.hour
-                  current_minute = now.minute
-                  print(f"Muscat time: {now.strftime('%H:%M')}")
-
-                  # ساعات التحديث الإجباري
-                  mandatory_update_hours = [0, 5, 6, 13, 14, 20, 21]
-
-                  is_mandatory_update = (current_hour in mandatory_update_hours)
-                  should_process = changed or is_mandatory_update
-
-                  print(f"File changed: {changed}")
-                  print(f"Mandatory update hour: {is_mandatory_update}")
-                  print(f"Should process: {should_process}")
-
-                  with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-                      f.write(f"changed={str(changed).lower()}\n")
-                      f.write(f"should_process={str(should_process).lower()}\n")
-                      f.write(f"filename={current_filename}\n")
-                      f.write(f"old_filename={old_filename}\n")
-
-                  print("=" * 60)
-                  print(f"  File changed:     {changed}")
-                  print(f"  Mandatory update: {is_mandatory_update}")
-                  print(f"  Should process:   {should_process}")
-                  print("=" * 60)
-
-              except requests.exceptions.Timeout:
-                  print("::error::Connection timeout while fetching import source name URL after retries")
-                  sys.exit(1)
-              except requests.exceptions.RequestException as e:
-                  print(f"::error::Request error after retries: {e}")
-                  sys.exit(1)
-              except Exception as e:
-                  print(f"Unexpected error: {e}")
-                  import traceback
-                  traceback.print_exc()
-                  sys.exit(1)
-
-          if __name__ == "__main__":
-              main()
-          EOF
+          IMPORT_EXCEL_URL: ${{ secrets.IMPORT_EXCEL_URL }}
+        run: python scripts/ci_roster_change_gate.py import
 
       - name: Display change info
         run: |
           echo "========================================"
           echo "Import Check Report:"
           echo "========================================"
-          echo "File changed:   ${{ steps.check_import_changes.outputs.changed }}"
-          echo "Should process: ${{ steps.check_import_changes.outputs.should_process }}"
-          echo "Current file:   ${{ steps.check_import_changes.outputs.filename }}"
-          echo "Previous file:  ${{ steps.check_import_changes.outputs.old_filename }}"
+          echo "Name changed:    ${{ steps.check_import_changes.outputs.name_changed }}"
+          echo "Content changed: ${{ steps.check_import_changes.outputs.content_changed }}"
+          echo "Should process:  ${{ steps.check_import_changes.outputs.should_process }}"
+          echo "Current file:    ${{ steps.check_import_changes.outputs.filename }}"
+          echo "Previous file:   ${{ steps.check_import_changes.outputs.old_filename }}"
+          echo "Month key:       ${{ steps.check_import_changes.outputs.month_key }}"
           echo "========================================"
 
       - name: Generate Import pages
@@ -165,24 +67,23 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/import import_last_filename.txt
+          git add docs/import import-rosters import_last_filename.txt
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             if [ "${{ steps.check_import_changes.outputs.changed }}" == "true" ]; then
               git commit -m "Update IMPORT roster: ${{ steps.check_import_changes.outputs.filename }}"
             else
-              git commit -m "Scheduled IMPORT update"
+              git commit -m "Refresh import roster pages"
             fi
             git pull --rebase --autostash
             git push
             echo "Pushed!"
-          fi
 
       - name: Skip - No action needed
         if: steps.check_import_changes.outputs.should_process == 'false'
         run: |
           echo "========================================"
-          echo "No action needed"
+          echo "No import changes detected (name + hash)"
           echo "Current file: ${{ steps.check_import_changes.outputs.filename }}"
           echo "========================================"

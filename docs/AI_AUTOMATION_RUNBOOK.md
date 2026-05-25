@@ -63,11 +63,10 @@ Trigger:
 
 Core logic:
 1. Reads current source filename from `EXPORT_SOURCE_NAME_URL`
-2. Compares with cached `last_filename.txt`
-3. Decides:
-   - `changed = true` if filename differs
-   - also supports mandatory refresh hours
-4. If processing required:
+2. Compares with committed `last_filename.txt` (name) and SHA-256 of `EXPORT_EXCEL_URL` (content)
+3. Regenerates when **either** changes, or on manual `workflow_dispatch` (no fixed “mandatory hours” gate)
+4. Email sends only when name or content changed (not every 10-minute poll)
+5. If processing required:
    - runs `generate_and_send.py`
    - runs `generate_employee_schedules.py`
    - commits updated `docs`, `rosters`, and state files
@@ -84,8 +83,9 @@ Trigger:
 
 Core logic:
 1. Reads source filename from `IMPORT_SOURCE_NAME_URL`
-2. Compares against `import_last_filename.txt`
-3. If needed:
+2. Compares name against `import_last_filename.txt` and Excel hash under `import-rosters/.versions/`
+3. Regenerates when name or content changes (or manual dispatch)
+4. If needed:
    - runs `generate_and_send_import.py`
    - commits updated `docs/import` and state files
 
