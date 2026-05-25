@@ -32,6 +32,7 @@
       --r-lg:18px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
+      --topbar-h: 64px;
     }
     body.light{
       --bg:#f5f7fa;
@@ -54,7 +55,7 @@
       -webkit-font-smoothing:antialiased;
       overflow-x:hidden;
       transition:background .2s, color .2s;
-      padding-top:64px; /* offset for fixed topbar */
+      padding-top:var(--topbar-h); /* synced to fixed topbar height (iPhone safe area) */
     }
     body.ar{direction:rtl}
     a{color:var(--accent);text-decoration:none}
@@ -226,7 +227,11 @@
 
     /* ── SEARCH SECTION ── */
     .search-section{
-      padding:16px 20px 0;
+      position:sticky;
+      top:var(--topbar-h);
+      z-index:90;
+      background:var(--bg);
+      padding:12px 16px 10px;
       max-width:960px;margin:0 auto;
     }
     .tips-pill{
@@ -1370,6 +1375,38 @@
       background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.75));
     }
 
+    /* iPhone: topbar taller than 64px — full-width ID row, 16px input avoids zoom */
+    @media (max-width: 520px) {
+      .topbar-inner{ padding:10px 14px; gap:8px; }
+      .search-section{ padding:10px 14px 12px; }
+      .search-form{ flex-wrap:wrap; width:100%; row-gap:8px; }
+      .search-avatar-wrap{ order:0; }
+      .id-input{
+        order:1;
+        flex:1 1 100%;
+        width:100%;
+        min-width:0;
+        max-width:100%;
+      }
+      .id-input .search-input{
+        flex:1 1 auto;
+        width:auto;
+        min-width:0;
+        max-width:100%;
+        font-size:16px;
+        min-height:44px;
+        -webkit-appearance:none;
+        appearance:none;
+      }
+      .id-prefix{ min-height:44px; }
+      .search-btn{
+        order:2;
+        flex:1 1 100%;
+        width:100%;
+        min-height:44px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -2208,8 +2245,10 @@
       const auroraInner = document.getElementById('auroraBarInner');
       if(!topbar) return;
 
-      function setAuroraPos(){
-        const h = topbar.offsetHeight || 62;
+      function syncTopbarInset(){
+        const h = Math.ceil(topbar.getBoundingClientRect().height) || topbar.offsetHeight || 64;
+        document.documentElement.style.setProperty('--topbar-h', h + 'px');
+        document.body.style.paddingTop = h + 'px';
         if(auroraBar) auroraBar.style.top = h + 'px';
       }
 
@@ -2218,10 +2257,16 @@
         if(auroraInner) auroraInner.classList.toggle('visible', scrolled);
       }
 
-      // init position after fonts/layout settle
-      setTimeout(setAuroraPos, 100);
+      syncTopbarInset();
+      requestAnimationFrame(syncTopbarInset);
+      setTimeout(syncTopbarInset, 100);
+      setTimeout(syncTopbarInset, 400);
       window.addEventListener('scroll', onScroll, {passive:true});
-      window.addEventListener('resize', setAuroraPos);
+      window.addEventListener('resize', syncTopbarInset);
+      window.addEventListener('orientationchange', function(){ setTimeout(syncTopbarInset, 150); });
+      if(typeof ResizeObserver !== 'undefined'){
+        new ResizeObserver(syncTopbarInset).observe(topbar);
+      }
     })();
 
 

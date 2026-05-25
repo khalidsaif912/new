@@ -2,7 +2,6 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8"/>
-  <script defer src="../../ios-tap-fix.js?v=20260525c"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Import - My Schedule</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,10 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--surface3:#21262d;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.12);--ink:#e6edf3;--muted:#8b949e;--dim:#484f58;--accent:#58a6ff;--r:12px;--r-lg:18px;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--glass-bg:rgba(255,255,255,.06);--glass-bg-hover:rgba(255,255,255,.10);--glass-border:rgba(255,255,255,.16);--glass-border-hover:rgba(255,255,255,.24);--glass-shadow:0 10px 28px rgba(0,0,0,.22);}
+    :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--surface3:#21262d;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.12);--ink:#e6edf3;--muted:#8b949e;--dim:#484f58;--accent:#58a6ff;--r:12px;--r-lg:18px;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--topbar-h:64px;--glass-bg:rgba(255,255,255,.06);--glass-bg-hover:rgba(255,255,255,.10);--glass-border:rgba(255,255,255,.16);--glass-border-hover:rgba(255,255,255,.24);--glass-shadow:0 10px 28px rgba(0,0,0,.22);}
     body.light{--bg:#f5f7fa;--surface:#ffffff;--surface2:#f0f2f5;--surface3:#e8ebf0;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.13);--ink:#1a1f2e;--muted:#6b7280;--dim:#9ca3af;--accent:#1d6fd4;--glass-bg:rgba(255,255,255,.70);--glass-bg-hover:rgba(255,255,255,.86);--glass-border:rgba(0,0,0,.10);--glass-border-hover:rgba(0,0,0,.16);--glass-shadow:0 10px 24px rgba(0,0,0,.10);}
     html{background:var(--bg);color:var(--ink);font-size:15px;scroll-behavior:smooth}
-    body{font-family:'Sora',system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .2s,color .2s;padding-top:64px;}
+    body{font-family:'Sora',system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .2s,color .2s;padding-top:var(--topbar-h);}
     body.ar{direction:rtl}
     button,input{font-family:inherit;font-size:inherit;cursor:pointer}
     @keyframes aurora{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -50,7 +49,7 @@
     .aurora-bar-inner{position:absolute;bottom:0;left:4%;right:4%;height:22px;border-radius:0 0 60% 60%;background:linear-gradient(90deg,#1f6feb,#58a6ff,#3fb950,#bc8cff,#ff7b72,#58a6ff,#1f6feb);background-size:300% 100%;filter:blur(10px);opacity:0;transform:translateY(-100%) scaleX(.7);transition:opacity .2s ease,transform .2s cubic-bezier(.22,1,.36,1);animation:aurora 4s ease infinite;}
     .aurora-bar-inner.visible{opacity:.35;transform:translateY(0) scaleX(1);}
     body.light .aurora-bar-inner{opacity:0!important;}
-    .search-section{padding:16px 20px 0;max-width:960px;margin:0 auto;}
+    .search-section{position:sticky;top:var(--topbar-h);z-index:90;background:var(--bg);padding:12px 16px 10px;max-width:960px;margin:0 auto;}
     .search-form{display:flex;gap:8px;align-items:center}
     .search-avatar-wrap{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
     .search-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1f6feb,#58a6ff);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:0 0 auto;box-shadow:0 3px 10px rgba(31,111,235,.4);letter-spacing:-.5px;animation:avatarPop .2s cubic-bezier(.22,1,.36,1);}
@@ -339,6 +338,7 @@
     .topbar-inner .home-btn,.topbar-inner .ghost-btn.theme-btn,.topbar-inner #langBtn,.topbar-inner .brand-swap,.topbar-inner .brand-sq{width:38px!important;height:38px!important;min-width:38px!important;border-radius:10px!important;display:grid!important;place-items:center!important;flex:0 0 38px!important;}
     .topbar-inner #langBtn{width:auto!important;min-width:38px!important;padding:0 11px!important;flex:0 0 auto!important;}
     .topbar-inner .ghost-btn.theme-btn,.topbar-inner .brand-sq{font-size:18px!important;}
+    @media (max-width:520px){.topbar-inner{padding:10px 14px;gap:8px}.search-section{padding:10px 14px 12px}.search-form{flex-wrap:wrap;width:100%;row-gap:8px}.id-input{flex:1 1 100%;width:100%;min-width:0;max-width:100%}.id-input .search-input{flex:1 1 auto;width:auto;min-width:0;max-width:100%;font-size:16px;min-height:44px;-webkit-appearance:none;appearance:none}.id-prefix{min-height:44px}.search-btn{flex:1 1 100%;width:100%;min-height:44px}}
     @media print{.topbar,.search-section,.toast-container,.modal,.actions-card{display:none!important}body{background:#fff;color:#000}}
   </style><meta name="theme-color" content="#f4354b">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -589,7 +589,7 @@
   function dlICS(){var sched=data.schedules[month]||[];var parts=month.split('-');var yr=parseInt(parts[0]),mo=parseInt(parts[1]);var pad=function(n){return String(n).padStart(2,'0');};var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ImportMySchedule//EN','CALSCALE:GREGORIAN'];sched.forEach(function(d){var dt2=yr+''+pad(mo)+''+pad(d.day);var dn=new Date(yr,mo-1,d.day+1);var dtE=dn.getFullYear()+''+pad(dn.getMonth()+1)+''+pad(dn.getDate());lines.push('BEGIN:VEVENT','DTSTART;VALUE=DATE:'+dt2,'DTEND;VALUE=DATE:'+dtE,'SUMMARY:'+(d.shift_code||d.shift_group),'UID:'+dt2+'-'+data.id+'@import','END:VEVENT');});lines.push('END:VCALENDAR');var blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='import-'+data.id+'-'+month+'.ics';a.click();URL.revokeObjectURL(a.href);}
   function shareS(){var url=siteRootUrl()+'import/my-schedules/?emp='+encodeURIComponent(data.id);if(navigator.share)navigator.share({title:'Import - My Schedule',text:'Schedule: '+data.name,url:url});else{navigator.clipboard.writeText(url);alert(lang==='ar'?'تم نسخ الرابط ✅':'Link copied ✅');}}
   (function(){var cal=document.getElementById('brandCal'),q=document.getElementById('brandQ');if(!cal||!q)return;var sc=true;setInterval(function(){sc=!sc;cal.classList.toggle('show',sc);q.classList.toggle('show',!sc);},2600);})();
-  (function(){var topbar=document.querySelector('.topbar'),aI=document.getElementById('auroraBarInner'),aB=document.getElementById('auroraBar');if(!topbar)return;function sp(){var h=topbar.offsetHeight||62;if(aB)aB.style.top=h+'px';}window.addEventListener('scroll',function(){if(aI)aI.classList.toggle('visible',window.scrollY>5);},{passive:true});setTimeout(sp,100);window.addEventListener('resize',sp);})();
+  (function(){var topbar=document.querySelector('.topbar'),aI=document.getElementById('auroraBarInner'),aB=document.getElementById('auroraBar');if(!topbar)return;function sp(){var h=Math.ceil(topbar.getBoundingClientRect().height)||topbar.offsetHeight||64;document.documentElement.style.setProperty('--topbar-h',h+'px');document.body.style.paddingTop=h+'px';if(aB)aB.style.top=h+'px';}sp();requestAnimationFrame(sp);setTimeout(sp,100);setTimeout(sp,400);window.addEventListener('scroll',function(){if(aI)aI.classList.toggle('visible',window.scrollY>5);},{passive:true});window.addEventListener('resize',sp);window.addEventListener('orientationchange',function(){setTimeout(sp,150);});if(typeof ResizeObserver!=='undefined'){new ResizeObserver(sp).observe(topbar);}})();
   applyLangUI();
   var qs=new URLSearchParams(location.search);
   var pEmp=qs.get('emp');
