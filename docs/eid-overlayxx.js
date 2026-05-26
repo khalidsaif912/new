@@ -21,10 +21,37 @@
     return y + '-' + mo + '-' + day;
   }
 
-  var todayMuscat = muscatTodayIso();
-  if (todayMuscat < EID_START || todayMuscat > EID_END) return;
+  function rosterActiveIso() {
+    var path = location.pathname || '';
+    var m = path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//)
+      || path.match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) return m[1];
+    var picker = document.getElementById('datePicker');
+    return (picker && picker.value) ? picker.value : '';
+  }
 
-  var dismissKey = 'eidOverlayDismissed_' + todayMuscat;
+  function isEidSeasonIso(iso) {
+    return !!iso && iso >= EID_START && iso <= EID_END;
+  }
+
+  function isEidActive() {
+    try {
+      if ((new URLSearchParams(location.search).get('eid') || '') === '1') return true;
+    } catch (e) {}
+    if (isEidSeasonIso(muscatTodayIso())) return true;
+    if (isEidSeasonIso(rosterActiveIso())) return true;
+    return false;
+  }
+
+  if (!isEidActive()) return;
+
+  var contextIso = (function () {
+    var page = rosterActiveIso();
+    if (isEidSeasonIso(page)) return page;
+    return muscatTodayIso();
+  })();
+
+  var dismissKey = 'eidOverlayDismissed_' + contextIso;
   try {
     if (sessionStorage.getItem(dismissKey) === '1') return;
   } catch (e) {}

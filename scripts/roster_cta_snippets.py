@@ -901,10 +901,12 @@ I18N_APPS_AR = "moreApps:'تطبيقات'"
 # ── Eid overlay (Muscat calendar, inclusive) — 3 days: 27–29 May 2026 ──
 EID_OVERLAY_START = "2026-05-27"
 EID_OVERLAY_END = "2026-05-29"
-EID_OVERLAY_VER = "20260527a"
+EID_OVERLAY_VER = "20260527b"
 
-EID_OVERLAY_LOAD_JS = f"""
-    function muscatTodayIso() {{
+EID_OVERLAY_FUNCS = f"""
+  var EID_START = '{EID_OVERLAY_START}';
+  var EID_END = '{EID_OVERLAY_END}';
+  function muscatTodayIso() {{
       var n = new Date();
       var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
       var d = new Date(t);
@@ -913,13 +915,38 @@ EID_OVERLAY_LOAD_JS = f"""
       var day = ('0' + d.getUTCDate()).slice(-2);
       return y + '-' + mo + '-' + day;
     }}
-    function isEidOverlayDay() {{
-      var today = muscatTodayIso();
-      return today >= '{EID_OVERLAY_START}' && today <= '{EID_OVERLAY_END}';
+    function rosterActiveIso() {{
+      var path = location.pathname || '';
+      var m = path.match(/\\/date\\/(\\d{{4}}-\\d{{2}}-\\d{{2}})\\//)
+        || path.match(/\\/(?:import\\/date|import)\\/(\\d{{4}}-\\d{{2}}-\\d{{2}})\\//);
+      if (m) return m[1];
+      var picker = document.getElementById('datePicker');
+      return (picker && picker.value) ? picker.value : '';
     }}
-    if (isEidOverlayDay()) {{
-      addScript(root + '/eid-overlayxx.js?v={EID_OVERLAY_VER}');
+    function isEidSeasonIso(iso) {{
+      return !!iso && iso >= EID_START && iso <= EID_END;
+    }}
+    function isEidOverlayDay() {{
+      try {{
+        if ((new URLSearchParams(location.search).get('eid') || '') === '1') return true;
+      }} catch (e) {{}}
+      if (isEidSeasonIso(muscatTodayIso())) return true;
+      if (isEidSeasonIso(rosterActiveIso())) return true;
+      return false;
+    }}
+    function loadEidOverlayScript() {{
+      if (!isEidOverlayDay()) return;
+      var src = root + '/eid-overlayxx.js?v={EID_OVERLAY_VER}';
+      if (document.querySelector('script[data-eid-overlay="1"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-eid-overlay', '1');
+      s.setAttribute('data-local-src', src);
+      document.body.appendChild(s);
     }}"""
+
+EID_OVERLAY_LOAD_JS = EID_OVERLAY_FUNCS + "\n  loadEidOverlayScript();"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
 IOS_PERF_VER = "20260525c"
@@ -938,6 +965,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
+""" + EID_OVERLAY_LOAD_JS + """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -946,7 +974,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
-""" + EID_OVERLAY_LOAD_JS + """
+    loadEidOverlayScript();
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
@@ -968,12 +996,13 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     document.body.appendChild(s);
   }
   addScript(root + '/site-last-updated.js?v=' + ver);
+""" + EID_OVERLAY_LOAD_JS + """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
-""" + EID_OVERLAY_LOAD_JS + """
+    loadEidOverlayScript();
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
@@ -987,6 +1016,12 @@ OLD_EID_LOAD_RE = re.compile(
     r"var m = \(location\.pathname[^\n]+\n\s*var activeIso[^\n]+\n\s*"
     r"if \(eidDays\.indexOf\(activeIso\) !== -1\) \{\s*"
     r"addScript\(root \+ '/eid-overlayxx\.js(?:\?v=[^']*)?'\);\s*\}",
+    re.MULTILINE,
+)
+
+OLD_EID_TODAY_ONLY_RE = re.compile(
+    r"function muscatTodayIso\(\) \{[\s\S]*?function isEidOverlayDay\(\) \{[\s\S]*?\}[\s\S]*?"
+    r"if \(isEidOverlayDay\(\)\) \{[\s\S]*?addScript\(root \+ '/eid-overlayxx\.js[^']*'\);[\s\S]*?\}",
     re.MULTILINE,
 )
 
