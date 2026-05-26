@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../../ios-tap-fix.js?v=20260525c"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260525c"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -225,7 +225,7 @@
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS */
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
     .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
@@ -254,49 +254,6 @@
     .header::before,
     .header::after {
       pointer-events:none;
-    }
-
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-
-    .header::before,
-    .header::after {
-      pointer-events:none;
-    }
-    .summaryBar {
-      position:relative;
-      z-index:30;
-      isolation:isolate;
-    }
-    .summaryBar a.summaryChip,
-    .summaryBar button.summaryChip,
-    .quickActions.roster-cta,
-    .quickActions .roster-cta-btn,
-    .importBottom .quickActions.roster-cta,
-    .importBottom .roster-cta-btn,
-    .topDock .dockCard.dockAction,
-    .topDock .dockCard.savedChip,
-    .topDock button.dockCard {
-      position:relative;
-      z-index:1;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-    .summaryBar a.summaryChip *,
-    .summaryBar button.summaryChip *,
-    .quickActions.roster-cta-btn .roster-cta-icon,
-    .quickActions.roster-cta-btn .roster-cta-label,
-    .topDock .dockCard * {
-      pointer-events:none;
-    }
-    .importBottom,
-    .quickActions.roster-cta {
-      position:relative;
-      z-index:25;
     }
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -875,7 +832,6 @@
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
       .header .bannerTitleMain { font-size:22px; }
       body.ar .header .bannerTitleMain { font-size:21px; }
@@ -1613,7 +1569,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 20:11</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 17:24</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026.xlsx</strong>
   </div>
 
@@ -2060,9 +2016,6 @@ function goToEmployeeSchedule(empName) {
 
   function resyncTodayIfNeeded() {
     if (!path.includes('/date/')) return;
-    try {
-      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
-    } catch (e) {}
     try {
       if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
     } catch (e) {}
@@ -2605,15 +2558,8 @@ function goToRosterDiff(event) {
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  function loadSecondary() {
-    addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
-    addScript(root + '/install-pwa.js?v=' + ver);
-    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
-    addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=' + ver);
-    var EID_START = '2026-05-27';
+
+  var EID_START = '2026-05-27';
   var EID_END = '2026-05-29';
   function muscatTodayIso() {
       var n = new Date();
@@ -2655,6 +2601,15 @@ function goToRosterDiff(event) {
       document.body.appendChild(s);
     }
   loadEidOverlayScript();
+  function loadSecondary() {
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/shift-swap.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+    loadEidOverlayScript();
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
