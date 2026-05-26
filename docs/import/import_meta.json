@@ -1,8 +1,8 @@
 {
   "sheet": "Sheet1",
-  "generated_for": "2026-05-25",
-  "employees_total": 73,
-  "excel_sha256": "618392ab3da94baeb2db0b17b7b259547ecba583f1f2a9807f8127f2d2dfef94",
+  "generated_for": "2026-05-11",
+  "employees_total": 74,
+  "excel_sha256": "5f4ad87892faf16af3c5a9248bca5cfb21bfaa8cd72eab9e3a65f70b150dec57",
   "date_min": "2026-03-01",
   "date_max": "2026-06-30",
   "available_months": [
@@ -14,7 +14,7 @@
   "month_sources": {
     "2026-03": "MARCH ROSTER MID.xlsx",
     "2026-04": "Sheet1",
-    "2026-05": "JUN 2026 IMPORT OPS ROSTER.xlsx",
+    "2026-05": "IMPORT OPS MAY 2026 REVISED.xlsx",
     "2026-06": "JUN 2026 IMPORT OPS ROSTER.xlsx"
   },
   "published_dates": [

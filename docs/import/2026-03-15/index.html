@@ -159,6 +159,9 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       text-decoration:none;
       cursor:pointer;
     }
+    
+    a.summaryChip.exportChip .chipVal { color:#059669; }
+    a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
     .welcomeChip.visible {
       display:flex;
     }
@@ -1170,9 +1173,9 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
 <body>
 <div class="wrap">
 
-  <div class="header">
+                            <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">ع</span></button>
-        <h1 id="pageTitle" class="bannerTitle">
+    <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
@@ -1181,34 +1184,34 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       <input id="datePicker" type="date" value="2026-03-15" min="2026-03-01" max="2026-06-30" aria-label="Select roster date" title="Pick day" />
     </div>
   </div>
-
-  
-  <div class="summaryBar">
-    <div class="summaryChip">
-      <div class="chipVal">78</div>
-      <div class="chipLabel" data-key="employees">Employees</div>
+<div class="summaryBar">
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">78</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
-    <div class="summaryChip">
-      <div class="chipVal" style="color:#059669;">7</div>
-      <div class="chipLabel" data-key="departments">Departments</div>
-    </div>
-    <a href="{BASE}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
-    <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+    <a href="#" id="exportBtn" class="summaryChip exportChip" style="text-decoration:none;" onclick="goToExport(event)">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
       <div class="chipLabel" data-key="exportRoster">Export</div>
     </a>
-    <a href="#" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule">
+    <a href="{{BASE}}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
       <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
       <div class="chipLabel" id="welcomeName"></div>
     </a>
+    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="{{BASE}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
+      <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
   </div>
 
-
-  
-    <div class="deptCard">
+  <div class="deptCard">
       <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
@@ -1921,8 +1924,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
 
       </div>
     </div>
-
-
   <div class="importBottom">
     <nav class="quickActions roster-cta" aria-label="Page actions">
   <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{BASE}/now/">
@@ -1946,7 +1947,8 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     <span class="roster-cta-label">Apps</span>
   </button>
 </nav>
-<div class="footer">
+
+    <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">16MAY2026 / 14:30</strong>
     <br>Total: <strong id="importTotalEmployees">78 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">MARCH ROSTER MID.xlsx</strong>
@@ -2041,7 +2043,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <script>
 // Hard-guaranteed import page behavior (independent from other scripts).
 (function() {
@@ -2175,7 +2176,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     });
   }
 
-  // Match Export roster logic (Muscat UTC+4): Night 21:00–04:59, Afternoon from 13:00, else Morning.
   function getImportCurrentShiftGroup() {
     var now = new Date();
     var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
@@ -2208,7 +2208,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     }
   });
 
-  // Keep footer "Last Updated" fresh on page load.
   var lastUpdatedEl = document.getElementById('importLastUpdated');
   if (lastUpdatedEl) {
     var now = new Date();
@@ -2221,6 +2220,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     lastUpdatedEl.textContent = (day + mon + year + ' / ' + hh + ':' + mm).toUpperCase();
   }
 })();
+
 </script>
 
 <script>
@@ -2424,11 +2424,11 @@ function goToEmployeeSchedule(empName) {
   function syncHeaderDate(iso) {
     var tag = document.getElementById('dateTag');
     if (tag) {
-    var dateLbl = document.getElementById('dateTagLabel');
-    var dateText = formatIsoLabel(iso);
-    if (dateLbl) dateLbl.textContent = dateText;
-    else tag.textContent = dateText;
-  }
+      var dateLbl = document.getElementById('dateTagLabel');
+      var dateText = formatIsoLabel(iso);
+      if (dateLbl) dateLbl.textContent = dateText;
+      else tag.textContent = dateText;
+    }
   }
 
   var path = window.location.pathname || '/';
@@ -2438,6 +2438,7 @@ function goToEmployeeSchedule(empName) {
     : getMuscatTodayIso();
   picker.value = effectiveIso;
   syncHeaderDate(effectiveIso);
+
   var DATE_PICKER_BUSY_KEY = 'rosterDatePickerBusy';
 
   function setDatePickerBusy(on) {
@@ -2476,18 +2477,24 @@ function goToEmployeeSchedule(empName) {
 
   var dateWrap = document.querySelector('.datePickerWrapper');
   if (dateWrap) {
-    dateWrap.addEventListener('touchend', function(e) {
-      if (e.target.closest && e.target.closest('#dateTag')) {
-        e.preventDefault();
-        openDatePicker();
-        return;
-      }
-      onDateWrapActivate(e);
-    }, { passive: false });
+    dateWrap.addEventListener('touchend', onDateWrapActivate, { passive: false });
     dateWrap.addEventListener('click', function(e) {
-      if (e.target.closest && e.target.closest('#dateTag')) return;
       if (e.target === picker) return;
       onDateWrapActivate(e);
+    });
+    function onPickerActivate(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      setDatePickerBusy(true);
+      openDatePicker();
+    }
+    picker.addEventListener('click', onPickerActivate);
+    picker.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        onPickerActivate(e);
+      }
     });
   }
   picker.addEventListener('focus', function() { setDatePickerBusy(true); });
@@ -2495,9 +2502,7 @@ function goToEmployeeSchedule(empName) {
     setTimeout(function() { setDatePickerBusy(false); }, 400);
   });
 
-  
   var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
-
 
   function consumeUserDateNavigation() {
     if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
@@ -2509,13 +2514,36 @@ function goToEmployeeSchedule(empName) {
     sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
   }
 
-  function buildDateBasePath() {
-    var p = window.location.pathname || '/';
-    return p
-      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
+  function normalizePathname(p) {
+    return (p || '/')
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/now\/.*$/i, '/')
+      .replace(/\/index\.html$/i, '')
       .replace(/\/+$/, '');
+  }
+
+  function isImportRosterPath(p) {
+    return /\/import(\/|$)/i.test(p || '');
+  }
+
+  function buildDateBasePath() {
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    var p = path || location.pathname || '';
+    if (isImportRosterPath(p)) {
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {
+        return '/import';
+      }
+      if (!/\/import$/i.test(base)) {
+        base = base.replace(/\/+$/, '') + '/import';
+      }
+      return base;
+    }
+    if (root) return root;
+    return normalizePathname(p);
   }
 
   function redirectToDate(iso, isNowPage) {
@@ -2526,14 +2554,11 @@ function goToEmployeeSchedule(empName) {
   // التحقق من التاريخ وإعادة التوجيه للـ today
   // ═══════════════════════════════════════════════════
   function checkAndRedirectToToday() {
-    var path = window.location.pathname || '/';
     var isNowPage = path.includes('/now');
     var todayIso = getMuscatTodayIso();
-    var hasDateInPath = /\/(?:import\/date|import)\/\d{4}-\d{2}-\d{2}\//.test(path);
 
-    if (!hasDateInPath) {
-      var baseRoot = (typeof getSiteRootPath === 'function' && getSiteRootPath()) || normalizePathname((path || '').replace(/\/now\/?$/i, '/'));
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+    if (!path.includes('/date/')) {
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
       return true;
     }
 
@@ -2554,7 +2579,13 @@ function goToEmployeeSchedule(empName) {
   }
 
   function resyncTodayIfNeeded() {
-    var path = window.location.pathname || '/';
+    if (!path.includes('/date/')) return;
+    try {
+      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
+    } catch (e) {}
+    try {
+      if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
+    } catch (e) {}
     var dateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
     if (!dateMatch) return;
     var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
@@ -2579,20 +2610,11 @@ function goToEmployeeSchedule(empName) {
   picker.addEventListener('change', function() {
     if (!picker.value) return;
 
-
     markUserDateNavigation();
     sessionStorage.removeItem('pageLoaded');
 
-    var path = window.location.pathname || '/';
-    var isNowPage = path.includes('/now');
-    var base = path
-      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
-      .replace(/\/now\/.*$/, '/')
-      .replace(/\/+$/, '');
-
+    var base = buildDateBasePath();
     var target = base + '/date/' + picker.value + '/';
-    if (isNowPage) target += 'now/';
 
     window.location.href = target;
   });
@@ -2924,11 +2946,9 @@ function applyLang(lang) {
   if(footer) {
     var h=footer.innerHTML;
     if(isAr) {
-      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Total:','المجموع:');
-      h=h.replace(' employees',' موظف'); h=h.replace('Source:','المصدر:');
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
     } else {
-      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المجموع:','Total:');
-      h=h.replace(' موظف',' employees'); h=h.replace('المصدر:','Source:');
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
     }
     footer.innerHTML=h;
   }
@@ -2938,39 +2958,30 @@ function applyLang(lang) {
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 
-
-function setSummaryChipHrefs() {
-  var rootUrl = (typeof getSiteRootUrl === 'function') ? getSiteRootUrl() : '';
-  var rootPath = (typeof getSiteRootPath === 'function') ? getSiteRootPath() : '';
-  var importBase = (typeof _importBase === 'function') ? _importBase() : (rootUrl + '/import');
-  var my = document.getElementById('myScheduleBtn');
-  var imp = document.getElementById('importBtn');
-  var exp = document.getElementById('exportBtn');
-  var trn = document.getElementById('trainingBtn');
-  var diff = document.getElementById('diffChipBtn');
-  var welcome = document.getElementById('welcomeChip');
-  if (my) {
-    my.href = (location.pathname || '').indexOf('/import/') >= 0
-      ? importBase + '/my-schedules/index.html'
-      : rootUrl + '/my-schedules/index.html';
-  }
-  if (imp) imp.href = rootUrl + '/import/';
-  if (exp) exp.href = rootUrl + '/';
-  if (trn) trn.href = rootPath + '/training/';
-  if (diff) diff.href = rootUrl + '/roster-diff/index.html';
-  if (welcome) {
-    welcome.href = (location.pathname || '').indexOf('/import/') >= 0
-      ? importBase + '/my-schedules/index.html'
-      : rootUrl + '/my-schedules/index.html';
-  }
-}
-
 function setLocalCtaLinks() {
   var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
   var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
   if (c2) c2.href = root + '/subscribe/';
+}
+
+function setSummaryChipHrefs() {
+  var base = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var exp = document.getElementById('exportBtn');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  var welcome = document.getElementById('welcomeChip');
+  if (my) my.href = base + '/my-schedules/index.html';
+  if (exp) { /* exportBtn href via import setSummaryChipHrefs */ }
+  if (trn) trn.href = base + '/training/';
+  if (diff) diff.href = base + '/roster-diff/index.html';
+  if (welcome) {
+    var wid = localStorage.getItem('importSavedEmpId');
+    var wbase = base + '/my-schedules/index.html';
+    welcome.href = wid ? wbase + '?emp=' + encodeURIComponent(wid) : wbase;
+  }
 }
 function goToTraining(e) {
   if (e) e.preventDefault();
@@ -2988,8 +2999,8 @@ startSummarySwitchLoop();
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
   if(!deptCards.length) return;
-  var savedEmpId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
-  var savedEmpName = (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || '').trim().toLowerCase();
+  var savedEmpId = localStorage.getItem('importSavedEmpId') || '';
+  var savedEmpName = ((localStorage.getItem('importSavedEmpName') || '') || '').trim().toLowerCase();
 
   function getCurrentShiftForMuscat(){
     var now = new Date();
@@ -3049,15 +3060,39 @@ startSummarySwitchLoop();
 
 function goToMySchedule(event) {
   if (event) event.preventDefault();
-  var id = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
+  var id = localStorage.getItem('importSavedEmpId');
   var base = getSiteRootUrl() + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }
 
 function goToImport(event) {
   if (event) event.preventDefault();
-  var target = getSiteRootUrl() + '/import/';
-  location.href = target;
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {
+    var m = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) iso = m[1];
+  }
+  var root = getSiteRootUrl();
+  var fallback = root + '/import/';
+  if (!iso) {
+    location.href = fallback;
+    return;
+  }
+  fetch(root + '/import/import_meta.json', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(meta) {
+      var months = meta && Array.isArray(meta.available_months) ? meta.available_months : [];
+      var ym = iso.slice(0, 7);
+      if (months.length && months.indexOf(ym) === -1) {
+        location.href = fallback;
+        return;
+      }
+      location.href = root + '/import/date/' + iso + '/';
+    })
+    .catch(function() {
+      location.href = root + '/import/date/' + iso + '/';
+    });
 }
 
 function goToRosterDiff(event) {
@@ -3066,72 +3101,6 @@ function goToRosterDiff(event) {
   location.href = target;
 }
 
-(function loadLocalEnhancements() {
-  var root = getSiteRootUrl();
-  var ver = '20260525c';
-  function addScript(src) {
-    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-    var s = document.createElement('script');
-    s.src = src;
-    s.defer = true;
-    s.setAttribute('data-local-src', src);
-    document.body.appendChild(s);
-  }
-  addScript(root + '/site-last-updated.js?v=' + ver);
-  function loadSecondary() {
-    addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/install-pwa.js?v=' + ver);
-    addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=' + ver);
-    var EID_START = '2026-05-27';
-  var EID_END = '2026-05-29';
-  function muscatTodayIso() {
-      var n = new Date();
-      var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
-      var d = new Date(t);
-      var y = d.getUTCFullYear();
-      var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
-      var day = ('0' + d.getUTCDate()).slice(-2);
-      return y + '-' + mo + '-' + day;
-    }
-    function rosterActiveIso() {
-      var path = location.pathname || '';
-      var m = path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//)
-        || path.match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
-      if (m) return m[1];
-      var picker = document.getElementById('datePicker');
-      return (picker && picker.value) ? picker.value : '';
-    }
-    function isEidSeasonIso(iso) {
-      return !!iso && iso >= EID_START && iso <= EID_END;
-    }
-    function isEidOverlayDay() {
-      try {
-        if ((new URLSearchParams(location.search).get('eid') || '') === '1') return true;
-      } catch (e) {}
-      if (isEidSeasonIso(muscatTodayIso())) return true;
-      if (isEidSeasonIso(rosterActiveIso())) return true;
-      return false;
-    }
-    function loadEidOverlayScript() {
-      if (!isEidOverlayDay()) return;
-      var src = root + '/eid-overlayxx.js?v=20260527b';
-      if (document.querySelector('script[data-eid-overlay="1"]')) return;
-      var s = document.createElement('script');
-      s.src = src;
-      s.defer = true;
-      s.setAttribute('data-eid-overlay', '1');
-      s.setAttribute('data-local-src', src);
-      document.body.appendChild(s);
-    }
-  loadEidOverlayScript();
-  }
-  if (window.requestIdleCallback) {
-    requestIdleCallback(loadSecondary, { timeout: 3000 });
-  } else {
-    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
-  }
-})();
 
 // Employee row: tap → schedule; long-press → next 5 shifts preview
 (function initEmployeeNextShiftPreview() {
@@ -3232,7 +3201,7 @@ function goToRosterDiff(event) {
         data.days.forEach(function(d) {
           if (!d || !d.day) return;
           var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
-          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || d.shift_code || '').trim() });
         });
         out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
         return out.slice(0, 5);
@@ -3240,12 +3209,15 @@ function goToRosterDiff(event) {
     }
     if (!data.schedules) return out;
     Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
       var rows = data.schedules[monthKey] || [];
       rows.forEach(function(r) {
         if (!r) return;
         var iso = String(r.date || '').trim();
         if (!iso && r.day != null && r.day !== '') {
-          iso = monthKey + '-' + String(r.day).padStart(2, '0');
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
         }
         if (!iso || iso < fromIso) return;
         out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
@@ -3469,6 +3441,7 @@ window.importDateIsPublished = function(iso) {
   }, true);
 })();
 
+
 /* ===== Import path overrides ===== */
 function getSiteRootPath() {
   var path = location.pathname || '/';
@@ -3489,6 +3462,78 @@ function _importBase() {
   return getSiteRootUrl() + '/import';
 }
 
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  var ver = '20260525c';
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  addScript(root + '/roster-icons.js?v=' + ver);
+  addScript(root + '/site-last-updated.js?v=' + ver);
+
+  var EID_START = '2026-05-27';
+  var EID_END = '2026-05-29';
+  function muscatTodayIso() {
+      var n = new Date();
+      var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
+      var d = new Date(t);
+      var y = d.getUTCFullYear();
+      var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
+      var day = ('0' + d.getUTCDate()).slice(-2);
+      return y + '-' + mo + '-' + day;
+    }
+    function rosterActiveIso() {
+      var path = location.pathname || '';
+      var m = path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//)
+        || path.match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+      if (m) return m[1];
+      var picker = document.getElementById('datePicker');
+      return (picker && picker.value) ? picker.value : '';
+    }
+    function isEidSeasonIso(iso) {
+      return !!iso && iso >= EID_START && iso <= EID_END;
+    }
+    function isEidOverlayDay() {
+      try {
+        if ((new URLSearchParams(location.search).get('eid') || '') === '1') return true;
+      } catch (e) {}
+      if (isEidSeasonIso(muscatTodayIso())) return true;
+      if (isEidSeasonIso(rosterActiveIso())) return true;
+      return false;
+    }
+    function loadEidOverlayScript() {
+      if (!isEidOverlayDay()) return;
+      var src = root + '/eid-overlayxx.js?v=20260527b';
+      if (document.querySelector('script[data-eid-overlay="1"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-eid-overlay', '1');
+      s.setAttribute('data-local-src', src);
+      document.body.appendChild(s);
+    }
+  loadEidOverlayScript();
+  function loadSecondary() {
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/shift-swap.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+    loadEidOverlayScript();
+  }
+  if (window.requestIdleCallback) {
+    requestIdleCallback(loadSecondary, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
+  }
+})();
 function goToMySchedule(event) {
   if(event) event.preventDefault();
   var id = localStorage.getItem('importSavedEmpId');
@@ -3509,7 +3554,18 @@ function goToEmployeeSchedule(empName) {
 
 function goToExport(event) {
   if (event) event.preventDefault();
-  location.href = getSiteRootUrl() + '/';
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {
+    var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+    if (m) iso = m[1];
+  }
+  var root = getSiteRootUrl();
+  if (!iso) {
+    location.href = root + '/';
+    return;
+  }
+  location.href = root + '/date/' + iso + '/';
 }
 
 function goToRosterDiff(event) {

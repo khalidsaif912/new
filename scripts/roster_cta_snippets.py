@@ -804,48 +804,70 @@ def export_cta_html(
     )
 
 
+def import_summary_bar_html(total_emp: int) -> str:
+    """Mirror export duty-page summary chips (Employees → My Schedule → cross-link → Welcome → Training → Diff)."""
+    return f"""
+  <div class="summaryBar">
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">{total_emp}</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
+    </div>
+    <a href="{{{{BASE}}}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
+      {CHIP_SCHEDULE_HTML}
+      <div class="chipLabel" data-key="mySchedule">My Schedule</div>
+    </a>
+    <a href="#" id="exportBtn" class="summaryChip exportChip" style="text-decoration:none;" onclick="goToExport(event)">
+      {CHIP_EXPORT_HTML}
+      <div class="chipLabel" data-key="exportRoster">Export</div>
+    </a>
+    <a href="{{{{BASE}}}}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
+      {CHIP_WAVE_HTML}
+      <div class="chipLabel" id="welcomeName"></div>
+    </a>
+    <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      {CHIP_TRAINING_HTML}
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="{{{{BASE}}}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
+      {CHIP_DIFF_HTML}
+      <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
+  </div>
+"""
+
+
 def import_cta_html(
     cta_href: str = "{BASE}/now/",
     subscribe_href: str = "{BASE}/subscribe/",
     compare_onclick: str = ' onclick="goToRosterDiff(event)"',
 ) -> str:
-    """Same 5-button grid layout as export (Full Roster / Subscribe / Compare + Share / Apps)."""
-    compare_extra = f' href="#"{compare_onclick}'
-    return (
-        '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
-        + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
-        + _btn(
-            "a",
-            "roster-cta-btn--subscribe",
-            "subscribeBtn",
-            "Subscribe",
-            SVG_BELL,
-            f' href="{subscribe_href}"',
-        )
-        + _btn(
-            "a",
-            "roster-cta-btn--compare",
-            "compareBtn",
-            "Compare",
-            SVG_COMPARE,
-            compare_extra,
-        )
-        + _btn(
-            "button",
-            "roster-cta-btn--share shareSiteBtn",
-            "shareSiteBtn",
-            "Share Site",
-            SVG_SHARE_OUT,
-        )
-        + _btn(
-            "button",
-            "roster-cta-btn--apps moreAppsBtn",
-            "moreAppsBtn",
-            "Apps",
-            SVG_APPS_BTN,
-        )
-        + "</nav>\n"
+    """Identical markup/grid classes as export duty pages (6-column pill layout)."""
+    return export_cta_html(
+        cta_href=cta_href,
+        subscribe_href=subscribe_href,
+        compare_onclick=compare_onclick,
     )
+
+
+IMPORT_BOTTOM_CTA_CSS = """    .importBottom {
+      margin-top: auto;
+      padding-top: 14px;
+      position: relative;
+      z-index: 25;
+    }
+    .importBottom .quickActions.roster-cta {
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+"""
+
+IMPORT_BOTTOM_FLEX_OLD = """    .importBottom .quickActions {
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }"""
 
 
 APPLY_LANG_NEW = """  function setCtaLabel(id, text) {
@@ -995,12 +1017,16 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
 """ + EID_OVERLAY_LOAD_JS + """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
     loadEidOverlayScript();
   }

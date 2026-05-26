@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Inject export roster UX (hover preview, screenshots, date picker, etc.) into import HTML pages."""
+"""Sync Import roster pages with Export UX (CTA bar, modals, scripts, date picker, etc.)."""
 
 from __future__ import annotations
 
+import calendar
+import datetime as dt
 import re
 import sys
 from pathlib import Path
@@ -10,24 +12,33 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 IMPORT_DIR = ROOT / "docs" / "import"
 
-CAPTURE_BLOCK = """
-<div id="captureBusy" class="captureBusy">Preparing image...</div>
-<div id="captureSheet" class="captureSheet" aria-hidden="true">
-  <motion class="captureSheetCard">
-    <div class="captureSheetTitle">Share or save image</div>
-    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
-    <div class="captureSheetActions">
-      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
-      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
-    </motion>
-    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
-  </div>
-</div>
-""".replace('<motion class="captureSheetCard">', '<motion class="captureSheetCard">').replace(
-    '<motion class="captureSheetCard">', '<div class="captureSheetCard">'
-).replace('</motion>\n    <button', '</div>\n    <button')
+DATE_TAG_SVG = (
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="4" width="18" height="18" rx="2"/>'
+    '<path d="M16 2v4M8 2v4M3 10h18"/></svg>'
+)
 
-HTML2CANVAS_TAG = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+GO_TO_EXPORT_OLD = """function goToExport(event) {
+  if (event) event.preventDefault();
+  location.href = getSiteRootUrl() + '/';
+}"""
+
+GO_TO_EXPORT_NEW = """function goToExport(event) {
+  if (event) event.preventDefault();
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {
+    var m = (location.pathname || '').match(/(\\d{4}-\\d{2}-\\d{2})/);
+    if (m) iso = m[1];
+  }
+  var root = getSiteRootUrl();
+  if (!iso) {
+    location.href = root + '/';
+    return;
+  }
+  location.href = root + '/date/' + iso + '/';
+}"""
 
 REPARTITION_FN_MARKER = "function repartitionLeaveRowsInDeptCards"
 REPARTITION_FN = """
@@ -78,18 +89,48 @@ EMP_ROW_ONCLICK = re.compile(
     r'<div class="empRow([^"]*)">\s*'
     r'<span class="empName" style="cursor:pointer;" onclick=\'goToEmployeeSchedule\(([^)]+)\)\'>([^<]+)</span>\s*'
     r'<span class="empStatus" style="color:([^"]+);">([^<]*)</span>\s*'
-    r'</motion>',
-    re.MULTILINE,
-)
-
-# fix typo in regex - should be </motion> -> </div>
-EMP_ROW_ONCLICK = re.compile(
-    r'<div class="empRow([^"]*)">\s*'
-    r'<span class="empName" style="cursor:pointer;" onclick=\'goToEmployeeSchedule\(([^)]+)\)\'>([^<]+)</span>\s*'
-    r'<span class="empStatus" style="color:([^"]+);">([^<]*)</span>\s*'
     r'</div>',
     re.MULTILINE,
 )
+
+FIRST_STYLE_RE = re.compile(r"<style>.*?</style>", re.DOTALL)
+HEADER_RE = re.compile(r'<div class="header">.*?</div>\s*\n\s*(?=<div class="summaryBar">)', re.DOTALL)
+OLD_QUICK_ACTIONS_RE = re.compile(
+    r'<div class="quickActions(?: roster-cta)?">\s*.*?</div>\s*(?=<div class="footer">)',
+    re.DOTALL,
+)
+LOAD_ENHANCE_RE = re.compile(r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);")
+IMPORT_GUARD_MARKER = "/* ===== Import path overrides ===== */"
+SUMMARY_BAR_START = '<div class="summaryBar">'
+DEPT_CARD_MARKER = '<div class="deptCard">'
+CTA_INSIDE_BOTTOM_RE = re.compile(
+    r'<div class="importBottom">\s*<nav class="quickActions roster-cta"[\s\S]*?</nav>\s*',
+    re.DOTALL,
+)
+EXTRA_IMPORT_CHIP_CSS = """
+    a.summaryChip.exportChip .chipVal { color:#059669; }
+    a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
+"""
+
+IMPORT_BOTTOM_FLEX_OLD = """    .importBottom .quickActions {
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }"""
+
+IMPORT_BOTTOM_CTA_CSS = """    .importBottom {
+      margin-top: auto;
+      padding-top: 14px;
+      position: relative;
+      z-index: 25;
+    }
+    .importBottom .quickActions.roster-cta {
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+"""
 
 
 def upgrade_emp_rows(html: str) -> str:
@@ -123,31 +164,26 @@ def patch_reference_date(html: str) -> str:
 
 
 def patch_flatten_future_shifts(html: str) -> str:
-    if "Array.isArray(data.days)" in html:
+    sys.path.insert(0, str(ROOT))
+    from generate_and_send_import import patch_flatten_future_shifts_js
+
+    return patch_flatten_future_shifts_js(html)
+
+
+def inject_modals(html: str, share_html: str, apps_html: str) -> str:
+    if 'id="siteShareSheet"' in html and 'id="siteAppsSheet"' in html:
         return html
-    flatten_old = """  function flattenFutureShifts(data, fromIso) {
-    var out = [];
-    if (!data || !data.schedules) return out;"""
-    flatten_new = """  function flattenFutureShifts(data, fromIso) {
-    var out = [];
-    if (!data) return out;
-    if (Array.isArray(data.days) && data.month) {
-      var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
-      if (mp) {
-        var y = mp[1], mo = mp[2];
-        data.days.forEach(function(d) {
-          if (!d || !d.day) return;
-          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
-          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
-        });
-        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
-        return out.slice(0, 5);
-      }
-    }
-    if (!data.schedules) return out;"""
-    if flatten_old not in html:
-        return html
-    return html.replace(flatten_old, flatten_new, 1)
+    needle = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+    if needle in html:
+        insert = f"\n{share_html}\n{apps_html}\n"
+        return html.replace(needle, insert + needle, 1)
+    if 'id="captureBusy"' in html:
+        return html.replace(
+            '<div id="captureBusy"',
+            f"{share_html}\n{apps_html}\n<div id=\"captureBusy\"",
+            1,
+        )
+    return html
 
 
 def inject_capture_shell(html: str) -> str:
@@ -156,7 +192,22 @@ def inject_capture_shell(html: str) -> str:
     needle = "</div>\n\n<script>\n// Hard-guaranteed import page behavior"
     if needle not in html:
         return html
-    insert = f"\n{CAPTURE_BLOCK}\n{HTML2CANVAS_TAG}\n"
+    capture = """
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+"""
+    html2 = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+    insert = f"\n{capture}\n{html2}\n"
     return html.replace(needle, f"</div>{insert}\n<script>\n// Hard-guaranteed import page behavior", 1)
 
 
@@ -170,15 +221,21 @@ def inject_repartition(html: str) -> str:
 
 
 def replace_export_script(html: str, export_script: str) -> str:
-    if "initEmployeeNextShiftPreview" in html:
+    guard = html.find(IMPORT_GUARD_MARKER)
+    if guard == -1:
         return html
-    start = html.find("<script>\n\n  (function () {\n    function siteRoot()")
+
+    marker = "<script>\n\n  (function () {\n    function siteRoot()"
+    start = html.find(marker)
     if start == -1:
-        start = html.find("<script>\n{script}")
-    end = html.find("/* ===== Import path overrides ===== */")
-    if start == -1 or end == -1:
+        hc = html.find("html2canvas")
+        if hc != -1:
+            start = html.find("<script>", hc)
+    if start == -1 or start >= guard:
         return html
-    return html[:start] + "<script>\n" + export_script + "\n\n" + html[end:]
+
+    content_start = html.find("\n", start) + 1
+    return html[:content_start] + export_script + "\n\n" + html[guard:]
 
 
 def remove_import_ux_duplicate(html: str) -> str:
@@ -190,42 +247,259 @@ def remove_import_ux_duplicate(html: str) -> str:
     )
 
 
-def patch_load_enhancements(html: str) -> str:
-    html = html.replace(
-        "addScript(root + '/install-pwa.js?v=' + ver);\n  addScript(root + '/banner-changer.js');",
-        "addScript(root + '/install-pwa.js?v=' + ver);\n  addScript(root + '/change-alert.js?v=' + ver);\n  addScript(root + '/banner-changer.js');",
-    )
-    html = html.replace(
-        "var ver = '11';",
-        "var ver = '20260514b';",
-    )
-    html = html.replace(
-        "match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//)",
-        "match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//)",
-    )
-    if "syncImportHeaderDate();" in html:
-        html = html.replace("  syncImportHeaderDate();\n", "  repartitionLeaveRowsInDeptCards();\n")
-    elif "repartitionLeaveRowsInDeptCards();" not in html.split("applySavedEmployeeDepartmentFirst();")[0][-500:]:
-        html = html.replace(
-            "  applySavedEmployeeDepartmentFirst();\n",
-            "  repartitionLeaveRowsInDeptCards();\n  applySavedEmployeeDepartmentFirst();\n",
-        )
+def replace_main_style(html: str, export_style: str) -> str:
+    if ".roster-cta-btn" in html and ".siteShareSheet" in html:
+        return html
+    return FIRST_STYLE_RE.sub(f"<style>{export_style}</style>", html, count=1)
+
+
+def page_date_label(html: str) -> tuple[str, str]:
+    m = re.search(r'id="datePicker"[^>]*value="(\d{4}-\d{2}-\d{2})"', html)
+    if not m:
+        m = re.search(r"/(\d{4}-\d{2}-\d{2})/", html)
+    if not m:
+        return "", "Select date"
+    iso = m.group(1)
+    try:
+        d = dt.date.fromisoformat(iso)
+        return iso, d.strftime("%d %B %Y")
+    except ValueError:
+        return iso, iso
+
+
+def patch_header(html: str, lang_toggle_html: str) -> str:
+    iso, date_label = page_date_label(html)
+    min_m = re.search(r'id="datePicker"[^>]*min="([^"]+)"', html)
+    max_m = re.search(r'id="datePicker"[^>]*max="([^"]+)"', html)
+    min_date = min_m.group(1) if min_m else (iso[:7] + "-01" if iso else "")
+    max_date = max_m.group(1) if max_m else ""
+    if iso and not max_date:
+        y, mo = int(iso[:4]), int(iso[5:7])
+        _, dim = calendar.monthrange(y, mo)
+        max_date = f"{y}-{mo:02d}-{dim:02d}"
+
+    header = f"""  <div class="header">
+    {lang_toggle_html}
+    <h1 id="pageTitle" class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
+      <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
+    </h1>
+    <div class="datePickerWrapper">
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true">{DATE_TAG_SVG}</span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></label>
+      <input id="datePicker" type="date" value="{iso}" min="{min_date}" max="{max_date}" aria-label="Select roster date" title="Pick day" />
+    </div>
+  </div>
+"""
+    if HEADER_RE.search(html):
+        return HEADER_RE.sub(header, html, count=1)
     return html
 
 
-def patch_file(path: Path, export_script: str) -> bool:
+def patch_cta_bar(html: str, cta_html: str) -> str:
+    if 'class="quickActions roster-cta"' in html and "shareSiteBtn" in html:
+        return html
+    if OLD_QUICK_ACTIONS_RE.search(html):
+        return OLD_QUICK_ACTIONS_RE.sub(cta_html + "\n    ", html, count=1)
+    return html
+
+
+def extract_employee_total(html: str) -> int:
+    m = re.search(r'id="summarySwitchVal"[^>]*>(\d+)<', html)
+    if m:
+        return int(m.group(1))
+    start = html.find(SUMMARY_BAR_START)
+    end = html.find(DEPT_CARD_MARKER, start if start != -1 else 0)
+    block = html[start:end] if start != -1 and end != -1 else ""
+    if block:
+        m4 = re.search(r'data-key="employees"[^>]*>Employees', block)
+        if m4:
+            before = block[: m4.start()]
+            nums = re.findall(r"<div class=\"chipVal\"[^>]*>(\d+)<", before)
+            if nums:
+                return int(nums[-1])
+        m5 = re.search(r"<div class=\"chipVal\"[^>]*>(\d+)<", block)
+        if m5:
+            return int(m5.group(1))
+    return 0
+
+
+def patch_summary_bar(html: str, bar_html: str) -> str:
+    if (
+        'id="summarySwitchChip"' in html
+        and 'id="trainingBtn"' in html
+        and 'id="diffChipBtn"' in html
+        and 'data-key="departments"' not in html
+        and html.count('id="myScheduleBtn"') <= 1
+    ):
+        return html
+    start = html.find(SUMMARY_BAR_START)
+    end = html.find(DEPT_CARD_MARKER, start + 1 if start != -1 else 0)
+    if start == -1 or end == -1:
+        return html
+    return html[:start] + bar_html.strip() + "\n\n  " + html[end:]
+
+
+def patch_cta_placement(html: str, cta_html: str) -> str:
+    """Keep CTA inside .importBottom so dept reorder (insertBefore importBottom) stays above it."""
+    # Remove CTA wrongly placed between dept cards and importBottom.
+    html = re.sub(
+        r"\n\s*<nav class=\"quickActions roster-cta\"[\s\S]*?</nav>\s*(?=<div class=\"importBottom\">)",
+        "\n  ",
+        html,
+        count=1,
+    )
+    if CTA_INSIDE_BOTTOM_RE.search(html):
+        return CTA_INSIDE_BOTTOM_RE.sub(
+            '<div class="importBottom">\n    ' + cta_html + "\n    ",
+            html,
+            count=1,
+        )
+    return re.sub(
+        r'(<div class="importBottom">)\s*(?!<nav class="quickActions)',
+        r"\1\n    " + cta_html + "\n    ",
+        html,
+        count=1,
+    )
+
+
+def patch_import_bottom_cta_css(html: str) -> str:
+    """Remove legacy flex-wrap CTA bar so export 6-column grid layout applies."""
+    if IMPORT_BOTTOM_FLEX_OLD in html:
+        html = html.replace(IMPORT_BOTTOM_FLEX_OLD, "", 1)
+    dup = """    .importBottom {
+      margin-top: auto;
+      padding-top: 14px;
+    }
+    .importBottom {
+      margin-top: auto;
+      padding-top: 14px;
+      position: relative;
+      z-index: 25;
+    }"""
+    if dup in html:
+        html = html.replace(dup, IMPORT_BOTTOM_CTA_CSS.strip(), 1)
+    elif ".importBottom .quickActions.roster-cta" not in html:
+        html = html.replace(
+            "    .importBottom {\n      margin-top: auto;\n      padding-top: 14px;\n    }",
+            IMPORT_BOTTOM_CTA_CSS.strip(),
+            1,
+        )
+    cta_rule = """    .importBottom .quickActions.roster-cta {
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }"""
+    while html.count(cta_rule) > 1:
+        html = html.replace(cta_rule, "", 1)
+    return html
+
+
+def patch_export_chip_css(html: str) -> str:
+    if "exportChip .chipVal" in html:
+        return html
+    marker = ".welcomeChip.visible {"
+    if marker in html:
+        return html.replace(marker, EXTRA_IMPORT_CHIP_CSS + "    " + marker, 1)
+    return html
+
+
+def inject_import_bootstrap(html: str, bootstrap_js: str) -> str:
+    if "function reorderImportDepartments" in html:
+        return html
+    needle = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+    block = f"<script>\n{bootstrap_js}\n</script>\n"
+    if needle in html:
+        return html.replace(needle, needle + "\n" + block, 1)
+    return html
+
+
+def patch_go_to_export(html: str) -> str:
+    if "location.href = root + '/date/' + iso + '/';" in html:
+        return html
+    if GO_TO_EXPORT_OLD in html:
+        return html.replace(GO_TO_EXPORT_OLD, GO_TO_EXPORT_NEW, 1)
+    return html
+
+
+def dedupe_load_enhancements(html: str) -> str:
+    guard = html.find(IMPORT_GUARD_MARKER)
+    if guard == -1:
+        return html
+    before = html[:guard]
+    after = html[guard:]
+    while LOAD_ENHANCE_RE.search(before):
+        before = LOAD_ENHANCE_RE.sub("", before, count=1)
+    # Keep at most one block after import overrides.
+    seen = False
+
+    def _keep_one(m: re.Match[str]) -> str:
+        nonlocal seen
+        if seen:
+            return ""
+        seen = True
+        return m.group(0)
+
+    after = LOAD_ENHANCE_RE.sub(_keep_one, after)
+    return before + after
+
+
+def patch_load_enhancements_footer(html: str, load_block: str) -> str:
+    guard = html.find(IMPORT_GUARD_MARKER)
+    if guard == -1:
+        return html
+    after = html[guard:]
+    block = load_block.strip()
+    if block in after:
+        return html
+
+    def _repl(_: re.Match[str]) -> str:
+        return block
+
+    if "function loadLocalEnhancements" in after:
+        after = LOAD_ENHANCE_RE.sub(_repl, after, count=1)
+    else:
+        insert_at = after.find("function goToMySchedule")
+        if insert_at != -1:
+            after = after[:insert_at] + block + "\n" + after[insert_at:]
+    return html[:guard] + after
+
+
+def patch_file(
+    path: Path,
+    export_style: str,
+    export_script: str,
+    lang_toggle_html: str,
+    cta_html: str,
+    summary_bar_html: str,
+    bootstrap_js: str,
+    load_block: str,
+    share_html: str,
+    apps_html: str,
+) -> bool:
     text = path.read_text(encoding="utf-8")
-    if ".deptCard" not in text or "Import path overrides" not in text:
+    if ".deptCard" not in text:
         return False
+
     updated = text
+    updated = replace_main_style(updated, export_style)
+    updated = patch_export_chip_css(updated)
+    updated = patch_import_bottom_cta_css(updated)
+    updated = patch_header(updated, lang_toggle_html)
+    updated = patch_summary_bar(updated, summary_bar_html)
+    updated = patch_cta_placement(updated, cta_html)
+    updated = patch_cta_bar(updated, cta_html)
     updated = inject_capture_shell(updated)
+    updated = inject_modals(updated, share_html, apps_html)
     updated = patch_flatten_future_shifts(updated)
     updated = patch_reference_date(updated)
     updated = upgrade_emp_rows(updated)
     updated = inject_repartition(updated)
     updated = replace_export_script(updated, export_script)
     updated = remove_import_ux_duplicate(updated)
-    updated = patch_load_enhancements(updated)
+    updated = dedupe_load_enhancements(updated)
+    updated = patch_load_enhancements_footer(updated, load_block)
+    updated = patch_go_to_export(updated)
+    updated = inject_import_bootstrap(updated, bootstrap_js)
+
     if updated == text:
         return False
     path.write_text(updated, encoding="utf-8", newline="\n")
@@ -234,19 +508,44 @@ def patch_file(path: Path, export_script: str) -> bool:
 
 def main() -> int:
     sys.path.insert(0, str(ROOT))
-    from generate_and_send_import import load_export_ui_template, prepare_export_script_for_import
+    from generate_and_send_import import import_bootstrap_script, load_export_ui_template, prepare_export_script_for_import
+    from roster_cta_snippets import (
+        import_cta_html,
+        import_summary_bar_html,
+        LANG_TOGGLE_HTML,
+        LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+        SITE_APPS_MODAL_HTML,
+        SITE_SHARE_MODAL_HTML,
+    )
 
-    _, export_script = load_export_ui_template(ROOT)
+    export_style, export_script = load_export_ui_template(ROOT)
     export_script = prepare_export_script_for_import(export_script)
     if len(export_script) < 5000:
         print("ERROR: export script too short; template extraction failed")
         return 1
 
+    cta_html = import_cta_html(cta_href="{BASE}/now/", subscribe_href="{BASE}/subscribe/")
+    bootstrap_js = import_bootstrap_script()
+    load_block = LOAD_LOCAL_ENHANCEMENTS_IMPORT.strip()
+
     updated = 0
     for path in sorted(IMPORT_DIR.rglob("index.html")):
-        if path.parent.name in {"fallback", "my-schedules"}:
+        if path.parent.name in {"fallback", "my-schedules", "subscribe"}:
             continue
-        if patch_file(path, export_script):
+        total = extract_employee_total(path.read_text(encoding="utf-8"))
+        summary_html = import_summary_bar_html(total)
+        if patch_file(
+            path,
+            export_style,
+            export_script,
+            LANG_TOGGLE_HTML,
+            cta_html,
+            summary_html,
+            bootstrap_js,
+            load_block,
+            SITE_SHARE_MODAL_HTML,
+            SITE_APPS_MODAL_HTML,
+        ):
             updated += 1
     print(f"patched={updated}")
     return 0

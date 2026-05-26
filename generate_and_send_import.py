@@ -46,9 +46,20 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_SCHEDULE_HTML,
     CHIP_WAVE_HTML,
     import_cta_html,
+    import_summary_bar_html,
     IOS_PERF_VER,
+    LANG_TOGGLE_HTML,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
     PERF_RENDER_CSS,
+    SITE_APPS_MODAL_HTML,
+    SITE_SHARE_MODAL_HTML,
+)
+
+DATE_TAG_SVG = (
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="4" width="18" height="18" rx="2"/>'
+    '<path d="M16 2v4M8 2v4M3 10h18"/></svg>'
 )
 
 CANONICAL_IMPORT_BASE = "https://khalidsaif912.github.io/new/docs/import/"
@@ -422,6 +433,54 @@ _LOAD_ENHANCE_IIFE_RE = re.compile(
     r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);\s*",
 )
 
+FLATTEN_FUTURE_SHIFTS_FN = """  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
+      if (mp) {
+        var y = mp[1], mo = mp[2];
+        data.days.forEach(function(d) {
+          if (!d || !d.day) return;
+          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || d.shift_code || '').trim() });
+        });
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;
+    Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\\d{4})-(\\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
+      var rows = data.schedules[monthKey] || [];
+      rows.forEach(function(r) {
+        if (!r) return;
+        var iso = String(r.date || '').trim();
+        if (!iso && r.day != null && r.day !== '') {
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+        }
+        if (!iso || iso < fromIso) return;
+        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
+      });
+    });
+    out.sort(function(a, b) {
+      return String(a.date).localeCompare(String(b.date));
+    });
+    return out.slice(0, 5);
+  }"""
+
+_FLATTEN_FUTURE_SHIFTS_RE = re.compile(
+    r"  function flattenFutureShifts\(data, fromIso\) \{[\s\S]*?\n  \}(?=\n\n  function formatShortDateParts)",
+)
+
+
+def patch_flatten_future_shifts_js(script: str) -> str:
+    if "Array.isArray(data.days)" in script and "d.code || d.shift_code" in script:
+        return script
+    return _FLATTEN_FUTURE_SHIFTS_RE.sub(lambda _m: FLATTEN_FUTURE_SHIFTS_FN, script, count=1)
+
 
 def sanitize_export_script_for_import(script: str) -> str:
     """
@@ -474,50 +533,39 @@ def prepare_export_script_for_import(script: str) -> str:
             "var m = (location.pathname || '').match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
             "var m = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);",
         ),
+        (
+            "    var isNowPage = (window.location.pathname || '').includes('/now');\n"
+            "    var base = buildDateBasePath();\n"
+            "    var target = base + '/date/' + picker.value + '/';\n"
+            "    if (isNowPage) target += 'now/';",
+            "    var base = buildDateBasePath();\n"
+            "    var target = base + '/date/' + picker.value + '/';",
+        ),
+        (
+            "localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId')",
+            "localStorage.getItem('importSavedEmpId')",
+        ),
+        (
+            "localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName')",
+            "(localStorage.getItem('importSavedEmpName') || '')",
+        ),
+        (
+            "var imp = document.getElementById('importBtn');",
+            "var exp = document.getElementById('exportBtn');",
+        ),
+        (
+            "if (imp) imp.href = base + '/import/';",
+            "if (exp) { /* exportBtn href via import setSummaryChipHrefs */ }",
+        ),
+        (
+            "var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');",
+            "var wid = localStorage.getItem('importSavedEmpId');",
+        ),
     ]
     for old, new in subs:
         script = script.replace(old, new)
 
-    # Import schedules use { month, days: [{day, code}] } not export schedules{} shape.
-    flatten_old = """  function flattenFutureShifts(data, fromIso) {
-    var out = [];
-    if (!data || !data.schedules) return out;"""
-    flatten_new = """  function flattenFutureShifts(data, fromIso) {
-    var out = [];
-    if (!data) return out;
-    if (Array.isArray(data.days) && data.month) {
-      var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
-      if (mp) {
-        var y = mp[1], mo = mp[2];
-        data.days.forEach(function(d) {
-          if (!d || !d.day) return;
-          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
-          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || '').trim() });
-        });
-        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
-        return out.slice(0, 5);
-      }
-    }
-    if (!data.schedules) return out;"""
-    if flatten_old in script:
-        script = script.replace(flatten_old, flatten_new, 1)
-
-    schedules_loop_old = """      rows.forEach(function(r) {
-        var d = String(r && r.date || '');
-        if (!d) return;
-        if (d >= fromIso) out.push(r);
-      });"""
-    schedules_loop_new = """      rows.forEach(function(r) {
-        if (!r) return;
-        var iso = String(r.date || '').trim();
-        if (!iso && r.day != null && r.day !== '') {
-          iso = monthKey + '-' + String(r.day).padStart(2, '0');
-        }
-        if (!iso || iso < fromIso) return;
-        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
-      });"""
-    if schedules_loop_old in script:
-        script = script.replace(schedules_loop_old, schedules_loop_new)
+    script = patch_flatten_future_shifts_js(script)
 
     script = script.replace("titleEyebrow:'Export'", "titleEyebrow:'Import'")
     script = script.replace("titleEyebrow:'الصادر'", "titleEyebrow:'الوارد'")
@@ -633,6 +681,10 @@ def discover_import_roster_catalog(import_root: Path) -> Dict[str, Any]:
                 source = _read_page_roster_source(sample.read_text(encoding="utf-8"))
             except OSError:
                 source = ""
+        # Reject contaminated month pages (e.g. 2026-05 pages generated from JUN 2026 file).
+        src_month = month_key_from_filename(source) if source else None
+        if src_month and src_month != ym:
+            continue
         if not _month_has_roster_file(len(dates), source):
             continue
         available_months.append(ym)
@@ -682,6 +734,12 @@ def _discover_import_dates(import_root: Path) -> List[str]:
             if m and (child / "index.html").is_file():
                 found.append(m.group(1))
     return found
+
+
+def import_bootstrap_script() -> str:
+    """Shared import-only bootstrap (dept order, saved employee pin, leave rows)."""
+    path = Path(__file__).resolve().parent / "scripts" / "import_page_bootstrap.js"
+    return path.read_text(encoding="utf-8")
 
 
 def build_duty_html(
@@ -738,30 +796,7 @@ def build_duty_html(
     depts = sorted(dept_map.items(), key=dept_sort_key)
     dept_count = len(depts)
 
-    summary = f"""
-  <div class="summaryBar">
-    <div class="summaryChip">
-      <div class="chipVal">{total_emp}</div>
-      <div class="chipLabel" data-key="employees">Employees</div>
-    </div>
-    <div class="summaryChip">
-      <div class="chipVal" style="color:#059669;">{dept_count}</div>
-      <div class="chipLabel" data-key="departments">Departments</div>
-    </div>
-    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
-      {CHIP_SCHEDULE_HTML}
-      <div class="chipLabel" data-key="mySchedule">My Schedule</div>
-    </a>
-    <a href="{{BASE}}/" id="exportBtn" class="summaryChip" style="text-decoration:none;">
-      {CHIP_EXPORT_HTML}
-      <div class="chipLabel" data-key="exportRoster">Export</div>
-    </a>
-    <a href="{{BASE}}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
-      {CHIP_WAVE_HTML}
-      <div class="chipLabel" id="welcomeName"></div>
-    </a>
-  </div>
-"""
+    summary = import_summary_bar_html(total_emp)
 
     palette = ["#2563eb","#0891b2","#059669","#dc2626","#7c3aed","#f59e0b","#0ea5e9","#a855f7"]
     order = ["Morning","Afternoon","Night","Standby","Off Day","Annual Leave","Sick Leave","Training","Other"]
@@ -894,6 +929,8 @@ def build_duty_html(
       text-decoration: none;
       cursor: pointer;
     }}
+    a.summaryChip.exportChip .chipVal {{ color:#059669; }}
+    a.summaryChip.exportChip:hover {{ box-shadow:0 8px 20px rgba(5,150,105,.18); }}
     .welcomeChip.visible {{
       display: flex;
     }}
@@ -920,13 +957,13 @@ def build_duty_html(
 <div class="wrap">
 
   <div class="header">
-    <button class="langToggle" id="langToggle" onclick="toggleLang()">ع</button>
+    {LANG_TOGGLE_HTML}
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <span class="dateTag" id="dateTag">📅 {date_label}</span>
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true">{DATE_TAG_SVG}</span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></label>
       <input id="datePicker" type="date" value="{date_iso}" min="{min_date}" max="{max_date}" aria-label="Select roster date" title="Pick day" />
     </div>
   </div>
@@ -943,187 +980,12 @@ def build_duty_html(
 </div>
 
 {CAPTURE_DOM_HTML}
+{SITE_SHARE_MODAL_HTML}
+{SITE_APPS_MODAL_HTML}
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-// Hard-guaranteed import page behavior (independent from other scripts).
-(function() {{
-  var IMPORT_DEPT_ORDER = [
-    'supervisors',
-    'documentation',
-    'import checkers',
-    'release control',
-    'import operators',
-    'flight dispatch (import)',
-    'flight dispatch (export)'
-  ];
-
-  function deptTitleNorm(card) {{
-    var t = card.querySelector('.deptTitle');
-    return (t && t.textContent ? t.textContent : '').trim().toLowerCase();
-  }}
-
-  function findDeptCardByName(deptName) {{
-    var target = String(deptName || '').trim().toLowerCase();
-    if (!target) return null;
-    var cards = Array.from(document.querySelectorAll('.deptCard'));
-    return cards.find(function(c) {{ return deptTitleNorm(c) === target; }}) || null;
-  }}
-
-  function pinDepartmentCardFirst(deptName) {{
-    var card = findDeptCardByName(deptName);
-    if (!card) return false;
-    var cards = Array.from(document.querySelectorAll('.deptCard'));
-    if (!cards.length || cards[0] === card) return true;
-    var parent = card.parentElement;
-    if (parent) parent.insertBefore(card, cards[0]);
-    return true;
-  }}
-
-  function reorderImportDepartments(preferredDept) {{
-    var cards = Array.from(document.querySelectorAll('.deptCard'));
-    if (!cards.length) return;
-    var parent = cards[0].parentElement;
-    if (!parent) return;
-    var bottom = document.querySelector('.importBottom');
-    var preferred = String(preferredDept || '').trim().toLowerCase();
-
-    if (preferred) {{
-      pinDepartmentCardFirst(preferred);
-      cards = Array.from(document.querySelectorAll('.deptCard'));
-    }}
-
-    var order = IMPORT_DEPT_ORDER.slice();
-    if (preferred && order.indexOf(preferred) === -1) {{
-      order.unshift(preferred);
-    }}
-
-    order.forEach(function(dep) {{
-      if (preferred && dep === preferred) return;
-      var card = cards.find(function(c) {{ return deptTitleNorm(c) === dep; }});
-      if (card) {{
-        if (bottom) parent.insertBefore(card, bottom);
-        else parent.appendChild(card);
-      }}
-    }});
-
-    if (preferred) pinDepartmentCardFirst(preferred);
-  }}
-
-  function applySavedEmployeeDepartmentFirst() {{
-    var empId = localStorage.getItem('importSavedEmpId');
-    if (!empId) {{
-      reorderImportDepartments();
-      return;
-    }}
-    var base = (function() {{
-      if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();
-      var p = location.pathname || '';
-      if (p.indexOf('/roster-site/') !== -1) return location.origin + '/roster-site';
-      if (location.hostname && location.hostname.endsWith('github.io')) {{
-        var segs = p.split('/').filter(Boolean);
-        if (segs.length >= 2 && segs[1] === 'docs') return location.origin + '/' + segs[0] + '/docs';
-        return location.origin + (segs.length ? '/' + segs[0] : '');
-      }}
-      return location.origin + '/';
-    }})();
-    fetch(base + '/import/schedules/' + encodeURIComponent(empId) + '.json')
-      .then(function(r) {{ return r.ok ? r.json() : null; }})
-      .then(function(d) {{
-        if (d && d.department) reorderImportDepartments(d.department);
-        else reorderImportDepartments();
-      }})
-      .catch(function() {{ reorderImportDepartments(); }});
-  }}
-
-  function repartitionLeaveRowsInDeptCards() {{
-    document.querySelectorAll('.deptCard').forEach(function(card) {{
-      var other = card.querySelector('details.shiftCard[data-shift="Other"]');
-      if (!other) return;
-      var toMove = [];
-      other.querySelectorAll('.empRow').forEach(function(row) {{
-        var st = row.querySelector('.empStatus');
-        if (!st) return;
-        var raw = (st.textContent || '').trim().toUpperCase();
-        var code = raw.split(/\\s+/)[0];
-        if (code === 'LV' || code === 'AL' || raw.indexOf('ANNUAL') >= 0) toMove.push(row);
-      }});
-      if (!toMove.length) return;
-      var annual = card.querySelector('details.shiftCard[data-shift="Annual Leave"]');
-      if (!annual) {{
-        var template = card.querySelector('details.shiftCard[data-shift="Off Day"]');
-        if (!template) return;
-        annual = template.cloneNode(true);
-        annual.setAttribute('data-shift', 'Annual Leave');
-        annual.style.border = '1px solid #10b98144';
-        annual.style.background = '#d1fae5';
-        var sum = annual.querySelector('.shiftSummary');
-        if (sum) {{ sum.style.background = '#d1fae5'; sum.style.borderBottom = '1px solid #10b98133'; }}
-        var label = annual.querySelector('.shiftLabel');
-        if (label) {{ label.textContent = 'Annual Leave'; label.style.color = '#065f46'; }}
-        var icon = annual.querySelector('.shiftIcon');
-        if (icon) icon.textContent = '✈️';
-        var emptyBody = annual.querySelector('.shiftBody');
-        if (emptyBody) emptyBody.innerHTML = '';
-        other.parentNode.insertBefore(annual, other);
-      }}
-      var body = annual.querySelector('.shiftBody');
-      toMove.forEach(function(row) {{ body.appendChild(row); }});
-      var oc = other.querySelector('.shiftCount');
-      var left = other.querySelectorAll('.empRow').length;
-      if (oc) oc.textContent = String(left);
-      if (!left) other.remove();
-      var ac = annual.querySelector('.shiftCount');
-      if (ac) ac.textContent = String(annual.querySelectorAll('.empRow').length);
-    }});
-  }}
-
-  // Match Export roster logic (Muscat UTC+4): Night 21:00–04:59, Afternoon from 13:00, else Morning.
-  function getImportCurrentShiftGroup() {{
-    var now = new Date();
-    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    var t = muscat.getHours() * 60 + muscat.getMinutes();
-    if (t >= 21 * 60 || t < 5 * 60) return 'Night';
-    if (t >= 13 * 60) return 'Afternoon';
-    return 'Morning';
-  }}
-
-  function syncImportShiftDetailsOpen() {{
-    var shift = getImportCurrentShiftGroup();
-    document.querySelectorAll('details.shiftCard').forEach(function(d) {{
-      d.removeAttribute('open');
-    }});
-    document.querySelectorAll('details.shiftCard[data-shift="' + shift + '"]').forEach(function(d) {{
-      d.setAttribute('open', '');
-    }});
-  }}
-
-  window.reorderImportDepartments = reorderImportDepartments;
-  window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
-
-  repartitionLeaveRowsInDeptCards();
-  applySavedEmployeeDepartmentFirst();
-  syncImportShiftDetailsOpen();
-
-  window.addEventListener('storage', function(e) {{
-    if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {{
-      applySavedEmployeeDepartmentFirst();
-    }}
-  }});
-
-  // Keep footer "Last Updated" fresh on page load.
-  var lastUpdatedEl = document.getElementById('importLastUpdated');
-  if (lastUpdatedEl) {{
-    var now = new Date();
-    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    var day = String(muscat.getDate()).padStart(2, '0');
-    var mon = muscat.toLocaleString('en-US', {{ month: 'short' }}).toUpperCase();
-    var year = muscat.getFullYear();
-    var hh = String(muscat.getHours()).padStart(2, '0');
-    var mm = String(muscat.getMinutes()).padStart(2, '0');
-    lastUpdatedEl.textContent = (day + mon + year + ' / ' + hh + ':' + mm).toUpperCase();
-  }}
-}})();
+{import_bootstrap_script()}
 </script>
 
 <script>
@@ -1169,7 +1031,18 @@ function goToEmployeeSchedule(empName) {{
 
 function goToExport(event) {{
   if (event) event.preventDefault();
-  location.href = getSiteRootUrl() + '/';
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {{
+    var m = (location.pathname || '').match(/(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
+    if (m) iso = m[1];
+  }}
+  var root = getSiteRootUrl();
+  if (!iso) {{
+    location.href = root + '/';
+    return;
+  }}
+  location.href = root + '/date/' + iso + '/';
 }}
 
 function goToRosterDiff(event) {{
@@ -1192,9 +1065,16 @@ function setSummaryChipHrefs() {{
   var my = document.getElementById('myScheduleBtn');
   var exp = document.getElementById('exportBtn');
   var welcome = document.getElementById('welcomeChip');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
   if (my) my.href = base;
   if (exp) exp.href = root + '/';
-  if (welcome) welcome.href = base;
+  if (trn) trn.href = root + '/training/';
+  if (diff) diff.href = root + '/roster-diff/index.html';
+  if (welcome) {{
+    var wid = localStorage.getItem('importSavedEmpId');
+    welcome.href = wid ? base + '?emp=' + encodeURIComponent(wid) : base;
+  }}
 }}
 
 {LOAD_LOCAL_ENHANCEMENTS_IMPORT}
