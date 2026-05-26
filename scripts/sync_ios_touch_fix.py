@@ -13,10 +13,12 @@ _SCRIPTS = ROOT / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 from roster_cta_snippets import (  # noqa: E402
+    EID_OVERLAY_LOAD_JS,
     IOS_PERF_VER,
     LOAD_ENHANCE_BLOCK_RE,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+    OLD_EID_LOAD_RE,
     PERF_RENDER_CSS,
 )
 
@@ -442,14 +444,17 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
         )
         notes.append("perf-css")
 
+    if OLD_EID_LOAD_RE.search(text) and "isEidOverlayDay" not in text:
+        text = OLD_EID_LOAD_RE.sub(EID_OVERLAY_LOAD_JS.strip(), text, count=1)
+        notes.append("eid-window")
+
     if LOAD_ENHANCE_BLOCK_RE.search(text):
-        is_import = "/import/" in text or 'id="exportBtn"' in text and 'goToExport' in text
         replacement = (
             LOAD_LOCAL_ENHANCEMENTS_IMPORT.strip()
             if "function goToExport" in text
             else LOAD_LOCAL_ENHANCEMENTS_EXPORT.strip()
         )
-        if "requestIdleCallback" not in text:
+        if "requestIdleCallback" not in text or "isEidOverlayDay" not in text:
             text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
             notes.append("lazy-enhance")
 

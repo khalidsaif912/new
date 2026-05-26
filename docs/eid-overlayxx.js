@@ -1,13 +1,33 @@
 /**
- * eid-overlay.js
+ * eid-overlayxx.js — عيد (نافذة 3 أيام بتوقيت مسقط)
  * - بالونات تطير من الأسفل — اضغط عليها لتنفجر بألعاب نارية
- * - السرعة تزداد كلما طال وقت المستخدم
  * - ألعاب نارية تلقائية + بالنقر على الخلفية
- * - زر ✕ للإغلاق
+ * - زر ✕ للإغلاق (مرة واحدة لكل جلسة في نفس اليوم)
  */
 
 (function () {
   'use strict';
+
+  var EID_START = '2026-05-27';
+  var EID_END = '2026-05-29';
+
+  function muscatTodayIso() {
+    var n = new Date();
+    var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
+    var d = new Date(t);
+    var y = d.getUTCFullYear();
+    var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
+    var day = ('0' + d.getUTCDate()).slice(-2);
+    return y + '-' + mo + '-' + day;
+  }
+
+  var todayMuscat = muscatTodayIso();
+  if (todayMuscat < EID_START || todayMuscat > EID_END) return;
+
+  var dismissKey = 'eidOverlayDismissed_' + todayMuscat;
+  try {
+    if (sessionStorage.getItem(dismissKey) === '1') return;
+  } catch (e) {}
 
   var CONFIG = {
     fireworkCount:  90,
@@ -582,6 +602,7 @@
     clearInterval(burstTimer);
     clearInterval(balloonTimer);
     window.removeEventListener('resize', drawStars);
+    try { sessionStorage.setItem(dismissKey, '1'); } catch (e) {}
     overlay.style.animation = 'eidFadeOut .5s ease forwards';
     setTimeout(function() {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);

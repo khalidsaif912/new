@@ -2172,11 +2172,21 @@ function goToRosterDiff(event) {
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
-    var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-    var m = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
-    var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-    if (eidDays.indexOf(activeIso) !== -1) {
-      addScript(root + '/eid-overlayxx.js');
+    function muscatTodayIso() {
+      var n = new Date();
+      var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
+      var d = new Date(t);
+      var y = d.getUTCFullYear();
+      var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
+      var day = ('0' + d.getUTCDate()).slice(-2);
+      return y + '-' + mo + '-' + day;
+    }
+    function isEidOverlayDay() {
+      var today = muscatTodayIso();
+      return today >= '2026-05-27' && today <= '2026-05-29';
+    }
+    if (isEidOverlayDay()) {
+      addScript(root + '/eid-overlayxx.js?v=20260527a');
     }
   }
   if (window.requestIdleCallback) {

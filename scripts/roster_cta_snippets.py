@@ -898,6 +898,29 @@ I18N_SHARE_AR = "shareSite:'مشاركة الموقع'"
 I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
+# ── Eid overlay (Muscat calendar, inclusive) — 3 days: 27–29 May 2026 ──
+EID_OVERLAY_START = "2026-05-27"
+EID_OVERLAY_END = "2026-05-29"
+EID_OVERLAY_VER = "20260527a"
+
+EID_OVERLAY_LOAD_JS = f"""
+    function muscatTodayIso() {{
+      var n = new Date();
+      var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
+      var d = new Date(t);
+      var y = d.getUTCFullYear();
+      var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
+      var day = ('0' + d.getUTCDate()).slice(-2);
+      return y + '-' + mo + '-' + day;
+    }}
+    function isEidOverlayDay() {{
+      var today = muscatTodayIso();
+      return today >= '{EID_OVERLAY_START}' && today <= '{EID_OVERLAY_END}';
+    }}
+    if (isEidOverlayDay()) {{
+      addScript(root + '/eid-overlayxx.js?v={EID_OVERLAY_VER}');
+    }}"""
+
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
 IOS_PERF_VER = "20260525c"
 
@@ -923,12 +946,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
-    var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-    var m = (location.pathname || '').match(/\\/date\\/(\\d{4}-\\d{2}-\\d{2})\\//);
-    var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-    if (eidDays.indexOf(activeIso) !== -1) {
-      addScript(root + '/eid-overlayxx.js');
-    }
+""" + EID_OVERLAY_LOAD_JS + """
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
@@ -955,12 +973,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
-    var eidDays = ['2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-06-16', '2026-06-17', '2026-06-18', '2026-06-19'];
-    var m = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{4}-\\d{2}-\\d{2})\\//);
-    var activeIso = m ? m[1] : (new Date()).toISOString().slice(0, 10);
-    if (eidDays.indexOf(activeIso) !== -1) {
-      addScript(root + '/eid-overlayxx.js');
-    }
+""" + EID_OVERLAY_LOAD_JS + """
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
@@ -968,6 +981,14 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
   }
 })();"""
+
+OLD_EID_LOAD_RE = re.compile(
+    r"var eidDays = \[[^\]]+\];\s*"
+    r"var m = \(location\.pathname[^\n]+\n\s*var activeIso[^\n]+\n\s*"
+    r"if \(eidDays\.indexOf\(activeIso\) !== -1\) \{\s*"
+    r"addScript\(root \+ '/eid-overlayxx\.js(?:\?v=[^']*)?'\);\s*\}",
+    re.MULTILINE,
+)
 
 LOAD_ENHANCE_BLOCK_RE = re.compile(
     r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);",
