@@ -13,7 +13,8 @@ _SCRIPTS = ROOT / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 from roster_cta_snippets import (  # noqa: E402
-    EID_OVERLAY_LOAD_JS,
+    EID_CALL_RE,
+    EID_LOAD_BLOCK_RE,
     IOS_PERF_VER,
     LOAD_ENHANCE_BLOCK_RE,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
@@ -445,14 +446,14 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
         )
         notes.append("perf-css")
 
-    if "loadEidOverlayScript" not in text:
-        eid_js = EID_OVERLAY_LOAD_JS.strip()
-        if OLD_EID_TODAY_ONLY_RE.search(text):
-            text = OLD_EID_TODAY_ONLY_RE.sub(lambda _m: eid_js, text, count=1)
-            notes.append("eid-window")
-        elif OLD_EID_LOAD_RE.search(text):
-            text = OLD_EID_LOAD_RE.sub(lambda _m: eid_js, text, count=1)
-            notes.append("eid-window")
+    if "eid-overlayxx" in text or "loadEidOverlayScript" in text or "var eidDays" in text:
+        text2 = EID_LOAD_BLOCK_RE.sub("\n", text)
+        text2 = EID_CALL_RE.sub("\n", text2)
+        text2 = OLD_EID_TODAY_ONLY_RE.sub("", text2)
+        text2 = OLD_EID_LOAD_RE.sub("", text2)
+        if text2 != text:
+            text = text2
+            notes.append("eid-removed")
 
     if LOAD_ENHANCE_BLOCK_RE.search(text):
         replacement = (
@@ -460,7 +461,10 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
             if "function goToExport" in text
             else LOAD_LOCAL_ENHANCEMENTS_EXPORT.strip()
         )
-        if "requestIdleCallback" not in text or "loadEidOverlayScript" not in text:
+        if "loadEidOverlayScript" in text or "var eidDays" in text:
+            text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
+            notes.append("load-enhance-clean")
+        elif "requestIdleCallback" not in text:
             text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
             notes.append("lazy-enhance")
 
