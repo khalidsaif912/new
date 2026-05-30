@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../../../ios-tap-fix.js?v=20260531a"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260531a"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -225,7 +225,7 @@
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS */
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
     .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
@@ -254,49 +254,6 @@
     .header::before,
     .header::after {
       pointer-events:none;
-    }
-
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-
-    .header::before,
-    .header::after {
-      pointer-events:none;
-    }
-    .summaryBar {
-      position:relative;
-      z-index:30;
-      isolation:isolate;
-    }
-    .summaryBar a.summaryChip,
-    .summaryBar button.summaryChip,
-    .quickActions.roster-cta,
-    .quickActions .roster-cta-btn,
-    .importBottom .quickActions.roster-cta,
-    .importBottom .roster-cta-btn,
-    .topDock .dockCard.dockAction,
-    .topDock .dockCard.savedChip,
-    .topDock button.dockCard {
-      position:relative;
-      z-index:1;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-    .summaryBar a.summaryChip *,
-    .summaryBar button.summaryChip *,
-    .quickActions.roster-cta-btn .roster-cta-icon,
-    .quickActions.roster-cta-btn .roster-cta-label,
-    .topDock .dockCard * {
-      pointer-events:none;
-    }
-    .importBottom,
-    .quickActions.roster-cta {
-      position:relative;
-      z-index:25;
     }
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -875,7 +832,6 @@
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
@@ -1042,7 +998,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1102,7 +1058,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1130,7 +1086,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1201,7 +1157,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1244,7 +1200,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1327,7 +1283,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1391,7 +1347,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1518,7 +1474,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1570,7 +1526,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1650,7 +1606,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 12:31</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 22:43</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026 Version2.xlsx</strong>
   </div>
 
@@ -2097,9 +2053,6 @@ function goToEmployeeSchedule(empName) {
 
   function resyncTodayIfNeeded() {
     if (!path.includes('/date/')) return;
-    try {
-      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
-    } catch (e) {}
     try {
       if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
     } catch (e) {}
