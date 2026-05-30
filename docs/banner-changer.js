@@ -239,11 +239,44 @@
     return Array.from(document.querySelectorAll('.header, .topbar'));
   }
 
+  function syncEarlyBannerStyle(name) {
+    if (!name) return;
+    const url = bannerUrl(name);
+    const pos = getBannerPosition(name);
+    let early = document.getElementById('banner-early-style');
+    if (!early) {
+      early = document.createElement('style');
+      early.id = 'banner-early-style';
+      document.head.appendChild(early);
+    }
+    early.textContent =
+      'html.' +
+      EARLY_CLASS +
+      ' .header,html.' +
+      EARLY_CLASS +
+      ' .topbar{background-image:url("' +
+      url.replace(/"/g, '') +
+      '")!important;background-size:cover!important;background-position:' +
+      pos +
+      '!important;background-repeat:no-repeat!important}' +
+      'html.' +
+      EARLY_CLASS +
+      ' .header::before,html.' +
+      EARLY_CLASS +
+      ' .topbar::before,html.' +
+      EARLY_CLASS +
+      ' .header::after,html.' +
+      EARLY_CLASS +
+      ' .topbar::after{opacity:0!important}';
+    document.documentElement.classList.add(EARLY_CLASS);
+  }
+
   function applyBanner(name) {
     const targets = getBannerTargets();
     if (!targets.length) return;
     const url = bannerUrl(name);
     const pos = getBannerPosition(name);
+    syncEarlyBannerStyle(name);
     targets.forEach(function (el) {
       el.setAttribute('data-banner', name);
       el.style.backgroundImage = "url('" + url + "')";
