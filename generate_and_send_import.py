@@ -504,6 +504,11 @@ def sanitize_export_script_for_import(script: str) -> str:
     return script
 
 
+_SET_SUMMARY_HREFS_RE = re.compile(
+    r"function setSummaryChipHrefs\(\)\s*\{[\s\S]*?\n\}\s*",
+)
+
+
 def prepare_export_script_for_import(script: str) -> str:
     """Adapt export roster JS for /import/ paths and schedules."""
     script = sanitize_export_script_for_import(script)
@@ -549,23 +554,33 @@ def prepare_export_script_for_import(script: str) -> str:
             "localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName')",
             "(localStorage.getItem('importSavedEmpName') || '')",
         ),
-        (
-            "var imp = document.getElementById('importBtn');",
-            "var exp = document.getElementById('exportBtn');",
-        ),
-        (
-            "if (imp) imp.href = base + '/import/';",
-            "if (exp) { /* exportBtn href via import setSummaryChipHrefs */ }",
-        ),
-        (
-            "var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');",
-            "var wid = localStorage.getItem('importSavedEmpId');",
-        ),
     ]
     for old, new in subs:
         script = script.replace(old, new)
 
+    import_my_sched = (
+        "(typeof _importBase === 'function' ? _importBase() : (getSiteRootUrl() + '/import'))"
+        " + '/my-schedules/index.html'"
+    )
+    script = script.replace(
+        "var base = getSiteRootUrl() + '/my-schedules/index.html';",
+        f"var base = {import_my_sched};",
+    )
+    script = script.replace(
+        "var base = getSiteRootUrl() + '/my-schedules/index.html'",
+        f"var base = {import_my_sched}",
+    )
+
     script = patch_flatten_future_shifts_js(script)
+
+    script, _ = _SET_SUMMARY_HREFS_RE.subn("", script, count=1)
+    script = re.sub(r"\nsetSummaryChipHrefs\(\);\s*", "\n", script)
+    script = re.sub(
+        r"setLocalCtaLinks\(\);\s*\nsetSummaryChipHrefs\(\);\s*\n",
+        "setLocalCtaLinks();\n",
+        script,
+        count=1,
+    )
 
     script = script.replace("titleEyebrow:'Export'", "titleEyebrow:'Import'")
     script = script.replace("titleEyebrow:'الصادر'", "titleEyebrow:'الوارد'")
@@ -1060,22 +1075,36 @@ function goToRosterDiff(event) {{
 }})();
 
 function setSummaryChipHrefs() {{
-  var base = _importBase() + '/my-schedules/index.html';
+  var importBase = _importBase() + '/my-schedules/index.html';
   var root = getSiteRootUrl();
   var my = document.getElementById('myScheduleBtn');
   var exp = document.getElementById('exportBtn');
   var welcome = document.getElementById('welcomeChip');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
-  if (my) my.href = base;
-  if (exp) exp.href = root + '/';
+  if (my) my.href = importBase;
+  if (exp) {{
+    var iso = '';
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) iso = picker.value;
+    if (!iso) {{
+      var pm = (location.pathname || '').match(/\\/(?:import\\/date|import)\\/(\\d{{4}}-\\d{{2}}-\\d{{2}})\\//);
+      if (pm) iso = pm[1];
+      if (!iso) {{
+        var m2 = (location.pathname || '').match(/(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
+        if (m2) iso = m2[1];
+      }}
+    }}
+    exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
+  }}
   if (trn) trn.href = root + '/training/';
   if (diff) diff.href = root + '/roster-diff/index.html';
   if (welcome) {{
     var wid = localStorage.getItem('importSavedEmpId');
-    welcome.href = wid ? base + '?emp=' + encodeURIComponent(wid) : base;
+    welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
   }}
 }}
+setSummaryChipHrefs();
 
 {LOAD_LOCAL_ENHANCEMENTS_IMPORT}
 

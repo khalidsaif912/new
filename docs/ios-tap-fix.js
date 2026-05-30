@@ -50,6 +50,8 @@
 
   function fixPlaceholderHrefs() {
     var base = siteRootUrl();
+    var isImport = (location.pathname || '').indexOf('/import/') >= 0;
+    var importRoot = base + '/import';
     document.querySelectorAll('a[href]').forEach(function (a) {
       var h = a.getAttribute('href') || '';
       if (h.indexOf('{BASE}') === -1 && h.indexOf('{{BASE}}') === -1) return;
@@ -58,10 +60,22 @@
     document.querySelectorAll('a[href="#"], a[href=""]').forEach(function (a) {
       if (!a.closest('.summaryBar, .quickActions, .topDock')) return;
       var id = a.id || '';
-      var base = siteRootUrl();
-      if (id === 'myScheduleBtn') a.setAttribute('href', base + '/my-schedules/index.html');
-      else if (id === 'importBtn') a.setAttribute('href', base + '/import/');
-      else if (id === 'trainingBtn') a.setAttribute('href', base + '/training/');
+      if (id === 'myScheduleBtn') {
+        a.setAttribute(
+          'href',
+          (isImport ? importRoot : base) + '/my-schedules/index.html'
+        );
+      } else if (id === 'importBtn') a.setAttribute('href', base + '/import/');
+      else if (id === 'exportBtn') {
+        var iso = '';
+        var picker = document.getElementById('datePicker');
+        if (picker && picker.value) iso = picker.value;
+        if (!iso) {
+          var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+          if (m) iso = m[1];
+        }
+        a.setAttribute('href', iso ? base + '/date/' + iso + '/' : base + '/');
+      } else if (id === 'trainingBtn') a.setAttribute('href', base + '/training/');
       else if (id === 'diffChipBtn') a.setAttribute('href', base + '/roster-diff/index.html');
     });
   }

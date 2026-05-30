@@ -286,7 +286,20 @@ function setSummaryChipHrefs() {
       : rootUrl + '/my-schedules/index.html';
   }
   if (imp) imp.href = rootUrl + '/import/';
-  if (exp) exp.href = rootUrl + '/';
+  if (exp) {
+    var iso = '';
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) iso = picker.value;
+    if (!iso) {
+      var pm = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+      if (pm) iso = pm[1];
+      if (!iso) {
+        var m2 = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+        if (m2) iso = m2[1];
+      }
+    }
+    exp.href = iso ? (rootUrl + '/date/' + iso + '/') : (rootUrl + '/');
+  }
   if (trn) trn.href = rootPath + '/training/';
   if (diff) diff.href = rootUrl + '/roster-diff/index.html';
   if (welcome) {

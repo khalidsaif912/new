@@ -2203,7 +2203,7 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
 
 function goToEmployeeSchedule(empName) {
   var match = empName.match(/-\s*(\d{3,})/);
-  var base = getSiteRootUrl() + '/my-schedules/index.html';
+  var base = (typeof _importBase === 'function' ? _importBase() : (getSiteRootUrl() + '/import')) + '/my-schedules/index.html';
 
   if (match) {
     location.href = base + '?emp=' + encodeURIComponent(match[1]);
@@ -2775,30 +2775,12 @@ function setLocalCtaLinks() {
   if (c2) c2.href = root + '/subscribe/';
 }
 
-function setSummaryChipHrefs() {
-  var base = getSiteRootUrl();
-  var my = document.getElementById('myScheduleBtn');
-  var exp = document.getElementById('exportBtn');
-  var trn = document.getElementById('trainingBtn');
-  var diff = document.getElementById('diffChipBtn');
-  var welcome = document.getElementById('welcomeChip');
-  if (my) my.href = base + '/my-schedules/index.html';
-  if (exp) { /* exportBtn href via import setSummaryChipHrefs */ }
-  if (trn) trn.href = base + '/training/';
-  if (diff) diff.href = base + '/roster-diff/index.html';
-  if (welcome) {
-    var wid = localStorage.getItem('importSavedEmpId');
-    var wbase = base + '/my-schedules/index.html';
-    welcome.href = wid ? wbase + '?emp=' + encodeURIComponent(wid) : wbase;
-  }
-}
 function goToTraining(e) {
   if (e) e.preventDefault();
   var root = getSiteRootPath();
   location.href = root + '/training/';
 }
 setLocalCtaLinks();
-setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
 
@@ -2870,7 +2852,7 @@ startSummarySwitchLoop();
 function goToMySchedule(event) {
   if (event) event.preventDefault();
   var id = localStorage.getItem('importSavedEmpId');
-  var base = getSiteRootUrl() + '/my-schedules/index.html';
+  var base = (typeof _importBase === 'function' ? _importBase() : (getSiteRootUrl() + '/import')) + '/my-schedules/index.html';
   location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
 }
 
@@ -3318,6 +3300,38 @@ function goToRosterDiff(event) {
     img.src = iconUrl;
   });
 })();
+
+function setSummaryChipHrefs() {
+  var importBase = _importBase() + '/my-schedules/index.html';
+  var root = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var exp = document.getElementById('exportBtn');
+  var welcome = document.getElementById('welcomeChip');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  if (my) my.href = importBase;
+  if (exp) {
+    var iso = '';
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) iso = picker.value;
+    if (!iso) {
+      var pm = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+      if (pm) iso = pm[1];
+      if (!iso) {
+        var m2 = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+        if (m2) iso = m2[1];
+      }
+    }
+    exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
+  }
+  if (trn) trn.href = root + '/training/';
+  if (diff) diff.href = root + '/roster-diff/index.html';
+  if (welcome) {
+    var wid = localStorage.getItem('importSavedEmpId');
+    welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
+  }
+}
+setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
