@@ -247,6 +247,10 @@
     }
     .tips-pill:hover{background:rgba(255,255,255,.1);color:var(--ink)}
     .search-form{display:flex;gap:8px;align-items:center}
+    .search-id-row{
+      display:flex;align-items:center;gap:8px;
+      flex:1 1 auto;min-width:0;
+    }
     .search-avatar-wrap{
       display:flex;align-items:center;gap:4px;flex:0 0 auto;
     }
@@ -1380,13 +1384,17 @@
       .topbar-inner{ padding:10px 14px; gap:8px; }
       .search-section{ padding:10px 14px 12px; }
       .search-form{ flex-wrap:wrap; width:100%; row-gap:8px; }
-      .search-avatar-wrap{ order:0; }
-      .id-input{
-        order:1;
+      .search-id-row{
         flex:1 1 100%;
         width:100%;
         min-width:0;
-        max-width:100%;
+      }
+      .search-avatar-wrap{ flex:0 0 auto; }
+      .id-input{
+        flex:1 1 auto;
+        width:auto;
+        min-width:0;
+        max-width:none;
       }
       .id-input .search-input{
         flex:1 1 auto;
@@ -1399,8 +1407,9 @@
         appearance:none;
       }
       .id-prefix{ min-height:44px; }
+      .search-avatar,
+      .search-change-btn{ width:44px; height:44px; min-height:44px; }
       .search-btn{
-        order:2;
         flex:1 1 100%;
         width:100%;
         min-height:44px;
@@ -1456,14 +1465,16 @@
   <section class="search-section">
     <form id="searchForm">
       <div class="search-form">
-        <div class="search-avatar-wrap" id="searchAvatarWrap" style="display:none">
-          <div class="search-avatar" id="searchAvatar"></div>
-          <button class="search-change-btn" type="button" id="searchChangeBtn" style="display:none"></button>
-        </div>
-        <div class="id-input">
-          <span class="id-prefix">SN</span>
-          <input class="search-input" id="empId" inputmode="numeric" autocomplete="off"
-                 placeholder="e.g. 12345" pattern="[0-9]+" required/>
+        <div class="search-id-row">
+          <div class="search-avatar-wrap" id="searchAvatarWrap" style="display:none">
+            <div class="search-avatar" id="searchAvatar"></div>
+            <button class="search-change-btn" type="button" id="searchChangeBtn" style="display:none"></button>
+          </div>
+          <div class="id-input">
+            <span class="id-prefix">SN</span>
+            <input class="search-input" id="empId" inputmode="numeric" autocomplete="off"
+                   placeholder="e.g. 8715" pattern="[0-9]+" required/>
+          </div>
         </div>
         <button class="search-btn" type="submit" id="sbtn">📅 View</button>
 </div>
@@ -1629,7 +1640,7 @@
         heroTitle:'Your roster in one view',
         heroDesc:'Enter your Employee ID to view the month, export as PDF, Image, or add to your calendar.',
         tipsTitle:'Help & Tips',tipsSub:'Quick help for using the roster.',
-        langBtn:'ع',back:'← Back',ph:'e.g. 12345',sbtn:'📅 View',tipsBtn:'❔ Tips',
+        langBtn:'ع',back:'← Back',ph:'e.g. 8715',sbtn:'📅 View',tipsBtn:'❔ Tips',
         loading:'Loading…',notFound:'Employee not found',
         notFoundSub:'ID not in the system. Please check and try again.',
         e1:'Search your schedule',e2:'Enter your Employee ID above to view your monthly roster.',
@@ -1653,7 +1664,7 @@
         heroTitle:'جدولك في عرض واحد',
         heroDesc:'أدخل رقمك الوظيفي لعرض الشهر، ثم حمّل PDF/صورة أو أضفه للتقويم.',
         tipsTitle:'مساعدة ونصائح',tipsSub:'مساعدة سريعة لاستخدام الجدول.',
-        langBtn:'EN',back:'رجوع →',ph:'مثال: 12345',sbtn:'📅 عرض',tipsBtn:'❔ نصائح',
+        langBtn:'EN',back:'رجوع →',ph:'مثال: 8715',sbtn:'📅 عرض',tipsBtn:'❔ نصائح',
         loading:'جاري التحميل…',notFound:'لم يُعثر على موظف',
         notFoundSub:'الرقم غير موجود في النظام. تحقق وأعد المحاولة.',
         e1:'ابحث عن جدولك',e2:'أدخل رقمك الوظيفي أعلاه لعرض مناوباتك الشهرية.',
