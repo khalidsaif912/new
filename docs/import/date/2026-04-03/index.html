@@ -875,8 +875,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     @media (max-width:480px){
       .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
-      .header .bannerTitleMain { font-size:22px; }
-      body.ar .header .bannerTitleMain { font-size:21px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
@@ -953,6 +951,73 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       40% { transform: rotate(-6deg); }
     }
   </style>
+
+  <meta name="theme-color" content="#f4354b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <script>
+  (function () {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var p = siteRoot();
+    var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
+    if (!p) base = location.origin + '/';
+    var pv = '13';
+    var imp = (location.pathname || '').indexOf('/import/') !== -1;
+    var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
+    var mlinks = document.querySelectorAll('link[rel="manifest"]');
+    var link = mlinks.length ? mlinks[0] : null;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = man;
+    for (var i = 1; i < mlinks.length; i++) mlinks[i].remove();
+    var touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/icon-192.png';
+    try {
+      var bn = localStorage.getItem('roster_banner_choice');
+      if (bn && /^banner\d+\.jpg$/i.test(bn)) {
+        var bUrl = base + 'assets/banners/' + bn;
+        if (!document.getElementById('banner-early-style')) {
+          var bes = document.createElement('style');
+          bes.id = 'banner-early-style';
+          bes.textContent =
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}' +
+            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{opacity:0!important}';
+          document.head.appendChild(bes);
+        }
+        if (!document.querySelector('link[data-banner-preload="1"]')) {
+          var bp = document.createElement('link');
+          bp.rel = 'preload';
+          bp.as = 'image';
+          bp.href = bUrl;
+          bp.setAttribute('data-banner-preload', '1');
+          document.head.appendChild(bp);
+        }
+        document.documentElement.classList.add('roster-banner-early');
+      }
+    } catch (bannerEarlyErr) {}
+  })();
+  </script>
+
 </head>
 <body>
 <div class="wrap">

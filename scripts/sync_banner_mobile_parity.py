@@ -1,7 +1,16 @@
+#!/usr/bin/env python3
+"""Unify roster banner appearance on mobile with desktop."""
+
+from __future__ import annotations
+
+import re
+import sys
 from pathlib import Path
 
-# Matches generate_and_send.py ROSTER_PWA_HEAD_SNIPPET: resolves manifest for GitHub Pages + /roster-site/
-HEAD_INJECT = """
+ROOT = Path(__file__).resolve().parent.parent
+DOCS = ROOT / "docs"
+
+PWA_HEAD_BLOCK = """
   <meta name="theme-color" content="#f4354b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -44,7 +53,7 @@ HEAD_INJECT = """
     touch.href = base + 'assets/icons/icon-192.png';
     try {
       var bn = localStorage.getItem('roster_banner_choice');
-      if (bn && /^banner\d+\.jpg$/i.test(bn)) {
+      if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {
         var bUrl = base + 'assets/banners/' + bn;
         if (!document.getElementById('banner-early-style')) {
           var bes = document.createElement('style');
@@ -69,26 +78,52 @@ HEAD_INJECT = """
   </script>
 """
 
-BODY_INJECT = """
-<script src="install-pwa.js?v=13" defer></script>
-"""
+BANNER_TITLE_SHRINK_RE = re.compile(
+    r"\s*\.header \.bannerTitleMain \{ font-size:22px; \}\s*"
+    r"body\.ar \.header \.bannerTitleMain \{ font-size:21px; \}\s*",
+    re.MULTILINE,
+)
 
 
-def patch_html_file(path: Path):
-    html = path.read_text(encoding="utf-8")
-    if 'rel="manifest"' not in html and 'siteRoot()' not in html and "</head>" in html:
-        html = html.replace("</head>", HEAD_INJECT + "\n</head>")
-    if "install-pwa.js" not in html and "</body>" in html:
-        html = html.replace("</body>", BODY_INJECT + "\n</body>")
-    path.write_text(html, encoding="utf-8")
-    print(f"Patched: {path}")
+def patch_html(text: str, path: Path) -> tuple[str, list[str]]:
+    notes: list[str] = []
+    if 'class="header"' not in text and "class='header'" not in text:
+        return text, notes
+
+    new_text, n = BANNER_TITLE_SHRINK_RE.subn("\n      ", text)
+    if n:
+        notes.append("drop-mobile-title-shrink")
+        text = new_text
+
+    if "background-position:center!important" in text:
+        text = text.replace(
+            "background-position:center!important",
+            "background-position:62% center!important",
+        )
+        notes.append("banner-pos-62")
+
+    if 'name="theme-color"' not in text and "</head>" in text:
+        rel = str(path.relative_to(DOCS)).replace("\\", "/")
+        if rel.startswith("import/") and "my-schedules" not in rel:
+            text = text.replace("</head>", PWA_HEAD_BLOCK + "\n</head>", 1)
+            notes.append("inject-pwa-head")
+
+    return text, notes
 
 
-def main():
-    docs = Path("docs")
-    for path in docs.rglob("*.html"):
-        patch_html_file(path)
+def main() -> int:
+    changed = 0
+    for path in sorted(DOCS.rglob("*.html")):
+        raw = path.read_text(encoding="utf-8")
+        updated, notes = patch_html(raw, path)
+        if updated != raw:
+            path.write_text(updated, encoding="utf-8", newline="\n")
+            changed += 1
+            if changed <= 8 or "--verbose" in sys.argv:
+                print(f"{path.relative_to(ROOT)}: {', '.join(notes)}")
+    print(f"patched {changed} html files")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

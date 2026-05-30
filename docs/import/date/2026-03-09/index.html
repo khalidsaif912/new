@@ -1025,8 +1025,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     @media (max-width:480px){
       .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
-      .header .bannerTitleMain { font-size:22px; }
-      body.ar .header .bannerTitleMain { font-size:21px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
@@ -1151,7 +1149,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
           var bes = document.createElement('style');
           bes.id = 'banner-early-style';
           bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}' +
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}' +
             'html.roster-banner-early .header::before,html.roster-banner-early .header::after{opacity:0!important}';
           document.head.appendChild(bes);
         }

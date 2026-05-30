@@ -130,7 +130,7 @@ IMPORT_PWA_HEAD_SNIPPET = """
           var bes = document.createElement('style');
           bes.id = 'banner-early-style';
           bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}}' +
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
             'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
           document.head.appendChild(bes);
         }}

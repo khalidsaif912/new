@@ -69,12 +69,6 @@
   function getBannerPosition(name) {
     const layout = BANNER_LAYOUT[name];
     if (!layout) return '62% center';
-    if (
-      layout.positionMobile &&
-      window.matchMedia('(max-width:480px)').matches
-    ) {
-      return layout.positionMobile;
-    }
     return layout.position || '62% center';
   }
 
@@ -176,6 +170,23 @@
       '}',
       '.' + ACTIVE_CLASS + ' .dateTag-icon svg{',
       'filter:' + DATE_TAG_ICON_FILTER + '!important;',
+      '}',
+      '@media (max-width:480px){',
+      '.header.' + ACTIVE_CLASS + ',.topbar.' + ACTIVE_CLASS + '{',
+      'padding:26px 18px 24px!important;',
+      '}',
+      '.' + ACTIVE_CLASS + ' .bannerTitleMain{',
+      'font-size:28px!important;',
+      '}',
+      'body.ar .' + ACTIVE_CLASS + ' .bannerTitleMain{',
+      'font-size:26px!important;',
+      '}',
+      '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow{',
+      'font-size:11px!important;',
+      '}',
+      'body.ar .' + ACTIVE_CLASS + ' .bannerTitleEyebrow{',
+      'font-size:12px!important;',
+      '}',
       '}',
       '.topbar.' + ACTIVE_CLASS + ' .page-title,',
       '.topbar.' + ACTIVE_CLASS + ' .page-title-eyebrow,',

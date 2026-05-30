@@ -1581,8 +1581,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){{
       .wrap            {{ padding:12px 10px 22px; }}
-      .header .bannerTitleMain {{ font-size:22px; }}
-      body.ar .header .bannerTitleMain {{ font-size:21px; }}
       .deptTitle       {{ font-size:16px; }}
       .empName         {{ font-size:14px; }}
       .empStatus       {{ font-size:12px; }}
