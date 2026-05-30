@@ -34,7 +34,7 @@
   ].join(',');
 
   var SKIP_SELECTOR =
-    '.datePickerWrapper, .siteShareSheet.open, .siteAppsSheet.open, .captureSheet.open';
+    '.datePickerWrapper, .siteShareSheet.open, .siteAppsSheet.open, .captureSheet.open, #banner-picker';
 
   function siteRootUrl() {
     if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();

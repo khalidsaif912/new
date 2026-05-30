@@ -239,16 +239,27 @@
     return Array.from(document.querySelectorAll('.header, .topbar'));
   }
 
+  function bannerLiveUrl(name) {
+    return bannerUrl(name) + '?live=' + encodeURIComponent(name.replace(/\.jpg$/i, ''));
+  }
+
+  function forceBannerRepaint(targets) {
+    targets.forEach(function (el) {
+      var img = el.style.getPropertyValue('background-image');
+      el.style.setProperty('background-image', 'none', 'important');
+      void el.offsetHeight;
+      if (img) el.style.setProperty('background-image', img, 'important');
+    });
+  }
+
   function syncEarlyBannerStyle(name) {
     if (!name) return;
-    const url = bannerUrl(name);
+    const url = bannerLiveUrl(name);
     const pos = getBannerPosition(name);
-    let early = document.getElementById('banner-early-style');
-    if (!early) {
-      early = document.createElement('style');
-      early.id = 'banner-early-style';
-      document.head.appendChild(early);
-    }
+    const prev = document.getElementById('banner-early-style');
+    if (prev) prev.remove();
+    const early = document.createElement('style');
+    early.id = 'banner-early-style';
     early.textContent =
       'html.' +
       EARLY_CLASS +
@@ -268,24 +279,35 @@
       ' .header::after,html.' +
       EARLY_CLASS +
       ' .topbar::after{opacity:0!important}';
+    document.head.appendChild(early);
     document.documentElement.classList.add(EARLY_CLASS);
+    var preload = document.querySelector('link[data-banner-preload="1"]');
+    if (preload) preload.href = url;
+  }
+
+  function paintBannerOnTargets(targets, name) {
+    const url = bannerLiveUrl(name);
+    const pos = getBannerPosition(name);
+    targets.forEach(function (el) {
+      el.setAttribute('data-banner', name);
+      el.style.setProperty('background-image', "url('" + url + "')", 'important');
+      el.style.setProperty('background-size', 'cover', 'important');
+      el.style.setProperty('background-position', pos, 'important');
+      el.style.setProperty('background-repeat', 'no-repeat', 'important');
+    });
   }
 
   function applyBanner(name) {
     const targets = getBannerTargets();
     if (!targets.length) return;
     const url = bannerUrl(name);
-    const pos = getBannerPosition(name);
     syncEarlyBannerStyle(name);
-    targets.forEach(function (el) {
-      el.setAttribute('data-banner', name);
-      el.style.backgroundImage = "url('" + url + "')";
-      el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = pos;
-      el.style.backgroundRepeat = 'no-repeat';
-    });
+    paintBannerOnTargets(targets, name);
     setCustomBannerActive(true);
     warmBannerCache(url);
+    requestAnimationFrame(function () {
+      forceBannerRepaint(targets);
+    });
   }
 
   function clearBanner() {
@@ -293,15 +315,23 @@
     if (!targets.length) return;
     targets.forEach(function (el) {
       el.removeAttribute('data-banner');
-      el.style.backgroundImage = '';
-      el.style.backgroundSize = '';
-      el.style.backgroundPosition = '';
-      el.style.backgroundRepeat = '';
+      el.style.removeProperty('background-image');
+      el.style.removeProperty('background-size');
+      el.style.removeProperty('background-position');
+      el.style.removeProperty('background-repeat');
     });
     setCustomBannerActive(false);
     const early = document.getElementById('banner-early-style');
     if (early) early.remove();
     document.documentElement.classList.remove(EARLY_CLASS);
+    var preload = document.querySelector('link[data-banner-preload="1"]');
+    if (preload) preload.remove();
+  }
+
+  function chooseBanner(name, overlay) {
+    saveBannerChoice(name);
+    applyBanner(name);
+    if (overlay && overlay.parentNode) overlay.remove();
   }
 
   function createChangerBtn() {
@@ -421,11 +451,22 @@
       wrap.appendChild(img);
       grid.appendChild(wrap);
       lazyImgs.push(img);
-      wrap.onclick = function () {
-        saveBannerChoice(name);
-        applyBanner(name);
-        overlay.remove();
-      };
+      (function (bannerName) {
+        var picked = false;
+        function pick(e) {
+          if (picked) return;
+          picked = true;
+          if (e && e.preventDefault) e.preventDefault();
+          if (e && e.stopPropagation) e.stopPropagation();
+          chooseBanner(bannerName, overlay);
+        }
+        wrap.setAttribute('role', 'button');
+        wrap.setAttribute('tabindex', '0');
+        wrap.style.touchAction = 'manipulation';
+        wrap.style.webkitTapHighlightColor = 'transparent';
+        wrap.addEventListener('click', pick);
+        wrap.addEventListener('touchend', pick, { passive: false });
+      })(name);
     });
 
     if ('IntersectionObserver' in window) {
@@ -454,6 +495,13 @@
       clearBanner();
       overlay.remove();
     };
+
+    document.getElementById('resetBanner').addEventListener('touchend', function (e) {
+      e.preventDefault();
+      localStorage.removeItem(BANNER_KEY);
+      clearBanner();
+      overlay.remove();
+    }, { passive: false });
 
     document.getElementById('closePicker').onclick = function () {
       overlay.remove();
