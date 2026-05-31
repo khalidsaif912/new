@@ -20,6 +20,8 @@
       quicklistSub: 'Shopping lists',
       games: 'Memory Games',
       gamesSub: 'Roster games hub',
+      store: 'Mobhar Store · متجر مُبهر',
+      storeSub: 'Electronics & gadgets',
     },
     ar: {
       btn: 'تطبيقات',
@@ -36,6 +38,8 @@
       quicklistSub: 'سجل المنزل',
       games: 'ألعاب الذاكرة',
       gamesSub: 'مركز ألعاب الروستر',
+      store: 'متجر مُبهر · Mobhar Store',
+      storeSub: 'أجهزة وتسوق',
     },
   };
 
@@ -70,11 +74,16 @@
     }
     sheet.querySelectorAll('[data-i18n]').forEach(function (el) {
       var id = el.getAttribute('data-i18n');
-      if (id) el.textContent = t(id);
+      if (!id) return;
+      var val = t(id);
+      if (val && val !== id) el.textContent = val;
     });
     sheet.querySelectorAll('[data-i18n-sub]').forEach(function (el) {
       var id = el.getAttribute('data-i18n-sub');
-      if (id) el.textContent = t(id + 'Sub');
+      if (!id) return;
+      var subKey = id + 'Sub';
+      var val = t(subKey);
+      if (val && val !== subKey) el.textContent = val;
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
   }

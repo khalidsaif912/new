@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from pathlib import Path
 
-OLD = "var ver = '20260525c';"
-NEW = "var ver = '20260531a';"
+OLD = "var ver = '20260531a';"
+NEW = "var ver = '20260601b';"
 root = Path(__file__).resolve().parents[1] / "docs"
 n = 0
 for p in root.rglob("*.html"):

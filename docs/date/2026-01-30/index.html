@@ -198,7 +198,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
@@ -228,7 +228,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       z-index:25;
     }
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       cursor:pointer;
@@ -756,6 +756,16 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
+      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes siteAppsStorePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+    .siteAppsLink--store,
     .siteAppsLink--games {
       grid-column: 1 / -1;
       flex-direction: row;
@@ -764,11 +774,19 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       padding-inline: 14px;
       gap: 12px;
     }
+    .siteAppsLink--store {
+      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+      border-color: #fdba74;
+    }
+    .siteAppsLink--store .siteAppsLink-icon {
+      flex-shrink: 0;
+    }
     .siteAppsLink--games .siteAppsLink-icon {
       background: #fdf2f8;
       border-color: #fbcfe8;
       flex-shrink: 0;
     }
+    .siteAppsLink--store .siteAppsLink-text,
     .siteAppsLink--games .siteAppsLink-text {
       display: flex;
       flex-direction: column;
@@ -776,6 +794,8 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       gap: 2px;
       flex: 1;
     }
+    .siteAppsLink--store .siteAppsLink-title,
+    .siteAppsLink--store .siteAppsLink-sub,
     .siteAppsLink--games .siteAppsLink-title,
     .siteAppsLink--games .siteAppsLink-sub {
       text-align: start;

@@ -91,6 +91,16 @@ SVG_APP_GAME = (
     '<rect x="2" y="6" width="20" height="12" rx="2"/>'
     '</svg>'
 )
+SVG_APP_STORE = (
+    '<svg class="siteAppsStoreSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" '
+    'stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M3 10h18"/>'
+    '<path d="M5 10l1.5-5h11L19 10"/>'
+    '<path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/>'
+    '<path d="M10 20v-5h4v5"/>'
+    '<path d="M12 7V5"/>'
+    '</svg>'
+)
 
 
 def _chip_svg(paths: str, *, size: int = 22, stroke: str = "#1e40af") -> str:
@@ -651,6 +661,16 @@ SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ════
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
+      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes siteAppsStorePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+    .siteAppsLink--store,
     .siteAppsLink--games {
       grid-column: 1 / -1;
       flex-direction: row;
@@ -659,11 +679,19 @@ SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ════
       padding-inline: 14px;
       gap: 12px;
     }
+    .siteAppsLink--store {
+      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+      border-color: #fdba74;
+    }
+    .siteAppsLink--store .siteAppsLink-icon {
+      flex-shrink: 0;
+    }
     .siteAppsLink--games .siteAppsLink-icon {
       background: #fdf2f8;
       border-color: #fbcfe8;
       flex-shrink: 0;
     }
+    .siteAppsLink--store .siteAppsLink-text,
     .siteAppsLink--games .siteAppsLink-text {
       display: flex;
       flex-direction: column;
@@ -671,6 +699,8 @@ SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ════
       gap: 2px;
       flex: 1;
     }
+    .siteAppsLink--store .siteAppsLink-title,
+    .siteAppsLink--store .siteAppsLink-sub,
     .siteAppsLink--games .siteAppsLink-title,
     .siteAppsLink--games .siteAppsLink-sub {
       text-align: start;
@@ -719,6 +749,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-icon">{SVG_APP_CART}</span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
         <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
+        <span class="siteAppsLink-icon">{SVG_APP_STORE}</span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store · متجر مُبهر</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        </span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon">{SVG_APP_GAME}</span>
@@ -921,7 +958,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260531a"
+IOS_PERF_VER = "20260601b"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {

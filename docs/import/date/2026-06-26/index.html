@@ -275,7 +275,7 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
@@ -305,7 +305,7 @@
       z-index:25;
     }
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       cursor:pointer;
@@ -932,6 +932,16 @@
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
+      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes siteAppsStorePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+    .siteAppsLink--store,
     .siteAppsLink--games {
       grid-column: 1 / -1;
       flex-direction: row;
@@ -940,11 +950,19 @@
       padding-inline: 14px;
       gap: 12px;
     }
+    .siteAppsLink--store {
+      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+      border-color: #fdba74;
+    }
+    .siteAppsLink--store .siteAppsLink-icon {
+      flex-shrink: 0;
+    }
     .siteAppsLink--games .siteAppsLink-icon {
       background: #fdf2f8;
       border-color: #fbcfe8;
       flex-shrink: 0;
     }
+    .siteAppsLink--store .siteAppsLink-text,
     .siteAppsLink--games .siteAppsLink-text {
       display: flex;
       flex-direction: column;
@@ -952,6 +970,8 @@
       gap: 2px;
       flex: 1;
     }
+    .siteAppsLink--store .siteAppsLink-title,
+    .siteAppsLink--store .siteAppsLink-sub,
     .siteAppsLink--games .siteAppsLink-title,
     .siteAppsLink--games .siteAppsLink-sub {
       text-align: start;
@@ -1933,6 +1953,13 @@
         <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
         <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
+        <span class="siteAppsLink-icon"><svg class="siteAppsStoreSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18"/><path d="M5 10l1.5-5h11L19 10"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-5h4v5"/><path d="M12 7V5"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store · متجر مُبهر</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        </span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></span>
@@ -3399,7 +3426,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260531a';
+  var ver = '20260601b';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
