@@ -1379,9 +1379,40 @@
       background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.75));
     }
 
-    /* iPhone: topbar taller than 64px — full-width ID row, 16px input avoids zoom */
+    /* iPhone: compact topbar + full-width ID row, 16px input avoids zoom */
     @media (max-width: 520px) {
-      .topbar-inner{ padding:10px 14px; gap:8px; }
+      .topbar-inner{ padding:8px 10px; gap:5px; align-items:center; }
+      .topbar-center{
+        flex:1 1 0;
+        min-width:0;
+        overflow:hidden;
+        padding-inline-end:4px;
+      }
+      .brand-info{ overflow:hidden; max-width:100%; }
+      .brand-name{ font-size:12px; line-height:1.15; }
+      .brand-sub{ display:none; }
+      .topbar-right{ gap:4px; flex-shrink:0; }
+      .topbar-inner .home-btn,
+      .topbar-inner .ghost-btn.theme-btn,
+      .topbar-inner #langBtn,
+      .topbar-inner .brand-swap,
+      .topbar-inner .brand-sq{
+        width:32px !important;
+        height:32px !important;
+        min-width:32px !important;
+        flex:0 0 32px !important;
+        border-radius:8px !important;
+      }
+      .topbar-inner #langBtn{
+        min-width:30px !important;
+        padding:0 6px !important;
+        font-size:11px !important;
+      }
+      .topbar-inner .ghost-btn.theme-btn,
+      .topbar-inner .brand-sq{ font-size:15px !important; }
+      .home-btn svg{ width:16px; height:16px; }
+      .brand-swap{ width:32px !important; height:32px !important; }
+      .brand-sq{ width:32px !important; height:32px !important; }
       .search-section{ padding:10px 14px 12px; }
       .search-form{ flex-wrap:wrap; width:100%; row-gap:8px; }
       .search-id-row{
@@ -1414,6 +1445,11 @@
         width:100%;
         min-height:44px;
       }
+    }
+
+    @media (max-width: 390px) {
+      #diffBtn{ display:none !important; }
+      .brand-name{ font-size:11px; }
     }
 
 </style>
