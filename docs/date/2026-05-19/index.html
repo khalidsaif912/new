@@ -2304,7 +2304,8 @@ function goToEmployeeSchedule(empName) {
       if(suppressNextClick){
         e.preventDefault();
         e.stopPropagation();
-        suppressNextClick = false;
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        setTimeout(function() { suppressNextClick = false; }, 0);
       }
     }, true);
     el.addEventListener('contextmenu', function(e){

@@ -87,7 +87,8 @@ NEW_BIND_HTML = """  function bindLongPress(el, onLongPress){
       if(suppressNextClick){
         e.preventDefault();
         e.stopPropagation();
-        suppressNextClick = false;
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        setTimeout(function() { suppressNextClick = false; }, 0);
       }
     }, true);
     el.addEventListener('contextmenu', function(e){
@@ -262,6 +263,14 @@ def patch_file(path: Path) -> bool:
     text = text.replace(
         "captureRosterElement(card, 'department');",
         "captureRosterElement(card, 'department', { expandAllShifts: true });",
+    )
+    text = text.replace(
+        "        e.preventDefault();\n        e.stopPropagation();\n        suppressNextClick = false;",
+        "        e.preventDefault();\n        e.stopPropagation();\n        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();\n        setTimeout(function() { suppressNextClick = false; }, 0);",
+    )
+    text = text.replace(
+        "        e.preventDefault();\r\n        e.stopPropagation();\r\n        suppressNextClick = false;",
+        "        e.preventDefault();\r\n        e.stopPropagation();\r\n        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();\r\n        setTimeout(function() { suppressNextClick = false; }, 0);",
     )
     replace_block(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE)
     replace_block(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC)
