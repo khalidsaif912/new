@@ -245,10 +245,26 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
 def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     orig = text
+    def replace_block(src: str, dst: str) -> None:
+        nonlocal text
+        if src in text:
+            text = text.replace(src, dst, 1)
+            return
+        src_crlf = src.replace("\n", "\r\n")
+        dst_crlf = dst.replace("\n", "\r\n")
+        if src_crlf in text:
+            text = text.replace(src_crlf, dst_crlf, 1)
+
     if OLD_BIND_HTML in text:
         text = text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1)
-    text = text.replace(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE, 1)
-    text = text.replace(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC, 1)
+    else:
+        replace_block(OLD_BIND_HTML, NEW_BIND_HTML)
+    text = text.replace(
+        "captureRosterElement(card, 'department');",
+        "captureRosterElement(card, 'department', { expandAllShifts: true });",
+    )
+    replace_block(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE)
+    replace_block(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC)
     if text == orig:
         return False
     path.write_text(text, encoding="utf-8")

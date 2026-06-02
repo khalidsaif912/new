@@ -2341,7 +2341,7 @@ function goToEmployeeSchedule(empName) {
         shiftCard.style.display = '';
         shiftCard.setAttribute('open', '');
       });
-      captureRosterElement(card, 'department');
+      captureRosterElement(card, 'department', { expandAllShifts: true });
     });
 
     if (head.dataset.deptShiftToggleBound === '1') return;
