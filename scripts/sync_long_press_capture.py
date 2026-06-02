@@ -95,12 +95,38 @@ NEW_BIND_HTML = """  function bindLongPress(el, onLongPress){
     });
   }"""
 
+OLD_DEPT_CAPTURE = """    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });"""
+
+NEW_DEPT_CAPTURE = """    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.classList.remove('collapsed');
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department');
+    });"""
+
 
 def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
+    orig = text
     if OLD_BIND_HTML not in text:
         return False
-    path.write_text(text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1), encoding="utf-8")
+    text = text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1)
+    text = text.replace(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE, 1)
+    if text == orig:
+        return False
+    path.write_text(text, encoding="utf-8")
     return True
 
 

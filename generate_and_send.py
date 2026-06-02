@@ -2152,6 +2152,7 @@ function goToEmployeeSchedule(empName) {{
     bindLongPress(head, function(){{
       var card = head.closest('.deptCard');
       if(!card) return;
+      card.classList.remove('collapsed');
       card.querySelectorAll('.shiftCard').forEach(function(shiftCard){{
         shiftCard.style.display = '';
         shiftCard.setAttribute('open', '');
