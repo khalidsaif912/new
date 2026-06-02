@@ -2310,6 +2310,10 @@ function goToEmployeeSchedule(empName) {
     if(!el) return;
     var timer = null;
     var moved = false;
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+    var MOVE_TOLERANCE_PX = 8;
 
     function clear(){
       if(timer) clearTimeout(timer);
@@ -2317,17 +2321,36 @@ function goToEmployeeSchedule(empName) {
     }
 
     el.addEventListener('pointerdown', function(e){
+      if(e.button !== 0 && e.button !== undefined) return;
       moved = false;
+      tracking = true;
+      startX = Number(e.clientX || 0);
+      startY = Number(e.clientY || 0);
       clear();
       timer = setTimeout(function(){
+        timer = null;
+        if(!tracking || moved) return;
         suppressNextClick = true;
         onLongPress(e);
       }, LONG_PRESS_MS);
     });
-    el.addEventListener('pointermove', function(){ moved = true; clear(); });
-    el.addEventListener('pointerup', clear);
-    el.addEventListener('pointercancel', clear);
-    el.addEventListener('pointerleave', function(){ if(moved) clear(); });
+    el.addEventListener('pointermove', function(e){
+      if(!tracking) return;
+      var dx = Math.abs(Number(e.clientX || 0) - startX);
+      var dy = Math.abs(Number(e.clientY || 0) - startY);
+      if(dx > MOVE_TOLERANCE_PX || dy > MOVE_TOLERANCE_PX){
+        moved = true;
+        clear();
+      }
+    });
+    el.addEventListener('pointerup', function(){ tracking = false; clear(); });
+    el.addEventListener('pointercancel', function(){ tracking = false; clear(); });
+    el.addEventListener('pointerleave', function(e){
+      if(e.pointerType === 'mouse' || moved){
+        tracking = false;
+        clear();
+      }
+    });
     el.addEventListener('click', function(e){
       if(suppressNextClick){
         e.preventDefault();
@@ -2335,6 +2358,9 @@ function goToEmployeeSchedule(empName) {
         suppressNextClick = false;
       }
     }, true);
+    el.addEventListener('contextmenu', function(e){
+      if(suppressNextClick) e.preventDefault();
+    });
   }
 
   document.querySelectorAll('.deptHead').forEach(function(head){
