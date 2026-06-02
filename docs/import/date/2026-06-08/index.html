@@ -2327,7 +2327,7 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
     }
     var header = document.querySelector('.header');
     var wrap = document.createElement('div');
-    wrap.style.position = 'fixed';
+    wrap.style.position = 'absolute';
     wrap.style.left = '-10000px';
     wrap.style.top = '0';
     wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
@@ -2374,11 +2374,17 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
     wrap.appendChild(targetClone);
     document.body.appendChild(wrap);
     await waitForCaptureLayout();
+    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);
+    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);
 
     var canvas = await html2canvas(wrap, {
       backgroundColor: '#eef1f7',
       scale: Math.max(2, window.devicePixelRatio || 1),
-      useCORS: true
+      useCORS: true,
+      width: captureWidth || undefined,
+      height: captureHeight || undefined,
+      windowWidth: captureWidth || window.innerWidth,
+      windowHeight: captureHeight || window.innerHeight
     });
     wrap.remove();
 

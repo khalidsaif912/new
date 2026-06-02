@@ -188,7 +188,7 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
     }
     var header = document.querySelector('.header');
     var wrap = document.createElement('div');
-    wrap.style.position = 'fixed';
+    wrap.style.position = 'absolute';
     wrap.style.left = '-10000px';
     wrap.style.top = '0';
     wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
@@ -235,11 +235,17 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
     wrap.appendChild(targetClone);
     document.body.appendChild(wrap);
     await waitForCaptureLayout();
+    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);
+    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);
 
     var canvas = await html2canvas(wrap, {
       backgroundColor: '#eef1f7',
       scale: Math.max(2, window.devicePixelRatio || 1),
-      useCORS: true
+      useCORS: true,
+      width: captureWidth || undefined,
+      height: captureHeight || undefined,
+      windowWidth: captureWidth || window.innerWidth,
+      windowHeight: captureHeight || window.innerHeight
     });
     wrap.remove();
 
@@ -302,6 +308,15 @@ def patch_file(path: Path) -> bool:
     text = text.replace(
         "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = 'block';\r\n        shiftCard.open = true;\r\n        shiftCard.setAttribute('open', '');\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n      });\r\n      var stack = targetClone.querySelector('.shiftStack');\r\n      if (stack) stack.style.display = 'flex';",
         "      var cloneStack = targetClone.querySelector('.shiftStack');\r\n      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));\r\n      if (cloneStack && srcCards.length) {\r\n        cloneStack.innerHTML = '';\r\n        srcCards.forEach(function(srcCard) {\r\n          var shiftCard = srcCard.cloneNode(true);\r\n          shiftCard.style.display = 'block';\r\n          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n            shiftCard.open = true;\r\n            shiftCard.setAttribute('open', '');\r\n          }\r\n          var body = shiftCard.querySelector('.shiftBody');\r\n          if (body) body.style.display = 'block';\r\n          cloneStack.appendChild(shiftCard);\r\n        });\r\n        cloneStack.style.display = 'flex';\r\n      }",
+    )
+    text = text.replace("    wrap.style.position = 'fixed';", "    wrap.style.position = 'absolute';")
+    text = text.replace(
+        "    document.body.appendChild(wrap);\n    await waitForCaptureLayout();\n\n    var canvas = await html2canvas(wrap, {\n      backgroundColor: '#eef1f7',\n      scale: Math.max(2, window.devicePixelRatio || 1),\n      useCORS: true\n    });",
+        "    document.body.appendChild(wrap);\n    await waitForCaptureLayout();\n    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);\n    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);\n\n    var canvas = await html2canvas(wrap, {\n      backgroundColor: '#eef1f7',\n      scale: Math.max(2, window.devicePixelRatio || 1),\n      useCORS: true,\n      width: captureWidth || undefined,\n      height: captureHeight || undefined,\n      windowWidth: captureWidth || window.innerWidth,\n      windowHeight: captureHeight || window.innerHeight\n    });",
+    )
+    text = text.replace(
+        "    document.body.appendChild(wrap);\r\n    await waitForCaptureLayout();\r\n\r\n    var canvas = await html2canvas(wrap, {\r\n      backgroundColor: '#eef1f7',\r\n      scale: Math.max(2, window.devicePixelRatio || 1),\r\n      useCORS: true\r\n    });",
+        "    document.body.appendChild(wrap);\r\n    await waitForCaptureLayout();\r\n    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);\r\n    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);\r\n\r\n    var canvas = await html2canvas(wrap, {\r\n      backgroundColor: '#eef1f7',\r\n      scale: Math.max(2, window.devicePixelRatio || 1),\r\n      useCORS: true,\r\n      width: captureWidth || undefined,\r\n      height: captureHeight || undefined,\r\n      windowWidth: captureWidth || window.innerWidth,\r\n      windowHeight: captureHeight || window.innerHeight\r\n    });",
     )
     if text == orig:
         return False
