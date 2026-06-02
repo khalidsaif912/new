@@ -2292,6 +2292,17 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
   if(!target || typeof html2canvas !== 'function') return;
   setCaptureBusy(true);
   try {
+    function waitForCaptureLayout() {
+      return new Promise(function(resolve) {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+          });
+        } else {
+          setTimeout(resolve, 32);
+        }
+      });
+    }
     var header = document.querySelector('.header');
     var wrap = document.createElement('div');
     wrap.style.position = 'fixed';
@@ -2314,12 +2325,20 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
       wrap.appendChild(pre);
     }
     var targetClone = target.cloneNode(true);
+    if (opts.expandAllShifts) {
+      targetClone.classList.remove('collapsed');
+      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+    }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
     targetClone.style.maxWidth = '100%';
     targetClone.style.boxSizing = 'border-box';
     wrap.appendChild(targetClone);
     document.body.appendChild(wrap);
+    await waitForCaptureLayout();
 
     var canvas = await html2canvas(wrap, {
       backgroundColor: '#eef1f7',

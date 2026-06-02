@@ -113,8 +113,133 @@ NEW_DEPT_CAPTURE = """    bindLongPress(head, function(){
         shiftCard.style.display = '';
         shiftCard.setAttribute('open', '');
       });
-      captureRosterElement(card, 'department');
+      captureRosterElement(card, 'department', { expandAllShifts: true });
     });"""
+
+OLD_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix, opts) {
+  opts = opts || {};
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.boxSizing = 'border-box';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    if (opts.prependClone && opts.prependClone.nodeType === 1) {
+      var pre = opts.prependClone.cloneNode(true);
+      pre.style.marginBottom = '8px';
+      wrap.appendChild(pre);
+    }
+    var targetClone = target.cloneNode(true);
+    targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
+}"""
+
+NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix, opts) {
+  opts = opts || {};
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  try {
+    function waitForCaptureLayout() {
+      return new Promise(function(resolve) {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+          });
+        } else {
+          setTimeout(resolve, 32);
+        }
+      });
+    }
+    var header = document.querySelector('.header');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'fixed';
+    wrap.style.left = '-10000px';
+    wrap.style.top = '0';
+    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.boxSizing = 'border-box';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = '14px';
+    wrap.style.zIndex = '9998';
+
+    if(header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    if (opts.prependClone && opts.prependClone.nodeType === 1) {
+      var pre = opts.prependClone.cloneNode(true);
+      pre.style.marginBottom = '8px';
+      wrap.appendChild(pre);
+    }
+    var targetClone = target.cloneNode(true);
+    if (opts.expandAllShifts) {
+      targetClone.classList.remove('collapsed');
+      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+    }
+    targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
+    wrap.appendChild(targetClone);
+    document.body.appendChild(wrap);
+    await waitForCaptureLayout();
+
+    var canvas = await html2canvas(wrap, {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true
+    });
+    wrap.remove();
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+    }, 'image/png');
+  } catch(err) {
+    alert('Could not create image snapshot.');
+  } finally {
+    setCaptureBusy(false);
+  }
+}"""
 
 
 def patch_file(path: Path) -> bool:
@@ -123,6 +248,7 @@ def patch_file(path: Path) -> bool:
     if OLD_BIND_HTML in text:
         text = text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1)
     text = text.replace(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE, 1)
+    text = text.replace(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC, 1)
     if text == orig:
         return False
     path.write_text(text, encoding="utf-8")
