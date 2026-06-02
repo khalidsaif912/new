@@ -2360,15 +2360,23 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
     var targetClone = target.cloneNode(true);
     if (opts.expandAllShifts) {
       targetClone.classList.remove('collapsed');
-      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {
-        shiftCard.style.display = 'block';
-        shiftCard.open = true;
-        shiftCard.setAttribute('open', '');
-        var body = shiftCard.querySelector('.shiftBody');
-        if (body) body.style.display = 'block';
-      });
-      var stack = targetClone.querySelector('.shiftStack');
-      if (stack) stack.style.display = 'flex';
+      var cloneStack = targetClone.querySelector('.shiftStack');
+      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));
+      if (cloneStack && srcCards.length) {
+        cloneStack.innerHTML = '';
+        srcCards.forEach(function(srcCard) {
+          var shiftCard = srcCard.cloneNode(true);
+          shiftCard.style.display = 'block';
+          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {
+            shiftCard.open = true;
+            shiftCard.setAttribute('open', '');
+          }
+          var body = shiftCard.querySelector('.shiftBody');
+          if (body) body.style.display = 'block';
+          cloneStack.appendChild(shiftCard);
+        });
+        cloneStack.style.display = 'flex';
+      }
     }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';

@@ -210,15 +210,23 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
     var targetClone = target.cloneNode(true);
     if (opts.expandAllShifts) {
       targetClone.classList.remove('collapsed');
-      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {
-        shiftCard.style.display = 'block';
-        shiftCard.open = true;
-        shiftCard.setAttribute('open', '');
-        var body = shiftCard.querySelector('.shiftBody');
-        if (body) body.style.display = 'block';
-      });
-      var stack = targetClone.querySelector('.shiftStack');
-      if (stack) stack.style.display = 'flex';
+      var cloneStack = targetClone.querySelector('.shiftStack');
+      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));
+      if (cloneStack && srcCards.length) {
+        cloneStack.innerHTML = '';
+        srcCards.forEach(function(srcCard) {
+          var shiftCard = srcCard.cloneNode(true);
+          shiftCard.style.display = 'block';
+          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {
+            shiftCard.open = true;
+            shiftCard.setAttribute('open', '');
+          }
+          var body = shiftCard.querySelector('.shiftBody');
+          if (body) body.style.display = 'block';
+          cloneStack.appendChild(shiftCard);
+        });
+        cloneStack.style.display = 'flex';
+      }
     }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
@@ -286,6 +294,14 @@ def patch_file(path: Path) -> bool:
     text = text.replace(
         "      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = '';\r\n        shiftCard.setAttribute('open', '');\r\n      });",
         "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = 'block';\r\n        shiftCard.open = true;\r\n        shiftCard.setAttribute('open', '');\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n      });\r\n      var stack = targetClone.querySelector('.shiftStack');\r\n      if (stack) stack.style.display = 'flex';",
+    )
+    text = text.replace(
+        "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\n        shiftCard.style.display = 'block';\n        shiftCard.open = true;\n        shiftCard.setAttribute('open', '');\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n      });\n      var stack = targetClone.querySelector('.shiftStack');\n      if (stack) stack.style.display = 'flex';",
+        "      var cloneStack = targetClone.querySelector('.shiftStack');\n      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));\n      if (cloneStack && srcCards.length) {\n        cloneStack.innerHTML = '';\n        srcCards.forEach(function(srcCard) {\n          var shiftCard = srcCard.cloneNode(true);\n          shiftCard.style.display = 'block';\n          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\n            shiftCard.open = true;\n            shiftCard.setAttribute('open', '');\n          }\n          var body = shiftCard.querySelector('.shiftBody');\n          if (body) body.style.display = 'block';\n          cloneStack.appendChild(shiftCard);\n        });\n        cloneStack.style.display = 'flex';\n      }",
+    )
+    text = text.replace(
+        "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = 'block';\r\n        shiftCard.open = true;\r\n        shiftCard.setAttribute('open', '');\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n      });\r\n      var stack = targetClone.querySelector('.shiftStack');\r\n      if (stack) stack.style.display = 'flex';",
+        "      var cloneStack = targetClone.querySelector('.shiftStack');\r\n      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));\r\n      if (cloneStack && srcCards.length) {\r\n        cloneStack.innerHTML = '';\r\n        srcCards.forEach(function(srcCard) {\r\n          var shiftCard = srcCard.cloneNode(true);\r\n          shiftCard.style.display = 'block';\r\n          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n            shiftCard.open = true;\r\n            shiftCard.setAttribute('open', '');\r\n          }\r\n          var body = shiftCard.querySelector('.shiftBody');\r\n          if (body) body.style.display = 'block';\r\n          cloneStack.appendChild(shiftCard);\r\n        });\r\n        cloneStack.style.display = 'flex';\r\n      }",
     )
     if text == orig:
         return False
