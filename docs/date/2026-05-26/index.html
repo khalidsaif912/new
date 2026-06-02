@@ -2021,10 +2021,15 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
     var targetClone = target.cloneNode(true);
     if (opts.expandAllShifts) {
       targetClone.classList.remove('collapsed');
-      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {
-        shiftCard.style.display = '';
+      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {
+        shiftCard.style.display = 'block';
+        shiftCard.open = true;
         shiftCard.setAttribute('open', '');
+        var body = shiftCard.querySelector('.shiftBody');
+        if (body) body.style.display = 'block';
       });
+      var stack = targetClone.querySelector('.shiftStack');
+      if (stack) stack.style.display = 'flex';
     }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';

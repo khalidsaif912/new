@@ -210,10 +210,15 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
     var targetClone = target.cloneNode(true);
     if (opts.expandAllShifts) {
       targetClone.classList.remove('collapsed');
-      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {
-        shiftCard.style.display = '';
+      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {
+        shiftCard.style.display = 'block';
+        shiftCard.open = true;
         shiftCard.setAttribute('open', '');
+        var body = shiftCard.querySelector('.shiftBody');
+        if (body) body.style.display = 'block';
       });
+      var stack = targetClone.querySelector('.shiftStack');
+      if (stack) stack.style.display = 'flex';
     }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
@@ -274,6 +279,14 @@ def patch_file(path: Path) -> bool:
     )
     replace_block(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE)
     replace_block(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC)
+    text = text.replace(
+        "      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {\n        shiftCard.style.display = '';\n        shiftCard.setAttribute('open', '');\n      });",
+        "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\n        shiftCard.style.display = 'block';\n        shiftCard.open = true;\n        shiftCard.setAttribute('open', '');\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n      });\n      var stack = targetClone.querySelector('.shiftStack');\n      if (stack) stack.style.display = 'flex';",
+    )
+    text = text.replace(
+        "      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = '';\r\n        shiftCard.setAttribute('open', '');\r\n      });",
+        "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\r\n        shiftCard.style.display = 'block';\r\n        shiftCard.open = true;\r\n        shiftCard.setAttribute('open', '');\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n      });\r\n      var stack = targetClone.querySelector('.shiftStack');\r\n      if (stack) stack.style.display = 'flex';",
+    )
     if text == orig:
         return False
     path.write_text(text, encoding="utf-8")
