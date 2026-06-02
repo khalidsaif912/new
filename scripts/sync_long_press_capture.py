@@ -120,9 +120,8 @@ NEW_DEPT_CAPTURE = """    bindLongPress(head, function(){
 def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     orig = text
-    if OLD_BIND_HTML not in text:
-        return False
-    text = text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1)
+    if OLD_BIND_HTML in text:
+        text = text.replace(OLD_BIND_HTML, NEW_BIND_HTML, 1)
     text = text.replace(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE, 1)
     if text == orig:
         return False
