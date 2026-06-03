@@ -59,6 +59,7 @@ from roster_app.settings import (
     TZ,
 )
 from roster_app.text_utils import (
+    append_range_suffix,
     clean,
     current_shift_key,
     looks_like_employee_name,
@@ -66,6 +67,7 @@ from roster_app.text_utils import (
     looks_like_time,
     map_shift,
     norm,
+    range_suffix_for_day,
     to_western_digits,
 )
 
@@ -252,70 +254,19 @@ def find_employee_col(ws, start_row: int):
             return c
     return None
 
-def range_suffix_for_day(day: int, daynum_to_raw: dict, code_key: str):
-    """
-    إذا كان يوم (day) جزء من block متصل من نفس code_key، يرجع (من X إلى Y)
-    """
-    sorted_days = sorted(daynum_to_raw.keys())
-    if day not in sorted_days:
-        return ""
-
-    up_key = code_key.upper()
-
-    # تحديد الأكواد المقبولة لهذا النوع من الإجازة/التدريب
-    acceptable_codes = []
-    if up_key in ["AL", "LV"] or "ANNUAL" in up_key:
-        # الإجازة السنوية
-        acceptable_codes = ["AL", "LV", "ANNUAL LEAVE"]
-    elif up_key == "SL" or "SICK" in up_key:
-        # الإجازة المرضية
-        acceptable_codes = ["SL", "SICK LEAVE"]
-    elif up_key == "TR" or "TRAINING" in up_key:
-        # التدريب
-        acceptable_codes = ["TR", "TRAINING"]
-    else:
-        # أي كود آخر - يجب أن يكون مطابق تماماً
-        acceptable_codes = [up_key]
-
-    def is_same_type(val: str) -> bool:
-        """تحقق إذا كان الكود من نفس النوع"""
-        if not val:
-            return False
-        val_upper = val.upper()
-        for code in acceptable_codes:
-            if code in val_upper or val_upper == code:
-                return True
-        return False
-
-    # إيجاد بداية ونهاية النطاق المتصل
-    start = day
-    end = day
-    
-    # البحث للخلف لإيجاد بداية النطاق
-    current = day - 1
-    while current in sorted_days:
-        val = norm(daynum_to_raw.get(current, ""))
-        if is_same_type(val):
-            start = current
-            current -= 1
-        else:
-            break
-    
-    # البحث للأمام لإيجاد نهاية النطاق
-    current = day + 1
-    while current in sorted_days:
-        val = norm(daynum_to_raw.get(current, ""))
-        if is_same_type(val):
-            end = current
-            current += 1
-        else:
-            break
-
-    if start == end:
-        return ""
-    return f"(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> {start} <span style='font-size:0.75em;opacity:0.8;'>TO</span> {end})"
-
-
+def _apply_shift_range_label(label: str, grp: str, day: int, daynum_to_raw: dict, raw: str) -> str:
+    """Apply (FROM x TO y) for leave blocks (suffix only) and regular multi-day shifts (code + suffix)."""
+    up = norm(raw).upper()
+    if grp == "Annual Leave" and (up == "AL" or "ANNUAL LEAVE" in up or up == "LV"):
+        suf = range_suffix_for_day(day, daynum_to_raw, raw)
+        return suf or label
+    if grp == "Sick Leave" and (up == "SL" or "SICK LEAVE" in up):
+        suf = range_suffix_for_day(day, daynum_to_raw, raw)
+        return suf or label
+    if grp == "Training" and (up == "TR" or "TRAINING" in up):
+        suf = range_suffix_for_day(day, daynum_to_raw, raw)
+        return suf or label
+    return label
 
 
 # =========================
@@ -1549,27 +1500,41 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
     /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
     .captureSheet {{
-      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
-      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:9999; padding:12px 10px;
       pointer-events:none; visibility:hidden;
     }}
     .captureSheet.open {{ display:flex; pointer-events:auto; visibility:visible; }}
     .captureSheetCard {{
-      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      width:min(100%,420px); max-height:min(92dvh, 900px);
+      display:flex; flex-direction:column; overflow:hidden;
+      background:#fff; border-radius:16px; padding:12px;
       border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
     }}
-    .capturePreviewImg {{
-      display:block; width:100%; max-width:100%; height:auto; border-radius:12px;
-      border:1px solid #e2e8f0; margin:0 0 10px; background:#f8fafc;
+    .captureSheetTitle {{
+      flex-shrink:0; font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px;
     }}
-    .captureSheetTitle {{ font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }}
-    .captureSheetActions {{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }}
+    .capturePreviewWrap {{
+      flex:1 1 auto; min-height:0;
+      max-height:min(58dvh, 520px); overflow-y:auto; overflow-x:hidden;
+      margin:0 0 10px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc;
+      -webkit-overflow-scrolling:touch;
+    }}
+    .capturePreviewImg {{
+      display:block; width:100%; max-width:100%; height:auto; margin:0;
+      border:none; border-radius:0; background:transparent;
+    }}
+    .captureSheetActions {{
+      flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }}
     .captureSheetBtn {{
       border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
     }}
     .captureShareBtn {{ background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }}
     .captureSaveBtn {{ background:#e8eefc; color:#1e40af; }}
-    .captureCancelBtn {{ margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }}
+    .captureCancelBtn {{
+      flex-shrink:0; margin-top:8px; width:100%; background:#f1f5f9; color:#475569;
+    }}
     .captureBusy {{
       position:fixed; top:12px; left:50%; transform:translateX(-50%);
       background:#0f172a; color:#fff; font-size:12px; font-weight:700;
@@ -1678,7 +1643,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
   <div class="captureSheetCard">
     <div class="captureSheetTitle">Share or save image</div>
-    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="capturePreviewWrap">
+      <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    </div>
     <div class="captureSheetActions">
       <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
       <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
@@ -1722,13 +1689,16 @@ function saveBlobFile(blob, fileName) {{
   setTimeout(function(){{ URL.revokeObjectURL(url); }}, 1200);
 }}
 
-function openCaptureSheet(blob, fileName) {{
+function openCaptureSheet(blob, fileName, captureMode) {{
   var sheet = document.getElementById('captureSheet');
   var shareBtn = document.getElementById('captureShareBtn');
   var saveBtn = document.getElementById('captureSaveBtn');
   var cancelBtn = document.getElementById('captureCancelBtn');
   var preview = document.getElementById('capturePreview');
+  var title = sheet ? sheet.querySelector('.captureSheetTitle') : null;
   if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+  var modeText = captureMode || 'UNKNOWN';
+  if (title) title.textContent = 'Share or save image (' + modeText + ')';
 
   var file = new File([blob], fileName, {{ type:'image/png' }});
   var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({{ files:[file] }}));
@@ -1736,6 +1706,13 @@ function openCaptureSheet(blob, fileName) {{
 
   var previewUrl = null;
   if (preview) {{
+    var previewWrap = preview.closest('.capturePreviewWrap');
+    if (!previewWrap && preview.parentNode) {{
+      previewWrap = document.createElement('div');
+      previewWrap.className = 'capturePreviewWrap';
+      preview.parentNode.insertBefore(previewWrap, preview);
+      previewWrap.appendChild(preview);
+    }}
     if (preview.dataset.revokeUrl) {{
       try {{ URL.revokeObjectURL(preview.dataset.revokeUrl); }} catch(e) {{}}
       preview.dataset.revokeUrl = '';
@@ -1744,6 +1721,7 @@ function openCaptureSheet(blob, fileName) {{
     preview.src = previewUrl;
     preview.dataset.revokeUrl = previewUrl;
     preview.style.display = '';
+    if (previewWrap) previewWrap.scrollTop = 0;
   }}
 
   function closeSheet() {{
@@ -1803,10 +1781,216 @@ function buildDeptBannerForSnapshot(deptCard) {{
   return banner;
 }}
 
+function openAllShiftsOnDept(dept) {{
+  var saved = [];
+  if (!dept) return function() {{}};
+  var wasCollapsed = dept.classList.contains('collapsed');
+  saved.push({{ kind: 'collapsed', el: dept, value: wasCollapsed }});
+  dept.classList.remove('collapsed');
+  var stack = dept.querySelector('.shiftStack');
+  if (stack) {{
+    saved.push({{ kind: 'stackDisplay', el: stack, value: stack.style.display }});
+    stack.style.display = 'flex';
+  }}
+  dept.querySelectorAll('details.shiftCard').forEach(function(d) {{
+    saved.push({{ kind: 'shiftOpen', el: d, value: d.open }});
+    d.open = true;
+    d.setAttribute('open', '');
+  }});
+  return function restoreDeptShiftState() {{
+    for (var i = saved.length - 1; i >= 0; i--) {{
+      var s = saved[i];
+      if (s.kind === 'shiftOpen') {{
+        s.el.open = s.value;
+        if (!s.value) s.el.removeAttribute('open');
+      }} else if (s.kind === 'stackDisplay') {{
+        s.el.style.display = s.value;
+      }} else if (s.kind === 'collapsed' && s.value) {{
+        s.el.classList.add('collapsed');
+      }}
+    }}
+  }};
+}}
+
+function prepareSnapshotClone(root) {{
+  if (!root) return;
+  root.classList.remove('collapsed');
+  root.style.contentVisibility = 'visible';
+  root.style.contain = 'none';
+  root.style.overflow = 'visible';
+  root.style.height = 'auto';
+  root.style.maxHeight = 'none';
+  root.querySelectorAll('.shiftStack').forEach(function(stack) {{
+    stack.style.display = 'flex';
+    stack.style.overflow = 'visible';
+    stack.style.height = 'auto';
+  }});
+  root.querySelectorAll('details.shiftCard').forEach(function(card) {{
+    card.open = true;
+    card.setAttribute('open', '');
+    card.style.display = 'block';
+    card.style.overflow = 'visible';
+    card.style.height = 'auto';
+    card.style.maxHeight = 'none';
+  }});
+  root.querySelectorAll('.shiftBody').forEach(function(body) {{
+    body.style.display = 'block';
+    body.style.overflow = 'visible';
+    body.style.height = 'auto';
+    body.style.maxHeight = 'none';
+  }});
+  root.querySelectorAll('.empRow').forEach(function(row) {{
+    row.style.display = 'flex';
+  }});
+}}
+
+function getBannerBackgroundForSnapshot() {{
+  var header = document.querySelector('.header');
+  if (header) {{
+    var cs = window.getComputedStyle(header);
+    var bgImg = cs.backgroundImage;
+    if (bgImg && bgImg !== 'none') {{
+      return {{
+        image: bgImg,
+        size: cs.backgroundSize || 'cover',
+        position: cs.backgroundPosition || '62% center',
+        repeat: cs.backgroundRepeat || 'no-repeat',
+        color: cs.backgroundColor || ''
+      }};
+    }}
+  }}
+  try {{
+    var bn = localStorage.getItem('roster_banner_choice');
+    if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {{
+      var url = getSiteRootUrl() + '/assets/banners/' + bn;
+      return {{ image: 'url("' + url + '")', size: 'cover', position: '62% center', repeat: 'no-repeat', color: '' }};
+    }}
+  }} catch(e) {{}}
+  return {{
+    image: 'linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%)',
+    size: 'cover',
+    position: 'center',
+    repeat: 'no-repeat',
+    color: ''
+  }};
+}}
+
+function buildBannerHeaderForSnapshot() {{
+  var liveHeader = document.querySelector('.header');
+  if (!liveHeader) return null;
+  var clone = liveHeader.cloneNode(true);
+  clone.className = 'header captureBannerHeader';
+  clone.querySelectorAll('.langToggle, #banner-changer-btn, #datePicker').forEach(function(el) {{
+    el.remove();
+  }});
+  var bg = getBannerBackgroundForSnapshot();
+  clone.style.position = 'relative';
+  clone.style.overflow = 'hidden';
+  clone.style.marginBottom = '6px';
+  clone.style.borderRadius = '20px';
+  clone.style.padding = '22px 16px 20px';
+  clone.style.textAlign = 'center';
+  clone.style.color = '#fff';
+  clone.style.minHeight = '112px';
+  clone.style.boxSizing = 'border-box';
+  clone.style.boxShadow = '0 4px 16px rgba(30,64,175,.14)';
+  clone.style.backgroundImage = bg.image;
+  clone.style.backgroundSize = bg.size;
+  clone.style.backgroundPosition = bg.position;
+  clone.style.backgroundRepeat = bg.repeat;
+  if (bg.color) clone.style.backgroundColor = bg.color;
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {{
+    el.style.position = 'relative';
+    el.style.zIndex = '2';
+    el.style.color = '#fff';
+    el.style.textShadow = '0 1px 3px rgba(0,0,0,.55)';
+  }});
+  var picker = clone.querySelector('.datePickerWrapper');
+  if (picker) {{
+    picker.style.position = 'relative';
+    picker.style.zIndex = '2';
+    picker.style.marginTop = '10px';
+    picker.style.display = 'inline-block';
+  }}
+  return clone;
+}}
+
+function injectCaptureSnapshotStyles(wrap) {{
+  if (!wrap || wrap.querySelector('[data-capture-style="1"]')) return;
+  var style = document.createElement('style');
+  style.setAttribute('data-capture-style', '1');
+  style.textContent = [
+    '[data-capture-wrap]{{box-sizing:border-box;}}',
+    '[data-capture-wrap] .captureBannerHeader{{width:100%;margin-bottom:10px;}}',
+    '[data-capture-wrap] .deptCard{{overflow:visible!important;content-visibility:visible!important;contain:none!important;border-radius:18px!important;box-shadow:0 4px 18px rgba(15,23,42,.08)!important;margin:0!important;}}',
+    '[data-capture-wrap] .deptHead::after,[data-capture-wrap] .shiftSummary::after{{display:none!important;}}',
+    '[data-capture-wrap] .shiftStack{{display:flex!important;flex-direction:column!important;gap:6px!important;padding:8px 10px!important;}}',
+    '[data-capture-wrap] .shiftCardFlat,[data-capture-wrap] .shiftCard{{display:block!important;overflow:visible!important;margin:0!important;border-radius:14px!important;}}',
+    '[data-capture-wrap] .shiftBody{{display:block!important;overflow:visible!important;height:auto!important;}}',
+    '[data-capture-wrap] .empRow{{display:flex!important;align-items:center!important;padding:8px 14px!important;min-height:36px!important;}}'
+  ].join('');
+  wrap.insertBefore(style, wrap.firstChild);
+}}
+
+function flattenShiftCardsInClone(root) {{
+  if (!root) return;
+  root.querySelectorAll('details.shiftCard').forEach(function(details) {{
+    var flat = document.createElement('div');
+    flat.className = details.className + ' shiftCardFlat';
+    if (details.getAttribute('style')) flat.setAttribute('style', details.getAttribute('style'));
+    flat.style.display = 'block';
+    flat.style.overflow = 'visible';
+    flat.style.height = 'auto';
+    flat.style.maxHeight = 'none';
+    Array.from(details.children).forEach(function(ch) {{
+      var tag = String(ch.tagName || '').toUpperCase();
+      if (tag === 'SUMMARY') {{
+        var sumDiv = document.createElement('div');
+        sumDiv.className = ch.className;
+        if (ch.getAttribute('style')) sumDiv.setAttribute('style', ch.getAttribute('style'));
+        sumDiv.innerHTML = ch.innerHTML;
+        flat.appendChild(sumDiv);
+      }} else {{
+        var cloned = ch.cloneNode(true);
+        cloned.style.display = 'block';
+        cloned.style.overflow = 'visible';
+        cloned.style.height = 'auto';
+        cloned.style.maxHeight = 'none';
+        if (cloned.classList && cloned.classList.contains('shiftBody')) {{
+          cloned.querySelectorAll('.empRow').forEach(function(row) {{ row.style.display = 'flex'; }});
+        }}
+        flat.appendChild(cloned);
+      }}
+    }});
+    details.replaceWith(flat);
+  }});
+}}
+
+function measureCaptureWrapHeight(wrap) {{
+  if (!wrap) return 400;
+  var total = 0;
+  Array.from(wrap.children).forEach(function(child) {{
+    if (child.getAttribute && child.getAttribute('data-capture-style') === '1') return;
+    var rect = child.getBoundingClientRect();
+    if (rect.height <= 0) return;
+    var st = window.getComputedStyle(child);
+    var mb = parseFloat(st.marginBottom) || 0;
+    var mt = parseFloat(st.marginTop) || 0;
+    total += rect.height + mb + mt;
+  }});
+  var wrapSt = window.getComputedStyle(wrap);
+  var pad = (parseFloat(wrapSt.paddingTop) || 0) + (parseFloat(wrapSt.paddingBottom) || 0);
+  var sum = Math.ceil(total + pad);
+  if (sum > 80) return sum + 2;
+  return Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0) + 2;
+}}
+
 async function captureRosterElement(target, fileNamePrefix, opts) {{
   opts = opts || {{}};
   if(!target || typeof html2canvas !== 'function') return;
   setCaptureBusy(true);
+  var restoreLiveDept = null;
+  var wrap = null;
   try {{
     function waitForCaptureLayout() {{
       return new Promise(function(resolve) {{
@@ -1819,18 +2003,29 @@ async function captureRosterElement(target, fileNamePrefix, opts) {{
         }}
       }});
     }}
+    var isDepartment = !!opts.expandAllShifts;
     var header = document.querySelector('.header');
-    var wrap = document.createElement('div');
+    var layoutW = rosterSnapshotLayoutWidth();
+    wrap = document.createElement('div');
+    wrap.setAttribute('data-capture-wrap', '1');
     wrap.style.position = 'absolute';
-    wrap.style.left = '-10000px';
+    wrap.style.left = '-9999px';
     wrap.style.top = '0';
-    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.width = layoutW + 'px';
     wrap.style.boxSizing = 'border-box';
     wrap.style.background = '#eef1f7';
-    wrap.style.padding = '14px';
-    wrap.style.zIndex = '9998';
+    wrap.style.padding = isDepartment ? '10px 12px 6px' : '14px';
+    wrap.style.visibility = 'visible';
+    wrap.style.opacity = '1';
+    wrap.style.pointerEvents = 'none';
+    wrap.style.overflow = 'visible';
+    wrap.style.height = 'auto';
+    wrap.style.maxHeight = 'none';
 
-    if(header) {{
+    if (isDepartment) {{
+      var bannerHeader = buildBannerHeaderForSnapshot();
+      if (bannerHeader) wrap.appendChild(bannerHeader);
+    }} else if (header) {{
       var headerClone = header.cloneNode(true);
       headerClone.style.marginBottom = '10px';
       wrap.appendChild(headerClone);
@@ -1840,56 +2035,111 @@ async function captureRosterElement(target, fileNamePrefix, opts) {{
       pre.style.marginBottom = '8px';
       wrap.appendChild(pre);
     }}
-    var targetClone = target.cloneNode(true);
-    if (opts.expandAllShifts) {{
-      targetClone.classList.remove('collapsed');
-      var cloneStack = targetClone.querySelector('.shiftStack');
-      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));
-      if (cloneStack && srcCards.length) {{
-        cloneStack.innerHTML = '';
-        srcCards.forEach(function(srcCard) {{
-          var shiftCard = srcCard.cloneNode(true);
-          shiftCard.style.display = 'block';
-          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {{
-            shiftCard.open = true;
-            shiftCard.setAttribute('open', '');
-          }}
-          var body = shiftCard.querySelector('.shiftBody');
-          if (body) body.style.display = 'block';
-          cloneStack.appendChild(shiftCard);
-        }});
-        cloneStack.style.display = 'flex';
-      }}
+
+    var sourceTarget = target;
+    if (opts.deptCaptureId) {{
+      var byId = document.querySelector('.deptCard[data-dept-capture-id="' + opts.deptCaptureId + '"]');
+      if (byId) sourceTarget = byId;
     }}
+    if (isDepartment && target && typeof target.closest === 'function') {{
+      var sourceDept = target.closest('.deptCard');
+      if (sourceDept) sourceTarget = sourceDept;
+    }}
+
+    var targetClone = null;
+    if (isDepartment) {{
+      var dept = sourceTarget;
+      restoreLiveDept = openAllShiftsOnDept(dept);
+      await waitForCaptureLayout();
+      targetClone = dept.cloneNode(true);
+      restoreLiveDept();
+      restoreLiveDept = null;
+      prepareSnapshotClone(targetClone);
+      flattenShiftCardsInClone(targetClone);
+    }} else {{
+      targetClone = sourceTarget.cloneNode(true);
+      if (targetClone.classList && targetClone.classList.contains('shiftCard')) {{
+        targetClone.open = true;
+        targetClone.setAttribute('open', '');
+      }}
+      prepareSnapshotClone(targetClone);
+    }}
+
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
     targetClone.style.maxWidth = '100%';
     targetClone.style.boxSizing = 'border-box';
     wrap.appendChild(targetClone);
+    injectCaptureSnapshotStyles(wrap);
     document.body.appendChild(wrap);
     await waitForCaptureLayout();
-    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);
-    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);
+    await waitForCaptureLayout();
 
-    var canvas = await html2canvas(wrap, {{
+    var captureHeight = 0;
+    if (isDepartment) {{
+      captureHeight = measureCaptureWrapHeight(wrap);
+    }}
+
+    var canvasOpts = {{
       backgroundColor: '#eef1f7',
       scale: Math.max(2, window.devicePixelRatio || 1),
       useCORS: true,
-      width: captureWidth || undefined,
-      height: captureHeight || undefined,
-      windowWidth: captureWidth || window.innerWidth,
-      windowHeight: captureHeight || window.innerHeight
-    }});
-    wrap.remove();
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      ignoreElements: function(el) {{
+        return el && el.id === 'captureSheet';
+      }},
+      onclone: function(doc) {{
+        var clonedWrap = doc.querySelector('[data-capture-wrap="1"]');
+        if (!clonedWrap) return;
+        clonedWrap.style.left = '0';
+        clonedWrap.style.visibility = 'visible';
+        clonedWrap.style.opacity = '1';
+        clonedWrap.style.overflow = 'visible';
+        clonedWrap.style.height = 'auto';
+        clonedWrap.style.maxHeight = 'none';
+        clonedWrap.querySelectorAll('.deptCard').forEach(function(dept) {{
+          prepareSnapshotClone(dept);
+          flattenShiftCardsInClone(dept);
+        }});
+        clonedWrap.querySelectorAll('.shiftCard').forEach(function(card) {{
+          prepareSnapshotClone(card);
+        }});
+      }}
+    }};
+    var scale = Math.max(2, window.devicePixelRatio || 1);
+    if (isDepartment && captureHeight > 14000) scale = 1.5;
+    if (isDepartment && captureHeight > 22000) scale = 1;
+    canvasOpts.scale = scale;
+
+    var canvas = null;
+    try {{
+      canvas = await html2canvas(wrap, canvasOpts);
+    }} catch (captureErr) {{
+      var fallbackOpts = Object.assign({{}}, canvasOpts, {{
+        scale: 1,
+        height: undefined,
+        windowHeight: undefined
+      }});
+      canvas = await html2canvas(wrap, fallbackOpts);
+    }}
+    if (wrap && wrap.parentNode) wrap.remove();
+    wrap = null;
 
     canvas.toBlob(function(blob){{
       if(!blob) return;
       var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
-      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+      var mode = isDepartment ? 'DEPARTMENT' : 'SHIFT';
+      console.log('[capture] mode=' + mode + ' canvas=' + canvas.width + 'x' + canvas.height);
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png', mode);
     }}, 'image/png');
   }} catch(err) {{
+    console.error('[capture]', err);
     alert('Could not create image snapshot.');
   }} finally {{
+    if (restoreLiveDept) restoreLiveDept();
+    if (wrap && wrap.parentNode) wrap.remove();
     setCaptureBusy(false);
   }}
 }}
@@ -2188,16 +2438,19 @@ function goToEmployeeSchedule(empName) {{
   }}
 
   document.querySelectorAll('.deptHead').forEach(function(head){{
-    bindLongPress(head, function(){{
-      var card = head.closest('.deptCard');
-      if(!card) return;
-      card.classList.remove('collapsed');
-      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){{
-        shiftCard.style.display = '';
-        shiftCard.setAttribute('open', '');
+    if (head.dataset.deptCaptureBound !== '1') {{
+      head.dataset.deptCaptureBound = '1';
+      bindLongPress(head, function(){{
+        var cardForLongPress = head.closest('.deptCard');
+        if(!cardForLongPress) return;
+        cardForLongPress.classList.remove('collapsed');
+        cardForLongPress.querySelectorAll('details.shiftCard').forEach(function(shiftCard){{
+          shiftCard.open = true;
+          shiftCard.setAttribute('open', '');
+        }});
+        captureRosterElement(cardForLongPress, 'department', {{ expandAllShifts: true }});
       }});
-      captureRosterElement(card, 'department', {{ expandAllShifts: true }});
-    }});
+    }}
 
     if (head.dataset.deptShiftToggleBound === '1') return;
     head.dataset.deptShiftToggleBound = '1';
@@ -2450,7 +2703,7 @@ function applyLang(lang) {{
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(shiftMap[el.dataset.key]) el.textContent=shiftMap[el.dataset.key];
   }});
-  document.querySelectorAll('.empStatus span').forEach(function(el) {{
+  document.querySelectorAll('.empStatus .shiftRangeLabel, .empStatus span').forEach(function(el) {{
     var txt=el.textContent.trim();
     if(txt==='FROM'||txt==='من') el.textContent=t.from;
     if(txt==='TO'||txt==='إلى') el.textContent=t.to;
@@ -2739,23 +2992,7 @@ def generate_date_pages_for_month(
                             continue
 
                         label, grp = map_shift(raw)
-
-                        up = norm(raw).upper()
-                        if grp == "Annual Leave":
-                            if up == "AL" or "ANNUAL LEAVE" in up or up == "LV":
-                                suf = range_suffix_for_day(day, daynum_to_raw, "AL")
-                                if suf:
-                                    label = suf
-                        elif grp == "Sick Leave":
-                            if up == "SL" or "SICK LEAVE" in up:
-                                suf = range_suffix_for_day(day, daynum_to_raw, "SL")
-                                if suf:
-                                    label = suf
-                        elif grp == "Training":
-                            if up == "TR" or "TRAINING" in up:
-                                suf = range_suffix_for_day(day, daynum_to_raw, "TR")
-                                if suf:
-                                    label = suf
+                        label = _apply_shift_range_label(label, grp, day, daynum_to_raw, raw)
 
                         buckets.setdefault(grp, []).append({"name": name, "shift": label})
 
@@ -3445,27 +3682,8 @@ def main():
                 continue
 
             label, grp = map_shift(raw)
+            label = _apply_shift_range_label(label, grp, today_day, daynum_to_raw, raw)
 
-            up = norm(raw).upper()
-            # إضافة نطاق التواريخ FROM TO للإجازات السنوية
-            if grp == "Annual Leave":
-                if up == "AL" or "ANNUAL LEAVE" in up or up == "LV":
-                    suf = range_suffix_for_day(today_day, daynum_to_raw, "AL")
-                    if suf:
-                        label = suf  # فقط النطاق الزمني بدون اسم الإجازة
-            # إضافة نطاق التواريخ FROM TO للإجازات المرضية
-            elif grp == "Sick Leave":
-                if up == "SL" or "SICK LEAVE" in up:
-                    suf = range_suffix_for_day(today_day, daynum_to_raw, "SL")
-                    if suf:
-                        label = suf  # فقط النطاق الزمني بدون اسم الإجازة
-            # إضافة نطاق التواريخ FROM TO للتدريب
-            elif grp == "Training":
-                if up == "TR" or "TRAINING" in up:
-                    suf = range_suffix_for_day(today_day, daynum_to_raw, "TR")
-                    if suf:
-                        label = suf  # فقط النطاق الزمني بدون اسم الإجازة
-            
             buckets.setdefault(grp, []).append({"name": name, "shift": label})
 
             if grp == active_group:

@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <script defer src="../../../ios-tap-fix.js?v=20260531a"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
+  <script defer src="../../../ios-tap-fix.js?v=20260601b"></script>
   <title>Import Duty Roster</title>
   
   <script>
@@ -63,7 +63,6 @@
       width:140px; height:140px;
       border-radius:50%;
       background:rgba(255,255,255,.08);
-      pointer-events:none;
     }
     .header::after {
       content:''; position:absolute;
@@ -71,7 +70,6 @@
       width:160px; height:160px;
       border-radius:50%;
       background:rgba(255,255,255,.06);
-      pointer-events:none;
     }
     .header .bannerTitle {
       margin:0;
@@ -160,9 +158,6 @@
       text-decoration:none;
       cursor:pointer;
     }
-    
-    a.summaryChip.exportChip .chipVal { color:#059669; }
-    a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
     .welcomeChip.visible {
       display:flex;
     }
@@ -219,7 +214,6 @@
       z-index:3;
       pointer-events:auto;
       color:#fff;
-    
       text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
     .dateTag-icon {
@@ -229,27 +223,25 @@
       flex-shrink:0;
       line-height:0;
       color:#fff;
+      pointer-events:none;
     }
     .dateTag-icon svg {
       display:block;
       width:16px;
       height:16px;
-          pointer-events:none;
+      pointer-events:none;
       filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
     }
     .dateTag-label {
       line-height:1.2;
       pointer-events:none;
-    text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
-    }
-    .dateTag-icon {
-      pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
     .header .dateTag:hover {
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS */
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
     .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
@@ -275,16 +267,19 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn {
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
-
     .header::before,
     .header::after {
       pointer-events:none;
     }
-    .summaryBar {
+
+    /* ═══════ SUMMARY BAR ═══════ */
+    .summaryBar { 
+      display:flex; 
+      justify-content:center; 
+      align-items:stretch;
+      gap:12px; 
+      margin-top:14px;
+      flex-wrap:wrap;
       position:relative;
       z-index:30;
       isolation:isolate;
@@ -303,22 +298,6 @@
     .importBottom {
       position:relative;
       z-index:25;
-    }
-
-    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-
-    /* ═══════ SUMMARY BAR ═══════ */
-    .summaryBar { 
-      display:flex; 
-      justify-content:center; 
-      align-items:stretch;
-      gap:12px; 
-      margin-top:14px;
-      flex-wrap:wrap;
     }
     a.summaryChip:hover {
       transform:translateY(-3px);
@@ -437,11 +416,7 @@
     }
 
 
-    /* ═══════ DEPARTMENT CARD ═══════ */    .deptCard {
-      content-visibility: auto;
-      contain-intrinsic-size: auto 180px;
-    }
-
+    /* ═══════ DEPARTMENT CARD ═══════ */
     .deptCard {
       margin-top:18px;
       background:#fff;
@@ -450,6 +425,11 @@
       border:1px solid rgba(15,23,42,.07);
       box-shadow:0 4px 18px rgba(15,23,42,.08);
     }
+    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+
     .deptHead {
       display:flex;
       align-items:center;
@@ -724,6 +704,11 @@
       border-color: #7dd3fc;
       color: #0369a1;
     }
+    .roster-cta-btn--texture {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #5b21b6;
+    }
     .roster-cta--import {
       grid-template-columns: 1fr 1fr;
     }
@@ -737,6 +722,7 @@
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
+      .roster-cta-btn--texture:hover { background: #ede9fe; }
       .roster-cta-btn--muted:hover { background: #e2e8f0; }
     }
     .roster-cta-btn:active {
@@ -1001,27 +987,41 @@
 
     /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
     .captureSheet {
-      position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center;
-      background:rgba(15,23,42,.38); z-index:9999; padding:14px;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:9999; padding:12px 10px;
       pointer-events:none; visibility:hidden;
     }
     .captureSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .captureSheetCard {
-      width:min(100%,420px); background:#fff; border-radius:16px; padding:12px;
+      width:min(100%,420px); max-height:min(92dvh, 900px);
+      display:flex; flex-direction:column; overflow:hidden;
+      background:#fff; border-radius:16px; padding:12px;
       border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
     }
-    .capturePreviewImg {
-      display:block; width:100%; max-width:100%; height:auto; border-radius:12px;
-      border:1px solid #e2e8f0; margin:0 0 10px; background:#f8fafc;
+    .captureSheetTitle {
+      flex-shrink:0; font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px;
     }
-    .captureSheetTitle { font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px; }
-    .captureSheetActions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .capturePreviewWrap {
+      flex:1 1 auto; min-height:0;
+      max-height:min(58dvh, 520px); overflow-y:auto; overflow-x:hidden;
+      margin:0 0 10px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc;
+      -webkit-overflow-scrolling:touch;
+    }
+    .capturePreviewImg {
+      display:block; width:100%; max-width:100%; height:auto; margin:0;
+      border:none; border-radius:0; background:transparent;
+    }
+    .captureSheetActions {
+      flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
     .captureSheetBtn {
       border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
     }
     .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
     .captureSaveBtn { background:#e8eefc; color:#1e40af; }
-    .captureCancelBtn { margin-top:8px; width:100%; background:#f1f5f9; color:#475569; }
+    .captureCancelBtn {
+      flex-shrink:0; margin-top:8px; width:100%; background:#f1f5f9; color:#475569;
+    }
     .captureBusy {
       position:fixed; top:12px; left:50%; transform:translateX(-50%);
       background:#0f172a; color:#fff; font-size:12px; font-weight:700;
@@ -1032,7 +1032,6 @@
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
@@ -1056,6 +1055,8 @@
     .importBottom {
       margin-top: auto;
       padding-top: 14px;
+      position: relative;
+      z-index: 25;
     }
     .importBottom .quickActions.roster-cta {
       margin-bottom: 6px;
@@ -1106,6 +1107,8 @@
       text-decoration: none;
       cursor: pointer;
     }
+    a.summaryChip.exportChip .chipVal { color:#059669; }
+    a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
     .welcomeChip.visible {
       display: flex;
     }
@@ -1126,6 +1129,22 @@
       30% { transform: rotate(16deg); }
       40% { transform: rotate(-6deg); }
     }
+    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+
+    .empStatus .shiftRange {
+      font-size: 0.88em;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+    .empStatus .shiftRangeLabel {
+      font-size: 0.78em;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
   </style>
   <meta name="theme-color" content="#f4354b">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1197,7 +1216,7 @@
 <body>
 <div class="wrap">
 
-                          <div class="header">
+  <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">ع</span></button>
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
@@ -1208,7 +1227,9 @@
       <input id="datePicker" type="date" value="2026-06-20" min="2026-03-01" max="2026-06-30" aria-label="Select roster date" title="Pick day" />
     </div>
   </div>
-<div class="summaryBar">
+
+  
+  <div class="summaryBar">
     <div class="summaryChip" id="summarySwitchChip">
       <div class="chipVal" id="summarySwitchVal">73</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
@@ -1217,7 +1238,7 @@
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
-    <a href="#" id="exportBtn" class="summaryChip exportChip" style="text-decoration:none;">
+    <a href="#" id="exportBtn" class="summaryChip exportChip" style="text-decoration:none;" onclick="goToExport(event)">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
       <div class="chipLabel" data-key="exportRoster">Export</div>
     </a>
@@ -1235,7 +1256,9 @@
     </a>
   </div>
 
-  <div class="deptCard">
+
+  
+    <div class="deptCard">
       <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
@@ -1264,10 +1287,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="FRITZ - 80269" role="button" tabindex="0">
        <span class="empName">FRITZ - 80269</span>
-       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt" data-emp-name="FROILAN - 80535" role="button" tabindex="0">
        <span class="empName">FROILAN - 80535</span>
-       <span class="empStatus" style="color:#92400e;">MN06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
     </details>
@@ -1281,7 +1304,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAMEER MAHMOOD - 990896" role="button" tabindex="0">
        <span class="empName">SAMEER MAHMOOD - 990896</span>
-       <span class="empStatus" style="color:#9a3412;">AN13 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
     </details>
@@ -1295,7 +1318,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="UDUGAMA - 8901" role="button" tabindex="0">
        <span class="empName">UDUGAMA - 8901</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
     </details>
@@ -1309,7 +1332,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MOHAMMED SAID - 81032" role="button" tabindex="0">
        <span class="empName">MOHAMMED SAID - 81032</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
@@ -1346,13 +1369,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="GLENDO - 80215" role="button" tabindex="0">
        <span class="empName">GLENDO - 80215</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="HAIFA AL BALUSHI - 82664" role="button" tabindex="0">
        <span class="empName">HAIFA AL BALUSHI - 82664</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="MAHAMAD AL MAHARBI - 82460" role="button" tabindex="0">
        <span class="empName">MAHAMAD AL MAHARBI - 82460</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHANAD AL HADI - 82665" role="button" tabindex="0">
        <span class="empName">MAHANAD AL HADI - 82665</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
@@ -1369,10 +1392,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="IBRAHIM AL QUTAITI - 81351" role="button" tabindex="0">
        <span class="empName">IBRAHIM AL QUTAITI - 81351</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL WAHAIBI - 82541" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL WAHAIBI - 82541</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
@@ -1386,13 +1409,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MAHMOOD AL HADIDI - 82452" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL HADIDI - 82452</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow empRowAlt" data-emp-name="AHMED ALRUJAIBI - 82476" role="button" tabindex="0">
        <span class="empName">AHMED ALRUJAIBI - 82476</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
        <span class="empName">JAMAL AL SINANI - 81399</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
     </details>
@@ -1406,16 +1429,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
        <span class="empName">WAFAA SALIM - 81021</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
        <span class="empName">ALA AL WAHAIBI - 82473</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow" data-emp-name="MOHAMMED AL YAARUBI - 82444" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL YAARUBI - 82444</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="YOUSUF AL WAHEEDI - 82100" role="button" tabindex="0">
        <span class="empName">YOUSUF AL WAHEEDI - 82100</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
@@ -1452,25 +1475,25 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SALIM AL MAAWALI - 80481" role="button" tabindex="0">
        <span class="empName">SALIM AL MAAWALI - 80481</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
        <span class="empName">SULEIMAN AL MAHARBI - 80833</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
        <span class="empName">NASSER AL MAAMARI - 82590</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
        <span class="empName">JABER AL JULANDANI - 81983</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 18 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
        <span class="empName">ABDULLAH AL SINAWI - 82663</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 18 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="KHALID AL BALUSHI - 8336" role="button" tabindex="0">
        <span class="empName">KHALID AL BALUSHI - 8336</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="MAJID AL GHAFRI - 82049" role="button" tabindex="0">
        <span class="empName">MAJID AL GHAFRI - 82049</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
@@ -1484,22 +1507,22 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
        <span class="empName">OMAR AL FUTAISI - 82107</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL SHAMSI - 82286</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
        <span class="empName">AHMED AL HUSAINI - 82455</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
        <span class="empName">MOOSA AL BALUSHI - 82667</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
        <span class="empName">HILAL AL SHAMAKHI - 81991</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
        <span class="empName">HISHAM AL SIYABI - 82434</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
@@ -1513,19 +1536,19 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="BADAR AL SHEHHI - 82583" role="button" tabindex="0">
        <span class="empName">BADAR AL SHEHHI - 82583</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow empRowAlt" data-emp-name="IBRAHIM AL HADHRAMI - 82668" role="button" tabindex="0">
        <span class="empName">IBRAHIM AL HADHRAMI - 82668</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
        <span class="empName">HISHAM AL MAHARBI - 82454</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow empRowAlt" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
        <span class="empName">AHMED AL FARSI - 82456</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
        <span class="empName">ADIL AL BULUSHI - 82457</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 22)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
     </details>
@@ -1539,13 +1562,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ANWAR AL HABSI - 82496" role="button" tabindex="0">
        <span class="empName">ANWAR AL HABSI - 82496</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
        <span class="empName">WAHEB AL BARAIDAI - 82470</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL MAWALI - 82614</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
@@ -1582,7 +1605,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
        <span class="empName">QASIM AL GHARIBI - 82412</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
@@ -1596,7 +1619,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MOOSA AL HADI - 82536" role="button" tabindex="0">
        <span class="empName">MOOSA AL HADI - 82536</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
@@ -1610,7 +1633,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="MOHAMMED AL KULAIBI - 81079" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL KULAIBI - 81079</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
     </details>
@@ -1624,10 +1647,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
        <span class="empName">SAID AL HADI - 81152</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
        <span class="empName">MAHIR AL BALUSHI - 82422</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
@@ -1664,16 +1687,16 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" role="button" tabindex="0">
        <span class="empName">ALI AL RIYAMI - 82459</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
        <span class="empName">QAIS AL MUKHAINI - 82435</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
        <span class="empName">MOHAMED AL MAAWALI - 82535</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="ANWAR AL AMRI - 82566" role="button" tabindex="0">
        <span class="empName">ANWAR AL AMRI - 82566</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
@@ -1687,7 +1710,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
        <span class="empName">KHALID AL ZADJALI - 82458</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 22)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
        <span class="empName">JUMA AL HABSI - 81151</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
@@ -1696,10 +1719,10 @@
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="KHAMIS AL KASBI - 990751" role="button" tabindex="0">
        <span class="empName">KHAMIS AL KASBI - 990751</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
        <span class="empName">MOHAMMED AL BALUCHI - 82330</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
@@ -1713,13 +1736,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
        <span class="empName">SAID AL AMRI - 80834</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
        <span class="empName">MOHD AL HADDABI - 990895</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow" data-emp-name="FARIZ AL BALUSHI - 80478" role="button" tabindex="0">
        <span class="empName">FARIZ AL BALUSHI - 80478</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
     </details>
@@ -1733,10 +1756,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="AHMED AL AMRI - 81080" role="button" tabindex="0">
        <span class="empName">AHMED AL AMRI - 81080</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
        <span class="empName">HAMED AL FAKHRI - 8836</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
@@ -1773,7 +1796,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
        <span class="empName">YOUNIS AL SIYABI - 80480</span>
-       <span class="empStatus" style="color:#92400e;">ME06 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 22)</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
        <span class="empName">HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
@@ -1796,7 +1819,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
        <span class="empName">YAARAB AL RAQADI - 82571</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
        <span class="empName">BADAR AL BUSAIDI - 82414</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
@@ -1805,7 +1828,7 @@
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow empRowAlt" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
        <span class="empName">BADAR AL BURTAMANI - 82423</span>
-       <span class="empStatus" style="color:#9a3412;">AE14 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow" data-emp-name="KHALIFA AL SAADI - 82537" role="button" tabindex="0">
        <span class="empName">KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
@@ -1822,13 +1845,13 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
        <span class="empName">NASSER AL OMAIRI - 82416</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 18 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL BALUSHI - 82431" role="button" tabindex="0">
        <span class="empName">MAHMOOD AL BALUSHI - 82431</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div><div class="empRow" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
        <span class="empName">ISMAIL AL MAHARBI - 82331</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22 (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
     </details>
@@ -1842,26 +1865,28 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
        <span class="empName">SAID AL SADI - 82410</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 20 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 21)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
        <span class="empName">TALAL AL HUSEINI - 82417</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
        <span class="empName">AHMED AL HADI - 82654</span>
-       <span class="empStatus" style="color:#3730a3;">O (<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 19 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
     </details>
 
       </div>
     </div>
+
+
   <div class="importBottom">
     <nav class="quickActions roster-cta" aria-label="Page actions">
-  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{BASE}/now/">
+  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
     <span class="roster-cta-label">Full Roster</span>
   </a>
-  <a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn" href="{BASE}/subscribe/">
+  <a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn" href="{{BASE}}/subscribe/">
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg></span>
     <span class="roster-cta-label">Subscribe</span>
   </a>
@@ -1879,16 +1904,32 @@
   </button>
 </nav>
 
-    <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">25MAY2026 / 14:48</strong>
+    
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">03JUN2026 / 13:00</strong>
     <br>Total: <strong id="importTotalEmployees">73 employees</strong>
-     &nbsp;·&nbsp; Source: <strong id="importSourceName">JUN 2026 IMPORT OPS ROSTER.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">2026-06.xlsx</strong>
   </div>
 
   </div>
 
 </div>
 
+
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <div class="capturePreviewWrap">
+      <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    </div>
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
 
 <div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
   <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
@@ -1966,20 +2007,8 @@
   </div>
 </div>
 
-<div id="captureBusy" class="captureBusy">Preparing image...</div>
-<div id="captureSheet" class="captureSheet" aria-hidden="true">
-  <div class="captureSheetCard">
-    <div class="captureSheetTitle">Share or save image</div>
-    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
-    <div class="captureSheetActions">
-      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
-      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
-    </div>
-    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script>
 // Hard-guaranteed import page behavior (independent from other scripts).
 (function() {
@@ -2195,13 +2224,16 @@ function saveBlobFile(blob, fileName) {
   setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
 }
 
-function openCaptureSheet(blob, fileName) {
+function openCaptureSheet(blob, fileName, captureMode) {
   var sheet = document.getElementById('captureSheet');
   var shareBtn = document.getElementById('captureShareBtn');
   var saveBtn = document.getElementById('captureSaveBtn');
   var cancelBtn = document.getElementById('captureCancelBtn');
   var preview = document.getElementById('capturePreview');
+  var title = sheet ? sheet.querySelector('.captureSheetTitle') : null;
   if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+  var modeText = captureMode || 'UNKNOWN';
+  if (title) title.textContent = 'Share or save image (' + modeText + ')';
 
   var file = new File([blob], fileName, { type:'image/png' });
   var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
@@ -2209,6 +2241,13 @@ function openCaptureSheet(blob, fileName) {
 
   var previewUrl = null;
   if (preview) {
+    var previewWrap = preview.closest('.capturePreviewWrap');
+    if (!previewWrap && preview.parentNode) {
+      previewWrap = document.createElement('div');
+      previewWrap.className = 'capturePreviewWrap';
+      preview.parentNode.insertBefore(previewWrap, preview);
+      previewWrap.appendChild(preview);
+    }
     if (preview.dataset.revokeUrl) {
       try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
       preview.dataset.revokeUrl = '';
@@ -2217,6 +2256,7 @@ function openCaptureSheet(blob, fileName) {
     preview.src = previewUrl;
     preview.dataset.revokeUrl = previewUrl;
     preview.style.display = '';
+    if (previewWrap) previewWrap.scrollTop = 0;
   }
 
   function closeSheet() {
@@ -2276,10 +2316,216 @@ function buildDeptBannerForSnapshot(deptCard) {
   return banner;
 }
 
+function openAllShiftsOnDept(dept) {
+  var saved = [];
+  if (!dept) return function() {};
+  var wasCollapsed = dept.classList.contains('collapsed');
+  saved.push({ kind: 'collapsed', el: dept, value: wasCollapsed });
+  dept.classList.remove('collapsed');
+  var stack = dept.querySelector('.shiftStack');
+  if (stack) {
+    saved.push({ kind: 'stackDisplay', el: stack, value: stack.style.display });
+    stack.style.display = 'flex';
+  }
+  dept.querySelectorAll('details.shiftCard').forEach(function(d) {
+    saved.push({ kind: 'shiftOpen', el: d, value: d.open });
+    d.open = true;
+    d.setAttribute('open', '');
+  });
+  return function restoreDeptShiftState() {
+    for (var i = saved.length - 1; i >= 0; i--) {
+      var s = saved[i];
+      if (s.kind === 'shiftOpen') {
+        s.el.open = s.value;
+        if (!s.value) s.el.removeAttribute('open');
+      } else if (s.kind === 'stackDisplay') {
+        s.el.style.display = s.value;
+      } else if (s.kind === 'collapsed' && s.value) {
+        s.el.classList.add('collapsed');
+      }
+    }
+  };
+}
+
+function prepareSnapshotClone(root) {
+  if (!root) return;
+  root.classList.remove('collapsed');
+  root.style.contentVisibility = 'visible';
+  root.style.contain = 'none';
+  root.style.overflow = 'visible';
+  root.style.height = 'auto';
+  root.style.maxHeight = 'none';
+  root.querySelectorAll('.shiftStack').forEach(function(stack) {
+    stack.style.display = 'flex';
+    stack.style.overflow = 'visible';
+    stack.style.height = 'auto';
+  });
+  root.querySelectorAll('details.shiftCard').forEach(function(card) {
+    card.open = true;
+    card.setAttribute('open', '');
+    card.style.display = 'block';
+    card.style.overflow = 'visible';
+    card.style.height = 'auto';
+    card.style.maxHeight = 'none';
+  });
+  root.querySelectorAll('.shiftBody').forEach(function(body) {
+    body.style.display = 'block';
+    body.style.overflow = 'visible';
+    body.style.height = 'auto';
+    body.style.maxHeight = 'none';
+  });
+  root.querySelectorAll('.empRow').forEach(function(row) {
+    row.style.display = 'flex';
+  });
+}
+
+function getBannerBackgroundForSnapshot() {
+  var header = document.querySelector('.header');
+  if (header) {
+    var cs = window.getComputedStyle(header);
+    var bgImg = cs.backgroundImage;
+    if (bgImg && bgImg !== 'none') {
+      return {
+        image: bgImg,
+        size: cs.backgroundSize || 'cover',
+        position: cs.backgroundPosition || '62% center',
+        repeat: cs.backgroundRepeat || 'no-repeat',
+        color: cs.backgroundColor || ''
+      };
+    }
+  }
+  try {
+    var bn = localStorage.getItem('roster_banner_choice');
+    if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {
+      var url = getSiteRootUrl() + '/assets/banners/' + bn;
+      return { image: 'url("' + url + '")', size: 'cover', position: '62% center', repeat: 'no-repeat', color: '' };
+    }
+  } catch(e) {}
+  return {
+    image: 'linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%)',
+    size: 'cover',
+    position: 'center',
+    repeat: 'no-repeat',
+    color: ''
+  };
+}
+
+function buildBannerHeaderForSnapshot() {
+  var liveHeader = document.querySelector('.header');
+  if (!liveHeader) return null;
+  var clone = liveHeader.cloneNode(true);
+  clone.className = 'header captureBannerHeader';
+  clone.querySelectorAll('.langToggle, #banner-changer-btn, #datePicker').forEach(function(el) {
+    el.remove();
+  });
+  var bg = getBannerBackgroundForSnapshot();
+  clone.style.position = 'relative';
+  clone.style.overflow = 'hidden';
+  clone.style.marginBottom = '6px';
+  clone.style.borderRadius = '20px';
+  clone.style.padding = '22px 16px 20px';
+  clone.style.textAlign = 'center';
+  clone.style.color = '#fff';
+  clone.style.minHeight = '112px';
+  clone.style.boxSizing = 'border-box';
+  clone.style.boxShadow = '0 4px 16px rgba(30,64,175,.14)';
+  clone.style.backgroundImage = bg.image;
+  clone.style.backgroundSize = bg.size;
+  clone.style.backgroundPosition = bg.position;
+  clone.style.backgroundRepeat = bg.repeat;
+  if (bg.color) clone.style.backgroundColor = bg.color;
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {
+    el.style.position = 'relative';
+    el.style.zIndex = '2';
+    el.style.color = '#fff';
+    el.style.textShadow = '0 1px 3px rgba(0,0,0,.55)';
+  });
+  var picker = clone.querySelector('.datePickerWrapper');
+  if (picker) {
+    picker.style.position = 'relative';
+    picker.style.zIndex = '2';
+    picker.style.marginTop = '10px';
+    picker.style.display = 'inline-block';
+  }
+  return clone;
+}
+
+function injectCaptureSnapshotStyles(wrap) {
+  if (!wrap || wrap.querySelector('[data-capture-style="1"]')) return;
+  var style = document.createElement('style');
+  style.setAttribute('data-capture-style', '1');
+  style.textContent = [
+    '[data-capture-wrap]{box-sizing:border-box;}',
+    '[data-capture-wrap] .captureBannerHeader{width:100%;margin-bottom:10px;}',
+    '[data-capture-wrap] .deptCard{overflow:visible!important;content-visibility:visible!important;contain:none!important;border-radius:18px!important;box-shadow:0 4px 18px rgba(15,23,42,.08)!important;margin:0!important;}',
+    '[data-capture-wrap] .deptHead::after,[data-capture-wrap] .shiftSummary::after{display:none!important;}',
+    '[data-capture-wrap] .shiftStack{display:flex!important;flex-direction:column!important;gap:6px!important;padding:8px 10px!important;}',
+    '[data-capture-wrap] .shiftCardFlat,[data-capture-wrap] .shiftCard{display:block!important;overflow:visible!important;margin:0!important;border-radius:14px!important;}',
+    '[data-capture-wrap] .shiftBody{display:block!important;overflow:visible!important;height:auto!important;}',
+    '[data-capture-wrap] .empRow{display:flex!important;align-items:center!important;padding:8px 14px!important;min-height:36px!important;}'
+  ].join('');
+  wrap.insertBefore(style, wrap.firstChild);
+}
+
+function flattenShiftCardsInClone(root) {
+  if (!root) return;
+  root.querySelectorAll('details.shiftCard').forEach(function(details) {
+    var flat = document.createElement('div');
+    flat.className = details.className + ' shiftCardFlat';
+    if (details.getAttribute('style')) flat.setAttribute('style', details.getAttribute('style'));
+    flat.style.display = 'block';
+    flat.style.overflow = 'visible';
+    flat.style.height = 'auto';
+    flat.style.maxHeight = 'none';
+    Array.from(details.children).forEach(function(ch) {
+      var tag = String(ch.tagName || '').toUpperCase();
+      if (tag === 'SUMMARY') {
+        var sumDiv = document.createElement('div');
+        sumDiv.className = ch.className;
+        if (ch.getAttribute('style')) sumDiv.setAttribute('style', ch.getAttribute('style'));
+        sumDiv.innerHTML = ch.innerHTML;
+        flat.appendChild(sumDiv);
+      } else {
+        var cloned = ch.cloneNode(true);
+        cloned.style.display = 'block';
+        cloned.style.overflow = 'visible';
+        cloned.style.height = 'auto';
+        cloned.style.maxHeight = 'none';
+        if (cloned.classList && cloned.classList.contains('shiftBody')) {
+          cloned.querySelectorAll('.empRow').forEach(function(row) { row.style.display = 'flex'; });
+        }
+        flat.appendChild(cloned);
+      }
+    });
+    details.replaceWith(flat);
+  });
+}
+
+function measureCaptureWrapHeight(wrap) {
+  if (!wrap) return 400;
+  var total = 0;
+  Array.from(wrap.children).forEach(function(child) {
+    if (child.getAttribute && child.getAttribute('data-capture-style') === '1') return;
+    var rect = child.getBoundingClientRect();
+    if (rect.height <= 0) return;
+    var st = window.getComputedStyle(child);
+    var mb = parseFloat(st.marginBottom) || 0;
+    var mt = parseFloat(st.marginTop) || 0;
+    total += rect.height + mb + mt;
+  });
+  var wrapSt = window.getComputedStyle(wrap);
+  var pad = (parseFloat(wrapSt.paddingTop) || 0) + (parseFloat(wrapSt.paddingBottom) || 0);
+  var sum = Math.ceil(total + pad);
+  if (sum > 80) return sum + 2;
+  return Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0) + 2;
+}
+
 async function captureRosterElement(target, fileNamePrefix, opts) {
   opts = opts || {};
   if(!target || typeof html2canvas !== 'function') return;
   setCaptureBusy(true);
+  var restoreLiveDept = null;
+  var wrap = null;
   try {
     function waitForCaptureLayout() {
       return new Promise(function(resolve) {
@@ -2292,18 +2538,29 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
         }
       });
     }
+    var isDepartment = !!opts.expandAllShifts;
     var header = document.querySelector('.header');
-    var wrap = document.createElement('div');
+    var layoutW = rosterSnapshotLayoutWidth();
+    wrap = document.createElement('div');
+    wrap.setAttribute('data-capture-wrap', '1');
     wrap.style.position = 'absolute';
-    wrap.style.left = '-10000px';
+    wrap.style.left = '-9999px';
     wrap.style.top = '0';
-    wrap.style.width = rosterSnapshotLayoutWidth() + 'px';
+    wrap.style.width = layoutW + 'px';
     wrap.style.boxSizing = 'border-box';
     wrap.style.background = '#eef1f7';
-    wrap.style.padding = '14px';
-    wrap.style.zIndex = '9998';
+    wrap.style.padding = isDepartment ? '10px 12px 6px' : '14px';
+    wrap.style.visibility = 'visible';
+    wrap.style.opacity = '1';
+    wrap.style.pointerEvents = 'none';
+    wrap.style.overflow = 'visible';
+    wrap.style.height = 'auto';
+    wrap.style.maxHeight = 'none';
 
-    if(header) {
+    if (isDepartment) {
+      var bannerHeader = buildBannerHeaderForSnapshot();
+      if (bannerHeader) wrap.appendChild(bannerHeader);
+    } else if (header) {
       var headerClone = header.cloneNode(true);
       headerClone.style.marginBottom = '10px';
       wrap.appendChild(headerClone);
@@ -2313,56 +2570,111 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
       pre.style.marginBottom = '8px';
       wrap.appendChild(pre);
     }
-    var targetClone = target.cloneNode(true);
-    if (opts.expandAllShifts) {
-      targetClone.classList.remove('collapsed');
-      var cloneStack = targetClone.querySelector('.shiftStack');
-      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));
-      if (cloneStack && srcCards.length) {
-        cloneStack.innerHTML = '';
-        srcCards.forEach(function(srcCard) {
-          var shiftCard = srcCard.cloneNode(true);
-          shiftCard.style.display = 'block';
-          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {
-            shiftCard.open = true;
-            shiftCard.setAttribute('open', '');
-          }
-          var body = shiftCard.querySelector('.shiftBody');
-          if (body) body.style.display = 'block';
-          cloneStack.appendChild(shiftCard);
-        });
-        cloneStack.style.display = 'flex';
-      }
+
+    var sourceTarget = target;
+    if (opts.deptCaptureId) {
+      var byId = document.querySelector('.deptCard[data-dept-capture-id="' + opts.deptCaptureId + '"]');
+      if (byId) sourceTarget = byId;
     }
+    if (isDepartment && target && typeof target.closest === 'function') {
+      var sourceDept = target.closest('.deptCard');
+      if (sourceDept) sourceTarget = sourceDept;
+    }
+
+    var targetClone = null;
+    if (isDepartment) {
+      var dept = sourceTarget;
+      restoreLiveDept = openAllShiftsOnDept(dept);
+      await waitForCaptureLayout();
+      targetClone = dept.cloneNode(true);
+      restoreLiveDept();
+      restoreLiveDept = null;
+      prepareSnapshotClone(targetClone);
+      flattenShiftCardsInClone(targetClone);
+    } else {
+      targetClone = sourceTarget.cloneNode(true);
+      if (targetClone.classList && targetClone.classList.contains('shiftCard')) {
+        targetClone.open = true;
+        targetClone.setAttribute('open', '');
+      }
+      prepareSnapshotClone(targetClone);
+    }
+
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
     targetClone.style.maxWidth = '100%';
     targetClone.style.boxSizing = 'border-box';
     wrap.appendChild(targetClone);
+    injectCaptureSnapshotStyles(wrap);
     document.body.appendChild(wrap);
     await waitForCaptureLayout();
-    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);
-    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);
+    await waitForCaptureLayout();
 
-    var canvas = await html2canvas(wrap, {
+    var captureHeight = 0;
+    if (isDepartment) {
+      captureHeight = measureCaptureWrapHeight(wrap);
+    }
+
+    var canvasOpts = {
       backgroundColor: '#eef1f7',
       scale: Math.max(2, window.devicePixelRatio || 1),
       useCORS: true,
-      width: captureWidth || undefined,
-      height: captureHeight || undefined,
-      windowWidth: captureWidth || window.innerWidth,
-      windowHeight: captureHeight || window.innerHeight
-    });
-    wrap.remove();
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      ignoreElements: function(el) {
+        return el && el.id === 'captureSheet';
+      },
+      onclone: function(doc) {
+        var clonedWrap = doc.querySelector('[data-capture-wrap="1"]');
+        if (!clonedWrap) return;
+        clonedWrap.style.left = '0';
+        clonedWrap.style.visibility = 'visible';
+        clonedWrap.style.opacity = '1';
+        clonedWrap.style.overflow = 'visible';
+        clonedWrap.style.height = 'auto';
+        clonedWrap.style.maxHeight = 'none';
+        clonedWrap.querySelectorAll('.deptCard').forEach(function(dept) {
+          prepareSnapshotClone(dept);
+          flattenShiftCardsInClone(dept);
+        });
+        clonedWrap.querySelectorAll('.shiftCard').forEach(function(card) {
+          prepareSnapshotClone(card);
+        });
+      }
+    };
+    var scale = Math.max(2, window.devicePixelRatio || 1);
+    if (isDepartment && captureHeight > 14000) scale = 1.5;
+    if (isDepartment && captureHeight > 22000) scale = 1;
+    canvasOpts.scale = scale;
+
+    var canvas = null;
+    try {
+      canvas = await html2canvas(wrap, canvasOpts);
+    } catch (captureErr) {
+      var fallbackOpts = Object.assign({}, canvasOpts, {
+        scale: 1,
+        height: undefined,
+        windowHeight: undefined
+      });
+      canvas = await html2canvas(wrap, fallbackOpts);
+    }
+    if (wrap && wrap.parentNode) wrap.remove();
+    wrap = null;
 
     canvas.toBlob(function(blob){
       if(!blob) return;
       var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
-      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');
+      var mode = isDepartment ? 'DEPARTMENT' : 'SHIFT';
+      console.log('[capture] mode=' + mode + ' canvas=' + canvas.width + 'x' + canvas.height);
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png', mode);
     }, 'image/png');
   } catch(err) {
+    console.error('[capture]', err);
     alert('Could not create image snapshot.');
   } finally {
+    if (restoreLiveDept) restoreLiveDept();
+    if (wrap && wrap.parentNode) wrap.remove();
     setCaptureBusy(false);
   }
 }
@@ -2556,9 +2868,6 @@ function goToEmployeeSchedule(empName) {
   function resyncTodayIfNeeded() {
     if (!path.includes('/date/')) return;
     try {
-      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
-    } catch (e) {}
-    try {
       if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
     } catch (e) {}
     var dateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
@@ -2662,16 +2971,19 @@ function goToEmployeeSchedule(empName) {
   }
 
   document.querySelectorAll('.deptHead').forEach(function(head){
-    bindLongPress(head, function(){
-      var card = head.closest('.deptCard');
-      if(!card) return;
-      card.classList.remove('collapsed');
-      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
-        shiftCard.style.display = '';
-        shiftCard.setAttribute('open', '');
+    if (head.dataset.deptCaptureBound !== '1') {
+      head.dataset.deptCaptureBound = '1';
+      bindLongPress(head, function(){
+        var cardForLongPress = head.closest('.deptCard');
+        if(!cardForLongPress) return;
+        cardForLongPress.classList.remove('collapsed');
+        cardForLongPress.querySelectorAll('details.shiftCard').forEach(function(shiftCard){
+          shiftCard.open = true;
+          shiftCard.setAttribute('open', '');
+        });
+        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });
       });
-      captureRosterElement(card, 'department', { expandAllShifts: true });
-    });
+    }
 
     if (head.dataset.deptShiftToggleBound === '1') return;
     head.dataset.deptShiftToggleBound = '1';
@@ -2722,6 +3034,7 @@ function goToEmployeeSchedule(empName) {
 })();
 
 // ═══════════════════════════════════════════════════
+
 // Shift Filter (NOW PAGE ONLY)
 // ═══════════════════════════════════════════════════
 (function(){
@@ -2926,7 +3239,7 @@ function applyLang(lang) {
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(shiftMap[el.dataset.key]) el.textContent=shiftMap[el.dataset.key];
   });
-  document.querySelectorAll('.empStatus span').forEach(function(el) {
+  document.querySelectorAll('.empStatus .shiftRangeLabel, .empStatus span').forEach(function(el) {
     var txt=el.textContent.trim();
     if(txt==='FROM'||txt==='من') el.textContent=t.from;
     if(txt==='TO'||txt==='إلى') el.textContent=t.to;
@@ -3447,66 +3760,6 @@ function _importBase() {
   return getSiteRootUrl() + '/import';
 }
 
-function setSummaryChipHrefs() {
-  var importBase = _importBase() + '/my-schedules/index.html';
-  var root = getSiteRootUrl();
-  var my = document.getElementById('myScheduleBtn');
-  var exp = document.getElementById('exportBtn');
-  var welcome = document.getElementById('welcomeChip');
-  var trn = document.getElementById('trainingBtn');
-  var diff = document.getElementById('diffChipBtn');
-  if (my) my.href = importBase;
-  if (exp) {
-    var iso = '';
-    var picker = document.getElementById('datePicker');
-    if (picker && picker.value) iso = picker.value;
-    if (!iso) {
-      var pm = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
-      if (pm) iso = pm[1];
-      if (!iso) {
-        var m2 = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
-        if (m2) iso = m2[1];
-      }
-    }
-    exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
-  }
-  if (trn) trn.href = root + '/training/';
-  if (diff) diff.href = root + '/roster-diff/index.html';
-  if (welcome) {
-    var wid = localStorage.getItem('importSavedEmpId');
-    welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
-  }
-}
-setSummaryChipHrefs();
-
-(function loadLocalEnhancements() {
-  var root = getSiteRootUrl();
-  var ver = '20260601b';
-  function addScript(src) {
-    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-    var s = document.createElement('script');
-    s.src = src;
-    s.defer = true;
-    s.setAttribute('data-local-src', src);
-    document.body.appendChild(s);
-  }
-  addScript(root + '/roster-icons.js?v=' + ver);
-  addScript(root + '/site-last-updated.js?v=' + ver);
-function loadSecondary() {
-    addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
-    addScript(root + '/install-pwa.js?v=' + ver);
-    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
-    addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=' + ver);
-}
-  if (window.requestIdleCallback) {
-    requestIdleCallback(loadSecondary, { timeout: 3000 });
-  } else {
-    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
-  }
-})();
 function goToMySchedule(event) {
   if(event) event.preventDefault();
   var id = localStorage.getItem('importSavedEmpId');
@@ -3547,7 +3800,71 @@ function goToRosterDiff(event) {
   location.href = target;
 }
 
+(function bindFlightSwitchIcons() {
+  var root = getSiteRootUrl();
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
+    img.src = iconUrl;
+  });
+})();
 
+function setSummaryChipHrefs() {
+  var importBase = _importBase() + '/my-schedules/index.html';
+  var root = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var exp = document.getElementById('exportBtn');
+  var welcome = document.getElementById('welcomeChip');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  if (my) my.href = importBase;
+  if (exp) {
+    var iso = '';
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) iso = picker.value;
+    if (!iso) {
+      var pm = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+      if (pm) iso = pm[1];
+      if (!iso) {
+        var m2 = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+        if (m2) iso = m2[1];
+      }
+    }
+    exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
+  }
+  if (trn) trn.href = root + '/training/';
+  if (diff) diff.href = root + '/roster-diff/index.html';
+  if (welcome) {
+    var wid = localStorage.getItem('importSavedEmpId');
+    welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
+  }
+}
+setSummaryChipHrefs();
+
+
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  var ver = '20260601b';
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  addScript(root + '/site-last-updated.js?v=' + ver);
+  function loadSecondary() {
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+  }
+  if (window.requestIdleCallback) {
+    requestIdleCallback(loadSecondary, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
+  }
+})();
 
 (function showWelcomeChip() {
   var empId = localStorage.getItem('importSavedEmpId');
@@ -3577,6 +3894,7 @@ function goToRosterDiff(event) {
     var href = a.getAttribute('href') || '';
     a.href = href.replaceAll('{{BASE}}', base).replaceAll('{BASE}', base);
   });
+  setSummaryChipHrefs();
 })();
 
 // Import banner labels (export script uses titleEyebrow + titleMain).

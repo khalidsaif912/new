@@ -623,5 +623,157 @@
     ]
   },
   "month": "2026-06",
-  "monthLabel": "2026-06"
+  "monthLabel": "June 2026",
+  "days": [
+    {
+      "day": 1,
+      "weekday": "Mon",
+      "code": "LV"
+    },
+    {
+      "day": 2,
+      "weekday": "Tue",
+      "code": "LV"
+    },
+    {
+      "day": 3,
+      "weekday": "Wed",
+      "code": "LV"
+    },
+    {
+      "day": 4,
+      "weekday": "Thu",
+      "code": "LV"
+    },
+    {
+      "day": 5,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 6,
+      "weekday": "Sat",
+      "code": "O"
+    },
+    {
+      "day": 7,
+      "weekday": "Sun",
+      "code": "LV"
+    },
+    {
+      "day": 8,
+      "weekday": "Mon",
+      "code": "LV"
+    },
+    {
+      "day": 9,
+      "weekday": "Tue",
+      "code": "LV"
+    },
+    {
+      "day": 10,
+      "weekday": "Wed",
+      "code": "LV"
+    },
+    {
+      "day": 11,
+      "weekday": "Thu",
+      "code": "LV"
+    },
+    {
+      "day": 12,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 13,
+      "weekday": "Sat",
+      "code": "O"
+    },
+    {
+      "day": 14,
+      "weekday": "Sun",
+      "code": "AN13"
+    },
+    {
+      "day": 15,
+      "weekday": "Mon",
+      "code": "AN13"
+    },
+    {
+      "day": 16,
+      "weekday": "Tue",
+      "code": "MN06"
+    },
+    {
+      "day": 17,
+      "weekday": "Wed",
+      "code": "MN06"
+    },
+    {
+      "day": 18,
+      "weekday": "Thu",
+      "code": "NN21"
+    },
+    {
+      "day": 19,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 20,
+      "weekday": "Sat",
+      "code": "O"
+    },
+    {
+      "day": 21,
+      "weekday": "Sun",
+      "code": "AN13"
+    },
+    {
+      "day": 22,
+      "weekday": "Mon",
+      "code": "AN13"
+    },
+    {
+      "day": 23,
+      "weekday": "Tue",
+      "code": "MN06"
+    },
+    {
+      "day": 24,
+      "weekday": "Wed",
+      "code": "MN06"
+    },
+    {
+      "day": 25,
+      "weekday": "Thu",
+      "code": "NN21"
+    },
+    {
+      "day": 26,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 27,
+      "weekday": "Sat",
+      "code": "O"
+    },
+    {
+      "day": 28,
+      "weekday": "Sun",
+      "code": "AN13"
+    },
+    {
+      "day": 29,
+      "weekday": "Mon",
+      "code": "AN13"
+    },
+    {
+      "day": 30,
+      "weekday": "Tue",
+      "code": "MN06"
+    }
+  ]
 }

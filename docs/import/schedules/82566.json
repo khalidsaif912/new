@@ -1,7 +1,7 @@
 {
   "id": "82566",
   "name": "ANWAR AL AMRI",
-  "department": "Flight Dispatch (Import)",
+  "department": "Import Operators",
   "schedules": {
     "2026-05": [
       {
@@ -623,5 +623,157 @@
     ]
   },
   "month": "2026-06",
-  "monthLabel": "2026-06"
+  "monthLabel": "June 2026",
+  "days": [
+    {
+      "day": 1,
+      "weekday": "Mon",
+      "code": "O"
+    },
+    {
+      "day": 2,
+      "weekday": "Tue",
+      "code": "O"
+    },
+    {
+      "day": 3,
+      "weekday": "Wed",
+      "code": "AE14"
+    },
+    {
+      "day": 4,
+      "weekday": "Thu",
+      "code": "ME06"
+    },
+    {
+      "day": 5,
+      "weekday": "Fri",
+      "code": "ME06"
+    },
+    {
+      "day": 6,
+      "weekday": "Sat",
+      "code": "ME06"
+    },
+    {
+      "day": 7,
+      "weekday": "Sun",
+      "code": "NE22"
+    },
+    {
+      "day": 8,
+      "weekday": "Mon",
+      "code": "O"
+    },
+    {
+      "day": 9,
+      "weekday": "Tue",
+      "code": "O"
+    },
+    {
+      "day": 10,
+      "weekday": "Wed",
+      "code": "AE14"
+    },
+    {
+      "day": 11,
+      "weekday": "Thu",
+      "code": "ME06"
+    },
+    {
+      "day": 12,
+      "weekday": "Fri",
+      "code": "ME06"
+    },
+    {
+      "day": 13,
+      "weekday": "Sat",
+      "code": "NE22"
+    },
+    {
+      "day": 14,
+      "weekday": "Sun",
+      "code": "NE22"
+    },
+    {
+      "day": 15,
+      "weekday": "Mon",
+      "code": "O"
+    },
+    {
+      "day": 16,
+      "weekday": "Tue",
+      "code": "O"
+    },
+    {
+      "day": 17,
+      "weekday": "Wed",
+      "code": "AE14"
+    },
+    {
+      "day": 18,
+      "weekday": "Thu",
+      "code": "AE14"
+    },
+    {
+      "day": 19,
+      "weekday": "Fri",
+      "code": "ME06"
+    },
+    {
+      "day": 20,
+      "weekday": "Sat",
+      "code": "ME06"
+    },
+    {
+      "day": 21,
+      "weekday": "Sun",
+      "code": "NE22"
+    },
+    {
+      "day": 22,
+      "weekday": "Mon",
+      "code": "O"
+    },
+    {
+      "day": 23,
+      "weekday": "Tue",
+      "code": "O"
+    },
+    {
+      "day": 24,
+      "weekday": "Wed",
+      "code": "AE14"
+    },
+    {
+      "day": 25,
+      "weekday": "Thu",
+      "code": "AE14"
+    },
+    {
+      "day": 26,
+      "weekday": "Fri",
+      "code": "ME06"
+    },
+    {
+      "day": 27,
+      "weekday": "Sat",
+      "code": "NE22"
+    },
+    {
+      "day": 28,
+      "weekday": "Sun",
+      "code": "NE22"
+    },
+    {
+      "day": 29,
+      "weekday": "Mon",
+      "code": "O"
+    },
+    {
+      "day": 30,
+      "weekday": "Tue",
+      "code": "O"
+    }
+  ]
 }

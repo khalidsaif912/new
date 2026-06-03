@@ -117,6 +117,37 @@ NEW_DEPT_CAPTURE = """    bindLongPress(head, function(){
       captureRosterElement(card, 'department', { expandAllShifts: true });
     });"""
 
+OLD_DEPT_BIND_SCOPE = """  document.querySelectorAll('.deptHead').forEach(function(head){
+    bindLongPress(head, function(){
+      var card = head.closest('.deptCard');
+      if(!card) return;
+      card.classList.remove('collapsed');
+      card.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+        shiftCard.style.display = '';
+        shiftCard.setAttribute('open', '');
+      });
+      captureRosterElement(card, 'department', { expandAllShifts: true });
+    });
+
+    if (head.dataset.deptShiftToggleBound === '1') return;"""
+
+NEW_DEPT_BIND_SCOPE = """  document.querySelectorAll('.deptHead').forEach(function(head){
+    if (head.dataset.deptCaptureBound !== '1') {
+      head.dataset.deptCaptureBound = '1';
+      bindLongPress(head, function(){
+        var cardForLongPress = head.closest('.deptCard');
+        if(!cardForLongPress) return;
+        cardForLongPress.classList.remove('collapsed');
+        cardForLongPress.querySelectorAll('.shiftCard').forEach(function(shiftCard){
+          shiftCard.style.display = '';
+          shiftCard.setAttribute('open', '');
+        });
+        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });
+      });
+    }
+
+    if (head.dataset.deptShiftToggleBound === '1') return;"""
+
 OLD_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix, opts) {
   opts = opts || {};
   if(!target || typeof html2canvas !== 'function') return;
@@ -207,26 +238,41 @@ NEW_CAPTURE_FUNC = """async function captureRosterElement(target, fileNamePrefix
       pre.style.marginBottom = '8px';
       wrap.appendChild(pre);
     }
-    var targetClone = target.cloneNode(true);
+    var sourceTarget = target;
+    if (opts.expandAllShifts && target && typeof target.closest === 'function') {
+      var sourceDept = target.closest('.deptCard');
+      if (sourceDept) sourceTarget = sourceDept;
+    }
+    var targetClone = null;
     if (opts.expandAllShifts) {
-      targetClone.classList.remove('collapsed');
-      var cloneStack = targetClone.querySelector('.shiftStack');
-      var srcCards = Array.from(target.querySelectorAll('.shiftCard'));
-      if (cloneStack && srcCards.length) {
-        cloneStack.innerHTML = '';
-        srcCards.forEach(function(srcCard) {
-          var shiftCard = srcCard.cloneNode(true);
-          shiftCard.style.display = 'block';
-          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {
-            shiftCard.open = true;
-            shiftCard.setAttribute('open', '');
-          }
-          var body = shiftCard.querySelector('.shiftBody');
-          if (body) body.style.display = 'block';
-          cloneStack.appendChild(shiftCard);
-        });
-        cloneStack.style.display = 'flex';
-      }
+      var dept = sourceTarget;
+      targetClone = document.createElement('div');
+      targetClone.className = 'deptCard';
+      var strip = dept && dept.firstElementChild ? dept.firstElementChild.cloneNode(true) : null;
+      var head = dept ? dept.querySelector('.deptHead') : null;
+      var stack = document.createElement('div');
+      stack.className = 'shiftStack';
+      stack.style.display = 'flex';
+      if (strip) targetClone.appendChild(strip);
+      if (head) targetClone.appendChild(head.cloneNode(true));
+      var srcCards = dept ? Array.from(dept.querySelectorAll('.shiftCard')) : [];
+      srcCards.forEach(function(srcCard) {
+        var shiftCard = srcCard.cloneNode(true);
+        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {
+          var flatCard = document.createElement('div');
+          flatCard.className = shiftCard.className;
+          if (shiftCard.getAttribute('style')) flatCard.setAttribute('style', shiftCard.getAttribute('style'));
+          Array.from(shiftCard.children).forEach(function(ch) { flatCard.appendChild(ch.cloneNode(true)); });
+          shiftCard = flatCard;
+        }
+        shiftCard.style.display = 'block';
+        var body = shiftCard.querySelector('.shiftBody');
+        if (body) body.style.display = 'block';
+        stack.appendChild(shiftCard);
+      });
+      targetClone.appendChild(stack);
+    } else {
+      targetClone = sourceTarget.cloneNode(true);
     }
     targetClone.style.marginTop = '0';
     targetClone.style.width = '100%';
@@ -291,8 +337,33 @@ def patch_file(path: Path) -> bool:
         "        e.preventDefault();\r\n        e.stopPropagation();\r\n        suppressNextClick = false;",
         "        e.preventDefault();\r\n        e.stopPropagation();\r\n        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();\r\n        setTimeout(function() { suppressNextClick = false; }, 0);",
     )
+    text = text.replace(
+        "    var cardForLongPress = head.closest('.deptCard');\n    if (cardForLongPress && cardForLongPress.dataset.deptCaptureBound !== '1') {\n      cardForLongPress.dataset.deptCaptureBound = '1';\n      bindLongPress(cardForLongPress, function(ev){\n        var t = ev && ev.target;\n        if (t && typeof t.closest === 'function' && t.closest('.shiftSummary')) return;\n        cardForLongPress.classList.remove('collapsed');\n        cardForLongPress.querySelectorAll('.shiftCard').forEach(function(shiftCard){\n          shiftCard.style.display = '';\n          shiftCard.setAttribute('open', '');\n        });\n        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });\n      });\n    }\n",
+        "    if (head.dataset.deptCaptureBound !== '1') {\n      head.dataset.deptCaptureBound = '1';\n      bindLongPress(head, function(){\n        var cardForLongPress = head.closest('.deptCard');\n        if(!cardForLongPress) return;\n        cardForLongPress.classList.remove('collapsed');\n        cardForLongPress.querySelectorAll('.shiftCard').forEach(function(shiftCard){\n          shiftCard.style.display = '';\n          shiftCard.setAttribute('open', '');\n        });\n        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });\n      });\n    }\n",
+    )
+    text = text.replace(
+        "    var cardForLongPress = head.closest('.deptCard');\r\n    if (cardForLongPress && cardForLongPress.dataset.deptCaptureBound !== '1') {\r\n      cardForLongPress.dataset.deptCaptureBound = '1';\r\n      bindLongPress(cardForLongPress, function(ev){\r\n        var t = ev && ev.target;\r\n        if (t && typeof t.closest === 'function' && t.closest('.shiftSummary')) return;\r\n        cardForLongPress.classList.remove('collapsed');\r\n        cardForLongPress.querySelectorAll('.shiftCard').forEach(function(shiftCard){\r\n          shiftCard.style.display = '';\r\n          shiftCard.setAttribute('open', '');\r\n        });\r\n        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });\r\n      });\r\n    }\r\n",
+        "    if (head.dataset.deptCaptureBound !== '1') {\r\n      head.dataset.deptCaptureBound = '1';\r\n      bindLongPress(head, function(){\r\n        var cardForLongPress = head.closest('.deptCard');\r\n        if(!cardForLongPress) return;\r\n        cardForLongPress.classList.remove('collapsed');\r\n        cardForLongPress.querySelectorAll('.shiftCard').forEach(function(shiftCard){\r\n          shiftCard.style.display = '';\r\n          shiftCard.setAttribute('open', '');\r\n        });\r\n        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });\r\n      });\r\n    }\r\n",
+    )
     replace_block(OLD_DEPT_CAPTURE, NEW_DEPT_CAPTURE)
+    replace_block(OLD_DEPT_BIND_SCOPE, NEW_DEPT_BIND_SCOPE)
     replace_block(OLD_CAPTURE_FUNC, NEW_CAPTURE_FUNC)
+    text = text.replace(
+        "var targetClone = target.cloneNode(true);",
+        "var sourceTarget = target;\n    if (opts.expandAllShifts && target && typeof target.closest === 'function') {\n      var sourceDept = target.closest('.deptCard');\n      if (sourceDept) sourceTarget = sourceDept;\n    }\n    var targetClone = sourceTarget.cloneNode(true);",
+    )
+    text = text.replace(
+        "var srcCards = Array.from(target.querySelectorAll('.shiftCard'));",
+        "var srcCards = Array.from(sourceTarget.querySelectorAll('.shiftCard'));",
+    )
+    text = text.replace(
+        "    var targetClone = sourceTarget.cloneNode(true);\n    if (opts.expandAllShifts) {\n      targetClone.classList.remove('collapsed');\n      var cloneStack = targetClone.querySelector('.shiftStack');\n      var srcCards = Array.from(sourceTarget.querySelectorAll('.shiftCard'));\n      if (cloneStack && srcCards.length) {\n        cloneStack.innerHTML = '';\n        srcCards.forEach(function(srcCard) {\n          var shiftCard = srcCard.cloneNode(true);\n          shiftCard.style.display = 'block';\n          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\n            shiftCard.open = true;\n            shiftCard.setAttribute('open', '');\n          }\n          var body = shiftCard.querySelector('.shiftBody');\n          if (body) body.style.display = 'block';\n          cloneStack.appendChild(shiftCard);\n        });\n        cloneStack.style.display = 'flex';\n      }\n    }",
+        "    var targetClone = null;\n    if (opts.expandAllShifts) {\n      var dept = sourceTarget;\n      targetClone = document.createElement('div');\n      targetClone.className = 'deptCard';\n      var strip = dept && dept.firstElementChild ? dept.firstElementChild.cloneNode(true) : null;\n      var head = dept ? dept.querySelector('.deptHead') : null;\n      var stack = document.createElement('div');\n      stack.className = 'shiftStack';\n      stack.style.display = 'flex';\n      if (strip) targetClone.appendChild(strip);\n      if (head) targetClone.appendChild(head.cloneNode(true));\n      var srcCards = dept ? Array.from(dept.querySelectorAll('.shiftCard')) : [];\n      srcCards.forEach(function(srcCard) {\n        var shiftCard = srcCard.cloneNode(true);\n        shiftCard.style.display = 'block';\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\n          shiftCard.open = true;\n          shiftCard.setAttribute('open', '');\n        }\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n        stack.appendChild(shiftCard);\n      });\n      targetClone.appendChild(stack);\n    } else {\n      targetClone = sourceTarget.cloneNode(true);\n    }",
+    )
+    text = text.replace(
+        "    var targetClone = sourceTarget.cloneNode(true);\r\n    if (opts.expandAllShifts) {\r\n      targetClone.classList.remove('collapsed');\r\n      var cloneStack = targetClone.querySelector('.shiftStack');\r\n      var srcCards = Array.from(sourceTarget.querySelectorAll('.shiftCard'));\r\n      if (cloneStack && srcCards.length) {\r\n        cloneStack.innerHTML = '';\r\n        srcCards.forEach(function(srcCard) {\r\n          var shiftCard = srcCard.cloneNode(true);\r\n          shiftCard.style.display = 'block';\r\n          if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n            shiftCard.open = true;\r\n            shiftCard.setAttribute('open', '');\r\n          }\r\n          var body = shiftCard.querySelector('.shiftBody');\r\n          if (body) body.style.display = 'block';\r\n          cloneStack.appendChild(shiftCard);\r\n        });\r\n        cloneStack.style.display = 'flex';\r\n      }\r\n    }",
+        "    var targetClone = null;\r\n    if (opts.expandAllShifts) {\r\n      var dept = sourceTarget;\r\n      targetClone = document.createElement('div');\r\n      targetClone.className = 'deptCard';\r\n      var strip = dept && dept.firstElementChild ? dept.firstElementChild.cloneNode(true) : null;\r\n      var head = dept ? dept.querySelector('.deptHead') : null;\r\n      var stack = document.createElement('div');\r\n      stack.className = 'shiftStack';\r\n      stack.style.display = 'flex';\r\n      if (strip) targetClone.appendChild(strip);\r\n      if (head) targetClone.appendChild(head.cloneNode(true));\r\n      var srcCards = dept ? Array.from(dept.querySelectorAll('.shiftCard')) : [];\r\n      srcCards.forEach(function(srcCard) {\r\n        var shiftCard = srcCard.cloneNode(true);\r\n        shiftCard.style.display = 'block';\r\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n          shiftCard.open = true;\r\n          shiftCard.setAttribute('open', '');\r\n        }\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n        stack.appendChild(shiftCard);\r\n      });\r\n      targetClone.appendChild(stack);\r\n    } else {\r\n      targetClone = sourceTarget.cloneNode(true);\r\n    }",
+    )
     text = text.replace(
         "      targetClone.querySelectorAll('.shiftCard').forEach(function(shiftCard) {\n        shiftCard.style.display = '';\n        shiftCard.setAttribute('open', '');\n      });",
         "      targetClone.querySelectorAll('details.shiftCard').forEach(function(shiftCard) {\n        shiftCard.style.display = 'block';\n        shiftCard.open = true;\n        shiftCard.setAttribute('open', '');\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n      });\n      var stack = targetClone.querySelector('.shiftStack');\n      if (stack) stack.style.display = 'flex';",
@@ -317,6 +388,38 @@ def patch_file(path: Path) -> bool:
     text = text.replace(
         "    document.body.appendChild(wrap);\r\n    await waitForCaptureLayout();\r\n\r\n    var canvas = await html2canvas(wrap, {\r\n      backgroundColor: '#eef1f7',\r\n      scale: Math.max(2, window.devicePixelRatio || 1),\r\n      useCORS: true\r\n    });",
         "    document.body.appendChild(wrap);\r\n    await waitForCaptureLayout();\r\n    var captureWidth = Math.ceil(wrap.scrollWidth || wrap.offsetWidth || 0);\r\n    var captureHeight = Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0);\r\n\r\n    var canvas = await html2canvas(wrap, {\r\n      backgroundColor: '#eef1f7',\r\n      scale: Math.max(2, window.devicePixelRatio || 1),\r\n      useCORS: true,\r\n      width: captureWidth || undefined,\r\n      height: captureHeight || undefined,\r\n      windowWidth: captureWidth || window.innerWidth,\r\n      windowHeight: captureHeight || window.innerHeight\r\n    });",
+    )
+    text = text.replace(
+        "function openCaptureSheet(blob, fileName) {",
+        "function openCaptureSheet(blob, fileName, captureMode) {",
+    )
+    text = text.replace(
+        "function openCaptureSheet(blob, fileName) {\r\n",
+        "function openCaptureSheet(blob, fileName, captureMode) {\r\n",
+    )
+    text = text.replace(
+        "  var preview = document.getElementById('capturePreview');\n  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;\n",
+        "  var preview = document.getElementById('capturePreview');\n  var title = sheet ? sheet.querySelector('.captureSheetTitle') : null;\n  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;\n  var modeText = captureMode || 'UNKNOWN';\n  if (title) title.textContent = 'Share or save image (' + modeText + ')';\n",
+    )
+    text = text.replace(
+        "  var preview = document.getElementById('capturePreview');\r\n  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;\r\n",
+        "  var preview = document.getElementById('capturePreview');\r\n  var title = sheet ? sheet.querySelector('.captureSheetTitle') : null;\r\n  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;\r\n  var modeText = captureMode || 'UNKNOWN';\r\n  if (title) title.textContent = 'Share or save image (' + modeText + ')';\r\n",
+    )
+    text = text.replace(
+        "      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');",
+        "      var mode = opts && opts.expandAllShifts ? 'DEPARTMENT' : 'SHIFT';\n      console.log('[capture] mode=' + mode + ' target=' + (target && target.className ? target.className : 'unknown'));\n      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png', mode);",
+    )
+    text = text.replace(
+        "      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png');\r\n",
+        "      var mode = opts && opts.expandAllShifts ? 'DEPARTMENT' : 'SHIFT';\r\n      console.log('[capture] mode=' + mode + ' target=' + (target && target.className ? target.className : 'unknown'));\r\n      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png', mode);\r\n",
+    )
+    text = text.replace(
+        "      srcCards.forEach(function(srcCard) {\n        var shiftCard = srcCard.cloneNode(true);\n        shiftCard.style.display = 'block';\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\n          shiftCard.open = true;\n          shiftCard.setAttribute('open', '');\n        }\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n        stack.appendChild(shiftCard);\n      });",
+        "      srcCards.forEach(function(srcCard) {\n        var shiftCard = srcCard.cloneNode(true);\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\n          var flatCard = document.createElement('div');\n          flatCard.className = shiftCard.className;\n          if (shiftCard.getAttribute('style')) flatCard.setAttribute('style', shiftCard.getAttribute('style'));\n          Array.from(shiftCard.children).forEach(function(ch) { flatCard.appendChild(ch.cloneNode(true)); });\n          shiftCard = flatCard;\n        }\n        shiftCard.style.display = 'block';\n        var body = shiftCard.querySelector('.shiftBody');\n        if (body) body.style.display = 'block';\n        stack.appendChild(shiftCard);\n      });",
+    )
+    text = text.replace(
+        "      srcCards.forEach(function(srcCard) {\r\n        var shiftCard = srcCard.cloneNode(true);\r\n        shiftCard.style.display = 'block';\r\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n          shiftCard.open = true;\r\n          shiftCard.setAttribute('open', '');\r\n        }\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n        stack.appendChild(shiftCard);\r\n      });",
+        "      srcCards.forEach(function(srcCard) {\r\n        var shiftCard = srcCard.cloneNode(true);\r\n        if (String(shiftCard.tagName || '').toUpperCase() === 'DETAILS') {\r\n          var flatCard = document.createElement('div');\r\n          flatCard.className = shiftCard.className;\r\n          if (shiftCard.getAttribute('style')) flatCard.setAttribute('style', shiftCard.getAttribute('style'));\r\n          Array.from(shiftCard.children).forEach(function(ch) { flatCard.appendChild(ch.cloneNode(true)); });\r\n          shiftCard = flatCard;\r\n        }\r\n        shiftCard.style.display = 'block';\r\n        var body = shiftCard.querySelector('.shiftBody');\r\n        if (body) body.style.display = 'block';\r\n        stack.appendChild(shiftCard);\r\n      });",
     )
     if text == orig:
         return False

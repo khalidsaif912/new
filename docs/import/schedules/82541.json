@@ -623,5 +623,157 @@
     ]
   },
   "month": "2026-06",
-  "monthLabel": "2026-06"
+  "monthLabel": "June 2026",
+  "days": [
+    {
+      "day": 1,
+      "weekday": "Mon",
+      "code": "AE14"
+    },
+    {
+      "day": 2,
+      "weekday": "Tue",
+      "code": "AE14"
+    },
+    {
+      "day": 3,
+      "weekday": "Wed",
+      "code": "NE22"
+    },
+    {
+      "day": 4,
+      "weekday": "Thu",
+      "code": "O"
+    },
+    {
+      "day": 5,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 6,
+      "weekday": "Sat",
+      "code": "AE14"
+    },
+    {
+      "day": 7,
+      "weekday": "Sun",
+      "code": "AE14"
+    },
+    {
+      "day": 8,
+      "weekday": "Mon",
+      "code": "ME06"
+    },
+    {
+      "day": 9,
+      "weekday": "Tue",
+      "code": "NE22"
+    },
+    {
+      "day": 10,
+      "weekday": "Wed",
+      "code": "NE22"
+    },
+    {
+      "day": 11,
+      "weekday": "Thu",
+      "code": "O"
+    },
+    {
+      "day": 12,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 13,
+      "weekday": "Sat",
+      "code": "AE14"
+    },
+    {
+      "day": 14,
+      "weekday": "Sun",
+      "code": "AE14"
+    },
+    {
+      "day": 15,
+      "weekday": "Mon",
+      "code": "ME06"
+    },
+    {
+      "day": 16,
+      "weekday": "Tue",
+      "code": "ME06"
+    },
+    {
+      "day": 17,
+      "weekday": "Wed",
+      "code": "NE22"
+    },
+    {
+      "day": 18,
+      "weekday": "Thu",
+      "code": "O"
+    },
+    {
+      "day": 19,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 20,
+      "weekday": "Sat",
+      "code": "AE14"
+    },
+    {
+      "day": 21,
+      "weekday": "Sun",
+      "code": "AE14"
+    },
+    {
+      "day": 22,
+      "weekday": "Mon",
+      "code": "TR"
+    },
+    {
+      "day": 23,
+      "weekday": "Tue",
+      "code": "TR"
+    },
+    {
+      "day": 24,
+      "weekday": "Wed",
+      "code": "TR"
+    },
+    {
+      "day": 25,
+      "weekday": "Thu",
+      "code": "O"
+    },
+    {
+      "day": 26,
+      "weekday": "Fri",
+      "code": "O"
+    },
+    {
+      "day": 27,
+      "weekday": "Sat",
+      "code": "AE14"
+    },
+    {
+      "day": 28,
+      "weekday": "Sun",
+      "code": "AE14"
+    },
+    {
+      "day": 29,
+      "weekday": "Mon",
+      "code": "ME06"
+    },
+    {
+      "day": 30,
+      "weekday": "Tue",
+      "code": "NE22"
+    }
+  ]
 }

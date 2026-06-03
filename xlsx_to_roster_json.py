@@ -55,7 +55,7 @@ DEPARTMENTS = [
 DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
 SHIFT_MAP = {
-    "MN06": "Morning",  "ME06": "Morning",  "ME07": "Morning",
+    "MN06": "Morning",  "ME06": "Morning",  "ME07": "Morning",  "ME12": "Morning",
     "MN12": "Afternoon","AN13": "Afternoon","AE14": "Afternoon",
     "NN21": "Night",    "NE22": "Night",
 }
@@ -141,6 +141,8 @@ def map_shift(code: str) -> tuple[str, str]:
         return ("OFF", "Off Day")
     if c in SHIFT_MAP:
         return SHIFT_MAP[c], SHIFT_MAP[c]
+    if c.startswith("ME"):
+        return (c0, "Morning")
     return (c0, "Other")
 
 def _is_date_number(v: str) -> bool:

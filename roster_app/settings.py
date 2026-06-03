@@ -32,6 +32,7 @@ SHIFT_MAP = {
     "MN06": ("MN06", "Morning"),
     "ME06": ("ME06", "Morning"),
     "ME07": ("ME07", "Morning"),
+    "ME12": ("ME12", "Morning"),
     "MN12": ("MN12", "Afternoon"),
     "AN13": ("AN13", "Afternoon"),
     "AE14": ("AE14", "Afternoon"),

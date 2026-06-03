@@ -84,7 +84,96 @@ def map_shift(code: str):
         return ("OFF", "Off Day")
     if c in SHIFT_MAP:
         return SHIFT_MAP[c]
+    if c.startswith("ME"):
+        return (c0, "Morning")
     return (c0, "Other")
+
+
+SHIFT_RANGE_TOKEN_RE = re.compile(r"^(MN|ME|AN|AE|NN|NE|NT)\d{1,2}", re.I)
+
+# FROM/TO ranges are shown only for these roster groups (not regular shifts or off days).
+RANGE_SUFFIX_GROUPS = frozenset({"Annual Leave", "Sick Leave", "Training"})
+
+
+def shift_range_match_key(code: str) -> str:
+    """Normalize a roster cell value for contiguous day-range matching."""
+    v = norm(code).upper()
+    if not v:
+        return ""
+    if v in ("O", "OFF") or v.startswith("OFF") or "OFF DAY" in v or "REST" in v:
+        return "OFF"
+    if v in ("AL", "LV") or "ANNUAL" in v:
+        return "ANNUAL"
+    if v == "SL" or "SICK" in v:
+        return "SICK"
+    if v == "TR" or "TRAINING" in v:
+        return "TR"
+    m = SHIFT_RANGE_TOKEN_RE.match(v)
+    if m:
+        return m.group(0).upper()
+    return v.split()[0]
+
+
+def range_suffix_for_day(day: int, daynum_to_raw: dict, code_key: str) -> str:
+    """If day is part of a contiguous leave/training block, return (FROM x TO y)."""
+    sorted_days = sorted(daynum_to_raw.keys())
+    if day not in sorted_days:
+        return ""
+
+    match_key = shift_range_match_key(code_key)
+    if not match_key:
+        return ""
+
+    def is_same_type(val: str) -> bool:
+        return shift_range_match_key(val) == match_key
+
+    start = day
+    end = day
+    current = day - 1
+    while current in sorted_days:
+        if is_same_type(daynum_to_raw.get(current, "")):
+            start = current
+            current -= 1
+        else:
+            break
+    current = day + 1
+    while current in sorted_days:
+        if is_same_type(daynum_to_raw.get(current, "")):
+            end = current
+            current += 1
+        else:
+            break
+
+    if start == end:
+        return ""
+    return (
+        f'(<span class="shiftRange">'
+        f'<span class="shiftRangeLabel">FROM</span> {start} '
+        f'<span class="shiftRangeLabel">TO</span> {end}'
+        f"</span>)"
+    )
+
+
+def append_range_suffix(
+    label: str,
+    day: int,
+    daynum_to_raw: dict,
+    raw_code: str,
+    *,
+    group_key: str | None = None,
+) -> str:
+    """Append (FROM x TO y) for annual/sick leave and training only."""
+    if group_key is not None and group_key not in RANGE_SUFFIX_GROUPS:
+        return label
+    suf = range_suffix_for_day(day, daynum_to_raw, raw_code)
+    if not suf:
+        return label
+    base = (label or "").strip()
+    if not base or base == "-":
+        return suf
+    if "FROM" in base.upper() or "من" in base:
+        return base
+    return f"{base} {suf}"
 
 
 def current_shift_key(now: datetime) -> str:

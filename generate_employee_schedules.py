@@ -52,6 +52,7 @@ SHIFT_MAP = {
     "MN06": ("🌅 Morning (MN06)", "Morning"),
     "ME06": ("🌅 Morning (ME06)", "Morning"),
     "ME07": ("🌅 Morning (ME07)", "Morning"),
+    "ME12": ("🌅 Morning (ME12)", "Morning"),
     "MN12": ("🌆 Afternoon (MN12)", "Afternoon"),
     "AN13": ("🌆 Afternoon (AN13)", "Afternoon"),
     "AE14": ("🌆 Afternoon (AE14)", "Afternoon"),
@@ -150,7 +151,10 @@ def map_shift(code: str):
     
     if c in SHIFT_MAP:
         return SHIFT_MAP[c]
-    
+
+    if c.startswith("ME"):
+        return (f"🌅 Morning ({c0})", "Morning")
+
     return (f"❓ {c0}", "Other")
 
 

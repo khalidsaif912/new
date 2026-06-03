@@ -1050,3 +1050,15 @@ PERF_RENDER_CSS = """    .deptCard {
       contain-intrinsic-size: auto 180px;
     }
 """
+
+SHIFT_RANGE_CSS = """    .empStatus .shiftRange {
+      font-size: 0.88em;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+    .empStatus .shiftRangeLabel {
+      font-size: 0.78em;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+"""

@@ -40,6 +40,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
 from roster_app.cache_io import month_key_from_filename  # noqa: E402
+from roster_app.text_utils import append_range_suffix  # noqa: E402
 from roster_cta_snippets import (  # noqa: E402
     CHIP_EXPORT_HTML,
     CHIP_ICON_CSS,
@@ -51,6 +52,7 @@ from roster_cta_snippets import (  # noqa: E402
     LANG_TOGGLE_HTML,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
     PERF_RENDER_CSS,
+    SHIFT_RANGE_CSS,
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
 )
@@ -234,62 +236,14 @@ def _norm_cell(val: Any) -> str:
     return str(val or "").strip()
 
 
-def range_suffix_for_day(day: int, daynum_to_raw: dict, code_key: str) -> str:
-    """If day is part of a contiguous leave/training block, return (FROM x TO y)."""
-    sorted_days = sorted(daynum_to_raw.keys())
-    if day not in sorted_days:
-        return ""
-
-    up_key = _norm_cell(code_key).upper()
-    acceptable_codes: List[str] = []
-    if up_key in ["AL", "LV"] or "ANNUAL" in up_key:
-        acceptable_codes = ["AL", "LV", "ANNUAL LEAVE"]
-    elif up_key == "SL" or "SICK" in up_key:
-        acceptable_codes = ["SL", "SICK LEAVE"]
-    elif up_key == "TR" or "TRAINING" in up_key:
-        acceptable_codes = ["TR", "TRAINING"]
-    else:
-        acceptable_codes = [up_key]
-
-    def is_same_type(val: str) -> bool:
-        if not val:
-            return False
-        val_upper = val.upper()
-        return any(code in val_upper or val_upper == code for code in acceptable_codes)
-
-    start = day
-    end = day
-    current = day - 1
-    while current in sorted_days:
-        val = _norm_cell(daynum_to_raw.get(current, ""))
-        if is_same_type(val):
-            start = current
-            current -= 1
-        else:
-            break
-    current = day + 1
-    while current in sorted_days:
-        val = _norm_cell(daynum_to_raw.get(current, ""))
-        if is_same_type(val):
-            end = current
-            current += 1
-        else:
-            break
-
-    if start == end:
-        return ""
-    return (
-        f"(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> {start} "
-        f"<span style='font-size:0.75em;opacity:0.8;'>TO</span> {end})"
-    )
-
-
 CAPTURE_DOM_HTML = """
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
   <div class="captureSheetCard">
     <div class="captureSheetTitle">Share or save image</div>
-    <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    <div class="capturePreviewWrap">
+      <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    </div>
     <div class="captureSheetActions">
       <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
       <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
@@ -298,6 +252,7 @@ CAPTURE_DOM_HTML = """
   </div>
 </div>
 """
+
 
 
 def parse_month_sheet(xlsx_path: str, sheet_name: str) -> Dict[str, Any]:
@@ -476,6 +431,39 @@ _FLATTEN_FUTURE_SHIFTS_RE = re.compile(
 )
 
 
+def merge_capture_script_from_generator(script: str, repo_root: Path) -> str:
+    """Replace legacy capture JS with the fixed bundle from generate_and_send.py."""
+    sys.path.insert(0, str(repo_root / "scripts"))
+    from roster_capture_bundle import capture_js_from_generator  # noqa: E402
+
+    new_block = capture_js_from_generator()
+    old_start = script.find("function openCaptureSheet")
+    old_end = script.find("function goToEmployeeSchedule", old_start)
+    if old_start < 0 or old_end < 0:
+        return script
+    return script[:old_start] + new_block + script[old_end:]
+
+
+def inject_capture_sheet_css(style: str, repo_root: Path) -> str:
+    sys.path.insert(0, str(repo_root / "scripts"))
+    from roster_capture_bundle import capture_css_from_generator  # noqa: E402
+
+    css = capture_css_from_generator()
+    if not css:
+        return style
+    marker = "/* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */"
+    if marker in style:
+        return re.sub(
+            r"/\* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ \*/.*?"
+            r"\.captureBusy\.open \{\{? display:block; \}\}?",
+            css,
+            style,
+            count=1,
+            flags=re.DOTALL,
+        )
+    return style + "\n" + css + "\n"
+
+
 def patch_flatten_future_shifts_js(script: str) -> str:
     if "Array.isArray(data.days)" in script and "d.code || d.shift_code" in script:
         return script
@@ -509,9 +497,11 @@ _SET_SUMMARY_HREFS_RE = re.compile(
 )
 
 
-def prepare_export_script_for_import(script: str) -> str:
+def prepare_export_script_for_import(script: str, repo_root: Path | None = None) -> str:
     """Adapt export roster JS for /import/ paths and schedules."""
     script = sanitize_export_script_for_import(script)
+    if repo_root is not None:
+        script = merge_capture_script_from_generator(script, repo_root)
     subs = [
         ("getSiteRootUrl() + '/schedules/'", "getSiteRootUrl() + '/import/schedules/'"),
         (
@@ -830,8 +820,12 @@ def build_duty_html(
             for idx, row in enumerate(rows):
                 name, empid, code = row["name"], row["id"], row["code"]
                 label = f"{name} - {empid}"
-                suffix = range_suffix_for_day(day, row["shifts"], code)
-                status_html = f"{code} {suffix}" if suffix else code
+                if key in ("Annual Leave", "Sick Leave", "Training"):
+                    status_html = append_range_suffix(
+                        code, day, row["shifts"], code, group_key=key
+                    )
+                else:
+                    status_html = code
                 name_attr = html_escape(label, quote=True)
                 alt = " empRowAlt" if idx % 2 == 1 else ""
                 emp_rows.append(f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
@@ -966,6 +960,8 @@ def build_duty_html(
       30% {{ transform: rotate(16deg); }}
       40% {{ transform: rotate(-6deg); }}
     }}
+{PERF_RENDER_CSS}
+{SHIFT_RANGE_CSS}
   </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
 <body>
@@ -1363,7 +1359,8 @@ def main() -> None:
         print(f"Generating month {gen_ym}; home page shows {display_date.isoformat()}")
 
     style, export_script = load_export_ui_template(repo_root)
-    export_script = prepare_export_script_for_import(export_script)
+    style = inject_capture_sheet_css(style, repo_root)
+    export_script = prepare_export_script_for_import(export_script, repo_root)
 
     roster_catalog = discover_import_roster_catalog(out_root)
     min_date = roster_catalog["date_min"]
