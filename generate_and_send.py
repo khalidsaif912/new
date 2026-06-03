@@ -1052,6 +1052,12 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       transform:translateY(-3px);
       box-shadow:0 8px 20px rgba(15,23,42,.12);
     }}
+    button.summaryChip.shiftFilterBtn:focus {{
+      outline:none;
+    }}
+    button.summaryChip.shiftFilterBtn:focus:not(.active) {{
+      border-color:transparent;
+    }}
     button.summaryChip.shiftFilterBtn.active {{
       border-color:currentColor;
       box-shadow:0 6px 16px rgba(15,23,42,.18);
@@ -1614,7 +1620,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       {CHIP_NIGHT_HTML}
       <div class="chipLabel" data-key="night">Night</div>
     </button>
-    <button class="summaryChip shiftFilterBtn all active" data-shift="All" style="cursor:pointer;">
+    <button class="summaryChip shiftFilterBtn all" data-shift="All" style="cursor:pointer;">
       {CHIP_ALL_HTML}
       <div class="chipLabel" data-key="allShifts">All Shifts</div>
     </button>
@@ -2500,112 +2506,6 @@ function goToEmployeeSchedule(empName) {{
   }});
 }})();
 
-// ═══════════════════════════════════════════════════
-// Shift Filter (NOW PAGE ONLY)
-// ═══════════════════════════════════════════════════
-(function(){{
-  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
-  if(!filterBtns.length) return; // Not a /now/ page
-  
-  var allShiftCards = document.querySelectorAll('.shiftCard');
-  
-  // Group shift cards by shift type
-  var shiftGroups = {{}};
-  allShiftCards.forEach(function(card){{
-    var shiftType = card.dataset.shift;
-    if(!shiftType) return;
-    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
-    shiftGroups[shiftType].push(card);
-  }});
-  
-  // Determine current shift based on time
-  function getCurrentShift(){{
-    var now = new Date();
-    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    var hour = muscatTime.getHours();
-    var minute = muscatTime.getMinutes();
-    var t = hour * 60 + minute;
-    
-    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
-    if(t >= 13 * 60) return 'Afternoon';
-    return 'Morning';
-  }}
-  
-  // Set active shift on load - default to current shift
-  var currentShift = getCurrentShift();
-  filterBtns.forEach(function(btn){{
-    if(btn.dataset.shift === currentShift){{
-      btn.classList.add('active');
-    }} else {{
-      btn.classList.remove('active');
-    }}
-  }});
-  
-  // Filter function
-  function filterShifts(selectedShift){{
-    var totalEmployees = 0;
-    
-    if(selectedShift === 'All'){{
-      // Show all shifts
-      allShiftCards.forEach(function(card){{
-        card.style.display = '';
-        var count = card.querySelector('.shiftCount');
-        if(count) totalEmployees += parseInt(count.textContent) || 0;
-      }});
-    }} else {{
-      // Hide all cards first
-      allShiftCards.forEach(function(card){{ card.style.display = 'none'; }});
-      
-      // Show only selected shift cards and count employees
-      if(shiftGroups[selectedShift]){{
-        shiftGroups[selectedShift].forEach(function(card){{
-          card.style.display = '';
-          // Auto-open the selected shift
-          card.setAttribute('open', '');
-          // Count employees in this card
-          var count = card.querySelector('.shiftCount');
-          if(count) totalEmployees += parseInt(count.textContent) || 0;
-        }});
-      }}
-      
-      // Also show Off Day, Leave, Training, Standby in all shifts
-      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
-      alwaysShow.forEach(function(type){{
-        if(shiftGroups[type]){{
-          shiftGroups[type].forEach(function(card){{
-            card.style.display = '';
-            // لا تحسب Off Day/Leave في عداد الفترة المختارة
-          }});
-        }}
-      }});
-    }}
-    
-    // Update employee count in summary
-    window.__summaryCounts = window.__summaryCounts || {{}};
-    window.__summaryCounts.employees = totalEmployees;
-    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
-    
-    // Update button states
-    filterBtns.forEach(function(btn){{
-      if(btn.dataset.shift === selectedShift){{
-        btn.classList.add('active');
-      }} else {{
-        btn.classList.remove('active');
-      }}
-    }});
-  }}
-  
-  // Add click handlers
-  filterBtns.forEach(function(btn){{
-    btn.addEventListener('click', function(){{
-      filterShifts(this.dataset.shift);
-    }});
-  }});
-  
-  // Auto-filter on page load - show current shift
-  filterShifts(currentShift);
-}})();
-
 // ══════════════════════════════════════════════════
 // Language Toggle
 // ══════════════════════════════════════════════════
@@ -2797,7 +2697,6 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){{
-      shiftCard.style.display = '';
       shiftCard.removeAttribute('open');
     }});
     var currentShift = getCurrentShiftForMuscat();
@@ -2836,6 +2735,114 @@ startSummarySwitchLoop();
       openMatchingShift(targetCard);
     }}
   }}
+}})();
+
+// ═══════════════════════════════════════════════════
+// Shift Filter (NOW PAGE ONLY) — runs after dept layout
+// ═══════════════════════════════════════════════════
+(function(){{
+  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
+  if(!filterBtns.length) return;
+
+  var allShiftCards = document.querySelectorAll('.shiftCard');
+
+  function normalizeShift(raw){{
+    if(!raw) return '';
+    var t = String(raw).trim().toLowerCase();
+    if(t === 'all' || t.includes('all shifts') || t === 'الكل') return 'All';
+    if(t.includes('morning') || t.includes('صباح')) return 'Morning';
+    if(t.includes('afternoon') || t.includes('ظهر') || t.includes('مساء')) return 'Afternoon';
+    if(t.includes('night') || t.includes('ليل')) return 'Night';
+    if(t.includes('off day') || (t.includes('off') && !t.includes('officer')) || t.includes('راحة') || t.includes('أوف')) return 'Off Day';
+    if(t.includes('annual') || t.includes('سنوية')) return 'Annual Leave';
+    if(t.includes('sick') || t.includes('مرض')) return 'Sick Leave';
+    if(t.includes('training') || t.includes('تدريب')) return 'Training';
+    if(t.includes('standby') || t.includes('ستاند') || t.includes('احتياط')) return 'Standby';
+    if(t.includes('other') || t.includes('أخرى') || t.includes('اخرى')) return 'Other';
+    return String(raw).trim();
+  }}
+
+  function btnShift(btn){{
+    return normalizeShift(btn.getAttribute('data-shift') || btn.dataset.shift || '');
+  }}
+
+  filterBtns.forEach(function(btn){{
+    var s = btnShift(btn);
+    if(s) btn.setAttribute('data-shift', s);
+  }});
+
+  var shiftGroups = {{}};
+  allShiftCards.forEach(function(card){{
+    var label = card.querySelector('.shiftSummary .shiftLabel');
+    var shiftType = normalizeShift(
+      label ? (label.dataset.key || label.textContent) : (card.getAttribute('data-shift') || card.dataset.shift || '')
+    );
+    if(!shiftType) return;
+    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
+    shiftGroups[shiftType].push(card);
+  }});
+
+  function getCurrentShift(){{
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var t = muscatTime.getHours() * 60 + muscatTime.getMinutes();
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }}
+
+  function setFilterBtnActive(selectedShift){{
+    filterBtns.forEach(function(btn){{
+      btn.classList.toggle('active', btnShift(btn) === selectedShift);
+    }});
+  }}
+
+  function filterShifts(selectedShiftRaw){{
+    var selectedShift = normalizeShift(selectedShiftRaw);
+    window.__shiftFilterSelection = selectedShift;
+    var totalEmployees = 0;
+
+    if(selectedShift === 'All'){{
+      allShiftCards.forEach(function(card){{
+        card.style.display = '';
+        var count = card.querySelector('.shiftCount');
+        if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+      }});
+    }} else {{
+      allShiftCards.forEach(function(card){{ card.style.display = 'none'; }});
+      if(shiftGroups[selectedShift]){{
+        shiftGroups[selectedShift].forEach(function(card){{
+          card.style.display = '';
+          card.setAttribute('open', '');
+          var count = card.querySelector('.shiftCount');
+          if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+        }});
+      }}
+      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
+      alwaysShow.forEach(function(type){{
+        if(shiftGroups[type]){{
+          shiftGroups[type].forEach(function(card){{
+            card.style.display = '';
+          }});
+        }}
+      }});
+    }}
+
+    window.__summaryCounts = window.__summaryCounts || {{}};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    setFilterBtnActive(selectedShift);
+  }}
+
+  window.applyShiftFilter = filterShifts;
+
+  filterBtns.forEach(function(btn){{
+    btn.addEventListener('click', function(){{
+      filterShifts(btnShift(btn));
+    }});
+  }});
+
+  filterShifts(getCurrentShift());
 }})();
 
 // ═══════════════════════════════════════════════════
