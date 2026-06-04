@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260531a"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260604a"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -735,241 +735,71 @@
 
     /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
     }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
     .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
     }
     .siteShareUrl {
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
     }
     .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
     }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+
     /* ═══════ RELATED APPS MODAL ═══════ */
     .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
     }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
     .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
     }
     .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
     }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    .siteAppsLink--store,
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
     .siteAppsLink--games {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      min-height: 72px;
-      justify-content: flex-start;
-      padding-inline: 14px;
-      gap: 12px;
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
     }
-    .siteAppsLink--store {
-      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
-      border-color: #fdba74;
-    }
-    .siteAppsLink--store .siteAppsLink-icon {
-      flex-shrink: 0;
-    }
-    .siteAppsLink--games .siteAppsLink-icon {
-      background: #fdf2f8;
-      border-color: #fbcfe8;
-      flex-shrink: 0;
-    }
-    .siteAppsLink--store .siteAppsLink-text,
-    .siteAppsLink--games .siteAppsLink-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      flex: 1;
-    }
-    .siteAppsLink--store .siteAppsLink-title,
-    .siteAppsLink--store .siteAppsLink-sub,
-    .siteAppsLink--games .siteAppsLink-title,
-    .siteAppsLink--games .siteAppsLink-sub {
-      text-align: start;
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
 
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
@@ -1111,8 +941,8 @@
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">1 June 2026</span></label>
-      <input id="datePicker" type="date" value="2026-06-01" min="2026-05-01" max="2026-07-31" aria-label="Select roster date" />
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">03 June 2026</span></label>
+      <input id="datePicker" type="date" value="2026-06-03" min="2026-05-01" max="2026-07-31" aria-label="Select roster date" />
     </div>
   </div>
 
@@ -1121,7 +951,7 @@
   <!-- ════ SUMMARY CHIPS ════ -->
   <div class="summaryBar">
     <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">51</div>
+      <div class="chipVal" id="summarySwitchVal">46</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
     <a href="https://khalidsaif912.github.io/roster-site/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
@@ -1188,30 +1018,19 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Adil Al Balushi - 81392" role="button" tabindex="0">
       <span class="empName">Adil Al Balushi - 81392</span>
        <span class="empStatus" style="color:#92400e;">ME07</span>
-     </div>
-      </div>
-    </details>
-            
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
-      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
-        <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
-      </summary>
-      <div class="shiftBody">
-        <div class="empRow" data-emp-name="Rajaram - 8899" role="button" tabindex="0">
-      <span class="empName">Rajaram - 8899</span>
-       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Salim Al Masroori - 8926" role="button" tabindex="0">
+      <span class="empName">Salim Al Masroori - 8926</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
@@ -1223,8 +1042,8 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Salim Al Masroori - 8926" role="button" tabindex="0">
-      <span class="empName">Salim Al Masroori - 8926</span>
+        <div class="empRow" data-emp-name="Rajaram - 8899" role="button" tabindex="0">
+      <span class="empName">Rajaram - 8899</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
       </div>
@@ -1239,7 +1058,7 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Rodolfo Magcaling - 80235" role="button" tabindex="0">
       <span class="empName">Rodolfo Magcaling - 80235</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 4)</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 4</span>)</span>
      </div>
       </div>
     </details>
@@ -1270,15 +1089,15 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Amri - 81404" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Amri - 81404</span>
+        <div class="empRow" data-emp-name="Talal Al Balushi - 81300" role="button" tabindex="0">
+      <span class="empName">Talal Al Balushi - 81300</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -1291,22 +1110,22 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Talal Al Balushi - 81300" role="button" tabindex="0">
-      <span class="empName">Talal Al Balushi - 81300</span>
+        <div class="empRow" data-emp-name="Saleh Al Rashdi - 82546" role="button" tabindex="0">
+      <span class="empName">Saleh Al Rashdi - 82546</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Kalbani - 82593" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Kalbani - 82593</span>
+        <div class="empRow" data-emp-name="Mohamed Al Amri - 81404" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Amri - 81404</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -1319,8 +1138,8 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Saleh Al Rashdi - 82546" role="button" tabindex="0">
-      <span class="empName">Saleh Al Rashdi - 82546</span>
+        <div class="empRow" data-emp-name="Mohamed Al Kalbani - 82593" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Kalbani - 82593</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
       </div>
@@ -1335,10 +1154,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Jay Macalino - 80250" role="button" tabindex="0">
       <span class="empName">Jay Macalino - 80250</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 6)</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 6</span>)</span>
      </div><div class="empRow empRowAlt" data-emp-name="Said Al Amri - 990737" role="button" tabindex="0">
       <span class="empName">Said Al Amri - 990737</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 4)</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 4</span>)</span>
      </div>
       </div>
     </details>
@@ -1369,18 +1188,18 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Hamed Al Fulaiti - 82596" role="button" tabindex="0">
-      <span class="empName">Hamed Al Fulaiti - 82596</span>
+        <div class="empRow" data-emp-name="Al Muthana Al Shamfari - 82445" role="button" tabindex="0">
+      <span class="empName">Al Muthana Al Shamfari - 82445</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Muqaini - 82548" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Muqaini - 82548</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Qasim Al Maqbali - 81409" role="button" tabindex="0">
+      <span class="empName">Qasim Al Maqbali - 81409</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
@@ -1393,31 +1212,34 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Habib Al Balushi - 82600" role="button" tabindex="0">
-      <span class="empName">Habib Al Balushi - 82600</span>
+        <div class="empRow" data-emp-name="Omar Al Obaidi - 82551" role="button" tabindex="0">
+      <span class="empName">Omar Al Obaidi - 82551</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Al Muthana Al Shamfari - 82445" role="button" tabindex="0">
-      <span class="empName">Al Muthana Al Shamfari - 82445</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Saleh Al Aufi - 82550" role="button" tabindex="0">
+      <span class="empName">Saleh Al Aufi - 82550</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow" data-emp-name="Qasim Al Maqbali - 81409" role="button" tabindex="0">
-      <span class="empName">Qasim Al Maqbali - 81409</span>
+     </div><div class="empRow" data-emp-name="Assad Al Omairi - 81348" role="button" tabindex="0">
+      <span class="empName">Assad Al Omairi - 81348</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">2</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Jaafar Al Balushi - 81258" role="button" tabindex="0">
-      <span class="empName">Jaafar Al Balushi - 81258</span>
+        <div class="empRow" data-emp-name="Habib Al Balushi - 82600" role="button" tabindex="0">
+      <span class="empName">Habib Al Balushi - 82600</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Siyabi - 81402" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Siyabi - 81402</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Hamed Al Fulaiti - 82596" role="button" tabindex="0">
+      <span class="empName">Hamed Al Fulaiti - 82596</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow" data-emp-name="Ahmed Al Muqaini - 82548" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Muqaini - 82548</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
@@ -1427,23 +1249,20 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mudathir Al Hajri - 82441" role="button" tabindex="0">
-      <span class="empName">Mudathir Al Hajri - 82441</span>
+        <div class="empRow" data-emp-name="Marwan Al Difai - 82437" role="button" tabindex="0">
+      <span class="empName">Marwan Al Difai - 82437</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Omar Al Obaidi - 82551" role="button" tabindex="0">
-      <span class="empName">Omar Al Obaidi - 82551</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Mubarak Al Nofli - 82114" role="button" tabindex="0">
+      <span class="empName">Mubarak Al Nofli - 82114</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Saleh Al Aufi - 82550" role="button" tabindex="0">
-      <span class="empName">Saleh Al Aufi - 82550</span>
+     </div><div class="empRow" data-emp-name="Jaafar Al Balushi - 81258" role="button" tabindex="0">
+      <span class="empName">Jaafar Al Balushi - 81258</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Assad Al Omairi - 81348" role="button" tabindex="0">
-      <span class="empName">Assad Al Omairi - 81348</span>
-       <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Bushra Al Wahiebi - 82657" role="button" tabindex="0">
-      <span class="empName">Bushra Al Wahiebi - 82657</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Siyabi - 81402" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Siyabi - 81402</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
       </div>
@@ -1453,29 +1272,18 @@
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
         <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
-        <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Marwan Al Difai - 82437" role="button" tabindex="0">
-      <span class="empName">Marwan Al Difai - 82437</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 2)</span>
+        <div class="empRow" data-emp-name="Mudathir Al Hajri - 82441" role="button" tabindex="0">
+      <span class="empName">Mudathir Al Hajri - 82441</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 3 <span class="shiftRangeLabel">TO</span> 7</span>)</span>
      </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Kharusi - 82575" role="button" tabindex="0">
       <span class="empName">Ahmed Al Kharusi - 82575</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 3)</span>
-     </div>
-      </div>
-    </details>
-            
-    <details class="shiftCard" data-shift="Training" style="border:1px solid #0ea5e944; background:#e0f2fe">
-      <summary class="shiftSummary" style="background:#e0f2fe; border-bottom:1px solid #0ea5e933;">
-        <span class="shiftIcon">📚</span>
-        <span class="shiftLabel" style="color:#075985;">Training</span>
-        <span class="shiftCount" style="background:#0ea5e922; color:#075985;">1</span>
-      </summary>
-      <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mubarak Al Nofli - 82114" role="button" tabindex="0">
-      <span class="empName">Mubarak Al Nofli - 82114</span>
-       <span class="empStatus" style="color:#075985;">TR</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 3</span>)</span>
+     </div><div class="empRow" data-emp-name="Bushra Al Wahiebi - 82657" role="button" tabindex="0">
+      <span class="empName">Bushra Al Wahiebi - 82657</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 2 <span class="shiftRangeLabel">TO</span> 6</span>)</span>
      </div>
       </div>
     </details>
@@ -1506,84 +1314,91 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">7</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Mazroie - 82658" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Mazroie - 82658</span>
-       <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Khalifa Al Maqbali - 82673" role="button" tabindex="0">
-      <span class="empName">Khalifa Al Maqbali - 82673</span>
-       <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow" data-emp-name="*Rashid Al Farsi - 82615" role="button" tabindex="0">
-      <span class="empName">*Rashid Al Farsi - 82615</span>
+        <div class="empRow" data-emp-name="Marlon Esmilla - 80270" role="button" tabindex="0">
+      <span class="empName">Marlon Esmilla - 80270</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow empRowAlt" data-emp-name="Ali Yousuf Al Balushi - 990752" role="button" tabindex="0">
       <span class="empName">Ali Yousuf Al Balushi - 990752</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow" data-emp-name="Ali Al Farsi - 81393" role="button" tabindex="0">
-      <span class="empName">Ali Al Farsi - 81393</span>
+     </div><div class="empRow" data-emp-name="Ghaith al Habsi - 82439" role="button" tabindex="0">
+      <span class="empName">Ghaith al Habsi - 82439</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Maskari - 82661" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Maskari - 82661</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Raad Al Farsi - 82578" role="button" tabindex="0">
+      <span class="empName">Raad Al Farsi - 82578</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="Riyahd Al Jabri - 82555" role="button" tabindex="0">
+      <span class="empName">Riyahd Al Jabri - 82555</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Riyadh Al Sulti - 82424" role="button" tabindex="0">
+      <span class="empName">Riyadh Al Sulti - 82424</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="Mohamed Al Subhi - 82592 (Inventory)" role="button" tabindex="0">
       <span class="empName">Mohamed Al Subhi - 82592 (Inventory)</span>
        <span class="empStatus" style="color:#92400e;">ME12</span>
-     </div></div>
+     </div>
+      </div>
     </details>
             
     <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">5</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Khalil Al Hinai - 82671" role="button" tabindex="0">
-      <span class="empName">Khalil Al Hinai - 82671</span>
+        <div class="empRow" data-emp-name="Ammar Al Hashmi - 82659" role="button" tabindex="0">
+      <span class="empName">Ammar Al Hashmi - 82659</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Marlon Esmilla - 80270" role="button" tabindex="0">
-      <span class="empName">Marlon Esmilla - 80270</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Mawali - 82283" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Mawali - 82283</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow" data-emp-name="Raad Al Farsi - 82578" role="button" tabindex="0">
-      <span class="empName">Raad Al Farsi - 82578</span>
+     </div><div class="empRow" data-emp-name="Yousuf Al Balushi - 82587" role="button" tabindex="0">
+      <span class="empName">Yousuf Al Balushi - 82587</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Riyahd Al Jabri - 82555" role="button" tabindex="0">
-      <span class="empName">Riyahd Al Jabri - 82555</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Hosni Al Sulti - 80695" role="button" tabindex="0">
+      <span class="empName">Hosni Al Sulti - 80695</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div><div class="empRow" data-emp-name="Adil Al Zadjali - 8584" role="button" tabindex="0">
       <span class="empName">Adil Al Zadjali - 8584</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Bakari - 81832" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Bakari - 81832</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">5</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Fahim Al Hashni - 8930" role="button" tabindex="0">
-      <span class="empName">Fahim Al Hashni - 8930</span>
+        <div class="empRow" data-emp-name="Mohamed Al Mazroie - 82658" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Mazroie - 82658</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Waleed Al Hadabi - 80482" role="button" tabindex="0">
-      <span class="empName">Waleed Al Hadabi - 80482</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Khalifa Al Maqbali - 82673" role="button" tabindex="0">
+      <span class="empName">Khalifa Al Maqbali - 82673</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow" data-emp-name="Abdullah Al Shukeili - 82645" role="button" tabindex="0">
-      <span class="empName">Abdullah Al Shukeili - 82645</span>
+     </div><div class="empRow" data-emp-name="Khalil Al Hinai - 82671" role="button" tabindex="0">
+      <span class="empName">Khalil Al Hinai - 82671</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mazin Al Hajri - 82547" role="button" tabindex="0">
-      <span class="empName">Mazin Al Hajri - 82547</span>
+     </div><div class="empRow empRowAlt" data-emp-name="*Rashid Al Farsi - 82615" role="button" tabindex="0">
+      <span class="empName">*Rashid Al Farsi - 82615</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow" data-emp-name="Ali Al Marjubi - 82577" role="button" tabindex="0">
-      <span class="empName">Ali Al Marjubi - 82577</span>
+     </div><div class="empRow" data-emp-name="Ali Al Farsi - 81393" role="button" tabindex="0">
+      <span class="empName">Ali Al Farsi - 81393</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Maskari - 82661" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Maskari - 82661</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
@@ -1593,35 +1408,32 @@
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
         <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
-        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">9</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">8</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Abdulfatah Al Shukeili - 990465" role="button" tabindex="0">
-      <span class="empName">Abdulfatah Al Shukeili - 990465</span>
+        <div class="empRow" data-emp-name="Wissam Al Kharusi - 82464" role="button" tabindex="0">
+      <span class="empName">Wissam Al Kharusi - 82464</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ammar Al Hashmi - 82659" role="button" tabindex="0">
-      <span class="empName">Ammar Al Hashmi - 82659</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Saif Al Mahrizi - 82649" role="button" tabindex="0">
+      <span class="empName">Saif Al Mahrizi - 82649</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Mawali - 82283" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Mawali - 82283</span>
+     </div><div class="empRow" data-emp-name="Dawood Al Siyabi - 82672" role="button" tabindex="0">
+      <span class="empName">Dawood Al Siyabi - 82672</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Yousuf Al Balushi - 82587" role="button" tabindex="0">
-      <span class="empName">Yousuf Al Balushi - 82587</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Fahim Al Hashni - 8930" role="button" tabindex="0">
+      <span class="empName">Fahim Al Hashni - 8930</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ali Al Mamari - 82574" role="button" tabindex="0">
-      <span class="empName">Ali Al Mamari - 82574</span>
+     </div><div class="empRow" data-emp-name="Waleed Al Hadabi - 80482" role="button" tabindex="0">
+      <span class="empName">Waleed Al Hadabi - 80482</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ghaith al Habsi - 82439" role="button" tabindex="0">
-      <span class="empName">Ghaith al Habsi - 82439</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Abdullah Al Shukeili - 82645" role="button" tabindex="0">
+      <span class="empName">Abdullah Al Shukeili - 82645</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Hashmi - 82616" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Hashmi - 82616</span>
+     </div><div class="empRow" data-emp-name="Mazin Al Hajri - 82547" role="button" tabindex="0">
+      <span class="empName">Mazin Al Hajri - 82547</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Hosni Al Sulti - 80695" role="button" tabindex="0">
-      <span class="empName">Hosni Al Sulti - 80695</span>
-       <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Bakari - 81832" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Bakari - 81832</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Ali Al Marjubi - 82577" role="button" tabindex="0">
+      <span class="empName">Ali Al Marjubi - 82577</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
       </div>
@@ -1631,27 +1443,18 @@
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
         <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
-        <span class="shiftCount" style="background:#10b98122; color:#065f46;">6</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Saif Al Mahrizi - 82649" role="button" tabindex="0">
-      <span class="empName">Saif Al Mahrizi - 82649</span>
-       <span class="empStatus" style="color:#065f46;">AL</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Khalid Al Raqadi - 8715" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Khalid Al Raqadi - 8715" role="button" tabindex="0">
       <span class="empName">Khalid Al Raqadi - 8715</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 5)</span>
-     </div><div class="empRow" data-emp-name="Dawood Al Siyabi - 82672" role="button" tabindex="0">
-      <span class="empName">Dawood Al Siyabi - 82672</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 2)</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 5</span>)</span>
      </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Mamari - 82674" role="button" tabindex="0">
       <span class="empName">Mohamed Al Mamari - 82674</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 5)</span>
-     </div><div class="empRow" data-emp-name="Riyadh Al Sulti - 82424" role="button" tabindex="0">
-      <span class="empName">Riyadh Al Sulti - 82424</span>
-       <span class="empStatus" style="color:#065f46;">AL</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Maskari - 82666" role="button" tabindex="0">
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 5</span>)</span>
+     </div><div class="empRow" data-emp-name="Mohamed Al Maskari - 82666" role="button" tabindex="0">
       <span class="empName">Mohamed Al Maskari - 82666</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 10)</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 10</span>)</span>
      </div>
       </div>
     </details>
@@ -1660,18 +1463,25 @@
       <summary class="shiftSummary" style="background:#e0f2fe; border-bottom:1px solid #0ea5e933;">
         <span class="shiftIcon">📚</span>
         <span class="shiftLabel" style="color:#075985;">Training</span>
-        <span class="shiftCount" style="background:#0ea5e922; color:#075985;">1</span>
+        <span class="shiftCount" style="background:#0ea5e922; color:#075985;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Wissam Al Kharusi - 82464" role="button" tabindex="0">
-      <span class="empName">Wissam Al Kharusi - 82464</span>
+        <div class="empRow" data-emp-name="Abdulfatah Al Shukeili - 990465" role="button" tabindex="0">
+      <span class="empName">Abdulfatah Al Shukeili - 990465</span>
+       <span class="empStatus" style="color:#075985;">TR</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Ali Al Mamari - 82574" role="button" tabindex="0">
+      <span class="empName">Ali Al Mamari - 82574</span>
+       <span class="empStatus" style="color:#075985;">TR</span>
+     </div><div class="empRow" data-emp-name="Ahmed Al Hashmi - 82616" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Hashmi - 82616</span>
        <span class="empStatus" style="color:#075985;">TR</span>
      </div>
       </div>
     </details>
-
+            
       </div>
     </div>
+    
 
     <div class="deptCard">
       <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
@@ -1695,24 +1505,27 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
-        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">5</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Muadh Al Qasim - 82534" role="button" tabindex="0">
-      <span class="empName">Muadh Al Qasim - 82534</span>
+        <div class="empRow" data-emp-name="Adil Al Oraimi - 8941" role="button" tabindex="0">
+      <span class="empName">Adil Al Oraimi - 8941</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Amri - 81224" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Amri - 81224</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Badar Al Hamadani - 81307" role="button" tabindex="0">
+      <span class="empName">Badar Al Hamadani - 81307</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow" data-emp-name="*Mohana Al Subhi - 8714" role="button" tabindex="0">
-      <span class="empName">*Mohana Al Subhi - 8714</span>
+     </div><div class="empRow" data-emp-name="Said Al Fahkri - 8744" role="button" tabindex="0">
+      <span class="empName">Said Al Fahkri - 8744</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Jamal Al Hadi - 82565" role="button" tabindex="0">
-      <span class="empName">Jamal Al Hadi - 82565</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Badar Al Fulaiti - 82468" role="button" tabindex="0">
+      <span class="empName">Badar Al Fulaiti - 82468</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="*Ahmed Al Sabii - 82653" role="button" tabindex="0">
+      <span class="empName">*Ahmed Al Sabii - 82653</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
@@ -1722,43 +1535,43 @@
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
         <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
-        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">5</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Badar Al Hamadani - 81307" role="button" tabindex="0">
-      <span class="empName">Badar Al Hamadani - 81307</span>
+        <div class="empRow" data-emp-name="Zakariya Al Balushi - 82429" role="button" tabindex="0">
+      <span class="empName">Zakariya Al Balushi - 82429</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ghassan Al Tarsi - 82588" role="button" tabindex="0">
-      <span class="empName">Ghassan Al Tarsi - 82588</span>
+     </div><div class="empRow empRowAlt" data-emp-name="*Salim Sulieman - 8722" role="button" tabindex="0">
+      <span class="empName">*Salim Sulieman - 8722</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow" data-emp-name="Mohamed Al Falahi - 8762" role="button" tabindex="0">
-      <span class="empName">Mohamed Al Falahi - 8762</span>
+     </div><div class="empRow" data-emp-name="*Mohana Al Subhi - 8714" role="button" tabindex="0">
+      <span class="empName">*Mohana Al Subhi - 8714</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Badar Al Fulaiti - 82468" role="button" tabindex="0">
-      <span class="empName">Badar Al Fulaiti - 82468</span>
-       <span class="empStatus" style="color:#9a3412;">AE14</span>
-     </div><div class="empRow" data-emp-name="*Ahmed Al Sabii - 82653" role="button" tabindex="0">
-      <span class="empName">*Ahmed Al Sabii - 82653</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Jamal Al Hadi - 82565" role="button" tabindex="0">
+      <span class="empName">Jamal Al Hadi - 82565</span>
        <span class="empStatus" style="color:#9a3412;">AE14</span>
      </div>
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="*Issa Al Douyani - 8647" role="button" tabindex="0">
-      <span class="empName">*Issa Al Douyani - 8647</span>
+        <div class="empRow" data-emp-name="Muadh Al Qasim - 82534" role="button" tabindex="0">
+      <span class="empName">Muadh Al Qasim - 82534</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Faisal Al Balushi - 82656" role="button" tabindex="0">
-      <span class="empName">Faisal Al Balushi - 82656</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Amri - 81224" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Amri - 81224</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow" data-emp-name="Salim Harrasi - 8542" role="button" tabindex="0">
-      <span class="empName">Salim Harrasi - 8542</span>
+     </div><div class="empRow" data-emp-name="Ghassan Al Tarsi - 82588" role="button" tabindex="0">
+      <span class="empName">Ghassan Al Tarsi - 82588</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Falahi - 8762" role="button" tabindex="0">
+      <span class="empName">Mohamed Al Falahi - 8762</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
       </div>
@@ -1771,20 +1584,20 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mazin Al Siyabi - 81223" role="button" tabindex="0">
-      <span class="empName">Mazin Al Siyabi - 81223</span>
+        <div class="empRow" data-emp-name="Ahmed Al Balushi - 82415" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Balushi - 82415</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Adil Al Oraimi - 8941" role="button" tabindex="0">
-      <span class="empName">Adil Al Oraimi - 8941</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Khamis Al Hinai - 82467" role="button" tabindex="0">
+      <span class="empName">Khamis Al Hinai - 82467</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Zakariya Al Balushi - 82429" role="button" tabindex="0">
-      <span class="empName">Zakariya Al Balushi - 82429</span>
+     </div><div class="empRow" data-emp-name="*Issa Al Douyani - 8647" role="button" tabindex="0">
+      <span class="empName">*Issa Al Douyani - 8647</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Said Al Fahkri - 8744" role="button" tabindex="0">
-      <span class="empName">Said Al Fahkri - 8744</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Faisal Al Balushi - 82656" role="button" tabindex="0">
+      <span class="empName">Faisal Al Balushi - 82656</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="*Salim Sulieman - 8722" role="button" tabindex="0">
-      <span class="empName">*Salim Sulieman - 8722</span>
+     </div><div class="empRow" data-emp-name="Salim Harrasi - 8542" role="button" tabindex="0">
+      <span class="empName">Salim Harrasi - 8542</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
       </div>
@@ -1794,15 +1607,12 @@
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
         <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
-        <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Ahmed Al Balushi - 82415" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Balushi - 82415</span>
-       <span class="empStatus" style="color:#065f46;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 1 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 2)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Khamis Al Hinai - 82467" role="button" tabindex="0">
-      <span class="empName">Khamis Al Hinai - 82467</span>
-       <span class="empStatus" style="color:#065f46;">AL</span>
+        <div class="empRow" data-emp-name="Mazin Al Siyabi - 81223" role="button" tabindex="0">
+      <span class="empName">Mazin Al Siyabi - 81223</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 3 <span class="shiftRangeLabel">TO</span> 7</span>)</span>
      </div>
       </div>
     </details>
@@ -1838,7 +1648,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 10:00</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">3 June 2026 / 22:02</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026 Version3.xlsx</strong>
   </div>
 
@@ -1872,11 +1682,19 @@
   </div>
 </div>
 
+
 <div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
   <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--wcvote" href="https://match-accb0.web.app/?utm_source=roster-site&utm_medium=apps" target="_blank" rel="noopener noreferrer" data-app-id="wcvote">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="#00d4ff"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wcvote">World Cup Fan Vote</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wcvote">Vote for your team</span>
+        </span>
+      </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
@@ -1919,6 +1737,7 @@
     </div>
   </div>
 </div>
+
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -2142,7 +1961,7 @@ function getBannerBackgroundForSnapshot() {
   }
   try {
     var bn = localStorage.getItem('roster_banner_choice');
-    if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {
+    if (bn && /^banner\d+\.jpg$/i.test(bn)) {
       var url = getSiteRootUrl() + '/assets/banners/' + bn;
       return { image: 'url("' + url + '")', size: 'cover', position: '62% center', repeat: 'no-repeat', color: '' };
     }
@@ -2785,7 +2604,7 @@ function goToEmployeeSchedule(empName) {
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
-window.__summaryCounts = window.__summaryCounts || { employees: 51, departments: 5 };
+window.__summaryCounts = window.__summaryCounts || { employees: 46, departments: 5 };
 window.__summarySwitchMode = 'employees';
 var T = {
   en: {
@@ -2828,7 +2647,7 @@ function updateSummarySwitchChip() {
     lbl.dataset.key = 'departments';
   } else {
     val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 51;
+    val.textContent = counts.employees != null ? counts.employees : 46;
     lbl.textContent = t.employees;
     lbl.dataset.key = 'employees';
   }
@@ -3200,7 +3019,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260603b';
+  var ver = '20260604a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3214,6 +3033,7 @@ function goToRosterDiff(event) {
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);

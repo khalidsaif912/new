@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260531a"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260604a"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -348,6 +348,12 @@
     button.summaryChip.shiftFilterBtn:hover {
       transform:translateY(-3px);
       box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    button.summaryChip.shiftFilterBtn:focus {
+      outline:none;
+    }
+    button.summaryChip.shiftFilterBtn:focus:not(.active) {
+      border-color:transparent;
     }
     button.summaryChip.shiftFilterBtn.active {
       border-color:currentColor;
@@ -729,241 +735,71 @@
 
     /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
     }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
     .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
     }
     .siteShareUrl {
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
     }
     .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
     }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+
     /* ═══════ RELATED APPS MODAL ═══════ */
     .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
     }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
     .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
     }
     .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
     }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    .siteAppsLink--store,
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
     .siteAppsLink--games {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      min-height: 72px;
-      justify-content: flex-start;
-      padding-inline: 14px;
-      gap: 12px;
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
     }
-    .siteAppsLink--store {
-      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
-      border-color: #fdba74;
-    }
-    .siteAppsLink--store .siteAppsLink-icon {
-      flex-shrink: 0;
-    }
-    .siteAppsLink--games .siteAppsLink-icon {
-      background: #fdf2f8;
-      border-color: #fbcfe8;
-      flex-shrink: 0;
-    }
-    .siteAppsLink--store .siteAppsLink-text,
-    .siteAppsLink--games .siteAppsLink-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      flex: 1;
-    }
-    .siteAppsLink--store .siteAppsLink-title,
-    .siteAppsLink--store .siteAppsLink-sub,
-    .siteAppsLink--games .siteAppsLink-title,
-    .siteAppsLink--games .siteAppsLink-sub {
-      text-align: start;
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
 
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
@@ -1165,7 +1001,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1191,10 +1027,10 @@
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Rodolfo Magcaling - 80235" role="button" tabindex="0">
       <span class="empName">Rodolfo Magcaling - 80235</span>
-       <span class="empStatus" style="color:#075985;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 14 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#075985;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 14 <span class="shiftRangeLabel">TO</span> 20</span>)</span>
      </div><div class="empRow empRowAlt" data-emp-name="Rajaram - 8899" role="button" tabindex="0">
       <span class="empName">Rajaram - 8899</span>
-       <span class="empStatus" style="color:#075985;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 14 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#075985;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 14 <span class="shiftRangeLabel">TO</span> 20</span>)</span>
      </div>
       </div>
     </details>
@@ -1225,7 +1061,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1253,7 +1089,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1293,7 +1129,7 @@
        <span class="empStatus" style="color:#075985;">TR</span>
      </div><div class="empRow empRowAlt" data-emp-name="Talal Al Balushi - 81300" role="button" tabindex="0">
       <span class="empName">Talal Al Balushi - 81300</span>
-       <span class="empStatus" style="color:#075985;">(<span style='font-size:0.75em;opacity:0.8;'>FROM</span> 14 <span style='font-size:0.75em;opacity:0.8;'>TO</span> 20)</span>
+       <span class="empStatus" style="color:#075985;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 14 <span class="shiftRangeLabel">TO</span> 20</span>)</span>
      </div>
       </div>
     </details>
@@ -1324,7 +1160,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1367,7 +1203,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1450,7 +1286,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1481,7 +1317,8 @@
      </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Subhi - 82592 (Inventory)" role="button" tabindex="0">
       <span class="empName">Mohamed Al Subhi - 82592 (Inventory)</span>
        <span class="empStatus" style="color:#92400e;">ME12</span>
-     </div></div>
+     </div>
+      </div>
     </details>
             
     <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
@@ -1516,7 +1353,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1602,9 +1439,10 @@
      </div>
       </div>
     </details>
-
+            
       </div>
     </div>
+    
 
     <div class="deptCard">
       <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
@@ -1628,7 +1466,7 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
         <span class="shiftLabel" style="color:#92400e;">Morning</span>
@@ -1680,7 +1518,7 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe" open>
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
@@ -1760,7 +1598,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 June 2026 / 10:00</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">3 June 2026 / 22:02</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026 Version3.xlsx</strong>
   </div>
 
@@ -1794,11 +1632,19 @@
   </div>
 </div>
 
+
 <div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
   <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--wcvote" href="https://match-accb0.web.app/?utm_source=roster-site&utm_medium=apps" target="_blank" rel="noopener noreferrer" data-app-id="wcvote">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="#00d4ff"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wcvote">World Cup Fan Vote</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wcvote">Vote for your team</span>
+        </span>
+      </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
@@ -1841,6 +1687,7 @@
     </div>
   </div>
 </div>
+
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -2064,7 +1911,7 @@ function getBannerBackgroundForSnapshot() {
   }
   try {
     var bn = localStorage.getItem('roster_banner_choice');
-    if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {
+    if (bn && /^banner\d+\.jpg$/i.test(bn)) {
       var url = getSiteRootUrl() + '/assets/banners/' + bn;
       return { image: 'url("' + url + '")', size: 'cover', position: '62% center', repeat: 'no-repeat', color: '' };
     }
@@ -2703,113 +2550,6 @@ function goToEmployeeSchedule(empName) {
   });
 })();
 
-// ═══════════════════════════════════════════════════
-
-// Shift Filter (NOW PAGE ONLY)
-// ═══════════════════════════════════════════════════
-(function(){
-  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
-  if(!filterBtns.length) return; // Not a /now/ page
-  
-  var allShiftCards = document.querySelectorAll('.shiftCard');
-  
-  // Group shift cards by shift type
-  var shiftGroups = {};
-  allShiftCards.forEach(function(card){
-    var shiftType = card.dataset.shift;
-    if(!shiftType) return;
-    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
-    shiftGroups[shiftType].push(card);
-  });
-  
-  // Determine current shift based on time
-  function getCurrentShift(){
-    var now = new Date();
-    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    var hour = muscatTime.getHours();
-    var minute = muscatTime.getMinutes();
-    var t = hour * 60 + minute;
-    
-    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
-    if(t >= 13 * 60) return 'Afternoon';
-    return 'Morning';
-  }
-  
-  // Set active shift on load - default to current shift
-  var currentShift = getCurrentShift();
-  filterBtns.forEach(function(btn){
-    if(btn.dataset.shift === currentShift){
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-  
-  // Filter function
-  function filterShifts(selectedShift){
-    var totalEmployees = 0;
-    
-    if(selectedShift === 'All'){
-      // Show all shifts
-      allShiftCards.forEach(function(card){
-        card.style.display = '';
-        var count = card.querySelector('.shiftCount');
-        if(count) totalEmployees += parseInt(count.textContent) || 0;
-      });
-    } else {
-      // Hide all cards first
-      allShiftCards.forEach(function(card){ card.style.display = 'none'; });
-      
-      // Show only selected shift cards and count employees
-      if(shiftGroups[selectedShift]){
-        shiftGroups[selectedShift].forEach(function(card){
-          card.style.display = '';
-          // Auto-open the selected shift
-          card.setAttribute('open', '');
-          // Count employees in this card
-          var count = card.querySelector('.shiftCount');
-          if(count) totalEmployees += parseInt(count.textContent) || 0;
-        });
-      }
-      
-      // Also show Off Day, Leave, Training, Standby in all shifts
-      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
-      alwaysShow.forEach(function(type){
-        if(shiftGroups[type]){
-          shiftGroups[type].forEach(function(card){
-            card.style.display = '';
-            // لا تحسب Off Day/Leave في عداد الفترة المختارة
-          });
-        }
-      });
-    }
-    
-    // Update employee count in summary
-    window.__summaryCounts = window.__summaryCounts || {};
-    window.__summaryCounts.employees = totalEmployees;
-    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
-    
-    // Update button states
-    filterBtns.forEach(function(btn){
-      if(btn.dataset.shift === selectedShift){
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-  
-  // Add click handlers
-  filterBtns.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      filterShifts(this.dataset.shift);
-    });
-  });
-  
-  // Auto-filter on page load - show current shift
-  filterShifts(currentShift);
-})();
-
 // ══════════════════════════════════════════════════
 // Language Toggle
 // ══════════════════════════════════════════════════
@@ -3003,7 +2743,6 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){
-      shiftCard.style.display = '';
       shiftCard.removeAttribute('open');
     });
     var currentShift = getCurrentShiftForMuscat();
@@ -3042,6 +2781,114 @@ startSummarySwitchLoop();
       openMatchingShift(targetCard);
     }
   }
+})();
+
+// ═══════════════════════════════════════════════════
+// Shift Filter (NOW PAGE ONLY) — runs after dept layout
+// ═══════════════════════════════════════════════════
+(function(){
+  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
+  if(!filterBtns.length) return;
+
+  var allShiftCards = document.querySelectorAll('.shiftCard');
+
+  function normalizeShift(raw){
+    if(!raw) return '';
+    var t = String(raw).trim().toLowerCase();
+    if(t === 'all' || t.includes('all shifts') || t === 'الكل') return 'All';
+    if(t.includes('morning') || t.includes('صباح')) return 'Morning';
+    if(t.includes('afternoon') || t.includes('ظهر') || t.includes('مساء')) return 'Afternoon';
+    if(t.includes('night') || t.includes('ليل')) return 'Night';
+    if(t.includes('off day') || (t.includes('off') && !t.includes('officer')) || t.includes('راحة') || t.includes('أوف')) return 'Off Day';
+    if(t.includes('annual') || t.includes('سنوية')) return 'Annual Leave';
+    if(t.includes('sick') || t.includes('مرض')) return 'Sick Leave';
+    if(t.includes('training') || t.includes('تدريب')) return 'Training';
+    if(t.includes('standby') || t.includes('ستاند') || t.includes('احتياط')) return 'Standby';
+    if(t.includes('other') || t.includes('أخرى') || t.includes('اخرى')) return 'Other';
+    return String(raw).trim();
+  }
+
+  function btnShift(btn){
+    return normalizeShift(btn.getAttribute('data-shift') || btn.dataset.shift || '');
+  }
+
+  filterBtns.forEach(function(btn){
+    var s = btnShift(btn);
+    if(s) btn.setAttribute('data-shift', s);
+  });
+
+  var shiftGroups = {};
+  allShiftCards.forEach(function(card){
+    var label = card.querySelector('.shiftSummary .shiftLabel');
+    var shiftType = normalizeShift(
+      label ? (label.dataset.key || label.textContent) : (card.getAttribute('data-shift') || card.dataset.shift || '')
+    );
+    if(!shiftType) return;
+    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
+    shiftGroups[shiftType].push(card);
+  });
+
+  function getCurrentShift(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var t = muscatTime.getHours() * 60 + muscatTime.getMinutes();
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function setFilterBtnActive(selectedShift){
+    filterBtns.forEach(function(btn){
+      btn.classList.toggle('active', btnShift(btn) === selectedShift);
+    });
+  }
+
+  function filterShifts(selectedShiftRaw){
+    var selectedShift = normalizeShift(selectedShiftRaw);
+    window.__shiftFilterSelection = selectedShift;
+    var totalEmployees = 0;
+
+    if(selectedShift === 'All'){
+      allShiftCards.forEach(function(card){
+        card.style.display = '';
+        var count = card.querySelector('.shiftCount');
+        if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+      });
+    } else {
+      allShiftCards.forEach(function(card){ card.style.display = 'none'; });
+      if(shiftGroups[selectedShift]){
+        shiftGroups[selectedShift].forEach(function(card){
+          card.style.display = '';
+          card.setAttribute('open', '');
+          var count = card.querySelector('.shiftCount');
+          if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+        });
+      }
+      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
+      alwaysShow.forEach(function(type){
+        if(shiftGroups[type]){
+          shiftGroups[type].forEach(function(card){
+            card.style.display = '';
+          });
+        }
+      });
+    }
+
+    window.__summaryCounts = window.__summaryCounts || {};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    setFilterBtnActive(selectedShift);
+  }
+
+  window.applyShiftFilter = filterShifts;
+
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterShifts(btnShift(btn));
+    });
+  });
+
+  filterShifts(getCurrentShift());
 })();
 
 // ═══════════════════════════════════════════════════
@@ -3122,7 +2969,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260603b';
+  var ver = '20260604a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3136,6 +2983,7 @@ function goToRosterDiff(event) {
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);

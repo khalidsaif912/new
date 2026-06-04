@@ -22,6 +22,8 @@
       gamesSub: 'Roster games hub',
       store: 'Mobhar Store · متجر مُبهر',
       storeSub: 'Electronics & gadgets',
+      wcvote: 'World Cup Fan Vote',
+      wcvoteSub: 'Vote for your team',
     },
     ar: {
       btn: 'تطبيقات',
@@ -40,6 +42,8 @@
       gamesSub: 'مركز ألعاب الروستر',
       store: 'متجر مُبهر · Mobhar Store',
       storeSub: 'أجهزة وتسوق',
+      wcvote: 'تصويت جماهير كأس العالم',
+      wcvoteSub: 'صوّت لمنتخبك',
     },
   };
 
