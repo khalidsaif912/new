@@ -996,7 +996,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260604e"
+IOS_PERF_VER = "20260604g"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1043,7 +1043,9 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   }
   addScript(root + '/site-last-updated.js?v=' + ver);
   function loadSecondary() {
+    addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);

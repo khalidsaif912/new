@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inject wc-vote-promo.js into all roster HTML pages that use loadLocalEnhancements."""
+"""Inject wc-vote-promo.js and sync loadLocalEnhancements on roster HTML pages."""
 
 from __future__ import annotations
 
@@ -9,7 +9,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-VER = "20260604b"
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from roster_cta_snippets import (  # noqa: E402
+    IOS_PERF_VER,
+    LOAD_LOCAL_ENHANCEMENTS_EXPORT,
+    LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+)
+
 MARKER = "wc-vote-promo.js"
 INJECT_LINE = "    addScript(root + '/wc-vote-promo.js?v=' + ver);"
 
@@ -18,18 +25,28 @@ LOAD_SECONDARY_RE = re.compile(
     re.MULTILINE,
 )
 
+LOAD_LOCAL_RE = re.compile(
+    r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);",
+    re.MULTILINE,
+)
+
+INDEX_LOAD = {
+    DOCS / "index.html": LOAD_LOCAL_ENHANCEMENTS_EXPORT.strip(),
+    DOCS / "import" / "index.html": LOAD_LOCAL_ENHANCEMENTS_IMPORT.strip(),
+    DOCS / "now" / "index.html": LOAD_LOCAL_ENHANCEMENTS_EXPORT.strip(),
+}
+
 
 def patch_load_block(text: str) -> tuple[str, bool]:
-    if MARKER in text:
-        return text, False
     if "function loadSecondary()" not in text:
+        return text, False
+    if MARKER in text:
         return text, False
 
     def repl(m: re.Match[str]) -> str:
         body = m.group(1)
         if MARKER in body:
             return m.group(0)
-        # After site-share.js if present, else at start of loadSecondary body
         if "site-share.js" in body:
             body = body.replace(
                 "addScript(root + '/site-share.js?v=' + ver);",
@@ -65,23 +82,49 @@ def patch_site_apps_modal(text: str) -> tuple[str, bool]:
     return text.replace(needle, insert, 1), True
 
 
+def bump_ver(text: str) -> tuple[str, bool]:
+    old = re.findall(r"var ver = '\d{8}[a-z]'", text)
+    if not old:
+        return text, False
+    new_line = f"var ver = '{IOS_PERF_VER}'"
+    out = text
+    changed = False
+    for o in set(old):
+        if o != new_line:
+            out = out.replace(o, new_line)
+            changed = True
+    return out, changed
+
+
+def patch_index_load(text: str, path: Path) -> tuple[str, bool]:
+    block = INDEX_LOAD.get(path)
+    if not block or "function loadLocalEnhancements()" not in text:
+        return text, False
+    new_text, n = LOAD_LOCAL_RE.subn(block + "\n", text, count=1)
+    return new_text, n > 0
+
+
+def patch_file(path: Path) -> bool:
+    text = path.read_text(encoding="utf-8")
+    orig = text
+    text, _ = bump_ver(text)
+    if path in INDEX_LOAD:
+        text, _ = patch_index_load(text, path)
+    text, _ = patch_load_block(text)
+    text, _ = patch_site_apps_modal(text)
+    if text != orig:
+        path.write_text(text, encoding="utf-8", newline="\n")
+        return True
+    return False
+
+
 def main() -> int:
     updated = 0
     for path in sorted(DOCS.rglob("*.html")):
-        text = path.read_text(encoding="utf-8")
-        changed = False
-        new_text, c1 = patch_load_block(text)
-        if c1:
-            text = new_text
-            changed = True
-        new_text, c2 = patch_site_apps_modal(text)
-        if c2:
-            text = new_text
-            changed = True
-        if changed:
-            path.write_text(text, encoding="utf-8", newline="\n")
+        if patch_file(path):
+            print("patched", path.relative_to(ROOT))
             updated += 1
-    print(f"patched_html={updated}")
+    print(f"done: {updated} file(s), ver={IOS_PERF_VER}")
     return 0
 
 

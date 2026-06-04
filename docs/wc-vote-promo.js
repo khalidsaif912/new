@@ -52,17 +52,28 @@
     return pack[key] || I18N.ar[key] || key;
   }
 
-  var TROPHY_ICON_VER = '20260604f';
+  var TROPHY_ICON_VER = '20260604g';
+
+  function getDocsAssetRoot() {
+    var path = location.pathname || '/';
+    if (location.protocol === 'file:') {
+      return path.indexOf('/import/') !== -1 ? '../../..' : '../..';
+    }
+    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
+      var segs = path.split('/').filter(Boolean);
+      var docsIdx = segs.indexOf('docs');
+      if (docsIdx >= 0) return '/' + segs.slice(0, docsIdx + 1).join('/');
+      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+      return segs.length ? '/' + segs[0] : '';
+    }
+    return '';
+  }
 
   function getTrophyIconUrl() {
-    if (location.protocol === 'file:') return '../../assets/icons/wc-trophy.png';
-    var root = '';
-    var path = location.pathname || '/';
-    if (path.indexOf('/roster-site/') !== -1) root = '/roster-site';
-    else if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
-      var segs = path.split('/').filter(Boolean);
-      if (segs.length >= 2 && segs[1] === 'docs') root = '/' + segs[0] + '/docs';
-      else if (segs.length) root = '/' + segs[0];
+    var root = getDocsAssetRoot();
+    if (location.protocol === 'file:') {
+      return root + '/assets/icons/wc-trophy.png';
     }
     return root + '/assets/icons/wc-trophy.png';
   }

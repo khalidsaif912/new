@@ -191,7 +191,16 @@
     if (isImport) {
       return /\/import\/?$/.test(path) || /\/import\/index\.html$/.test(path) || /\/import\/date\//.test(path);
     }
-    return /\/roster-site\/?$/.test(path) || /\/roster-site\/index\.html$/.test(path) || /\/roster-site\/date\//.test(path) || /^\/$/.test(path) || /\/index\.html$/.test(path) || /\/date\//.test(path);
+    return (
+      /\/roster-site\/?$/.test(path) ||
+      /\/roster-site\/index\.html$/.test(path) ||
+      /\/roster-site\/date\//.test(path) ||
+      /\/docs\/?$/.test(path) ||
+      /\/docs\/index\.html$/.test(path) ||
+      /^\/$/.test(path) ||
+      /\/index\.html$/.test(path) ||
+      /\/date\//.test(path)
+    );
   }
 
   function onMySchedulePage() {

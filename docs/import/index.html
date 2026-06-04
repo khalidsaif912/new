@@ -3943,7 +3943,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260603b';
+  var ver = '20260604g';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3955,8 +3955,8 @@ setSummaryChipHrefs();
   addScript(root + '/site-last-updated.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
-  addScript(root + '/site-share.js?v=' + ver);
-  addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
@@ -3968,6 +3968,7 @@ setSummaryChipHrefs();
     window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
   }
 })();
+
 
 (function showWelcomeChip() {
   var empId = localStorage.getItem('importSavedEmpId');
