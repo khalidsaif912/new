@@ -91,6 +91,13 @@ SVG_APP_GAME = (
     '<rect x="2" y="6" width="20" height="12" rx="2"/>'
     '</svg>'
 )
+SVG_APP_WCVOTE = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">'
+    '<circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/>'
+    '<path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/>'
+    '<circle cx="16" cy="14" r="2" fill="#00d4ff"/>'
+    '</svg>'
+)
 SVG_APP_STORE = (
     '<svg class="siteAppsStoreSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" '
     'stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -670,6 +677,30 @@ SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ════
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.07); }
     }
+    .siteAppsLink--wcvote {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      min-height: 72px;
+      justify-content: flex-start;
+      padding-inline: 14px;
+      gap: 12px;
+      background: linear-gradient(135deg, #0a1520 0%, #1a2744 100%);
+      border-color: rgba(255, 215, 0, 0.45);
+    }
+    .siteAppsLink--wcvote .siteAppsLink-icon {
+      background: rgba(255, 215, 0, 0.12);
+      border-color: rgba(255, 215, 0, 0.35);
+      flex-shrink: 0;
+    }
+    .siteAppsLink--wcvote .siteAppsLink-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      flex: 1;
+    }
+    .siteAppsLink--wcvote .siteAppsLink-title { color: #FFD700; text-align: start; }
+    .siteAppsLink--wcvote .siteAppsLink-sub { color: #e8f4f8; text-align: start; }
     .siteAppsLink--store,
     .siteAppsLink--games {
       grid-column: 1 / -1;
@@ -730,6 +761,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--wcvote" href="https://match-accb0.web.app/?utm_source=roster-site&utm_medium=apps" target="_blank" rel="noopener noreferrer" data-app-id="wcvote">
+        <span class="siteAppsLink-icon">{SVG_APP_WCVOTE}</span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wcvote">World Cup Fan Vote</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wcvote">Vote for your team</span>
+        </span>
+      </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon">{SVG_APP_FLIGHT}</span>
         <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
@@ -958,7 +996,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260601b"
+IOS_PERF_VER = "20260604e"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -977,6 +1015,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
@@ -1005,6 +1044,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   addScript(root + '/site-last-updated.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
