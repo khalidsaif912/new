@@ -150,9 +150,6 @@
         (variant === 'hero'
           ? '<span class="wc-mini-name">' + escapeHtml(shortTeamName(col.team.name)) + '</span>'
           : '') +
-        '<span class="wc-mini-votes">' +
-        col.team.votes +
-        '</span>' +
         '</div>' +
         '<div class="wc-mini-block"><span>' +
         col.rank +
@@ -322,11 +319,6 @@
       '.wc-mini-name{display:block;font-size:8px;font-weight:700;color:#334155;line-height:1.1;margin-bottom:1px;' +
       'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;direction:rtl;}' +
       '.wc-mini-p1 .wc-mini-name{color:#B8860B;}' +
-      '.wc-mini-votes{display:block;font-size:9px;font-weight:900;line-height:1;color:#64748b;font-family:system-ui,sans-serif;}' +
-      '.wc-mini-p1 .wc-mini-votes{color:#CA8A04;}' +
-      '.wc-mini-p2 .wc-mini-votes{color:#64748b;}' +
-      '.wc-mini-p3 .wc-mini-votes{color:#B45309;}' +
-      '.wc-mini-podium--hero .wc-mini-votes{font-size:11px;}' +
       '.wc-mini-block{display:flex;align-items:center;justify-content:center;border-radius:0 0 6px 6px;' +
       'font-size:10px;font-weight:900;color:rgba(15,23,42,.35);font-family:system-ui,sans-serif;}' +
       '.wc-mini-p1 .wc-mini-block{height:20px;background:linear-gradient(180deg,rgba(255,215,0,.35),rgba(255,215,0,.12));color:rgba(180,134,11,.7);}' +
