@@ -301,9 +301,9 @@
       '.wc-mini-podium{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:3px;' +
       'padding:0;background:transparent;border:none;box-shadow:none;}' +
       '.wc-mini-podium--dot{min-width:86px;transform-origin:center bottom;' +
-      'filter:drop-shadow(0 2px 5px rgba(15,23,42,.16)) drop-shadow(0 1px 2px rgba(0,0,0,.1));}' +
+      'filter:drop-shadow(0 3px 8px rgba(0,0,0,.42)) drop-shadow(0 1px 3px rgba(0,0,0,.28));}' +
       '.wc-mini-podium--hero{min-width:220px;gap:5px;' +
-      'filter:drop-shadow(0 3px 8px rgba(15,23,42,.14));}' +
+      'filter:drop-shadow(0 4px 12px rgba(0,0,0,.38)) drop-shadow(0 2px 4px rgba(0,0,0,.22));}' +
       '.wc-mini-podium--loading{min-width:52px;min-height:44px;align-items:center;justify-content:center;filter:none;}' +
       '.wc-mini-fallback{font-size:28px;line-height:1;}' +
       '.wc-mini-col{display:flex;flex-direction:column;align-items:stretch;flex:1 1 0;min-width:0;max-width:34px;}' +
