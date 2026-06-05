@@ -5,12 +5,186 @@
 (function () {
   'use strict';
 
-  var VOTE_URL = 'https://match-accb0.web.app/?utm_source=roster-site&utm_medium=popup';
+  var VOTE_BASE = 'https://match-accb0.web.app/?utm_source=roster-site&utm_medium=popup';
+
+  function buildVoteUrl() {
+    var url = VOTE_BASE;
+    try {
+      var emp = (
+        localStorage.getItem('exportSavedEmpId') ||
+        localStorage.getItem('savedEmpId') ||
+        ''
+      ).trim();
+      if (emp) url += '&emp=' + encodeURIComponent(emp);
+    } catch (e) {}
+    return url;
+  }
   var STORAGE_KEY = 'wcVotePromoDismissed_v1';
   var PROMO_LANG_KEY = 'wcVotePromoLang';
   var STYLE_ID = 'wc-vote-promo-styles';
   var SHEET_ID = 'wcVotePromoSheet';
   var DOT_ID = 'wc-vote-dot';
+  var FIRESTORE_KEY = 'AIzaSyCK8yLoaa7q_tTobuMiG33h9576AFg253M';
+  var TEAMS_POLL_MS = 45000;
+  var lastTop3 = null;
+  var podiumPollTimer = null;
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function parseFirestoreValue(v) {
+    if (!v) return null;
+    if (v.stringValue !== undefined) return v.stringValue;
+    if (v.integerValue !== undefined) return parseInt(v.integerValue, 10);
+    if (v.doubleValue !== undefined) return v.doubleValue;
+    if (v.booleanValue !== undefined) return v.booleanValue;
+    return null;
+  }
+
+  function docToTeam(doc) {
+    var f = (doc && doc.fields) || {};
+    return {
+      id: (doc.name || '').split('/').pop(),
+      name: parseFirestoreValue(f.name) || '',
+      flag: parseFirestoreValue(f.flag) || '🏳️',
+      votes: Number(parseFirestoreValue(f.votes)) || 0,
+    };
+  }
+
+  function fetchTop3Teams() {
+    return fetch(
+      'https://firestore.googleapis.com/v1/projects/match-accb0/databases/(default)/documents:runQuery?key=' +
+        FIRESTORE_KEY,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: 'teams' }],
+            where: {
+              fieldFilter: {
+                field: { fieldPath: 'active' },
+                op: 'EQUAL',
+                value: { booleanValue: true },
+              },
+            },
+            orderBy: [{ field: { fieldPath: 'votes' }, direction: 'DESCENDING' }],
+            limit: 3,
+          },
+        }),
+      }
+    )
+      .then(function (r) {
+        if (!r.ok) throw new Error('query failed');
+        return r.json();
+      })
+      .then(function (rows) {
+        return (rows || [])
+          .filter(function (row) {
+            return row && row.document;
+          })
+          .map(function (row) {
+            return docToTeam(row.document);
+          });
+      })
+      .catch(function () {
+        return fetch(
+          'https://firestore.googleapis.com/v1/projects/match-accb0/databases/(default)/documents/teams?key=' +
+            FIRESTORE_KEY +
+            '&pageSize=100'
+        )
+          .then(function (r) {
+            return r.ok ? r.json() : { documents: [] };
+          })
+          .then(function (data) {
+            return (data.documents || [])
+              .map(docToTeam)
+              .sort(function (a, b) {
+                return b.votes - a.votes;
+              })
+              .slice(0, 3);
+          });
+      });
+  }
+
+  function shortTeamName(name) {
+    var n = String(name || '').trim();
+    if (n.length <= 8) return n;
+    return n.slice(0, 7) + '…';
+  }
+
+  function miniPodiumHtml(teams, variant) {
+    variant = variant || 'dot';
+    if (!teams || !teams.length) {
+      return (
+        '<div class="wc-mini-podium wc-mini-podium--' +
+        variant +
+        ' wc-mini-podium--loading" dir="ltr"><span class="wc-mini-fallback">🏆</span></div>'
+      );
+    }
+    var cols = [
+      { team: teams[1], rank: 2, place: 'wc-mini-p2' },
+      { team: teams[0], rank: 1, place: 'wc-mini-p1' },
+      { team: teams[2], rank: 3, place: 'wc-mini-p3' },
+    ];
+    var html =
+      '<div class="wc-mini-podium wc-mini-podium--' + variant + '" dir="ltr" role="img" aria-label="Top 3">';
+    cols.forEach(function (col) {
+      if (!col.team) {
+        html += '<div class="wc-mini-col ' + col.place + ' is-empty"></div>';
+        return;
+      }
+      html +=
+        '<div class="wc-mini-col ' +
+        col.place +
+        '">' +
+        '<div class="wc-mini-card">' +
+        '<span class="wc-mini-flag">' +
+        col.team.flag +
+        '</span>' +
+        (variant === 'hero'
+          ? '<span class="wc-mini-name">' + escapeHtml(shortTeamName(col.team.name)) + '</span>'
+          : '') +
+        '<span class="wc-mini-votes">' +
+        col.team.votes +
+        '</span>' +
+        '</div>' +
+        '<div class="wc-mini-block"><span>' +
+        col.rank +
+        '</span></div>' +
+        '</div>';
+    });
+    html += '<span class="wc-mini-live" title="Live"></span></div>';
+    return html;
+  }
+
+  function updatePodiumWidgets(teams) {
+    var dotWrap = document.querySelector('#' + DOT_ID + ' .wc-vote-dot-podium');
+    if (dotWrap) dotWrap.innerHTML = miniPodiumHtml(teams, 'dot');
+    var heroPod = document.getElementById('wcVotePromoMiniPodium');
+    if (heroPod) heroPod.innerHTML = miniPodiumHtml(teams, 'hero');
+  }
+
+  function refreshMiniPodium() {
+    fetchTop3Teams()
+      .then(function (teams) {
+        if (!teams || !teams.length) return;
+        lastTop3 = teams;
+        updatePodiumWidgets(teams);
+      })
+      .catch(function () {});
+  }
+
+  function startPodiumPolling() {
+    refreshMiniPodium();
+    if (podiumPollTimer) clearInterval(podiumPollTimer);
+    podiumPollTimer = setInterval(refreshMiniPodium, TEAMS_POLL_MS);
+  }
 
   var I18N = {
     en: {
@@ -23,7 +197,7 @@
       close: 'Close',
       langBtn: 'ع',
       langAria: 'Arabic',
-      dotAria: 'Open World Cup vote trial',
+      dotAria: 'Live top 3 — open World Cup vote',
     },
     ar: {
       trial: 'تجربة',
@@ -35,7 +209,7 @@
       close: 'إغلاق',
       langBtn: 'EN',
       langAria: 'English',
-      dotAria: 'فتح تجربة التصويت لكأس العالم',
+      dotAria: 'الثلاثة الأوائل مباشرة — فتح التصويت',
     },
   };
 
@@ -50,46 +224,6 @@
   function t(key) {
     var pack = I18N[lang()] || I18N.ar;
     return pack[key] || I18N.ar[key] || key;
-  }
-
-  var TROPHY_ICON_VER = '20260604g';
-
-  function getDocsAssetRoot() {
-    var path = location.pathname || '/';
-    if (location.protocol === 'file:') {
-      return path.indexOf('/import/') !== -1 ? '../../..' : '../..';
-    }
-    if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
-    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
-      var segs = path.split('/').filter(Boolean);
-      var docsIdx = segs.indexOf('docs');
-      if (docsIdx >= 0) return '/' + segs.slice(0, docsIdx + 1).join('/');
-      if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
-      return segs.length ? '/' + segs[0] : '';
-    }
-    return '';
-  }
-
-  function getTrophyIconUrl() {
-    var root = getDocsAssetRoot();
-    if (location.protocol === 'file:') {
-      return root + '/assets/icons/wc-trophy.png';
-    }
-    return root + '/assets/icons/wc-trophy.png';
-  }
-
-  /** Same flat gold cup as reference asset (PNG), not a hand-drawn SVG. */
-  function trophyIconHtml(size) {
-    var src = getTrophyIconUrl() + '?v=' + TROPHY_ICON_VER;
-    return (
-      '<img class="wc-trophy-icon-img" src="' +
-      src +
-      '" width="' +
-      size +
-      '" height="' +
-      size +
-      '" alt="" decoding="async" draggable="false"/>'
-    );
   }
 
   function isDismissed() {
@@ -163,8 +297,47 @@
       'text-transform:uppercase;color:#00d4ff;margin-bottom:8px;}' +
       '[dir="rtl"] .wcVotePromoBadge{letter-spacing:.04em;text-transform:none;font-size:12px;}' +
       '.wcVotePromoTrophy{display:flex;justify-content:center;margin:6px 0 8px;line-height:0;}' +
-      '.wcVotePromoTrophy .wc-trophy-icon-img{filter:drop-shadow(0 3px 8px rgba(15,23,42,.18)) drop-shadow(0 1px 3px rgba(0,0,0,.1));animation:wcTrophyHero 2.5s ease-in-out infinite;transform-origin:center bottom;}' +
-      '@keyframes wcTrophyHero{0%,100%{transform:translateY(0) rotate(0deg) scale(1);}25%{transform:translateY(-4px) rotate(-5deg) scale(1.04);}50%{transform:translateY(-2px) rotate(3deg) scale(1.02);}75%{transform:translateY(-5px) rotate(5deg) scale(1.05);}}' +
+      '.wcVotePromoMiniPodium{display:flex;justify-content:center;margin:8px 0 10px;}' +
+      '.wc-mini-podium{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:3px;' +
+      'padding:5px 7px 4px;border-radius:14px;' +
+      'background:linear-gradient(165deg,#0a1520 0%,#111e2e 55%,#0f1e2e 100%);' +
+      'border:1px solid rgba(255,215,0,.32);box-shadow:0 6px 20px rgba(0,0,0,.35),0 0 16px rgba(255,215,0,.08);}' +
+      '.wc-mini-podium--dot{min-width:86px;transform-origin:center bottom;}' +
+      '.wc-mini-podium--hero{min-width:220px;padding:8px 10px 6px;gap:5px;}' +
+      '.wc-mini-podium--loading{min-width:52px;min-height:44px;align-items:center;justify-content:center;}' +
+      '.wc-mini-fallback{font-size:28px;line-height:1;}' +
+      '.wc-mini-col{display:flex;flex-direction:column;align-items:stretch;flex:1 1 0;min-width:0;max-width:34px;}' +
+      '.wc-mini-podium--hero .wc-mini-col{max-width:68px;}' +
+      '.wc-mini-col.is-empty{visibility:hidden;}' +
+      '.wc-mini-card{text-align:center;padding:3px 2px 4px;border-radius:8px 8px 0 0;' +
+      'border:1px solid rgba(255,255,255,.08);border-bottom:none;' +
+      'background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));}' +
+      '.wc-mini-p1 .wc-mini-card{border-color:rgba(255,215,0,.35);background:linear-gradient(180deg,rgba(255,215,0,.14),rgba(255,215,0,.02));}' +
+      '.wc-mini-p2 .wc-mini-card{border-color:rgba(192,192,192,.28);}' +
+      '.wc-mini-p3 .wc-mini-card{border-color:rgba(205,127,50,.28);}' +
+      '.wc-mini-flag{display:block;font-size:15px;line-height:1;margin-bottom:1px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));}' +
+      '.wc-mini-podium--hero .wc-mini-flag{font-size:22px;margin-bottom:2px;}' +
+      '.wc-mini-p1 .wc-mini-flag{font-size:17px;}' +
+      '.wc-mini-podium--hero .wc-mini-p1 .wc-mini-flag{font-size:26px;}' +
+      '.wc-mini-name{display:block;font-size:8px;font-weight:700;color:#e8f4f8;line-height:1.1;margin-bottom:1px;' +
+      'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;direction:rtl;}' +
+      '.wc-mini-p1 .wc-mini-name{color:#FFD700;}' +
+      '.wc-mini-votes{display:block;font-size:9px;font-weight:900;line-height:1;color:#8ab4cc;font-family:system-ui,sans-serif;}' +
+      '.wc-mini-p1 .wc-mini-votes{color:#FFD700;}' +
+      '.wc-mini-p2 .wc-mini-votes{color:#c0c0c0;}' +
+      '.wc-mini-p3 .wc-mini-votes{color:#cd7f32;}' +
+      '.wc-mini-podium--hero .wc-mini-votes{font-size:11px;}' +
+      '.wc-mini-block{display:flex;align-items:center;justify-content:center;border-radius:0 0 6px 6px;' +
+      'font-size:10px;font-weight:900;color:rgba(255,255,255,.45);font-family:system-ui,sans-serif;}' +
+      '.wc-mini-p1 .wc-mini-block{height:20px;background:linear-gradient(180deg,rgba(255,215,0,.22),rgba(255,215,0,.06));color:rgba(255,215,0,.55);}' +
+      '.wc-mini-p2 .wc-mini-block{height:14px;background:linear-gradient(180deg,rgba(192,192,192,.18),rgba(192,192,192,.04));}' +
+      '.wc-mini-p3 .wc-mini-block{height:10px;background:linear-gradient(180deg,rgba(205,127,50,.18),rgba(205,127,50,.04));}' +
+      '.wc-mini-podium--hero .wc-mini-p1 .wc-mini-block{height:28px;font-size:13px;}' +
+      '.wc-mini-podium--hero .wc-mini-p2 .wc-mini-block{height:20px;font-size:12px;}' +
+      '.wc-mini-podium--hero .wc-mini-p3 .wc-mini-block{height:14px;font-size:11px;}' +
+      '.wc-mini-live{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#00e676;' +
+      'box-shadow:0 0 6px #00e676;animation:wcMiniLive 2s ease-in-out infinite;}' +
+      '@keyframes wcMiniLive{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.55;transform:scale(.85);}}' +
       '.wcVotePromoTitle{margin:0 0 8px;font-size:22px;font-weight:900;color:#FFD700;line-height:1.2;}' +
       '.wcVotePromoSub{margin:0 0 16px;font-size:13px;line-height:1.55;color:#8ab4cc;padding:0 8px;}' +
       '.wcVotePromoQr{margin:0 auto 14px;width:120px;height:120px;padding:8px;background:#fff;border-radius:14px;}' +
@@ -192,14 +365,15 @@
       DOT_ID +
       '.is-on{animation:wcDotIn .45s cubic-bezier(.34,1.4,.64,1) forwards;}' +
       '@keyframes wcDotIn{from{opacity:0;transform:translateY(8px) scale(.92);}to{opacity:1;transform:translateY(0) scale(1);}}' +
-      '@keyframes wcTrophyFloat{0%,100%{transform:translateY(0) rotate(0deg) scale(1);}30%{transform:translateY(-3px) rotate(-5deg) scale(1.05);}55%{transform:translateY(-1px) rotate(3deg) scale(1.02);}80%{transform:translateY(-3px) rotate(5deg) scale(1.05);}}' +
       '#' +
       DOT_ID +
-      ' .wc-vote-dot-icon{line-height:0;display:block;animation:wcTrophyFloat 1.85s ease-in-out infinite;transform-origin:center bottom;}' +
+      ' .wc-vote-dot-podium{display:block;line-height:0;transition:transform .25s ease;}' +
       '#' +
       DOT_ID +
-      ' .wc-trophy-icon-img{display:block;width:42px;height:40px;object-fit:contain;' +
-      'filter:drop-shadow(0 2px 5px rgba(15,23,42,.2)) drop-shadow(0 1px 2px rgba(0,0,0,.1));}';
+      ':hover .wc-vote-dot-podium{transform:translateY(-2px);}' +
+      '#' +
+      DOT_ID +
+      ':active .wc-vote-dot-podium{transform:scale(.97);}';
     var el = document.getElementById(STYLE_ID);
     if (!el) {
       el = document.createElement('style');
@@ -212,9 +386,10 @@
   function buildSheet() {
     if (document.getElementById(SHEET_ID)) return document.getElementById(SHEET_ID);
 
+    var voteUrl = buildVoteUrl();
     var qrSrc =
       'https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=8&data=' +
-      encodeURIComponent(VOTE_URL);
+      encodeURIComponent(voteUrl);
 
     var sheet = document.createElement('div');
     sheet.id = SHEET_ID;
@@ -229,9 +404,7 @@
       '    <button type="button" class="wcVotePromoLangToggle" id="wcVotePromoLangToggle" aria-label=""></button>' +
       '    <div class="wcVotePromoTrial" id="wcVotePromoTrial"></div>' +
       '    <span class="wcVotePromoBadge" id="wcVotePromoBadge"></span>' +
-      '    <div class="wcVotePromoTrophy" aria-hidden="true">' +
-      trophyIconHtml(96) +
-      '</div>' +
+      '    <div class="wcVotePromoMiniPodium" id="wcVotePromoMiniPodium" aria-hidden="true"></div>' +
       '    <h2 class="wcVotePromoTitle" id="wcVotePromoTitle"></h2>' +
       '    <p class="wcVotePromoSub" id="wcVotePromoSub"></p>' +
       '    <div class="wcVotePromoQr"><img src="' +
@@ -240,7 +413,7 @@
       '  </div>' +
       '  <div class="wcVotePromoActions">' +
       '    <a class="wcVotePromoCta" id="wcVotePromoCta" href="' +
-      VOTE_URL +
+      voteUrl +
       '" target="_blank" rel="noopener noreferrer">🗳️ <span id="wcVotePromoCtaLbl"></span></a>' +
       '    <button type="button" class="wcVotePromoLater" id="wcVotePromoLater"></button>' +
       '  </div>' +
@@ -256,6 +429,7 @@
     document.getElementById('wcVotePromoLater').addEventListener('click', dismiss);
     document.getElementById('wcVotePromoLangToggle').addEventListener('click', togglePromoLang);
 
+    updatePodiumWidgets(lastTop3);
     return sheet;
   }
 
@@ -265,7 +439,8 @@
     btn.id = DOT_ID;
     btn.type = 'button';
     btn.className = 'wc-vote-dot';
-    btn.innerHTML = '<span class="wc-vote-dot-icon" aria-hidden="true">' + trophyIconHtml(40) + '</span>';
+    btn.innerHTML =
+      '<span class="wc-vote-dot-podium" aria-hidden="true">' + miniPodiumHtml(lastTop3, 'dot') + '</span>';
     btn.addEventListener('click', function () {
       openSheet();
     });
@@ -276,8 +451,7 @@
   function showFloatingDot() {
     injectStyles();
     var dot = buildFloatingDot();
-    var icon = dot.querySelector('.wc-vote-dot-icon');
-    if (icon) icon.innerHTML = trophyIconHtml(40);
+    if (lastTop3) updatePodiumWidgets(lastTop3);
     dot.classList.add('is-on');
     dot.setAttribute('aria-label', t('dotAria'));
   }
@@ -318,6 +492,10 @@
     injectStyles();
     var sheet = buildSheet();
     applyI18n();
+    var voteUrl = buildVoteUrl();
+    var cta = document.getElementById('wcVotePromoCta');
+    if (cta) cta.href = voteUrl;
+    if (lastTop3) updatePodiumWidgets(lastTop3);
     sheet.classList.add('is-open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -335,6 +513,7 @@
 
   function init() {
     injectStyles();
+    startPodiumPolling();
     if (shouldAutoOpen()) {
       setTimeout(openSheet, 1400);
     } else if (isDismissed()) {
