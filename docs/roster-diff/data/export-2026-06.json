@@ -1,157 +1,143 @@
 {
   "kind": "export",
   "month": "2026-06",
-  "generated_at": "2026-05-31T06:01:05.319078Z",
-  "old_file": "Export Roster June 2026 Version2.xlsx",
+  "generated_at": "2026-06-07T11:24:52.548839Z",
+  "old_file": "Export Roster June 2026 Version3.xlsx",
   "new_file": "Export Roster June 2026 Version3.xlsx",
-  "total_changes": 21,
+  "total_changes": 19,
   "changes": [
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
+      "day": 3,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
       "day": 4,
       "v1": "AE14",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
       "day": 5,
-      "v1": "AE14",
+      "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
       "day": 6,
       "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
       "day": 7,
-      "v1": "NE22",
+      "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
-      "day": 8,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Al Muthana Al Shamfari - 82445",
-      "name": "Al Muthana Al Shamfari - 82445",
-      "day": 9,
+      "emp_id": "name:Ahmed Al Mawali - 82283",
+      "name": "Ahmed Al Mawali - 82283",
+      "day": 4,
       "v1": "ME06",
       "v2": "AE14"
     },
     {
-      "emp_id": "name:Al Muthana Al Shamfari - 82445",
-      "name": "Al Muthana Al Shamfari - 82445",
-      "day": 11,
+      "emp_id": "name:Ahmed Al Mawali - 82283",
+      "name": "Ahmed Al Mawali - 82283",
+      "day": 6,
       "v1": "NE22",
       "v2": "ME06"
     },
     {
-      "emp_id": "name:Bushra Al Wahiebi - 82657",
-      "name": "Bushra Al Wahiebi - 82657",
+      "emp_id": "name:Ali Al Marjubi - 82577",
+      "name": "Ali Al Marjubi - 82577",
+      "day": 1,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 1,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
       "day": 2,
-      "v1": "AE14",
-      "v2": "LV"
+      "v1": "ME12",
+      "v2": "ME06"
     },
     {
-      "emp_id": "name:Bushra Al Wahiebi - 82657",
-      "name": "Bushra Al Wahiebi - 82657",
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
       "day": 3,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Bushra Al Wahiebi - 82657",
-      "name": "Bushra Al Wahiebi - 82657",
-      "day": 4,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Bushra Al Wahiebi - 82657",
-      "name": "Bushra Al Wahiebi - 82657",
-      "day": 5,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Bushra Al Wahiebi - 82657",
-      "name": "Bushra Al Wahiebi - 82657",
-      "day": 6,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marwan Al Difai - 82437",
-      "name": "Marwan Al Difai - 82437",
-      "day": 13,
-      "v1": "AE14",
+      "v1": "ME12",
       "v2": "ME06"
     },
     {
-      "emp_id": "name:Mudathir Al Hajri - 82441",
-      "name": "Mudathir Al Hajri - 82441",
-      "day": 13,
-      "v1": "ME06",
-      "v2": "NE22"
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 8,
+      "v1": "ME12",
+      "v2": "ME06"
     },
     {
-      "emp_id": "name:Omar Al Obaidi - 82551",
-      "name": "Omar Al Obaidi - 82551",
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
       "day": 9,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Omar Al Obaidi - 82551",
-      "name": "Omar Al Obaidi - 82551",
-      "day": 10,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Omar Al Obaidi - 82551",
-      "name": "Omar Al Obaidi - 82551",
-      "day": 11,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Omar Al Obaidi - 82551",
-      "name": "Omar Al Obaidi - 82551",
-      "day": 12,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Omar Al Obaidi - 82551",
-      "name": "Omar Al Obaidi - 82551",
-      "day": 13,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Qasim Al Maqbali - 81409",
-      "name": "Qasim Al Maqbali - 81409",
-      "day": 4,
-      "v1": "NE22",
+      "v1": "ME12",
       "v2": "ME06"
     },
     {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 6,
-      "v1": "ME06",
-      "v2": "NE22"
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 10,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 15,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 16,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 17,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 29,
+      "v1": "ME12",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 30,
+      "v1": "ME12",
+      "v2": "ME06"
     }
   ]
 }

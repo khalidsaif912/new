@@ -1378,9 +1378,9 @@
         "day": 1,
         "day_name_ar": "الاثنين",
         "day_name_en": "Monday",
-        "shift_code": "NE22",
-        "shift_label": "🌙 Night (NE22)",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-06-02",
