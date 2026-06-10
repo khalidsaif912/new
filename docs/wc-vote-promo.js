@@ -1,6 +1,6 @@
 /**
  * wc-vote-promo.js — World Cup fan voting promo (match-accb0)
- * Arabic-first popup; floating trophy icon after dismiss (right of change-alert bell).
+ * Floating mini-podium beside change-alert bell; opens vote site on tap (no auto popup).
  */
 (function () {
   'use strict';
@@ -435,7 +435,7 @@
     btn.innerHTML =
       '<span class="wc-vote-dot-podium" aria-hidden="true">' + miniPodiumHtml(lastTop3, 'dot') + '</span>';
     btn.addEventListener('click', function () {
-      openSheet();
+      window.open(buildVoteUrl(), '_blank', 'noopener,noreferrer');
     });
     document.body.appendChild(btn);
     return btn;
@@ -507,15 +507,18 @@
   function init() {
     injectStyles();
     startPodiumPolling();
-    if (shouldAutoOpen()) {
-      setTimeout(openSheet, 1400);
-    } else if (isDismissed()) {
-      showFloatingDot();
-    }
+    showFloatingDot();
+    try {
+      if ((new URLSearchParams(location.search).get('wcvote') || '') === '1') {
+        window.open(buildVoteUrl(), '_blank', 'noopener,noreferrer');
+      }
+    } catch (e) {}
   }
 
   window.wcVotePromo = {
-    open: openSheet,
+    open: function () {
+      window.open(buildVoteUrl(), '_blank', 'noopener,noreferrer');
+    },
     close: dismiss,
     setLang: applyI18n,
     toggleLang: togglePromoLang,
