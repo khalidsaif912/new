@@ -1,7 +1,7 @@
 (function () {
   let deferredPrompt = null;
 
-  const PWA_VER = '13';
+  const PWA_VER = '14';
 
   function pwaSiteRoot() {
     if (location.protocol === 'file:') return '';
@@ -42,10 +42,26 @@
     touch.href = base + 'assets/icons/icon-192.png';
   })();
 
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isIOS =
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone =
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
+
+  function disableServiceWorkerOnIOS() {
+    if (!isIOS || !('serviceWorker' in navigator)) return Promise.resolve();
+    return navigator.serviceWorker
+      .getRegistrations()
+      .then(function (regs) {
+        return Promise.all(
+          regs.map(function (reg) {
+            return reg.unregister();
+          })
+        );
+      })
+      .catch(function () {});
+  }
 
   const DISMISS_KEY = 'roster_pwa_banner_dismissed_v1';
 
@@ -310,18 +326,26 @@
           });
         });
       }
-      navigator.serviceWorker.ready.then(function (reg) {
-        if (reg.active) reg.active.postMessage({ type: 'cache-banner', url: url });
-      }).catch(function () {});
+      if (!isIOS) {
+        navigator.serviceWorker.ready.then(function (reg) {
+          if (reg.active) reg.active.postMessage({ type: 'cache-banner', url: url });
+        }).catch(function () {});
+      }
     } catch (_) {}
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register(pwaBaseUrl() + 'sw.js?v=' + PWA_VER)
-      .then(function () {
+    if (isIOS) {
+      disableServiceWorkerOnIOS().then(function () {
         warmSavedBannerCache();
-      })
-      .catch(function () {});
+      });
+    } else {
+      navigator.serviceWorker
+        .register(pwaBaseUrl() + 'sw.js?v=' + PWA_VER)
+        .then(function () {
+          warmSavedBannerCache();
+        })
+        .catch(function () {});
+    }
   }
 })();

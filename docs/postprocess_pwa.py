@@ -22,7 +22,7 @@ HEAD_INJECT = """
     var p = siteRoot();
     var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
     if (!p) base = location.origin + '/';
-    var pv = '13';
+    var pv = '14';
     var imp = (location.pathname || '').indexOf('/import/') !== -1;
     var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
     var mlinks = document.querySelectorAll('link[rel="manifest"]');
@@ -42,6 +42,15 @@ HEAD_INJECT = """
       document.head.appendChild(touch);
     }
     touch.href = base + 'assets/icons/icon-192.png';
+    try {
+      var iOS = /iP(hone|ad|od)/i.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (iOS && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) { r.unregister(); });
+        });
+      }
+    } catch (swIosErr) {}
     try {
       var bn = localStorage.getItem('roster_banner_choice');
       if (bn && /^banner\d+\.jpg$/i.test(bn)) {
@@ -70,7 +79,7 @@ HEAD_INJECT = """
 """
 
 BODY_INJECT = """
-<script src="install-pwa.js?v=13" defer></script>
+<script src="install-pwa.js?v=14" defer></script>
 """
 
 

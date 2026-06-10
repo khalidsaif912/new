@@ -148,7 +148,6 @@
   }
 
   document.addEventListener('touchend', onPointerEnd, { passive: false, capture: true });
-  document.addEventListener('pointerup', onPointerEnd, { passive: false, capture: true });
 
   document.addEventListener(
     'click',

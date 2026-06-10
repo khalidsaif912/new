@@ -9,6 +9,13 @@
   var patterns = null;
   var patternsPromise = null;
 
+  function isIOSDevice() {
+    return (
+      /iP(hone|ad|od)/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+  }
+
   var ICON =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<circle cx="13.5" cy="6.5" r="2.5" fill="#7c3aed" stroke="none"/>' +
@@ -47,11 +54,15 @@
       '.bgTextureShuffleWrap .roster-cta-icon svg{width:16px;height:16px;}' +
       '.roster-cta-btn--texture{background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6;}' +
       '@media (hover:hover){.roster-cta-btn--texture:hover{background:#ede9fe;}}' +
-      'html.roster-bg-textured,body.roster-bg-textured{background-attachment:fixed;background-repeat:repeat;}' +
+      'html.roster-bg-textured,body.roster-bg-textured{background-attachment:' +
+      (isIOSDevice() ? 'scroll' : 'fixed') +
+      ';background-repeat:repeat;}' +
       'body.roster-bg-textured .wrap{background:transparent!important;}' +
       'body.roster-bg-textured .importBottom{background:transparent!important;}' +
       'body.roster-bg-textured .footer{background:rgba(255,255,255,.38)!important;' +
-      'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);' +
+      (isIOSDevice()
+        ? ''
+        : 'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);') +
       'border-top-color:rgba(148,163,184,.28)!important;}';
     document.head.appendChild(st);
   }
@@ -128,6 +139,9 @@
     body.style.backgroundImage = bgImage;
     html.style.backgroundRepeat = 'repeat';
     body.style.backgroundRepeat = 'repeat';
+    var attachment = isIOSDevice() ? 'scroll' : 'fixed';
+    html.style.backgroundAttachment = attachment;
+    body.style.backgroundAttachment = attachment;
     try {
       localStorage.setItem(
         STORAGE_KEY,

@@ -10,6 +10,13 @@
     'drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45))';
   const BANNER_NAME_RE = /^banner\d+\.jpg$/i;
 
+  function isIOSDevice() {
+    return (
+      /iP(hone|ad|od)/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+  }
+
   function getSiteRootPath() {
     const path = location.pathname || '/';
     if (path.includes('/roster-site/')) return '/roster-site';
@@ -94,7 +101,11 @@
           });
         });
       }
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      if (
+        !isIOSDevice() &&
+        navigator.serviceWorker &&
+        navigator.serviceWorker.controller
+      ) {
         navigator.serviceWorker.controller.postMessage({ type: 'cache-banner', url: url });
       }
     } catch (_) {}
@@ -160,9 +171,13 @@
       'body.ar #banner-changer-btn{left:12px!important;right:auto!important;}',
       '.' + ACTIVE_CLASS + ' .dateTag{',
       'color:#fff!important;',
-      'background:rgba(15,23,42,.28)!important;',
+      isIOSDevice()
+        ? 'background:rgba(15,23,42,.45)!important;'
+        : 'background:rgba(15,23,42,.28)!important;',
       'border-color:rgba(255,255,255,.32)!important;',
-      'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);',
+      isIOSDevice()
+        ? ''
+        : 'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);',
       'text-shadow:' + DATE_TAG_SHADOW + '!important;',
       '}',
       '.' + ACTIVE_CLASS + ' .dateTag-label{',
@@ -244,6 +259,7 @@
   }
 
   function forceBannerRepaint(targets) {
+    if (isIOSDevice()) return;
     targets.forEach(function (el) {
       var img = el.style.getPropertyValue('background-image');
       el.style.setProperty('background-image', 'none', 'important');
