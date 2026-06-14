@@ -6,18 +6,24 @@
   'use strict';
 
   var VOTE_BASE = 'https://match-accb0.web.app/?utm_source=roster-site&utm_medium=popup';
+  var FIXTURES_BASE = 'https://match-accb0.web.app/fixtures.html?utm_source=roster-site&utm_medium=popup';
+  var RESULTS_BASE = 'https://match-accb0.web.app/results.html?utm_source=roster-site&utm_medium=popup';
 
-  function buildVoteUrl() {
-    var url = VOTE_BASE;
+  function buildMatchUrl(base) {
+    var url = base;
     try {
       var emp = (
         localStorage.getItem('exportSavedEmpId') ||
         localStorage.getItem('savedEmpId') ||
         ''
       ).trim();
-      if (emp) url += '&emp=' + encodeURIComponent(emp);
+      if (emp) url += (url.indexOf('?') >= 0 ? '&' : '?') + 'emp=' + encodeURIComponent(emp);
     } catch (e) {}
     return url;
+  }
+
+  function buildVoteUrl() {
+    return buildMatchUrl(VOTE_BASE);
   }
   var STORAGE_KEY = 'wcVotePromoDismissed_v1';
   var PROMO_LANG_KEY = 'wcVotePromoLang';
@@ -190,11 +196,13 @@
       title: 'Vote for your team!',
       sub: 'Join the global fan ranking — one vote every 24 hours. Live results.',
       cta: 'Vote now',
+      btnFixtures: 'Match schedule',
+      btnResults: 'Results',
       later: 'Maybe later',
       close: 'Close',
       langBtn: 'ع',
       langAria: 'Arabic',
-      dotAria: 'Live top 3 — open World Cup vote',
+      dotAria: 'World Cup 2026 — vote, schedule & results',
     },
     ar: {
       trial: 'تجربة',
@@ -202,11 +210,13 @@
       title: 'ترتيب جماهير',
       sub: 'صوّت لمنتخبك المفضل وساعده على الوصول إلى المركز الأول في التصنيف الجماهيري العالمي',
       cta: 'صوّت الآن',
+      btnFixtures: 'جدول المباريات',
+      btnResults: 'النتائج',
       later: 'لاحقاً',
       close: 'إغلاق',
       langBtn: 'EN',
       langAria: 'English',
-      dotAria: 'الثلاثة الأوائل مباشرة — فتح التصويت',
+      dotAria: 'كأس العالم 2026 — تصويت وجدول ونتائج',
     },
   };
 
@@ -332,17 +342,22 @@
       'box-shadow:0 0 4px #00e676;animation:wcMiniLive 2s ease-in-out infinite;}' +
       '@keyframes wcMiniLive{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.55;transform:scale(.85);}}' +
       '.wcVotePromoTitle{margin:0 0 8px;font-size:22px;font-weight:900;color:#FFD700;line-height:1.2;}' +
-      '.wcVotePromoSub{margin:0 0 16px;font-size:13px;line-height:1.55;color:#8ab4cc;padding:0 8px;}' +
-      '.wcVotePromoQr{margin:0 auto 14px;width:120px;height:120px;padding:8px;background:#fff;border-radius:14px;}' +
-      '.wcVotePromoQr img{display:block;width:100%;height:100%;border-radius:8px;}' +
+      '.wcVotePromoSub{margin:0 0 14px;font-size:13px;line-height:1.55;color:#8ab4cc;padding:0 8px;}' +
       '.wcVotePromoActions{display:flex;flex-direction:column;gap:10px;padding:0 18px 20px;}' +
-      '.wcVotePromoCta{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;' +
-      'padding:12px 18px;border-radius:999px;border:none;font-size:16px;font-weight:800;cursor:pointer;' +
-      'background:linear-gradient(135deg,#FFD700,#B8860B);color:#000;text-decoration:none;' +
-      'box-shadow:0 6px 20px rgba(255,215,0,.35);-webkit-tap-highlight-color:transparent;}' +
-      '.wcVotePromoLater{min-height:44px;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);' +
-      'background:transparent;color:#8ab4cc;font-size:14px;font-weight:700;cursor:pointer;' +
-      '-webkit-tap-highlight-color:transparent;}' +
+      '.wcVotePromoBtn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;' +
+      'padding:12px 18px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;text-decoration:none;' +
+      '-webkit-tap-highlight-color:transparent;border:1px solid transparent;transition:transform .15s ease,box-shadow .15s ease;}' +
+      '.wcVotePromoBtn:active{transform:scale(.98);}' +
+      '.wcVotePromoBtn--vote{' +
+      'background:linear-gradient(135deg,#FFD700,#B8860B);color:#0a1520;' +
+      'box-shadow:0 6px 20px rgba(255,215,0,.35);border-color:rgba(255,215,0,.45);}' +
+      '.wcVotePromoBtn--fixtures{' +
+      'background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(124,58,237,.12));color:#e9d5ff;' +
+      'border-color:rgba(168,85,247,.35);box-shadow:0 4px 16px rgba(124,58,237,.2);}' +
+      '.wcVotePromoBtn--results{' +
+      'background:linear-gradient(135deg,rgba(37,211,102,.18),rgba(22,163,74,.1));color:#bbf7d0;' +
+      'border-color:rgba(37,211,102,.35);box-shadow:0 4px 16px rgba(37,211,102,.15);}' +
+      '.wcVotePromoBtn-icon{font-size:20px;line-height:1;flex-shrink:0;}' +
       '#' +
       DOT_ID +
       '{position:fixed;left:16px;bottom:26px;width:auto;height:auto;display:none;align-items:center;' +
@@ -380,9 +395,8 @@
     if (document.getElementById(SHEET_ID)) return document.getElementById(SHEET_ID);
 
     var voteUrl = buildVoteUrl();
-    var qrSrc =
-      'https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=8&data=' +
-      encodeURIComponent(voteUrl);
+    var fixturesUrl = buildMatchUrl(FIXTURES_BASE);
+    var resultsUrl = buildMatchUrl(RESULTS_BASE);
 
     var sheet = document.createElement('div');
     sheet.id = SHEET_ID;
@@ -400,15 +414,26 @@
       '    <div class="wcVotePromoMiniPodium" id="wcVotePromoMiniPodium" aria-hidden="true"></div>' +
       '    <h2 class="wcVotePromoTitle" id="wcVotePromoTitle"></h2>' +
       '    <p class="wcVotePromoSub" id="wcVotePromoSub"></p>' +
-      '    <div class="wcVotePromoQr"><img src="' +
-      qrSrc +
-      '" width="104" height="104" alt="QR"></div>' +
       '  </div>' +
       '  <div class="wcVotePromoActions">' +
-      '    <a class="wcVotePromoCta" id="wcVotePromoCta" href="' +
+      '    <a class="wcVotePromoBtn wcVotePromoBtn--vote" id="wcVotePromoCta" href="' +
       voteUrl +
-      '" target="_blank" rel="noopener noreferrer">🗳️ <span id="wcVotePromoCtaLbl"></span></a>' +
-      '    <button type="button" class="wcVotePromoLater" id="wcVotePromoLater"></button>' +
+      '" target="_blank" rel="noopener noreferrer">' +
+      '      <span class="wcVotePromoBtn-icon" aria-hidden="true">🗳️</span>' +
+      '      <span id="wcVotePromoCtaLbl"></span>' +
+      '    </a>' +
+      '    <a class="wcVotePromoBtn wcVotePromoBtn--fixtures" id="wcVotePromoFixtures" href="' +
+      fixturesUrl +
+      '" target="_blank" rel="noopener noreferrer">' +
+      '      <span class="wcVotePromoBtn-icon" aria-hidden="true">📅</span>' +
+      '      <span id="wcVotePromoFixturesLbl"></span>' +
+      '    </a>' +
+      '    <a class="wcVotePromoBtn wcVotePromoBtn--results" id="wcVotePromoResults" href="' +
+      resultsUrl +
+      '" target="_blank" rel="noopener noreferrer">' +
+      '      <span class="wcVotePromoBtn-icon" aria-hidden="true">🏁</span>' +
+      '      <span id="wcVotePromoResultsLbl"></span>' +
+      '    </a>' +
       '  </div>' +
       '</div>';
 
@@ -419,7 +444,6 @@
     });
 
     document.getElementById('wcVotePromoClose').addEventListener('click', dismiss);
-    document.getElementById('wcVotePromoLater').addEventListener('click', dismiss);
     document.getElementById('wcVotePromoLangToggle').addEventListener('click', togglePromoLang);
 
     updatePodiumWidgets(lastTop3);
@@ -435,7 +459,7 @@
     btn.innerHTML =
       '<span class="wc-vote-dot-podium" aria-hidden="true">' + miniPodiumHtml(lastTop3, 'dot') + '</span>';
     btn.addEventListener('click', function () {
-      window.open(buildVoteUrl(), '_blank', 'noopener,noreferrer');
+      openSheet();
     });
     document.body.appendChild(btn);
     return btn;
@@ -463,21 +487,30 @@
     var title = document.getElementById('wcVotePromoTitle');
     var sub = document.getElementById('wcVotePromoSub');
     var ctaLbl = document.getElementById('wcVotePromoCtaLbl');
-    var later = document.getElementById('wcVotePromoLater');
+    var fixturesLbl = document.getElementById('wcVotePromoFixturesLbl');
+    var resultsLbl = document.getElementById('wcVotePromoResultsLbl');
     var closeBtn = document.getElementById('wcVotePromoClose');
     var langBtn = document.getElementById('wcVotePromoLangToggle');
+    var cta = document.getElementById('wcVotePromoCta');
+    var fixtures = document.getElementById('wcVotePromoFixtures');
+    var results = document.getElementById('wcVotePromoResults');
     var dot = document.getElementById(DOT_ID);
     if (trial) trial.textContent = t('trial');
     if (badge) badge.textContent = t('badge');
     if (title) title.textContent = t('title');
     if (sub) sub.textContent = t('sub');
     if (ctaLbl) ctaLbl.textContent = t('cta');
-    if (later) later.textContent = t('later');
+    if (fixturesLbl) fixturesLbl.textContent = t('btnFixtures');
+    if (resultsLbl) resultsLbl.textContent = t('btnResults');
     if (closeBtn) closeBtn.setAttribute('aria-label', t('close'));
     if (langBtn) {
       langBtn.textContent = t('langBtn');
       langBtn.setAttribute('aria-label', t('langAria'));
     }
+    var voteUrl = buildVoteUrl();
+    if (cta) cta.href = voteUrl;
+    if (fixtures) fixtures.href = buildMatchUrl(FIXTURES_BASE);
+    if (results) results.href = buildMatchUrl(RESULTS_BASE);
     if (dot && dot.classList.contains('is-on')) dot.setAttribute('aria-label', t('dotAria'));
   }
 
@@ -485,14 +518,10 @@
     injectStyles();
     var sheet = buildSheet();
     applyI18n();
-    var voteUrl = buildVoteUrl();
-    var cta = document.getElementById('wcVotePromoCta');
-    if (cta) cta.href = voteUrl;
     if (lastTop3) updatePodiumWidgets(lastTop3);
     sheet.classList.add('is-open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    hideFloatingDot();
   }
 
   function closeSheet() {
@@ -516,9 +545,7 @@
   }
 
   window.wcVotePromo = {
-    open: function () {
-      window.open(buildVoteUrl(), '_blank', 'noopener,noreferrer');
-    },
+    open: openSheet,
     close: dismiss,
     setLang: applyI18n,
     toggleLang: togglePromoLang,
