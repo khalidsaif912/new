@@ -1654,7 +1654,16 @@
       Other:         {icon:'❓', dot:'#8b949e'}
     };
 
-    const SHIFT_HOURS_PER_DAY=9;
+    const SHIFT_HOURS_LEGACY=9;
+    const SHIFT_HOURS_CURRENT=8;
+    function currentMonthKey(){
+      const now=new Date();
+      return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    }
+    function shiftHoursPerDay(ym){
+      const key=ym||month||currentMonthKey();
+      return key>=currentMonthKey()?SHIFT_HOURS_CURRENT:SHIFT_HOURS_LEGACY;
+    }
     const STAT_MODAL=[
       {k:'workHours',icon:'⏱️',c:'c-blue',label_en:'Work hrs',label_ar:'ساعات عمل',hrsOnly:1},
       {k:'work',icon:'💼',c:'c-blue',label_en:'Work',label_ar:'عمل',hrsKey:'workHours'},
@@ -1919,9 +1928,9 @@
       if(c.startsWith('NN')||c.startsWith('NE')) return 'Night';
       return 'Other';
     }
-    function shiftHoursForCode(code){
+    function shiftHoursForCode(code, ym){
       const g=codeToGroup(code);
-      if(g==='Morning'||g==='Afternoon'||g==='Night') return SHIFT_HOURS_PER_DAY;
+      if(g==='Morning'||g==='Afternoon'||g==='Night') return shiftHoursPerDay(ym);
       return 0;
     }
     function fmtHours(h){
