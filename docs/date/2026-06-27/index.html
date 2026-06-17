@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../../ios-tap-fix.js?v=20260610a"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260610a"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -225,7 +225,7 @@
       background:rgba(255,255,255,.25);
       transform:translateY(-1px);
     }
-    /* Transparent date input over #dateTag — native picker on iOS */
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
     .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
@@ -254,49 +254,6 @@
     .header::before,
     .header::after {
       pointer-events:none;
-    }
-
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-
-    .header::before,
-    .header::after {
-      pointer-events:none;
-    }
-    .summaryBar {
-      position:relative;
-      z-index:30;
-      isolation:isolate;
-    }
-    .summaryBar a.summaryChip,
-    .summaryBar button.summaryChip,
-    .quickActions.roster-cta,
-    .quickActions .roster-cta-btn,
-    .importBottom .quickActions.roster-cta,
-    .importBottom .roster-cta-btn,
-    .topDock .dockCard.dockAction,
-    .topDock .dockCard.savedChip,
-    .topDock button.dockCard {
-      position:relative;
-      z-index:1;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
-    }
-    .summaryBar a.summaryChip *,
-    .summaryBar button.summaryChip *,
-    .quickActions.roster-cta-btn .roster-cta-icon,
-    .quickActions.roster-cta-btn .roster-cta-label,
-    .topDock .dockCard * {
-      pointer-events:none;
-    }
-    .importBottom,
-    .quickActions.roster-cta {
-      position:relative;
-      z-index:25;
     }
 
     /* ═══════ SUMMARY BAR ═══════ */
@@ -895,7 +852,6 @@
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
       .wrap            { padding:12px 10px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
@@ -947,15 +903,15 @@
       document.head.appendChild(touch);
     }
     touch.href = base + 'assets/icons/icon-192.png';
-    try {
+    try {{
       var iOS = /iP(hone|ad|od)/i.test(navigator.userAgent) ||
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (iOS && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          regs.forEach(function(r) { r.unregister(); });
-        });
-      }
-    } catch (swIosErr) {}
+      if (iOS && 'serviceWorker' in navigator) {{
+        navigator.serviceWorker.getRegistrations().then(function(regs) {{
+          regs.forEach(function(r) {{ r.unregister(); }});
+        }});
+      }}
+    }} catch (swIosErr) {{}}
     try {{
       var bn = localStorage.getItem('roster_banner_choice');
       if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
@@ -1401,7 +1357,7 @@
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
         <span class="shiftLabel" style="color:#5b21b6;">Night</span>
-        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">7</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">6</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Abdulfatah Al Shukeili - 990465" role="button" tabindex="0">
@@ -1419,10 +1375,7 @@
      </div><div class="empRow" data-emp-name="Ghaith al Habsi - 82439" role="button" tabindex="0">
       <span class="empName">Ghaith al Habsi - 82439</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Hashmi - 82616" role="button" tabindex="0">
-      <span class="empName">Ahmed Al Hashmi - 82616</span>
-       <span class="empStatus" style="color:#5b21b6;">NE22</span>
-     </div><div class="empRow" data-emp-name="Hosni Al Sulti - 80695" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Hosni Al Sulti - 80695" role="button" tabindex="0">
       <span class="empName">Hosni Al Sulti - 80695</span>
        <span class="empStatus" style="color:#5b21b6;">NE22</span>
      </div>
@@ -1477,7 +1430,7 @@
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
         <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
-        <span class="shiftCount" style="background:#10b98122; color:#065f46;">3</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">4</span>
       </summary>
       <div class="shiftBody">
         <div class="empRow" data-emp-name="Wissam Al Kharusi - 82464" role="button" tabindex="0">
@@ -1489,6 +1442,9 @@
      </div><div class="empRow" data-emp-name="Ali Al Mamari - 82574" role="button" tabindex="0">
       <span class="empName">Ali Al Mamari - 82574</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 17 <span class="shiftRangeLabel">TO</span> 28</span>)</span>
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Hashmi - 82616" role="button" tabindex="0">
+      <span class="empName">Ahmed Al Hashmi - 82616</span>
+       <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 25 <span class="shiftRangeLabel">TO</span> 28</span>)</span>
      </div>
       </div>
     </details>
@@ -1651,8 +1607,8 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">8 June 2026 / 15:29</strong><br>
-    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026 Version4.xlsx</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">17 June 2026 / 13:42</strong><br>
+    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export Roster June 2026 Version5.xlsx</strong>
   </div>
 
 </div>
@@ -2435,9 +2391,6 @@ function goToEmployeeSchedule(empName) {
 
   function resyncTodayIfNeeded() {
     if (!path.includes('/date/')) return;
-    try {
-      if (sessionStorage.getItem('rosterDatePickerBusy') === '1') return;
-    } catch (e) {}
     try {
       if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
     } catch (e) {}
