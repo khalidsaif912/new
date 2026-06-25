@@ -34,17 +34,43 @@
       background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
       color: #fff;
     }
-    .calc-back {
+    .calc-back,
+    .calc-refresh {
       border: 0;
       background: rgba(255, 255, 255, 0.18);
       color: #fff;
       border-radius: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .calc-back {
       min-height: 36px;
       padding: 0 12px;
       font-size: 14px;
       font-weight: 700;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
+    }
+    .calc-refresh {
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .calc-refresh:active {
+      transform: scale(0.94);
+      background: rgba(255, 255, 255, 0.28);
+    }
+    .calc-refresh.spinning {
+      animation: calcRefreshSpin 0.7s linear;
+    }
+    @keyframes calcRefreshSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
     .calc-title {
       flex: 1;
@@ -72,7 +98,7 @@
     <div class="calc-top">
       <button type="button" class="calc-back" id="calcBackBtn" aria-label="رجوع">← رجوع</button>
       <h1 class="calc-title">📦 حساب الكميات</h1>
-      <span style="width:72px" aria-hidden="true"></span>
+      <button type="button" class="calc-refresh" id="calcRefreshBtn" aria-label="تحديث" title="تحديث">↻</button>
     </div>
     <div class="calc-frame-wrap">
       <iframe
@@ -85,6 +111,8 @@
   </div>
   <script>
     (function () {
+      var CALC_SRC = 'https://iammrk-8af39.web.app/calculator/index.html?from=roster&embed=1&v=20260628';
+
       function siteRoot() {
         if (location.protocol === 'file:') return '';
         var path = location.pathname || '/';
@@ -105,6 +133,17 @@
         var root = siteRoot();
         var home = location.origin + root + (root && root.charAt(root.length - 1) !== '/' ? '/' : '/');
         location.href = home;
+      });
+
+      document.getElementById('calcRefreshBtn').addEventListener('click', function () {
+        var btn = this;
+        var frame = document.getElementById('calcFrame');
+        if (!frame) return;
+        btn.classList.add('spinning');
+        frame.src = CALC_SRC + '&_=' + Date.now();
+        setTimeout(function () {
+          btn.classList.remove('spinning');
+        }, 700);
       });
     })();
   </script>
