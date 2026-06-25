@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <script defer src="../../../ios-tap-fix.js?v=20260610a"></script>
+  <script defer src="../../../ios-tap-fix.js?v=20260625a"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <title>Import Duty Roster</title>
@@ -302,7 +302,13 @@
       z-index:25;
     }
 
-    a.summaryChip, button.summaryChip, .langToggle, .btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
+    }
+
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn, a.roster-cta-btn, button.roster-cta-btn, .topDock .dockCard.dockAction, .topDock button.dockCard {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       cursor:pointer;
@@ -3961,7 +3967,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260610a';
+  var ver = '20260627a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');

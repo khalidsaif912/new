@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2196F3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>حساب الكميات</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #1976D2;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      touch-action: manipulation;
+    }
+    .calc-shell {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+    }
+    .calc-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px;
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      color: #fff;
+    }
+    .calc-back {
+      border: 0;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 0 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .calc-title {
+      flex: 1;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      margin: 0;
+    }
+    .calc-frame-wrap {
+      flex: 1;
+      min-height: 0;
+      background: #fff;
+    }
+    #calcFrame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="calc-shell">
+    <div class="calc-top">
+      <button type="button" class="calc-back" id="calcBackBtn" aria-label="رجوع">← رجوع</button>
+      <h1 class="calc-title">📦 حساب الكميات</h1>
+      <span style="width:72px" aria-hidden="true"></span>
+    </div>
+    <div class="calc-frame-wrap">
+      <iframe
+        id="calcFrame"
+        title="حساب الكميات"
+        allow="clipboard-read; clipboard-write"
+        src="https://iammrk-8af39.web.app/calculator/index.html?from=roster&amp;embed=1&amp;v=20260627"
+      ></iframe>
+    </div>
+  </div>
+  <script>
+    (function () {
+      function siteRoot() {
+        if (location.protocol === 'file:') return '';
+        var path = location.pathname || '/';
+        if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+        if (location.hostname && location.hostname.endsWith('github.io')) {
+          var segs = path.split('/').filter(Boolean);
+          if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+          return segs.length ? '/' + segs[0] : '';
+        }
+        return '';
+      }
+
+      document.getElementById('calcBackBtn').addEventListener('click', function () {
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+        var root = siteRoot();
+        var home = location.origin + root + (root && root.charAt(root.length - 1) !== '/' ? '/' : '/');
+        location.href = home;
+      });
+    })();
+  </script>
+</body>
+</html>

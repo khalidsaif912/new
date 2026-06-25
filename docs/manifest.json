@@ -3,7 +3,7 @@
   "short_name": "الصادر",
   "description": "جدول مناوبات الصادر",
   "start_url": "./",
-  "scope": "./",
+  "scope": "/roster-site/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f4354b",

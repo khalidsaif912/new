@@ -4,6 +4,8 @@
 (function () {
   'use strict';
 
+  var CALC_VER = '20260627';
+
   var I18N = {
     en: {
       btn: 'Apps',
@@ -57,6 +59,56 @@
     return pack[key] || I18N.en[key] || key;
   }
 
+  function siteRootUrl() {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl();
+    }
+    if (location.protocol === 'file:') {
+      return '';
+    }
+    var path = location.pathname || '/';
+    if (path.indexOf('/roster-site/') !== -1) {
+      return location.origin + '/roster-site';
+    }
+    if (location.hostname && location.hostname.endsWith('github.io')) {
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length >= 2 && segs[1] === 'docs') {
+        return location.origin + '/' + segs[0] + '/docs';
+      }
+      if (segs.length) {
+        return location.origin + '/' + segs[0];
+      }
+    }
+    return location.origin;
+  }
+
+  function calcWrapperUrl() {
+    return siteRootUrl() + '/apps/calc.html?v=' + CALC_VER;
+  }
+
+  function isStandaloneApp() {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function patchCalcLink() {
+    var link = document.querySelector('.siteAppsLink--calc');
+    if (!link) return;
+    link.href = calcWrapperUrl();
+    link.removeAttribute('target');
+    link.setAttribute('data-pwa-calc', '1');
+  }
+
+  function openCalcFromPwa(e) {
+    var link = e.target.closest('a.siteAppsLink--calc');
+    if (!link) return;
+    e.preventDefault();
+    closeModal();
+    window.location.assign(calcWrapperUrl());
+  }
+
   function applyI18n() {
     var btn = document.getElementById('moreAppsBtn');
     if (btn) {
@@ -108,6 +160,7 @@
     if (!sheet) return;
     closeShareIfOpen();
     applyI18n();
+    patchCalcLink();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -121,6 +174,23 @@
     document.body.style.overflow = '';
   }
 
+  function bindExternalAppLinks() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    patchCalcLink();
+    grid.addEventListener('click', function (e) {
+      if (e.target.closest('a.siteAppsLink--calc')) {
+        openCalcFromPwa(e);
+        return;
+      }
+      var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
+      if (!link || !isStandaloneApp()) return;
+      e.preventDefault();
+      closeModal();
+      window.location.assign(link.href);
+    });
+  }
+
   function bindUi() {
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
@@ -129,6 +199,7 @@
       openModal();
     });
     document.getElementById('siteAppsCloseBtn')?.addEventListener('click', closeModal);
+    bindExternalAppLinks();
     sheet.addEventListener('click', function (e) {
       if (e.target === sheet) closeModal();
     });
@@ -140,12 +211,14 @@
   function init() {
     bindUi();
     applyI18n();
+    patchCalcLink();
   }
 
   window.rosterSiteApps = {
     setLang: applyI18n,
     open: openModal,
     close: closeModal,
+    calcUrl: calcWrapperUrl,
   };
 
   if (document.readyState === 'loading') {
