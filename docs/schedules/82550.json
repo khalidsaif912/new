@@ -1495,9 +1495,9 @@
         "day": 14,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "TR",
-        "shift_label": "📚 Training",
-        "shift_group": "Training"
+        "shift_code": "NE22",
+        "shift_label": "🌙 Night (NE22)",
+        "shift_group": "Night"
       },
       {
         "date": "2026-06-15",
