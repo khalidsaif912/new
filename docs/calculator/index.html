@@ -154,58 +154,112 @@
         }
 
         .input-section {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            background: white;
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .shipment-form-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
         }
 
         .form-row {
             display: flex;
-            gap: 12px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            align-items: flex-end;
         }
 
         .field-label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             font-weight: 700;
-            color: #334155;
+            color: #64748b;
             margin-bottom: 6px;
             text-align: right;
+            letter-spacing: 0.02em;
         }
 
         .input-group {
-            flex: 1 1 100%;
-            width: 100%;
+            flex: 1 1 0;
+            width: auto;
             min-width: 0;
         }
 
-        .input-group.awb-group,
+        .input-group.awb-group {
+            flex: 1.2 1 0;
+        }
+
         .input-group.qty-group {
-            flex: 1 1 100%;
+            flex: 0.8 1 0;
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            min-height: 50px;
+            padding: 12px 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            min-height: 48px;
             text-align: center;
             direction: ltr;
+            background: #fff;
+            color: #0f172a;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .form-input::-webkit-outer-spin-button,
+        .form-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-group.awb-group .form-input {
+            border-color: #90caf9;
+            background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);
+        }
+
+        .input-group.qty-group .form-input {
+            border-color: #a5b4fc;
+            background: linear-gradient(180deg, #ffffff 0%, #f5f7ff 100%);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.14), inset 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        .input-group.awb-group .form-input:focus {
+            background: #fff;
+        }
+
+        .input-group.qty-group .form-input:focus {
+            background: #fff;
         }
 
         .form-input.auto-focused {
             border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.16);
+        }
+
+        .btn-add-shipment {
+            margin-top: 0;
         }
 
         .btn {
@@ -223,25 +277,11 @@
             background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
             color: white;
             width: 100%;
-            margin-top: 10px;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-
-        .btn-success { 
-            background: #4CAF50; 
-            color: white; 
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-
-        .add-part-hint {
-            font-size: 0.72rem;
-            font-weight: 600;
-            opacity: 0.85;
         }
 
         .tabs-container {
@@ -703,12 +743,6 @@
             animation: screenFlash 0.8s ease-in-out;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
         .floating-add-part {
             display: none;
             position: fixed;
@@ -736,11 +770,6 @@
 
         .floating-add-part:active {
             transform: scale(0.98);
-        }
-
-        body.keyboard-open .tab-content.active .action-buttons {
-            visibility: hidden;
-            pointer-events: none;
         }
 
         .empty-state {
@@ -1278,16 +1307,6 @@
                 font-size: 16px;
             }
 
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn-success {
-                width: 100%;
-                min-height: 48px;
-                padding: 12px 16px;
-            }
-
             .empty-state {
                 padding: 36px 18px;
             }
@@ -1389,17 +1408,19 @@
 
         <div class="main-content">
             <div class="input-section">
-                <div class="form-row">
-                    <div class="input-group awb-group">
-                        <label class="field-label" for="awb">رقم AWB</label>
-                        <input type="number" id="awb" class="form-input" placeholder="AWB Number" dir="ltr" inputmode="numeric" oninput="handleAWBInput(this)">
+                <div class="shipment-form-card">
+                    <div class="form-row shipment-fields">
+                        <div class="input-group awb-group">
+                            <label class="field-label" for="awb">رقم AWB</label>
+                            <input type="text" id="awb" class="form-input" placeholder="AWB" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off" oninput="handleAWBInput(this)">
+                        </div>
+                        <div class="input-group qty-group">
+                            <label class="field-label" for="quantity">الكمية الكلية</label>
+                            <input type="text" id="quantity" class="form-input" placeholder="QTY" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                        </div>
                     </div>
-                    <div class="input-group qty-group">
-                        <label class="field-label" for="quantity">الكمية الكلية</label>
-                        <input type="number" id="quantity" class="form-input" placeholder="Total Quantity" min="1" inputmode="numeric">
-                    </div>
+                    <button class="btn btn-primary btn-add-shipment" onclick="addShipment()">➕ إضافة/تحديث الشحنة</button>
                 </div>
-                <button class="btn btn-primary" onclick="addShipment()">➕ إضافة/تحديث الشحنة</button>
             </div>
 
             <div class="tabs-container">
@@ -1725,9 +1746,6 @@
                 content += '</div>';
             }
             
-            content += '</div>';
-            content += '<div class="action-buttons">';
-            content += '<button class="btn btn-success" onclick="addPart(\'' + awb + '\')">➕ إضافة جزء <span class="add-part-hint">(0 مطول)</span></button>';
             content += '</div>';
             content += '</div>';
             
