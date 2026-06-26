@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <script>
+        (function () {
+            var meta = document.querySelector('meta[name=viewport]');
+            if (!meta) return;
+            function fixViewport() {
+                var iw = window.innerWidth || 0;
+                var sw = Math.min(screen.width || 0, screen.height || 0) || iw;
+                if ('ontouchstart' in window && iw > sw + 60) {
+                    meta.setAttribute('content', 'width=' + sw + ', initial-scale=1, viewport-fit=cover');
+                } else {
+                    meta.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+                }
+            }
+            fixViewport();
+            document.addEventListener('DOMContentLoaded', fixViewport);
+            window.addEventListener('resize', fixViewport);
+        })();
+    </script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="حساب الكميات">
+    <meta name="theme-color" content="#2196F3">
+    <title>حساب الكميات</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            height: 100%;
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100%;
+            min-height: 100dvh;
+            direction: rtl;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 12px 15px;
+            padding-top: calc(12px + env(safe-area-inset-top, 0px));
+            padding-left: calc(15px + env(safe-area-inset-left, 0px));
+            padding-right: calc(15px + env(safe-area-inset-right, 0px));
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 1000 !important;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            margin-bottom: 3px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .main-content {
+            position: fixed !important;
+            top: var(--header-h, 75px) !important;
+            bottom: var(--footer-h, 40px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain;
+        }
+
+        .input-section {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+            text-align: right;
+        }
+
+        .input-group {
+            flex: 1 1 100%;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .input-group.awb-group,
+        .input-group.qty-group {
+            flex: 1 1 100%;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            min-height: 50px;
+            text-align: center;
+            direction: ltr;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .form-input.auto-focused {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 50px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-success { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .add-part-hint {
+            font-size: 0.72rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .tabs-container {
+            margin: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs-nav {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 10px;
+            gap: 5px;
+            background: #f4f4f4;
+            padding-top: 5px;
+            padding-bottom: 2px;
+        }
+
+        .tabs-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            white-space: nowrap;
+            border-radius: 8px 8px 0 0;
+            background: #1565c0;
+            color: white;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.25s ease;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: #1e88e5;
+            border-color: #1565c0;
+        }
+
+        .tab-btn.complete {
+            background: #2e7d32;
+        }
+        .tab-btn.complete.active {
+            background: #43a047;
+        }
+
+        .tab-btn.excess {
+            background: #b71c1c;
+        }
+        .tab-btn.excess.active {
+            background: #e53935;
+        }
+
+        .tab-close {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
+        .tab-btn.active .tab-close {
+            display: block;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .parts-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .parts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quantity-display {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .parts-grid {
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr) !important;
+            gap: 20px 15px;
+            margin: 15px 0;
+            padding: 30px 20px;
+            border-radius: 12px;
+            width: fit-content;
+            min-width: 400px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+        }
+
+        .part-row {
+            position: relative;
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            border-radius: 8px;
+            width: 80px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(200, 35, 51, 0.5);
+            cursor: grab;
+        }
+
+        .part-row::before {
+            content: '📦';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            z-index: 15;
+        }
+
+        .part-row:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .number-3d {
+            font-size: 26px;
+            font-weight: 900;
+            text-align: center;
+            direction: ltr;
+            color: #333;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #ddd;
+            outline: none;
+            cursor: text;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            z-index: 5;
+            width: 80%;
+            height: 70%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .number-3d:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px #007bff;
+        }
+
+        .delete-part-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 25;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-part-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .remaining-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2196F3;
+        }
+
+        .remaining-text {
+            font-weight: 600;
+            color: #333;
+            direction: ltr;
+            text-align: center;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .remaining-text .used { color: #4CAF50; }
+        .remaining-text .remaining { color: #F44336; }
+
+        .status-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .status-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            border: 2px solid #66BB6A;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            border: 2px solid #ef5350;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; transform: scale(1); }
+            51%, 100% { opacity: 0.6; transform: scale(0.95); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes screenFlash {
+            0% { background-color: transparent; }
+            25% { background-color: rgba(76, 175, 80, 0.3); }
+            50% { background-color: rgba(76, 175, 80, 0.1); }
+            75% { background-color: rgba(76, 175, 80, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        .flash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1500;
+        }
+
+        .flash-screen.active {
+            animation: screenFlash 0.8s ease-in-out;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .floating-add-part {
+            display: none;
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            z-index: 2500;
+            margin: 0;
+            min-height: 44px;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.35);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .floating-add-part.visible {
+            display: block;
+        }
+
+        .floating-add-part:active {
+            transform: scale(0.98);
+        }
+
+        body.keyboard-open .tab-content.active .action-buttons {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .footer-bar {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            min-height: var(--footer-h, 40px) !important;
+            z-index: 1000 !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 0 !important;
+            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+            margin: 0 !important;
+        }
+
+        .footer-status {
+            background: #2196F3;
+            color: white;
+            padding: 10px 12px;
+            padding-left: calc(12px + env(safe-area-inset-left, 0px));
+            padding-right: calc(12px + env(safe-area-inset-right, 0px));
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-height: 44px;
+        }
+
+        .footer-status .status-text {
+            color: #fff;
+            font-weight: bold;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #totalShipments {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        /* INFO BUTTON STYLES */
+        .info-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+            border: 1px solid white;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
+            font-weight: bold;
+            z-index: 999;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .info-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 8px rgba(255, 107, 107, 0.5);
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-radius: 16px;
+            padding: 16px 14px;
+            max-width: 300px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            border: 2px solid #e3f2fd;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: relative;
+            background: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #FF5252;
+            font-weight: bold;
+            padding: 0;
+            margin-left: auto;
+            margin-bottom: 12px;
+        }
+
+        .modal-close:hover {
+            background: #FFE0E0;
+            transform: rotate(90deg);
+            color: #FF3B3B;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+
+        .modal-header h2 {
+            color: #1976D2;
+            margin: 0 0 4px 0;
+            font-size: 1.2rem;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 0.75rem;
+            margin: 0;
+        }
+
+        .modal-body {
+            text-align: center;
+        }
+
+        .designer-info {
+            margin: 8px 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #E3F2FD 0%, #F3E5F5 100%);
+            border-radius: 12px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .designer-info label {
+            display: block;
+            color: #666;
+            font-size: 0.7rem;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .designer-info .value {
+            color: #1976D2;
+            font-size: 0.85rem;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .whatsapp-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* CUSTOM ALERT AND CONFIRM STYLES */
+        .custom-alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .custom-alert-overlay.active {
+            display: flex;
+        }
+
+        .custom-alert-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            border: 2px solid #e3f2fd;
+        }
+
+        .custom-alert-content h3 {
+            color: #1976D2;
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .custom-alert-content p {
+            color: #666;
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .alert-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .alert-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .alert-btn-ok {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .alert-btn-ok:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .alert-btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+        }
+
+        .alert-btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        @media (max-width: 768px), (hover: none) and (pointer: coarse) {
+            html {
+                font-size: 17px;
+            }
+
+            .header {
+                padding: 14px 16px;
+                padding-top: calc(14px + env(safe-area-inset-top, 0px));
+            }
+
+            .header h1 {
+                font-size: 1.35rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .input-section {
+                padding: 14px 16px;
+            }
+
+            .form-row {
+                flex-direction: row-reverse;
+                flex-wrap: nowrap;
+                align-items: flex-end;
+                gap: 10px;
+            }
+
+            .input-group {
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+            }
+
+            .input-group.awb-group {
+                flex: 1.15 1 0;
+            }
+
+            .input-group.qty-group {
+                flex: 0.85 1 0;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: column;
+                min-height: 100dvh;
+                height: auto;
+            }
+
+            .header {
+                position: relative !important;
+                top: auto !important;
+                flex-shrink: 0;
+            }
+
+            .main-content {
+                position: relative !important;
+                top: auto !important;
+                bottom: auto !important;
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .footer-bar {
+                position: relative !important;
+                bottom: auto !important;
+                flex-shrink: 0;
+            }
+
+            .tabs-container {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #tabsContent {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .tab-content.active {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .parts-container {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .parts-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 14px 8px;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                padding: 20px 10px;
+                margin-left: 0;
+                margin-right: 0;
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+            }
+
+            .field-label {
+                font-size: 1rem;
+            }
+
+            .form-input {
+                font-size: 18px;
+                padding: 14px 12px;
+                min-height: 52px;
+            }
+
+            .btn {
+                min-height: 52px;
+                font-size: 1.05rem;
+            }
+
+            .btn-primary {
+                margin-top: 4px;
+            }
+
+            .tabs-container {
+                margin: 10px 8px;
+            }
+
+            .tab-btn {
+                min-height: 46px;
+                padding: 10px 16px;
+                font-size: 0.95rem;
+                flex-shrink: 0;
+            }
+
+            .tab-btn.active .tab-close {
+                display: flex;
+                width: 22px;
+                height: 22px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .parts-container {
+                padding: 10px;
+            }
+
+            .parts-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .parts-header h3 {
+                font-size: 0.95rem;
+                word-break: break-all;
+            }
+
+            .quantity-display {
+                font-size: 1rem;
+            }
+
+            .remaining-info {
+                padding: 10px;
+            }
+
+            .remaining-text {
+                font-size: 0.9rem;
+            }
+
+            .part-row {
+                width: 100%;
+                max-width: 100%;
+                height: 48px;
+                margin: 0 auto;
+            }
+
+            .number-3d {
+                font-size: 18px;
+            }
+
+            .delete-part-btn {
+                width: 28px;
+                height: 28px;
+                top: -10px;
+                right: -10px;
+                font-size: 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-success {
+                width: 100%;
+                min-height: 48px;
+                padding: 12px 16px;
+            }
+
+            .empty-state {
+                padding: 36px 18px;
+            }
+
+            .empty-state-icon {
+                font-size: 3.5rem;
+            }
+
+            .empty-state h3 {
+                font-size: 1.3rem;
+            }
+
+            .info-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+                flex-shrink: 0;
+            }
+
+            .modal-content,
+            .custom-alert-content {
+                max-width: min(340px, calc(100vw - 32px));
+                padding: 18px 16px;
+            }
+
+            .modal-overlay,
+            .custom-alert-overlay {
+                padding: 16px;
+                padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+                align-items: flex-end;
+            }
+
+            @media (min-height: 500px) {
+                .modal-overlay,
+                .custom-alert-overlay {
+                    align-items: center;
+                }
+            }
+        }
+
+        @media (max-width: 380px) {
+            .parts-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px 8px;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .footer-status {
+                font-size: 0.82rem;
+            }
+        }
+
+        @media (min-width: 769px) and (hover: hover) and (pointer: fine) {
+            .form-row {
+                flex-direction: row-reverse;
+                flex-wrap: nowrap;
+            }
+
+            .input-group {
+                flex: 1;
+                width: auto;
+            }
+
+            .input-group.awb-group {
+                flex: 1.2;
+            }
+
+            .input-group.qty-group {
+                flex: 0.8;
+            }
+        }
+
+        :root{
+            --header-h: 82px;
+            --footer-h: 44px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 برنامج حساب الكميات</h1>
+            <p>Quantity calculation</p>
+        </div>
+
+    <!-- FLASH SCREEN -->
+    <div class="flash-screen" id="flashScreen"></div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="form-row">
+                    <div class="input-group awb-group">
+                        <label class="field-label" for="awb">رقم AWB</label>
+                        <input type="number" id="awb" class="form-input" placeholder="AWB Number" dir="ltr" inputmode="numeric" oninput="handleAWBInput(this)">
+                    </div>
+                    <div class="input-group qty-group">
+                        <label class="field-label" for="quantity">الكمية الكلية</label>
+                        <input type="number" id="quantity" class="form-input" placeholder="Total Quantity" min="1" inputmode="numeric">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addShipment()">➕ إضافة/تحديث الشحنة</button>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tabs-nav" id="tabsNav"></div>
+                <div id="tabsContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔭</div>
+                        <h3>لا توجد شحنات</h3>
+                        <p>أضف شحنة جديدة للبدء</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bar">
+            <div class="footer-status">
+                <span class="status-text" id="statusText">جاهز للاستخدام</span>
+                <span id="totalShipments">الشحنات: 0</span>
+                <button class="info-btn" id="infoBtn" title="معلومات المصمم">!</button>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="floating-add-part" id="floatingAddPartBtn" aria-label="إضافة جزء">➕ إضافة جزء</button>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="infoModal">
+        <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeInfoModal()" title="إغلاق">✕</button>
+                <div class="modal-header">
+                    <h2>👨‍💻 معلومات المصمم</h2>
+                    <p>تطوير التطبيقات الويب المتقدمة</p>
+                </div>
+                <div class="modal-body">
+                    <div class="designer-info">
+                        <label>اسم المصمم</label>
+                        <div class="value">خالد الرقادي</div>
+                    </div>
+                    <div class="designer-info">
+                        <label>رقم الهاتف</label>
+                        <div class="value" dir="ltr">+968 99678553</div>
+                    </div>
+                    <a href="https://wa.me/96899678553?text=مرحباً، أريد التواصل معك بخصوص برنامج حساب الكميات" target="_blank" class="whatsapp-link">
+                        <svg class="whatsapp-svg" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16">
+                            <path d="M13.601 2.326A7.854 7.854 0 0 0 8.001.001C3.582.001 0 3.583 0 8.002c0 1.41.368 2.79 1.064 4.003L.057 15.944l4.063-1.064A7.96 7.96 0 0 0 8.001 16c4.419 0 8.001-3.582 8.001-7.998a7.954 7.954 0 0 0-2.401-5.676zM8.001 14.5a6.48 6.48 0 0 1-3.307-.898l-.236-.14-2.409.631.643-2.345-.154-.24a6.48 6.48 0 0 1-.99-3.45 6.503 6.503 0 0 1 6.507-6.498 6.48 6.48 0 0 1 4.6 1.904 6.48 6.48 0 0 1 1.905 4.596c0 3.588-2.919 6.49-6.504 6.49zm3.684-4.97c-.202-.101-1.197-.59-1.382-.658-.185-.07-.32-.102-.454.102s-.521.657-.64.793c-.118.135-.236.152-.438.051-.202-.102-.854-.314-1.626-1.001-.601-.534-1.006-1.193-1.124-1.395-.117-.202-.013-.311.088-.412.09-.09.202-.236.303-.354.101-.118.135-.202.202-.337.067-.135.034-.253-.017-.354-.051-.101-.454-1.095-.622-1.497-.165-.398-.334-.344-.454-.35-.118-.006-.253-.007-.388-.007s-.354.051-.54.253c-.185.202-.709.693-.709 1.69s.726 1.962.827 2.099c.101.135 1.431 2.186 3.467 3.065.485.21.863.335 1.157.428.486.155.928.133 1.278.081.39-.058 1.197-.49 1.366-.963.168-.473.168-.877.118-.963-.051-.084-.185-.135-.387-.236z"/>
+                        </svg>
+                        توصل عبر واتساب
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM ALERT -->
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-content">
+            <h3 id="alertTitle">تنبيه</h3>
+            <p id="alertMessage"></p>
+            <div class="alert-buttons">
+                <button class="alert-btn alert-btn-ok" onclick="closeCustomAlert()">حسناً</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRM -->
+    <div class="custom-alert-overlay" id="customConfirmOverlay">
+        <div class="custom-alert-content">
+            <h3 id="confirmTitle">تأكيد</h3>
+            <p id="confirmMessage"></p>
+            <div class="alert-buttons">
+                <button class="alert-btn alert-btn-cancel" onclick="closeCustomConfirm()">إلغاء</button>
+                <button class="alert-btn alert-btn-ok" onclick="confirmAction()">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        var shipments = {};
+        var activeTab = null;
+        var pendingConfirmCallback = null;
+
+        // CUSTOM ALERT
+        function showCustomAlert(message, title) {
+            title = title || 'تنبيه';
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('customAlertOverlay').classList.add('active');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlertOverlay').classList.remove('active');
+        }
+
+        // CUSTOM CONFIRM
+        function showCustomConfirm(message, callback, title) {
+            title = title || 'تأكيد';
+            pendingConfirmCallback = callback;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('customConfirmOverlay').classList.add('active');
+        }
+
+        function closeCustomConfirm() {
+            document.getElementById('customConfirmOverlay').classList.remove('active');
+            pendingConfirmCallback = null;
+        }
+
+        function confirmAction() {
+            if (pendingConfirmCallback) {
+                pendingConfirmCallback();
+            }
+            closeCustomConfirm();
+        }
+
+        // إغلاق عند النقر خارج النافذة
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'customAlertOverlay') {
+                closeCustomAlert();
+            }
+            if (e.target.id === 'customConfirmOverlay') {
+                closeCustomConfirm();
+            }
+        });
+
+        // MODAL INFO
+
+        // معالجة إدخال رقم الشحنة
+        function handleAWBInput(element) {
+            var value = element.value;
+            if (value.length >= 4) {
+                var quantityInput = document.getElementById('quantity');
+                if (quantityInput) {
+                    quantityInput.classList.add('auto-focused');
+                    quantityInput.focus();
+                    setTimeout(function() {
+                        quantityInput.classList.remove('auto-focused');
+                    }, 2000);
+                }
+            }
+        }
+
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.add('active');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        document.getElementById('infoBtn').addEventListener('click', openInfoModal);
+
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeInfoModal();
+        });
+
+        function addShipment() {
+            var awbInput = document.getElementById('awb');
+            var quantityInput = document.getElementById('quantity');
+            var awb = awbInput.value.trim();
+            var quantity = parseInt(quantityInput.value);
+
+            if (!awb) {
+                showCustomAlert('يرجى إدخال رقم الشحنة');
+                awbInput.focus();
+                return;
+            }
+
+            if (!quantity || quantity <= 0) {
+                showCustomAlert('يرجى إدخال كمية صحيحة');
+                quantityInput.focus();
+                return;
+            }
+
+            if (shipments[awb]) {
+                shipments[awb].quantity = quantity;
+                updateTabContent(awb);
+                setStatus('تم تحديث الشحنة: ' + awb);
+            } else {
+                shipments[awb] = {
+                    quantity: quantity,
+                    parts: [{ quantity: '', color: 'default' }],
+                    celebrated: false
+                };
+                createTab(awb);
+                setStatus('تم إضافة الشحنة: ' + awb);
+            }
+            
+            updateCount();
+            updateTabStatus(awb);
+            updateLayoutHeights();
+            
+            awbInput.value = '';
+            quantityInput.value = '';
+            awbInput.focus();
+            
+            setTimeout(function() { 
+                switchTab(awb);
+                setTimeout(function() {
+                    var firstPartElement = document.querySelector('#tab-' + awb + ' [data-index="0"] .number-3d');
+                    if (firstPartElement) {
+                        firstPartElement.focus();
+                    }
+                }, 100);
+            }, 100);
+            saveData();
+        }
+
+        function updateTabStatus(awb) {
+            var tabBtn = document.querySelector('[data-tab="' + awb + '"]');
+            if (!tabBtn) return;
+            
+            var data = shipments[awb];
+            var totalUsed = getTotalUsed(awb);
+            var remaining = data.quantity - totalUsed;
+            
+            tabBtn.classList.remove('complete', 'excess');
+            
+            if (remaining === 0) {
+                tabBtn.classList.add('complete');
+                triggerCelebration(awb);
+            } else if (remaining < 0) {
+                tabBtn.classList.add('excess');
+            }
+        }
+
+        function createTab(awb) {
+            var tabsNav = document.getElementById('tabsNav');
+            var tabsContent = document.getElementById('tabsContent');
+
+            var emptyState = tabsContent.querySelector('.empty-state');
+            if (emptyState) tabsContent.innerHTML = '';
+
+            var tabBtn = document.createElement('div');
+            tabBtn.className = 'tab-btn';
+            tabBtn.setAttribute('data-tab', awb);
+            tabBtn.innerHTML = awb + '<button class="tab-close" onclick="deleteTab(\'' + awb + '\')" title="حذف">×</button>';
+            tabBtn.onclick = function() { switchTab(awb); };
+            tabsNav.appendChild(tabBtn);
+
+            var tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+            tabContent.id = 'tab-' + awb;
+            tabContent.innerHTML = createTabContent(awb);
+            tabsContent.appendChild(tabContent);
+            updateLayoutHeights();
+        }
+
+        function createTabContent(awb) {
+            var data = shipments[awb];
+            if (!data) return '<div>خطأ في البيانات</div>';
+            
+            var totalUsed = getTotalUsed(awb);
+            var remaining = data.quantity - totalUsed;
+            
+            var statusIcon = '';
+            if (remaining === 0) {
+                statusIcon = '<span class="status-icon status-success">✓</span>';
+            } else if (remaining < 0) {
+                statusIcon = '<span class="status-icon status-error">✕</span>';
+            }
+            
+            var content = '<div class="parts-container">';
+            content += '<div class="parts-header">';
+            content += '<div class="quantity-display">QTY: ' + data.quantity + '</div>';
+            content += '<h3>📋 AWB: ' + awb + '</h3>';
+            content += '</div>';
+            
+            content += '<div class="remaining-info">';
+            content += '<div class="remaining-text">';
+            content += statusIcon + '<span class="used">Used: ' + totalUsed + '</span> | ';
+            content += '<span class="remaining">Remaining: ' + remaining + '</span>';
+            content += '</div></div>';
+            
+            content += '<div class="parts-grid">';
+            for (var i = 0; i < data.parts.length; i++) {
+                var part = data.parts[i];
+                content += '<div class="part-row" data-index="' + i + '" data-awb="' + awb + '">';
+                content += '<div class="number-3d" contenteditable="true" inputmode="numeric" onkeydown="handlePartKeydown(event)" onkeyup="handlePartKeyup(event)" oninput="updatePart(this)" onfocus="selectAllOnFocus(this)">' + (part.quantity || '') + '</div>';
+                content += '<button class="delete-part-btn" onclick="deletePart(\'' + awb + '\', ' + i + ')" title="حذف">×</button>';
+                content += '</div>';
+            }
+            
+            content += '</div>';
+            content += '<div class="action-buttons">';
+            content += '<button class="btn btn-success" onclick="addPart(\'' + awb + '\')">➕ إضافة جزء <span class="add-part-hint">(0 مطول)</span></button>';
+            content += '</div>';
+            content += '</div>';
+            
+            return content;
+        }
+
+        function switchTab(awb) {
+            var tabs = document.querySelectorAll('.tab-btn');
+            var contents = document.querySelectorAll('.tab-content');
+            
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+
+            var tabBtn = document.querySelector('[data-tab="' + awb + '"]');
+            var tabContent = document.getElementById('tab-' + awb);
+            
+            if (tabBtn && tabContent) {
+                tabBtn.classList.add('active');
+                tabContent.classList.add('active');
+                activeTab = awb;
+            }
+        }
+
+        function addPart(awb) {
+            var data = shipments[awb];
+            var totalUsed = getTotalUsed(awb);
+            var remaining = data.quantity - totalUsed;
+            
+            if (remaining <= 0) {
+                alert('تم استخدام جميع الكمية');
+                return;
+            }
+            
+            data.parts.push({ quantity: '', color: 'default' });
+            updateTabContent(awb);
+            setStatus('تم إضافة جزء جديد');
+            
+            setTimeout(function() {
+                var newPartIndex = data.parts.length - 1;
+                var newPartElement = document.querySelector('#tab-' + awb + ' [data-index="' + newPartIndex + '"] .number-3d');
+                if (newPartElement) {
+                    newPartElement.focus();
+                }
+            }, 100);
+            
+            saveData();
+        }
+
+        function deletePart(awb, index) {
+            var data = shipments[awb];
+            
+            if (data.parts.length > 1) {
+                showCustomConfirm('هل تريد حذف هذا الجزء؟', function() {
+                    data.parts.splice(index, 1);
+                    updateTabContent(awb);
+                    updateTabStatus(awb);
+                    setStatus('تم حذف الجزء');
+                    saveData();
+                }, 'تأكيد الحذف');
+            } else {
+                showCustomAlert('لا يمكن حذف الجزء الأخير', 'تنبيه');
+            }
+        }
+
+        function updateTabContent(awb) {
+            var tabContent = document.getElementById('tab-' + awb);
+            if (tabContent) {
+                tabContent.innerHTML = createTabContent(awb);
+            }
+        }
+
+        function getTotalUsed(awb) {
+            var data = shipments[awb];
+            if (!data) return 0;
+            
+            var total = 0;
+            for (var i = 0; i < data.parts.length; i++) {
+                total += parseInt(data.parts[i].quantity) || 0;
+            }
+            return total;
+        }
+
+        function updatePart(element) {
+            var awb = element.closest('[data-awb]').getAttribute('data-awb');
+            var index = parseInt(element.closest('[data-index]').getAttribute('data-index'));
+            var value = element.textContent.replace(/[^0-9]/g, '').substring(0, 6);
+            
+            if (element.textContent !== value) {
+                element.textContent = value;
+            }
+            
+            var data = shipments[awb];
+            if (data && data.parts[index]) {
+                data.parts[index].quantity = value === '' ? 0 : parseInt(value);
+                updateRemainingInfo(awb);
+                updateTabStatus(awb);
+                saveData();
+            }
+        }
+
+        function updateRemainingInfo(awb) {
+            var remainingContainer = document.querySelector('#tab-' + awb + ' .remaining-info .remaining-text');
+            if (remainingContainer) {
+                var data = shipments[awb];
+                var totalUsed = getTotalUsed(awb);
+                var remaining = data.quantity - totalUsed;
+                
+                var statusIcon = '';
+                if (remaining === 0) {
+                    statusIcon = '<span class="status-icon status-success">✓</span>';
+                } else if (remaining < 0) {
+                    statusIcon = '<span class="status-icon status-error">✕</span>';
+                }
+                
+                remainingContainer.innerHTML = statusIcon + '<span class="used">Used: ' + totalUsed + '</span> | <span class="remaining">Remaining: ' + remaining + '</span>';
+            }
+        }
+
+        function handleInput(event) {
+            var allowedKeys = ['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'];
+            
+            if (!allowedKeys.includes(event.key) && (event.key < '0' || event.key > '9')) {
+                event.preventDefault();
+                return;
+            }
+            
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.target.blur();
+            }
+        }
+
+        var zeroHoldTimer = null;
+        var zeroHoldFired = false;
+
+        function handlePartKeydown(event) {
+            handleInput(event);
+            if (event.key !== '0' || event.repeat) return;
+
+            var el = event.target;
+            clearTimeout(zeroHoldTimer);
+            zeroHoldFired = false;
+            zeroHoldTimer = setTimeout(function() {
+                var row = el.closest('[data-awb]');
+                if (!row || document.activeElement !== el) return;
+                var awb = row.getAttribute('data-awb');
+                if (!awb) return;
+                zeroHoldFired = true;
+                addPart(awb);
+                setStatus('تم إضافة جزء (اختصار: 0 مطول)');
+            }, 600);
+        }
+
+        function handlePartKeyup(event) {
+            if (event.key !== '0') return;
+            clearTimeout(zeroHoldTimer);
+            zeroHoldTimer = null;
+            if (zeroHoldFired) {
+                var el = event.target;
+                if (el && el.textContent === '0') {
+                    el.textContent = '';
+                    updatePart(el);
+                }
+                zeroHoldFired = false;
+            }
+        }
+
+        function selectAllOnFocus(element) {
+            setTimeout(function() {
+                if (window.getSelection && document.createRange) {
+                    var selection = window.getSelection();
+                    var range = document.createRange();
+                    selection.removeAllRanges();
+                    range.selectNodeContents(element);
+                    selection.addRange(range);
+                }
+            }, 10);
+        }
+
+        function deleteTab(awb) {
+            showCustomConfirm('هل أنت متأكد من حذف الشحنة: ' + awb + '؟', function() {
+                delete shipments[awb];
+                
+                var tabBtn = document.querySelector('[data-tab="' + awb + '"]');
+                if (tabBtn) tabBtn.remove();
+                
+                var tabContent = document.getElementById('tab-' + awb);
+                if (tabContent) tabContent.remove();
+                
+                var remainingTabs = Object.keys(shipments);
+                if (remainingTabs.length > 0) {
+                    setTimeout(function() { switchTab(remainingTabs[0]); }, 100);
+                } else {
+                    document.getElementById('tabsContent').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔭</div><h3>لا توجد شحنات</h3><p>أضف شحنة جديدة للبدء</p></div>';
+                    activeTab = null;
+                }
+                
+                updateCount();
+                setStatus('تم حذف الشحنة: ' + awb);
+                saveData();
+            }, 'تأكيد الحذف');
+        }
+
+        function updateCount() {
+            var totalShipments = document.getElementById('totalShipments');
+            totalShipments.textContent = 'الشحنات: ' + Object.keys(shipments).length;
+        }
+
+        function setStatus(message) {
+            var statusText = document.getElementById('statusText');
+            statusText.textContent = message;
+            setTimeout(function() { 
+                statusText.textContent = 'جاهز للاستخدام'; 
+            }, 3000);
+        }
+
+        function saveData() {
+            try {
+                var data = {
+                    shipments: shipments,
+                    activeTab: activeTab,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('quantitySplitterData', JSON.stringify(data));
+            } catch (error) {
+                console.warn('فشل في حفظ البيانات:', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                var savedData = localStorage.getItem('quantitySplitterData');
+                if (savedData) {
+                    var data = JSON.parse(savedData);
+                    shipments = data.shipments || {};
+                    activeTab = data.activeTab;
+                    
+                    var awbs = Object.keys(shipments);
+                    for (var i = 0; i < awbs.length; i++) {
+                        createTab(awbs[i]);
+                        updateTabStatus(awbs[i]);
+                    }
+                    
+                    if (activeTab && shipments[activeTab]) {
+                        setTimeout(function() { switchTab(activeTab); }, 100);
+                    } else if (awbs.length > 0) {
+                        setTimeout(function() { switchTab(awbs[0]); }, 100);
+                    }
+                    
+                    updateCount();
+                    setStatus('تم استعادة البيانات المحفوظة');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('فشل في تحميل البيانات:', error);
+            }
+            return false;
+        }
+
+        function triggerCelebration(awb) {
+            try {
+                if (awb && shipments && shipments[awb]) {
+                    if (shipments[awb].celebrated) return;
+                    shipments[awb].celebrated = true;
+                    saveData();
+                }
+            } catch(e){ console.warn(e); }
+            showCompletionNotification(awb);
+        }
+
+        function showCompletionNotification(awb) {
+            setStatus('✓ تم إكمال الشحنة: ' + awb + ' بنجاح');
+            
+            // تأثير الوميض
+            var flashScreen = document.getElementById('flashScreen');
+            if (flashScreen) {
+                flashScreen.classList.remove('active');
+                // إعادة تشغيل الحركة
+                void flashScreen.offsetWidth;
+                flashScreen.classList.add('active');
+                
+                // إزالة التأثير بعد انتهاءه
+                setTimeout(function() {
+                    flashScreen.classList.remove('active');
+                }, 800);
+            }
+            
+            // إضافة تأثير بصري على التبويب
+            var tabBtn = document.querySelector('[data-tab="' + awb + '"]');
+            if (tabBtn) {
+                tabBtn.style.animation = 'none';
+                setTimeout(function() {
+                    tabBtn.style.animation = 'pulse 0.6s ease-in-out';
+                }, 10);
+            }
+        }
+
+        // Override alert and confirm globally
+        window.alert = function(message) {
+            showCustomAlert(message, 'تنبيه');
+        };
+
+        window.confirm = function(message) {
+            showCustomConfirm(message, function() {
+                // This is handled by the confirm action
+            }, 'تأكيد');
+            return true;
+        };
+
+        // منع أي نوافذ المتصفح
+        if (typeof navigator !== 'undefined') {
+            window.addEventListener('beforeunload', function(e) {
+                saveData();
+            });
+        }
+
+        // منع سلوك المتصفح الافتراضي
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+        });
+
+        // تحديث ارتفاع الهيدر والفوتر ديناميكياً (مهم للجوال)
+        function updateLayoutHeights() {
+            var header = document.querySelector('.header');
+            var footer = document.querySelector('.footer-bar');
+            if (header) {
+                document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+            }
+            if (footer) {
+                document.documentElement.style.setProperty('--footer-h', footer.offsetHeight + 'px');
+            }
+        }
+
+        function scrollFocusedIntoView() {
+            document.addEventListener('focusin', function(e) {
+                if (e.target.matches('.number-3d[contenteditable]')) {
+                    showFloatingAddPart(true);
+                    return;
+                }
+                if (e.target.matches('.form-input')) {
+                    setTimeout(function() {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 350);
+                }
+            });
+
+            document.addEventListener('focusout', function(e) {
+                if (e.target.matches('.number-3d[contenteditable]')) {
+                    setTimeout(function() {
+                        if (!document.activeElement ||
+                            !document.activeElement.matches('.number-3d[contenteditable], #floatingAddPartBtn')) {
+                            showFloatingAddPart(false);
+                        }
+                    }, 120);
+                }
+            });
+        }
+
+        function keyboardInset() {
+            var vv = window.visualViewport;
+            if (!vv) return 0;
+            return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+        }
+
+        function positionFloatingAddPart() {
+            var btn = document.getElementById('floatingAddPartBtn');
+            if (!btn) return;
+            var inset = keyboardInset();
+            var keyboardOpen = inset > 60;
+            var editingPart = document.activeElement &&
+                document.activeElement.matches('.number-3d[contenteditable]');
+
+            if (keyboardOpen && editingPart && activeTab) {
+                document.body.classList.add('keyboard-open');
+                btn.classList.add('visible');
+                btn.style.bottom = (inset + 8) + 'px';
+            } else {
+                document.body.classList.remove('keyboard-open');
+                btn.classList.remove('visible');
+            }
+        }
+
+        function showFloatingAddPart(show) {
+            if (show && activeTab) {
+                positionFloatingAddPart();
+                setTimeout(positionFloatingAddPart, 250);
+                setTimeout(positionFloatingAddPart, 500);
+            } else {
+                document.body.classList.remove('keyboard-open');
+                var btn = document.getElementById('floatingAddPartBtn');
+                if (btn) btn.classList.remove('visible');
+            }
+        }
+
+        function setupFloatingAddPart() {
+            var btn = document.getElementById('floatingAddPartBtn');
+            if (!btn) return;
+
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!activeTab) return;
+                addPart(activeTab);
+            });
+
+            btn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+            });
+
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', positionFloatingAddPart);
+                window.visualViewport.addEventListener('scroll', positionFloatingAddPart);
+            }
+            window.addEventListener('resize', positionFloatingAddPart);
+        }
+
+        window.onload = function() {
+            updateLayoutHeights();
+            scrollFocusedIntoView();
+            setupFloatingAddPart();
+            window.addEventListener('resize', updateLayoutHeights);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(updateLayoutHeights, 150);
+            });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', updateLayoutHeights);
+            }
+
+            if (!loadData()) {
+                setStatus('بدء جلسة جديدة - أضف شحنة للبدء');
+            }
+            
+            var awbInput = document.getElementById('awb');
+            if (awbInput) {
+                awbInput.focus();
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.target.id === 'awb' || e.target.id === 'quantity')) {
+                    e.preventDefault();
+                    addShipment();
+                }
+            });
+            
+            window.addEventListener('beforeunload', function(e) {
+                saveData();
+            });
+            
+            setInterval(function() {
+                if (Object.keys(shipments).length > 0) {
+                    saveData();
+                }
+            }, 60000);
+        };
+    </script>
+</body>
+</html>

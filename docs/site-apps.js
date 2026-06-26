@@ -108,6 +108,7 @@
     if (!sheet) return;
     closeShareIfOpen();
     applyI18n();
+    patchCalcLink();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -121,6 +122,31 @@
     document.body.style.overflow = '';
   }
 
+  function calcPageUrl() {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl() + '/calculator/index.html';
+    }
+    return 'https://khalidsaif912.github.io/new/docs/calculator/index.html';
+  }
+
+  function patchCalcLink() {
+    var link = document.querySelector('.siteAppsLink--calc');
+    if (!link) return;
+    link.href = calcPageUrl();
+    link.setAttribute('data-open-same', '1');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+  }
+
+  function openCalcFromPwa(e) {
+    var link = e.target.closest('a.siteAppsLink--calc');
+    if (!link) return;
+    if (!isStandaloneApp()) return;
+    e.preventDefault();
+    closeModal();
+    window.location.assign(calcPageUrl());
+  }
+
   function isStandaloneApp() {
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -131,7 +157,12 @@
   function bindExternalAppLinks() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
+    patchCalcLink();
     grid.addEventListener('click', function (e) {
+      if (e.target.closest('a.siteAppsLink--calc')) {
+        openCalcFromPwa(e);
+        return;
+      }
       var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
       if (!link || !isStandaloneApp()) return;
       e.preventDefault();
@@ -160,12 +191,14 @@
   function init() {
     bindUi();
     applyI18n();
+    patchCalcLink();
   }
 
   window.rosterSiteApps = {
     setLang: applyI18n,
     open: openModal,
     close: closeModal,
+    calcUrl: calcPageUrl,
   };
 
   if (document.readyState === 'loading') {
