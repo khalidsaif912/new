@@ -29,7 +29,7 @@
     <title>حساب الكميات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -448,14 +448,15 @@
             min-height: 34px;
             margin-bottom: 0;
             z-index: 8;
-            font-family: 'Rubik', 'Segoe UI', Roboto, system-ui, sans-serif;
-            font-size: 31px;
-            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', 'Rubik', 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-size: 33px;
+            font-weight: 600;
             font-feature-settings: "tnum" 1, "lnum" 1;
             font-variant-numeric: lining-nums tabular-nums;
+            font-synthesis: none;
             text-align: center;
             direction: ltr;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
             caret-color: #334155;
             border: none;
             outline: none;
@@ -466,9 +467,9 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            line-height: 1.05;
-            padding-bottom: 0;
-            color: #4fc3f7;
+            line-height: 1;
+            padding: 0 1px;
+            color: #1976d2;
             background: none;
             -webkit-text-fill-color: currentColor;
             -webkit-text-stroke: 0;
@@ -476,34 +477,26 @@
             transform: none;
             text-rendering: geometricPrecision;
             text-shadow:
-                0 -1px 0 #e1f5fe,
-                0 1px 0 #29b6f6,
-                0 2px 0 #1e88e5,
-                0 3px 0 #1565c0,
-                0 4px 0 #0d47a1,
-                0 5px 0 #0a3d91;
+                0 1px 0 #1565c0,
+                0 2px 0 #0d47a1,
+                0 3px 0 #0a3d91;
             box-shadow: none;
             transition: color 0.15s ease, text-shadow 0.15s ease;
         }
 
         .part-row:hover .number-3d {
-            color: #81d4fa;
+            color: #1e88e5;
             text-shadow:
-                0 -1px 0 #f0f9ff,
-                0 1px 0 #4fc3f7,
-                0 2px 0 #2196f3,
-                0 3px 0 #1976d2,
-                0 4px 0 #1565c0,
-                0 5px 0 #0d47a1;
+                0 1px 0 #1976d2,
+                0 2px 0 #1565c0,
+                0 3px 0 #0d47a1;
         }
 
         .number-3d:empty::before {
             content: '0';
-            color: #90caf9;
-            text-shadow:
-                0 1px 0 #81d4fa,
-                0 2px 0 #64b5f6;
-            opacity: 0.5;
+            color: #64b5f6;
+            text-shadow: 0 1px 0 #42a5f5;
+            opacity: 0.55;
         }
 
         .number-3d:focus,
@@ -1168,9 +1161,9 @@
             }
 
             .number-3d {
-                font-size: 28px;
+                font-size: 29px;
                 min-height: 32px;
-                letter-spacing: 0.04em;
+                letter-spacing: 0.06em;
             }
 
             .pallet-stage {
