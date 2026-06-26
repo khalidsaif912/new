@@ -27,6 +27,9 @@
     <meta name="apple-mobile-web-app-title" content="حساب الكميات">
     <meta name="theme-color" content="#2196F3">
     <title>حساب الكميات</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -447,12 +450,14 @@
             min-height: 32px;
             margin-bottom: 0;
             z-index: 8;
-            font-size: 32px;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
+            font-family: 'Rubik', 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            font-feature-settings: "tnum" 1, "lnum" 1;
+            font-variant-numeric: lining-nums tabular-nums;
             text-align: center;
             direction: ltr;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.02em;
             caret-color: #334155;
             border: none;
             outline: none;
@@ -463,7 +468,7 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            line-height: 1;
+            line-height: 1.05;
             padding-bottom: 1px;
             color: #1e88e5;
             background: none;
@@ -471,23 +476,20 @@
             -webkit-text-stroke: 0;
             filter: none;
             transform-origin: 50% 100%;
-            transform: rotateX(-16deg) translateZ(6px);
-            text-rendering: geometricPrecision;
+            transform: rotateX(-14deg) translateZ(6px);
+            text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
             text-shadow:
-                0 -1px 0 rgba(255, 255, 255, 0.55),
                 0 1px 0 #1976d2,
                 0 2px 0 #1565c0,
-                0 3px 0 #0d47a1,
-                0 4px 0 #0a3d91,
-                0 6px 4px rgba(13, 71, 161, 0.28);
+                0 3px 1px rgba(13, 71, 161, 0.28);
             box-shadow: none;
             transition: color 0.15s ease, transform 0.15s ease;
         }
 
         .part-row:hover .number-3d {
             color: #2196f3;
-            transform: rotateX(-14deg) translateZ(8px) translateY(-1px);
+            transform: rotateX(-12deg) translateZ(8px) translateY(-1px);
         }
 
         .number-3d:empty::before {
@@ -502,7 +504,7 @@
             outline: none;
             box-shadow: none;
             filter: none;
-            transform: rotateX(-16deg) translateZ(6px);
+            transform: rotateX(-14deg) translateZ(6px);
         }
 
         .delete-part-btn {
@@ -1159,18 +1161,19 @@
             }
 
             .number-3d {
-                font-size: 28px;
+                font-size: 27px;
                 min-height: 30px;
-                transform: rotateX(-14deg) translateZ(5px);
+                letter-spacing: 0.03em;
+                transform: rotateX(-12deg) translateZ(5px);
             }
 
             .part-row:hover .number-3d {
-                transform: rotateX(-12deg) translateZ(6px) translateY(-1px);
+                transform: rotateX(-10deg) translateZ(6px) translateY(-1px);
             }
 
             .number-3d:focus,
             .number-3d:focus-visible {
-                transform: rotateX(-14deg) translateZ(5px);
+                transform: rotateX(-12deg) translateZ(5px);
             }
 
             .pallet-stage {
