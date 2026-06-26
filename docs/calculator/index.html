@@ -440,10 +440,11 @@
             text-align: center;
             direction: ltr;
             letter-spacing: -0.03em;
-            caret-color: #0d47a1;
+            caret-color: #334155;
             border: none;
             outline: none;
             cursor: text;
+            -webkit-tap-highlight-color: transparent;
             white-space: nowrap;
             overflow: visible;
             display: flex;
@@ -497,32 +498,21 @@
         }
 
         .number-3d:focus {
-            --num-grad: linear-gradient(
-                168deg,
-                #f0f9ff 0%,
-                #b3e5fc 12%,
-                #4fc3f7 28%,
-                #29b6f6 46%,
-                #1e88e5 62%,
-                #5c6bc0 78%,
-                #1565c0 90%,
-                #0d47a1 100%
-            );
             outline: none;
-            transform: perspective(160px) rotateX(4deg) scale(1.03);
+            box-shadow: none;
+            transform: perspective(160px) rotateX(7deg);
             filter:
-                drop-shadow(0 1px 0 rgba(21, 101, 192, 0.98))
-                drop-shadow(0 2px 0 rgba(13, 71, 161, 0.94))
-                drop-shadow(0 3px 0 rgba(10, 61, 140, 0.88))
-                drop-shadow(0 4px 0 rgba(8, 50, 120, 0.78))
-                drop-shadow(0 8px 14px rgba(13, 71, 161, 0.38))
-                drop-shadow(0 0 18px rgba(41, 182, 246, 0.35));
+                drop-shadow(0 1px 0 rgba(21, 101, 192, 0.92))
+                drop-shadow(0 2px 0 rgba(13, 71, 161, 0.88))
+                drop-shadow(0 3px 0 rgba(10, 61, 140, 0.82))
+                drop-shadow(0 4px 0 rgba(8, 50, 120, 0.72))
+                drop-shadow(0 6px 10px rgba(13, 71, 161, 0.32))
+                drop-shadow(0 0 14px rgba(79, 195, 247, 0.22));
         }
 
         .number-3d:focus-visible {
-            outline: 2px solid rgba(33, 150, 243, 0.45);
-            outline-offset: 2px;
-            border-radius: 6px;
+            outline: none;
+            box-shadow: none;
         }
 
         .delete-part-btn {
@@ -1190,7 +1180,7 @@
             }
 
             .number-3d:focus {
-                transform: perspective(140px) rotateX(3deg) scale(1.03);
+                transform: perspective(140px) rotateX(6deg);
             }
 
             .pallet-stage {
