@@ -384,7 +384,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 0;
             background: transparent;
             border: none;
             box-shadow: none;
@@ -397,11 +397,35 @@
             transform: translateY(-1px);
         }
 
+        .pallet-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            perspective: 210px;
+            perspective-origin: 50% 82%;
+        }
+
         .pallet-stage {
             position: relative;
             width: 92%;
             line-height: 0;
+            margin-top: 1px;
+            transform-origin: 50% 0%;
+            transform: rotateX(11deg);
             filter: drop-shadow(0 2px 5px rgba(92, 16, 16, 0.2));
+        }
+
+        .pallet-stage::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 12%;
+            right: 12%;
+            height: 5px;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 72%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         .pallet-svg {
@@ -420,7 +444,7 @@
         .number-3d {
             position: relative;
             width: 92%;
-            min-height: 30px;
+            min-height: 32px;
             margin-bottom: 0;
             z-index: 8;
             font-size: 32px;
@@ -437,30 +461,33 @@
             white-space: nowrap;
             overflow: visible;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
             line-height: 1;
+            padding-bottom: 1px;
             color: #1e88e5;
             background: none;
             -webkit-text-fill-color: currentColor;
             -webkit-text-stroke: 0;
             filter: none;
-            transform: none;
+            transform-origin: 50% 100%;
+            transform: rotateX(-16deg) translateZ(6px);
             text-rendering: geometricPrecision;
             -webkit-font-smoothing: antialiased;
             text-shadow:
-                0 -1px 0 rgba(255, 255, 255, 0.5),
+                0 -1px 0 rgba(255, 255, 255, 0.55),
                 0 1px 0 #1976d2,
                 0 2px 0 #1565c0,
                 0 3px 0 #0d47a1,
-                0 4px 1px rgba(13, 71, 161, 0.4);
+                0 4px 0 #0a3d91,
+                0 6px 4px rgba(13, 71, 161, 0.28);
             box-shadow: none;
             transition: color 0.15s ease, transform 0.15s ease;
         }
 
         .part-row:hover .number-3d {
             color: #2196f3;
-            transform: translateY(-1px);
+            transform: rotateX(-14deg) translateZ(8px) translateY(-1px);
         }
 
         .number-3d:empty::before {
@@ -475,7 +502,7 @@
             outline: none;
             box-shadow: none;
             filter: none;
-            transform: none;
+            transform: rotateX(-16deg) translateZ(6px);
         }
 
         .delete-part-btn {
@@ -1133,11 +1160,22 @@
 
             .number-3d {
                 font-size: 28px;
-                min-height: 28px;
+                min-height: 30px;
+                transform: rotateX(-14deg) translateZ(5px);
+            }
+
+            .part-row:hover .number-3d {
+                transform: rotateX(-12deg) translateZ(6px) translateY(-1px);
+            }
+
+            .number-3d:focus,
+            .number-3d:focus-visible {
+                transform: rotateX(-14deg) translateZ(5px);
             }
 
             .pallet-stage {
                 width: 94%;
+                transform: rotateX(9deg);
             }
 
             .delete-part-btn {
@@ -1575,9 +1613,11 @@
                 var part = data.parts[i];
                 content += '<div class="part-row" data-index="' + i + '" data-awb="' + awb + '">';
                 content += '<button class="delete-part-btn" onclick="deletePart(\'' + awb + '\', ' + i + ')" title="حذف">×</button>';
+                content += '<div class="pallet-stack">';
                 content += '<div class="number-3d" contenteditable="true" inputmode="numeric" onkeydown="handlePartKeydown(event)" onkeyup="handlePartKeyup(event)" oninput="updatePart(this)" onfocus="selectAllOnFocus(this)">' + (part.quantity || '') + '</div>';
                 content += '<div class="pallet-stage">';
                 content += buildPalletSvg(awb + '_' + i);
+                content += '</div>';
                 content += '</div>';
                 content += '</div>';
             }
