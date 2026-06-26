@@ -83,29 +83,26 @@ body {
 
     /* --- Header --- */
     .header {
-      display: flex;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
       align-items: center;
+      gap: 8px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 1rem 3.25rem;
-      padding-top: calc(1rem + env(safe-area-inset-top, 0px));
-      padding-left: calc(3.25rem + env(safe-area-inset-left, 0px));
-      padding-right: calc(3.25rem + env(safe-area-inset-right, 0px));
+      min-height: calc(58px + env(safe-area-inset-top, 0px));
+      padding: 12px 14px;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      padding-left: calc(14px + env(safe-area-inset-left, 0px));
+      padding-right: calc(14px + env(safe-area-inset-right, 0px));
       background: var(--header-gradient);
       color: var(--text-light);
       box-shadow: 0 2px 10px rgba(21, 101, 192, 0.22);
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
     }
 
     .header-home-btn {
-      position: absolute;
-      top: calc(0.65rem + env(safe-area-inset-top, 0px));
-      right: calc(0.65rem + env(safe-area-inset-right, 0px));
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: rgba(0, 0, 0, 0.22);
       display: flex;
@@ -115,6 +112,7 @@ body {
       transition: transform 0.2s ease, background 0.2s ease;
       text-decoration: none;
       -webkit-tap-highlight-color: transparent;
+      justify-self: end;
     }
 
     .header-home-btn img {
@@ -133,22 +131,18 @@ body {
     }
 
     .header .icon {
-      position: absolute;
-      top: calc(0.65rem + env(safe-area-inset-top, 0px));
-      left: calc(0.65rem + env(safe-area-inset-left, 0px));
-      font-size: 1.75rem;
+      font-size: 1.65rem;
+      line-height: 1;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
-      transition: transform 0.2s ease-in-out;
+      justify-self: start;
     }
-    .header .icon:hover {
-      transform: scale(1.2) rotate(-8deg);
-    }
+
     #datetime {
       font-size: 0.95rem;
-      font-weight: 500;
-      opacity: 0.95;
+      font-weight: 600;
+      opacity: 0.96;
       text-align: center;
-      max-width: calc(100% - 7rem);
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -156,54 +150,90 @@ body {
 
 main.container {
   margin: 0.75rem auto;
-  padding: 1rem;
+  padding: 0 0 1rem;
   max-width: 634px;
   width: calc(100% - 1rem);
   background: #fff;
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 18px rgba(21, 101, 192, 0.12);
+  overflow: hidden;
 }
 
-    
-    .section-title {
-      display: none; /* Hidden for screen readers */
+    .container-body {
+      padding: 0 1rem 1rem;
     }
 
-    /* --- Tabs --- */
-    .tabs-container {
+    /* --- Tabs (calculator style) --- */
+    .tabs-wrap {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 0.75rem;
-      padding: 0.35rem 0;
+      align-items: flex-end;
+      gap: 6px;
+      margin-bottom: 0;
+      padding: 10px 10px 0;
+      background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
+      border-bottom: 1px solid #dbe4f0;
     }
-    .tabs-dots {
+
+    .tabs-nav {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      align-items: flex-end;
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 6px;
     }
-    .tab-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid var(--primary-color);
-      background: #fff;
+
+    .tabs-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      padding: 7px 14px;
+      border: 1px solid rgba(21, 101, 192, 0.22);
+      border-bottom: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      white-space: nowrap;
+      border-radius: 10px 10px 0 0;
+      background: linear-gradient(180deg, #5d9fd8 0%, #1565c0 100%);
+      color: rgba(255, 255, 255, 0.9);
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      transition: transform 0.22s ease, min-height 0.22s ease, padding 0.22s ease, font-size 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      opacity: 0.72;
+      transform: translateY(5px) scale(0.93);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      z-index: 1;
+      -webkit-tap-highlight-color: transparent;
     }
-    .tab-dot.active {
-      background: var(--secondary-color);
-      border-color: var(--secondary-color);
-      box-shadow: 0 0 8px rgba(33, 150, 243, 0.45);
-      transform: scale(1.1);
+
+    .tab-btn.active {
+      min-height: 44px;
+      padding: 10px 18px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      background: linear-gradient(180deg, #4fc3f7 0%, #1e88e5 52%, #1565c0 100%);
+      border-color: #1565c0;
+      color: #fff;
+      box-shadow: 0 -3px 10px rgba(21, 101, 192, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      z-index: 3;
     }
+
     .tab-add-btn {
       flex-shrink: 0;
       width: 36px;
       height: 36px;
+      margin-bottom: 4px;
       border: none;
       border-radius: 50%;
       display: inline-flex;
@@ -219,37 +249,18 @@ main.container {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       -webkit-tap-highlight-color: transparent;
     }
+
     .tab-add-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 5px 14px rgba(21, 101, 192, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.26);
     }
+
     .tab-add-btn:active {
       transform: scale(0.94);
     }
-    .tab-title {
-      padding: 0.25rem;
-      margin-bottom: 1rem;
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--secondary-color);
-      text-align: center;
-      user-select: none;
-      border-radius: var(--border-radius-sm);
-      transition: background 0.2s, color 0.2s;
-    }
-    .tab-title.glow {
-      background: linear-gradient(90deg, #e3f2fd 40%, #bbdefb 75%);
-      color: #1565c0;
-    }
 
-    .tab-swipe-hint {
+    .section-title {
       display: none;
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin: -0.5rem 0 0.75rem;
-      user-select: none;
-      opacity: 0.85;
     }
     
     /* --- Forms & Buttons --- */
@@ -570,107 +581,9 @@ main.container {
     { background: linear-gradient(135deg, rgba(3, 192, 250, 0.8), rgba(235, 240, 235, 0.8)
     ); }
 
-    /* --- Footer --- */
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-variant-numeric: normal;
-      unicode-bidi: plaintext;
-    }
-    
-    
-    main.container {
-      flex: 1; /* يأخذ كل المساحة المتاحة ليبقي الفوتر أسفل الصفحة */
-    }
-    /* الفوتر المحسن */
-.footer {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-  color: #fff;
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  padding-left: calc(16px + env(safe-area-inset-left, 0px));
-  padding-right: calc(16px + env(safe-area-inset-right, 0px));
-  text-align: center;
-  flex-shrink: 0;
-  margin-top: auto;
-  box-shadow: 0 -2px 10px rgba(21, 101, 192, 0.2);
-  border-top: none;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
+    /* --- Footer removed --- */
 
-/* مجموعات الروابط المتحركة */
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
-  overflow: hidden;
-  white-space: nowrap;
-  justify-content: center;
-  cursor: grab;
-  user-select: none;
-}
-
-.footer-links:active {
-  cursor: grabbing;
-}
-
-.footer-links-scroll {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  animation: none;
-  transition: transform 0.3s ease;
-}
-
-.footer-links-scroll.paused {
-  animation-play-state: paused !important;
-}
-
-/* الروابط المحسنة */
-.footer a {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.25s ease;
-  position: relative;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.footer a:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-
-.footer .sep {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 300;
-  font-size: 0.8rem;
-}
-
-.copyright {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 0.75rem;
-  opacity: 0.7;
-  font-weight: 400;
-}
-
-/* تأثير التمرير للشاشات الصغيرة */
-@keyframes scrollLinks {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
-/* --- Animations --- */
+    /* --- Animations --- */
 .shake { animation: shake 0.4s; }
 @keyframes shake {
   10%, 90% { transform: translateX(-2px); }
@@ -688,15 +601,11 @@ main.container {
 @media (max-width: 768px) {
   main.container {
     margin: 0.5rem auto;
-    padding: 0.85rem;
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
     border-radius: var(--border-radius-md);
-    box-shadow: 0 4px 14px rgba(3, 145, 180, 0.35);
   }
 
-  .tab-title {
-    font-size: 1.25rem;
-    margin-bottom: 0.75rem;
+  .container-body {
+    padding: 0 0.85rem 0.85rem;
   }
 
   .history-title {
@@ -711,55 +620,40 @@ main.container {
   }
 
   .header {
-    border-radius: 0 0 18px 18px;
-    margin: 0;
-    padding: 0.7rem 0.85rem;
-    padding-top: calc(0.7rem + env(safe-area-inset-top, 0px));
-    gap: 0.5rem;
+    min-height: calc(60px + env(safe-area-inset-top, 0px));
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+
+  .header-home-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .tab-btn.active {
+    min-height: 42px;
+    padding: 9px 16px;
+    font-size: 0.92rem;
   }
 
   .header .icon {
     font-size: 1.6rem;
-    flex-shrink: 0;
-    order: -1;
   }
 
   #datetime {
-    font-size: 0.8rem;
-    text-align: center;
-    white-space: normal;
+    font-size: 0.82rem;
     line-height: 1.35;
   }
 
   main.container {
     margin: 0.4rem;
-    padding: 0.75rem;
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
     max-width: calc(100vw - 0.8rem);
     width: auto;
     border-radius: 14px;
   }
 
-  .tab-swipe-hint {
-    display: block;
-  }
-
-  .tabs-container {
-    gap: 8px;
-    margin-bottom: 0.5rem;
-  }
-
-  .tab-dot {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    min-height: 18px;
-  }
-
-  .tab-title {
-    font-size: 1.15rem;
-    padding: 0.35rem 0.5rem;
-    margin-bottom: 0.65rem;
+  .container-body {
+    padding: 0 0.75rem 0.75rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   }
 
   textarea#inputList {
@@ -1039,49 +933,11 @@ main.container {
   .toast.show {
     transform: translateX(-50%) scale(1);
   }
-
-  /* الفوتر */
-  .footer {
-    margin: 0;
-    padding: 10px 8px;
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-  }
-
-  .footer-links {
-    justify-content: flex-start;
-    overflow: hidden;
-    max-width: 100%;
-  }
-
-  .footer-links-scroll {
-    animation: scrollLinks 18s linear infinite;
-    gap: 20px;
-  }
-
-  .footer a {
-    font-size: 0.78rem;
-    padding: 6px 10px;
-    min-height: 36px;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .copyright {
-    font-size: 0.65rem;
-    margin-top: 5px;
-    padding-top: 5px;
-  }
 }
 
 @media (max-width: 360px) {
   #datetime {
     font-size: 0.72rem;
-  }
-
-  .tab-title {
-    font-size: 1.05rem;
   }
 
   .purchase-table tbody tr {
@@ -1099,8 +955,8 @@ main.container {
   .header .icon:hover,
   .main-button:hover,
   .tab-add-btn:hover,
+  .tab-btn:hover,
   .delete-btn:hover,
-  .footer a:hover,
   .notes-btn:hover,
   .modal-button:hover {
     transform: none;
@@ -1243,33 +1099,18 @@ html, body, *:lang(ar) {
   </header>
   
 <main class="container" id="mainContainer">
-    <div class="tabs-container">
-      <div class="tabs-dots" id="tabsDots"></div>
+    <div class="tabs-wrap">
+      <div class="tabs-nav" id="tabsNav"></div>
       <button type="button" id="addTabBtn" class="tab-add-btn" title="إضافة تبويب جديد" aria-label="إضافة تبويب جديد">+</button>
     </div>
-    <div class="tab-title" id="activeTabTitle"></div>
-    <p class="tab-swipe-hint" id="tabSwipeHint">← اضغط يمين/يسار للتبديل · اضغط مطوّلاً للحذف →</p>
-
+    <div class="container-body">
     <h2 class="section-title">إضافة قائمة مشتريات جديدة 📝</h2>
     <textarea id="inputList" placeholder="الصق قائمة المشتريات هنا..."></textarea>
     <button id="addBtn" class="main-button" aria-label="إضافة الأغراض">➕ إضافة الأغراض</button>
     <h3 class="history-title">سجل القوائم السابقة <span style="font-size:1.2rem;">📅</span></h3>
     <div id="purchaseHistory" aria-live="polite"></div>
-</main>
-
-<footer class="footer">
-  <div class="footer-links">
-    <div class="footer-links-scroll">
-      <a href="https://iammrk-8af39.web.app/" target="_blank">🌐 موقعي الشخصي</a>
-      <span class="sep">|</span>
-      <a href="https://wa.me/c/96899678553" target="_blank">📱 كتالوج الواتساب</a>
-      <span class="sep">|</span>
-      <a href="https://median.co/share/zrwlpl" target="_blank">📱 تنزيل التطبيق</a>
-      <span class="sep">|</span>
-      <a href="https://mystore-96d8e.web.app/" target="_blank">🏪 متجر مُبهر</a>
     </div>
-  </div>
-</footer>
+</main>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -1279,8 +1120,7 @@ html, body, *:lang(ar) {
             inputList: document.getElementById("inputList"),
             addBtn: document.getElementById("addBtn"),
             purchaseHistory: document.getElementById("purchaseHistory"),
-            tabsDots: document.getElementById("tabsDots"),
-            activeTabTitle: document.getElementById("activeTabTitle"),
+            tabsNav: document.getElementById("tabsNav"),
             addTabBtn: document.getElementById("addTabBtn"),
             addTabModal: document.getElementById("addTabModal"),
             addTabInput: document.getElementById("addTabInput"),
@@ -1420,16 +1260,37 @@ const parseInputToItems = (input) => {
 
         // --- Rendering Logic ---
         const renderTabs = () => {
-            const { tabsDots, activeTabTitle } = DOMElements;
-            tabsDots.innerHTML = "";
-            
+            const { tabsNav } = DOMElements;
+            tabsNav.innerHTML = "";
+
             state.tabs.forEach((tab, index) => {
-                const dot = document.createElement("div");
-                dot.className = `tab-dot ${index === state.currentTab ? "active" : ""}`;
-                dot.dataset.index = index;
-                tabsDots.appendChild(dot);
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "tab-btn" + (index === state.currentTab ? " active" : "");
+                btn.textContent = tab.name;
+                btn.dataset.index = index;
+
+                btn.addEventListener("click", () => {
+                    if (state.currentTab === index) return;
+                    state.currentTab = index;
+                    saveState();
+                    render();
+                });
+
+                let tabPressTimer = null;
+                btn.addEventListener("pointerdown", () => {
+                    if (index !== state.currentTab) return;
+                    tabPressTimer = setTimeout(() => {
+                        showModal(DOMElements.deleteTabModal);
+                        DOMElements.deleteTabModal.dataset.tabToDelete = index;
+                    }, 600);
+                });
+                btn.addEventListener("pointerup", () => clearTimeout(tabPressTimer));
+                btn.addEventListener("pointercancel", () => clearTimeout(tabPressTimer));
+                btn.addEventListener("pointerleave", () => clearTimeout(tabPressTimer));
+
+                tabsNav.appendChild(btn);
             });
-            activeTabTitle.textContent = state.tabs[state.currentTab]?.name || "قائمة فارغة";
         };
 
         const renderPurchaseHistory = () => {
@@ -1685,69 +1546,6 @@ const init = () => {
     DOMElements.purchaseHistory.addEventListener('change', handleHistoryChange);
     DOMElements.purchaseHistory.addEventListener('dblclick', handleHistoryDblClick);
 
-    // --- Tab switching + long-press delete ---
-    let pressTimerId = null;
-    let longPressFired = false;
-
-    const isInteractive = (el) =>
-        ["BUTTON","INPUT","TEXTAREA","SELECT","LABEL"].includes(el.tagName);
-
-    const isInTabArea = (evt) => {
-        const inputRect = DOMElements.inputList.getBoundingClientRect();
-        const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY) ?? 0;
-        return clientY < inputRect.top; // فوق خانة اللصق = منطقة التبويب
-    };
-
-    const startPressTimer = (evt) => {
-        if (isInteractive(evt.target) || !isInTabArea(evt)) return;
-        longPressFired = false;
-        pressTimerId = setTimeout(() => {
-            longPressFired = true;
-            showModal(DOMElements.deleteTabModal);
-            DOMElements.deleteTabModal.dataset.tabToDelete = state.currentTab;
-        }, 600); // 0.6 ثانية
-    };
-
-    const cancelPressTimer = () => {
-        if (pressTimerId !== null) {
-            clearTimeout(pressTimerId);
-            pressTimerId = null;
-        }
-    };
-
-    DOMElements.mainContainer.addEventListener("pointerdown", startPressTimer);
-    DOMElements.mainContainer.addEventListener("pointerup", cancelPressTimer);
-    DOMElements.mainContainer.addEventListener("pointercancel", cancelPressTimer);
-    DOMElements.mainContainer.addEventListener("pointerleave", cancelPressTimer);
-
-    DOMElements.mainContainer.addEventListener("click", (e) => {
-        if (isInteractive(e.target) || !isInTabArea(e)) return;
-
-        if (longPressFired) {
-            longPressFired = false;
-            return; // لا نعمل تبديل بعد الضغط المطوّل
-        }
-
-        const rect = DOMElements.mainContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        if (x < rect.width / 2) {
-            state.currentTab = (state.currentTab - 1 + state.tabs.length) % state.tabs.length;
-        } else {
-            state.currentTab = (state.currentTab + 1) % state.tabs.length;
-        }
-        saveState();
-        render();
-    });
-
-
-
-
-
-
-
-
-
-
 
 
 const startListPress = (evt) => {
@@ -1861,114 +1659,6 @@ const startListPress = (evt) => {
 
 init();
 
-// --- Footer Interactive Scroll Control ---
-// --- Footer Interactive Scroll Control ---
-const footerInteractive = () => {
-    const footerLinks = document.querySelector('.footer-links');
-    const footerScroll = document.querySelector('.footer-links-scroll');
-    
-    if (!footerLinks || !footerScroll) return;
-    
-    let isDragging = false;
-    let startX = 0;
-    let currentTranslate = 0;
-    let animationId = 0;
-    let resumeTimer = null;
-    let isSmallScreen = window.innerWidth <= 520;
-    
-    // بدء الانيميشن للشاشات الصغيرة
-    if (isSmallScreen) {
-        footerScroll.style.animation = 'scrollLinks 15s linear infinite';
-    }
-    
-const pauseAnimation = () => {
-    if (isSmallScreen) {
-        footerScroll.style.animationPlayState = 'paused';
-    }
-    clearTimeout(resumeTimer);
-};
-
-const resumeAnimation = () => {
-    clearTimeout(resumeTimer);
-    resumeTimer = setTimeout(() => {
-        if (!isDragging && isSmallScreen) {
-            footerScroll.style.animationPlayState = 'running';
-        }
-    }, 2000);
-};
-
-    
-    const handleStart = (e) => {
-        isDragging = true;
-        pauseAnimation();
-        startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-        footerLinks.style.cursor = 'grabbing';
-        if (animationId) cancelAnimationFrame(animationId);
-    };
-    
-    const handleMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-        const diff = currentX - startX;
-        currentTranslate += diff * 0.5;
-        footerScroll.style.transform = `translateX(${currentTranslate}px)`;
-        startX = currentX;
-    };
-    
-    const handleEnd = () => {
-        isDragging = false;
-        footerLinks.style.cursor = 'grab';
-        
-        const resetPosition = () => {
-            currentTranslate *= 0.9;
-            if (Math.abs(currentTranslate) > 1) {
-                footerScroll.style.transform = `translateX(${currentTranslate}px)`;
-                animationId = requestAnimationFrame(resetPosition);
-            } else {
-                footerScroll.style.transform = 'translateX(0)';
-                currentTranslate = 0;
-                resumeAnimation();
-            }
-        };
-        resetPosition();
-    };
-    
-    // أحداث الماوس واللمس
-    footerLinks.addEventListener('mousedown', handleStart);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-    footerLinks.addEventListener('touchstart', handleStart, { passive: false });
-    footerLinks.addEventListener('touchmove', handleMove, { passive: false });
-    footerLinks.addEventListener('touchend', handleEnd);
-    
- // إيقاف التمرير عند التحويم للشاشات الصغيرة
-if (isSmallScreen) {
-    footerLinks.addEventListener('mouseenter', pauseAnimation);
-    footerLinks.addEventListener('mouseleave', resumeAnimation);
-
-    // 📱 إيقاف التمرير عند لمس الشاشة في الهواتف
-    footerLinks.addEventListener('touchstart', pauseAnimation, { passive: true });
-    footerLinks.addEventListener('touchend', resumeAnimation);
-}
-
-    
-    // معالجة تغيير حجم الشاشة
-    window.addEventListener('resize', () => {
-        const newIsSmallScreen = window.innerWidth <= 520;
-        if (newIsSmallScreen !== isSmallScreen) {
-            isSmallScreen = newIsSmallScreen;
-            if (isSmallScreen) {
-                footerScroll.style.animation = 'scrollLinks 15s linear infinite';
-            } else {
-                footerScroll.style.animation = 'none';
-                footerScroll.classList.remove('paused');
-            }
-        }
-    });
-};
-
-footerInteractive();
     });
   </script>
   <script>
