@@ -109,6 +109,7 @@
     closeShareIfOpen();
     applyI18n();
     patchCalcLink();
+    patchQuicklistLink();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -137,10 +138,26 @@
     return 'https://khalidsaif912.github.io/new/docs/calculator/index.html';
   }
 
+  function quicklistPageUrl() {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl() + '/QuickList/index.html';
+    }
+    return 'https://khalidsaif912.github.io/new/docs/QuickList/index.html';
+  }
+
   function patchCalcLink() {
     var link = document.querySelector('.siteAppsLink--calc');
     if (!link) return;
     link.href = calcPageUrl();
+    link.setAttribute('data-open-same', '1');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+  }
+
+  function patchQuicklistLink() {
+    var link = document.querySelector('.siteAppsLink--quicklist');
+    if (!link) return;
+    link.href = quicklistPageUrl();
     link.setAttribute('data-open-same', '1');
     link.removeAttribute('target');
     link.removeAttribute('rel');
@@ -156,6 +173,15 @@
     window.location.assign(calcPageUrl());
   }
 
+  function openQuicklistFromPwa(e) {
+    var link = e.target.closest('a.siteAppsLink--quicklist');
+    if (!link) return;
+    if (!isStandaloneApp()) return;
+    e.preventDefault();
+    closeModal();
+    window.location.assign(quicklistPageUrl());
+  }
+
   function isStandaloneApp() {
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -167,10 +193,15 @@
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
     patchCalcLink();
+    patchQuicklistLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
         openCalcFromPwa(e);
+        return;
+      }
+      if (e.target.closest('a.siteAppsLink--quicklist')) {
+        openQuicklistFromPwa(e);
         return;
       }
       var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
@@ -202,6 +233,7 @@
     bindUi();
     applyI18n();
     patchCalcLink();
+    patchQuicklistLink();
   }
 
   window.rosterSiteApps = {
@@ -209,6 +241,7 @@
     open: openModal,
     close: closeModal,
     calcUrl: calcPageUrl,
+    quicklistUrl: quicklistPageUrl,
   };
 
   if (document.readyState === 'loading') {

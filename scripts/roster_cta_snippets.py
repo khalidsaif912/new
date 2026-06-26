@@ -783,7 +783,7 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
         <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
       </a>
-      <a class="siteAppsLink siteAppsLink--quicklist" href="https://iammrk-8af39.web.app/QuickList/index.html" target="_blank" rel="noopener noreferrer" data-app-id="quicklist">
+      <a class="siteAppsLink siteAppsLink--quicklist" href="https://khalidsaif912.github.io/new/docs/QuickList/index.html" data-app-id="quicklist" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_CART}</span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
         <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
