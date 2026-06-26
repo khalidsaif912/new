@@ -778,7 +778,7 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
         <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
       </a>
-      <a class="siteAppsLink siteAppsLink--calc" href="https://iammrk-8af39.web.app/calculator/roster.html?v=20260630" data-app-id="calc" data-pwa-calc="1">
+      <a class="siteAppsLink siteAppsLink--calc" href="https://iammrk-8af39.web.app/calculator/index.html?from=roster&amp;embed=1&amp;v=20260701" data-app-id="calc" data-pwa-calc="1">
         <span class="siteAppsLink-icon">{SVG_APP_CALC}</span>
         <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
         <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
@@ -996,7 +996,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260630a"
+IOS_PERF_VER = "20260701a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
