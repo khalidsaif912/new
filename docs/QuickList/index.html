@@ -130,22 +130,74 @@ body {
       transform: scale(0.92);
     }
 
-    .header .icon {
-      font-size: 1.65rem;
-      line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+    .header-refresh-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       justify-self: start;
+      padding: 0;
+    }
+
+    .header-refresh-btn svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .header-refresh-btn:hover {
+      background: rgba(0, 0, 0, 0.32);
+    }
+
+    .header-refresh-btn:active {
+      transform: scale(0.92);
+    }
+
+    .header-refresh-btn.spinning svg {
+      animation: refresh-spin 0.65s ease;
+    }
+
+    @keyframes refresh-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     #datetime {
-      font-size: 0.95rem;
-      font-weight: 600;
-      opacity: 0.96;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
       text-align: center;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      line-height: 1.2;
+      white-space: normal;
+    }
+
+    #datetime .header-day {
+      font-size: 1.32rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+      line-height: 1.15;
+    }
+
+    #datetime .header-date {
+      font-size: 0.7rem;
+      font-weight: 600;
+      opacity: 0.9;
+      letter-spacing: 0.03em;
+      line-height: 1.25;
+      margin-top: 1px;
     }
 
 main.container {
@@ -374,173 +426,328 @@ main.container {
       font-size: var(--font-size-md);
     }
     .purchase-list {
-      margin-bottom: 0.75rem;
-      border-radius: var(--border-radius-lg);
+      margin-bottom: 0.85rem;
+      border-radius: 14px;
       overflow: hidden;
-      border: 1px solid #dbe7f5;
+      border: 1px solid #cfe0f5;
       box-shadow: 0 2px 10px rgba(21, 101, 192, 0.1);
+      background: #fff;
     }
-
 
     .purchase-list.over {
-    border-color: var(--danger-color);
+      border-color: var(--danger-color);
     }
+
     .purchase-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 1rem;
-      font-size: var(--font-size-md);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.7rem 0.85rem;
+      font-size: 0.9rem;
       font-weight: 700;
       user-select: none;
       cursor: pointer;
-      transition: background-color 0.2s;
+      background: #e3f2fd;
+      color: #1565c0;
+      border-bottom: 1px solid #cfe0f5;
     }
-    .purchase-list:nth-child(odd) .purchase-header { background: #e3f2fd; color: #1565c0; }
-    .purchase-list:nth-child(even) .purchase-header { background: #f1f5f9; color: #1976d2; }
+
+    .purchase-list:nth-child(even) .purchase-header {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
     .purchase-header.over {
       background: var(--danger-bg-color) !important;
       color: var(--danger-color);
+      border-bottom-color: #f5c6cb;
     }
-    .ph-date { font-weight: 800; font-size: 1.1rem; }
-    .ph-budget { display: flex; align-items: center; gap: 0.5rem; }
-    .budget-input {
-      width: 70px;
-      padding: 4px 6px;
+
+    .ph-date {
+      font-weight: 800;
+      font-size: 1.08rem;
+      flex: 0 0 auto;
+      color: #0d47a1;
+      letter-spacing: 0.02em;
+    }
+
+    .ph-budget {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.55rem;
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      min-width: 0;
+    }
+
+    .ph-budget-label {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0d47a1;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      padding-bottom: 5px;
+    }
+
+    .budget-input,
+    .total-input {
+      width: auto;
+      min-width: 76px;
+      max-width: 120px;
+      min-height: auto;
+      padding: 0 8px 4px;
       direction: ltr;
-      border: 1px solid #ccc;
-      border-radius: var(--border-radius-sm);
-      transition: border-color 0.2s;
+      text-align: center;
+      border: none;
+      border-bottom: 2.5px solid #1e88e5;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0d47a1;
+      letter-spacing: 0.05em;
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.2s ease, color 0.2s ease;
+      -moz-appearance: textfield;
     }
-    .budget-input:focus { border-color: var(--accent-color); outline: none; }
+
+    .budget-input::-webkit-outer-spin-button,
+    .budget-input::-webkit-inner-spin-button,
+    .total-input::-webkit-outer-spin-button,
+    .total-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .budget-input::placeholder,
+    .total-input::placeholder {
+      color: #90caf9;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      opacity: 0.85;
+    }
+
+    .budget-input:focus,
+    .total-input:focus {
+      outline: none;
+      border-bottom-color: #1565c0;
+      border-bottom-width: 3px;
+      padding-bottom: 3px;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .total-input {
+      min-width: 84px;
+      border-bottom-color: #00897b;
+      color: #00695c;
+    }
+
+    .total-input.edited {
+      border-bottom-color: var(--info-color);
+      color: var(--info-color);
+      background: transparent;
+    }
+
     .purchase-list.closed .ph-budget { display: none; }
-    .ph-total { font-weight: 800; font-size: var(--font-size-lg); }
+    .ph-total { font-weight: 800; font-size: 1rem; }
     .purchase-list.closed .ph-total { display: block; }
+
     .purchase-content {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      padding: 0 0.5rem;
+      padding: 0;
+      background: #fff;
     }
-    .purchase-list:nth-child(odd) .purchase-content { background: #f8fbff; }
-    .purchase-list:nth-child(even) .purchase-content { background: #fafcff; }
-    .purchase-content.open { max-height: 1500px; padding: 0.5rem; }
+
+    .purchase-content.open {
+      max-height: 2000px;
+      padding: 0;
+    }
 
     .table-scroll-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
-      margin: 0 -0.15rem;
     }
 
-    .table-scroll-wrap table {
-      min-width: 300px;
-    }
-
-    /* --- Purchase Table --- */
-    table {
+    .purchase-table {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
     }
-    th, td {
-      padding: 0.6rem 0.5rem;
+
+    .purchase-table th,
+    .purchase-table td {
+      padding: 0.55rem 0.35rem;
       text-align: center;
-      font-size: var(--font-size-sm);
-      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #e3edf7;
     }
-    th {
+
+    .purchase-table thead th {
       font-weight: 700;
       background: #e0f2f1;
-      color: var(--secondary-color);
+      color: #00796b;
+      border-bottom: 1px solid #b2dfdb;
+      padding: 0.6rem 0.35rem;
     }
-    tbody tr { cursor: pointer; transition: background-color 0.15s ease; }
-    tbody tr:not(.checked):hover { background-color: #f0f8ff; }
-    tr.checked { color: var(--text-muted); background: #f5f5f5; }
-    tr.checked .col-item { text-decoration: line-through; }
-    .col-item { font-weight: 500; word-break: break-word; }
+
+    .purchase-table .col-buy { width: 11%; }
+    .purchase-table .col-item {
+      width: 34%;
+      text-align: start;
+      font-weight: 600;
+      word-break: break-word;
+      padding-inline: 0.45rem;
+    }
+    .purchase-table .col-qty { width: 18%; }
+    .purchase-table .col-price { width: 22%; }
+    .purchase-table .col-del { width: 15%; }
+
+    .purchase-table tbody tr {
+      background: #fff;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .purchase-table tbody tr:not(.checked):hover {
+      background-color: #f8fbff;
+    }
+
+    .purchase-table tbody tr.checked {
+      color: var(--text-muted);
+      background: #f5f7fa;
+    }
+
+    .purchase-table tbody tr.checked .col-item {
+      text-decoration: line-through;
+    }
+
+    .purchase-table .col-buy input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #1976d2;
+      cursor: pointer;
+    }
+
     .delete-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
       color: var(--danger-color);
-      font-weight: bold;
-      font-size: 1.5rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      line-height: 1;
       user-select: none;
-      transition: color 0.2s, transform 0.2s;
+      border-radius: 50%;
+      background: transparent;
+      transition: background 0.2s, transform 0.2s;
     }
-    .delete-btn:hover { color: #c0392b; transform: scale(1.2); }
-    .quantity-input, .price-input {
-      width: 50px;
-      padding: 4px;
-      font-size: var(--font-size-sm);
+
+    .delete-btn:hover {
+      background: rgba(211, 47, 47, 0.1);
+      transform: scale(1.05);
+    }
+
+    .quantity-input,
+    .price-input {
+      width: 100%;
+      max-width: 64px;
+      min-height: 34px;
+      padding: 4px 6px;
+      font-size: 0.82rem;
       text-align: center;
-      background: #fffde7;
-      border: 1px solid #ccc;
-      border-radius: var(--border-radius-sm);
+      background: #fffef5;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      direction: ltr;
     }
-    .quantity-input:focus, .price-input:focus {
-      outline: 2px solid var(--accent-color);
-      border-color: var(--accent-color);
+
+    .quantity-input:focus,
+    .price-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
     }
+
     .total-row-table td {
-      padding: 0.75rem;
+      padding: 0.7rem 0.5rem;
       font-weight: 800;
-      font-size: var(--font-size-md);
-      background: #e0f7fa !important;
-      color: var(--secondary-color);
+      font-size: 0.92rem;
+      background: #e0f2f1 !important;
+      color: #00796b;
       border-bottom: none;
     }
+
     .total-row-table td.over {
       background: var(--danger-bg-color) !important;
       color: var(--danger-color);
     }
-    .total-actions { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-    .total-input {
-      width: 75px;
-      padding: 4px;
-      font-size: var(--font-size-md);
-      font-weight: bold;
-      text-align: center;
-      color: var(--secondary-color);
-      background: var(--text-light);
-      border: 1px solid var(--primary-color);
-      border-radius: var(--border-radius-sm);
-      transition: all 0.3s ease;
+
+    .total-actions {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0.55rem;
+      flex-wrap: wrap;
     }
-    .total-input.edited {
-      border-color: var(--info-color);
-      background: var(--info-bg-color);
-      box-shadow: 0 2px 8px rgba(100, 181, 246, 0.3);
+
+    .total-actions > span:first-child {
+      padding-bottom: 5px;
+      font-weight: 800;
+      color: #00695c;
     }
+
+    .notes-btn {
+      display: block;
+      width: calc(100% - 1rem);
+      margin: 0.75rem auto 0.65rem;
+      padding: 0.65rem 1rem;
+      min-height: 44px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(180deg, #42a5f5 0%, #1e88e5 55%, #1565c0 100%);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(21, 101, 192, 0.22);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .notes-btn:hover {
+      box-shadow: 0 4px 14px rgba(21, 101, 192, 0.28);
+    }
+
+    .notes-btn:active {
+      transform: scale(0.99);
+    }
+
+    .notes-display {
+      margin: 0 0.5rem 0.65rem;
+      padding: 0.75rem;
+      background: #fffde7;
+      border: 1px solid #ffd54f;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.88rem;
+    }
+
     .total-edited-mark {
       font-size: 0.7rem;
       font-weight: bold;
       color: var(--info-color);
       background: var(--info-bg-color);
-      padding: 2px 4px;
+      padding: 2px 6px;
       border-radius: 4px;
-      display: none;
-    }
-
-    /* --- Notes Section --- */
-    .notes-btn {
-      display: block;
-      margin: 1rem auto 0.5rem;
-      padding: 0.5rem 1rem;
-      font-size: var(--font-size-sm);
-      font-weight: 700;
-      color: var(--text-dark);
-      background-color: var(--accent-color);
-      border-radius: var(--border-radius-sm);
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .notes-btn:hover { background-color: #ffb300; }
-    .notes-display {
-        padding: 0.75rem;
-        margin-top: 0.5rem;
-        background: #fffde7;
-        border: 1px solid #ffd54f;
-        border-radius: var(--border-radius-sm);
-        white-space: pre-wrap;
-        word-wrap: break-word;
     }
 
     /* --- Modals & Toasts --- */
@@ -676,7 +883,8 @@ main.container {
     padding-top: calc(14px + env(safe-area-inset-top, 0px));
   }
 
-  .header-home-btn {
+  .header-home-btn,
+  .header-refresh-btn {
     width: 38px;
     height: 38px;
   }
@@ -701,13 +909,12 @@ main.container {
     font-size: 1.1rem;
   }
 
-  .header .icon {
-    font-size: 1.6rem;
+  #datetime .header-day {
+    font-size: 1.18rem;
   }
 
-  #datetime {
-    font-size: 0.82rem;
-    line-height: 1.35;
+  #datetime .header-date {
+    font-size: 0.66rem;
   }
 
   main.container {
@@ -764,235 +971,41 @@ main.container {
   #addTabDialog input,
   #notesModalTextarea {
     font-size: 16px;
-    min-height: 44px;
   }
 
+  .budget-input,
+  .quantity-input,
+  .price-input,
   .total-input {
-    width: 90px;
-    flex: 1;
-    max-width: 120px;
+    min-height: auto;
   }
 
-  .delete-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    font-size: 1.35rem;
-    line-height: 1;
-    border-radius: 50%;
-    background: rgba(211, 47, 47, 0.08);
-  }
-
-  .delete-btn:active {
-    background: rgba(211, 47, 47, 0.18);
-    transform: scale(0.92);
-  }
-
-  /* بطاقات العناصر — صف علوي: ✓ اسم × | صف سفلي: كمية + سعر */
-  .table-scroll-wrap {
-    overflow-x: visible;
-    margin: 0;
-  }
-
-  .purchase-table {
-    min-width: unset;
-    width: 100%;
-  }
-
-  .purchase-table thead {
-    display: none;
-  }
-
-  .purchase-table tbody tr {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 0.65rem;
-    padding: 0.75rem;
-    margin-bottom: 0.55rem;
-    background: #fff;
-    border: 1px solid #dbe7f5;
-    border-radius: 12px;
-    box-shadow: 0 1px 6px rgba(21, 101, 192, 0.08);
-  }
-
-  .purchase-table tbody tr.checked {
-    background: #f5f7fa;
-    opacity: 0.9;
-  }
-
-  .purchase-table tbody tr:not(.checked):active {
-    background-color: #f0f8ff;
-  }
-
-  .purchase-table tbody td {
-    display: flex;
-    align-items: center;
-    border: none;
-    padding: 0;
-    font-size: 0.9rem;
-  }
-
-  .purchase-table .col-buy {
-    order: 1;
-    flex: 0 0 36px;
-    justify-content: center;
-  }
-
-  .purchase-table .col-buy input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-    accent-color: var(--secondary-color);
-    cursor: pointer;
+  .purchase-table th,
+  .purchase-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.78rem;
   }
 
   .purchase-table .col-item {
-    order: 2;
-    flex: 1 1 0;
-    min-width: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    text-align: start;
-    justify-content: flex-start;
-    line-height: 1.35;
-    padding-inline: 0.15rem;
+    font-size: 0.86rem;
   }
 
-  .purchase-table .col-del {
-    order: 3;
-    flex: 0 0 36px;
-    justify-content: center;
-  }
-
-  .purchase-table .col-qty {
-    order: 4;
-    flex: 1 1 calc(50% - 0.4rem);
-    min-width: 0;
-    gap: 0.45rem;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .purchase-table .col-qty::before {
-    content: "الكمية";
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--secondary-color);
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
-  .purchase-table .col-price {
-    order: 5;
-    flex: 1 1 calc(50% - 0.4rem);
-    min-width: 0;
-    gap: 0.45rem;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .purchase-table .col-price::before {
-    content: "السعر";
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--secondary-color);
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
-  .purchase-table .quantity-input,
-  .purchase-table .price-input {
-    flex: 1 1 0;
-    width: auto;
-    min-width: 0;
-    max-width: none;
-    padding: 0.5rem 0.55rem;
-    min-height: 42px;
-    border-radius: 8px;
-    border: 1px solid #c5d9f0;
-    background: #fffef5;
-  }
-
-  .purchase-table tfoot tr {
-    display: block;
-    border: none;
-    margin-top: 0.25rem;
-  }
-
-  .purchase-table .total-row-table td {
-    display: block;
-    padding: 0.85rem;
-    border-radius: 10px;
-    font-size: 1rem;
-  }
-
-  .total-actions {
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    justify-content: center;
-  }
-
-  .purchase-header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "date date"
-      "budget budget";
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.75rem 0.85rem;
-  }
-
-  .ph-date {
-    grid-area: date;
-    font-size: 0.95rem;
-    text-align: start;
-  }
-
-  .ph-budget {
-    grid-area: budget;
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.45rem;
-    font-size: 0.84rem;
+  .quantity-input,
+  .price-input {
+    max-width: 58px;
+    min-height: 36px;
   }
 
   .budget-input {
-    flex: 1;
-    max-width: 160px;
-    min-height: 40px;
+    min-width: 68px;
+    font-size: 1.05rem;
+    padding-bottom: 5px;
   }
 
-  .purchase-list.closed .purchase-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .purchase-list.closed .ph-date {
-    flex: 1 1 auto;
-  }
-
-  .purchase-list.closed .ph-total {
-    flex: 0 0 auto;
-    text-align: end;
-  }
-
-  .notes-btn {
-    width: 100%;
-    min-height: 48px;
-    font-size: var(--font-size-md);
-    border-radius: 10px;
-  }
-
-  .notes-display {
-    font-size: 0.9rem;
-    border-radius: 10px;
+  .total-input {
+    min-width: 76px;
+    width: auto;
+    padding-bottom: 5px;
   }
 
   /* نوافذ منبثقة بأسلوب Bottom Sheet */
@@ -1045,23 +1058,22 @@ main.container {
 }
 
 @media (max-width: 360px) {
-  #datetime {
-    font-size: 0.72rem;
+  #datetime .header-day {
+    font-size: 1.05rem;
   }
 
-  .purchase-table tbody tr {
-    padding: 0.65rem;
-    gap: 0.4rem;
+  #datetime .header-date {
+    font-size: 0.62rem;
   }
 
   .purchase-table .col-item {
-    font-size: 0.92rem;
+    font-size: 0.8rem;
   }
 }
 
 /* إلغاء تأثيرات hover على الشاشات اللمسية */
 @media (hover: none) and (pointer: coarse) {
-  .header .icon:hover,
+  .header-refresh-btn:hover,
   .main-button:hover,
   .tab-add-btn:hover,
   .tab-btn:hover,
@@ -1208,7 +1220,21 @@ html, body, *:lang(ar) {
       <img src="home-icon.png" alt="" width="22" height="22">
     </a>
     <time id="datetime"></time>
-    <span class="icon" aria-hidden="true">🛒</span>
+    <button type="button" class="header-refresh-btn" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="url(#qlRefreshGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <defs>
+          <linearGradient id="qlRefreshGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4df1a1"/>
+            <stop offset="48%" stop-color="#2dd4c8"/>
+            <stop offset="100%" stop-color="#00a8ff"/>
+          </linearGradient>
+        </defs>
+        <path d="M1 4v6h6"></path>
+        <path d="M23 20v-6h-6"></path>
+        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"></path>
+        <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
+      </svg>
+    </button>
   </header>
   
 <main class="container" id="mainContainer">
@@ -1286,12 +1312,15 @@ html, body, *:lang(ar) {
 
 const updateDateTime = () => {
     const now = new Date();
-    const isMobile = window.innerWidth <= 520;
-    const options = isMobile
-        ? { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
-        : { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    const dateStr = now.toLocaleDateString('ar-EG', options);
-    DOMElements.dateTime.textContent = convertToEnglishNumbers(dateStr);
+    const dayName = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+    const datePart = now.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    DOMElements.dateTime.innerHTML =
+        `<span class="header-day">${convertToEnglishNumbers(dayName)}</span>` +
+        `<span class="header-date">${convertToEnglishNumbers(datePart)}</span>`;
 };
         
         const showToast = (element, message, duration = 2000) => {
@@ -1457,7 +1486,8 @@ const parseInputToItems = (input) => {
                         <span class="ph-date">${purchase.date}</span>
                         ${purchase.open ? 
                             `<span class="ph-budget">
-                                الميزانية : <input class="budget-input" type="number" min="0" step="0.1" value="${purchase.budget}" placeholder="ريال"/>
+                                <span class="ph-budget-label">الميزانية : ريال</span>
+                                <input class="budget-input" type="number" min="0" step="0.1" value="${purchase.budget}" placeholder="ـــــ" inputmode="decimal"/>
                              </span>` :
                             `<span class="ph-total">المجموع: ${displayTotal} ر.ع.</span>`
                         }
@@ -1493,7 +1523,7 @@ const parseInputToItems = (input) => {
                                     <td colspan="5" class="${isOver ? 'over' : ''}">
                                         <div class="total-actions">
                                             <span>المجموع:</span>
-                                            <input class="total-input ${purchase.manualTotal ? 'edited' : ''}" type="number" step="0.1" min="0" value="${displayTotal}" placeholder="المجموع" />
+                                            <input class="total-input ${purchase.manualTotal ? 'edited' : ''}" type="number" step="0.1" min="0" value="${displayTotal}" placeholder="ـــــ" inputmode="decimal" />
                                             <span class="total-edited-mark" style="display:${purchase.manualTotal ? 'inline' : 'none'};">تم التعديل</span>
                                         </div>
                                     </td>
@@ -1554,7 +1584,7 @@ const today = `${year}/${month}/${day}`;
             const purchase = state.tabs[state.currentTab].lists[listIndex];
             
             // Toggle list open/close
-            if (e.target.closest('.purchase-header') && !e.target.matches('.budget-input')) {
+            if (e.target.closest('.purchase-header') && !e.target.closest('.ph-budget')) {
                 purchase.open = !purchase.open;
                 saveState();
                 render();
@@ -1806,13 +1836,26 @@ init();
       return rosterHome;
     }
 
-  (function setupHomeButton() {
+  (function setupHeaderButtons() {
     var homeBtn = document.getElementById('homeBtn');
-    if (!homeBtn) return;
-    homeBtn.href = getRosterHomeUrl();
-    homeBtn.addEventListener('click', function(e) {
+    if (homeBtn) {
+      homeBtn.href = getRosterHomeUrl();
+      homeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.assign(getRosterHomeUrl());
+      });
+    }
+
+    var refreshBtn = document.getElementById('refreshBtn');
+    if (!refreshBtn) return;
+    refreshBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      window.location.assign(getRosterHomeUrl());
+      refreshBtn.classList.add('spinning');
+      var url = new URL(window.location.href);
+      url.searchParams.set('v', String(Date.now()));
+      window.setTimeout(function() {
+        window.location.replace(url.toString());
+      }, 180);
     });
   })();
   </script>
