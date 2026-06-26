@@ -666,33 +666,57 @@
 
         .delete-part-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #fff;
-            color: #c62828;
-            border: 1.5px solid #e53935;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            z-index: 30;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 5px rgba(198, 40, 40, 0.22);
-            line-height: 1;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
             padding: 0;
+            border: 1px solid rgba(229, 57, 53, 0.45);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.97);
+            cursor: pointer;
+            z-index: 30;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .delete-part-btn:hover {
+        .delete-part-btn::before,
+        .delete-part-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 1.5px;
+            margin-left: -4px;
+            margin-top: -0.75px;
             background: #e53935;
-            color: #fff;
+            border-radius: 1px;
+            transition: background 0.2s ease;
+        }
+
+        .delete-part-btn::before {
+            transform: rotate(45deg);
+        }
+
+        .delete-part-btn::after {
+            transform: rotate(-45deg);
+        }
+
+        .delete-part-btn:hover,
+        .delete-part-btn:active {
+            background: #e53935;
             border-color: #c62828;
-            transform: scale(1.08);
-            box-shadow: 0 3px 10px rgba(198, 40, 40, 0.35);
+            transform: scale(1.06);
+            box-shadow: 0 2px 6px rgba(198, 40, 40, 0.28);
+        }
+
+        .delete-part-btn:hover::before,
+        .delete-part-btn:hover::after,
+        .delete-part-btn:active::before,
+        .delete-part-btn:active::after {
+            background: #fff;
         }
 
         .remaining-info {
@@ -1338,11 +1362,16 @@
             }
 
             .delete-part-btn {
-                width: 22px;
-                height: 22px;
-                top: -9px;
-                right: -9px;
-                font-size: 12px;
+                width: 20px;
+                height: 20px;
+                top: -7px;
+                right: -7px;
+            }
+
+            .delete-part-btn::before,
+            .delete-part-btn::after {
+                width: 9px;
+                margin-left: -4.5px;
             }
 
             .empty-state {
@@ -1766,7 +1795,7 @@
             for (var i = 0; i < data.parts.length; i++) {
                 var part = data.parts[i];
                 content += '<div class="part-row" data-index="' + i + '" data-awb="' + awb + '">';
-                content += '<button class="delete-part-btn" onclick="deletePart(\'' + awb + '\', ' + i + ')" title="حذف">×</button>';
+                content += '<button type="button" class="delete-part-btn" onclick="deletePart(\'' + awb + '\', ' + i + ')" title="حذف" aria-label="حذف"></button>';
                 content += '<div class="pallet-stack">';
                 content += '<div class="number-3d" contenteditable="true" inputmode="numeric" onkeydown="handlePartKeydown(event)" onkeyup="handlePartKeyup(event)" oninput="updatePart(this)" onfocus="selectAllOnFocus(this)">' + (part.quantity || '') + '</div>';
                 content += '<div class="pallet-stage">';
