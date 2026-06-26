@@ -82,6 +82,52 @@
             z-index: 1000 !important;
         }
 
+        .refresh-btn {
+            position: absolute;
+            top: calc(10px + env(safe-area-inset-top, 0px));
+            left: calc(10px + env(safe-area-inset-left, 0px));
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            z-index: 1001;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: transform 0.2s ease, background 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .refresh-btn svg {
+            display: block;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.26);
+        }
+
+        .refresh-btn:active {
+            transform: scale(0.92);
+        }
+
+        .refresh-btn.spinning svg {
+            animation: refresh-spin 0.65s ease;
+        }
+
+        @keyframes refresh-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         .header h1 {
             font-size: 1.3rem;
             margin-bottom: 3px;
@@ -1253,6 +1299,14 @@
 <body>
     <div class="container">
         <div class="header">
+            <button type="button" class="refresh-btn" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 4v6h6"></path>
+                    <path d="M23 20v-6h-6"></path>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"></path>
+                    <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
+                </svg>
+            </button>
             <h1>📦 برنامج حساب الكميات</h1>
             <p>Quantity calculation</p>
         </div>
@@ -2011,10 +2065,30 @@
             window.addEventListener('resize', positionFloatingAddPart);
         }
 
+        function refreshCalculatorPage() {
+            var btn = document.getElementById('refreshBtn');
+            if (btn) btn.classList.add('spinning');
+            var url = new URL(window.location.href);
+            url.searchParams.set('v', String(Date.now()));
+            window.setTimeout(function() {
+                window.location.replace(url.toString());
+            }, 180);
+        }
+
+        function setupRefreshButton() {
+            var btn = document.getElementById('refreshBtn');
+            if (!btn) return;
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                refreshCalculatorPage();
+            });
+        }
+
         window.onload = function() {
             updateLayoutHeights();
             scrollFocusedIntoView();
             setupFloatingAddPart();
+            setupRefreshButton();
             window.addEventListener('resize', updateLayoutHeights);
             window.addEventListener('orientationchange', function() {
                 setTimeout(updateLayoutHeights, 150);
