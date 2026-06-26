@@ -1859,22 +1859,67 @@ init();
 
     var refreshBtn = document.getElementById('refreshBtn');
     if (!refreshBtn) return;
-    refreshBtn.addEventListener('click', function(e) {
-      e.preventDefault();
+
+    function hardRefreshQuickList() {
       refreshBtn.classList.add('spinning');
       var url = new URL(window.location.href);
       url.searchParams.set('v', String(Date.now()));
-      window.setTimeout(function() {
-        window.location.replace(url.toString());
-      }, 180);
+
+      function reload() {
+        window.setTimeout(function() {
+          window.location.replace(url.toString());
+        }, 120);
+      }
+
+      var tasks = [];
+      if ('serviceWorker' in navigator) {
+        tasks.push(
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            return Promise.all(regs.map(function(reg) { return reg.unregister(); }));
+          })
+        );
+      }
+      if (window.caches && caches.keys) {
+        tasks.push(
+          caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(key) { return caches.delete(key); }));
+          })
+        );
+      }
+
+      if (tasks.length) {
+        Promise.all(tasks).then(reload).catch(reload);
+      } else {
+        reload();
+      }
+    }
+
+    refreshBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      hardRefreshQuickList();
     });
   })();
   </script>
   <!-- ✅ تسجيل Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js").then(() => {
+      navigator.serviceWorker.register("sw.js?v=3").then(function(reg) {
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        reg.addEventListener('updatefound', function() {
+          var worker = reg.installing;
+          if (!worker) return;
+          worker.addEventListener('statechange', function() {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              worker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
         console.log("✅ Service Worker Registered");
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (window.__qlSwReloading) return;
+        window.__qlSwReloading = true;
+        window.location.reload();
       });
     }
     <!-- زر إضافة تبويب جديد -->
