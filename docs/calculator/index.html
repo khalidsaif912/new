@@ -290,29 +290,50 @@
         }
 
         .btn-add-shipment {
-            margin-top: 0;
-        }
-
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 50px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
+            min-height: 44px;
+            padding: 10px 16px;
+            margin-top: 0;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #42a5f5 0%, #1e88e5 50%, #1565c0 100%);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.94rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            box-shadow:
+                0 4px 14px rgba(21, 101, 192, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.24);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        .btn-add-shipment svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            stroke: currentColor;
+        }
+
+        .btn-add-shipment:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 6px 18px rgba(21, 101, 192, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .btn-add-shipment:active {
+            transform: translateY(0) scale(0.99);
+            box-shadow:
+                0 2px 8px rgba(21, 101, 192, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
         }
 
         .tabs-container {
@@ -1275,13 +1296,10 @@
                 min-height: 52px;
             }
 
-            .btn {
-                min-height: 52px;
-                font-size: 1.05rem;
-            }
-
-            .btn-primary {
-                margin-top: 4px;
+            .btn-add-shipment {
+                min-height: 46px;
+                font-size: 0.97rem;
+                border-radius: 12px;
             }
 
             .tabs-container {
@@ -1489,7 +1507,13 @@
                             <input type="text" id="quantity" class="form-input" placeholder="QTY" aria-label="الكمية الكلية" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-add-shipment" onclick="addShipment()">➕ إضافة/تحديث الشحنة</button>
+                    <button type="button" class="btn-add-shipment" onclick="addShipment()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 5v14"></path>
+                            <path d="M5 12h14"></path>
+                        </svg>
+                        <span>إضافة / تحديث الشحنة</span>
+                    </button>
                 </div>
             </div>
 
