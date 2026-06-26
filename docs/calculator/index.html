@@ -2188,20 +2188,41 @@
         }
 
         function getRosterHomeUrl() {
-            var path = location.pathname || '';
-            var homePath = (/\/docs\/calculator(\/|$)/.test(path) || /\/roster-site\//.test(path))
-                ? '../import/now/index.html'
-                : '../index.html';
             try {
-                return new URL(homePath, location.href).toString();
-            } catch (e) {
-                return homePath;
+                var saved = sessionStorage.getItem('calcReturnUrl');
+                if (saved && /\/import\//.test(saved)) return saved;
+            } catch (e) {}
+
+            var path = location.pathname || '';
+            if (/\/docs\/calculator(\/|$)/.test(path) || /\/roster-site\//.test(path) || /^\/docs\//.test(path)) {
+                try {
+                    return new URL('../import/now/index.html', location.href).toString();
+                } catch (e) {
+                    return '../import/now/index.html';
+                }
             }
+
+            if (location.hostname && location.hostname.endsWith('github.io')) {
+                var segs = path.split('/').filter(Boolean);
+                if (segs.length >= 2 && segs[1] === 'docs') {
+                    try {
+                        return new URL('/' + segs[0] + '/docs/import/now/index.html', location.origin).toString();
+                    } catch (e) {}
+                }
+            }
+
+            return 'https://khalidsaif912.github.io/new/docs/import/now/index.html';
         }
 
         function setupHeaderButtons() {
             var homeBtn = document.getElementById('homeBtn');
-            if (homeBtn) homeBtn.href = getRosterHomeUrl();
+            if (homeBtn) {
+                homeBtn.href = getRosterHomeUrl();
+                homeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.assign(getRosterHomeUrl());
+                });
+            }
 
             var refreshBtn = document.getElementById('refreshBtn');
             if (!refreshBtn) return;

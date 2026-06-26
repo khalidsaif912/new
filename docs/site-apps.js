@@ -122,6 +122,14 @@
     document.body.style.overflow = '';
   }
 
+  function rememberCalcReturnUrl() {
+    try {
+      var path = location.pathname || '';
+      if (/\/calculator(\/|$)/.test(path)) return;
+      sessionStorage.setItem('calcReturnUrl', location.href);
+    } catch (e) {}
+  }
+
   function calcPageUrl() {
     if (typeof getSiteRootUrl === 'function') {
       return getSiteRootUrl() + '/calculator/index.html';
@@ -144,6 +152,7 @@
     if (!isStandaloneApp()) return;
     e.preventDefault();
     closeModal();
+    rememberCalcReturnUrl();
     window.location.assign(calcPageUrl());
   }
 
@@ -160,6 +169,7 @@
     patchCalcLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
+        rememberCalcReturnUrl();
         openCalcFromPwa(e);
         return;
       }
