@@ -85,16 +85,14 @@
             z-index: 1000 !important;
         }
 
-        .refresh-btn {
+        .header-icon-btn {
             position: absolute;
-            top: calc(10px + env(safe-area-inset-top, 0px));
-            left: calc(10px + env(safe-area-inset-left, 0px));
-            width: 28px;
-            height: 28px;
+            top: calc(8px + env(safe-area-inset-top, 0px));
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: 1.5px solid rgba(255, 255, 255, 0.55);
-            background: rgba(255, 255, 255, 0.16);
-            color: #fff;
+            border: none;
+            background: rgba(0, 0, 0, 0.22);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -104,25 +102,35 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
             transition: transform 0.2s ease, background 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            text-decoration: none;
         }
 
-        .refresh-btn svg {
+        .header-icon-btn--left {
+            left: calc(10px + env(safe-area-inset-left, 0px));
+        }
+
+        .header-icon-btn--right {
+            right: calc(10px + env(safe-area-inset-right, 0px));
+        }
+
+        .header-icon-btn svg,
+        .header-icon-btn img {
             display: block;
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             pointer-events: none;
         }
 
-        .refresh-btn:hover {
-            background: rgba(255, 255, 255, 0.26);
+        .header-icon-btn:hover {
+            background: rgba(0, 0, 0, 0.32);
         }
 
-        .refresh-btn:active {
+        .header-icon-btn:active {
             transform: scale(0.92);
         }
 
-        .refresh-btn.spinning svg {
+        .header-icon-btn.spinning svg {
             animation: refresh-spin 0.65s ease;
         }
 
@@ -162,14 +170,6 @@
             font-family: 'Plus Jakarta Sans', 'Segoe UI', Roboto, system-ui, sans-serif;
             font-weight: 700;
             opacity: 0.95;
-        }
-
-        .header-app-icon {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            flex-shrink: 0;
-            display: block;
         }
 
         .main-content {
@@ -821,35 +821,6 @@
             animation: screenFlash 0.8s ease-in-out;
         }
 
-        .floating-add-part {
-            display: none;
-            position: fixed;
-            left: 10px;
-            right: 10px;
-            z-index: 2500;
-            margin: 0;
-            min-height: 44px;
-            padding: 10px 14px;
-            border: 0;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 800;
-            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.35);
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        .floating-add-part.visible {
-            display: block;
-        }
-
-        .floating-add-part:active {
-            transform: scale(0.98);
-        }
-
         .empty-state {
             text-align: center;
             padding: 48px 20px;
@@ -1185,11 +1156,6 @@
                 font-size: 1.08rem;
             }
 
-            .header-app-icon {
-                width: 34px;
-                height: 34px;
-            }
-
             .input-section {
                 padding: 14px 16px;
             }
@@ -1476,16 +1442,27 @@
 <body>
     <div class="container">
         <div class="header">
-            <button type="button" class="refresh-btn" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+                <defs>
+                    <linearGradient id="hdrIconGrad" x1="0" y1="0" x2="0" y2="24" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#4df1a1"/>
+                        <stop offset="48%" stop-color="#2dd4c8"/>
+                        <stop offset="100%" stop-color="#00a8ff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <button type="button" class="header-icon-btn header-icon-btn--left" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
+                <svg viewBox="0 0 24 24" fill="none" stroke="url(#hdrIconGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M1 4v6h6"></path>
                     <path d="M23 20v-6h-6"></path>
                     <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"></path>
                     <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
                 </svg>
             </button>
+            <a href="../import/now/index.html" class="header-icon-btn header-icon-btn--right" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
+                <img src="home-icon.png" alt="" width="22" height="22">
+            </a>
             <h1 class="header-brand">
-                <img src="parcel-icon.png" alt="" class="header-app-icon" width="32" height="32">
                 <span class="header-titles">
                     <span class="header-title-line">حساب الكميات</span>
                     <span class="header-title-line" lang="en">Quantity Calculation</span>
@@ -1537,8 +1514,6 @@
             </div>
         </div>
     </div>
-
-    <button type="button" class="floating-add-part" id="floatingAddPartBtn" aria-label="إضافة جزء">➕ إضافة جزء</button>
 
     <!-- MODAL -->
     <div class="modal-overlay" id="infoModal">
@@ -2194,84 +2169,12 @@
 
         function scrollFocusedIntoView() {
             document.addEventListener('focusin', function(e) {
-                if (e.target.matches('.number-3d[contenteditable]')) {
-                    showFloatingAddPart(true);
-                    return;
-                }
                 if (e.target.matches('.form-input')) {
                     setTimeout(function() {
                         e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 350);
                 }
             });
-
-            document.addEventListener('focusout', function(e) {
-                if (e.target.matches('.number-3d[contenteditable]')) {
-                    setTimeout(function() {
-                        if (!document.activeElement ||
-                            !document.activeElement.matches('.number-3d[contenteditable], #floatingAddPartBtn')) {
-                            showFloatingAddPart(false);
-                        }
-                    }, 120);
-                }
-            });
-        }
-
-        function keyboardInset() {
-            var vv = window.visualViewport;
-            if (!vv) return 0;
-            return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-        }
-
-        function positionFloatingAddPart() {
-            var btn = document.getElementById('floatingAddPartBtn');
-            if (!btn) return;
-            var inset = keyboardInset();
-            var keyboardOpen = inset > 60;
-            var editingPart = document.activeElement &&
-                document.activeElement.matches('.number-3d[contenteditable]');
-
-            if (keyboardOpen && editingPart && activeTab) {
-                document.body.classList.add('keyboard-open');
-                btn.classList.add('visible');
-                btn.style.bottom = (inset + 8) + 'px';
-            } else {
-                document.body.classList.remove('keyboard-open');
-                btn.classList.remove('visible');
-            }
-        }
-
-        function showFloatingAddPart(show) {
-            if (show && activeTab) {
-                positionFloatingAddPart();
-                setTimeout(positionFloatingAddPart, 250);
-                setTimeout(positionFloatingAddPart, 500);
-            } else {
-                document.body.classList.remove('keyboard-open');
-                var btn = document.getElementById('floatingAddPartBtn');
-                if (btn) btn.classList.remove('visible');
-            }
-        }
-
-        function setupFloatingAddPart() {
-            var btn = document.getElementById('floatingAddPartBtn');
-            if (!btn) return;
-
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (!activeTab) return;
-                addPart(activeTab);
-            });
-
-            btn.addEventListener('mousedown', function(e) {
-                e.preventDefault();
-            });
-
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', positionFloatingAddPart);
-                window.visualViewport.addEventListener('scroll', positionFloatingAddPart);
-            }
-            window.addEventListener('resize', positionFloatingAddPart);
         }
 
         function refreshCalculatorPage() {
@@ -2284,10 +2187,25 @@
             }, 180);
         }
 
-        function setupRefreshButton() {
-            var btn = document.getElementById('refreshBtn');
-            if (!btn) return;
-            btn.addEventListener('click', function(e) {
+        function getRosterHomeUrl() {
+            var path = location.pathname || '';
+            var homePath = (/\/docs\/calculator(\/|$)/.test(path) || /\/roster-site\//.test(path))
+                ? '../import/now/index.html'
+                : '../index.html';
+            try {
+                return new URL(homePath, location.href).toString();
+            } catch (e) {
+                return homePath;
+            }
+        }
+
+        function setupHeaderButtons() {
+            var homeBtn = document.getElementById('homeBtn');
+            if (homeBtn) homeBtn.href = getRosterHomeUrl();
+
+            var refreshBtn = document.getElementById('refreshBtn');
+            if (!refreshBtn) return;
+            refreshBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 refreshCalculatorPage();
             });
@@ -2296,8 +2214,7 @@
         window.onload = function() {
             updateLayoutHeights();
             scrollFocusedIntoView();
-            setupFloatingAddPart();
-            setupRefreshButton();
+            setupHeaderButtons();
             window.addEventListener('resize', updateLayoutHeights);
             window.addEventListener('orientationchange', function() {
                 setTimeout(updateLayoutHeights, 150);
