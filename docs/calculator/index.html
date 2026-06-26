@@ -299,11 +299,9 @@
             gap: 10px;
         }
 
-        .parts-header h3 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #333;
+        .parts-header .quantity-display {
+            flex: 1;
+            min-width: 0;
         }
 
         .quantity-display {
@@ -1020,17 +1018,9 @@
                 text-align: start;
             }
 
-            .parts-header h3 {
+            .parts-header .quantity-display {
                 flex: 1;
                 min-width: 0;
-                margin: 0;
-                font-size: 0.95rem;
-                word-break: break-all;
-                text-align: end;
-            }
-
-            .quantity-display {
-                flex-shrink: 0;
                 font-size: 0.95rem;
                 padding: 8px 12px;
             }
@@ -1443,7 +1433,7 @@
             var content = '<div class="parts-container">';
             content += '<div class="parts-header">';
             content += '<div class="quantity-display">QTY: ' + data.quantity + '</div>';
-            content += '<h3>📋 AWB: ' + awb + '</h3>';
+            content += '<div class="quantity-display">AWB: ' + awb + '</div>';
             content += '</div>';
             
             content += '<div class="remaining-info">';
