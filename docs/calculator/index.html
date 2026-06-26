@@ -405,7 +405,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
         }
 
         .pallet-stage {
@@ -413,7 +413,7 @@
             width: 92%;
             line-height: 0;
             transform-origin: 50% 0%;
-            transform: rotateX(10deg);
+            transform: perspective(280px) rotateX(12deg);
             filter: drop-shadow(0 2px 4px rgba(92, 16, 16, 0.18));
         }
 
@@ -445,12 +445,12 @@
         .number-3d {
             position: relative;
             width: 92%;
-            min-height: 32px;
+            min-height: 34px;
             margin-bottom: 0;
             z-index: 8;
             font-family: 'Rubik', 'Segoe UI', Roboto, system-ui, sans-serif;
             font-size: 31px;
-            font-weight: 600;
+            font-weight: 700;
             font-feature-settings: "tnum" 1, "lnum" 1;
             font-variant-numeric: lining-nums tabular-nums;
             text-align: center;
@@ -466,29 +466,44 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            line-height: 1.1;
+            line-height: 1.05;
             padding-bottom: 0;
-            color: #1565c0;
+            color: #4fc3f7;
             background: none;
             -webkit-text-fill-color: currentColor;
             -webkit-text-stroke: 0;
             filter: none;
             transform: none;
             text-rendering: geometricPrecision;
-            text-shadow: none;
+            text-shadow:
+                0 -1px 0 #e1f5fe,
+                0 1px 0 #29b6f6,
+                0 2px 0 #1e88e5,
+                0 3px 0 #1565c0,
+                0 4px 0 #0d47a1,
+                0 5px 0 #0a3d91;
             box-shadow: none;
-            transition: color 0.15s ease;
+            transition: color 0.15s ease, text-shadow 0.15s ease;
         }
 
         .part-row:hover .number-3d {
-            color: #1976d2;
+            color: #81d4fa;
+            text-shadow:
+                0 -1px 0 #f0f9ff,
+                0 1px 0 #4fc3f7,
+                0 2px 0 #2196f3,
+                0 3px 0 #1976d2,
+                0 4px 0 #1565c0,
+                0 5px 0 #0d47a1;
         }
 
         .number-3d:empty::before {
             content: '0';
             color: #90caf9;
-            text-shadow: none;
-            opacity: 0.55;
+            text-shadow:
+                0 1px 0 #81d4fa,
+                0 2px 0 #64b5f6;
+            opacity: 0.5;
         }
 
         .number-3d:focus,
@@ -1154,13 +1169,13 @@
 
             .number-3d {
                 font-size: 28px;
-                min-height: 30px;
+                min-height: 32px;
                 letter-spacing: 0.04em;
             }
 
             .pallet-stage {
                 width: 94%;
-                transform: rotateX(8deg);
+                transform: perspective(240px) rotateX(10deg);
             }
 
             .delete-part-btn {
