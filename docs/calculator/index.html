@@ -131,26 +131,45 @@
             to { transform: rotate(360deg); }
         }
 
-        .header h1 {
+        .header h1.header-brand {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 1.3rem;
-            margin-bottom: 3px;
+            gap: 10px;
+            margin: 0 0 2px;
+            padding: 0;
+            font-weight: inherit;
+            font-size: inherit;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            line-height: 1.15;
+            min-width: 0;
+        }
+
+        .header-title-line {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .header-title-line[lang="en"] {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-weight: 700;
+            opacity: 0.95;
         }
 
         .header-app-icon {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             flex-shrink: 0;
             display: block;
-        }
-
-        .header p {
-            font-size: 0.85rem;
-            margin: 0;
         }
 
         .main-content {
@@ -1111,12 +1130,17 @@
                 padding-top: calc(14px + env(safe-area-inset-top, 0px));
             }
 
-            .header h1 {
-                font-size: 1.35rem;
+            .header h1.header-brand {
+                gap: 10px;
             }
 
-            .header p {
-                font-size: 0.9rem;
+            .header-title-line {
+                font-size: 1.08rem;
+            }
+
+            .header-app-icon {
+                width: 34px;
+                height: 34px;
             }
 
             .input-section {
@@ -1365,8 +1389,8 @@
                 gap: 12px 8px;
             }
 
-            .header h1 {
-                font-size: 1.2rem;
+            .header-title-line {
+                font-size: 0.98rem;
             }
 
             .footer-status {
@@ -1411,8 +1435,13 @@
                     <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
                 </svg>
             </button>
-            <h1><img src="parcel-icon.png" alt="" class="header-app-icon" width="30" height="30">برنامج حساب الكميات</h1>
-            <p>Quantity calculation</p>
+            <h1 class="header-brand">
+                <img src="parcel-icon.png" alt="" class="header-app-icon" width="32" height="32">
+                <span class="header-titles">
+                    <span class="header-title-line">حساب الكميات</span>
+                    <span class="header-title-line" lang="en">Quantity Calculation</span>
+                </span>
+            </h1>
         </div>
 
     <!-- FLASH SCREEN -->
