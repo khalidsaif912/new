@@ -170,7 +170,7 @@
         .form-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             flex-wrap: nowrap;
             flex-direction: row;
             align-items: flex-end;
@@ -1411,12 +1411,10 @@
                 <div class="shipment-form-card">
                     <div class="form-row shipment-fields">
                         <div class="input-group awb-group">
-                            <label class="field-label" for="awb">رقم AWB</label>
-                            <input type="text" id="awb" class="form-input" placeholder="AWB" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off" oninput="handleAWBInput(this)">
+                            <input type="text" id="awb" class="form-input" placeholder="AWB" aria-label="رقم AWB" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off" oninput="handleAWBInput(this)">
                         </div>
                         <div class="input-group qty-group">
-                            <label class="field-label" for="quantity">الكمية الكلية</label>
-                            <input type="text" id="quantity" class="form-input" placeholder="QTY" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                            <input type="text" id="quantity" class="form-input" placeholder="QTY" aria-label="الكمية الكلية" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
                         </div>
                     </div>
                     <button class="btn btn-primary btn-add-shipment" onclick="addShipment()">➕ إضافة/تحديث الشحنة</button>
