@@ -492,6 +492,44 @@
                 0 3px 0 #0d47a1;
         }
 
+        .part-row.ghost-part {
+            cursor: pointer;
+            opacity: 0.38;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .part-row.ghost-part:hover,
+        .part-row.ghost-part:focus-visible {
+            opacity: 0.58;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .part-row.ghost-part:active {
+            opacity: 0.72;
+            transform: scale(0.98);
+        }
+
+        .part-row.ghost-part .ghost-number {
+            pointer-events: none;
+            user-select: none;
+            color: #64b5f6;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-shadow: none;
+            min-height: 34px;
+        }
+
+        .part-row.ghost-part .pallet-stage {
+            pointer-events: none;
+        }
+
+        .part-row.ghost-part .pallet-svg {
+            opacity: 0.85;
+        }
+
         .number-3d:empty::before {
             content: '0';
             color: #64b5f6;
@@ -1614,6 +1652,17 @@
                 content += '</div>';
                 content += '</div>';
             }
+
+            if (remaining > 0) {
+                content += '<div class="part-row ghost-part" role="button" tabindex="0" aria-label="إضافة جزء سريع" onclick="activateGhostPart(\'' + awb + '\')" onkeydown="handleGhostPartKeydown(event, \'' + awb + '\')">';
+                content += '<div class="pallet-stack">';
+                content += '<div class="number-3d ghost-number">+</div>';
+                content += '<div class="pallet-stage">';
+                content += buildPalletSvg(awb + '_ghost');
+                content += '</div>';
+                content += '</div>';
+                content += '</div>';
+            }
             
             content += '</div>';
             content += '<div class="action-buttons">';
@@ -1642,6 +1691,17 @@
                 tabBtn.classList.add('active');
                 tabContent.classList.add('active');
                 activeTab = awb;
+            }
+        }
+
+        function activateGhostPart(awb) {
+            addPart(awb);
+        }
+
+        function handleGhostPartKeydown(event, awb) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activateGhostPart(awb);
             }
         }
 
