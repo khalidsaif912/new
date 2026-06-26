@@ -4,7 +4,8 @@
 (function () {
   'use strict';
 
-  var CALC_VER = '20260627';
+  var CALC_VER = '20260630';
+  var CALC_WRAPPER = 'https://iammrk-8af39.web.app/calculator/roster.html';
 
   var I18N = {
     en: {
@@ -83,7 +84,7 @@
   }
 
   function calcWrapperUrl() {
-    return siteRootUrl() + '/apps/calc.html?v=' + CALC_VER;
+    return CALC_WRAPPER + '?v=' + CALC_VER;
   }
 
   function isStandaloneApp() {
