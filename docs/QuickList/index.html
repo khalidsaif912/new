@@ -8,7 +8,7 @@
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#00c3ad">
+  <meta name="theme-color" content="#2196F3">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,19 +17,19 @@
   <style>
     /* --- CSS Variables --- */
     :root {
-      --primary-color: #00c3ad;
-      --secondary-color: #058b58;
-      --accent-color: #ff9800;
+      --primary-color: #2196F3;
+      --secondary-color: #1976D2;
+      --accent-color: #42a5f5;
       --danger-color: #d32f2f;
-      --danger-bg-color: #ffebf0;
+      --danger-bg-color: #ffebee;
       --success-color: #4CAF50;
       --info-color: #1976D2;
       --info-bg-color: #E3F2FD;
 
-      --bg-gradient: linear-gradient(135deg, #f0fff0 0%, #e0f7fa 100%);
-      --header-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      --button-gradient: linear-gradient(90deg, var(--primary-color) 60%, #ffb74d 100%);
-      --button-hover-gradient: linear-gradient(90deg, var(--secondary-color) 60%, var(--accent-color) 100%);
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --header-gradient: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      --button-gradient: linear-gradient(180deg, #42a5f5 0%, #1e88e5 50%, #1565c0 100%);
+      --button-hover-gradient: linear-gradient(180deg, #4fc3f7 0%, #1e88e5 52%, #1565c0 100%);
 
       --text-dark: #212121;
       --text-light: #ffffff;
@@ -66,10 +66,7 @@
 body {
   font-family: var(--font-family);
   color: var(--text-dark);
-  background: 
-    url("https://www.transparenttextures.com/patterns/simple-horizontal-light.png"),
-    linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  background-blend-mode: overlay;
+  background: var(--bg-gradient);
   min-height: 100%;
   min-height: 100dvh;
   direction: rtl;
@@ -98,9 +95,9 @@ body {
       padding-right: calc(3.25rem + env(safe-area-inset-right, 0px));
       background: var(--header-gradient);
       color: var(--text-light);
-      box-shadow: var(--shadow-md);
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
+      box-shadow: 0 2px 10px rgba(21, 101, 192, 0.22);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
     .header-home-btn {
@@ -158,15 +155,13 @@ body {
     }
 
 main.container {
-  margin: 1rem auto;           /* يخليها في الوسط */
+  margin: 0.75rem auto;
   padding: 1rem;
-  max-width: 634px;            /* عرض مثل الآيباد */
-  width: 100%;                 /* يتقلص في الشاشات الأصغر */
-  background: rgba(250, 250, 250, 1.0);
-  background-image: url("https://www.transparenttextures.com/patterns/paper.png");
+  max-width: 634px;
+  width: calc(100% - 1rem);
+  background: #fff;
   border-radius: var(--border-radius-lg);
-  box-shadow: 0 6px 20px rgba(3, 145, 180, 0.5);
-  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 18px rgba(21, 101, 192, 0.12);
 }
 
     
@@ -179,33 +174,62 @@ main.container {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 0.75rem;
+      padding: 0.35rem 0;
     }
     .tabs-dots {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .tab-dot {
       width: 14px;
       height: 14px;
       border-radius: 50%;
       border: 2px solid var(--primary-color);
-      background: var(--text-light);
+      background: #fff;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .tab-dot.active {
       background: var(--secondary-color);
       border-color: var(--secondary-color);
-      box-shadow: 0 0 8px rgba(0, 159, 112, 0.5);
+      box-shadow: 0 0 8px rgba(33, 150, 243, 0.45);
       transform: scale(1.1);
+    }
+    .tab-add-btn {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--button-gradient);
+      color: #fff;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(21, 101, 192, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-add-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(21, 101, 192, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+    }
+    .tab-add-btn:active {
+      transform: scale(0.94);
     }
     .tab-title {
       padding: 0.25rem;
       margin-bottom: 1rem;
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: var(--secondary-color);
       text-align: center;
@@ -214,8 +238,8 @@ main.container {
       transition: background 0.2s, color 0.2s;
     }
     .tab-title.glow {
-      background: linear-gradient(90deg, #afffc8 40%, #98e0b3 75%);
-      color: #007f54;
+      background: linear-gradient(90deg, #e3f2fd 40%, #bbdefb 75%);
+      color: #1565c0;
     }
 
     .tab-swipe-hint {
@@ -237,79 +261,47 @@ main.container {
       margin-bottom: 0.75rem;
       font-size: var(--font-size-lg);
       text-align: center;
-      background: #f8f8ff;
-      border: 2px solid var(--primary-color);
+      background: #f8fbff;
+      border: 2px solid #90caf9;
       border-radius: var(--border-radius-md);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(21, 101, 192, 0.08);
       transition: border-color 0.2s, box-shadow 0.3s;
       -webkit-user-select: text;
       user-select: text;
     }
 
-    
     textarea#inputList:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 2px 12px rgba(255, 152, 0, 0.2);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.16);
       outline: none;
     }
+
 .main-button {
   display: block;
   width: 100%;
-  padding: 0.8rem 0;
+  min-height: 44px;
+  padding: 10px 16px;
   margin-bottom: 1.25rem;
-  font-size: var(--font-size-lg);
+  font-size: 0.94rem;
   font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--text-on-primary);
-  background: linear-gradient(90deg, #5eb392 60%, #02be31 100%); 
-  border-radius: var(--border-radius-md);
-  /* ظل متعدد الطبقات للعمق */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1),
-              0 4px 8px rgba(0, 0, 0, 0.1),
-              0 8px 16px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: var(--button-gradient);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.24);
   cursor: pointer;
-  transition: all 0.3s ease;
-  transform: translateY(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .main-button:hover {
-  background: linear-gradient(90deg, #01fa9a 60%, #02a72b 100%);  /* ظل أكبر عند التمرير = ارتفاع */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15),
-              0 8px 16px rgba(0, 0, 0, 0.15),
-              0 16px 32px rgba(0, 195, 173, 0.25);
-  transform: translateY(-3px);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(21, 101, 192, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .main-button:active {
-  /* ظل أصغر عند الضغط = انخفاض */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
-              0 2px 4px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
-
-    /* --- Floating Action Button (FAB) --- */
-    .fab {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      right: calc(1.25rem + env(safe-area-inset-right, 0px));
-      bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-      width: 58px;
-      height: 58px;
-      z-index: 2000;
-      font-size: 2rem;
-      color: var(--text-light);
-      background: var(--header-gradient);
-      border-radius: 50%;
-      box-shadow: 0 4px 18px rgba(0, 195, 173, 0.4);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .fab:hover {
-      transform: scale(1.1) rotate(-15deg);
-      box-shadow: 0 6px 24px rgba(0, 195, 173, 0.5);
-    }
 
     /* --- Purchase History --- */
     .history-title {
@@ -345,8 +337,8 @@ main.container {
       cursor: pointer;
       transition: background-color 0.2s;
     }
-    .purchase-list:nth-child(odd) .purchase-header { background: #e0f7fa; color: #00796b; }
-    .purchase-list:nth-child(even) .purchase-header { background: #f1f8e9; color: #33691e; }
+    .purchase-list:nth-child(odd) .purchase-header { background: #e3f2fd; color: #1565c0; }
+    .purchase-list:nth-child(even) .purchase-header { background: #f1f5f9; color: #1976d2; }
     .purchase-header.over {
       background: var(--danger-bg-color) !important;
       color: var(--danger-color);
@@ -371,8 +363,8 @@ main.container {
       transition: max-height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       padding: 0 0.5rem;
     }
-    .purchase-list:nth-child(odd) .purchase-content { background: #f8fffd; }
-    .purchase-list:nth-child(even) .purchase-content { background: #fcfff8; }
+    .purchase-list:nth-child(odd) .purchase-content { background: #f8fbff; }
+    .purchase-list:nth-child(even) .purchase-content { background: #fafcff; }
     .purchase-content.open { max-height: 1500px; padding: 0.5rem; }
 
     .table-scroll-wrap {
@@ -593,19 +585,19 @@ main.container {
     }
     /* الفوتر المحسن */
 .footer {
-  background: #000000;
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
   color: #fff;
-  padding: 15px 20px 12px;
+  padding: 12px 16px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  padding-left: calc(20px + env(safe-area-inset-left, 0px));
-  padding-right: calc(20px + env(safe-area-inset-right, 0px));
+  padding-left: calc(16px + env(safe-area-inset-left, 0px));
+  padding-right: calc(16px + env(safe-area-inset-right, 0px));
   text-align: center;
   flex-shrink: 0;
   margin-top: auto;
-  box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.3);
-  border-top: 2px solid rgba(255, 255, 255, 0.1);
- border-top-left-radius: 15px;
-border-top-right-radius: 15px;
+  box-shadow: 0 -2px 10px rgba(21, 101, 192, 0.2);
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 /* مجموعات الروابط المتحركة */
@@ -779,28 +771,20 @@ border-top-right-radius: 15px;
 
   .main-button {
     font-size: var(--font-size-md);
-    min-height: 50px;
-    padding: 0.9rem 0;
-    border-radius: 10px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .tab-add-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1.2rem;
   }
 
   .history-title {
     font-size: 1rem;
     text-align: center;
-  }
-
-  .fab {
-    width: 56px;
-    height: 56px;
-    font-size: 1.8rem;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .fab:active {
-    transform: translateX(-50%) scale(0.95);
   }
 
   .purchase-list {
@@ -1114,7 +1098,7 @@ border-top-right-radius: 15px;
 @media (hover: none) and (pointer: coarse) {
   .header .icon:hover,
   .main-button:hover,
-  .fab:hover,
+  .tab-add-btn:hover,
   .delete-btn:hover,
   .footer a:hover,
   .notes-btn:hover,
@@ -1126,12 +1110,11 @@ border-top-right-radius: 15px;
   }
 
   .main-button:active {
-    background: linear-gradient(90deg, #01fa9a 60%, #02a72b 100%);
     transform: scale(0.98);
   }
 
-  .fab:active {
-    transform: translateX(-50%) scale(0.92);
+  .tab-add-btn:active {
+    transform: scale(0.92);
   }
 }
 
@@ -1262,6 +1245,7 @@ html, body, *:lang(ar) {
 <main class="container" id="mainContainer">
     <div class="tabs-container">
       <div class="tabs-dots" id="tabsDots"></div>
+      <button type="button" id="addTabBtn" class="tab-add-btn" title="إضافة تبويب جديد" aria-label="إضافة تبويب جديد">+</button>
     </div>
     <div class="tab-title" id="activeTabTitle"></div>
     <p class="tab-swipe-hint" id="tabSwipeHint">← اضغط يمين/يسار للتبديل · اضغط مطوّلاً للحذف →</p>
@@ -1287,8 +1271,6 @@ html, body, *:lang(ar) {
   </div>
 </footer>
 
-<button id="addTabBtn" class="fab" title="إضافة تبويب جديد">➕</button>
-  
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
