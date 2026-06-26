@@ -318,9 +318,9 @@
         .parts-grid {
             display: grid !important;
             grid-template-columns: repeat(5, 1fr) !important;
-            gap: 20px 15px;
+            gap: 22px 15px;
             margin: 15px 0;
-            padding: 30px 20px;
+            padding: 18px 16px 24px;
             border-radius: 12px;
             width: fit-content;
             min-width: 400px;
@@ -333,108 +333,138 @@
 
         .part-row {
             position: relative;
-            background-color: #c62828;
-            background-image:
-                linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px),
-                linear-gradient(180deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px),
-                radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.14), transparent 55%),
-                linear-gradient(180deg, #d32f2f 0%, #b71c1c 100%);
-            background-size: 8px 8px, 8px 8px, 100% 100%, 100% 100%;
-            border-radius: 5px;
-            width: 80px;
-            height: 54px;
+            width: 100px;
+            margin: 0 auto;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            box-shadow:
-                inset 0 0 0 2px rgba(255, 255, 255, 0.14),
-                inset 0 -3px 6px rgba(0, 0, 0, 0.18),
-                0 4px 10px rgba(183, 28, 28, 0.35);
-            transition: all 0.25s ease;
-            border: 3px solid #8e0000;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
             cursor: grab;
-            overflow: hidden;
-        }
-
-        .part-row::before {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            border: 1px solid rgba(0, 0, 0, 0.16);
-            border-radius: 2px;
-            pointer-events: none;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+            overflow: visible;
+            transition: transform 0.2s ease;
         }
 
         .part-row:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                inset 0 0 0 2px rgba(255, 255, 255, 0.18),
-                0 6px 14px rgba(183, 28, 28, 0.42);
+            transform: translateY(-1px);
+        }
+
+        .pallet-stage {
+            position: relative;
+            width: 92%;
+            line-height: 0;
+            filter: drop-shadow(0 2px 5px rgba(92, 16, 16, 0.2));
+        }
+
+        .pallet-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.2s ease;
+        }
+
+        .part-row:hover .pallet-svg {
+            filter: brightness(1.05);
         }
 
         .number-3d {
             position: relative;
-            z-index: 2;
-            font-size: 24px;
+            width: 92%;
+            min-height: 28px;
+            margin-bottom: 0;
+            z-index: 8;
+            font-size: 30px;
             font-weight: 900;
+            font-variant-numeric: tabular-nums;
             text-align: center;
             direction: ltr;
-            color: #fff;
-            background: transparent;
+            color: #fafafa;
+            letter-spacing: -0.03em;
+            caret-color: #1565c0;
+            background: transparent !important;
             border: none;
             outline: none;
             cursor: text;
             white-space: nowrap;
-            caret-color: #fff;
-            -webkit-user-select: text;
-            user-select: text;
-            overflow: hidden;
-            transition: all 0.2s ease;
-            border-radius: 3px;
-            width: 88%;
-            height: 78%;
+            overflow: visible;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 0.92;
+            border-radius: 0;
+            transform: perspective(140px) rotateX(8deg);
+            transform-origin: center center;
+            -webkit-text-stroke: 0.4px rgba(127, 21, 21, 0.45);
             text-shadow:
-                0 1px 0 rgba(0, 0, 0, 0.55),
-                0 0 8px rgba(0, 0, 0, 0.25);
+                0 1px 0 #d32f2f,
+                0 2px 0 #c62828,
+                0 3px 0 #b71c1c,
+                0 4px 0 #9b1b1b,
+                0 5px 0 #7f1515,
+                0 6px 1px rgba(74, 10, 10, 0.65);
             box-shadow: none;
+            transition: transform 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .part-row:hover .number-3d {
+            transform: perspective(140px) rotateX(6deg) translateY(-1px);
+        }
+
+        .number-3d:empty::before {
+            content: '0';
+            color: rgba(255, 255, 255, 0.38);
+            -webkit-text-stroke: 0;
+            text-shadow:
+                0 1px 0 rgba(198, 40, 40, 0.35),
+                0 2px 0 rgba(183, 28, 28, 0.3),
+                0 3px 4px rgba(0, 0, 0, 0.15);
         }
 
         .number-3d:focus {
-            transform: scale(1.04);
-            background: rgba(255, 255, 255, 0.14);
+            background: transparent !important;
+            box-shadow: none;
             outline: none;
-            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.55);
-            color: #fff;
+            color: #ffffff;
+            transform: perspective(140px) rotateX(5deg) scale(1.02);
+        }
+
+        .number-3d:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.65);
+            outline-offset: 1px;
+            border-radius: 4px;
         }
 
         .delete-part-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -11px;
+            right: -11px;
             background: #fff;
-            color: #dc3545;
-            border: 2px solid #dc3545;
+            color: #c62828;
+            border: 2px solid #e53935;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 25px;
+            height: 25px;
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 25;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 30;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 8px rgba(198, 40, 40, 0.25);
         }
 
         .delete-part-btn:hover {
-            background: #dc3545;
-            color: white;
-            transform: scale(1.1);
+            background: #e53935;
+            color: #fff;
+            border-color: #c62828;
+            transform: scale(1.08);
+            box-shadow: 0 3px 10px rgba(198, 40, 40, 0.35);
         }
 
         .remaining-info {
@@ -977,11 +1007,11 @@
 
             .parts-grid {
                 grid-template-columns: repeat(3, 1fr) !important;
-                gap: 14px 8px;
+                gap: 20px 12px;
                 width: 100% !important;
                 min-width: 0 !important;
                 max-width: 100% !important;
-                padding: 20px 10px;
+                padding: 20px 14px 26px;
                 margin-left: 0;
                 margin-right: 0;
                 flex: 1;
@@ -1057,20 +1087,34 @@
 
             .part-row {
                 width: 100%;
-                max-width: 100%;
-                height: 52px;
+                max-width: 116px;
                 margin: 0 auto;
             }
 
             .number-3d {
-                font-size: 20px;
+                font-size: 26px;
+                min-height: 26px;
+                margin-bottom: 0;
+                transform: perspective(120px) rotateX(7deg);
+            }
+
+            .part-row:hover .number-3d {
+                transform: perspective(120px) rotateX(5deg) translateY(-1px);
+            }
+
+            .number-3d:focus {
+                transform: perspective(120px) rotateX(4deg) scale(1.02);
+            }
+
+            .pallet-stage {
+                width: 94%;
             }
 
             .delete-part-btn {
                 width: 28px;
                 height: 28px;
-                top: -10px;
-                right: -10px;
+                top: -14px;
+                right: -14px;
                 font-size: 16px;
             }
 
@@ -1438,6 +1482,30 @@
             updateLayoutHeights();
         }
 
+        function buildPalletSvg(uid) {
+            var pid = 'pl' + String(uid).replace(/[^a-z0-9]/gi, '');
+            return '' +
+                '<svg class="pallet-svg" viewBox="0 0 100 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+                '<defs>' +
+                '<linearGradient id="' + pid + 'base" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="#e53935"/>' +
+                '<stop offset="100%" stop-color="#8b1515"/>' +
+                '</linearGradient>' +
+                '<linearGradient id="' + pid + 'slat" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="#c62828"/>' +
+                '<stop offset="100%" stop-color="#8b1515"/>' +
+                '</linearGradient>' +
+                '</defs>' +
+                '<ellipse cx="50" cy="26.5" rx="38" ry="2.5" fill="rgba(0,0,0,0.1)"/>' +
+                '<rect x="7" y="4" width="86" height="15" rx="2.5" fill="url(#' + pid + 'base)" stroke="#4a0a0a" stroke-width="0.7"/>' +
+                '<rect x="9.5" y="6" width="19" height="11" rx="1" fill="url(#' + pid + 'slat)" stroke="#4a0a0a" stroke-width="0.45"/>' +
+                '<rect x="40.5" y="6" width="19" height="11" rx="1" fill="url(#' + pid + 'slat)" stroke="#4a0a0a" stroke-width="0.45"/>' +
+                '<rect x="71.5" y="6" width="19" height="11" rx="1" fill="url(#' + pid + 'slat)" stroke="#4a0a0a" stroke-width="0.45"/>' +
+                '<rect x="28" y="8.5" width="14" height="7" rx="0.5" fill="#2d0808"/>' +
+                '<rect x="58" y="8.5" width="14" height="7" rx="0.5" fill="#2d0808"/>' +
+                '</svg>';
+        }
+
         function createTabContent(awb) {
             var data = shipments[awb];
             if (!data) return '<div>خطأ في البيانات</div>';
@@ -1468,8 +1536,11 @@
             for (var i = 0; i < data.parts.length; i++) {
                 var part = data.parts[i];
                 content += '<div class="part-row" data-index="' + i + '" data-awb="' + awb + '">';
-                content += '<div class="number-3d" contenteditable="true" inputmode="numeric" onkeydown="handlePartKeydown(event)" onkeyup="handlePartKeyup(event)" oninput="updatePart(this)" onfocus="selectAllOnFocus(this)">' + (part.quantity || '') + '</div>';
                 content += '<button class="delete-part-btn" onclick="deletePart(\'' + awb + '\', ' + i + ')" title="حذف">×</button>';
+                content += '<div class="number-3d" contenteditable="true" inputmode="numeric" onkeydown="handlePartKeydown(event)" onkeyup="handlePartKeyup(event)" oninput="updatePart(this)" onfocus="selectAllOnFocus(this)">' + (part.quantity || '') + '</div>';
+                content += '<div class="pallet-stage">';
+                content += buildPalletSvg(awb + '_' + i);
+                content += '</div>';
                 content += '</div>';
             }
             
