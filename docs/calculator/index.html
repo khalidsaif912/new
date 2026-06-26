@@ -1459,7 +1459,7 @@
                     <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
                 </svg>
             </button>
-            <a href="../import/now/index.html" class="header-icon-btn header-icon-btn--right" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
+            <a href="https://khalidsaif912.github.io/new/" class="header-icon-btn header-icon-btn--right" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
                 <img src="home-icon.png" alt="" width="22" height="22">
             </a>
             <h1 class="header-brand">
@@ -2188,30 +2188,25 @@
         }
 
         function getRosterHomeUrl() {
-            try {
-                var saved = sessionStorage.getItem('calcReturnUrl');
-                if (saved && /\/import\//.test(saved)) return saved;
-            } catch (e) {}
-
+            var rosterHome = 'https://khalidsaif912.github.io/new/';
             var path = location.pathname || '';
-            if (/\/docs\/calculator(\/|$)/.test(path) || /\/roster-site\//.test(path) || /^\/docs\//.test(path)) {
-                try {
-                    return new URL('../import/now/index.html', location.href).toString();
-                } catch (e) {
-                    return '../import/now/index.html';
-                }
-            }
 
             if (location.hostname && location.hostname.endsWith('github.io')) {
                 var segs = path.split('/').filter(Boolean);
                 if (segs.length >= 2 && segs[1] === 'docs') {
                     try {
-                        return new URL('/' + segs[0] + '/docs/import/now/index.html', location.origin).toString();
+                        return new URL('/' + segs[0] + '/', location.origin).toString();
                     } catch (e) {}
                 }
             }
 
-            return 'https://khalidsaif912.github.io/new/docs/import/now/index.html';
+            if (/\/docs\/calculator(\/|$)/.test(path) || /\/roster-site\//.test(path) || /^\/docs\//.test(path)) {
+                try {
+                    return new URL('../../', location.href).toString();
+                } catch (e) {}
+            }
+
+            return rosterHome;
         }
 
         function setupHeaderButtons() {
