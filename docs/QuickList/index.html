@@ -163,26 +163,27 @@ main.container {
       padding: 0 1rem 1rem;
     }
 
-    /* --- Tabs (calculator style) --- */
+    /* --- Tabs --- */
     .tabs-wrap {
       display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      margin-bottom: 0;
-      padding: 10px 10px 0;
-      background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
-      border-bottom: 1px solid #dbe4f0;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 12px 10px;
+      background: #fff;
+      border-bottom: 1px solid #e8eef5;
     }
 
     .tabs-nav {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       flex: 1;
       min-width: 0;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      gap: 6px;
+      gap: 8px;
+      padding: 2px 4px;
+      scroll-padding-inline: 8px;
     }
 
     .tabs-nav::-webkit-scrollbar {
@@ -190,69 +191,64 @@ main.container {
     }
 
     .tab-btn {
-      padding: 7px 14px;
-      border: 1px solid rgba(21, 101, 192, 0.22);
-      border-bottom: none;
+      padding: 8px 16px;
+      min-height: 36px;
+      max-width: 148px;
+      border: 1.5px solid #c5d9f5;
+      border-radius: 999px;
+      background: #f4f8fd;
+      color: #1565c0;
       cursor: pointer;
       white-space: nowrap;
-      border-radius: 10px 10px 0 0;
-      background: linear-gradient(180deg, #5d9fd8 0%, #1565c0 100%);
-      color: rgba(255, 255, 255, 0.9);
-      min-height: 34px;
-      display: flex;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       flex-shrink: 0;
-      transition: transform 0.22s ease, min-height 0.22s ease, padding 0.22s ease, font-size 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-      font-size: 0.8rem;
+      font-size: 0.84rem;
       font-weight: 600;
       font-family: inherit;
-      opacity: 0.72;
-      transform: translateY(5px) scale(0.93);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      z-index: 1;
+      line-height: 1.2;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
       -webkit-tap-highlight-color: transparent;
     }
 
     .tab-btn.active {
-      min-height: 44px;
-      padding: 10px 18px;
-      font-size: 0.98rem;
+      min-height: 38px;
+      padding: 9px 20px;
+      max-width: 180px;
+      font-size: 0.92rem;
       font-weight: 700;
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      background: linear-gradient(180deg, #4fc3f7 0%, #1e88e5 52%, #1565c0 100%);
-      border-color: #1565c0;
       color: #fff;
-      box-shadow: 0 -3px 10px rgba(21, 101, 192, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-      z-index: 3;
+      border-color: transparent;
+      background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 55%, #1565c0 100%);
+      box-shadow: 0 4px 14px rgba(21, 101, 192, 0.28);
     }
 
     .tab-add-btn {
       flex-shrink: 0;
       width: 36px;
       height: 36px;
-      margin-bottom: 4px;
-      border: none;
+      border: 1.5px dashed #90caf9;
       border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--button-gradient);
-      color: #fff;
-      font-size: 1.35rem;
+      background: #fff;
+      color: #1976d2;
+      font-size: 1.25rem;
       font-weight: 700;
       line-height: 1;
       cursor: pointer;
-      box-shadow: 0 3px 10px rgba(21, 101, 192, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
       -webkit-tap-highlight-color: transparent;
     }
 
     .tab-add-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 14px rgba(21, 101, 192, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+      background: #e3f2fd;
+      border-color: #64b5f6;
+      border-style: solid;
     }
 
     .tab-add-btn:active {
@@ -629,10 +625,14 @@ main.container {
     height: 38px;
   }
 
+  .tab-btn {
+    font-size: 0.82rem;
+    padding: 7px 14px;
+  }
+
   .tab-btn.active {
-    min-height: 42px;
-    padding: 9px 16px;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    padding: 8px 18px;
   }
 
   .header .icon {
@@ -969,6 +969,10 @@ main.container {
     transform: scale(0.98);
   }
 
+  .tab-btn:active {
+    transform: scale(0.97);
+  }
+
   .tab-add-btn:active {
     transform: scale(0.92);
   }
@@ -1290,6 +1294,13 @@ const parseInputToItems = (input) => {
                 btn.addEventListener("pointerleave", () => clearTimeout(tabPressTimer));
 
                 tabsNav.appendChild(btn);
+            });
+
+            requestAnimationFrame(() => {
+                const activeTab = tabsNav.querySelector(".tab-btn.active");
+                if (activeTab) {
+                    activeTab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                }
             });
         };
 
