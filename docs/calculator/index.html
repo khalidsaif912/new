@@ -132,8 +132,20 @@
         }
 
         .header h1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             font-size: 1.3rem;
             margin-bottom: 3px;
+        }
+
+        .header-app-icon {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
         }
 
         .header p {
@@ -163,7 +175,7 @@
             background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 14px;
-            padding: 12px;
+            padding: 10px;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
         }
 
@@ -1399,7 +1411,7 @@
                     <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
                 </svg>
             </button>
-            <h1>📦 برنامج حساب الكميات</h1>
+            <h1><img src="parcel-icon.png" alt="" class="header-app-icon" width="30" height="30">برنامج حساب الكميات</h1>
             <p>Quantity calculation</p>
         </div>
 
