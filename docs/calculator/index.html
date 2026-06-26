@@ -405,18 +405,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            perspective: 210px;
-            perspective-origin: 50% 82%;
+            gap: 3px;
         }
 
         .pallet-stage {
             position: relative;
             width: 92%;
             line-height: 0;
-            margin-top: 1px;
             transform-origin: 50% 0%;
-            transform: rotateX(11deg);
-            filter: drop-shadow(0 2px 5px rgba(92, 16, 16, 0.2));
+            transform: rotateX(10deg);
+            filter: drop-shadow(0 2px 4px rgba(92, 16, 16, 0.18));
         }
 
         .pallet-stage::before {
@@ -451,13 +449,13 @@
             margin-bottom: 0;
             z-index: 8;
             font-family: 'Rubik', 'Segoe UI', Roboto, system-ui, sans-serif;
-            font-size: 30px;
-            font-weight: 700;
+            font-size: 31px;
+            font-weight: 600;
             font-feature-settings: "tnum" 1, "lnum" 1;
             font-variant-numeric: lining-nums tabular-nums;
             text-align: center;
             direction: ltr;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.03em;
             caret-color: #334155;
             border: none;
             outline: none;
@@ -468,28 +466,22 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            line-height: 1.05;
-            padding-bottom: 1px;
-            color: #1e88e5;
+            line-height: 1.1;
+            padding-bottom: 0;
+            color: #1565c0;
             background: none;
             -webkit-text-fill-color: currentColor;
             -webkit-text-stroke: 0;
             filter: none;
-            transform-origin: 50% 100%;
-            transform: rotateX(-14deg) translateZ(6px);
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-            text-shadow:
-                0 1px 0 #1976d2,
-                0 2px 0 #1565c0,
-                0 3px 1px rgba(13, 71, 161, 0.28);
+            transform: none;
+            text-rendering: geometricPrecision;
+            text-shadow: none;
             box-shadow: none;
-            transition: color 0.15s ease, transform 0.15s ease;
+            transition: color 0.15s ease;
         }
 
         .part-row:hover .number-3d {
-            color: #2196f3;
-            transform: rotateX(-12deg) translateZ(8px) translateY(-1px);
+            color: #1976d2;
         }
 
         .number-3d:empty::before {
@@ -504,7 +496,7 @@
             outline: none;
             box-shadow: none;
             filter: none;
-            transform: rotateX(-14deg) translateZ(6px);
+            transform: none;
         }
 
         .delete-part-btn {
@@ -1161,24 +1153,14 @@
             }
 
             .number-3d {
-                font-size: 27px;
+                font-size: 28px;
                 min-height: 30px;
-                letter-spacing: 0.03em;
-                transform: rotateX(-12deg) translateZ(5px);
-            }
-
-            .part-row:hover .number-3d {
-                transform: rotateX(-10deg) translateZ(6px) translateY(-1px);
-            }
-
-            .number-3d:focus,
-            .number-3d:focus-visible {
-                transform: rotateX(-12deg) translateZ(5px);
+                letter-spacing: 0.04em;
             }
 
             .pallet-stage {
                 width: 94%;
-                transform: rotateX(9deg);
+                transform: rotateX(8deg);
             }
 
             .delete-part-btn {
