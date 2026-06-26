@@ -750,55 +750,97 @@ main.container {
       border-radius: 4px;
     }
 
-    /* --- Modals & Toasts --- */
+    /* --- Modals & Toasts (Bottom Sheet) --- */
     .modal {
       display: none;
       position: fixed;
       z-index: 3000;
       inset: 0;
       justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.4);
+      align-items: flex-end;
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
-      padding: 16px;
-      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      padding: 0;
     }
+
     .modal.show { display: flex; }
+
     .modal-content {
-      width: 90vw;
-      max-width: 340px;
-      padding: 1.5rem;
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      padding: 0.5rem 1.15rem 1.35rem;
+      padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
       text-align: center;
       background: var(--text-light);
-      border-radius: var(--border-radius-lg);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      transform: scale(0.95);
-      opacity: 0;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.2);
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
     }
-    .modal.show .modal-content { transform: scale(1); opacity: 1; }
-    .modal-content h3 { margin: 0 0 1rem; font-size: 1.2rem; }
-    .modal-buttons { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem; }
+
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-content::before {
+      content: '';
+      display: block;
+      width: 42px;
+      height: 4px;
+      margin: 0.55rem auto 1rem;
+      border-radius: 999px;
+      background: #cfd8dc;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 0.65rem;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #1565c0;
+    }
+
+    .modal-content p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: #546e7a;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.55rem;
+      margin-top: 1.25rem;
+    }
+
     .modal-button {
-        padding: 0.6rem 1.25rem;
-        font-size: var(--font-size-md);
-        font-weight: 700;
-        border-radius: var(--border-radius-sm);
-        cursor: pointer;
-        transition: opacity 0.2s;
-        min-height: 44px;
+      width: 100%;
+      padding: 0.75rem 1.25rem;
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s;
+      min-height: 48px;
     }
-    .modal-button:hover { opacity: 0.85; }
-    .modal-button.confirm { background-color: var(--danger-color); color: var(--text-light); }
-    .modal-button.confirm-add { background-color: var(--primary-color); color: var(--text-light); }
-    .modal-button.cancel { background-color: #eee; color: var(--text-dark); }
+
+    .modal-button:active {
+      transform: scale(0.98);
+    }
+
+    .modal-button:hover { opacity: 0.9; }
+    .modal-button.confirm { background: linear-gradient(180deg, #ef5350 0%, #d32f2f 100%); color: var(--text-light); }
+    .modal-button.confirm-add { background: linear-gradient(180deg, #42a5f5 0%, #1e88e5 55%, #1565c0 100%); color: var(--text-light); }
+    .modal-button.cancel { background: #eceff1; color: #37474f; }
 
     #addTabDialog input, #notesModalTextarea {
         width: 100%;
-        padding: 0.75rem;
+        margin-top: 0.85rem;
+        padding: 0.8rem 0.85rem;
         font-size: var(--font-size-md);
         border: 1.5px solid var(--border-color);
-        border-radius: var(--border-radius-sm);
+        border-radius: 12px;
         background: #f8f8ff;
         transition: border-color 0.2s;
     }
@@ -1008,37 +1050,6 @@ main.container {
     padding-bottom: 5px;
   }
 
-  /* نوافذ منبثقة بأسلوب Bottom Sheet */
-  .modal {
-    align-items: flex-end;
-    padding: 0;
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  .modal-content {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 18px 18px 0 0;
-    padding: 1.25rem 1rem;
-    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-    transform: translateY(100%);
-  }
-
-  .modal.show .modal-content {
-    transform: translateY(0);
-  }
-
-  .modal-buttons {
-    flex-direction: column-reverse;
-    gap: 0.5rem;
-  }
-
-  .modal-button {
-    width: 100%;
-    min-height: 48px;
-    min-width: unset;
-  }
-
   /* إشعارات في الأعلى */
   .toast {
     top: calc(4.5rem + env(safe-area-inset-top, 0px));
@@ -1206,10 +1217,10 @@ html, body, *:lang(ar) {
   
   <div id="notesModal" class="modal">
     <div class="modal-content">
-      <h3 style="color:var(--accent-color);">📝 ملاحظات القائمة</h3>
+      <h3>📝 ملاحظات القائمة</h3>
       <textarea id="notesModalTextarea" placeholder="اكتب ملاحظاتك هنا..."></textarea>
       <div class="modal-buttons">
-        <button class="modal-button confirm-add notes-modal-save" style="background-color: var(--accent-color);">حفظ</button>
+        <button class="modal-button confirm-add notes-modal-save">حفظ</button>
         <button class="modal-button cancel notes-modal-cancel">إلغاء</button>
       </div>
     </div>
