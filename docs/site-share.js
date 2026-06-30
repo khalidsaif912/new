@@ -48,14 +48,49 @@
     },
   };
 
-  function lang() {
-    var l = localStorage.getItem('rosterLang') || document.documentElement.getAttribute('lang') || 'en';
-    return l === 'ar' ? 'ar' : 'en';
+  var I18N_TRAINING = {
+    en: {
+      btn: 'Share page',
+      title: 'Share training page',
+      hint: 'Scan the QR code or copy the link',
+      share: 'Share',
+      whatsapp: 'WhatsApp',
+      copy: 'Copy link',
+      copied: 'Copied!',
+      close: 'Close',
+      shareText: 'Training Courses — visual schedule',
+    },
+    ar: {
+      btn: 'مشاركة الصفحة',
+      title: 'مشاركة صفحة التدريب',
+      hint: 'امسح رمز QR أو انسخ الرابط',
+      share: 'مشاركة',
+      whatsapp: 'واتساب',
+      copy: 'نسخ الرابط',
+      copied: 'تم النسخ!',
+      close: 'إغلاق',
+      shareText: 'دورات التدريب — الجدول',
+    },
+  };
+
+  function isTrainingPage() {
+    return /\/training(\/|$)/.test(location.pathname || '');
+  }
+
+  function activeI18n() {
+    var pack = isTrainingPage() ? I18N_TRAINING : I18N;
+    return pack[lang()] || pack.en;
   }
 
   function t(key) {
-    var pack = I18N[lang()] || I18N.en;
-    return pack[key] || I18N.en[key] || key;
+    var pack = activeI18n();
+    var fallback = isTrainingPage() ? I18N_TRAINING.en : I18N.en;
+    return pack[key] || fallback[key] || key;
+  }
+
+  function lang() {
+    var l = localStorage.getItem('rosterLang') || document.documentElement.getAttribute('lang') || 'en';
+    return l === 'ar' ? 'ar' : 'en';
   }
 
   function setModalBtnLabel(id, iconKey, text) {
@@ -65,7 +100,7 @@
     if (lbl) lbl.textContent = text;
     else el.textContent = text;
     if (iconKey && ICONS[iconKey]) {
-      var iconWrap = el.querySelector('.roster-cta-icon');
+      var iconWrap = el.querySelector('.roster-cta-icon') || el.querySelector('.trainingShareIcon');
       if (iconWrap) iconWrap.innerHTML = ICONS[iconKey];
     }
   }
@@ -87,6 +122,11 @@
   function getCanonicalSharePath() {
     var path = location.pathname || '/';
     if (/\/import(\/|$)/.test(path)) return '/import/';
+    var archiveMonth = path.match(/(\/training\/archive\/[^/]+\.html)$/);
+    if (archiveMonth) return archiveMonth[1];
+    if (/\/training\/archive\/?$/.test(path) || /\/training\/archive\/index\.html$/.test(path)) {
+      return '/training/archive/';
+    }
     if (/\/training(\/|$)/.test(path)) return '/training/';
     if (/\/roster-diff(\/|$)/.test(path)) return '/roster-diff/';
     if (/\/a-cup-of-book(\/|$)/.test(path)) return '/a-cup-of-book/';
