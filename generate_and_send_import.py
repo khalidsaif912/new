@@ -1483,6 +1483,24 @@ def main() -> None:
             print(f"WARNING: could not write import_last_filename.txt: {e}")
     print("OK: Generated Import pages in docs/import/")
     print(f"OK: Legacy redirect stub -> legacy-redirects/roster-site/import/index.html -> {CANONICAL_IMPORT_BASE}")
+    ci_commit_import_docs(repo_root, source_filename)
+
+
+def ci_commit_import_docs(repo_root: Path, source_filename: str) -> None:
+    """Commit/push import docs during CI (workaround for broken workflow shell step)."""
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        return
+    script = repo_root / "scripts" / "ci_commit_import_docs.sh"
+    if not script.is_file():
+        print("WARNING: ci_commit_import_docs.sh not found; skipping CI commit")
+        return
+    label = (source_filename or "import roster").strip()
+    print(f"CI: committing import docs ({label}) ...")
+    subprocess.run(
+        ["bash", str(script), "true", label],
+        cwd=str(repo_root),
+        check=True,
+    )
 
 
 if __name__ == "__main__":
