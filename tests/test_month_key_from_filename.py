@@ -9,6 +9,15 @@ class MonthKeyFromFilenameTests(unittest.TestCase):
     def test_july_without_space(self):
         self.assertEqual(month_key_from_filename("EXPORT Roster July2026.xlsx"), "2026-07")
 
+    def test_operation_roster_july_without_space(self):
+        self.assertEqual(month_key_from_filename("operation roster july2026.xlsx"), "2026-07")
+
+    def test_july_import_ops_roster(self):
+        self.assertEqual(
+            month_key_from_filename("JULY 2026 IMPORT OPS ROSTER.xlsx"),
+            "2026-07",
+        )
+
     def test_july_with_space(self):
         self.assertEqual(month_key_from_filename("EXPORT Roster July 2026.xlsx"), "2026-07")
 
@@ -26,6 +35,7 @@ class MonthKeyFromFilenameTests(unittest.TestCase):
 
     def test_looks_like_roster_month(self):
         self.assertTrue(looks_like_roster_month_filename("EXPORT Roster July2026.xlsx"))
+        self.assertTrue(looks_like_roster_month_filename("operation roster july2026.xlsx"))
         self.assertFalse(looks_like_roster_month_filename("absence-report.xlsb"))
 
 

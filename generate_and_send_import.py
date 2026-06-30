@@ -39,7 +39,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
-from roster_app.cache_io import month_key_from_filename  # noqa: E402
+from roster_app.cache_io import looks_like_roster_month_filename, month_key_from_filename  # noqa: E402
 from roster_app.text_utils import append_range_suffix  # noqa: E402
 from roster_cta_snippets import (  # noqa: E402
     CHIP_EXPORT_HTML,
@@ -1278,12 +1278,11 @@ def write_legacy_roster_site_import_redirect(repo_root: Path) -> None:
     )
 
 
-def pick_export_roster_filename(raw_source_name: str) -> str:
-    """Pick the correct Export roster file name when multiple names are provided."""
+def pick_import_roster_filename(raw_source_name: str) -> str:
+    """Pick the correct Import roster filename when multiple names are provided."""
     if not raw_source_name:
         return ""
 
-    # Some sources provide more than one filename in one payload.
     candidates = [line.strip() for line in re.split(r"[\r\n,;]+", raw_source_name) if line.strip()]
     if not candidates:
         return ""
@@ -1293,12 +1292,15 @@ def pick_export_roster_filename(raw_source_name: str) -> str:
         if "export staff roster changes" in name_lower:
             print(f"⏭️ Skipping changes file: {source_name}")
             continue
-        if "export roster" not in name_lower:
-            print(f"⏭️ Skipping non-roster file: {source_name}")
+        if not looks_like_roster_month_filename(source_name):
+            print(f"⏭️ Skipping non-month roster file: {source_name}")
+            continue
+        if not month_key_from_filename(source_name):
+            print(f"⏭️ Skipping unknown month file: {source_name}")
             continue
         return source_name
 
-    print("⚠️ No matching export roster file found in provided source names.")
+    print("⚠️ No matching import roster file found in provided source names.")
     return candidates[0]
 
 
@@ -1314,7 +1316,7 @@ def main() -> None:
 
     # Get original filename from source_name.txt (or CLI override)
     source_filename_raw = (args.source_name or "").strip() or get_source_filename()
-    source_filename = pick_export_roster_filename(source_filename_raw)
+    source_filename = pick_import_roster_filename(source_filename_raw)
     print(f"Source filename: {source_filename or '(not set)'}")
 
     # Load Excel from local file or URL

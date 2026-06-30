@@ -1,4 +1,4 @@
-# Publish the newest "Export Roster*.xlsx" from the repo root to docs/ + rosters cache.
+# Publish the newest roster-like .xlsx from the repo root to docs/ + rosters cache.
 # Usage: powershell -File scripts/export/publish_latest_export.ps1
 param(
     [string]$ExcelFilePath = "",
@@ -11,10 +11,17 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 Set-Location $root
 
 if (-not $ExcelFilePath) {
-    $candidates = Get-ChildItem -LiteralPath $root -Filter "Export Roster*.xlsx" -File -ErrorAction SilentlyContinue |
+    # Accept both Export/Operation roster names and minor variations, as long
+    # as the filename looks like a monthly roster according to shared Python logic.
+    $candidates = Get-ChildItem -LiteralPath $root -Filter "*.xlsx" -File -ErrorAction SilentlyContinue |
+        Where-Object {
+            $name = $_.Name
+            $looksLikeRoster = (python -c "from roster_app.cache_io import looks_like_roster_month_filename; import sys; print('1' if looks_like_roster_month_filename(sys.argv[1]) else '')" $name).Trim()
+            [string]::Equals($looksLikeRoster, "1")
+        } |
         Sort-Object LastWriteTime -Descending
     if (-not $candidates) {
-        throw "No Export Roster*.xlsx found in project root: $root"
+        throw "No roster-like monthly .xlsx file found in project root: $root"
     }
     $ExcelFilePath = $candidates[0].FullName
 }
