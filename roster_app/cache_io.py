@@ -162,8 +162,13 @@ def month_key_from_filename(name: str) -> str | None:
     n = name.lower()
     n = re.sub(r"[\._\-]+", " ", n)
     n = re.sub(r"\s+", " ", n).strip()
+    # YYYY-MM or YYYY_MM in filename
+    m = re.search(r"\b(20\d{2})[-_ ](0[1-9]|1[0-2])\b", n)
+    if m:
+        return f"{int(m.group(1)):04d}-{int(m.group(2)):02d}"
+    # Month name + year (space optional, e.g. "July 2026" or "July2026")
     m = re.search(
-        r"\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|sept|october|oct|november|nov|december|dec)\b\s+(\d{4})\b",
+        r"\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|sept|october|oct|november|nov|december|dec)[\s_-]*(20\d{2})\b",
         n,
     )
     if not m:

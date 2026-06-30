@@ -3559,16 +3559,16 @@ def main():
     wb_curr = try_load_cached_workbook(curr_key)
     wb_next = try_load_cached_workbook(next_key)
 
-    # FIX #4: استخدام البيانات المحملة لتعبئة الكاش الناقص - workbook واحد فقط
+    # FIX #4: استخدام البيانات المحملة للشهر المطابق (تجاوز الكاش القديم)
     if data:
         wb_data = load_workbook(BytesIO(data), data_only=True)
-        if wb_prev is None and incoming_key == prev_key:
+        if incoming_key == prev_key:
             wb_prev = wb_data
             print(f"✅ Using downloaded data for {prev_key}")
-        elif wb_curr is None and incoming_key == curr_key:
+        if incoming_key == curr_key:
             wb_curr = wb_data
             print(f"✅ Using downloaded data for {curr_key}")
-        elif wb_next is None and incoming_key == next_key:
+        if incoming_key == next_key:
             wb_next = wb_data
             print(f"✅ Using downloaded data for {next_key}")
 
