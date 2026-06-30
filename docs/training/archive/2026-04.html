@@ -653,7 +653,7 @@ body{
       <div class="staffModalTop">
         <div>
           <div class="staffModalTitle">Save employee</div>
-          <div class="staffModalSub">Enter a staff number or name</div>
+          <div class="staffModalSub">Uses your roster saved ID if available, or enter staff number / name</div>
         </div>
         <button class="staffClose" id="staffClose" type="button">x</button>
       </div>
@@ -668,6 +668,8 @@ body{
 <script>
 (function(){
   const SAVED_QUERY_KEY = 'trainingSavedQuery';
+  const ROSTER_EMP_ID_KEYS = ['exportSavedEmpId', 'savedEmpId'];
+  const ROSTER_EMP_NAME_KEYS = ['exportSavedEmpName', 'savedEmpName'];
   const cards = Array.from(document.querySelectorAll('.courseCard'));
   const searchToggle = document.getElementById('searchToggle');
   const filtersBox = document.getElementById('filtersBox');
@@ -696,6 +698,56 @@ body{
   const myTrainingCountLbl = document.getElementById('myTrainingCountLbl');
   const myTrainingList = document.getElementById('myTrainingList');
   const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function getRosterSavedEmpId(){
+    for(const key of ROSTER_EMP_ID_KEYS){
+      const value = (localStorage.getItem(key) || '').trim();
+      if(value) return value;
+    }
+    return '';
+  }
+  function getRosterSavedEmpName(){
+    for(const key of ROSTER_EMP_NAME_KEYS){
+      const value = (localStorage.getItem(key) || '').trim();
+      if(value) return value;
+    }
+    return '';
+  }
+  function getSavedQuery(){
+    const rosterId = getRosterSavedEmpId();
+    if(rosterId) return rosterId;
+    const rosterName = getRosterSavedEmpName();
+    if(rosterName) return rosterName;
+    return (localStorage.getItem(SAVED_QUERY_KEY) || '').trim();
+  }
+  function persistSavedQuery(value){
+    const trimmed = (value || '').trim();
+    if(!trimmed){
+      localStorage.removeItem(SAVED_QUERY_KEY);
+      ROSTER_EMP_ID_KEYS.forEach(key => localStorage.removeItem(key));
+      ROSTER_EMP_NAME_KEYS.forEach(key => localStorage.removeItem(key));
+      return;
+    }
+    localStorage.setItem(SAVED_QUERY_KEY, trimmed);
+    if(/^\d+$/.test(trimmed)){
+      localStorage.setItem('exportSavedEmpId', trimmed);
+      localStorage.removeItem('savedEmpId');
+      localStorage.removeItem('exportSavedEmpName');
+      localStorage.removeItem('savedEmpName');
+    }
+  }
+  function getSchedulesBase(){
+    if(window.location.pathname.includes('/new/docs/')) return '/new/docs/schedules/';
+    if(window.location.pathname.includes('/roster-site/')) return '/roster-site/schedules/';
+    return '/schedules/';
+  }
+  function fetchRosterDisplayName(empId, done){
+    if(!empId || !/^\d+$/.test(empId)){ done(''); return; }
+    fetch(getSchedulesBase() + encodeURIComponent(empId) + '.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => done((data && data.name) ? data.name : ''))
+      .catch(() => done(''));
+  }
 
   function norm(v){ return (v || '').toLowerCase().trim(); }
   function firstName(name){
@@ -808,7 +860,7 @@ body{
     document.querySelectorAll('.empRow.favorite').forEach(r => r.classList.remove('favorite'));
     document.querySelectorAll('.favBadge').forEach(b => b.remove());
     cards.forEach(c => c.classList.remove('is-saved'));
-    const raw = localStorage.getItem(SAVED_QUERY_KEY) || '';
+    const raw = getSavedQuery();
     const sessions = findAllSavedSessions(raw);
     sessions.forEach(session => {
       session.row.classList.add('favorite');
@@ -824,6 +876,7 @@ body{
     const primary = sessions[0] || null;
     let displayName = '';
     let staffCode = '';
+    const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
     if(primary){
       displayName = firstName(primary.name) || primary.name;
       staffCode = primary.code;
@@ -831,13 +884,22 @@ body{
       savedName.textContent = displayName;
       savedNo.textContent = staffCode ? ('#' + staffCode) : '';
     } else if(raw){
+      staffCode = /^\d+$/.test(raw) ? raw : (getRosterSavedEmpId() || '');
       displayName = firstName(raw) || raw;
       savedChip.classList.remove('savedEmpty');
       savedName.textContent = displayName;
-      savedNo.textContent = '';
+      savedNo.textContent = staffCode ? ('#' + staffCode) : '';
+      if(staffCode){
+        fetchRosterDisplayName(staffCode, (fullName) => {
+          if(!fullName || getSavedQuery() !== staffCode) return;
+          const label = firstName(fullName) || fullName;
+          savedName.textContent = label;
+          renderMyTrainingPanel(staffCode, findAllSavedSessions(staffCode), label, staffCode);
+        });
+      }
     } else {
       savedChip.classList.add('savedEmpty');
-      savedName.textContent = document.documentElement.lang === 'ar' ? 'موظفي' : 'My Staff';
+      savedName.textContent = ar ? 'موظفي' : 'My Staff';
       savedNo.textContent = '';
     }
     renderMyTrainingPanel(raw, sessions, displayName, staffCode);
@@ -845,7 +907,7 @@ body{
 
   function openStaffModal(){
     if(!staffModal) return;
-    const current = localStorage.getItem(SAVED_QUERY_KEY) || '';
+    const current = getSavedQuery();
     if(staffInput) staffInput.value = current;
     staffModal.classList.add('open');
     staffModal.setAttribute('aria-hidden','false');
@@ -885,15 +947,14 @@ body{
   staffClose?.addEventListener('click', closeStaffModal);
   staffModal?.addEventListener('click', (e) => { if(e.target === staffModal) closeStaffModal(); });
   staffClear?.addEventListener('click', () => {
-    localStorage.removeItem(SAVED_QUERY_KEY);
+    persistSavedQuery('');
     refreshSaved();
     applyFilters();
     closeStaffModal();
   });
   staffSave?.addEventListener('click', () => {
     const value = (staffInput?.value || '').trim();
-    if(value) localStorage.setItem(SAVED_QUERY_KEY, value);
-    else localStorage.removeItem(SAVED_QUERY_KEY);
+    persistSavedQuery(value);
     refreshSaved();
     applyFilters();
     closeStaffModal();
@@ -942,6 +1003,13 @@ body{
       placeFaces(idx, prev);
     }, 2600);
   }
+  window.addEventListener('storage', (e) => {
+    if(!e.key) return;
+    if([SAVED_QUERY_KEY, ...ROSTER_EMP_ID_KEYS, ...ROSTER_EMP_NAME_KEYS].includes(e.key)){
+      refreshSaved();
+      applyFilters();
+    }
+  });
   refreshSaved();
   applyFilters();
 })();
