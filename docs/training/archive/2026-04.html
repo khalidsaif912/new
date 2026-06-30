@@ -138,37 +138,50 @@ body{
 }
 .dateTagSelect{position:absolute;inset:0;opacity:0;cursor:pointer;border:none;appearance:none}
 .topDock{
-  display:grid;
-  grid-template-columns:repeat(5, minmax(0, 1fr));
-  gap:10px;
-  margin-top:18px;
+  display:flex;
+  justify-content:center;
   align-items:stretch;
+  gap:12px;
+  margin-top:14px;
+  flex-wrap:wrap;
+  position:relative;
+  z-index:30;
+  isolation:isolate;
 }
 .dockCard{
-  min-width:0;width:100%;padding:12px 8px;border-radius:20px;
-  min-height:76px;
+  min-width:72px;
+  width:auto;
+  padding:10px 12px;
+  border-radius:14px;
+  min-height:unset;
   background:#fff;
-  border:1px solid rgba(15,23,42,.07);
-  box-shadow:var(--shadow-soft);
-  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+  border:1px solid rgba(15,23,42,.1);
+  box-shadow:0 2px 8px rgba(15,23,42,.06);
+  transition:all .25s ease;
   text-align:center;position:relative;overflow:hidden;
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
 }
 .dockCard:hover{
-  transform:translateY(-5px);
-  box-shadow:0 18px 40px rgba(15,23,42,.11);
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(15,23,42,.12);
   border-color:rgba(37,99,235,.16);
 }
-.dockCard:active{transform:translateY(-2px)}
+.dockCard:active{transform:translateY(-1px)}
 .dockAction{cursor:pointer;border:none;font-family:inherit;background:#fff}
 .statsCard{
+  flex:1 1 100%;
+  max-width:100%;
   display:flex;align-items:center;justify-content:center;
-  padding:8px 5px;
-  background:linear-gradient(165deg,#fff 0%,#f8fafc 100%);
-  border-color:rgba(37,99,235,.08);
+  padding:10px 12px;
+  background:#fff;
+  border-color:rgba(15,23,42,.1);
 }
-.statsTicker{position:relative;width:100%;height:50px;overflow:hidden;isolation:isolate}
+.statsTicker{position:relative;width:100%;height:26px;overflow:hidden;isolation:isolate}
 .statsFace{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   opacity:0;transform:translateY(110%);
@@ -180,17 +193,17 @@ body{
 .statsIcon{display:none}
 .statsText{min-width:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;white-space:nowrap}
 .statsValue{
-  font-size:26px;font-weight:900;line-height:1;color:#2563eb;
-  font-family:'Sora',sans-serif;
-  -webkit-text-fill-color:#2563eb;
+  font-size:22px;font-weight:900;line-height:1;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  color:#1e40af;font-family:'Sora',sans-serif;
 }
 .statsLabel{
-  margin-top:0;font-size:9px;font-weight:800;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.11em;
+  margin-top:4px;font-size:9.5px;font-weight:600;color:#64748b;
+  text-transform:uppercase;letter-spacing:.4px;
 }
 .otherPageInner{
   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;min-height:52px;width:100%;padding-inline:4px;
+  gap:0;min-height:26px;width:100%;padding-inline:0;
 }
 .otherIcon{
   width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
@@ -200,7 +213,7 @@ body{
 }
 #otherPageBtn:hover .otherIcon{transform:translateY(-5px) scale(1.06)}
 .rosterCard{display:block;text-decoration:none;color:inherit}
-.rosterInner{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;width:100%}
+.rosterInner{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:26px;width:100%}
 .rosterIcon{
   width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
   filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
@@ -209,54 +222,93 @@ body{
 }
 .rosterCard:hover .rosterIcon{transform:translateY(-5px) scale(1.06)}
 .bookCupIcon{width:68px;height:68px;display:block;object-fit:contain;position:absolute;left:50%;top:46%;transform:translate(-50%,-50%)}
-.dockValue{font-size:22px;font-weight:900;line-height:1;color:var(--blue);font-family:'Sora',sans-serif;letter-spacing:-.03em}
-.searchGlyph{font-size:34px;line-height:1;display:inline-block;transition:transform .28s ease}
-#searchToggle:hover .searchGlyph{transform:translateY(-3px) scale(1.08) rotate(-6deg)}
+.dockValue{font-size:22px;font-weight:900;line-height:1;height:26px;display:flex;align-items:center;justify-content:center;color:#1e40af;font-family:'Sora',sans-serif;letter-spacing:-.03em}
+.searchGlyph{line-height:0;display:flex;align-items:center;justify-content:center;transition:transform .25s ease}
+#searchToggle:hover .searchGlyph{transform:translateY(-3px) scale(1.05)}
 .dockLabel,.rosterLabel,.savedName,.otherPageLabel{
-  margin-top:5px;
-  font-size:clamp(7px, 1.85vw, 9px);
-  font-weight:800;
-  line-height:1.2;
-  letter-spacing:.06em;
-  color:var(--muted);
+  margin-top:4px;
+  font-size:9.5px;
+  font-weight:600;
+  line-height:1.1;
+  letter-spacing:.4px;
+  color:#64748b;
   text-align:center;
   text-transform:uppercase;
-  white-space:normal;
-  word-break:break-word;
-  hyphens:auto;
+  white-space:nowrap;
   max-width:100%;
-  padding:0 3px;
+  padding:0;
 }
 .otherPageLabel{
   color:#5b3517;
   text-transform:none;
   letter-spacing:.02em;
-  font-size:clamp(7px, 1.7vw, 8px);
+  font-size:8.5px;
   line-height:1.15;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:1px;
+  gap:0;
+  white-space:normal;
 }
 .dockLabelLine{display:block}
-.rosterLabel{color:var(--blue2)}
+.rosterLabel{color:#2563eb}
 .savedChip{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  text-align:center;cursor:pointer;padding:8px 6px;
-  background:linear-gradient(165deg,#fff 0%,#f8fafc 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;
+  text-align:center;cursor:pointer;padding:10px 12px;
+  background:#fff;
 }
-.savedChip:hover{box-shadow:0 16px 34px rgba(37,99,235,.1)}
+.savedChip:hover{box-shadow:0 8px 20px rgba(37,99,235,.12)}
 .savedIcon{
-  width:38px;height:38px;flex:0 0 auto;border-radius:14px;display:grid;place-items:center;
-  background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(13,148,136,.1));
-  font-size:18px;border:1px solid rgba(37,99,235,.1);
-  box-shadow:0 4px 12px rgba(37,99,235,.1);transition:all .28s ease;
+  width:auto;height:26px;flex:0 0 auto;border-radius:0;display:flex;align-items:center;justify-content:center;
+  background:transparent;font-size:18px;border:none;
+  box-shadow:none;transition:transform .25s ease;
 }
-.savedChip:hover .savedIcon{background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(13,148,136,.14));transform:scale(1.06)}
+.savedChip:hover .savedIcon{transform:translateY(-2px) scale(1.04)}
 .savedLines{min-width:0;flex:0 0 auto;width:100%}
-.savedName{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
-.savedNo{display:none}
-.savedEmpty .savedName{color:var(--blue)}
+.savedName{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;text-transform:none}
+.savedNo{
+  display:block;font-size:8px;font-weight:700;color:#6366f1;margin-top:2px;
+  letter-spacing:.03em;line-height:1;
+}
+.savedEmpty .savedName{color:#1e40af}
+.savedEmpty .savedNo{display:none}
+.myTrainingPanel{
+  margin-top:14px;padding:14px 14px 12px;border-radius:18px;
+  background:linear-gradient(165deg,#fff 0%,#f0fdfa 100%);
+  border:1px solid rgba(13,148,136,.2);
+  box-shadow:0 6px 22px rgba(13,148,136,.08);
+}
+.myTrainingPanel[hidden]{display:none!important}
+.myTrainingHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.myTrainingTitle{font:800 15px/1.25 'Sora',sans-serif;color:#0f766e}
+.myTrainingSub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
+.myTrainingCount{
+  flex:0 0 auto;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#0f766e;
+  font-size:11px;font-weight:800;white-space:nowrap;
+}
+.myTrainingList{display:flex;flex-direction:column;gap:8px}
+.myTrainingItem{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 12px;align-items:center;
+  padding:10px 12px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.08);
+  text-align:left;cursor:pointer;font-family:inherit;width:100%;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.myTrainingItem:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.08);border-color:rgba(13,148,136,.22)}
+.myTrainingItem.is-past{opacity:.62}
+.myTrainingItem.is-today{border-color:rgba(37,99,235,.28);box-shadow:0 0 0 1px rgba(37,99,235,.12)}
+.myTrainingDate{
+  min-width:50px;text-align:center;padding:6px 8px;border-radius:12px;
+  background:#eff6ff;color:#1d4ed8;font-weight:800;font-size:11px;line-height:1.15;
+}
+.myTrainingDate .dayNum{font-size:17px;display:block;line-height:1;font-family:'Sora',sans-serif}
+.myTrainingMeta{min-width:0}
+.myTrainingCourse{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.myTrainingVenue{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.myTrainingTime{font-size:11px;font-weight:700;color:#0f766e;white-space:nowrap}
+.myTrainingEmpty{
+  padding:16px 12px;text-align:center;font-size:13px;color:var(--muted);
+  border:1px dashed rgba(15,23,42,.12);border-radius:14px;background:#fff;line-height:1.45;
+}
 .filters{
   display:none;margin-top:4px;margin-bottom:4px;padding:16px 16px 17px;border-radius:22px;
   background:linear-gradient(165deg,#fafbfc 0%,#f1f5f9 100%);
@@ -456,24 +508,16 @@ body{
   .mainPanel::before{border-radius:26px 26px 0 0}
   .header{padding:24px 18px 22px;border-radius:28px}
   .header::after{font-size:56px;left:4%;bottom:8%}
-  .topDock{
-    grid-template-columns:repeat(4, minmax(0, 1fr));
-    grid-template-rows:auto auto;
-    gap:10px;
-    margin-top:14px;
-  }
-  .statsCard{grid-column:1 / -1}
-  .dockCard{padding:11px 6px;border-radius:18px;min-height:70px}
-  .statsTicker{height:44px}
-  .statsValue{font-size:24px}
-  .statsLabel{font-size:8px;letter-spacing:.08em}
-  .savedIcon{width:34px;height:34px;font-size:16px}
-  .otherPageInner{min-height:48px;padding-inline:2px}
-  .otherIcon{width:30px;height:30px}
-  .bookCupIcon{width:58px;height:58px}
-  .rosterIcon{width:30px;height:30px}
-  .dockLabel,.rosterLabel,.savedName{font-size:8px}
-  .otherPageLabel{font-size:7.5px}
+  .topDock{gap:6px;margin-top:14px}
+  .dockCard{padding:8px 8px;min-width:60px;border-radius:14px}
+  .statsTicker{height:26px}
+  .statsValue{font-size:18px;height:24px}
+  .statsLabel{font-size:8.5px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
+  .otherPageLabel{font-size:8px}
+  .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
+  .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
+  .myTrainingTime{grid-column:2}
   .courseHead{grid-template-columns:42px minmax(0,1fr) auto;gap:10px;padding:14px 14px}
   .courseIcon{width:42px;height:42px;font-size:19px;border-radius:16px}
   .courseTitle{font-size:15px}
@@ -485,17 +529,12 @@ body{
 @media(max-width:420px){
   .wrap{padding:12px 10px 30px}
   .header{padding:22px 14px 18px;border-radius:24px}
-  .topDock{gap:8px}
-  .dockCard{padding:10px 5px;border-radius:16px;min-height:66px}
-  .statsTicker{height:40px}
-  .statsValue{font-size:22px}
-  .searchGlyph{font-size:28px}
-  .otherIcon{width:26px;height:26px}
-  .bookCupIcon{width:52px;height:52px}
-  .rosterIcon{width:26px;height:26px}
-  .savedIcon{width:30px;height:30px;font-size:14px}
-  .dockLabel,.rosterLabel,.savedName{font-size:7px;letter-spacing:.05em}
-  .otherPageLabel{font-size:7px}
+  .topDock{gap:6px}
+  .dockCard{padding:8px 6px;min-width:56px}
+  .statsValue{font-size:18px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8px}
+  .otherPageLabel{font-size:7.5px}
+  .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
   .peopleBadge{min-width:32px;height:32px;font-size:10px}
@@ -548,16 +587,16 @@ body{
     <div class="statsTicker"><div class="statsFace"><div class="statsText"><div class="statsValue">1</div><div class="statsLabel">Sessions</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">1</div><div class="statsLabel">Types</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">8</div><div class="statsLabel">Employees</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">1</div><div class="statsLabel">Venues</div></div></div></div>
   </div>
   <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
-    <div class="rosterInner"><span class="rosterIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span class="rosterLabel">Roster</span></div>
+    <div class="rosterInner"><span class="rosterIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span class="rosterLabel">Roster</span></div>
   </button>
   <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
-    <div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel">Search</div>
+    <div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel" data-key="search">Search</div>
   </button>
   <button class="dockCard dockAction" id="otherPageBtn" type="button">
-    <div class="otherPageInner"><span class="otherIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H15"/><path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/><path d="M17 8h2a2 2 0 0 1 0 4h-1"/><path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/></svg></span><div class="dockLabel otherPageLabel" aria-label="A Cup of Book"><span class="dockLabelLine">A Cup</span><span class="dockLabelLine">of Book</span></div></div>
+    <div class="otherPageInner"><span class="otherIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H15"/><path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/><path d="M17 8h2a2 2 0 0 1 0 4h-1"/><path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/></svg></span><div class="dockLabel otherPageLabel" aria-label="A Cup of Book"><span class="dockLabelLine">A Cup</span><span class="dockLabelLine">of Book</span></div></div>
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
-    <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
+    <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
     <div class="savedLines">
       <div class="savedName" id="savedName">My Staff</div>
       <div class="savedNo" id="savedNo"></div>
@@ -565,6 +604,17 @@ body{
   </button>
 </div>
 
+
+  <div class="myTrainingPanel" id="myTrainingPanel" hidden>
+    <div class="myTrainingHead">
+      <div>
+        <div class="myTrainingTitle" id="myTrainingTitle">My training dates</div>
+        <div class="myTrainingSub" id="myTrainingSub"></div>
+      </div>
+      <div class="myTrainingCount" id="myTrainingCount"></div>
+    </div>
+    <div class="myTrainingList" id="myTrainingList"></div>
+  </div>
 
   <div class="mainPanel">
   <div class="filters" id="filtersBox">
@@ -577,7 +627,7 @@ body{
 
   <section class="scheduleSection" aria-label="Training schedule">
     <div class="cards"><div class="pastLabel" id="pastSep">Previous sessions</div>
-<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops  cargo training room 08:00 to 15:00 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8">
+<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops  cargo training room 08:00 to 15:00 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8" data-course-date="2026-04-29" data-course-end="2026-04-29" data-course-title="DGR-CBTA-OPS" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
     <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
@@ -645,57 +695,156 @@ body{
   const otherPageBtn = document.getElementById('otherPageBtn');
   const rosterHomeBtn = document.getElementById('rosterHomeBtn');
 
+  const myTrainingPanel = document.getElementById('myTrainingPanel');
+  const myTrainingTitle = document.getElementById('myTrainingTitle');
+  const myTrainingSub = document.getElementById('myTrainingSub');
+  const myTrainingCount = document.getElementById('myTrainingCount');
+  const myTrainingList = document.getElementById('myTrainingList');
+  const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
   function norm(v){ return (v || '').toLowerCase().trim(); }
   function firstName(name){
     const cleaned = (name || '').replace(/^(mr|mrs|ms|dr)\.?\s+/i,'').trim();
     return cleaned ? cleaned.split(/\s+/)[0] : '';
   }
   function allRows(){ return Array.from(document.querySelectorAll('.empRow')); }
-  function matchSaved(raw){
+  function rowMatchesQuery(row, q){
+    const code = norm(row.querySelector('.empCode')?.textContent || '');
+    const name = norm(row.querySelector('.empName')?.textContent || '');
+    return code === q || name.includes(q) || (code && q.includes(code));
+  }
+  function sessionFromRow(row){
+    const card = row.closest('.courseCard');
+    if(!card) return null;
+    return {
+      row,
+      card,
+      code: row.querySelector('.empCode')?.textContent?.trim() || '',
+      name: row.querySelector('.empName')?.textContent?.trim() || '',
+      title: card.dataset.courseTitle || card.querySelector('.courseTitle')?.textContent?.trim() || '',
+      dateIso: card.dataset.courseDate || '',
+      dateEnd: card.dataset.courseEnd || card.dataset.courseDate || '',
+      venue: card.dataset.venue || '',
+      time: card.dataset.time || '',
+      dateLabel: card.querySelector('.dateBadge')?.textContent?.trim() || '',
+      isPast: card.classList.contains('is-past'),
+      isToday: card.classList.contains('is-today') || !!card.querySelector('.todayBadge')
+    };
+  }
+  function findAllSavedSessions(raw){
     const q = norm(raw);
-    if(!q) return null;
+    if(!q) return [];
+    const seen = new Set();
+    const sessions = [];
     for(const row of allRows()){
-      const code = norm(row.querySelector('.empCode')?.textContent || '');
-      const name = norm(row.querySelector('.empName')?.textContent || '');
-      if(code === q || name.includes(q) || q.includes(code)){
-        return {
-          row,
-          code: row.querySelector('.empCode')?.textContent?.trim() || '',
-          name: row.querySelector('.empName')?.textContent?.trim() || '',
-          card: row.closest('.courseCard')
-        };
-      }
+      if(!rowMatchesQuery(row, q)) continue;
+      const session = sessionFromRow(row);
+      if(!session || !session.card) continue;
+      const key = (session.dateIso || '') + '|' + session.title;
+      if(seen.has(key)) continue;
+      seen.add(key);
+      sessions.push(session);
     }
-    return null;
+    return sessions.sort((a,b) => (a.dateIso || '').localeCompare(b.dateIso || ''));
+  }
+  function matchSaved(raw){
+    const sessions = findAllSavedSessions(raw);
+    return sessions.length ? sessions[0] : null;
+  }
+  function formatSessionDate(iso){
+    if(!iso || iso.split('-').length < 3) return {dayNum:'—', mon:''};
+    const parts = iso.split('-');
+    return {dayNum:String(+parts[2]), mon:MONTH_SHORT[+parts[1]-1] || ''};
+  }
+  function scrollToSession(session){
+    if(!session?.card) return;
+    session.card.open = true;
+    session.card.scrollIntoView({behavior:'smooth', block:'center'});
+    session.row?.classList.add('favorite');
+  }
+  function renderMyTrainingPanel(raw, sessions, displayName, staffCode){
+    if(!myTrainingPanel || !myTrainingList) return;
+    if(!raw){
+      myTrainingPanel.hidden = true;
+      myTrainingList.innerHTML = '';
+      return;
+    }
+    myTrainingPanel.hidden = false;
+    const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+    const who = displayName || raw;
+    const codeText = staffCode ? (' · ' + staffCode) : '';
+    if(myTrainingTitle) myTrainingTitle.textContent = ar ? 'مواعيد التدريب' : 'My training dates';
+    if(myTrainingSub) myTrainingSub.textContent = ar
+      ? ('لـ ' + who + codeText)
+      : ('For ' + who + codeText);
+    if(myTrainingCount) myTrainingCount.textContent = ar
+      ? (sessions.length + ' دورة')
+      : (sessions.length + ' session' + (sessions.length === 1 ? '' : 's'));
+    if(!sessions.length){
+      myTrainingList.innerHTML = '<div class="myTrainingEmpty">' + (ar
+        ? 'لا توجد دورات مسجّلة لهذا الرقم في هذا الشهر.'
+        : 'No courses found for this staff number in this month.') + '</div>';
+      return;
+    }
+    myTrainingList.innerHTML = sessions.map((session, idx) => {
+      const d = formatSessionDate(session.dateIso);
+      const cls = ['myTrainingItem', session.isPast ? 'is-past' : '', session.isToday ? 'is-today' : ''].filter(Boolean).join(' ');
+      const range = session.dateLabel || (d.mon + ' ' + d.dayNum);
+      return (
+        '<button type="button" class="' + cls + '" data-session-idx="' + idx + '">' +
+          '<div class="myTrainingDate"><span class="dayNum">' + d.dayNum + '</span>' + d.mon + '</div>' +
+          '<div class="myTrainingMeta">' +
+            '<div class="myTrainingCourse">' + session.title + '</div>' +
+            '<div class="myTrainingVenue">' + (session.venue || range) + '</div>' +
+          '</div>' +
+          '<div class="myTrainingTime">' + (session.time || '') + '</div>' +
+        '</button>'
+      );
+    }).join('');
+    myTrainingList.querySelectorAll('[data-session-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.getAttribute('data-session-idx'));
+        scrollToSession(sessions[idx]);
+      });
+    });
   }
   function refreshSaved(){
     document.querySelectorAll('.empRow.favorite').forEach(r => r.classList.remove('favorite'));
     document.querySelectorAll('.favBadge').forEach(b => b.remove());
     cards.forEach(c => c.classList.remove('is-saved'));
     const raw = localStorage.getItem(SAVED_QUERY_KEY) || '';
-    const match = matchSaved(raw);
-    if(match){
-      match.row.classList.add('favorite');
-      const nameCell = match.row.querySelector('.empName');
+    const sessions = findAllSavedSessions(raw);
+    sessions.forEach(session => {
+      session.row.classList.add('favorite');
+      const nameCell = session.row.querySelector('.empName');
       if(nameCell && !nameCell.querySelector('.favBadge')){
         const b = document.createElement('span');
         b.className = 'favBadge';
-        b.textContent = 'محفوظ';
+        b.textContent = document.documentElement.lang === 'ar' ? 'محفوظ' : 'Saved';
         nameCell.appendChild(b);
       }
-      if(match.card) match.card.classList.add('is-saved');
+      session.card.classList.add('is-saved');
+    });
+    const primary = sessions[0] || null;
+    let displayName = '';
+    let staffCode = '';
+    if(primary){
+      displayName = firstName(primary.name) || primary.name;
+      staffCode = primary.code;
       savedChip.classList.remove('savedEmpty');
-      savedName.textContent = firstName(match.name) || match.name;
-      savedNo.textContent = '';
+      savedName.textContent = displayName;
+      savedNo.textContent = staffCode ? ('#' + staffCode) : '';
     } else if(raw){
+      displayName = firstName(raw) || raw;
       savedChip.classList.remove('savedEmpty');
-      savedName.textContent = firstName(raw) || raw;
+      savedName.textContent = displayName;
       savedNo.textContent = '';
     } else {
       savedChip.classList.add('savedEmpty');
-      savedName.textContent = 'My Staff';
+      savedName.textContent = document.documentElement.lang === 'ar' ? 'موظفي' : 'My Staff';
       savedNo.textContent = '';
     }
+    renderMyTrainingPanel(raw, sessions, displayName, staffCode);
   }
 
   function openStaffModal(){
@@ -752,6 +901,9 @@ body{
     refreshSaved();
     applyFilters();
     closeStaffModal();
+    if(value && myTrainingPanel && !myTrainingPanel.hidden){
+      myTrainingPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
   });
   staffInput?.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){ e.preventDefault(); staffSave?.click(); }

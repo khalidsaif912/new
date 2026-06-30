@@ -34,20 +34,20 @@ PAGE_TITLE_HTML = (
 
 SVG_DOCK_ROSTER = _svg(
     '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>',
-    size=28,
+    size=22,
     stroke="#2563eb",
     extra_class="dockSvg",
 )
 SVG_DOCK_SEARCH = _svg(
     '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
-    size=28,
+    size=22,
     stroke="#475569",
     extra_class="dockSvg",
 )
 SVG_DOCK_USER = _svg(
     '<circle cx="12" cy="8" r="3"/>'
     '<path d="M6 20v-1a6 6 0 0 1 12 0v1"/>',
-    size=20,
+    size=22,
     stroke="#2563eb",
     extra_class="dockSvg",
 )
@@ -59,7 +59,7 @@ DOCK_ROSTER_INNER = (
 )
 DOCK_SEARCH_INNER = (
     f'<div class="dockValue searchGlyph">{SVG_DOCK_SEARCH}</div>'
-    f'<div class="dockLabel">Search</div>'
+    f'<div class="dockLabel" data-key="search">Search</div>'
 )
 DOCK_SAVED_ICON = f'<div class="savedIcon">{SVG_DOCK_USER}</div>'
 
@@ -69,7 +69,7 @@ SVG_DOCK_CUP = _svg(
     '<path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/>'
     '<path d="M17 8h2a2 2 0 0 1 0 4h-1"/>'
     '<path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/>',
-    size=28,
+    size=22,
     stroke="#92400e",
     extra_class="dockSvg",
 )
