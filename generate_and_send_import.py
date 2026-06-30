@@ -1496,11 +1496,16 @@ def ci_commit_import_docs(repo_root: Path, source_filename: str) -> None:
         return
     label = (source_filename or "import roster").strip()
     print(f"CI: committing import docs ({label}) ...")
-    subprocess.run(
+    result = subprocess.run(
         ["bash", str(script), "true", label],
         cwd=str(repo_root),
-        check=True,
+        check=False,
     )
+    if result.returncode != 0:
+        print(
+            "WARNING: CI commit/push failed in generate step; "
+            "workflow commit step will retry"
+        )
 
 
 if __name__ == "__main__":
