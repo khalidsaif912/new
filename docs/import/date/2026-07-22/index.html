@@ -1,0 +1,3790 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="x-apple-disable-message-reformatting">
+  <script defer src="../../../ios-tap-fix.js?v=20260705a"></script>
+  <title>Import Duty Roster</title>
+  
+  <script>
+  (function () {
+    var path = location.pathname || '';
+    if (path.indexOf('/roster-site/import') === -1) return;
+    var base = 'https://khalidsaif912.github.io/new/docs/import/';
+    var rest = path.replace(/^.*\/roster-site\/import\/?/, '');
+    if (rest) {
+      rest = rest.replace(/\/?$/, '/');
+      location.replace(base + rest + location.search + location.hash);
+    } else {
+      location.replace(base + location.search + location.hash);
+    }
+  })();
+  </script>
+
+  <style>
+    /* ═══════ RESET ═══════ */
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
+      width:100%;
+      overflow-x:hidden;
+    }
+    body {
+      margin:0; padding:0;
+      min-height:100dvh;
+      background:#eef1f7;
+      font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      touch-action:manipulation;
+    }
+    * { box-sizing:border-box; }
+
+    /* ═══════ WRAP ═══════ */
+    .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+
+    /* ═══════ HEADER ═══════ */
+    .header {
+      background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color:#fff;
+      padding:26px 18px 24px;
+      border-radius:20px;
+      text-align:center;
+      box-shadow:0 4px 16px rgba(30,64,175,.14);
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute;
+      top:-30px; right:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .header::after {
+      content:''; position:absolute;
+      bottom:-50px; left:-30px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,.06);
+    }
+    .header .bannerTitle {
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }
+    .header .bannerTitleEyebrow {
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+    .header .bannerTitleMain {
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+    body.ar .header .bannerTitleEyebrow {
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }
+    body.ar .header .bannerTitleMain {
+      font-size:26px;
+      letter-spacing:0;
+    }
+
+    /* زر اللغة */
+    .langToggle {
+      position:absolute; top:12px; right:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; height:auto; padding:4px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      transition:transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+    body.ar .langToggle { right:12px; left:auto; }
+    .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
+    .langToggle-icon svg {
+      display:block; width:18px; height:18px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      text-shadow:0 1px 3px rgba(0,0,0,.65);
+    }
+    #banner-changer-btn {
+      position:absolute; top:12px; left:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; min-height:auto; padding:4px;
+      color:#fff; cursor:pointer; line-height:0;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+    #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    #banner-changer-btn .banner-changer-icon svg {
+      display:block; width:20px; height:20px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    body.ar #banner-changer-btn { left:12px; right:auto; }
+    @media (max-width:720px) {
+      .langToggle { padding:6px; }
+      .langToggle-icon svg { width:20px; height:20px; }
+      .langToggle-label { font-size:11px; }
+      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+    }
+
+    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
+    .empRow, .empName, .empStatus { direction:ltr !important; unicode-bidi:embed; text-align:left !important; }
+
+    .welcomeChip {
+      display:none;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .welcomeChip.visible {
+      display:flex;
+    }
+    .welcomeChip .chipLabel {
+      max-width:88px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .waveHand {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:0;
+      transform-origin:50% 88%;
+      animation:waveHand 1.8s ease-in-out infinite;
+    }
+    @keyframes waveHand {
+      0%, 50%, 100% { transform:rotate(0deg); }
+      10% { transform:rotate(16deg); }
+      20% { transform:rotate(-10deg); }
+      30% { transform:rotate(16deg); }
+      40% { transform:rotate(-6deg); }
+    }
+
+    /* Date Picker Wrapper */
+    .datePickerWrapper {
+      position:relative;
+      display:inline-block;
+      margin-top:14px;
+      z-index:20;
+      min-height:44px;
+      min-width:min(100%, 220px);
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .header .dateTag {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
+      cursor:pointer;
+      transition:all .3s;
+      border:2px solid rgba(255,255,255,.2);
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      -webkit-user-select:none;
+      direction:ltr;
+      position:relative;
+      z-index:3;
+      pointer-events:auto;
+      color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .dateTag-icon {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
+      pointer-events:none;
+    }
+    .dateTag-icon svg {
+      display:block;
+      width:16px;
+      height:16px;
+      pointer-events:none;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
+    }
+    .dateTag-label {
+      line-height:1.2;
+      pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .header .dateTag:hover {
+      background:rgba(255,255,255,.25);
+      transform:translateY(-1px);
+    }
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
+    .datePickerWrapper #datePicker {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      min-height:44px;
+      margin:0;
+      padding:0;
+      opacity:0;
+      cursor:pointer;
+      font-size:16px;
+      line-height:44px;
+      border:none;
+      z-index:5;
+      pointer-events:auto;
+      color:transparent;
+      background:transparent;
+      touch-action:manipulation;
+    }
+
+    a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .header::before,
+    .header::after {
+      pointer-events:none;
+    }
+
+    /* ═══════ SUMMARY BAR ═══════ */
+    .summaryBar { 
+      display:flex; 
+      justify-content:center; 
+      align-items:stretch;
+      gap:12px; 
+      margin-top:14px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:30;
+      isolation:isolate;
+    }
+    .summaryBar a.summaryChip,
+    .summaryBar button.summaryChip {
+      position:relative;
+      z-index:1;
+    }
+    .summaryBar a.summaryChip *,
+    .summaryBar button.summaryChip *,
+    .quickActions.roster-cta-btn .roster-cta-icon,
+    .quickActions.roster-cta-btn .roster-cta-label {
+      pointer-events:none;
+    }
+    .importBottom {
+      position:relative;
+      z-index:25;
+    }
+    a.summaryChip:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
+    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
+    a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
+    a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.diffChip .chipVal { color:#ef4444; }
+    a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
+    .summaryChip {
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      border-radius:14px;
+      padding:10px 12px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      transition:all .25s ease;
+      min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
+    #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
+    .summaryChip .chipLabel { 
+      font-size:9.5px;
+      font-weight:600; 
+      color:#64748b; 
+      text-transform:uppercase; 
+      letter-spacing:.4px; 
+      margin-top:4px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    /* ═══════ SHIFT FILTER BUTTONS AS CHIPS ═══════ */
+    button.summaryChip.shiftFilterBtn {
+      border:2px solid transparent;
+      position:relative;
+      overflow:hidden;
+      padding:10px 14px; /* padding أصغر للأزرار */
+    }
+    button.summaryChip.shiftFilterBtn:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    button.summaryChip.shiftFilterBtn:focus {
+      outline:none;
+    }
+    button.summaryChip.shiftFilterBtn:focus:not(.active) {
+      border-color:transparent;
+    }
+    button.summaryChip.shiftFilterBtn.active {
+      border-color:currentColor;
+      box-shadow:0 6px 16px rgba(15,23,42,.18);
+    }
+    button.summaryChip.shiftFilterBtn.active::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background:currentColor;
+      opacity:.06;
+    }
+    
+    /* ألوان الورديات */
+    button.shiftFilterBtn.morning {
+      color:#f59e0b;
+    }
+    button.shiftFilterBtn.morning .chipVal { color:#f59e0b; }
+    button.shiftFilterBtn.morning .chipLabel { color:#92400e; }
+    
+    button.shiftFilterBtn.afternoon {
+      color:#f97316;
+    }
+    button.shiftFilterBtn.afternoon .chipVal { color:#f97316; }
+    button.shiftFilterBtn.afternoon .chipLabel { color:#9a3412; }
+    
+    button.shiftFilterBtn.night {
+      color:#8b5cf6;
+    }
+    button.shiftFilterBtn.night .chipVal { color:#8b5cf6; }
+    button.shiftFilterBtn.night .chipLabel { color:#5b21b6; }
+    
+    button.shiftFilterBtn.all {
+      color:#1e40af;
+    }
+    button.shiftFilterBtn.all .chipVal { color:#1e40af; }
+    button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
+    
+    /* للشاشات المتوسطة */
+    @media (max-width:900px){
+      .summaryBar { flex-wrap:wrap; } /* السماح بالانتقال للصف الثاني */
+    }
+    
+    /* للموبايل */
+    @media (max-width:600px){
+      .summaryBar { gap:6px; }
+      .summaryChip { padding:8px 8px; min-width:60px; }
+      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
+    }
+
+
+    /* ═══════ DEPARTMENT CARD ═══════ */
+    .deptCard {
+      margin-top:18px;
+      background:#fff;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(15,23,42,.07);
+      box-shadow:0 4px 18px rgba(15,23,42,.08);
+    }
+    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+
+    .deptHead {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      background:#fff;
+      cursor:pointer;
+    }
+    .deptHead::after {
+      content:'▾';
+      color:#94a3b8;
+      font-size:14px;
+      margin-inline-start:6px;
+      transition:transform .2s ease;
+    }
+    .deptCard:not(.collapsed) .deptHead::after { transform:rotate(180deg); }
+    .deptIcon {
+      width:40px; height:40px;
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
+    .deptBadge { min-width:48px; padding:6px 10px; border-radius:12px; text-align:center; }
+    .deptCard.collapsed .deptHead { border-bottom:none !important; }
+    .deptCard.collapsed .shiftStack { display:none; }
+
+    /* ═══════ SHIFT STACK ═══════ */
+    .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+    /* ═══════ SHIFT CARD — <details> ═══════ */
+    .shiftCard {
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .shiftSummary {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 14px;
+      cursor:pointer;
+      list-style:none;
+      -webkit-appearance:none;
+      appearance:none;
+      user-select:none;
+    }
+    .shiftSummary::-webkit-details-marker { display:none; }
+    .shiftSummary::marker              { display:none; }
+
+    .shiftIcon  { font-size:20px; line-height:1; flex-shrink:0; }
+    .shiftLabel { font-size:15px; font-weight:800; flex:1; letter-spacing:-.1px; }
+    .shiftCount {
+      font-size:13px; font-weight:800;
+      padding:3px 10px; border-radius:20px;
+      flex-shrink:0;
+    }
+
+    /* chevron يدور لما يفتح */
+    .shiftSummary::after {
+      content:'▾';
+      font-size:14px;
+      color:#94a3b8;
+      transition:transform .2s;
+      flex-shrink:0;
+    }
+    .shiftCard[open] .shiftSummary::after {
+      transform:rotate(180deg);
+    }
+
+    .shiftBody { background:rgba(255,255,255,.7); }
+
+    /* ── employee row (tap/long-press targets whole row in JS) ── */
+    .empRow {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:9px 16px;
+      border-top:1px solid rgba(15,23,42,.06);
+      cursor:pointer;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .empRowAlt { background:rgba(15,23,42,.02); }
+    .empName  {
+      font-size:15px; font-weight:700; color:#1e293b;
+      -webkit-user-select:none;
+      user-select:none;
+      pointer-events:none;
+    }
+    .empStatus { font-size:13px; font-weight:600; }
+    .nextShiftTooltip {
+      position: fixed;
+      z-index: 12000;
+      min-width: 250px;
+      max-width: 320px;
+      background: #ffffff;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 14px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.20);
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .nextShiftTooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .nextShiftHead {
+      padding: 8px 10px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .nextShiftHeadText { flex: 1; min-width: 0; }
+    .nextShiftClose {
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .nextShiftClose:hover { background: rgba(255, 255, 255, 0.32); }
+    .nextShiftEmp {
+      font-size: 12px; font-weight: 800; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nextShiftTitle {
+      font-size: 10px; font-weight: 700; opacity: .9; margin-top: 2px;
+    }
+    .nextShiftBody {
+      padding: 8px 9px 9px; background: rgba(255, 255, 255, 0.96);
+    }
+    .nextShiftItem {
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(241, 245, 249, 0.92);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .nextShiftDay {
+      font-size: 11px; font-weight: 800; color: #334155;
+      line-height: 1.2; min-width: 36px;
+    }
+    .nextShiftDate {
+      font-size: 10px; color: #64748b; line-height: 1.2; min-width: 58px;
+    }
+    .nextShiftCode {
+      margin-inline-start: auto;
+      font-size: 12px; font-weight: 800; color: #0f172a; line-height: 1.2;
+    }
+    .nextShiftEmpty {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
+    .quickActions.roster-cta {
+      --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --cta-gap: 10px;
+      margin-top: 22px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--cta-gap);
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
+    }
+    .roster-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      font-family: var(--cta-font);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    button.roster-cta-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      font: inherit;
+    }
+    .roster-cta-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 0;
+    }
+    .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .roster-cta-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roster-cta-btn--roster {
+      background: #e8f1ff;
+      border-color: #b8c9f5;
+      color: #1e3a8a;
+    }
+    .roster-cta-btn--subscribe {
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }
+    .roster-cta-btn--compare {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }
+    .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .roster-cta-btn--share {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+    .roster-cta-btn--texture {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #5b21b6;
+    }
+    .roster-cta--import {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (hover: hover) {
+      .roster-cta-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      }
+      .roster-cta-btn--roster:hover { background: #dce8ff; }
+      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
+      .roster-cta-btn--compare:hover { background: #fef3c7; }
+      .roster-cta-btn--share:hover { background: #d1fae5; }
+      .roster-cta-btn--apps:hover { background: #e0f2fe; }
+      .roster-cta-btn--texture:hover { background: #ede9fe; }
+      .roster-cta-btn--muted:hover { background: #e2e8f0; }
+    }
+    .roster-cta-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+    .roster-cta-btn:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.45);
+      outline-offset: 2px;
+    }
+    @media (max-width: 380px) {
+      .roster-cta-btn {
+        padding: 9px 8px;
+        font-size: 11px;
+        gap: 5px;
+        min-height: 40px;
+      }
+      .roster-cta-icon { font-size: 16px; }
+    }
+
+    /* ═══════ SITE SHARE MODAL ═══════ */
+    .siteShareSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteShareCard {
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
+    }
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteShareQr {
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
+    }
+    .siteShareUrl {
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
+    }
+    .siteShareActions {
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
+    }
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteAppsCard {
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
+    }
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
+    .siteAppsLink {
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .siteAppsLink-icon {
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+    }
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
+    .siteAppsLink--games {
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
+    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
+
+    /* ═══════ FOOTER ═══════ */
+    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
+    .footer strong { color:#64748b; }
+
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:9999; padding:12px 10px;
+      pointer-events:none; visibility:hidden;
+    }
+    .captureSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .captureSheetCard {
+      width:min(100%,420px); max-height:min(92dvh, 900px);
+      display:flex; flex-direction:column; overflow:hidden;
+      background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .captureSheetTitle {
+      flex-shrink:0; font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px;
+    }
+    .capturePreviewWrap {
+      flex:1 1 auto; min-height:0;
+      max-height:min(58dvh, 520px); overflow-y:auto; overflow-x:hidden;
+      margin:0 0 10px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc;
+      -webkit-overflow-scrolling:touch;
+    }
+    .capturePreviewImg {
+      display:block; width:100%; max-width:100%; height:auto; margin:0;
+      border:none; border-radius:0; background:transparent;
+    }
+    .captureSheetActions {
+      flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn {
+      flex-shrink:0; margin-top:8px; width:100%; background:#f1f5f9; color:#475569;
+    }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+      pointer-events:none;
+    }
+    .captureBusy.open { display:block; }
+
+    /* ═══════ MOBILE ═══════ */
+    @media (max-width:480px){
+      .wrap            { padding:12px 10px 22px; }
+      .deptTitle       { font-size:16px; }
+      .empName         { font-size:14px; }
+      .empStatus       { font-size:12px; }
+      .shiftLabel      { font-size:14px; }
+      .summaryBar      { gap:8px; }
+      .summaryChip     { padding:8px 14px; }
+      .summaryChip .chipVal { font-size:19px; }
+    }
+
+  </style>
+  <style>
+    html, body { min-height: 100%; width:100%; overflow-x:hidden; }
+    body { min-height: 100dvh; }
+    .wrap {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 28px;
+    }
+    .importBottom {
+      margin-top: auto;
+      padding-top: 14px;
+      position: relative;
+      z-index: 25;
+    }
+    .importBottom .quickActions.roster-cta {
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+    .footer {
+      margin-top: 0;
+      padding: 10px 12px;
+      background: rgba(238,241,247,.96);
+      border-top: 1px solid rgba(148,163,184,.25);
+    }
+    .summaryBar .summaryChip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .summaryBar .summaryChip .chipVal {
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+
+    .summaryBar .summaryChip .chipLabel {
+      margin-top: 4px;
+      line-height: 1.1;
+    }
+    .welcomeChip {
+      display: none;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a.summaryChip.exportChip .chipVal { color:#059669; }
+    a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
+    .welcomeChip.visible {
+      display: flex;
+    }
+    .welcomeChip .chipLabel {
+      max-width: 88px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .waveHand {
+      display: inline-block;
+      transform-origin: 70% 70%;
+      animation: waveHand 1.8s ease-in-out infinite;
+    }
+    @keyframes waveHand {
+      0%, 50%, 100% { transform: rotate(0deg); }
+      10% { transform: rotate(16deg); }
+      20% { transform: rotate(-10deg); }
+      30% { transform: rotate(16deg); }
+      40% { transform: rotate(-6deg); }
+    }
+    .deptCard {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 180px;
+    }
+
+    .empStatus .shiftRange {
+      font-size: 0.88em;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+    .empStatus .shiftRangeLabel {
+      font-size: 0.78em;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
+  </style>
+  <meta name="theme-color" content="#f4354b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <script>
+  (function () {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var p = siteRoot();
+    var base = location.origin + p + (p && p.charAt(p.length - 1) !== '/' ? '/' : '');
+    if (!p) base = location.origin + '/';
+    var pv = '14';
+    var imp = (location.pathname || '').indexOf('/import/') !== -1;
+    var man = base + (imp ? 'import/manifest.json' : 'manifest.json') + '?v=' + pv;
+    var mlinks = document.querySelectorAll('link[rel="manifest"]');
+    var link = mlinks.length ? mlinks[0] : null;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'manifest';
+      document.head.appendChild(link);
+    }
+    link.href = man;
+    for (var i = 1; i < mlinks.length; i++) mlinks[i].remove();
+    var touch = document.querySelector('link[rel="apple-touch-icon"][data-pwa-touch="1"]');
+    if (!touch) {
+      touch = document.createElement('link');
+      touch.rel = 'apple-touch-icon';
+      touch.setAttribute('data-pwa-touch', '1');
+      document.head.appendChild(touch);
+    }
+    touch.href = base + 'assets/icons/icon-192.png';
+    try {{
+      var iOS = /iP(hone|ad|od)/i.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (iOS && 'serviceWorker' in navigator) {{
+        navigator.serviceWorker.getRegistrations().then(function(regs) {{
+          regs.forEach(function(r) {{ r.unregister(); }});
+        }});
+      }}
+    }} catch (swIosErr) {{}}
+    try {{
+      var bn = localStorage.getItem('roster_banner_choice');
+      if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
+        var bUrl = base + 'assets/banners/' + bn;
+        if (!document.getElementById('banner-early-style')) {{
+          var bes = document.createElement('style');
+          bes.id = 'banner-early-style';
+          bes.textContent =
+            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
+            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
+          document.head.appendChild(bes);
+        }}
+        if (!document.querySelector('link[data-banner-preload="1"]')) {{
+          var bp = document.createElement('link');
+          bp.rel = 'preload';
+          bp.as = 'image';
+          bp.href = bUrl;
+          bp.setAttribute('data-banner-preload', '1');
+          document.head.appendChild(bp);
+        }}
+        document.documentElement.classList.add('roster-banner-early');
+      }}
+    }} catch (bannerEarlyErr) {{}}
+  }})();
+  </script>
+
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">ع</span></button>
+    <h1 id="pageTitle" class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
+      <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
+    </h1>
+    <div class="datePickerWrapper">
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">22 July 2026</span></label>
+      <input id="datePicker" type="date" value="2026-07-22" min="2026-03-01" max="2026-07-31" aria-label="Select roster date" title="Pick day" />
+    </div>
+  </div>
+
+  
+  <div class="summaryBar">
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">69</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
+    </div>
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+      <div class="chipLabel" data-key="mySchedule">My Schedule</div>
+    </a>
+    <a href="#" id="exportBtn" class="summaryChip exportChip" style="text-decoration:none;" onclick="goToExport(event)">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+      <div class="chipLabel" data-key="exportRoster">Export</div>
+    </a>
+    <a href="{{BASE}}/my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
+      <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+      <div class="chipLabel" id="welcomeName"></div>
+    </a>
+    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
+    </a>
+    <a href="{{BASE}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
+      <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
+  </div>
+
+
+  
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
+        <div class="deptIcon" style="background:#2563eb15; color:#2563eb;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Supervisors</div>
+        <div class="deptBadge" style="background:#2563eb15; color:#2563eb; border:1px solid #2563eb18;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">5</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="MOHAMMED SAID - 81032" role="button" tabindex="0">
+       <span class="empName">MOHAMMED SAID - 81032</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="FRITZ - 80269" role="button" tabindex="0">
+       <span class="empName">FRITZ - 80269</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt" data-emp-name="UDUGAMA - 8901" role="button" tabindex="0">
+       <span class="empName">UDUGAMA - 8901</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="SAMEER MAHMOOD - 990896" role="button" tabindex="0">
+       <span class="empName">SAMEER MAHMOOD - 990896</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="FROILAN - 80535" role="button" tabindex="0">
+       <span class="empName">FROILAN - 80535</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #0891b2, #0891b2cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #0891b218;">
+        <div class="deptIcon" style="background:#0891b215; color:#0891b2;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Documentation</div>
+        <div class="deptBadge" style="background:#0891b215; color:#0891b2; border:1px solid #0891b218;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">12</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
+       <span class="empName">WAFAA SALIM - 81021</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
+       <span class="empName">ALA AL WAHAIBI - 82473</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="AHMED ALRUJAIBI - 82476" role="button" tabindex="0">
+       <span class="empName">AHMED ALRUJAIBI - 82476</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="YOUSUF AL WAHEEDI - 82100" role="button" tabindex="0">
+       <span class="empName">YOUSUF AL WAHEEDI - 82100</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="GLENDO - 80215" role="button" tabindex="0">
+       <span class="empName">GLENDO - 80215</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL HADIDI - 82452" role="button" tabindex="0">
+       <span class="empName">MAHMOOD AL HADIDI - 82452</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
+       <span class="empName">JAMAL AL SINANI - 81399</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="IBRAHIM AL QUTAITI - 81351" role="button" tabindex="0">
+       <span class="empName">IBRAHIM AL QUTAITI - 81351</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL WAHAIBI - 82541" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL WAHAIBI - 82541</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow" data-emp-name="MOHAMMED AL YAARUBI - 82444" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL YAARUBI - 82444</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="MAHAMAD AL MAHARBI - 82460" role="button" tabindex="0">
+       <span class="empName">MAHAMAD AL MAHARBI - 82460</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MAHANAD AL HADI - 82665" role="button" tabindex="0">
+       <span class="empName">MAHANAD AL HADI - 82665</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #059669, #059669cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #05966918;">
+        <div class="deptIcon" style="background:#05966915; color:#059669;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Import Checkers</div>
+        <div class="deptBadge" style="background:#05966915; color:#059669; border:1px solid #05966918;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">18</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="ANWAR AL HABSI - 82496" role="button" tabindex="0">
+       <span class="empName">ANWAR AL HABSI - 82496</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
+       <span class="empName">AHMED AL FARSI - 82456</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
+       <span class="empName">WAHEB AL BARAIDAI - 82470</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL MAWALI - 82614</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">5</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
+       <span class="empName">NASSER AL MAAMARI - 82590</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL SHEHHI - 82583" role="button" tabindex="0">
+       <span class="empName">BADAR AL SHEHHI - 82583</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
+       <span class="empName">JABER AL JULANDANI - 81983</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="IBRAHIM AL HADHRAMI - 82668" role="button" tabindex="0">
+       <span class="empName">IBRAHIM AL HADHRAMI - 82668</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
+       <span class="empName">HISHAM AL MAHARBI - 82454</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
+       <span class="empName">OMAR AL FUTAISI - 82107</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
+       <span class="empName">MAHMOOD AL SHAMSI - 82286</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
+       <span class="empName">MOOSA AL BALUSHI - 82667</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
+       <span class="empName">HISHAM AL SIYABI - 82434</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
+       <span class="empName">SULEIMAN AL MAHARBI - 80833</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
+       <span class="empName">AHMED AL HUSAINI - 82455</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
+       <span class="empName">ADIL AL BULUSHI - 82457</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
+       <span class="empName">HILAL AL SHAMAKHI - 81991</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
+       <span class="empName">ABDULLAH AL SINAWI - 82663</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 22 <span class="shiftRangeLabel">TO</span> 26</span>)</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #dc2626, #dc2626cc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #dc262618;">
+        <div class="deptIcon" style="background:#dc262615; color:#dc2626;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Release Control</div>
+        <div class="deptBadge" style="background:#dc262615; color:#dc2626; border:1px solid #dc262618;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">5</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
+       <span class="empName">MAHIR AL BALUSHI - 82422</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
+       <span class="empName">QASIM AL GHARIBI - 82412</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL KULAIBI - 81079" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL KULAIBI - 81079</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
+       <span class="empName">SAID AL HADI - 81152</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="MOOSA AL HADI - 82536" role="button" tabindex="0">
+       <span class="empName">MOOSA AL HADI - 82536</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #7c3aed18;">
+        <div class="deptIcon" style="background:#7c3aed15; color:#7c3aed;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Import Operators</div>
+        <div class="deptBadge" style="background:#7c3aed15; color:#7c3aed; border:1px solid #7c3aed18;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">13</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
+       <span class="empName">MOHD AL HADDABI - 990895</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL AMRI - 81080" role="button" tabindex="0">
+       <span class="empName">AHMED AL AMRI - 81080</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
+       <span class="empName">HAMED AL FAKHRI - 8836</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
+       <span class="empName">SAID AL AMRI - 80834</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="KHAMIS AL KASBI - 990751" role="button" tabindex="0">
+       <span class="empName">KHAMIS AL KASBI - 990751</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
+       <span class="empName">KHALID AL ZADJALI - 82458</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
+       <span class="empName">JUMA AL HABSI - 81151</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow" data-emp-name="YASIR AL GHARABI - 990786" role="button" tabindex="0">
+       <span class="empName">YASIR AL GHARABI - 990786</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL BALUCHI - 82330</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" role="button" tabindex="0">
+       <span class="empName">ALI AL RIYAMI - 82459</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
+       <span class="empName">QAIS AL MUKHAINI - 82435</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
+       <span class="empName">MOHAMED AL MAAWALI - 82535</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="FARIS AL BALUSHI - 80478" role="button" tabindex="0">
+       <span class="empName">FARIS AL BALUSHI - 80478</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 21 <span class="shiftRangeLabel">TO</span> 25</span>)</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+    <div class="deptCard">
+      <div style="height:5px; background:linear-gradient(to right, #f59e0b, #f59e0bcc);"></div>
+
+      <div class="deptHead" style="border-bottom:2px solid #f59e0b18;">
+        <div class="deptIcon" style="background:#f59e0b15; color:#f59e0b;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>
+            <rect x="9" y="14" width="2" height="3"/>
+            <rect x="13" y="14" width="2" height="3"/>
+          </svg>
+        </div>
+        <div class="deptTitle">Flight Dispatch (Export)</div>
+        <div class="deptBadge" style="background:#f59e0b15; color:#f59e0b; border:1px solid #f59e0b18;">
+          <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
+          <span style="font-size:17px;font-weight:900;">16</span>
+        </div>
+      </div>
+
+      <div class="shiftStack">
+        
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+      <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
+        <span class="shiftIcon">☀️</span>
+        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
+       <span class="empName">ANWAR ALAMRI - 82566</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
+       <span class="empName">ISMAIL AL MAHARBI - 82331</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
+       <span class="empName">TALAL AL HUSEINI - 82417</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
+       <span class="empName">AHMED AL HADI - 82654</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
+      <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
+        <span class="shiftIcon">🌤️</span>
+        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
+       <span class="empName">HAITHAM AL BALUSHI - 82419</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="ALI AL SHAMSI - 82425" role="button" tabindex="0">
+       <span class="empName">ALI AL SHAMSI - 82425</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
+       <span class="empName">NASSER AL OMAIRI - 82416</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div><div class="empRow empRowAlt" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
+       <span class="empName">ANWAR ALAMRI - 82566</span>
+       <span class="empStatus" style="color:#9a3412;">AE14</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
+      <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
+        <span class="shiftIcon">🌙</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
+       <span class="empName">BADAR AL BUSAIDI - 82414</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL SAADI - 82420" role="button" tabindex="0">
+       <span class="empName">MOHAMMED AL SAADI - 82420</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
+       <span class="empName">BADAR AL BURTAMANI - 82423</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div><div class="empRow empRowAlt" data-emp-name="KHALIFA AL SAADI - 82537" role="button" tabindex="0">
+       <span class="empName">KHALIFA AL SAADI - 82537</span>
+       <span class="empStatus" style="color:#5b21b6;">NE22</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
+      <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
+        <span class="shiftIcon">🛋️</span>
+        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftCount" style="background:#6366f122; color:#3730a3;">3</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
+       <span class="empName">YAARAB AL RAQADI - 82571</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
+       <span class="empName">YOUNIS AL SIYABI - 80480</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
+       <span class="empName">SAMI AL HADABI - 80479</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div>
+      </div>
+    </details>
+
+    <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
+      <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
+        <span class="shiftIcon">✈️</span>
+        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
+      </summary>
+      <div class="shiftBody">
+        <div class="empRow" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
+       <span class="empName">SAID AL SADI - 82410</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 20 <span class="shiftRangeLabel">TO</span> 24</span>)</span>
+     </div>
+      </div>
+    </details>
+
+      </div>
+    </div>
+
+
+  <div class="importBottom">
+    <nav class="quickActions roster-cta" aria-label="Page actions">
+  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
+    <span class="roster-cta-label">Full Roster</span>
+  </a>
+  <a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn" href="{{BASE}}/subscribe/">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="roster-cta-label">Subscribe</span>
+  </a>
+  <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></span>
+    <span class="roster-cta-label">Compare</span>
+  </a>
+  <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+    <span class="roster-cta-label">Share Site</span>
+  </button>
+  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+    <span class="roster-cta-label">Apps</span>
+  </button>
+</nav>
+
+    
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">30JUN2026 / 19:31</strong>
+    <br>Total: <strong id="importTotalEmployees">69 employees</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">JULY 2026 IMPORT OPS ROSTER.xlsx</strong>
+  </div>
+
+  </div>
+
+</div>
+
+
+<div id="captureBusy" class="captureBusy">Preparing image...</div>
+<div id="captureSheet" class="captureSheet" aria-hidden="true">
+  <div class="captureSheetCard">
+    <div class="captureSheetTitle">Share or save image</div>
+    <div class="capturePreviewWrap">
+      <img id="capturePreview" class="capturePreviewImg" alt="Snapshot preview" />
+    </div>
+    <div class="captureSheetActions">
+      <button id="captureShareBtn" class="captureSheetBtn captureShareBtn" type="button">Share</button>
+      <button id="captureSaveBtn" class="captureSheetBtn captureSaveBtn" type="button">Save</button>
+    </div>
+    <button id="captureCancelBtn" class="captureSheetBtn captureCancelBtn" type="button">Cancel</button>
+  </div>
+</div>
+
+<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+    <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
+    <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
+    <div class="siteShareQr" id="siteShareQr"></div>
+    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <div class="siteShareActions">
+      <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span class="roster-cta-label">Share</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg></span>
+        <span class="roster-cta-label">WhatsApp</span>
+      </button>
+      <button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">
+        <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg></span>
+        <span class="roster-cta-label">Copy link</span>
+      </button>
+    </div>
+    <div class="siteShareCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="siteAppsSheet" class="siteAppsSheet" aria-hidden="true">
+  <div class="siteAppsCard" role="dialog" aria-labelledby="siteAppsTitle">
+    <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
+    <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
+    <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--wcvote" href="https://match-accb0.web.app/?utm_source=roster-site&utm_medium=apps" target="_blank" rel="noopener noreferrer" data-app-id="wcvote">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="#00d4ff"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wcvote">World Cup Fan Vote</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wcvote">Vote for your team</span>
+        </span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="flights">Airport board</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--calc" href="https://khalidsaif912.github.io/new/docs/calculator/index.html" data-app-id="calc" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--quicklist" href="https://khalidsaif912.github.io/new/docs/QuickList/index.html" data-app-id="quicklist" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
+        <span class="siteAppsLink-icon"><svg class="siteAppsStoreSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18"/><path d="M5 10l1.5-5h11L19 10"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-5h4v5"/><path d="M12 7V5"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store · متجر مُبهر</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        </span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
+        <span class="siteAppsLink-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        </span>
+      </a>
+    </div>
+    <div class="siteAppsCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted siteAppsCloseBtn" id="siteAppsCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+// Hard-guaranteed import page behavior (independent from other scripts).
+(function() {
+  var IMPORT_DEPT_ORDER = [
+    'supervisors',
+    'documentation',
+    'import checkers',
+    'release control',
+    'import operators',
+    'flight dispatch (import)',
+    'flight dispatch (export)'
+  ];
+
+  function deptTitleNorm(card) {
+    var t = card.querySelector('.deptTitle');
+    return (t && t.textContent ? t.textContent : '').trim().toLowerCase();
+  }
+
+  function findDeptCardByName(deptName) {
+    var target = String(deptName || '').trim().toLowerCase();
+    if (!target) return null;
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    return cards.find(function(c) { return deptTitleNorm(c) === target; }) || null;
+  }
+
+  function pinDepartmentCardFirst(deptName) {
+    var card = findDeptCardByName(deptName);
+    if (!card) return false;
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    if (!cards.length || cards[0] === card) return true;
+    var parent = card.parentElement;
+    if (parent) parent.insertBefore(card, cards[0]);
+    return true;
+  }
+
+  function reorderImportDepartments(preferredDept) {
+    var cards = Array.from(document.querySelectorAll('.deptCard'));
+    if (!cards.length) return;
+    var parent = cards[0].parentElement;
+    if (!parent) return;
+    var bottom = document.querySelector('.importBottom');
+    var preferred = String(preferredDept || '').trim().toLowerCase();
+
+    if (preferred) {
+      pinDepartmentCardFirst(preferred);
+      cards = Array.from(document.querySelectorAll('.deptCard'));
+    }
+
+    var order = IMPORT_DEPT_ORDER.slice();
+    if (preferred && order.indexOf(preferred) === -1) {
+      order.unshift(preferred);
+    }
+
+    order.forEach(function(dep) {
+      if (preferred && dep === preferred) return;
+      var card = cards.find(function(c) { return deptTitleNorm(c) === dep; });
+      if (card) {
+        if (bottom) parent.insertBefore(card, bottom);
+        else parent.appendChild(card);
+      }
+    });
+
+    if (preferred) pinDepartmentCardFirst(preferred);
+  }
+
+  function applySavedEmployeeDepartmentFirst() {
+    var empId = localStorage.getItem('importSavedEmpId');
+    if (!empId) {
+      reorderImportDepartments();
+      return;
+    }
+    var base = (function() {
+      if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();
+      var p = location.pathname || '';
+      if (p.indexOf('/roster-site/') !== -1) return location.origin + '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = p.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return location.origin + '/' + segs[0] + '/docs';
+        return location.origin + (segs.length ? '/' + segs[0] : '');
+      }
+      return location.origin + '/';
+    })();
+    fetch(base + '/import/schedules/' + encodeURIComponent(empId) + '.json')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(d) {
+        if (d && d.department) reorderImportDepartments(d.department);
+        else reorderImportDepartments();
+      })
+      .catch(function() { reorderImportDepartments(); });
+  }
+
+  function repartitionLeaveRowsInDeptCards() {
+    document.querySelectorAll('.deptCard').forEach(function(card) {
+      var other = card.querySelector('details.shiftCard[data-shift="Other"]');
+      if (!other) return;
+      var toMove = [];
+      other.querySelectorAll('.empRow').forEach(function(row) {
+        var st = row.querySelector('.empStatus');
+        if (!st) return;
+        var raw = (st.textContent || '').trim().toUpperCase();
+        var code = raw.split(/\s+/)[0];
+        if (code === 'LV' || code === 'AL' || raw.indexOf('ANNUAL') >= 0) toMove.push(row);
+      });
+      if (!toMove.length) return;
+      var annual = card.querySelector('details.shiftCard[data-shift="Annual Leave"]');
+      if (!annual) {
+        var template = card.querySelector('details.shiftCard[data-shift="Off Day"]');
+        if (!template) return;
+        annual = template.cloneNode(true);
+        annual.setAttribute('data-shift', 'Annual Leave');
+        annual.style.border = '1px solid #10b98144';
+        annual.style.background = '#d1fae5';
+        var sum = annual.querySelector('.shiftSummary');
+        if (sum) { sum.style.background = '#d1fae5'; sum.style.borderBottom = '1px solid #10b98133'; }
+        var label = annual.querySelector('.shiftLabel');
+        if (label) { label.textContent = 'Annual Leave'; label.style.color = '#065f46'; }
+        var icon = annual.querySelector('.shiftIcon');
+        if (icon) icon.textContent = '✈️';
+        var emptyBody = annual.querySelector('.shiftBody');
+        if (emptyBody) emptyBody.innerHTML = '';
+        other.parentNode.insertBefore(annual, other);
+      }
+      var body = annual.querySelector('.shiftBody');
+      toMove.forEach(function(row) { body.appendChild(row); });
+      var oc = other.querySelector('.shiftCount');
+      var left = other.querySelectorAll('.empRow').length;
+      if (oc) oc.textContent = String(left);
+      if (!left) other.remove();
+      var ac = annual.querySelector('.shiftCount');
+      if (ac) ac.textContent = String(annual.querySelectorAll('.empRow').length);
+    });
+  }
+
+  function getImportCurrentShiftGroup() {
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var t = muscat.getHours() * 60 + muscat.getMinutes();
+    if (t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if (t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function syncImportShiftDetailsOpen() {
+    var shift = getImportCurrentShiftGroup();
+    document.querySelectorAll('details.shiftCard').forEach(function(d) {
+      d.removeAttribute('open');
+    });
+    document.querySelectorAll('details.shiftCard[data-shift="' + shift + '"]').forEach(function(d) {
+      d.setAttribute('open', '');
+    });
+  }
+
+  window.reorderImportDepartments = reorderImportDepartments;
+  window.applySavedEmployeeDepartmentFirst = applySavedEmployeeDepartmentFirst;
+
+  repartitionLeaveRowsInDeptCards();
+  applySavedEmployeeDepartmentFirst();
+  syncImportShiftDetailsOpen();
+
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'importSavedEmpId' && typeof applySavedEmployeeDepartmentFirst === 'function') {
+      applySavedEmployeeDepartmentFirst();
+    }
+  });
+
+  var lastUpdatedEl = document.getElementById('importLastUpdated');
+  if (lastUpdatedEl) {
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var day = String(muscat.getDate()).padStart(2, '0');
+    var mon = muscat.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+    var year = muscat.getFullYear();
+    var hh = String(muscat.getHours()).padStart(2, '0');
+    var mm = String(muscat.getMinutes()).padStart(2, '0');
+    lastUpdatedEl.textContent = (day + mon + year + ' / ' + hh + ':' + mm).toUpperCase();
+  }
+})();
+
+</script>
+
+<script>
+
+function getSiteRootPath() {
+  if (location.protocol === 'file:') return '';
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
+function setCaptureBusy(isBusy) {
+  var busy = document.getElementById('captureBusy');
+  if(!busy) return;
+  busy.classList.toggle('open', !!isBusy);
+}
+
+function saveBlobFile(blob, fileName) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+}
+
+function openCaptureSheet(blob, fileName, captureMode) {
+  var sheet = document.getElementById('captureSheet');
+  var shareBtn = document.getElementById('captureShareBtn');
+  var saveBtn = document.getElementById('captureSaveBtn');
+  var cancelBtn = document.getElementById('captureCancelBtn');
+  var preview = document.getElementById('capturePreview');
+  var title = sheet ? sheet.querySelector('.captureSheetTitle') : null;
+  if(!sheet || !shareBtn || !saveBtn || !cancelBtn) return;
+  var modeText = captureMode || 'UNKNOWN';
+  if (title) title.textContent = 'Share or save image (' + modeText + ')';
+
+  var file = new File([blob], fileName, { type:'image/png' });
+  var shareSupported = !!(navigator.share && navigator.canShare && navigator.canShare({ files:[file] }));
+  shareBtn.style.display = shareSupported ? '' : 'none';
+
+  var previewUrl = null;
+  if (preview) {
+    var previewWrap = preview.closest('.capturePreviewWrap');
+    if (!previewWrap && preview.parentNode) {
+      previewWrap = document.createElement('div');
+      previewWrap.className = 'capturePreviewWrap';
+      preview.parentNode.insertBefore(previewWrap, preview);
+      previewWrap.appendChild(preview);
+    }
+    if (preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+    }
+    previewUrl = URL.createObjectURL(blob);
+    preview.src = previewUrl;
+    preview.dataset.revokeUrl = previewUrl;
+    preview.style.display = '';
+    if (previewWrap) previewWrap.scrollTop = 0;
+  }
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    shareBtn.onclick = null;
+    saveBtn.onclick = null;
+    cancelBtn.onclick = null;
+    sheet.onclick = null;
+    if (preview && preview.dataset.revokeUrl) {
+      try { URL.revokeObjectURL(preview.dataset.revokeUrl); } catch(e) {}
+      preview.dataset.revokeUrl = '';
+      preview.removeAttribute('src');
+    }
+  }
+
+  saveBtn.onclick = function() {
+    saveBlobFile(blob, fileName);
+    closeSheet();
+  };
+  shareBtn.onclick = async function() {
+    try {
+      await navigator.share({ files:[file], title:'Duty Roster Snapshot' });
+    } catch(e) {
+      // User may cancel share dialog.
+    }
+    closeSheet();
+  };
+  cancelBtn.onclick = closeSheet;
+  sheet.onclick = function(e) { if(e.target === sheet) closeSheet(); };
+
+  sheet.classList.add('open');
+  sheet.setAttribute('aria-hidden', 'false');
+}
+
+function rosterSnapshotLayoutWidth() {
+  var iw = window.innerWidth || 400;
+  /* Same visual column as phone: narrow on desktop, full usable width on small screens (max ~430). */
+  return Math.min(Math.max(iw - 28, 280), 430);
+}
+
+/** Gradient strip + .deptHead (everything before .shiftStack) for shift snapshots. */
+function buildDeptBannerForSnapshot(deptCard) {
+  if (!deptCard) return null;
+  var stack = deptCard.querySelector('.shiftStack');
+  if (!stack) return null;
+  var banner = document.createElement('div');
+  var el = deptCard.firstElementChild;
+  while (el && el !== stack) {
+    banner.appendChild(el.cloneNode(true));
+    el = el.nextElementSibling;
+  }
+  if (!banner.children.length) return null;
+  banner.style.marginBottom = '8px';
+  banner.style.width = '100%';
+  banner.style.boxSizing = 'border-box';
+  return banner;
+}
+
+function openAllShiftsOnDept(dept) {
+  var saved = [];
+  if (!dept) return function() {};
+  var wasCollapsed = dept.classList.contains('collapsed');
+  saved.push({ kind: 'collapsed', el: dept, value: wasCollapsed });
+  dept.classList.remove('collapsed');
+  var stack = dept.querySelector('.shiftStack');
+  if (stack) {
+    saved.push({ kind: 'stackDisplay', el: stack, value: stack.style.display });
+    stack.style.display = 'flex';
+  }
+  dept.querySelectorAll('details.shiftCard').forEach(function(d) {
+    saved.push({ kind: 'shiftOpen', el: d, value: d.open });
+    d.open = true;
+    d.setAttribute('open', '');
+  });
+  return function restoreDeptShiftState() {
+    for (var i = saved.length - 1; i >= 0; i--) {
+      var s = saved[i];
+      if (s.kind === 'shiftOpen') {
+        s.el.open = s.value;
+        if (!s.value) s.el.removeAttribute('open');
+      } else if (s.kind === 'stackDisplay') {
+        s.el.style.display = s.value;
+      } else if (s.kind === 'collapsed' && s.value) {
+        s.el.classList.add('collapsed');
+      }
+    }
+  };
+}
+
+function prepareSnapshotClone(root) {
+  if (!root) return;
+  root.classList.remove('collapsed');
+  root.style.contentVisibility = 'visible';
+  root.style.contain = 'none';
+  root.style.overflow = 'visible';
+  root.style.height = 'auto';
+  root.style.maxHeight = 'none';
+  root.querySelectorAll('.shiftStack').forEach(function(stack) {
+    stack.style.display = 'flex';
+    stack.style.overflow = 'visible';
+    stack.style.height = 'auto';
+  });
+  root.querySelectorAll('details.shiftCard').forEach(function(card) {
+    card.open = true;
+    card.setAttribute('open', '');
+    card.style.display = 'block';
+    card.style.overflow = 'visible';
+    card.style.height = 'auto';
+    card.style.maxHeight = 'none';
+  });
+  root.querySelectorAll('.shiftBody').forEach(function(body) {
+    body.style.display = 'block';
+    body.style.overflow = 'visible';
+    body.style.height = 'auto';
+    body.style.maxHeight = 'none';
+  });
+  root.querySelectorAll('.empRow').forEach(function(row) {
+    row.style.display = 'flex';
+  });
+}
+
+function getBannerBackgroundForSnapshot() {
+  var header = document.querySelector('.header');
+  if (header) {
+    var cs = window.getComputedStyle(header);
+    var bgImg = cs.backgroundImage;
+    if (bgImg && bgImg !== 'none') {
+      return {
+        image: bgImg,
+        size: cs.backgroundSize || 'cover',
+        position: cs.backgroundPosition || '62% center',
+        repeat: cs.backgroundRepeat || 'no-repeat',
+        color: cs.backgroundColor || ''
+      };
+    }
+  }
+  try {
+    var bn = localStorage.getItem('roster_banner_choice');
+    if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {
+      var url = getSiteRootUrl() + '/assets/banners/' + bn;
+      return { image: 'url("' + url + '")', size: 'cover', position: '62% center', repeat: 'no-repeat', color: '' };
+    }
+  } catch(e) {}
+  return {
+    image: 'linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%)',
+    size: 'cover',
+    position: 'center',
+    repeat: 'no-repeat',
+    color: ''
+  };
+}
+
+function buildBannerHeaderForSnapshot() {
+  var liveHeader = document.querySelector('.header');
+  if (!liveHeader) return null;
+  var clone = liveHeader.cloneNode(true);
+  clone.className = 'header captureBannerHeader';
+  clone.querySelectorAll('.langToggle, #banner-changer-btn, #datePicker').forEach(function(el) {
+    el.remove();
+  });
+  var bg = getBannerBackgroundForSnapshot();
+  clone.style.position = 'relative';
+  clone.style.overflow = 'hidden';
+  clone.style.marginBottom = '6px';
+  clone.style.borderRadius = '20px';
+  clone.style.padding = '22px 16px 20px';
+  clone.style.textAlign = 'center';
+  clone.style.color = '#fff';
+  clone.style.minHeight = '112px';
+  clone.style.boxSizing = 'border-box';
+  clone.style.boxShadow = '0 4px 16px rgba(30,64,175,.14)';
+  clone.style.backgroundImage = bg.image;
+  clone.style.backgroundSize = bg.size;
+  clone.style.backgroundPosition = bg.position;
+  clone.style.backgroundRepeat = bg.repeat;
+  if (bg.color) clone.style.backgroundColor = bg.color;
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {
+    el.style.position = 'relative';
+    el.style.zIndex = '2';
+    el.style.color = '#fff';
+    el.style.textShadow = '0 1px 3px rgba(0,0,0,.55)';
+  });
+  var picker = clone.querySelector('.datePickerWrapper');
+  if (picker) {
+    picker.style.position = 'relative';
+    picker.style.zIndex = '2';
+    picker.style.marginTop = '10px';
+    picker.style.display = 'inline-block';
+  }
+  return clone;
+}
+
+function injectCaptureSnapshotStyles(wrap) {
+  if (!wrap || wrap.querySelector('[data-capture-style="1"]')) return;
+  var style = document.createElement('style');
+  style.setAttribute('data-capture-style', '1');
+  style.textContent = [
+    '[data-capture-wrap]{box-sizing:border-box;}',
+    '[data-capture-wrap] .captureBannerHeader{width:100%;margin-bottom:10px;}',
+    '[data-capture-wrap] .deptCard{overflow:visible!important;content-visibility:visible!important;contain:none!important;border-radius:18px!important;box-shadow:0 4px 18px rgba(15,23,42,.08)!important;margin:0!important;}',
+    '[data-capture-wrap] .deptHead::after,[data-capture-wrap] .shiftSummary::after{display:none!important;}',
+    '[data-capture-wrap] .shiftStack{display:flex!important;flex-direction:column!important;gap:6px!important;padding:8px 10px!important;}',
+    '[data-capture-wrap] .shiftCardFlat,[data-capture-wrap] .shiftCard{display:block!important;overflow:visible!important;margin:0!important;border-radius:14px!important;}',
+    '[data-capture-wrap] .shiftBody{display:block!important;overflow:visible!important;height:auto!important;}',
+    '[data-capture-wrap] .empRow{display:flex!important;align-items:center!important;padding:8px 14px!important;min-height:36px!important;}'
+  ].join('');
+  wrap.insertBefore(style, wrap.firstChild);
+}
+
+function flattenShiftCardsInClone(root) {
+  if (!root) return;
+  root.querySelectorAll('details.shiftCard').forEach(function(details) {
+    var flat = document.createElement('div');
+    flat.className = details.className + ' shiftCardFlat';
+    if (details.getAttribute('style')) flat.setAttribute('style', details.getAttribute('style'));
+    flat.style.display = 'block';
+    flat.style.overflow = 'visible';
+    flat.style.height = 'auto';
+    flat.style.maxHeight = 'none';
+    Array.from(details.children).forEach(function(ch) {
+      var tag = String(ch.tagName || '').toUpperCase();
+      if (tag === 'SUMMARY') {
+        var sumDiv = document.createElement('div');
+        sumDiv.className = ch.className;
+        if (ch.getAttribute('style')) sumDiv.setAttribute('style', ch.getAttribute('style'));
+        sumDiv.innerHTML = ch.innerHTML;
+        flat.appendChild(sumDiv);
+      } else {
+        var cloned = ch.cloneNode(true);
+        cloned.style.display = 'block';
+        cloned.style.overflow = 'visible';
+        cloned.style.height = 'auto';
+        cloned.style.maxHeight = 'none';
+        if (cloned.classList && cloned.classList.contains('shiftBody')) {
+          cloned.querySelectorAll('.empRow').forEach(function(row) { row.style.display = 'flex'; });
+        }
+        flat.appendChild(cloned);
+      }
+    });
+    details.replaceWith(flat);
+  });
+}
+
+function measureCaptureWrapHeight(wrap) {
+  if (!wrap) return 400;
+  var total = 0;
+  Array.from(wrap.children).forEach(function(child) {
+    if (child.getAttribute && child.getAttribute('data-capture-style') === '1') return;
+    var rect = child.getBoundingClientRect();
+    if (rect.height <= 0) return;
+    var st = window.getComputedStyle(child);
+    var mb = parseFloat(st.marginBottom) || 0;
+    var mt = parseFloat(st.marginTop) || 0;
+    total += rect.height + mb + mt;
+  });
+  var wrapSt = window.getComputedStyle(wrap);
+  var pad = (parseFloat(wrapSt.paddingTop) || 0) + (parseFloat(wrapSt.paddingBottom) || 0);
+  var sum = Math.ceil(total + pad);
+  if (sum > 80) return sum + 2;
+  return Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 0) + 2;
+}
+
+async function captureRosterElement(target, fileNamePrefix, opts) {
+  opts = opts || {};
+  if(!target || typeof html2canvas !== 'function') return;
+  setCaptureBusy(true);
+  var restoreLiveDept = null;
+  var wrap = null;
+  try {
+    function waitForCaptureLayout() {
+      return new Promise(function(resolve) {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+          });
+        } else {
+          setTimeout(resolve, 32);
+        }
+      });
+    }
+    var isDepartment = !!opts.expandAllShifts;
+    var header = document.querySelector('.header');
+    var layoutW = rosterSnapshotLayoutWidth();
+    wrap = document.createElement('div');
+    wrap.setAttribute('data-capture-wrap', '1');
+    wrap.style.position = 'absolute';
+    wrap.style.left = '-9999px';
+    wrap.style.top = '0';
+    wrap.style.width = layoutW + 'px';
+    wrap.style.boxSizing = 'border-box';
+    wrap.style.background = '#eef1f7';
+    wrap.style.padding = isDepartment ? '10px 12px 6px' : '14px';
+    wrap.style.visibility = 'visible';
+    wrap.style.opacity = '1';
+    wrap.style.pointerEvents = 'none';
+    wrap.style.overflow = 'visible';
+    wrap.style.height = 'auto';
+    wrap.style.maxHeight = 'none';
+
+    if (isDepartment) {
+      var bannerHeader = buildBannerHeaderForSnapshot();
+      if (bannerHeader) wrap.appendChild(bannerHeader);
+    } else if (header) {
+      var headerClone = header.cloneNode(true);
+      headerClone.style.marginBottom = '10px';
+      wrap.appendChild(headerClone);
+    }
+    if (opts.prependClone && opts.prependClone.nodeType === 1) {
+      var pre = opts.prependClone.cloneNode(true);
+      pre.style.marginBottom = '8px';
+      wrap.appendChild(pre);
+    }
+
+    var sourceTarget = target;
+    if (opts.deptCaptureId) {
+      var byId = document.querySelector('.deptCard[data-dept-capture-id="' + opts.deptCaptureId + '"]');
+      if (byId) sourceTarget = byId;
+    }
+    if (isDepartment && target && typeof target.closest === 'function') {
+      var sourceDept = target.closest('.deptCard');
+      if (sourceDept) sourceTarget = sourceDept;
+    }
+
+    var targetClone = null;
+    if (isDepartment) {
+      var dept = sourceTarget;
+      restoreLiveDept = openAllShiftsOnDept(dept);
+      await waitForCaptureLayout();
+      targetClone = dept.cloneNode(true);
+      restoreLiveDept();
+      restoreLiveDept = null;
+      prepareSnapshotClone(targetClone);
+      flattenShiftCardsInClone(targetClone);
+    } else {
+      targetClone = sourceTarget.cloneNode(true);
+      if (targetClone.classList && targetClone.classList.contains('shiftCard')) {
+        targetClone.open = true;
+        targetClone.setAttribute('open', '');
+      }
+      prepareSnapshotClone(targetClone);
+    }
+
+    targetClone.style.marginTop = '0';
+    targetClone.style.width = '100%';
+    targetClone.style.maxWidth = '100%';
+    targetClone.style.boxSizing = 'border-box';
+    wrap.appendChild(targetClone);
+    injectCaptureSnapshotStyles(wrap);
+    document.body.appendChild(wrap);
+    await waitForCaptureLayout();
+    await waitForCaptureLayout();
+
+    var captureHeight = 0;
+    if (isDepartment) {
+      captureHeight = measureCaptureWrapHeight(wrap);
+    }
+
+    var canvasOpts = {
+      backgroundColor: '#eef1f7',
+      scale: Math.max(2, window.devicePixelRatio || 1),
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      ignoreElements: function(el) {
+        return el && el.id === 'captureSheet';
+      },
+      onclone: function(doc) {
+        var clonedWrap = doc.querySelector('[data-capture-wrap="1"]');
+        if (!clonedWrap) return;
+        clonedWrap.style.left = '0';
+        clonedWrap.style.visibility = 'visible';
+        clonedWrap.style.opacity = '1';
+        clonedWrap.style.overflow = 'visible';
+        clonedWrap.style.height = 'auto';
+        clonedWrap.style.maxHeight = 'none';
+        clonedWrap.querySelectorAll('.deptCard').forEach(function(dept) {
+          prepareSnapshotClone(dept);
+          flattenShiftCardsInClone(dept);
+        });
+        clonedWrap.querySelectorAll('.shiftCard').forEach(function(card) {
+          prepareSnapshotClone(card);
+        });
+      }
+    };
+    var scale = Math.max(2, window.devicePixelRatio || 1);
+    if (isDepartment && captureHeight > 14000) scale = 1.5;
+    if (isDepartment && captureHeight > 22000) scale = 1;
+    canvasOpts.scale = scale;
+
+    var canvas = null;
+    try {
+      canvas = await html2canvas(wrap, canvasOpts);
+    } catch (captureErr) {
+      var fallbackOpts = Object.assign({}, canvasOpts, {
+        scale: 1,
+        height: undefined,
+        windowHeight: undefined
+      });
+      canvas = await html2canvas(wrap, fallbackOpts);
+    }
+    if (wrap && wrap.parentNode) wrap.remove();
+    wrap = null;
+
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      var mode = isDepartment ? 'DEPARTMENT' : 'SHIFT';
+      console.log('[capture] mode=' + mode + ' canvas=' + canvas.width + 'x' + canvas.height);
+      openCaptureSheet(blob, fileNamePrefix + '-' + stamp + '.png', mode);
+    }, 'image/png');
+  } catch(err) {
+    console.error('[capture]', err);
+    alert('Could not create image snapshot.');
+  } finally {
+    if (restoreLiveDept) restoreLiveDept();
+    if (wrap && wrap.parentNode) wrap.remove();
+    setCaptureBusy(false);
+  }
+}
+
+function goToEmployeeSchedule(empName) {
+  var match = empName.match(/-\s*(\d{3,})/);
+  var base = (typeof _importBase === 'function' ? _importBase() : (getSiteRootUrl() + '/import')) + '/my-schedules/index.html';
+
+  if (match) {
+    location.href = base + '?emp=' + encodeURIComponent(match[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(empName);
+  }
+}
+
+(function(){
+  var picker = document.getElementById('datePicker');
+  if(!picker) return;
+
+  function getMuscatTodayIso() {
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscatTime.getFullYear() + '-' +
+      String(muscatTime.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscatTime.getDate()).padStart(2, '0');
+  }
+
+  function formatIsoLabel(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function syncHeaderDate(iso) {
+    var tag = document.getElementById('dateTag');
+    if (tag) {
+      var dateLbl = document.getElementById('dateTagLabel');
+      var dateText = formatIsoLabel(iso);
+      if (dateLbl) dateLbl.textContent = dateText;
+      else tag.textContent = dateText;
+    }
+  }
+
+  var path = window.location.pathname || '/';
+  var pageDateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
+  var effectiveIso = pageDateMatch
+    ? (pageDateMatch[1] + '-' + pageDateMatch[2] + '-' + pageDateMatch[3])
+    : getMuscatTodayIso();
+  picker.value = effectiveIso;
+  syncHeaderDate(effectiveIso);
+
+  var DATE_PICKER_BUSY_KEY = 'rosterDatePickerBusy';
+
+  function setDatePickerBusy(on) {
+    try {
+      if (on) sessionStorage.setItem(DATE_PICKER_BUSY_KEY, '1');
+      else sessionStorage.removeItem(DATE_PICKER_BUSY_KEY);
+    } catch (e) {}
+  }
+
+  window.openDatePicker = function() {
+    if (!picker) return;
+    setDatePickerBusy(true);
+    try { picker.focus({ preventScroll: true }); } catch (e) { picker.focus(); }
+    if (typeof picker.showPicker === 'function') {
+      try { picker.showPicker(); return; } catch (e) {}
+    }
+    try { picker.click(); } catch (e2) {}
+  };
+
+  function onDateWrapActivate(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    openDatePicker();
+  }
+
+
+  var dateTagEl = document.getElementById('dateTag');
+  if (dateTagEl) {
+    dateTagEl.addEventListener('click', function(e) {
+      if (e) e.preventDefault();
+      openDatePicker();
+    });
+  }
+
+  var dateWrap = document.querySelector('.datePickerWrapper');
+  if (dateWrap) {
+    dateWrap.addEventListener('touchend', onDateWrapActivate, { passive: false });
+    dateWrap.addEventListener('click', function(e) {
+      if (e.target === picker) return;
+      onDateWrapActivate(e);
+    });
+    function onPickerActivate(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      setDatePickerBusy(true);
+      openDatePicker();
+    }
+    picker.addEventListener('click', onPickerActivate);
+    picker.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        onPickerActivate(e);
+      }
+    });
+  }
+  picker.addEventListener('focus', function() { setDatePickerBusy(true); });
+  picker.addEventListener('blur', function() {
+    setTimeout(function() { setDatePickerBusy(false); }, 400);
+  });
+
+  var USER_DATE_NAV_KEY = 'rosterUserPickedDate';
+
+  function consumeUserDateNavigation() {
+    if (sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') return false;
+    sessionStorage.removeItem(USER_DATE_NAV_KEY);
+    return true;
+  }
+
+  function markUserDateNavigation() {
+    sessionStorage.setItem(USER_DATE_NAV_KEY, '1');
+  }
+
+  function normalizePathname(p) {
+    return (p || '/')
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/import\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/i, '/')
+      .replace(/\/now\/.*$/i, '/')
+      .replace(/\/index\.html$/i, '')
+      .replace(/\/+$/, '');
+  }
+
+  function isImportRosterPath(p) {
+    return /\/import(\/|$)/i.test(p || '');
+  }
+
+  function buildDateBasePath() {
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    var p = path || location.pathname || '';
+    if (isImportRosterPath(p)) {
+      var base = root || normalizePathname(p);
+      if (!base || base === '/') {
+        return '/import';
+      }
+      if (!/\/import$/i.test(base)) {
+        base = base.replace(/\/+$/, '') + '/import';
+      }
+      return base;
+    }
+    if (root) return root;
+    return normalizePathname(p);
+  }
+
+  function redirectToDate(iso, isNowPage) {
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+  }
+
+  // ═══════════════════════════════════════════════════
+  // التحقق من التاريخ وإعادة التوجيه للـ today
+  // ═══════════════════════════════════════════════════
+  function checkAndRedirectToToday() {
+    var isNowPage = path.includes('/now');
+    var todayIso = getMuscatTodayIso();
+
+    if (!path.includes('/date/')) {
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      return true;
+    }
+
+    var dateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (!dateMatch) return false;
+
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    if (pageIso === todayIso) {
+      sessionStorage.removeItem(USER_DATE_NAV_KEY);
+      sessionStorage.removeItem('pageLoaded');
+      return false;
+    }
+
+    if (consumeUserDateNavigation()) return false;
+
+    redirectToDate(todayIso, isNowPage);
+    return true;
+  }
+
+  function resyncTodayIfNeeded() {
+    if (!path.includes('/date/')) return;
+    try {
+      if (sessionStorage.getItem(DATE_PICKER_BUSY_KEY) === '1') return;
+    } catch (e) {}
+    var dateMatch = path.match(/\/(?:import\/date|import)\/(\d{4})-(\d{2})-(\d{2})\//);
+    if (!dateMatch) return;
+    var pageIso = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+    var todayIso = getMuscatTodayIso();
+    if (pageIso !== todayIso && sessionStorage.getItem(USER_DATE_NAV_KEY) !== '1') {
+      redirectToDate(todayIso, path.includes('/now'));
+    }
+  }
+
+  if (checkAndRedirectToToday()) return;
+
+  window.addEventListener('pageshow', function(ev) {
+    if (ev.persisted) resyncTodayIfNeeded();
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') resyncTodayIfNeeded();
+  });
+
+  // ═══════════════════════════════════════════════════
+  // عند تغيير التاريخ → انتقل للصفحة المناسبة
+  // ═══════════════════════════════════════════════════
+  picker.addEventListener('change', function() {
+    if (!picker.value) return;
+
+    markUserDateNavigation();
+    sessionStorage.removeItem('pageLoaded');
+
+    var base = buildDateBasePath();
+    var target = base + '/date/' + picker.value + '/';
+
+    window.location.href = target;
+  });
+
+})();
+
+// ═══════════════════════════════════════════════════
+// Long-press capture for section / shift
+// ═══════════════════════════════════════════════════
+(function(){
+  var LONG_PRESS_MS = 550;
+  var suppressNextClick = false;
+
+  function bindLongPress(el, onLongPress){
+    if(!el) return;
+    var timer = null;
+    var moved = false;
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+    var MOVE_TOLERANCE_PX = 8;
+
+    function clear(){
+      if(timer) clearTimeout(timer);
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', function(e){
+      if(e.button !== 0 && e.button !== undefined) return;
+      moved = false;
+      tracking = true;
+      startX = Number(e.clientX || 0);
+      startY = Number(e.clientY || 0);
+      clear();
+      timer = setTimeout(function(){
+        timer = null;
+        if(!tracking || moved) return;
+        suppressNextClick = true;
+        onLongPress(e);
+      }, LONG_PRESS_MS);
+    });
+    el.addEventListener('pointermove', function(e){
+      if(!tracking) return;
+      var dx = Math.abs(Number(e.clientX || 0) - startX);
+      var dy = Math.abs(Number(e.clientY || 0) - startY);
+      if(dx > MOVE_TOLERANCE_PX || dy > MOVE_TOLERANCE_PX){
+        moved = true;
+        clear();
+      }
+    });
+    el.addEventListener('pointerup', function(){ tracking = false; clear(); });
+    el.addEventListener('pointercancel', function(){ tracking = false; clear(); });
+    el.addEventListener('pointerleave', function(e){
+      if(e.pointerType === 'mouse' || moved){
+        tracking = false;
+        clear();
+      }
+    });
+    el.addEventListener('click', function(e){
+      if(suppressNextClick){
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        setTimeout(function() { suppressNextClick = false; }, 0);
+      }
+    }, true);
+    el.addEventListener('contextmenu', function(e){
+      if(suppressNextClick) e.preventDefault();
+    });
+  }
+
+  document.querySelectorAll('.deptHead').forEach(function(head){
+    if (head.dataset.deptCaptureBound !== '1') {
+      head.dataset.deptCaptureBound = '1';
+      bindLongPress(head, function(){
+        var cardForLongPress = head.closest('.deptCard');
+        if(!cardForLongPress) return;
+        cardForLongPress.classList.remove('collapsed');
+        cardForLongPress.querySelectorAll('details.shiftCard').forEach(function(shiftCard){
+          shiftCard.open = true;
+          shiftCard.setAttribute('open', '');
+        });
+        captureRosterElement(cardForLongPress, 'department', { expandAllShifts: true });
+      });
+    }
+
+    if (head.dataset.deptShiftToggleBound === '1') return;
+    head.dataset.deptShiftToggleBound = '1';
+    head.addEventListener('click', function() {
+      if (suppressNextClick) return;
+      var card = head.closest('.deptCard');
+      if (!card) return;
+      card.classList.remove('collapsed');
+      var shifts = card.querySelectorAll('details.shiftCard');
+      if (!shifts.length) return;
+      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
+      if (isNaN(step) || step < 0 || step > 2) step = 0;
+      if (step === 0) {
+        shifts.forEach(function(d) { d.setAttribute('open', ''); });
+        card.dataset.deptShiftStep = '1';
+      } else if (step === 1) {
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        card.dataset.deptShiftStep = '2';
+      } else {
+        var now = new Date();
+        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+        var hour = muscatTime.getHours();
+        var minute = muscatTime.getMinutes();
+        var tt = hour * 60 + minute;
+        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
+        shifts.forEach(function(d) { d.removeAttribute('open'); });
+        var target = null;
+        shifts.forEach(function(d) {
+          if (d.dataset.shift === currentShift) target = d;
+        });
+        if (!target) target = shifts[0];
+        if (target) target.setAttribute('open', '');
+        card.dataset.deptShiftStep = '0';
+      }
+    });
+  });
+
+  document.querySelectorAll('.shiftSummary').forEach(function(summary){
+    bindLongPress(summary, function(){
+      var shiftCard = summary.closest('.shiftCard');
+      if(!shiftCard) return;
+      shiftCard.setAttribute('open', '');
+      var deptCard = shiftCard.closest('.deptCard');
+      var deptBanner = buildDeptBannerForSnapshot(deptCard);
+      captureRosterElement(shiftCard, 'shift', deptBanner ? { prependClone: deptBanner } : {});
+    });
+  });
+})();
+
+// ══════════════════════════════════════════════════
+// Language Toggle
+// ══════════════════════════════════════════════════
+var LANG = localStorage.getItem('rosterLang') || 'en';
+window.__summaryCounts = window.__summaryCounts || { employees: 71, departments: 5 };
+window.__summarySwitchMode = 'employees';
+var T = {
+  en: {
+    titleEyebrow:'Import', titleMain:'Duty Roster', langBtn:'ع',
+    employees:'Emp.', departments:'Depts.', total:'Total',
+    morning:'Morning', afternoon:'Afternoon', night:'Night',
+    offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
+    training:'Training', standby:'Standby', other:'Other',
+    from:'FROM', to:'TO',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
+    officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
+    exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+  },
+  ar: {
+    titleEyebrow:'الوارد', titleMain:'جدول المناوبات', langBtn:'EN',
+    employees:'الموظفون', departments:'الأقسام', total:'المجموع',
+    morning:'صباح', afternoon:'ظهر', night:'ليل',
+    offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
+    training:'تدريب', standby:'احتياط', other:'أخرى',
+    from:'من', to:'إلى',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
+    officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+  }
+};
+
+function updateSummarySwitchChip() {
+  var val = document.getElementById('summarySwitchVal');
+  var lbl = document.getElementById('summarySwitchLabel');
+  if(!val || !lbl) return;
+  var t = T[LANG] || T.en;
+  var mode = window.__summarySwitchMode || 'employees';
+  var counts = window.__summaryCounts || {};
+  if(mode === 'departments') {
+    val.style.color = '#059669';
+    val.textContent = counts.departments != null ? counts.departments : 5;
+    lbl.textContent = t.departments;
+    lbl.dataset.key = 'departments';
+  } else {
+    val.style.color = '';
+    val.textContent = counts.employees != null ? counts.employees : 71;
+    lbl.textContent = t.employees;
+    lbl.dataset.key = 'employees';
+  }
+}
+
+function startSummarySwitchLoop() {
+  if(window.__summarySwitchTimer) return;
+  window.__summarySwitchTimer = setInterval(function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateSummarySwitchChip();
+  }, 2200);
+}
+
+function applyLang(lang) {
+  var t=T[lang], isAr=lang==='ar';
+  document.body.classList.toggle('ar',isAr);
+  document.documentElement.setAttribute('lang',lang);
+  var eyebrow=document.getElementById('pageTitleEyebrow');
+  var main=document.getElementById('pageTitleMain');
+  if(eyebrow) eyebrow.textContent=t.titleEyebrow;
+  if(main) main.textContent=t.titleMain;
+  var langLbl=document.getElementById('langToggleLabel');
+  if(langLbl) langLbl.textContent=t.langBtn;
+  else {{ var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn; }}
+  document.querySelectorAll('.chipLabel').forEach(function(el) {
+    var k=el.dataset.key;
+    if(k==='employees') el.textContent=t.employees;
+    else if(k==='departments') el.textContent=t.departments;
+    else if(k==='morning') el.textContent=t.morning2;
+    else if(k==='afternoon') el.textContent=t.afternoon2;
+    else if(k==='night') el.textContent=t.night2;
+    else if(k==='allShifts') el.textContent=t.allShifts;
+    else if(k==='mySchedule') el.textContent=t.mySchedule;
+    else if(k==='importRoster') el.textContent=t.importRoster;
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='diffPage') el.textContent=t.diffPage;
+  });
+  document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
+  var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
+  document.querySelectorAll('.deptTitle').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
+  });
+  var shiftMap={'Morning':t.morning,'Afternoon':t.afternoon,'Night':t.night,
+    'Off Day':t.offday,'Annual Leave':t.annualLeave,'Sick Leave':t.sickLeave,
+    'Training':t.training,'Standby':t.standby,'Other':t.other};
+  document.querySelectorAll('.shiftLabel').forEach(function(el) {
+    if(!el.dataset.key) el.dataset.key=el.textContent.trim();
+    if(shiftMap[el.dataset.key]) el.textContent=shiftMap[el.dataset.key];
+  });
+  document.querySelectorAll('.empStatus .shiftRangeLabel, .empStatus span').forEach(function(el) {
+    var txt=el.textContent.trim();
+    if(txt==='FROM'||txt==='من') el.textContent=t.from;
+    if(txt==='TO'||txt==='إلى') el.textContent=t.to;
+  });
+  function setCtaLabel(id, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var lbl = el.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = text;
+    else el.textContent = text;
+  }
+  setCtaLabel('ctaBtn', t.viewFull);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
+  setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('moreAppsBtn', t.moreApps);
+  if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
+  if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
+  var footer=document.querySelector('.footer');
+  if(footer) {
+    var h=footer.innerHTML;
+    if(isAr) {
+      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
+    } else {
+      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
+    }
+    footer.innerHTML=h;
+  }
+  localStorage.setItem('rosterLang',lang);
+  LANG=lang;
+  updateSummarySwitchChip();
+}
+function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
+
+function setLocalCtaLinks() {
+  var root = getSiteRootPath();
+  var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
+  if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
+}
+
+function goToTraining(e) {
+  if (e) e.preventDefault();
+  var root = getSiteRootPath();
+  location.href = root + '/training/';
+}
+setLocalCtaLinks();
+applyLang(LANG);
+startSummarySwitchLoop();
+
+// ═══════════════════════════════════════════════════
+// Department layout: all sections open + time-based shift open
+// ═══════════════════════════════════════════════════
+(function(){
+  var deptCards = Array.from(document.querySelectorAll('.deptCard'));
+  if(!deptCards.length) return;
+  var savedEmpId = localStorage.getItem('importSavedEmpId') || '';
+  var savedEmpName = ((localStorage.getItem('importSavedEmpName') || '') || '').trim().toLowerCase();
+
+  function getCurrentShiftForMuscat(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var hour = muscatTime.getHours();
+    var minute = muscatTime.getMinutes();
+    var t = hour * 60 + minute;
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function openMatchingShift(card){
+    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
+    if(!shiftCards.length) return;
+    shiftCards.forEach(function(shiftCard){
+      shiftCard.removeAttribute('open');
+    });
+    var currentShift = getCurrentShiftForMuscat();
+    var target = shiftCards.find(function(shiftCard){
+      return shiftCard.dataset.shift === currentShift;
+    }) || shiftCards[0];
+    if(target) target.setAttribute('open', '');
+  }
+
+  function cardHasSavedEmployee(card){
+    var rows = Array.from(card.querySelectorAll('.empName'));
+    if(!rows.length) return false;
+    return rows.some(function(row){
+      var txt = (row.textContent || '').trim();
+      if(!txt) return false;
+      if(savedEmpId && txt.indexOf(savedEmpId) !== -1) return true;
+      if(savedEmpName && txt.toLowerCase().indexOf(savedEmpName) !== -1) return true;
+      return false;
+    });
+  }
+
+  // Keep all department sections visible/open.
+  deptCards.forEach(function(card){
+    card.classList.remove('collapsed');
+    openMatchingShift(card);
+  });
+
+  // If a saved employee exists, move their department to top.
+  if(savedEmpId || savedEmpName){
+    var targetCard = deptCards.find(cardHasSavedEmployee);
+    if(targetCard && targetCard.parentElement){
+      var firstDeptCard = deptCards[0];
+      if(firstDeptCard && firstDeptCard !== targetCard){
+        targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
+      }
+      openMatchingShift(targetCard);
+    }
+  }
+})();
+
+// ═══════════════════════════════════════════════════
+// Shift Filter (NOW PAGE ONLY) — runs after dept layout
+// ═══════════════════════════════════════════════════
+(function(){
+  var filterBtns = document.querySelectorAll('.shiftFilterBtn');
+  if(!filterBtns.length) return;
+
+  var allShiftCards = document.querySelectorAll('.shiftCard');
+
+  function normalizeShift(raw){
+    if(!raw) return '';
+    var t = String(raw).trim().toLowerCase();
+    if(t === 'all' || t.includes('all shifts') || t === 'الكل') return 'All';
+    if(t.includes('morning') || t.includes('صباح')) return 'Morning';
+    if(t.includes('afternoon') || t.includes('ظهر') || t.includes('مساء')) return 'Afternoon';
+    if(t.includes('night') || t.includes('ليل')) return 'Night';
+    if(t.includes('off day') || (t.includes('off') && !t.includes('officer')) || t.includes('راحة') || t.includes('أوف')) return 'Off Day';
+    if(t.includes('annual') || t.includes('سنوية')) return 'Annual Leave';
+    if(t.includes('sick') || t.includes('مرض')) return 'Sick Leave';
+    if(t.includes('training') || t.includes('تدريب')) return 'Training';
+    if(t.includes('standby') || t.includes('ستاند') || t.includes('احتياط')) return 'Standby';
+    if(t.includes('other') || t.includes('أخرى') || t.includes('اخرى')) return 'Other';
+    return String(raw).trim();
+  }
+
+  function btnShift(btn){
+    return normalizeShift(btn.getAttribute('data-shift') || btn.dataset.shift || '');
+  }
+
+  filterBtns.forEach(function(btn){
+    var s = btnShift(btn);
+    if(s) btn.setAttribute('data-shift', s);
+  });
+
+  var shiftGroups = {};
+  allShiftCards.forEach(function(card){
+    var label = card.querySelector('.shiftSummary .shiftLabel');
+    var shiftType = normalizeShift(
+      label ? (label.dataset.key || label.textContent) : (card.getAttribute('data-shift') || card.dataset.shift || '')
+    );
+    if(!shiftType) return;
+    if(!shiftGroups[shiftType]) shiftGroups[shiftType] = [];
+    shiftGroups[shiftType].push(card);
+  });
+
+  function getCurrentShift(){
+    var now = new Date();
+    var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var t = muscatTime.getHours() * 60 + muscatTime.getMinutes();
+    if(t >= 21 * 60 || t < 5 * 60) return 'Night';
+    if(t >= 13 * 60) return 'Afternoon';
+    return 'Morning';
+  }
+
+  function setFilterBtnActive(selectedShift){
+    filterBtns.forEach(function(btn){
+      btn.classList.toggle('active', btnShift(btn) === selectedShift);
+    });
+  }
+
+  function filterShifts(selectedShiftRaw){
+    var selectedShift = normalizeShift(selectedShiftRaw);
+    window.__shiftFilterSelection = selectedShift;
+    var totalEmployees = 0;
+
+    if(selectedShift === 'All'){
+      allShiftCards.forEach(function(card){
+        card.style.display = '';
+        var count = card.querySelector('.shiftCount');
+        if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+      });
+    } else {
+      allShiftCards.forEach(function(card){ card.style.display = 'none'; });
+      if(shiftGroups[selectedShift]){
+        shiftGroups[selectedShift].forEach(function(card){
+          card.style.display = '';
+          card.setAttribute('open', '');
+          var count = card.querySelector('.shiftCount');
+          if(count) totalEmployees += parseInt(count.textContent, 10) || 0;
+        });
+      }
+      var alwaysShow = ['Off Day', 'Annual Leave', 'Sick Leave', 'Training', 'Standby', 'Other'];
+      alwaysShow.forEach(function(type){
+        if(shiftGroups[type]){
+          shiftGroups[type].forEach(function(card){
+            card.style.display = '';
+          });
+        }
+      });
+    }
+
+    window.__summaryCounts = window.__summaryCounts || {};
+    window.__summaryCounts.employees = totalEmployees;
+    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    setFilterBtnActive(selectedShift);
+  }
+
+  window.applyShiftFilter = filterShifts;
+
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterShifts(btnShift(btn));
+    });
+  });
+
+  filterShifts(getCurrentShift());
+})();
+
+function goToMySchedule(event) {
+  if (event) event.preventDefault();
+  var id = localStorage.getItem('importSavedEmpId');
+  var base = (typeof _importBase === 'function' ? _importBase() : (getSiteRootUrl() + '/import')) + '/my-schedules/index.html';
+  location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
+}
+
+function goToImport(event) {
+  if (event) event.preventDefault();
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {
+    var m = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) iso = m[1];
+  }
+  var root = getSiteRootUrl();
+  var fallback = root + '/import/';
+  if (!iso) {
+    location.href = fallback;
+    return;
+  }
+  fetch(root + '/import/import_meta.json', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(meta) {
+      var months = meta && Array.isArray(meta.available_months) ? meta.available_months : [];
+      var ym = iso.slice(0, 7);
+      if (months.length && months.indexOf(ym) === -1) {
+        location.href = fallback;
+        return;
+      }
+      location.href = root + '/import/date/' + iso + '/';
+    })
+    .catch(function() {
+      location.href = root + '/import/date/' + iso + '/';
+    });
+}
+
+function goToRosterDiff(event) {
+  if (event) event.preventDefault();
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
+  location.href = target;
+}
+
+
+// Employee row: tap → schedule; long-press → next 5 shifts preview
+(function initEmployeeNextShiftPreview() {
+  var tooltip = document.createElement('div');
+  tooltip.className = 'nextShiftTooltip';
+  tooltip.innerHTML = '<div class="nextShiftHead"><div class="nextShiftHeadText"><div id="nextShiftEmp" class="nextShiftEmp">-</div><div class="nextShiftTitle">Upcoming 5 shifts</div></div><button type="button" class="nextShiftClose" id="nextShiftClose" aria-label="Close">&times;</button></div><div id="nextShiftBody" class="nextShiftBody"></div>';
+  document.body.appendChild(tooltip);
+  var tooltipBody = tooltip.querySelector('#nextShiftBody');
+  var tooltipEmp = tooltip.querySelector('#nextShiftEmp');
+  var tooltipClose = tooltip.querySelector('#nextShiftClose');
+
+  var scheduleCache = {};
+  var tooltipPinned = false;
+  var activeEl = null;
+  var hideTimer = null;
+  var longPressTimer = null;
+  var suppressClickFor = null;
+  var longPressRow = null;
+  var longPressMoved = false;
+  var LONG_PRESS_MS = 550;
+
+  function empNameFromRow(rowEl) {
+    if (!rowEl) return '';
+    var raw = rowEl.getAttribute('data-emp-name');
+    if (raw) return raw.trim();
+    var nameEl = rowEl.querySelector('.empName');
+    return nameEl ? String(nameEl.textContent || '').trim() : '';
+  }
+
+  function getReferenceIsoDate() {
+    var pathMatch = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+    if (pathMatch) return pathMatch[1];
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscat.getFullYear() + '-' +
+      String(muscat.getMonth() + 1).padStart(2, '0') + '-' +
+      String(muscat.getDate()).padStart(2, '0');
+  }
+
+  function moveTooltip(ev) {
+    if (!ev) return;
+    var x = ev.clientX + 14;
+    var y = ev.clientY + 14;
+    var maxX = window.innerWidth - tooltip.offsetWidth - 10;
+    var maxY = window.innerHeight - tooltip.offsetHeight - 10;
+    tooltip.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+    tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+  }
+  function moveTooltipToElement(el) {
+    if (!el) return;
+    var rect = el.getBoundingClientRect();
+    var x = rect.left + rect.width / 2 + 12;
+    var y = rect.top + rect.height + 12;
+    var maxX = window.innerWidth - tooltip.offsetWidth - 10;
+    var maxY = window.innerHeight - tooltip.offsetHeight - 10;
+    tooltip.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+    tooltip.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+  }
+
+  function cancelHideTooltip() {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
+  function hideTooltipNow() {
+    cancelHideTooltip();
+    tooltipPinned = false;
+    tooltip.classList.remove('show');
+    activeEl = null;
+  }
+
+  function hideTooltipSoon() {
+    if (tooltipPinned) return;
+    cancelHideTooltip();
+    hideTimer = setTimeout(function() {
+      tooltip.classList.remove('show');
+      activeEl = null;
+      hideTimer = null;
+    }, 120);
+  }
+
+  function parseEmployeeId(nameText) {
+    var match = String(nameText || '').match(/-\s*(\d{3,})/);
+    return match ? match[1] : '';
+  }
+
+  function flattenFutureShifts(data, fromIso) {
+    var out = [];
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\d{4})-(\d{2})$/);
+      if (mp) {
+        var y = mp[1], mo = mp[2];
+        data.days.forEach(function(d) {
+          if (!d || !d.day) return;
+          var iso = y + '-' + mo + '-' + String(d.day).padStart(2, '0');
+          if (iso >= fromIso) out.push({ date: iso, shift_code: String(d.code || d.shift_code || '').trim() });
+        });
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;
+    Object.keys(data.schedules).forEach(function(monthKey) {
+      var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+      if (!mk) return;
+      var y = mk[1], mo = mk[2];
+      var rows = data.schedules[monthKey] || [];
+      rows.forEach(function(r) {
+        if (!r) return;
+        var iso = String(r.date || '').trim();
+        if (!iso && r.day != null && r.day !== '') {
+          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+        }
+        if (!iso || iso < fromIso) return;
+        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
+      });
+    });
+    out.sort(function(a, b) {
+      return String(a.date).localeCompare(String(b.date));
+    });
+    return out.slice(0, 5);
+  }
+
+  function formatShortDateParts(isoDate) {
+    var match = String(isoDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return { dayName: '--', dateLabel: String(isoDate || '-') };
+    var d = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    if (isNaN(d.getTime())) return { dayName: '--', dateLabel: String(isoDate || '-') };
+    var dayName = d.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase();
+    var dateLabel = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    return { dayName: dayName, dateLabel: dateLabel };
+  }
+
+  function renderTooltipRows(rows) {
+    if (!rows.length) {
+      tooltipBody.innerHTML = '<div class="nextShiftEmpty">No upcoming shifts found.</div>';
+      return;
+    }
+    tooltipBody.innerHTML = rows.map(function(r) {
+      var parts = formatShortDateParts(String(r.date || ''));
+      var shiftCode = String(r.shift_code || '').trim() || '-';
+      return '<div class="nextShiftItem"><div class="nextShiftDay">' + parts.dayName + '</div><div class="nextShiftDate">' + parts.dateLabel + '</div><div class="nextShiftCode">' + shiftCode + '</div></div>';
+    }).join('');
+  }
+
+  function getScheduleRows(empId, fromIso) {
+    if (!empId) return Promise.resolve([]);
+    if (scheduleCache[empId]) {
+      return Promise.resolve(flattenFutureShifts(scheduleCache[empId], fromIso));
+    }
+    var url = getSiteRootUrl() + '/import/schedules/' + encodeURIComponent(empId) + '.json';
+    return fetch(url).then(function(res) {
+      if (!res.ok) throw new Error('Schedule not found');
+      return res.json();
+    }).then(function(json) {
+      scheduleCache[empId] = json;
+      return flattenFutureShifts(json, fromIso);
+    }).catch(function() {
+      return [];
+    });
+  }
+
+  function showPreviewForRow(rowEl, ev) {
+    if (!rowEl) return;
+    cancelHideTooltip();
+    tooltipPinned = true;
+    activeEl = rowEl;
+    var label = empNameFromRow(rowEl);
+    if (tooltipEmp) tooltipEmp.textContent = label || '-';
+    tooltipBody.innerHTML = '<div class="nextShiftEmpty">Loading...</div>';
+    tooltip.classList.add('show');
+    if (ev && typeof ev.clientX === 'number') moveTooltip(ev);
+    else moveTooltipToElement(rowEl);
+
+    var empId = parseEmployeeId(label);
+    var fromIso = getReferenceIsoDate();
+    getScheduleRows(empId, fromIso).then(function(rows) {
+      if (activeEl !== rowEl) return;
+      renderTooltipRows(rows);
+      if (ev && typeof ev.clientX === 'number') moveTooltip(ev);
+      else moveTooltipToElement(rowEl);
+    });
+  }
+
+  function bindEmployeeRow(rowEl) {
+    if (!rowEl || rowEl.dataset.nextShiftBound === '1') return;
+    rowEl.dataset.nextShiftBound = '1';
+
+    rowEl.addEventListener('pointerdown', function(ev) {
+      if (ev.button !== 0 && ev.button !== undefined) return;
+      longPressRow = rowEl;
+      longPressMoved = false;
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(function() {
+        longPressTimer = null;
+        if (longPressRow !== rowEl || longPressMoved) return;
+        suppressClickFor = rowEl;
+        showPreviewForRow(rowEl, null);
+      }, LONG_PRESS_MS);
+    });
+    rowEl.addEventListener('pointermove', function(ev) {
+      if (longPressRow !== rowEl) return;
+      if (typeof ev.movementX === 'number' && (Math.abs(ev.movementX) > 8 || Math.abs(ev.movementY) > 8)) {
+        longPressMoved = true;
+      }
+    });
+    rowEl.addEventListener('pointerup', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('pointercancel', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('contextmenu', function(ev) {
+      if (suppressClickFor === rowEl) ev.preventDefault();
+    });
+
+    rowEl.addEventListener('click', function(ev) {
+      if (suppressClickFor === rowEl) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        suppressClickFor = null;
+        return;
+      }
+      ev.preventDefault();
+      goToEmployeeSchedule(empNameFromRow(rowEl));
+    }, true);
+
+    rowEl.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        goToEmployeeSchedule(empNameFromRow(rowEl));
+      }
+    });
+  }
+
+  if (tooltipClose) {
+    tooltipClose.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      hideTooltipNow();
+    });
+  }
+
+  function isTooltipOpen() {
+    return tooltip.classList.contains('show');
+  }
+
+  function dismissUnlessTooltipTarget(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev && ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }
+
+  document.addEventListener('pointerdown', dismissUnlessTooltipTarget, true);
+  document.addEventListener('click', function(ev) {
+    if (suppressClickFor) return;
+    dismissUnlessTooltipTarget(ev);
+  }, true);
+
+  function dismissOnScroll() {
+    if (isTooltipOpen()) hideTooltipNow();
+  }
+  window.addEventListener('scroll', dismissOnScroll, true);
+  window.addEventListener('wheel', dismissOnScroll, { passive: true, capture: true });
+  window.addEventListener('touchmove', function(ev) {
+    if (!isTooltipOpen()) return;
+    var t = ev.target;
+    if (t && typeof t.closest === 'function' && t.closest('.nextShiftTooltip')) return;
+    hideTooltipNow();
+  }, { passive: true, capture: true });
+
+  document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);
+})();
+
+
+
+// Import roster catalog: only months/dates with a published roster file (import_meta.json).
+window.importDateIsPublished = function(iso) {
+  if (!iso) return false;
+  var dates = window.__importPublishedDates;
+  if (Array.isArray(dates) && dates.length) return dates.indexOf(iso) >= 0;
+  var months = window.__importAvailableMonths;
+  if (Array.isArray(months) && months.length) return months.indexOf(String(iso).slice(0, 7)) >= 0;
+  return true;
+};
+
+(function applyImportDateRange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker) return;
+  function base() {
+    if (typeof _importBase === 'function') return _importBase();
+    var path = window.location.pathname || '/';
+    return path
+      .replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/\d{4}-\d{2}-\d{2}\/.*$/, '/')
+      .replace(/\/now\/.*$/, '/')
+      .replace(/\/+$/, '');
+  }
+  fetch(base() + '/import_meta.json', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(meta) {
+      if (!meta) return;
+      if (meta.date_min) picker.min = meta.date_min;
+      if (meta.date_max) picker.max = meta.date_max;
+      if (Array.isArray(meta.published_dates)) window.__importPublishedDates = meta.published_dates.slice();
+      if (Array.isArray(meta.available_months) && meta.available_months.length) {
+        window.__importAvailableMonths = meta.available_months.slice();
+        window._avail = meta.available_months.slice();
+      }
+    })
+    .catch(function() {});
+})();
+
+(function guardImportDateChange() {
+  var picker = document.getElementById('datePicker');
+  if (!picker || picker.dataset.importGuard === '1') return;
+  picker.dataset.importGuard = '1';
+  picker.addEventListener('change', function(ev) {
+    if (!picker.value) return;
+    if (typeof importDateIsPublished === 'function' && !importDateIsPublished(picker.value)) {
+      ev.stopImmediatePropagation();
+      var ar = (document.documentElement.lang || '') === 'ar';
+      alert(ar ? 'لا يوجد ملف روستر منشور لهذا التاريخ.' : 'No published roster file for this date.');
+      var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) picker.value = m[1];
+      return false;
+    }
+  }, true);
+})();
+
+
+/* ===== Import path overrides ===== */
+function getSiteRootPath() {
+  var path = location.pathname || '/';
+  if (path.includes('/roster-site/')) return '/roster-site';
+  if (location.hostname && location.hostname.endsWith('github.io')) {
+    var segs = path.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+    return segs.length ? '/' + segs[0] : '';
+  }
+  return '';
+}
+
+function getSiteRootUrl() {
+  return location.origin + getSiteRootPath();
+}
+
+function _importBase() {
+  return getSiteRootUrl() + '/import';
+}
+
+function goToMySchedule(event) {
+  if(event) event.preventDefault();
+  var id = localStorage.getItem('importSavedEmpId');
+  var base = _importBase() + '/my-schedules/index.html';
+  location.href = id ? base + '?emp=' + encodeURIComponent(id) : base;
+}
+
+function goToEmployeeSchedule(empName) {
+  var s = String(empName || '').trim();
+  var base = _importBase() + '/my-schedules/index.html';
+  var m = s.match(/-\s*(\d+)\s*$/);
+  if (m) {
+    location.href = base + '?emp=' + encodeURIComponent(m[1]);
+  } else {
+    location.href = base + '?name=' + encodeURIComponent(s);
+  }
+}
+
+function goToExport(event) {
+  if (event) event.preventDefault();
+  var picker = document.getElementById('datePicker');
+  var iso = (picker && picker.value) ? picker.value : '';
+  if (!iso) {
+    var m = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+    if (m) iso = m[1];
+  }
+  var root = getSiteRootUrl();
+  if (!iso) {
+    location.href = root + '/';
+    return;
+  }
+  location.href = root + '/date/' + iso + '/';
+}
+
+function goToRosterDiff(event) {
+  if (event) event.preventDefault();
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
+  location.href = target;
+}
+
+(function bindFlightSwitchIcons() {
+  var root = getSiteRootUrl();
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
+    img.src = iconUrl;
+  });
+})();
+
+function setSummaryChipHrefs() {
+  var importBase = _importBase() + '/my-schedules/index.html';
+  var root = getSiteRootUrl();
+  var my = document.getElementById('myScheduleBtn');
+  var exp = document.getElementById('exportBtn');
+  var welcome = document.getElementById('welcomeChip');
+  var trn = document.getElementById('trainingBtn');
+  var diff = document.getElementById('diffChipBtn');
+  if (my) my.href = importBase;
+  if (exp) {
+    var iso = '';
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) iso = picker.value;
+    if (!iso) {
+      var pm = (location.pathname || '').match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//);
+      if (pm) iso = pm[1];
+      if (!iso) {
+        var m2 = (location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
+        if (m2) iso = m2[1];
+      }
+    }
+    exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
+  }
+  if (trn) trn.href = root + '/training/';
+  if (diff) diff.href = root + '/roster-diff/index.html';
+  if (welcome) {
+    var wid = localStorage.getItem('importSavedEmpId');
+    welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
+  }
+}
+setSummaryChipHrefs();
+
+
+(function loadLocalEnhancements() {
+  var root = getSiteRootUrl();
+  var ver = '20260705a';
+  function addScript(src) {
+    if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.setAttribute('data-local-src', src);
+    document.body.appendChild(s);
+  }
+  addScript(root + '/site-last-updated.js?v=' + ver);
+  function loadSecondary() {
+    addScript(root + '/roster-icons.js?v=' + ver);
+    addScript(root + '/site-share.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/wc-vote-promo.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/change-alert.js?v=' + ver);
+    addScript(root + '/banner-changer.js?v=' + ver);
+  }
+  if (window.requestIdleCallback) {
+    requestIdleCallback(loadSecondary, { timeout: 3000 });
+  } else {
+    window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
+  }
+})();
+
+(function showWelcomeChip() {
+  var empId = localStorage.getItem('importSavedEmpId');
+  if (!empId) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
+  var base = getSiteRootUrl() + '/';
+  fetch(base + 'import/schedules/' + empId + '.json')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(d) {
+      if (!d || !d.name) return;
+      if (chip && nameEl) {
+        nameEl.textContent = d.name.split(' ')[0];
+        chip.classList.add('visible');
+      }
+      if (d.department && typeof window.reorderImportDepartments === 'function') {
+        window.reorderImportDepartments(d.department);
+      }
+    })
+    .catch(function() {});
+})();
+
+// Override the BASE placeholder for links that were hardcoded in Export HTML
+(function() {
+  var base = _importBase();
+  document.querySelectorAll('a[href*="{BASE}"], a[href*="{{BASE}}"]').forEach(function(a) {
+    var href = a.getAttribute('href') || '';
+    a.href = href.replaceAll('{{BASE}}', base).replaceAll('{BASE}', base);
+  });
+  setSummaryChipHrefs();
+})();
+
+// Import banner labels (export script uses titleEyebrow + titleMain).
+(function() {
+  if (typeof T !== 'undefined') {
+    if (T.en) { T.en.titleEyebrow = 'Import'; T.en.titleMain = 'Duty Roster'; }
+    if (T.ar) { T.ar.titleEyebrow = 'الوارد'; T.ar.titleMain = 'جدول المناوبات'; }
+  }
+  if (typeof applyLang === 'function' && typeof LANG !== 'undefined') {
+    applyLang(LANG);
+  }
+})();
+
+</script>
+
+</body>
+</html>
