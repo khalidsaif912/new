@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from roster_app.cache_io import download_excel, month_key_from_filename  # noqa: E402
+from roster_app.cache_io import download_excel, looks_like_roster_month_filename, month_key_from_filename  # noqa: E402
 
 MUSCAT = timezone(timedelta(hours=4))
 
@@ -106,6 +106,9 @@ def gate_export() -> int:
     old_name = _read_text(ROOT / "last_filename.txt") or "none"
     name_changed = old_name != current_name
     month_key = month_key_from_filename(current_name) or ""
+    if looks_like_roster_month_filename(current_name) and not month_key:
+        print(f"::error::Could not detect month from export filename: {current_name}")
+        return 1
 
     content_changed = False
     remote_hash = ""
@@ -178,6 +181,9 @@ def gate_import() -> int:
     old_name = _read_text(ROOT / "import_last_filename.txt") or "none"
     name_changed = old_name != current_name
     month_key = month_key_from_filename(current_name) or ""
+    if looks_like_roster_month_filename(current_name) and not month_key:
+        print(f"::error::Could not detect month from import filename: {current_name}")
+        return 1
 
     content_changed = False
     remote_hash = ""

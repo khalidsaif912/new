@@ -415,27 +415,14 @@ def add_months(year, month, delta):
 
 
 def detect_month_from_url(url: str):
-    """استنتاج الشهر من اسم ملف Excel في الرابط"""
-    if not url:
+    """استنتاج الشهر من اسم ملف Excel — نفس منطق generate_and_send."""
+    from roster_app.cache_io import month_key_from_filename
+
+    key = month_key_from_filename(url or "")
+    if not key:
         return None
-    month_map = {
-        "jan":1,"january":1,"feb":2,"february":2,"mar":3,"march":3,
-        "apr":4,"april":4,"may":5,"jun":6,"june":6,"jul":7,"july":7,
-        "aug":8,"august":8,"sep":9,"sept":9,"september":9,
-        "oct":10,"october":10,"nov":11,"november":11,"dec":12,"december":12,
-    }
-    m = re.search(r'(20\d{2})[-_](0[1-9]|1[0-2])', url)
-    if m:
-        return int(m.group(1)), int(m.group(2))
-    m2 = re.search(
-        r'(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)[\s_-]*(20\d{2})',
-        url, re.IGNORECASE
-    )
-    if m2:
-        mon = m2.group(1).lower()
-        yr = int(m2.group(2))
-        return (yr, month_map[mon]) if mon in month_map else None
-    return None
+    year_s, month_s = key.split("-", 1)
+    return int(year_s), int(month_s)
 
 
 def detect_month_from_wb(wb):

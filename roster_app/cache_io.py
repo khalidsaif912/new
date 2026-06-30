@@ -156,6 +156,18 @@ MONTH_NAME_TO_NUM = {
 }
 
 
+_ROSTER_MONTH_HINT = re.compile(
+    r"\b(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|sept|october|oct|november|nov|december|dec)\b|20\d{2}",
+    re.IGNORECASE,
+)
+
+
+def looks_like_roster_month_filename(name: str) -> bool:
+    if not name:
+        return False
+    return bool(_ROSTER_MONTH_HINT.search(name))
+
+
 def month_key_from_filename(name: str) -> str | None:
     if not name:
         return None

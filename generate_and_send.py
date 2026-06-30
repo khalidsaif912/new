@@ -42,6 +42,7 @@ from roster_app.cache_io import (
     download_excel,
     get_source_name,
     infer_pages_base_url,
+    looks_like_roster_month_filename,
     month_key_from_filename,
     try_load_cached_workbook,
     write_bytes,
@@ -3507,6 +3508,11 @@ def main():
     incoming_key = month_key_from_filename(source_name) if source_name else None
     print(f"📄 Source file: {source_name}")
     print(f"📅 Detected month: {incoming_key or 'unknown'}")
+    if source_name and looks_like_roster_month_filename(source_name) and not incoming_key:
+        raise RuntimeError(
+            f"Could not detect month from roster filename: {source_name}. "
+            "Fix month_key_from_filename before publishing."
+        )
 
     # Anchor calendar window to the roster file month (e.g. June file while today is still May).
     if incoming_key and not args.date and (args.excel_file or data):
@@ -3593,6 +3599,14 @@ def main():
         min_date=min_date, max_date=max_date,
         site_last_updated=site_last_updated,
     )
+
+    if incoming_key and data:
+        slot_wb = {prev_key: wb_prev, curr_key: wb_curr, next_key: wb_next}.get(incoming_key)
+        if slot_wb is None:
+            raise RuntimeError(
+                f"Roster data downloaded for {incoming_key} but no workbook was bound "
+                f"to the publish window ({prev_key}, {curr_key}, {next_key})."
+            )
 
     # الصفحة الرئيسية تستخدم الشهر الحالي
     wb = wb_curr
