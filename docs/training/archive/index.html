@@ -173,34 +173,8 @@ body{
 }
 .dockCard:active{transform:translateY(-1px)}
 .dockAction{cursor:pointer;border:none;font-family:inherit;background:#fff}
-.statsCard{
-  flex:1 1 100%;
-  max-width:100%;
-  display:flex;align-items:center;justify-content:center;
-  padding:10px 12px;
-  background:#fff;
-  border-color:rgba(15,23,42,.1);
-}
-.statsTicker{position:relative;width:100%;height:26px;overflow:hidden;isolation:isolate}
-.statsFace{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  opacity:0;transform:translateY(110%);
-  transition:transform .58s cubic-bezier(.22,.7,.2,1),opacity .28s ease;
-  will-change:transform,opacity;
-}
-.statsFace.active{opacity:1;transform:translateY(0);z-index:2}
-.statsFace.prev{opacity:0;transform:translateY(-110%);z-index:1}
-.statsIcon{display:none}
-.statsText{min-width:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;white-space:nowrap}
-.statsValue{
-  font-size:22px;font-weight:900;line-height:1;height:26px;
-  display:flex;align-items:center;justify-content:center;
-  color:#1e40af;font-family:'Sora',sans-serif;
-}
-.statsLabel{
-  margin-top:4px;font-size:9.5px;font-weight:600;color:#64748b;
-  text-transform:uppercase;letter-spacing:.4px;
-}
+.statChip{pointer-events:none;cursor:default}
+.statChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06);border-color:rgba(15,23,42,.1)}
 .otherPageInner{
   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;min-height:26px;width:100%;padding-inline:0;
@@ -282,10 +256,13 @@ body{
 .myTrainingHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .myTrainingTitle{font:800 15px/1.25 'Sora',sans-serif;color:#0f766e}
 .myTrainingSub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
-.myTrainingCount{
-  flex:0 0 auto;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#0f766e;
-  font-size:11px;font-weight:800;white-space:nowrap;
+.myTrainingCountChip{
+  flex:0 0 auto;pointer-events:none;cursor:default;
+  background:#fff;border-color:rgba(13,148,136,.18);
 }
+.myTrainingCountChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.myTrainingCountChip .dockValue{color:#0f766e}
+.myTrainingCountChip .dockLabel{color:#64748b}
 .myTrainingList{display:flex;flex-direction:column;gap:8px}
 .myTrainingItem{
   display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 12px;align-items:center;
@@ -510,9 +487,7 @@ body{
   .header::after{font-size:56px;left:4%;bottom:8%}
   .topDock{gap:6px;margin-top:14px}
   .dockCard{padding:8px 8px;min-width:60px;border-radius:14px}
-  .statsTicker{height:26px}
-  .statsValue{font-size:18px;height:24px}
-  .statsLabel{font-size:8.5px}
+  .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}

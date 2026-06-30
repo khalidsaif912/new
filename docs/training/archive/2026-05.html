@@ -173,34 +173,8 @@ body{
 }
 .dockCard:active{transform:translateY(-1px)}
 .dockAction{cursor:pointer;border:none;font-family:inherit;background:#fff}
-.statsCard{
-  flex:1 1 100%;
-  max-width:100%;
-  display:flex;align-items:center;justify-content:center;
-  padding:10px 12px;
-  background:#fff;
-  border-color:rgba(15,23,42,.1);
-}
-.statsTicker{position:relative;width:100%;height:26px;overflow:hidden;isolation:isolate}
-.statsFace{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  opacity:0;transform:translateY(110%);
-  transition:transform .58s cubic-bezier(.22,.7,.2,1),opacity .28s ease;
-  will-change:transform,opacity;
-}
-.statsFace.active{opacity:1;transform:translateY(0);z-index:2}
-.statsFace.prev{opacity:0;transform:translateY(-110%);z-index:1}
-.statsIcon{display:none}
-.statsText{min-width:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;white-space:nowrap}
-.statsValue{
-  font-size:22px;font-weight:900;line-height:1;height:26px;
-  display:flex;align-items:center;justify-content:center;
-  color:#1e40af;font-family:'Sora',sans-serif;
-}
-.statsLabel{
-  margin-top:4px;font-size:9.5px;font-weight:600;color:#64748b;
-  text-transform:uppercase;letter-spacing:.4px;
-}
+.statChip{pointer-events:none;cursor:default}
+.statChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06);border-color:rgba(15,23,42,.1)}
 .otherPageInner{
   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;min-height:26px;width:100%;padding-inline:0;
@@ -282,10 +256,13 @@ body{
 .myTrainingHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .myTrainingTitle{font:800 15px/1.25 'Sora',sans-serif;color:#0f766e}
 .myTrainingSub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
-.myTrainingCount{
-  flex:0 0 auto;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#0f766e;
-  font-size:11px;font-weight:800;white-space:nowrap;
+.myTrainingCountChip{
+  flex:0 0 auto;pointer-events:none;cursor:default;
+  background:#fff;border-color:rgba(13,148,136,.18);
 }
+.myTrainingCountChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.myTrainingCountChip .dockValue{color:#0f766e}
+.myTrainingCountChip .dockLabel{color:#64748b}
 .myTrainingList{display:flex;flex-direction:column;gap:8px}
 .myTrainingItem{
   display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 12px;align-items:center;
@@ -510,9 +487,7 @@ body{
   .header::after{font-size:56px;left:4%;bottom:8%}
   .topDock{gap:6px;margin-top:14px}
   .dockCard{padding:8px 8px;min-width:60px;border-radius:14px}
-  .statsTicker{height:26px}
-  .statsValue{font-size:18px;height:24px}
-  .statsLabel{font-size:8.5px}
+  .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
@@ -583,9 +558,7 @@ body{
 
   
 <div class="topDock">
-  <div class="dockCard statsCard">
-    <div class="statsTicker"><div class="statsFace"><div class="statsText"><div class="statsValue">7</div><div class="statsLabel">Sessions</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">6</div><div class="statsLabel">Types</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">59</div><div class="statsLabel">Employees</div></div></div><div class="statsFace"><div class="statsText"><div class="statsValue">1</div><div class="statsLabel">Venues</div></div></div></div>
-  </div>
+  <div class="dockCard statChip"><div class="dockValue">7</div><div class="dockLabel">Sessions</div></div><div class="dockCard statChip"><div class="dockValue">6</div><div class="dockLabel">Types</div></div><div class="dockCard statChip"><div class="dockValue">59</div><div class="dockLabel">Employees</div></div><div class="dockCard statChip"><div class="dockValue">1</div><div class="dockLabel">Venues</div></div>
   <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
     <div class="rosterInner"><span class="rosterIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span class="rosterLabel">Roster</span></div>
   </button>
@@ -611,7 +584,10 @@ body{
         <div class="myTrainingTitle" id="myTrainingTitle">My training dates</div>
         <div class="myTrainingSub" id="myTrainingSub"></div>
       </div>
-      <div class="myTrainingCount" id="myTrainingCount"></div>
+      <div class="myTrainingCountChip dockCard" id="myTrainingCount">
+        <div class="dockValue" id="myTrainingCountVal">0</div>
+        <div class="dockLabel" id="myTrainingCountLbl">Sessions</div>
+      </div>
     </div>
     <div class="myTrainingList" id="myTrainingList"></div>
   </div>
@@ -829,14 +805,14 @@ body{
   const emptyState = document.getElementById('emptyState');
   const monthPicker = document.getElementById('monthPicker');
   const pastSep = document.getElementById('pastSep');
-  const statsFaces = Array.from(document.querySelectorAll('.statsFace'));
   const otherPageBtn = document.getElementById('otherPageBtn');
   const rosterHomeBtn = document.getElementById('rosterHomeBtn');
 
   const myTrainingPanel = document.getElementById('myTrainingPanel');
   const myTrainingTitle = document.getElementById('myTrainingTitle');
   const myTrainingSub = document.getElementById('myTrainingSub');
-  const myTrainingCount = document.getElementById('myTrainingCount');
+  const myTrainingCountVal = document.getElementById('myTrainingCountVal');
+  const myTrainingCountLbl = document.getElementById('myTrainingCountLbl');
   const myTrainingList = document.getElementById('myTrainingList');
   const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -915,9 +891,10 @@ body{
     if(myTrainingSub) myTrainingSub.textContent = ar
       ? ('لـ ' + who + codeText)
       : ('For ' + who + codeText);
-    if(myTrainingCount) myTrainingCount.textContent = ar
-      ? (sessions.length + ' دورة')
-      : (sessions.length + ' session' + (sessions.length === 1 ? '' : 's'));
+    if(myTrainingCountVal) myTrainingCountVal.textContent = String(sessions.length);
+    if(myTrainingCountLbl) myTrainingCountLbl.textContent = ar
+      ? (sessions.length === 1 ? 'دورة' : 'دورات')
+      : (sessions.length === 1 ? 'Session' : 'Sessions');
     if(!sessions.length){
       myTrainingList.innerHTML = '<div class="myTrainingEmpty">' + (ar
         ? 'لا توجد دورات مسجّلة لهذا الرقم في هذا الشهر.'
@@ -1058,32 +1035,6 @@ body{
     const trainingBase = window.location.pathname.includes('/new/docs/') ? '/new/docs' : '';
     window.location.href = root + trainingBase + '/a-cup-of-book/';
   });
-  if(statsFaces.length){
-    let idx = 0;
-    const placeFaces = (activeIdx, prevIdx = -1) => {
-      statsFaces.forEach((f,i)=>{
-        f.classList.remove('active','prev');
-        if(i === activeIdx){
-          f.style.transform = 'translateY(0)';
-          f.style.opacity = '1';
-          f.classList.add('active');
-        }else if(i === prevIdx){
-          f.style.transform = 'translateY(-110%)';
-          f.style.opacity = '0';
-          f.classList.add('prev');
-        }else{
-          f.style.transform = 'translateY(110%)';
-          f.style.opacity = '0';
-        }
-      });
-    };
-    placeFaces(0);
-    setInterval(() => {
-      const prev = idx;
-      idx = (idx + 1) % statsFaces.length;
-      placeFaces(idx, prev);
-    }, 2600);
-  }
   refreshSaved();
   applyFilters();
 })();
