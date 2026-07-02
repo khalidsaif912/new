@@ -26,6 +26,9 @@ from roster_cta_snippets import (  # noqa: E402
     APPLY_LANG_LANG_BTN_NEW,
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
+    SHIFT_COPY_BUTTON_HTML,
+    SHIFT_COPY_MODAL_HTML,
+    SHIFT_COPY_CSS,
     export_cta_html,
     IOS_PERF_VER,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
@@ -1512,6 +1515,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .siteAppsCloseWrap {{ margin-top:4px; }}
     .siteAppsCloseWrap .roster-cta-btn {{ width:100%; }}
 
+{SHIFT_COPY_CSS}
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
     .footer strong {{ color:#64748b; }}
@@ -1645,6 +1649,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <!-- ════ CTA ════ -->
 {export_cta_html()}
 
+  <!-- ════ COPY SHIFT ════ -->
+{SHIFT_COPY_BUTTON_HTML}
+
   <!-- ════ FOOTER ════ -->
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">{last_updated}</strong><br>
@@ -1656,6 +1663,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 {SITE_SHARE_MODAL_HTML}
 
 {SITE_APPS_MODAL_HTML}
+
+{SHIFT_COPY_MODAL_HTML}
 
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -2536,6 +2545,7 @@ var T = {{
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+    copyShift:'Copy Shift List', copyTitle:'On-duty list', copyHint:'Pick a shift — copied as WhatsApp text (Officers excluded)', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close',
   }},
   ar: {{
     titleEyebrow:'الصادر', titleMain:'جدول المناوبات', langBtn:'EN',
@@ -2548,6 +2558,7 @@ var T = {{
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+    copyShift:'نسخ قائمة المناوبة', copyTitle:'قائمة المناوبين', copyHint:'اختر مناوبة — تُنسخ كنص واتساب (بدون الضباط)', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق',
   }}
 }};
 
@@ -2637,8 +2648,10 @@ function applyLang(lang) {{
   setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
+  setCtaLabel('copyShiftBtn', t.copyShift);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
+  if(window.rosterSiteShiftCopy && window.rosterSiteShiftCopy.setLang) window.rosterSiteShiftCopy.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {{
     var h=footer.innerHTML;

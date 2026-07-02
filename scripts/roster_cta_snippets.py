@@ -812,6 +812,181 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
 </div>
 """
 
+# ═══════════════════════════════════════════════════════════════════════
+# SHIFT COPY — bottom button + modal to copy on-duty names as WhatsApp text
+# ═══════════════════════════════════════════════════════════════════════
+SVG_COPY_SHIFT = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="8" y="8" width="12" height="12" rx="2"/>'
+    '<path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'
+    '<path d="M11.5 13h5M11.5 16h3"/></svg>'
+)
+
+
+def _shift_opt_svg(paths: str, stroke: str) -> str:
+    return (
+        f'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="{stroke}" '
+        f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
+    )
+
+
+_SVG_OPT_MORNING = _shift_opt_svg(
+    '<circle cx="12" cy="12" r="4"/>'
+    '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41"/>'
+    '<path d="M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    "#f59e0b",
+)
+_SVG_OPT_AFTERNOON = _shift_opt_svg(
+    '<path d="M17 18H8a5 5 0 1 1 2-9.5"/><circle cx="17" cy="8" r="3"/>',
+    "#f97316",
+)
+_SVG_OPT_NIGHT = _shift_opt_svg(
+    '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+    "#8b5cf6",
+)
+_SVG_OPT_ANNUAL = _shift_opt_svg(
+    '<path d="M12 3v3M5.6 8.6 3.5 6.5M18.4 8.6l2.1-2.1"/>'
+    '<path d="M3 13a9 9 0 0 1 18 0z"/>'
+    '<path d="M12 13v8M9 21h6"/>',
+    "#dc2626",
+)
+_SVG_OPT_TRAINING = _shift_opt_svg(
+    '<path d="M22 10 12 5 2 10l10 5 10-5z"/>'
+    '<path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/>',
+    "#7c3aed",
+)
+
+_SHIFT_OPT_ICONS = {
+    "Morning": ("shiftCopyOpt--morning", _SVG_OPT_MORNING),
+    "Afternoon": ("shiftCopyOpt--afternoon", _SVG_OPT_AFTERNOON),
+    "Night": ("shiftCopyOpt--night", _SVG_OPT_NIGHT),
+    "Annual Leave": ("shiftCopyOpt--annual", _SVG_OPT_ANNUAL),
+    "Training": ("shiftCopyOpt--training", _SVG_OPT_TRAINING),
+}
+
+_SHIFT_OPT_LABELS = {
+    "Morning": "Morning",
+    "Afternoon": "Afternoon",
+    "Night": "Night",
+    "Annual Leave": "Annual Leave",
+    "Training": "Training",
+}
+
+
+def _shift_copy_option(shift_key: str) -> str:
+    cls, icon = _SHIFT_OPT_ICONS[shift_key]
+    label = _SHIFT_OPT_LABELS[shift_key]
+    return (
+        f'      <button type="button" class="shiftCopyOpt {cls}" data-shift="{shift_key}">\n'
+        f'        <span class="shiftCopyOpt-icon">{icon}</span>\n'
+        f'        <span class="shiftCopyOpt-label">{label}</span>\n'
+        f'        <span class="shiftCopyOpt-count" data-shift-count="{shift_key}">0</span>\n'
+        f"      </button>\n"
+    )
+
+
+SHIFT_COPY_BUTTON_HTML = (
+    '<nav class="quickActions rosterCopyBar" aria-label="Copy on-duty list">\n'
+    '  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">\n'
+    f'    <span class="roster-cta-icon">{SVG_COPY_SHIFT}</span>\n'
+    '    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift List</span>\n'
+    "  </button>\n"
+    "</nav>\n"
+)
+
+SHIFT_COPY_MODAL_HTML = (
+    '<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">\n'
+    '  <div class="shiftCopyCard" role="dialog" aria-labelledby="shiftCopyTitle">\n'
+    '    <h2 class="shiftCopyTitle" id="shiftCopyTitle">On-duty list</h2>\n'
+    '    <p class="shiftCopyHint" id="shiftCopyHint">Pick a shift — copied as WhatsApp text (Officers excluded)</p>\n'
+    '    <div class="shiftCopyGrid">\n'
+    + _shift_copy_option("Morning")
+    + _shift_copy_option("Afternoon")
+    + _shift_copy_option("Night")
+    + _shift_copy_option("Annual Leave")
+    + _shift_copy_option("Training")
+    + "    </div>\n"
+    '    <p class="shiftCopyStatus" id="shiftCopyStatus" aria-live="polite"></p>\n'
+    '    <div class="shiftCopyCloseWrap">\n'
+    '      <button type="button" class="roster-cta-btn roster-cta-btn--muted shiftCopyCloseBtn" id="shiftCopyCloseBtn">\n'
+    '        <span class="roster-cta-label" id="shiftCopyCloseLabel">Close</span>\n'
+    "      </button>\n"
+    "    </div>\n"
+    "  </div>\n"
+    "</div>\n"
+)
+
+# Plain-CSS (single braces). Interpolated into the page <style> f-string.
+SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
+    .quickActions.rosterCopyBar {
+      margin-top: 10px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: 1fr;
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .rosterCopyBar .roster-cta-btn { width: 100%; }
+    .shiftCopySheet {
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
+      pointer-events: none; visibility: hidden;
+    }
+    .shiftCopySheet.open { display: flex; pointer-events: auto; visibility: visible; }
+    .shiftCopyCard {
+      width: min(100%, 380px); background: #fff; border-radius: 18px; padding: 18px 16px 14px;
+      border: 1px solid rgba(15,23,42,.1); box-shadow: 0 20px 48px rgba(15,23,42,.22);
+      text-align: center;
+    }
+    .shiftCopyTitle { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
+    .shiftCopyHint { font-size: 12px; color: #64748b; margin: 0 0 14px; line-height: 1.4; }
+    .shiftCopyGrid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 6px; }
+    .shiftCopyOpt {
+      display: flex; align-items: center; gap: 12px;
+      min-height: 52px; padding: 10px 14px; border-radius: 14px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc; cursor: pointer;
+      font: inherit; text-align: start; -webkit-tap-highlight-color: transparent;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .shiftCopyOpt:active { transform: scale(.98); }
+    .shiftCopyOpt-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px; background: #fff;
+      border: 1px solid #e2e8f0; flex-shrink: 0;
+    }
+    .shiftCopyOpt-label { flex: 1; font-size: 14px; font-weight: 800; color: #1e293b; }
+    .shiftCopyOpt-count {
+      min-width: 26px; padding: 2px 8px; border-radius: 999px;
+      font-size: 12px; font-weight: 800; color: #475569;
+      background: #eef2f7; border: 1px solid #e2e8f0;
+    }
+    .shiftCopyOpt.is-empty { opacity: .5; }
+    .shiftCopyOpt--morning { border-color: #fcd34d; background: #fffbeb; }
+    .shiftCopyOpt--morning .shiftCopyOpt-icon { background: #fef9c3; border-color: #fde68a; }
+    .shiftCopyOpt--afternoon { border-color: #fdba74; background: #fff7ed; }
+    .shiftCopyOpt--afternoon .shiftCopyOpt-icon { background: #ffedd5; border-color: #fed7aa; }
+    .shiftCopyOpt--night { border-color: #c4b5fd; background: #f5f3ff; }
+    .shiftCopyOpt--night .shiftCopyOpt-icon { background: #ede9fe; border-color: #ddd6fe; }
+    .shiftCopyOpt--annual { border-color: #fca5a5; background: #fef2f2; }
+    .shiftCopyOpt--annual .shiftCopyOpt-icon { background: #fee2e2; border-color: #fecaca; }
+    .shiftCopyOpt--training { border-color: #d8b4fe; background: #faf5ff; }
+    .shiftCopyOpt--training .shiftCopyOpt-icon { background: #f3e8ff; border-color: #e9d5ff; }
+    .shiftCopyStatus {
+      min-height: 18px; margin: 10px 0 12px; font-size: 12.5px; font-weight: 700;
+      line-height: 1.4; color: #64748b;
+    }
+    .shiftCopyStatus.is-ok { color: #166534; }
+    .shiftCopyStatus.is-err { color: #b91c1c; }
+    .shiftCopyCloseWrap { margin-top: 2px; }
+    .shiftCopyCloseWrap .roster-cta-btn { width: 100%; }
+    body.ar .shiftCopyOpt { text-align: start; }
+    @media (hover: hover) {
+      .shiftCopyOpt:hover { background: #fff; box-shadow: 0 6px 16px rgba(15,23,42,.08); transform: translateY(-1px); }
+    }
+"""
+
 ROSTER_ICONS_SCRIPT = "addScript(root + '/roster-icons.js?v=' + ver);"
 SITE_APPS_SCRIPT = "  addScript(root + '/site-apps.js?v=' + ver);"
 
@@ -1015,6 +1190,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
