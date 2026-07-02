@@ -29,6 +29,37 @@
     return t(LABEL_KEYS[shiftKey] || "", shiftKey);
   }
 
+  var MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var MONTHS_AR = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+    "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+  function pad2(n) {
+    return (n < 10 ? "0" : "") + n;
+  }
+
+  // The reference date for the current page (date pages, picker, or today Muscat).
+  function refIsoDate() {
+    var m = (location.pathname || "").match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+    if (m) return m[1];
+    var picker = document.getElementById("datePicker");
+    if (picker && picker.value) return picker.value;
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 3600 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    return muscat.getFullYear() + "-" + pad2(muscat.getMonth() + 1) + "-" + pad2(muscat.getDate());
+  }
+
+  function formatDate(iso) {
+    var parts = (iso || "").split("-");
+    if (parts.length !== 3) return iso || "";
+    var d = parseInt(parts[2], 10);
+    var mo = parseInt(parts[1], 10);
+    var y = parts[0];
+    var months = (window.LANG === "ar") ? MONTHS_AR : MONTHS_EN;
+    var name = months[mo - 1] || String(mo);
+    return d + " " + name + " " + y;
+  }
+
   function deptEnglishName(card) {
     var el = card.querySelector(".deptTitle");
     if (!el) return "";
@@ -88,6 +119,9 @@
     var groups = collectGroups(shiftKey);
     if (!groups.length) return "";
     var lines = [];
+    // Header: shift name + date, so the recipient knows what the list is.
+    lines.push("\u200e*" + labelFor(shiftKey) + " — " + formatDate(refIsoDate()) + "*");
+    lines.push("");
     groups.forEach(function (g, i) {
       // Prefix each line with a Left-to-Right Mark so WhatsApp keeps LTR
       // alignment even when the app UI is Arabic (RTL).
@@ -147,16 +181,22 @@
     var hint = document.getElementById("shiftCopyHint");
     var closeLbl = document.getElementById("shiftCopyCloseLabel");
     if (title) title.textContent = t("copyTitle", "On-duty list");
-    if (hint) hint.textContent = t("copyHint", "Pick a shift — copied as WhatsApp text (Officers excluded)");
+    if (hint) hint.textContent = t("copyHint", "Copy or share a shift as WhatsApp text");
     if (closeLbl) closeLbl.textContent = t("copyClose", "Close");
-    Array.prototype.forEach.call(sheet.querySelectorAll(".shiftCopyOpt"), function (btn) {
-      var key = btn.getAttribute("data-shift");
-      var labelEl = btn.querySelector(".shiftCopyOpt-label");
-      var countEl = btn.querySelector(".shiftCopyOpt-count");
+    var copyLabel = t("copyAction", "Copy");
+    var shareLabel = t("shareAction", "Share");
+    Array.prototype.forEach.call(sheet.querySelectorAll(".shiftCopyOpt"), function (row) {
+      var key = row.getAttribute("data-shift");
+      var labelEl = row.querySelector(".shiftCopyOpt-label");
+      var countEl = row.querySelector(".shiftCopyOpt-count");
       if (labelEl) labelEl.textContent = labelFor(key);
       var c = countNames(key);
       if (countEl) countEl.textContent = c;
-      btn.classList.toggle("is-empty", c === 0);
+      row.classList.toggle("is-empty", c === 0);
+      var copyBtn = row.querySelector(".shiftCopyAct--copy");
+      var shareBtn = row.querySelector(".shiftCopyAct--share");
+      if (copyBtn) { copyBtn.title = copyLabel; copyBtn.setAttribute("aria-label", copyLabel + " " + labelFor(key)); }
+      if (shareBtn) { shareBtn.title = shareLabel; shareBtn.setAttribute("aria-label", shareLabel + " " + labelFor(key)); }
     });
   }
 
@@ -176,7 +216,12 @@
     sheet.setAttribute("aria-hidden", "true");
   }
 
-  function onOption(shiftKey) {
+  function openWhatsApp(text) {
+    var url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(url, "_blank", "noopener");
+  }
+
+  function doCopy(shiftKey) {
     var text = buildText(shiftKey);
     if (!text) {
       setStatus(t("copyEmpty", "No employees in this shift"), false);
@@ -188,6 +233,30 @@
     }).catch(function () {
       setStatus(t("copyFail", "Copy failed — long-press to copy"), false);
     });
+  }
+
+  function doShare(shiftKey) {
+    var text = buildText(shiftKey);
+    if (!text) {
+      setStatus(t("copyEmpty", "No employees in this shift"), false);
+      return;
+    }
+    if (navigator.share) {
+      navigator.share({ text: text }).then(function () {
+        setStatus(t("shareDone", "Shared") + " · " + labelFor(shiftKey), true);
+      }).catch(function (err) {
+        // Ignore user-cancelled share; otherwise fall back to WhatsApp.
+        if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+        openWhatsApp(text);
+      });
+    } else {
+      openWhatsApp(text);
+    }
+  }
+
+  function onAction(act, shiftKey) {
+    if (act === "share") doShare(shiftKey);
+    else doCopy(shiftKey);
   }
 
   function bind() {
@@ -207,9 +276,11 @@
     sheet.addEventListener("click", function (e) {
       if (e.target === sheet) close();
     });
-    Array.prototype.forEach.call(sheet.querySelectorAll(".shiftCopyOpt"), function (btn) {
-      btn.addEventListener("click", function () {
-        onOption(btn.getAttribute("data-shift"));
+    Array.prototype.forEach.call(sheet.querySelectorAll(".shiftCopyAct"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        onAction(btn.getAttribute("data-act"), btn.getAttribute("data-shift"));
       });
     });
     document.addEventListener("keydown", function (e) {

@@ -857,6 +857,20 @@ _SVG_OPT_TRAINING = _shift_opt_svg(
     "#7c3aed",
 )
 
+# Small per-shift action icons (Copy + Share).
+_SVG_ACT_COPY = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="8" y="8" width="12" height="12" rx="2"/>'
+    '<path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>'
+)
+_SVG_ACT_SHARE = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>'
+    '<path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>'
+)
+
 _SHIFT_OPT_ICONS = {
     "Morning": ("shiftCopyOpt--morning", _SVG_OPT_MORNING),
     "Afternoon": ("shiftCopyOpt--afternoon", _SVG_OPT_AFTERNOON),
@@ -878,11 +892,17 @@ def _shift_copy_option(shift_key: str) -> str:
     cls, icon = _SHIFT_OPT_ICONS[shift_key]
     label = _SHIFT_OPT_LABELS[shift_key]
     return (
-        f'      <button type="button" class="shiftCopyOpt {cls}" data-shift="{shift_key}">\n'
+        f'      <div class="shiftCopyOpt {cls}" data-shift="{shift_key}">\n'
         f'        <span class="shiftCopyOpt-icon">{icon}</span>\n'
-        f'        <span class="shiftCopyOpt-label">{label}</span>\n'
-        f'        <span class="shiftCopyOpt-count" data-shift-count="{shift_key}">0</span>\n'
-        f"      </button>\n"
+        f'        <span class="shiftCopyOpt-main">\n'
+        f'          <span class="shiftCopyOpt-label">{label}</span>\n'
+        f'          <span class="shiftCopyOpt-count" data-shift-count="{shift_key}">0</span>\n'
+        f"        </span>\n"
+        f'        <span class="shiftCopyOpt-actions">\n'
+        f'          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="{shift_key}" title="Copy" aria-label="Copy">{_SVG_ACT_COPY}</button>\n'
+        f'          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="{shift_key}" title="Share" aria-label="Share">{_SVG_ACT_SHARE}</button>\n'
+        f"        </span>\n"
+        f"      </div>\n"
     )
 
 
@@ -899,7 +919,7 @@ SHIFT_COPY_MODAL_HTML = (
     '<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">\n'
     '  <div class="shiftCopyCard" role="dialog" aria-labelledby="shiftCopyTitle">\n'
     '    <h2 class="shiftCopyTitle" id="shiftCopyTitle">On-duty list</h2>\n'
-    '    <p class="shiftCopyHint" id="shiftCopyHint">Pick a shift — copied as WhatsApp text</p>\n'
+    '    <p class="shiftCopyHint" id="shiftCopyHint">Copy or share a shift as WhatsApp text</p>\n'
     '    <div class="shiftCopyGrid">\n'
     + _shift_copy_option("Morning")
     + _shift_copy_option("Afternoon")
@@ -946,24 +966,37 @@ SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + mod
     .shiftCopyGrid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 6px; }
     .shiftCopyOpt {
       display: flex; align-items: center; gap: 12px;
-      min-height: 52px; padding: 10px 14px; border-radius: 14px;
-      border: 1.5px solid #e2e8f0; background: #f8fafc; cursor: pointer;
+      min-height: 52px; padding: 8px 10px 8px 14px; border-radius: 14px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc;
       font: inherit; text-align: start; -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
     }
-    .shiftCopyOpt:active { transform: scale(.98); }
     .shiftCopyOpt-icon {
       display: inline-flex; align-items: center; justify-content: center;
       width: 40px; height: 40px; border-radius: 12px; background: #fff;
       border: 1px solid #e2e8f0; flex-shrink: 0;
     }
-    .shiftCopyOpt-label { flex: 1; font-size: 14px; font-weight: 800; color: #1e293b; }
+    .shiftCopyOpt-main {
+      flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0;
+    }
+    .shiftCopyOpt-label { font-size: 14px; font-weight: 800; color: #1e293b; }
     .shiftCopyOpt-count {
       min-width: 26px; padding: 2px 8px; border-radius: 999px;
       font-size: 12px; font-weight: 800; color: #475569;
-      background: #eef2f7; border: 1px solid #e2e8f0;
+      background: #eef2f7; border: 1px solid #e2e8f0; text-align: center;
     }
+    .shiftCopyOpt-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .shiftCopyAct {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
+      border: 1.5px solid #e2e8f0; background: #fff; font: inherit;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .shiftCopyAct:active { transform: scale(.94); }
+    .shiftCopyAct svg { display: block; }
+    .shiftCopyAct--share { background: #ecfdf5; border-color: #86efac; }
     .shiftCopyOpt.is-empty { opacity: .5; }
+    .shiftCopyOpt.is-empty .shiftCopyAct { pointer-events: none; }
     .shiftCopyOpt--morning { border-color: #fcd34d; background: #fffbeb; }
     .shiftCopyOpt--morning .shiftCopyOpt-icon { background: #fef9c3; border-color: #fde68a; }
     .shiftCopyOpt--afternoon { border-color: #fdba74; background: #fff7ed; }
@@ -984,7 +1017,8 @@ SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + mod
     .shiftCopyCloseWrap .roster-cta-btn { width: 100%; }
     body.ar .shiftCopyOpt { text-align: start; }
     @media (hover: hover) {
-      .shiftCopyOpt:hover { background: #fff; box-shadow: 0 6px 16px rgba(15,23,42,.08); transform: translateY(-1px); }
+      .shiftCopyAct--copy:hover { background: #f1f5f9; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
+      .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 """
 
@@ -1172,7 +1206,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260705b"
+IOS_PERF_VER = "20260705c"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
