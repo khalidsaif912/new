@@ -41,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
 from roster_app.cache_io import looks_like_roster_month_filename, month_key_from_filename  # noqa: E402
 from roster_app.text_utils import append_range_suffix  # noqa: E402
+from roster_app import name_i18n  # noqa: E402
 from roster_cta_snippets import (  # noqa: E402
     CHIP_EXPORT_HTML,
     CHIP_ICON_CSS,
@@ -836,9 +837,10 @@ def build_duty_html(
                 else:
                     status_html = code
                 name_attr = html_escape(label, quote=True)
+                ar_name_attr = html_escape(name_i18n.arabic_display(label), quote=True)
                 alt = " empRowAlt" if idx % 2 == 1 else ""
                 emp_rows.append(f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
-       <span class="empName">{label}</span>
+       <span class="empName" data-name-ar="{ar_name_attr}">{label}</span>
        <span class="empStatus" style="color:{info['text']};">{status_html}</span>
      </div>""")
             shift_blocks.append(f"""
@@ -1474,6 +1476,10 @@ def main() -> None:
             subprocess.run([sys.executable, str(sync_script)], check=False, cwd=str(repo_root))
 
     write_legacy_roster_site_import_redirect(repo_root)
+    try:
+        name_i18n.flush()
+    except Exception as e:
+        print(f"WARNING: could not write name translations: {e}")
     if source_filename:
         try:
             (repo_root / "import_last_filename.txt").write_text(

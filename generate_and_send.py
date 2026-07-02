@@ -71,6 +71,7 @@ from roster_app.text_utils import (
     range_suffix_for_day,
     to_western_digits,
 )
+from roster_app import name_i18n
 
 # PWA: manifest + iOS meta; paths resolve for /roster-site/ and GitHub Pages /user/docs/
 ROSTER_PWA_HEAD_SNIPPET = """
@@ -717,8 +718,9 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
         for i, e in enumerate(emps):
             alt = " empRowAlt" if i % 2 == 1 else ""
             name_attr = html_escape(e["name"], quote=True)
+            ar_name_attr = html_escape(name_i18n.arabic_display(e["name"]), quote=True)
             rows_html += f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
-      <span class="empName">{e['name']}</span>
+      <span class="empName" data-name-ar="{ar_name_attr}">{e['name']}</span>
        <span class="empStatus" style="color:{colors['status_color']};">{e['shift']}</span>
      </div>"""
 
@@ -2618,6 +2620,11 @@ function applyLang(lang) {{
     if(txt==='FROM'||txt==='من') el.textContent=t.from;
     if(txt==='TO'||txt==='إلى') el.textContent=t.to;
   }});
+  document.querySelectorAll('.empName').forEach(function(el) {{
+    if(el.dataset.nameEn===undefined) el.dataset.nameEn=el.textContent;
+    var ar=el.getAttribute('data-name-ar');
+    el.textContent=(isAr && ar) ? ar : el.dataset.nameEn;
+  }});
   function setCtaLabel(id, text) {{
     var el = document.getElementById(id);
     if (!el) return;
@@ -3798,6 +3805,12 @@ def main():
             f.write(_src)
 
     write_site_last_updated_json(datetime.now(TZ))
+
+    # Persist any newly discovered Arabic name translations for owner review.
+    try:
+        name_i18n.flush()
+    except Exception as e:
+        print(f"WARNING: could not write name translations: {e}")
 
     if source_name:
         try:
