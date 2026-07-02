@@ -2703,6 +2703,29 @@ setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
 
+(function bindSummarySwitchScroll() {{
+  var chip = document.getElementById('summarySwitchChip');
+  if (!chip || chip.__scrollBound) return;
+  chip.__scrollBound = true;
+  chip.style.cursor = 'pointer';
+  chip.setAttribute('role', 'button');
+  chip.setAttribute('tabindex', '0');
+  function scrollToBottom() {{
+    var target = document.querySelector('.rosterCopyBar')
+      || document.querySelector('.footer')
+      || document.body;
+    if (target && target.scrollIntoView) {{
+      target.scrollIntoView({{ behavior: 'smooth', block: 'end' }});
+    }} else {{
+      window.scrollTo({{ top: document.body.scrollHeight, behavior: 'smooth' }});
+    }}
+  }}
+  chip.addEventListener('click', scrollToBottom);
+  chip.addEventListener('keydown', function (e) {{
+    if (e.key === 'Enter' || e.key === ' ') {{ e.preventDefault(); scrollToBottom(); }}
+  }});
+}})();
+
 // ═══════════════════════════════════════════════════
 // Department layout: all sections open + time-based shift open
 // ═══════════════════════════════════════════════════
