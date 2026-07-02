@@ -1094,7 +1094,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">2 July 2026 / 17:02</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">2 July 2026 / 17:47</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Operation Roster July2026.xlsx</strong>
   </div>
 
@@ -2264,6 +2264,29 @@ setLocalCtaLinks();
 setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
+
+(function bindSummarySwitchScroll() {
+  var chip = document.getElementById('summarySwitchChip');
+  if (!chip || chip.__scrollBound) return;
+  chip.__scrollBound = true;
+  chip.style.cursor = 'pointer';
+  chip.setAttribute('role', 'button');
+  chip.setAttribute('tabindex', '0');
+  function scrollToBottom() {
+    var target = document.querySelector('.rosterCopyBar')
+      || document.querySelector('.footer')
+      || document.body;
+    if (target && target.scrollIntoView) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }
+  chip.addEventListener('click', scrollToBottom);
+  chip.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToBottom(); }
+  });
+})();
 
 // ═══════════════════════════════════════════════════
 // Department layout: all sections open + time-based shift open
