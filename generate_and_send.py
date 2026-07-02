@@ -2710,15 +2710,32 @@ startSummarySwitchLoop();
   chip.style.cursor = 'pointer';
   chip.setAttribute('role', 'button');
   chip.setAttribute('tabindex', '0');
+  function ensureShuffleButton() {{
+    if (document.getElementById('bgTextureShuffleBtn')) return;
+    try {{
+      var root = getSiteRootUrl();
+      var src = root + '/bg-texture-shuffle.js?v={IOS_PERF_VER}';
+      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-local-src', src);
+      document.body.appendChild(s);
+    }} catch (e) {{}}
+  }}
   function scrollToBottom() {{
+    ensureShuffleButton();
     function go() {{
       var root = document.scrollingElement || document.documentElement;
       var top = Math.max(0, root.scrollHeight - root.clientHeight);
       window.scrollTo({{ top: top, left: 0, behavior: 'smooth' }});
     }}
     go();
-    // Footer grows when "Shuffle background" injects; scroll again after layout settles.
-    window.setTimeout(go, 450);
+    // The "Shuffle background" button is injected lazily (requestIdleCallback,
+    // up to ~3s), which grows the footer. Re-scroll several times so we always
+    // land on the true bottom once that button appears.
+    var delays = [150, 400, 800, 1400, 2200, 3200];
+    delays.forEach(function (ms) {{ window.setTimeout(go, ms); }});
   }}
   chip.addEventListener('click', scrollToBottom);
   chip.addEventListener('keydown', function (e) {{
