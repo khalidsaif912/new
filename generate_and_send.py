@@ -2711,14 +2711,14 @@ startSummarySwitchLoop();
   chip.setAttribute('role', 'button');
   chip.setAttribute('tabindex', '0');
   function scrollToBottom() {{
-    var target = document.querySelector('.rosterCopyBar')
-      || document.querySelector('.footer')
-      || document.body;
-    if (target && target.scrollIntoView) {{
-      target.scrollIntoView({{ behavior: 'smooth', block: 'end' }});
-    }} else {{
-      window.scrollTo({{ top: document.body.scrollHeight, behavior: 'smooth' }});
+    function go() {{
+      var root = document.scrollingElement || document.documentElement;
+      var top = Math.max(0, root.scrollHeight - root.clientHeight);
+      window.scrollTo({{ top: top, left: 0, behavior: 'smooth' }});
     }}
+    go();
+    // Footer grows when "Shuffle background" injects; scroll again after layout settles.
+    window.setTimeout(go, 450);
   }}
   chip.addEventListener('click', scrollToBottom);
   chip.addEventListener('keydown', function (e) {{
