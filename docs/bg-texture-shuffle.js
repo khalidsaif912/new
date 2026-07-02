@@ -24,9 +24,14 @@
     '<circle cx="6.5" cy="12.5" r="2.5" fill="#ddd6fe" stroke="none"/>' +
   '</svg>';
 
+  var UP_ICON =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5b21b6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M12 19V6"/><path d="M6 12l6-6 6 6"/>' +
+  '</svg>';
+
   var I18N = {
-    en: { btn: 'Shuffle background', title: 'New random color and texture' },
-    ar: { btn: 'خلفية عشوائية', title: 'لون ونقش عشوائي جديد' },
+    en: { btn: 'Shuffle background', title: 'New random color and texture', top: 'Back to top' },
+    ar: { btn: 'خلفية عشوائية', title: 'لون ونقش عشوائي جديد', top: 'العودة إلى الأعلى' },
   };
 
   function lang() {
@@ -47,13 +52,20 @@
     var st = document.createElement('style');
     st.id = 'bgTextureShuffleStyles';
     st.textContent =
-      '.bgTextureShuffleWrap{margin-top:8px;display:flex;justify-content:center;}' +
+      '.bgTextureShuffleWrap{margin-top:8px;display:flex;justify-content:center;align-items:center;gap:6px;}' +
       '.bgTextureShuffleWrap .roster-cta-btn{' +
       'min-height:0;padding:5px 12px;font-size:11px;font-weight:600;gap:6px;}' +
       '.bgTextureShuffleWrap .roster-cta-icon{width:16px;height:16px;}' +
       '.bgTextureShuffleWrap .roster-cta-icon svg{width:16px;height:16px;}' +
       '.roster-cta-btn--texture{background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6;}' +
       '@media (hover:hover){.roster-cta-btn--texture:hover{background:#ede9fe;}}' +
+      '.bgScrollTopBtn{display:inline-flex;align-items:center;justify-content:center;' +
+      'width:28px;height:28px;padding:0;border-radius:9px;cursor:pointer;flex:none;' +
+      'border:1px solid #c4b5fd;background:#f5f3ff;line-height:0;' +
+      '-webkit-tap-highlight-color:transparent;transition:background .15s ease,transform .15s ease;}' +
+      '.bgScrollTopBtn:active{transform:scale(.92);}' +
+      '.bgScrollTopBtn svg{width:16px;height:16px;display:block;}' +
+      '@media (hover:hover){.bgScrollTopBtn:hover{background:#ede9fe;}}' +
       'html.roster-bg-textured,body.roster-bg-textured{background-attachment:' +
       (isIOSDevice() ? 'scroll' : 'fixed') +
       ';background-repeat:repeat;}' +
@@ -198,13 +210,27 @@
       });
     });
 
+    var topBtn = document.createElement('button');
+    topBtn.type = 'button';
+    topBtn.id = 'bgScrollTopBtn';
+    topBtn.className = 'bgScrollTopBtn';
+    topBtn.title = t('top');
+    topBtn.setAttribute('aria-label', t('top'));
+    topBtn.innerHTML = UP_ICON;
+    topBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    });
+
     wrap.appendChild(btn);
+    wrap.appendChild(topBtn);
     footer.appendChild(wrap);
 
     document.addEventListener('rosterLangChange', function () {
       if (labelEl) labelEl.textContent = t('btn');
       btn.title = t('title');
       btn.setAttribute('aria-label', t('title'));
+      topBtn.title = t('top');
+      topBtn.setAttribute('aria-label', t('top'));
     });
   }
 
