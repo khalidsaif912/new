@@ -1700,7 +1700,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">2 July 2026 / 17:54</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">2 July 2026 / 18:00</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Operation Roster July2026.xlsx</strong>
   </div>
 
@@ -2878,15 +2878,32 @@ startSummarySwitchLoop();
   chip.style.cursor = 'pointer';
   chip.setAttribute('role', 'button');
   chip.setAttribute('tabindex', '0');
+  function ensureShuffleButton() {
+    if (document.getElementById('bgTextureShuffleBtn')) return;
+    try {
+      var root = getSiteRootUrl();
+      var src = root + '/bg-texture-shuffle.js?v=20260705b';
+      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-local-src', src);
+      document.body.appendChild(s);
+    } catch (e) {}
+  }
   function scrollToBottom() {
+    ensureShuffleButton();
     function go() {
       var root = document.scrollingElement || document.documentElement;
       var top = Math.max(0, root.scrollHeight - root.clientHeight);
       window.scrollTo({ top: top, left: 0, behavior: 'smooth' });
     }
     go();
-    // Footer grows when "Shuffle background" injects; scroll again after layout settles.
-    window.setTimeout(go, 450);
+    // The "Shuffle background" button is injected lazily (requestIdleCallback,
+    // up to ~3s), which grows the footer. Re-scroll several times so we always
+    // land on the true bottom once that button appears.
+    var delays = [150, 400, 800, 1400, 2200, 3200];
+    delays.forEach(function (ms) { window.setTimeout(go, ms); });
   }
   chip.addEventListener('click', scrollToBottom);
   chip.addEventListener('keydown', function (e) {
