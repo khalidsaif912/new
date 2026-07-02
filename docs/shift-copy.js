@@ -89,13 +89,17 @@
     if (!groups.length) return "";
     var lines = [];
     groups.forEach(function (g, i) {
-      lines.push("*" + g.dept + "*");
+      // Prefix each line with a Left-to-Right Mark so WhatsApp keeps LTR
+      // alignment even when the app UI is Arabic (RTL).
+      lines.push("\u200e*" + g.dept + "*");
       g.names.forEach(function (n) {
-        lines.push(n);
+        lines.push("\u200e" + n);
       });
       if (i < groups.length - 1) lines.push("");
     });
-    return lines.join("\n");
+    // Trailing invisible LTR line: gives the WhatsApp timestamp its own line
+    // so the last name is no longer shifted to make room for the time.
+    return lines.join("\n") + "\n\u200e";
   }
 
   function copyText(text) {
