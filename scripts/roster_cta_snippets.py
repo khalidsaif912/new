@@ -890,7 +890,7 @@ SHIFT_COPY_BUTTON_HTML = (
     '<nav class="quickActions rosterCopyBar" aria-label="Copy on-duty list">\n'
     '  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">\n'
     f'    <span class="roster-cta-icon">{SVG_COPY_SHIFT}</span>\n'
-    '    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift List</span>\n'
+    '    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>\n'
     "  </button>\n"
     "</nav>\n"
 )
@@ -899,7 +899,7 @@ SHIFT_COPY_MODAL_HTML = (
     '<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">\n'
     '  <div class="shiftCopyCard" role="dialog" aria-labelledby="shiftCopyTitle">\n'
     '    <h2 class="shiftCopyTitle" id="shiftCopyTitle">On-duty list</h2>\n'
-    '    <p class="shiftCopyHint" id="shiftCopyHint">Pick a shift — copied as WhatsApp text (Officers excluded)</p>\n'
+    '    <p class="shiftCopyHint" id="shiftCopyHint">Pick a shift — copied as WhatsApp text</p>\n'
     '    <div class="shiftCopyGrid">\n'
     + _shift_copy_option("Morning")
     + _shift_copy_option("Afternoon")
@@ -923,12 +923,13 @@ SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + mod
       margin-top: 10px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
       width: 100%;
       max-width: 100%;
       margin-inline: auto;
     }
-    .rosterCopyBar .roster-cta-btn { width: 100%; }
+    .rosterCopyBar .roster-cta-btn { grid-column: 3 / span 2; }
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;

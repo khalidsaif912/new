@@ -41,12 +41,26 @@
     return String(s).replace(/"/g, '\\"');
   }
 
+  // Department output order for the copied list.
+  var DEPT_ORDER = [
+    "Officers",
+    "Supervisors",
+    "Load Control",
+    "Export Checker",
+    "Export Operators"
+  ];
+
+  function deptRank(dept) {
+    var i = DEPT_ORDER.indexOf(dept);
+    return i === -1 ? DEPT_ORDER.length : i;
+  }
+
   function collectGroups(shiftKey) {
     var groups = [];
     var cards = document.querySelectorAll(".deptCard");
     Array.prototype.forEach.call(cards, function (card) {
       var dept = deptEnglishName(card);
-      if (!dept || dept.toLowerCase() === "officers") return;
+      if (!dept) return;
       var shift = card.querySelector('.shiftCard[data-shift="' + attrEscape(shiftKey) + '"]');
       if (!shift) return;
       var names = [];
@@ -55,6 +69,9 @@
         if (n) names.push(n);
       });
       if (names.length) groups.push({ dept: dept, names: names });
+    });
+    groups.sort(function (a, b) {
+      return deptRank(a.dept) - deptRank(b.dept);
     });
     return groups;
   }

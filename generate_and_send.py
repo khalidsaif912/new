@@ -2545,7 +2545,7 @@ var T = {{
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
-    copyShift:'Copy Shift List', copyTitle:'On-duty list', copyHint:'Pick a shift — copied as WhatsApp text (Officers excluded)', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close',
+    copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Pick a shift — copied as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close',
   }},
   ar: {{
     titleEyebrow:'الصادر', titleMain:'جدول المناوبات', langBtn:'EN',
@@ -2558,7 +2558,7 @@ var T = {{
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
-    copyShift:'نسخ قائمة المناوبة', copyTitle:'قائمة المناوبين', copyHint:'اختر مناوبة — تُنسخ كنص واتساب (بدون الضباط)', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق',
+    copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'اختر مناوبة — تُنسخ كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق',
   }}
 }};
 
