@@ -1659,9 +1659,9 @@
         "day": 2,
         "day_name_ar": "الخميس",
         "day_name_en": "Thursday",
-        "shift_code": "ME06",
-        "shift_label": "🌅 Morning (ME06)",
-        "shift_group": "Morning"
+        "shift_code": "AE14",
+        "shift_label": "🌆 Afternoon (AE14)",
+        "shift_group": "Afternoon"
       },
       {
         "date": "2026-07-03",
