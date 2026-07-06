@@ -729,7 +729,7 @@
       },
       {
         "day": 22,
-        "shift_code": "ME06",
+        "shift_code": "MN06",
         "shift_group": "Morning"
       },
       {
@@ -890,7 +890,7 @@
     {
       "day": 22,
       "weekday": "Wed",
-      "code": "ME06"
+      "code": "MN06"
     },
     {
       "day": 23,

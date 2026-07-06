@@ -679,8 +679,8 @@
       },
       {
         "day": 12,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "ME06",
+        "shift_group": "Morning"
       },
       {
         "day": 13,
@@ -840,7 +840,7 @@
     {
       "day": 12,
       "weekday": "Sun",
-      "code": "AE14"
+      "code": "ME06"
     },
     {
       "day": 13,

@@ -709,8 +709,8 @@
       },
       {
         "day": 18,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "NE22",
+        "shift_group": "Night"
       },
       {
         "day": 19,
@@ -870,7 +870,7 @@
     {
       "day": 18,
       "weekday": "Sat",
-      "code": "ME06"
+      "code": "NE22"
     },
     {
       "day": 19,

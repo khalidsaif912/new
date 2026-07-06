@@ -749,13 +749,13 @@
       },
       {
         "day": 26,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 27,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 28,
@@ -910,12 +910,12 @@
     {
       "day": 26,
       "weekday": "Sun",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 27,
       "weekday": "Mon",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 28,

@@ -774,8 +774,8 @@
       },
       {
         "day": 31,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       }
     ]
   },
@@ -935,7 +935,7 @@
     {
       "day": 31,
       "weekday": "Fri",
-      "code": "AE14"
+      "code": "O"
     }
   ]
 }

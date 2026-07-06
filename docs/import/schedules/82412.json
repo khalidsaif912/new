@@ -659,13 +659,13 @@
       },
       {
         "day": 8,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 9,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 10,
@@ -820,12 +820,12 @@
     {
       "day": 8,
       "weekday": "Wed",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 9,
       "weekday": "Thu",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 10,

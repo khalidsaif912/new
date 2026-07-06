@@ -624,28 +624,28 @@
     "2026-07": [
       {
         "day": 1,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 2,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 3,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 4,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 5,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 6,
@@ -659,28 +659,28 @@
       },
       {
         "day": 8,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 9,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 10,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 11,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 12,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 13,
@@ -694,28 +694,28 @@
       },
       {
         "day": 15,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 16,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 17,
-        "shift_code": "ME06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 18,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 19,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 20,
@@ -785,27 +785,27 @@
     {
       "day": 1,
       "weekday": "Wed",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 2,
       "weekday": "Thu",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 3,
       "weekday": "Fri",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 4,
       "weekday": "Sat",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 5,
       "weekday": "Sun",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 6,
@@ -820,27 +820,27 @@
     {
       "day": 8,
       "weekday": "Wed",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 9,
       "weekday": "Thu",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 10,
       "weekday": "Fri",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 11,
       "weekday": "Sat",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 12,
       "weekday": "Sun",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 13,
@@ -855,27 +855,27 @@
     {
       "day": 15,
       "weekday": "Wed",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 16,
       "weekday": "Thu",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 17,
       "weekday": "Fri",
-      "code": "ME06"
+      "code": "LV"
     },
     {
       "day": 18,
       "weekday": "Sat",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 19,
       "weekday": "Sun",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 20,

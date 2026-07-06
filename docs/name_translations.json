@@ -1,4 +1,5 @@
 {
+  "_instructions": "عدّل القيمة العربية لأي اسم لتصحيح ترجمته. المفتاح هو الاسم بالإنجليزية (بحروف كبيرة). لا تحذف الأسماء. تُطبّق الترجمة تلقائياً عند تبديل اللغة إلى العربية. الأسماء المُدرجة في auto_generated تُرجمت آلياً وتحتاج مراجعة؛ بعد تصحيح الاسم يمكنك حذفه من هذه القائمة.",
   "names": {
     "*AHMED AL SABII": "*أحمد السابعي",
     "*ISSA AL DOUYANI": "*عيسى الضوياني",
@@ -41,6 +42,7 @@
     "AMMAR AL HASHMI": "عمار الهاشمي",
     "ANWAR AL AMRI": "أنور العامري",
     "ANWAR AL HABSI": "أنور الحبسي",
+    "ANWAR ALAMRI": "أنور الامري",
     "ASSAD AL OMAIRI": "أسعد العميري",
     "BADAR AL BURTAMANI": "بدر البرطماني",
     "BADAR AL BUSAIDI": "بدر البوسعيدي",
@@ -52,6 +54,7 @@
     "DAWOOD AL SIYABI": "داود السيابي",
     "FAHIM AL HASHNI": "فهيم الحسني",
     "FAISAL AL BALUSHI": "فيصل البلوشي",
+    "FARIS AL BALUSHI": "فاريس ال بالوشي",
     "FARIZ AL BALUSHI": "فاس البلوشي",
     "FRITZ": "فريتز",
     "FROILAN": "فرويلان",
@@ -373,6 +376,7 @@
     "AMMAR AL HASHMI",
     "ANWAR AL AMRI",
     "ANWAR AL HABSI",
+    "ANWAR ALAMRI",
     "ASSAD AL OMAIRI",
     "BADAR AL BURTAMANI",
     "BADAR AL BUSAIDI",
@@ -384,6 +388,7 @@
     "DAWOOD AL SIYABI",
     "FAHIM AL HASHNI",
     "FAISAL AL BALUSHI",
+    "FARIS AL BALUSHI",
     "FARIZ AL BALUSHI",
     "FRITZ",
     "FROILAN",
