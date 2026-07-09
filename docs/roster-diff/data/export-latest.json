@@ -1,325 +1,108 @@
 {
   "kind": "export",
   "month": "2026-07",
-  "generated_at": "2026-07-05T10:30:20.470270Z",
-  "old_file": "Operation Roster July2026.xlsx",
-  "new_file": "Operation Roster July2026 Version 2.xlsx",
-  "total_changes": 45,
+  "generated_at": "2026-07-09T11:31:07.832972Z",
+  "old_file": "Operation Roster July2026 Version 2.xlsx",
+  "new_file": "Operation Roster July2026 Version 3.xlsx",
+  "total_changes": 14,
   "changes": [
     {
-      "emp_id": "name:Adil Al Balushi - 81392",
-      "name": "Adil Al Balushi - 81392",
-      "day": 5,
-      "v1": "ME07",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Adil Al Balushi - 81392",
-      "name": "Adil Al Balushi - 81392",
-      "day": 6,
-      "v1": "ME07",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Adil Al Balushi - 81392",
-      "name": "Adil Al Balushi - 81392",
-      "day": 7,
-      "v1": "ME07",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Adil Al Balushi - 81392",
-      "name": "Adil Al Balushi - 81392",
-      "day": 8,
-      "v1": "ME07",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Adil Al Balushi - 81392",
-      "name": "Adil Al Balushi - 81392",
-      "day": 9,
-      "v1": "ME07",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Ahmed Al Balushi - 82415",
-      "name": "Ahmed Al Balushi - 82415",
-      "day": 27,
-      "v1": "NE22",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
-      "day": 2,
+      "emp_id": "name:Ahmed Al Mawali - 82283",
+      "name": "Ahmed Al Mawali - 82283",
+      "day": 17,
       "v1": "ME06",
-      "v2": "AE14"
+      "v2": "LV"
     },
     {
       "emp_id": "name:Ahmed Al Mawali - 82283",
       "name": "Ahmed Al Mawali - 82283",
-      "day": 2,
-      "v1": "AE14",
-      "v2": "ME06"
+      "day": 18,
+      "v1": "ME06",
+      "v2": "LV"
     },
     {
-      "emp_id": "name:Al Muthana Al Shamfari - 82445",
-      "name": "Al Muthana Al Shamfari - 82445",
-      "day": 14,
+      "emp_id": "name:Ahmed Al Mawali - 82283",
+      "name": "Ahmed Al Mawali - 82283",
+      "day": 19,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Ali Al Marjubi - 82577",
+      "name": "Ali Al Marjubi - 82577",
+      "day": 17,
       "v1": "AE14",
       "v2": "ME06"
     },
     {
       "emp_id": "name:Ali Yousuf Al Balushi - 990752",
       "name": "Ali Yousuf Al Balushi - 990752",
-      "day": 13,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Assad Al Omairi - 81348",
-      "name": "Assad Al Omairi - 81348",
-      "day": 23,
-      "v1": "ME06",
-      "v2": "AE14"
-    },
-    {
-      "emp_id": "name:Faisal Al Balushi - 82656",
-      "name": "Faisal Al Balushi - 82656",
-      "day": 3,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Faisal Al Balushi - 82656",
-      "name": "Faisal Al Balushi - 82656",
-      "day": 4,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Faisal Al Balushi - 82656",
-      "name": "Faisal Al Balushi - 82656",
-      "day": 5,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Faisal Al Balushi - 82656",
-      "name": "Faisal Al Balushi - 82656",
       "day": 6,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Habib Al Balushi - 82600",
-      "name": "Habib Al Balushi - 82600",
-      "day": 20,
-      "v1": "ME06",
-      "v2": "AE14"
-    },
-    {
-      "emp_id": "name:Hosni Al Sulti - 80695",
-      "name": "Hosni Al Sulti - 80695",
-      "day": 8,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Marlon Esmilla - 80270",
-      "name": "Marlon Esmilla - 80270",
-      "day": 6,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marlon Esmilla - 80270",
-      "name": "Marlon Esmilla - 80270",
-      "day": 7,
       "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Marlon Esmilla - 80270",
-      "name": "Marlon Esmilla - 80270",
-      "day": 8,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marlon Esmilla - 80270",
-      "name": "Marlon Esmilla - 80270",
-      "day": 9,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marlon Esmilla - 80270",
-      "name": "Marlon Esmilla - 80270",
-      "day": 10,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marwan Al Difai - 82437",
-      "name": "Marwan Al Difai - 82437",
-      "day": 10,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Marwan Al Difai - 82437",
-      "name": "Marwan Al Difai - 82437",
-      "day": 11,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81224",
-      "name": "Mohamed Al Amri - 81224",
-      "day": 12,
-      "v1": "ME06",
-      "v2": "AE14"
-    },
-    {
-      "emp_id": "name:Mohamed Al Maskari - 82666",
-      "name": "Mohamed Al Maskari - 82666",
-      "day": 28,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Siyabi - 81402",
-      "name": "Mohamed Al Siyabi - 81402",
-      "day": 17,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mubarak Al Nofli - 82114",
-      "name": "Mubarak Al Nofli - 82114",
-      "day": 24,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mudathir Al Hajri - 82441",
-      "name": "Mudathir Al Hajri - 82441",
-      "day": 25,
-      "v1": "NE22",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 15,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
+      "emp_id": "name:Ali Yousuf Al Balushi - 990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
       "day": 16,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 17,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 18,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 19,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 20,
-      "v1": "OFF",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 21,
-      "v1": "OFF",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 22,
+      "emp_id": "name:Jaafar Al Balushi - 81258",
+      "name": "Jaafar Al Balushi - 81258",
+      "day": 31,
       "v1": "AE14",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 23,
-      "v1": "TR",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 24,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 25,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Saleh Al Aufi - 82550",
-      "name": "Saleh Al Aufi - 82550",
-      "day": 26,
+      "emp_id": "name:Khalil Al Hinai - 82671",
+      "name": "Khalil Al Hinai - 82671",
+      "day": 15,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Saleh Al Rashdi - 82546",
-      "name": "Saleh Al Rashdi - 82546",
-      "day": 24,
-      "v1": "AN13",
-      "v2": "MN06"
+      "emp_id": "name:Khalil Al Hinai - 82671",
+      "name": "Khalil Al Hinai - 82671",
+      "day": 16,
+      "v1": "NE22",
+      "v2": "LV"
     },
     {
-      "emp_id": "name:Waleed Al Hadabi - 80482",
-      "name": "Waleed Al Hadabi - 80482",
-      "day": 13,
+      "emp_id": "name:Mohamed Al Mazroie - 82658",
+      "name": "Mohamed Al Mazroie - 82658",
+      "day": 28,
+      "v1": "NE22",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Raad Al Farsi - 82578",
+      "name": "Raad Al Farsi - 82578",
+      "day": 15,
       "v1": "ME06",
       "v2": "NE22"
     },
     {
-      "emp_id": "name:Yousuf Al Balushi - 82587",
-      "name": "Yousuf Al Balushi - 82587",
+      "emp_id": "name:Riyahd Al Jabri - 82555",
+      "name": "Riyahd Al Jabri - 82555",
+      "day": 16,
+      "v1": "ME06",
+      "v2": "NE22"
+    },
+    {
+      "emp_id": "name:Saif Al Mahrizi - 82649",
+      "name": "Saif Al Mahrizi - 82649",
+      "day": 31,
+      "v1": "ME06",
+      "v2": "AE14"
+    },
+    {
+      "emp_id": "name:Talal Al Balushi - 81300",
+      "name": "Talal Al Balushi - 81300",
       "day": 10,
-      "v1": "ME06",
-      "v2": "NE22"
-    },
-    {
-      "emp_id": "name:Yousuf Al Balushi - 82587",
-      "name": "Yousuf Al Balushi - 82587",
-      "day": 17,
-      "v1": "ME06",
-      "v2": "NE22"
+      "v1": "NN21",
+      "v2": "LV"
     }
   ]
 }
