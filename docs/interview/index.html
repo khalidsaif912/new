@@ -238,57 +238,68 @@
 
     .foot strong { color: var(--ink); font-weight: 800; }
 
+    .shots-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 22px 0 8px;
+      align-items: start;
+    }
+
     .shot-card {
-      margin: 22px auto 8px;
-      max-width: 340px;
-      padding: 14px 14px 0;
+      margin: 0;
+      max-width: none;
+      width: 100%;
+      padding: 12px 12px 0;
       overflow: hidden;
-      border-radius: 28px;
+      border-radius: 24px;
       border: 1px solid rgba(148, 163, 184, 0.28);
       box-shadow:
-        0 18px 40px rgba(15, 23, 42, 0.18),
-        0 0 0 8px rgba(15, 23, 42, 0.06);
+        0 14px 32px rgba(15, 23, 42, 0.16),
+        0 0 0 6px rgba(15, 23, 42, 0.05);
       background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
     }
 
     .shot-card::before {
       content: "";
       display: block;
-      width: 72px;
-      height: 7px;
-      margin: 0 auto 12px;
+      width: 56px;
+      height: 6px;
+      margin: 0 auto 10px;
       border-radius: 999px;
       background: rgba(148, 163, 184, 0.35);
     }
 
     .shot-frame {
       overflow: hidden;
-      border-radius: 18px 18px 8px 8px;
+      border-radius: 16px 16px 6px 6px;
       background: #0b1220;
       line-height: 0;
+      aspect-ratio: 9 / 16;
     }
 
     .shot-card img {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
       object-fit: cover;
       object-position: top center;
     }
 
     .shot-caption {
-      padding: 14px 12px 16px;
+      padding: 12px 8px 14px;
       text-align: center;
-      font-size: 0.86rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 800;
       color: #e2e8f0;
       letter-spacing: 0.01em;
+      line-height: 1.45;
     }
 
     .shot-caption span {
       display: block;
       margin-top: 2px;
-      font-size: 0.75rem;
+      font-size: 0.68rem;
       font-weight: 600;
       color: #94a3b8;
     }
@@ -345,6 +356,9 @@
     @media (max-width: 720px) {
       .links-bar { grid-template-columns: 1fr; gap: 12px; max-width: 280px; margin-inline: auto; }
       .link-card img { width: 120px; height: 120px; }
+      .shots-gallery { grid-template-columns: 1fr; max-width: 280px; margin-inline: auto; gap: 16px; }
+      .shot-frame { aspect-ratio: auto; }
+      .shot-card img { height: auto; }
     }
 
     @media (max-width: 560px) {
@@ -354,7 +368,7 @@
       .q-num { width: 36px; height: 36px; border-radius: 11px; }
       .a { padding: 4px 40px 0 2px; }
       .a::before { right: 14px; }
-      .shot-card { max-width: 280px; padding: 12px 12px 0; border-radius: 24px; }
+      .shot-card { padding: 12px 12px 0; border-radius: 24px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -426,15 +440,35 @@
           <p>لم تكن هناك لحظة واحدة محدّدة، بل كانت المشكلة تتكرّر يوميًا معي ومع الزملاء. كان الروستر يصلنا كملف إكسل، ومعظم الموظفين يعتمدون على الهواتف، مما يجعل تصفّح الجداول مرهقًا بين التكبير والتصغير والبحث داخل الصفوف والأعمدة.</p>
           <p>أدركت أن التحدي <span class="highlight">ليس في توفّر المعلومات، بل في طريقة عرضها</span>. من هنا جاءت فكرة تحويل ملف الإكسل إلى منصة بسيطة مصمّمة للهاتف أولًا، تعرض المناوبات بوضوح وسرعة.</p>
           <p>بدأت الفكرة كحل لمشكلة يومية، ثم تطوّرت لتصبح أداة يعتمد عليها الزملاء لمتابعة جداولهم ومعرفة مواعيدهم بسهولة وثقة.</p>
-          <figure class="shot-card">
-            <div class="shot-frame">
-              <img src="roster-app.png" alt="واجهة تطبيق Duty Roster على الهاتف" width="720" height="1280" loading="lazy" />
-            </div>
-            <figcaption class="shot-caption">
-              لقطة من واجهة تطبيق الروستر
-              <span>Duty Roster · مصمّم للهاتف أولًا</span>
-            </figcaption>
-          </figure>
+          <div class="shots-gallery">
+            <figure class="shot-card">
+              <div class="shot-frame">
+                <img src="roster-app.png" alt="واجهة تطبيق Duty Roster" width="720" height="1280" loading="lazy" />
+              </div>
+              <figcaption class="shot-caption">
+                موقع الروستر
+                <span>Duty Roster</span>
+              </figcaption>
+            </figure>
+            <figure class="shot-card">
+              <div class="shot-frame">
+                <img src="calculator-app.png" alt="واجهة حاسبة الكميات" width="720" height="1280" loading="lazy" />
+              </div>
+              <figcaption class="shot-caption">
+                حاسبة الكميات
+                <span>Quantity Calculation</span>
+              </figcaption>
+            </figure>
+            <figure class="shot-card">
+              <div class="shot-frame">
+                <img src="store-app.png" alt="واجهة متجر مُبهر" width="720" height="1280" loading="lazy" />
+              </div>
+              <figcaption class="shot-caption">
+                متجر مُبهر
+                <span>Mobhar Store</span>
+              </figcaption>
+            </figure>
+          </div>
         </div>
       </article>
 
