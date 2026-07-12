@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>لقاء مع خالد بن سيف الرقادي · ترانزم الشحن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #0f172a;
+      --bg-2: #1e293b;
+      --brand: #38bdf8;
+      --brand-2: #2dd4bf;
+      --brand-3: #818cf8;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --card: #ffffff;
+      --page: #eef4fb;
+      --ring: rgba(56, 189, 248, 0.35);
+      --shadow-lg: 0 22px 60px rgba(15, 23, 42, 0.14);
+      --shadow-sm: 0 6px 22px rgba(15, 23, 42, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Tajawal', system-ui, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+        radial-gradient(900px 500px at 0% 10%, rgba(129, 140, 248, 0.14), transparent 55%),
+        var(--page);
+      color: var(--ink);
+      line-height: 1.85;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative;
+      margin: 0 auto;
+      padding: 72px 20px 120px;
+      text-align: center;
+      color: #e2e8f0;
+      background:
+        radial-gradient(700px 340px at 78% 0%, rgba(45, 212, 191, 0.28), transparent 62%),
+        linear-gradient(160deg, #0b1220 0%, #13233f 55%, #0e2033 100%);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: -1px;
+      height: 90px;
+      background: var(--page);
+      clip-path: ellipse(75% 100% at 50% 100%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #0b1220;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(45, 212, 191, 0.35);
+    }
+
+    .hero h1 {
+      margin: 22px 0 6px;
+      font-size: clamp(1.7rem, 5vw, 2.9rem);
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+    }
+
+    .hero .role {
+      font-size: clamp(0.95rem, 2.6vw, 1.15rem);
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .hero .lead {
+      max-width: 620px;
+      margin: 20px auto 0;
+      font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+      color: #cbd5e1;
+      opacity: 0.95;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 26px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tags span {
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ===== Q&A ===== */
+    .qa {
+      margin-top: -70px;
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 26px 24px 28px;
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+    }
+
+    .card.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .q {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .q-num {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      border-radius: 13px;
+      background: linear-gradient(145deg, var(--brand-3), var(--brand));
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .q-text {
+      font-size: clamp(1.05rem, 3vw, 1.25rem);
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.6;
+      padding-top: 4px;
+    }
+
+    .a {
+      position: relative;
+      padding: 4px 54px 0 4px;
+      color: var(--ink-soft);
+      font-size: clamp(0.96rem, 2.5vw, 1.06rem);
+      font-weight: 500;
+    }
+
+    .a p { margin-bottom: 12px; }
+    .a p:last-child { margin-bottom: 0; }
+
+    .a::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      right: 18px;
+      width: 4px;
+      height: calc(100% - 6px);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--brand), var(--brand-2));
+      opacity: 0.5;
+    }
+
+    .highlight {
+      color: var(--ink);
+      font-weight: 700;
+      background: linear-gradient(120deg, rgba(45, 212, 191, 0.18), rgba(56, 189, 248, 0.18));
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    /* ===== Footer ===== */
+    .foot {
+      margin-top: 46px;
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+    }
+
+    .foot .divider {
+      width: 60px;
+      height: 4px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+    }
+
+    .foot strong { color: var(--ink); font-weight: 800; }
+
+    .shot-card {
+      margin: 18px 0 6px;
+      padding: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: var(--shadow-sm);
+      background: #0f172a;
+    }
+
+    .shot-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 620px;
+      object-fit: contain;
+      background: #0f172a;
+    }
+
+    .shot-caption {
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: linear-gradient(180deg, #13233f, #0f172a);
+    }
+
+    .links-bar {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .link-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 22px 16px 20px;
+      text-align: center;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .link-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .link-card img {
+      width: 132px;
+      height: 132px;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      padding: 8px;
+    }
+
+    .link-card .title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .link-card .sub {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-top: -6px;
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding: 56px 18px 110px; }
+      .card { padding: 22px 18px 24px; }
+      .q { gap: 11px; }
+      .q-num { width: 36px; height: 36px; border-radius: 11px; }
+      .a { padding: 4px 40px 0 2px; }
+      .a::before { right: 14px; }
+      .links-bar { grid-template-columns: 1fr; gap: 12px; }
+      .link-card img { width: 120px; height: 120px; }
+      .shot-card img { max-height: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="hero-badge">✦ لقاء خاص</span>
+    <h1>خالد بن سيف الرقادي</h1>
+    <div class="role">موظف في مجال الشحن الجوي · مطوّر ومصمّم رقمي</div>
+    <p class="lead">
+      حديث عن الشغف بالتقنية، ورحلة تحويل تحديات العمل اليومية إلى أدوات ذكية تخدم الزملاء في قطاع الشحن واللوجستيات.
+    </p>
+    <div class="hero-tags">
+      <span>الشحن الجوي</span>
+      <span>تطوير التطبيقات</span>
+      <span>التصميم</span>
+      <span>التحول الرقمي</span>
+      <span>الابتكار</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="qa">
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">1</div>
+          <h2 class="q-text">خبّرنا عن نفسك قليلاً</h2>
+        </div>
+        <div class="a">
+          <p>خالد بن سيف الرقادي، أعمل في مجال الشحن الجوي، لكن شغفي الحقيقي يمتد إلى عالم التقنية والإنترنت والتصميم والابتكار. أجد متعة كبيرة في تحويل الأفكار إلى حلول وأدوات مفيدة، وأحب التحديات التي تدفعني إلى التعلم والتطور المستمر.</p>
+          <p>أتابع أخبار التقنية بشغف، وأحرص دائمًا على اكتساب مهارات جديدة وتجربة الأفكار الحديثة، خصوصًا في مجالات البرمجة والتصميم والتحول الرقمي. أؤمن بأن الابتكار لا يرتبط بمجال محدد، بل يبدأ من ملاحظة الاحتياجات اليومية والبحث عن طرق أفضل لتسهيل العمل وتحسين التجربة.</p>
+          <p>تجربتي في مجال الشحن الجوي ساعدتني على فهم التحديات العملية عن قرب، وهذا ما يدفعني إلى التفكير في حلول تقنية تخدم الموظفين وتوفّر الوقت والجهد. بالنسبة لي، التعلم المستمر والشغف بالتقنية هما المحرك الأساسي للاستمرار والعطاء.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">2</div>
+          <h2 class="q-text">نعلم أنك تحب عالم الإلكترونيات والتطبيقات الرقمية. ما الذي أشعل اهتمامك وشغفك لأول مرة في هذا المجال؟</h2>
+        </div>
+        <div class="a">
+          <p>بدأ اهتمامي بالإلكترونيات من حبي لفهم طريقة عمل الأجهزة وليس مجرد استخدامها. كنت دائمًا أحب فك الأشياء ومعرفة كيف تعمل، ثم تطوّر هذا الفضول إلى تجربة الدوائر الإلكترونية والمشاريع البسيطة.</p>
+          <p>بعد ذلك انتقل شغفي إلى البرمجة والتطبيقات الرقمية، لأنني اكتشفت أن بإمكاني تحويل الأفكار إلى حلول عملية تساعد الناس وتوفّر الوقت والجهد. واليوم ما زلت أستمتع بتعلّم كل ما هو جديد، سواء في الإلكترونيات أو تطوير التطبيقات والمواقع.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">3</div>
+          <h2 class="q-text">هل يمكنك أن تخبرنا قليلاً عن متجرك الإلكتروني؟ ما الذي ألهمك لتأسيسه، وما هو أكثر شيء تستمتع به في إدارته؟</h2>
+        </div>
+        <div class="a">
+          <p>بدأت رحلتي من شغفي بالإلكترونيات والتسوق الإلكتروني. كنت أشتري المنتجات التي تعجبني وأجرّبها، ثم أعرضها في مجموعات الواتساب، ولاحظت إقبالًا جيدًا شجّعني على التوسّع.</p>
+          <p>بعد ذلك صمّمت متجرًا إلكترونيًا يعرض المنتجات بشكل منظّم وجذّاب، مع روابط مشاركة لكل منتج لتسهيل نشره والوصول إليه. ومع تطوّر المشروع، طوّرت نظامًا متصلًا بالواتساب يرسل تلقائيًا منتجات مختارة من المتجر للعملاء والأصدقاء، ليبقوا على اطلاع دائم بكل جديد وما هو متوفّر.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">4</div>
+          <h2 class="q-text">كيف رصدت الفرصة لتطوير تطبيق ذكي مخصّص لعمليات الشحن لدينا؟ هل كانت هناك لحظة معيّنة قلت فيها: «يمكنني بناء أداة تقنية لتسهيل هذا العمل»؟</h2>
+        </div>
+        <div class="a">
+          <p>لم تكن هناك لحظة واحدة محدّدة، بل كانت المشكلة تتكرّر يوميًا معي ومع الزملاء. كان الروستر يصلنا كملف إكسل، ومعظم الموظفين يعتمدون على الهواتف، مما يجعل تصفّح الجداول مرهقًا بين التكبير والتصغير والبحث داخل الصفوف والأعمدة.</p>
+          <p>أدركت أن التحدي <span class="highlight">ليس في توفّر المعلومات، بل في طريقة عرضها</span>. من هنا جاءت فكرة تحويل ملف الإكسل إلى منصة بسيطة مصمّمة للهاتف أولًا، تعرض المناوبات بوضوح وسرعة.</p>
+          <p>بدأت الفكرة كحل لمشكلة يومية، ثم تطوّرت لتصبح أداة يعتمد عليها الزملاء لمتابعة جداولهم ومعرفة مواعيدهم بسهولة وثقة.</p>
+          <figure class="shot-card">
+            <img src="roster-app.png" alt="واجهة تطبيق Duty Roster على الهاتف" width="720" height="1280" loading="lazy" />
+            <figcaption class="shot-caption">لقطة من واجهة تطبيق الروستر · Duty Roster</figcaption>
+          </figure>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">5</div>
+          <h2 class="q-text">بتبسيط غير معقّد، كيف يعمل هذا التطبيق، وكيف يساهم عمليًا في تسهيل العمليات اليومية للزملاء في الفريق؟</h2>
+        </div>
+        <div class="a">
+          <p>الواجهة تبدو بسيطة وسهلة الاستخدام، ولكن خلفها مئات الملفات وعشرات العمليات التي تعمل بشكل متكامل قبل إصدار الروستر الجديد وأرشفة الروستر السابق.</p>
+          <p>يقوم التطبيق بتحليل ملف الإكسل واستخراج جدول كل موظف، بحيث يحصل كل موظف على صفحة خاصة تحتوي على جدوله الشهري الحالي والسابق. كما يمكنه حفظ رقمه الوظيفي ليظهر اسمه والقسم التابع له في أعلى الموقع، إضافةً إلى جدوله الشهري. وأي تغيّر في روستر الموظف يظهر له تنبيه يُشعره بهذا التغيّر.</p>
+          <p>يتيح التطبيق تنزيل ملف ICS الخاص بالتقويم، وحفظ جدول المناوبات للشهر كاملًا داخل التقويم، مما يساعد الموظف على معرفة مناوباته بسهولة وفي أي وقت، كما يمكنه حفظ صورة من جدوله الشهري أو ملف PDF.</p>
+          <p>وفي حال إصدار جدول جديد لنفس الشهر، يقوم النظام بعرض الفرق بين الجدول السابق والحالي، ويوضّح التغييرات التي تمت. كذلك توجد صفحة خاصة بالتدريب تحتوي على قائمة الدورات للشهر الحالي، وتوضّح في أعلى الصفحة ما إذا كان لدى الموظف دورة تدريبية خلال هذا الشهر أم لا.</p>
+          <p>كما يستطيع المشرف نسخ قائمة الموظفين المناوبين لليوم بسهولة. وبشكل عام، يهدف الموقع إلى تسهيل وصول الموظفين والمشرفين إلى جداول المناوبات والمعلومات المرتبطة بها بطريقة سريعة ومنظّمة.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">6</div>
+          <h2 class="q-text">كيف تساعدك مهاراتك التقنية خارج أوقات الدوام في أداء دورك اليومي هنا في ترانزم الشحن؟</h2>
+        </div>
+        <div class="a">
+          <p>صمّمت العديد من التطبيقات التي تهدف إلى تسهيل مهام العمل، من بينها تطبيق حساب الشحنات، وخاصة الشحنات الكبيرة، حيث يتيح للموظف حساب أكثر من شحنة في الوقت نفسه بطريقة سهلة ومنظّمة. التطبيق متوفّر ضمن موقع الروستر إلى جانب مجموعة من التطبيقات الأخرى.</p>
+          <p>كما طوّرت تطبيقًا لطباعة بوليصة الشحن الجوي (Air Waybill)، بحيث يمكن لموظفي CTU أو المشرفين استخدامه عند الحاجة إلى طباعة رقم البوليصة بشكل سريع.</p>
+          <p>بالإضافة إلى ذلك، طوّرت برنامج توزيع الأوزان الذي يساعد الموظفين على تقسيم الشحنات وإظهار وزن كل جزء بدقة. يتميّز البرنامج بإمكانية التعامل مع أكثر من شحنة في نفس الوقت، مما يسهّل عملية إدخال الأوزان ويقلّل الحاجة إلى الحساب اليدوي باستخدام الآلة الحاسبة.</p>
+          <p>جميع هذه الأدوات جاءت بهدف تبسيط الإجراءات اليومية، وتقليل الوقت والجهد، ورفع كفاءة العمل.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">7</div>
+          <h2 class="q-text">بين إدارة متجرك، وتطوير التطبيقات، ومهامك الوظيفية اليومية؛ جدولك مليء بالمسؤوليات! كيف توازن بين وقتك وتحافظ على هذه الطاقة الإبداعية العالية؟</h2>
+        </div>
+        <div class="a">
+          <p>الشغف هو الكلمة الأنسب لهذا السؤال. فحب هذا المجال هو الروح التي تدفعني دائمًا إلى الاستمرار، وعدم الاستسلام أمام أي عقبة أو تحدٍّ.</p>
+          <p>كما أن ردود الفعل الجميلة من الأصدقاء والزملاء تمثّل دافعًا مستمرًا لي لمواصلة العطاء والتطوير.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">8</div>
+          <h2 class="q-text">هل هناك تحديثات قادمة تخطّط لإضافتها للتطبيق، أو أدوات رقمية أخرى تطمح لابتكارها لقطاع اللوجستيات والشحن؟</h2>
+        </div>
+        <div class="a">
+          <p>بالتأكيد، فالتطوير بالنسبة لي لا يتوقّف؛ كل أداة أبنيها تفتح لي فكرة جديدة. بدأ الروستر كعرض مبسّط للمناوبات، لكنه أصبح اليوم منصة تجمع أدوات متعددة تخدم الموظف، من حاسبة الكميات الخاصة بالشحن إلى أدوات أخرى تساعده في عمله اليومي.</p>
+          <p>أما طموحي القادم فهو جعل الروستر <span class="highlight">أكثر ذكاءً واستباقية</span>، من خلال إضافة إشعارات للمناوبات، وأدوات تسهّل التنسيق وتبادل المناوبات بين الزملاء.</p>
+          <p>وأؤمن أن قطاع اللوجستيات والشحن مليء بالفرص للتحول الرقمي، وهدفي هو تحويل التحديات اليومية في الميدان إلى حلول تقنية توفّر الوقت وتقلّل الأخطاء، لأن أفضل الأفكار تولد من واقع العمل نفسه.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="q">
+          <div class="q-num">9</div>
+          <h2 class="q-text">ما النصيحة التي تقدّمها لزملائك ممن يمتلكون موهبة أو فكرة مشروع ولكنهم يتردّدون في السعي وراءها؟</h2>
+        </div>
+        <div class="a">
+          <p>نصيحتي لهم أن يتذكّروا دائمًا أن <span class="highlight">زكاة العلم نشره</span>؛ فكلما شاركتم الآخرين بما تملكونه من معرفة أو موهبة، زادت خبرتكم وتطوّرت مهاراتكم. لا تجعلوا التردّد أو الخوف عائقًا أمامكم، بل جرّبوا وحاولوا وتعلّموا من التجارب والأخطاء.</p>
+          <p>ابحثوا عن أشخاص يشاركونكم نفس الاهتمام أو الموهبة، فالتعاون وتبادل الأفكار يفتحان أبوابًا جديدة للتطور والابتكار. قد تبدأ الفكرة بخطوة بسيطة، لكنها مع الشغف والاستمرار يمكن أن تتحوّل إلى إنجاز مميّز يترك أثرًا إيجابيًا.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <section class="links-bar" aria-label="روابط سريعة">
+      <a class="link-card" href="https://khalidsaif912.github.io/new/" target="_blank" rel="noopener noreferrer">
+        <img src="qr-roster.png" alt="باركود موقع الروستر" width="132" height="132" />
+        <div class="title">موقع الروستر</div>
+        <div class="sub">Duty Roster</div>
+      </a>
+      <a class="link-card" href="https://mystore-96d8e.web.app/" target="_blank" rel="noopener noreferrer">
+        <img src="qr-store.png" alt="باركود متجر مُبهر" width="132" height="132" />
+        <div class="title">متجر مُبهر</div>
+        <div class="sub">Mobhar Store</div>
+      </a>
+    </section>
+
+    <footer class="foot">
+      <div class="divider"></div>
+      <p><strong>خالد بن سيف الرقادي</strong> — ترانزم الشحن</p>
+      <p>شغفٌ بالتقنية، وحلولٌ تُولد من قلب الميدان.</p>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var cards = document.querySelectorAll('.card');
+      if (!('IntersectionObserver' in window)) {
+        cards.forEach(function (c) { c.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      cards.forEach(function (c) { io.observe(c); });
+    })();
+  </script>
+</body>
+</html>
