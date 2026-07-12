@@ -239,21 +239,22 @@
     .foot strong { color: var(--ink); font-weight: 800; }
 
     .shots-gallery {
-      display: block;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
       margin: 18px 0 0;
       width: 100%;
     }
 
     .shot-card {
       margin: 0;
-      max-width: none;
       width: 100%;
       padding: 0;
       overflow: visible;
-      border-radius: 18px;
+      border-radius: 16px;
       border: 1px solid rgba(148, 163, 184, 0.22);
       box-shadow: var(--shadow-sm);
-      background: #f1f5f9;
+      background: #fff;
     }
 
     .shot-card::before {
@@ -262,39 +263,38 @@
 
     .shot-frame {
       overflow: visible;
-      border-radius: 18px 18px 0 0;
-      background: #eef2f7;
+      border-radius: 16px 16px 0 0;
+      background: #f1f5f9;
       line-height: 0;
-      padding: 10px 8px 0;
+      padding: 8px;
     }
 
     .shot-card img {
       display: block;
       width: 100%;
-      max-width: 100%;
       height: auto;
       object-fit: contain;
-      object-position: center center;
       border-radius: 10px;
+      background: #fff;
     }
 
     .shot-caption {
-      padding: 12px 10px 14px;
+      padding: 10px 8px 12px;
       text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       font-weight: 800;
       color: #0f172a;
       letter-spacing: 0.01em;
-      line-height: 1.45;
+      line-height: 1.4;
       background: #fff;
-      border-radius: 0 0 18px 18px;
-      border-top: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 0 0 16px 16px;
+      border-top: 1px solid rgba(148, 163, 184, 0.14);
     }
 
     .shot-caption span {
       display: block;
       margin-top: 2px;
-      font-size: 0.74rem;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #64748b;
     }
@@ -351,7 +351,18 @@
     @media (max-width: 720px) {
       .links-bar { grid-template-columns: 1fr; gap: 12px; max-width: 280px; margin-inline: auto; }
       .link-card img { width: 120px; height: 120px; }
-      .shot-frame { padding: 6px 4px 0; }
+      .shots-gallery {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+      }
+      .shots-gallery .shot-card {
+        flex: 0 0 min(78vw, 300px);
+        scroll-snap-align: center;
+      }
     }
 
     @media (max-width: 560px) {
@@ -361,9 +372,7 @@
       .q-num { width: 36px; height: 36px; border-radius: 11px; }
       .a { padding: 4px 40px 0 2px; }
       .a::before { right: 14px; }
-      .shot-card { border-radius: 14px; }
-      .shot-frame { border-radius: 14px 14px 0 0; padding: 4px 2px 0; }
-      .shot-caption { font-size: 0.8rem; border-radius: 0 0 14px 14px; }
+      .shot-caption { font-size: 0.8rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -439,11 +448,29 @@
           <div class="shots-gallery">
             <figure class="shot-card">
               <div class="shot-frame">
-                <img src="apps-showcase.png" alt="لقطات من الروستر وحاسبة الكميات ومتجر مُبهر" width="1600" height="900" loading="lazy" />
+                <img src="roster-app.png" alt="واجهة موقع الروستر كاملة" width="720" height="1280" loading="lazy" />
               </div>
               <figcaption class="shot-caption">
-                نماذج من المشاريع
-                <span>الروستر · حاسبة الكميات · متجر مُبهر</span>
+                موقع الروستر
+                <span>Duty Roster</span>
+              </figcaption>
+            </figure>
+            <figure class="shot-card">
+              <div class="shot-frame">
+                <img src="calculator-app.png" alt="واجهة حاسبة الكميات كاملة" width="720" height="1280" loading="lazy" />
+              </div>
+              <figcaption class="shot-caption">
+                حاسبة الكميات
+                <span>Quantity Calculation</span>
+              </figcaption>
+            </figure>
+            <figure class="shot-card">
+              <div class="shot-frame">
+                <img src="store-app.png" alt="واجهة متجر مُبهر كاملة" width="720" height="1280" loading="lazy" />
+              </div>
+              <figcaption class="shot-caption">
+                متجر مُبهر
+                <span>Mobhar Store</span>
               </figcaption>
             </figure>
           </div>
