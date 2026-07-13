@@ -1,107 +1,121 @@
 {
   "kind": "export",
   "month": "2026-07",
-  "generated_at": "2026-07-09T11:31:07.832972Z",
-  "old_file": "Operation Roster July2026 Version 2.xlsx",
-  "new_file": "Operation Roster July2026 Version 3.xlsx",
-  "total_changes": 14,
+  "generated_at": "2026-07-13T17:30:20.572914Z",
+  "old_file": "Operation Roster July2026 Version 3.xlsx",
+  "new_file": "Operation Roster July2026 Version 4.xlsx",
+  "total_changes": 16,
   "changes": [
     {
-      "emp_id": "name:Ahmed Al Mawali - 82283",
-      "name": "Ahmed Al Mawali - 82283",
+      "emp_id": "name:Adil Al Zadjali - 8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 25,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Zadjali - 8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 26,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Zadjali - 8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 27,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Zadjali - 8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 28,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Zadjali - 8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 29,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 15,
+      "v1": "AE14",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Marwan Al Difai - 82437",
+      "name": "Marwan Al Difai - 82437",
+      "day": 18,
+      "v1": "AE14",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Mohamed Al Siyabi - 81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 16,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Siyabi - 81402",
+      "name": "Mohamed Al Siyabi - 81402",
       "day": 17,
       "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Mawali - 82283",
-      "name": "Ahmed Al Mawali - 82283",
+      "emp_id": "name:Mohamed Al Siyabi - 81402",
+      "name": "Mohamed Al Siyabi - 81402",
       "day": 18,
       "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Mawali - 82283",
-      "name": "Ahmed Al Mawali - 82283",
+      "emp_id": "name:Mohamed Al Siyabi - 81402",
+      "name": "Mohamed Al Siyabi - 81402",
       "day": 19,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ali Al Marjubi - 82577",
-      "name": "Ali Al Marjubi - 82577",
-      "day": 17,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Ali Yousuf Al Balushi - 990752",
-      "name": "Ali Yousuf Al Balushi - 990752",
-      "day": 6,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Ali Yousuf Al Balushi - 990752",
-      "name": "Ali Yousuf Al Balushi - 990752",
-      "day": 16,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Jaafar Al Balushi - 81258",
-      "name": "Jaafar Al Balushi - 81258",
-      "day": 31,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Khalil Al Hinai - 82671",
-      "name": "Khalil Al Hinai - 82671",
-      "day": 15,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Khalil Al Hinai - 82671",
-      "name": "Khalil Al Hinai - 82671",
-      "day": 16,
-      "v1": "NE22",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Mazroie - 82658",
-      "name": "Mohamed Al Mazroie - 82658",
-      "day": 28,
-      "v1": "NE22",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Raad Al Farsi - 82578",
-      "name": "Raad Al Farsi - 82578",
-      "day": 15,
+      "emp_id": "name:Mubarak Al Nofli - 82114",
+      "name": "Mubarak Al Nofli - 82114",
+      "day": 19,
       "v1": "ME06",
       "v2": "NE22"
+    },
+    {
+      "emp_id": "name:Mudathir Al Hajri - 82441",
+      "name": "Mudathir Al Hajri - 82441",
+      "day": 16,
+      "v1": "ME06",
+      "v2": "AE14"
     },
     {
       "emp_id": "name:Riyahd Al Jabri - 82555",
       "name": "Riyahd Al Jabri - 82555",
-      "day": 16,
-      "v1": "ME06",
-      "v2": "NE22"
-    },
-    {
-      "emp_id": "name:Saif Al Mahrizi - 82649",
-      "name": "Saif Al Mahrizi - 82649",
-      "day": 31,
+      "day": 28,
       "v1": "ME06",
       "v2": "AE14"
     },
     {
       "emp_id": "name:Talal Al Balushi - 81300",
       "name": "Talal Al Balushi - 81300",
-      "day": 10,
-      "v1": "NN21",
+      "day": 13,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Talal Al Balushi - 81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 14,
+      "v1": "TR",
       "v2": "LV"
     }
   ]
