@@ -358,6 +358,21 @@
       background:#dbeafe;
       flex-shrink:0;
     }
+    .mineAbsenceEmpty {
+      border:1px solid #bbf7d0;
+      background:linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%);
+      color:#166534;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:800;
+      font-size:15px;
+      text-align:center;
+      margin-bottom:2px;
+    }
+    .empFold.empFoldMine {
+      border-color:#93c5fd;
+      box-shadow:0 0 0 2px rgba(59, 130, 246, 0.12);
+    }
     .changeRows { padding:0 10px 10px; display:grid; gap:8px; }
     .changeRow {
       display:flex;
@@ -533,8 +548,9 @@
         sourceHint: 'Comparison source is shown from the two Excel files used to compute this diff.',
         summaryStats: '{changes} changes across {employees} employees in {departments} departments',
         noSavedEmp: 'No saved employee ID found for this section.',
-        noAbsence: 'No recorded absences for this employee.',
-        absenceSummary: '{days} absence records across {months} months',
+        noAbsence: 'You have no absences.',
+        noAbsenceAll: 'No absence records found.',
+        absenceSummary: '{employees} employees · {days} absence days · {departments} departments',
         absent: 'Absent',
         recorded: 'Recorded',
         dayFallback: 'Day {day}',
@@ -561,8 +577,9 @@
         sourceHint: 'مصدر المقارنة يظهر من ملفي الإكسل المستخدمين في حساب الفروقات.',
         summaryStats: '{changes} تغييرات بين {employees} موظفين في {departments} أقسام',
         noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
-        noAbsence: 'لا توجد أيام غياب مسجلة لهذا الموظف.',
-        absenceSummary: '{days} سجلات غياب ضمن {months} أشهر',
+        noAbsence: 'لا يوجد غياب لديك',
+        noAbsenceAll: 'لا توجد سجلات غياب.',
+        absenceSummary: '{employees} موظفين · {days} أيام غياب · {departments} أقسام',
         absent: 'غياب',
         recorded: 'مسجل',
         dayFallback: 'اليوم {day}',
@@ -903,58 +920,145 @@
       err.textContent = '';
       summary.textContent = '';
       diffList.innerHTML = '';
+      lastSummaryStats = null;
+
       try {
         const root = getSiteRootPath();
-        const empId = (localStorage.getItem(kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId') || '').trim();
-        if (!empId) {
-          err.textContent = t('noSavedEmp');
-          return;
-        }
-        const schedulePath = kind === 'import' ? `import/schedules/${encodeURIComponent(empId)}.json` : `schedules/${encodeURIComponent(empId)}.json`;
-        const [empRes, absRes] = await Promise.all([
-          fetch(`${root}/${schedulePath}?ts=${Date.now()}`),
-          fetch(`${root}/absence-data.json?ts=${Date.now()}`)
-        ]);
-        if (!empRes.ok || !absRes.ok) throw new Error('Could not load absence data.');
-        const emp = await empRes.json();
+        const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
+        const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
+        const savedEmpId = (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || '').trim();
+
+        const absRes = await fetch(`${root}/absence-data.json?ts=${Date.now()}`);
+        if (!absRes.ok) throw new Error('Could not load absence data.');
         const absData = await absRes.json();
         const records = (absData && absData.records) || [];
-        const cleanName = String((emp && emp.name) || '').replace(/-\s*\d+\s*$/, '').trim();
-        const dates = [];
-        records.forEach((rec) => {
-          let matched = false;
-          if (rec && Array.isArray(rec.empNos) && rec.empNos.includes(String(empId))) matched = true;
-          if (!matched && cleanName && Array.isArray(rec.names)) matched = rec.names.some((n) => nameMatch(cleanName, n));
-          if (matched && rec && rec.date) dates.push(rec.date);
-        });
-        const uniqDates = Array.from(new Set(dates)).sort();
-        if (!uniqDates.length) {
-          err.textContent = t('noAbsence');
+        if (!records.length) {
+          err.textContent = t('noAbsenceAll');
           return;
         }
-        const groupedByMonth = new Map();
-        uniqDates.forEach((d) => {
-          const key = String(d || '').match(/^\d{4}-\d{2}-\d{2}$/) ? String(d).slice(0, 7) : 'unknown';
-          if (!groupedByMonth.has(key)) groupedByMonth.set(key, []);
-          groupedByMonth.get(key).push(String(d));
+
+        const lookup = await getDeptLookup(kind);
+        const byEmp = new Map();
+
+        records.forEach((rec) => {
+          if (!rec || !rec.date) return;
+          const names = Array.isArray(rec.names) ? rec.names : [];
+          const empNos = Array.isArray(rec.empNos) ? rec.empNos : [];
+          const sections = Array.isArray(rec.sections) ? rec.sections : [];
+          const len = Math.max(names.length, empNos.length, sections.length);
+          for (let i = 0; i < len; i++) {
+            const empNo = String(empNos[i] || '').trim();
+            const employeeName = String(names[i] || '').trim() || '-';
+            const section = String(sections[i] || '').trim();
+            const key = empNo
+              ? `id:${normalizeId(empNo)}`
+              : `name:${normalizeName(employeeName) || employeeName}`;
+            if (!key || key === 'id:' || key === 'name:') continue;
+            if (!byEmp.has(key)) {
+              byEmp.set(key, {
+                empId: empNo,
+                employeeName,
+                dates: [],
+                section: section || '',
+              });
+            }
+            const g = byEmp.get(key);
+            g.dates.push(String(rec.date));
+            if ((!g.employeeName || g.employeeName === '-') && employeeName && employeeName !== '-') {
+              g.employeeName = employeeName;
+            }
+            if (!g.section && section) g.section = section;
+            if (!g.empId && empNo) g.empId = empNo;
+          }
         });
-        const monthKeys = Array.from(groupedByMonth.keys()).sort((a, b) => {
-          if (a === 'unknown') return 1;
-          if (b === 'unknown') return -1;
-          return b.localeCompare(a);
+
+        const groups = Array.from(byEmp.values()).map((g) => {
+          const uniqDates = Array.from(new Set(g.dates)).sort((a, b) => b.localeCompare(a));
+          const idLike = String(g.empId || '').trim();
+          const matchSaved =
+            !!savedEmpId &&
+            (idsMatch(g.empId, savedEmpId) ||
+              idsMatch(idLike, savedEmpId) ||
+              String(g.employeeName || '').includes(savedEmpId));
+          const department =
+            g.section ||
+            resolveDepartment(g.empId, g.employeeName, lookup) ||
+            'Other';
+          return {
+            empId: g.empId,
+            employeeName: g.employeeName || '-',
+            dates: uniqDates,
+            matchSaved,
+            department,
+          };
+        }).filter((g) => g.dates.length);
+
+        if (!groups.length) {
+          err.textContent = t('noAbsenceAll');
+          return;
+        }
+
+        const mine = savedEmpId ? groups.find((g) => g.matchSaved) : null;
+        if (savedEmpId && !mine) {
+          const empty = document.createElement('div');
+          empty.className = 'mineAbsenceEmpty';
+          empty.textContent = t('noAbsence');
+          diffList.appendChild(empty);
+        }
+
+        const byDept = new Map();
+        groups.forEach((g) => {
+          if (!byDept.has(g.department)) byDept.set(g.department, []);
+          byDept.get(g.department).push(g);
         });
-        summary.textContent = t('absenceSummary', { days: uniqDates.length, months: monthKeys.length });
-        monthKeys.forEach((monthKey, idx) => {
-          const monthDetails = document.createElement('details');
-          monthDetails.className = 'deptFold';
-          if (idx === 0) monthDetails.open = true;
-          const monthDates = (groupedByMonth.get(monthKey) || []).slice().sort((a, b) => b.localeCompare(a));
-          const rowsHtml = monthDates
-            .map((d, i) => `<div class="changeRow"><span class="changeDay">${i + 1}</span><span class="changeDate">${formatAbsenceDate(d)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`)
-            .join('');
-          const monthTitle = monthKey === 'unknown' ? 'Unknown' : formatAbsenceMonth(monthKey);
-          monthDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${monthTitle}</span></span><span class="empCount">${monthDates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
-          diffList.appendChild(monthDetails);
+        const deptGroups = Array.from(byDept.entries()).map(([department, employees]) => ({
+          department,
+          employees,
+          hasSaved: employees.some((e) => e.matchSaved),
+          totalDays: employees.reduce((n, e) => n + e.dates.length, 0),
+        }));
+        deptGroups.sort((a, b) => {
+          if (a.hasSaved && !b.hasSaved) return -1;
+          if (!a.hasSaved && b.hasSaved) return 1;
+          return a.department.localeCompare(b.department);
+        });
+
+        const totalDays = groups.reduce((n, g) => n + g.dates.length, 0);
+        summary.textContent = t('absenceSummary', {
+          employees: groups.length,
+          days: totalDays,
+          departments: deptGroups.length,
+        });
+
+        deptGroups.forEach((d, deptIdx) => {
+          d.employees.sort((a, b) => {
+            if (a.matchSaved && !b.matchSaved) return -1;
+            if (!a.matchSaved && b.matchSaved) return 1;
+            return a.employeeName.localeCompare(b.employeeName);
+          });
+          const deptDetails = document.createElement('details');
+          deptDetails.className = 'deptFold';
+          if ((savedEmpId && d.hasSaved) || (!savedEmpId && deptIdx === 0)) deptDetails.open = true;
+
+          const deptRows = document.createElement('div');
+          deptRows.className = 'deptRows';
+          d.employees.forEach((g, empIdx) => {
+            const details = document.createElement('details');
+            details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
+            if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+            const rowsHtml = g.dates
+              .map((dateStr, i) => {
+                const dayNum = String(dateStr || '').match(/^\d{4}-\d{2}-(\d{2})$/);
+                const day = dayNum ? String(Number(dayNum[1])) : String(i + 1);
+                return `<div class="changeRow"><span class="changeDay">${day}</span><span class="changeDate">${formatAbsenceDate(dateStr)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`;
+              })
+              .join('');
+            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${g.employeeName}${g.empId ? ` - ${g.empId}` : ''}</span></span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+            deptRows.appendChild(details);
+          });
+          deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${d.department}</span></span><span class="empCount">${d.totalDays}</span></summary>`;
+          deptDetails.appendChild(deptRows);
+          diffList.appendChild(deptDetails);
         });
       } catch (e) {
         err.textContent = e.message || String(e);
