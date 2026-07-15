@@ -382,6 +382,17 @@
       text-align:center;
       margin-bottom:2px;
     }
+    .mineChangeEmpty {
+      border:1px solid #bfdbfe;
+      background:linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+      color:#1d4ed8;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:800;
+      font-size:15px;
+      text-align:center;
+      margin-bottom:2px;
+    }
     .empFold.empFoldMine {
       border-color:#93c5fd;
       box-shadow:0 0 0 2px rgba(59, 130, 246, 0.12);
@@ -568,11 +579,29 @@
         noSavedEmp: 'No saved employee ID found for this section.',
         noAbsence: 'You have no absences.',
         noAbsenceAll: 'No absence records found.',
+        noChangeMine: 'You have no changes in your schedule.',
         absenceSummary: '{employees} employees · {days} absence days · {departments} departments',
         absent: 'Absent',
         recorded: 'Recorded',
         dayFallback: 'Day {day}',
-        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.'
+        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.',
+        dept_other: 'Other',
+        dept_officers: 'Officers',
+        dept_supervisors: 'Supervisors',
+        dept_loadControl: 'Load Control',
+        dept_exportChecker: 'Export Checker',
+        dept_exportOps: 'Export Operators',
+        dept_unassigned: 'Unassigned',
+        dept_documentation: 'Documentation',
+        dept_importCheckers: 'Import Checkers',
+        dept_importOps: 'Import Operators',
+        dept_cargoOps: 'Cargo - Exp/Imp Operation',
+        shift_off: 'Off Day',
+        shift_annual: 'Annual Leave',
+        shift_sick: 'Sick Leave',
+        shift_training: 'Training',
+        shift_standby: 'Standby',
+        shift_leave: 'Leave'
       },
       ar: {
         tabDiff: 'فروقات الروستر',
@@ -598,11 +627,29 @@
         noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
         noAbsence: 'لا يوجد غياب لديك',
         noAbsenceAll: 'لا توجد سجلات غياب.',
+        noChangeMine: 'لا يوجد تغيّر في جدولك',
         absenceSummary: '{employees} موظفين · {days} أيام غياب · {departments} أقسام',
         absent: 'غياب',
         recorded: 'مسجل',
         dayFallback: 'اليوم {day}',
-        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.'
+        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.',
+        dept_other: 'أخرى',
+        dept_officers: 'الضباط',
+        dept_supervisors: 'المشرفون',
+        dept_loadControl: 'مراقبة الحمولة',
+        dept_exportChecker: 'مدقق الصادرات',
+        dept_exportOps: 'مشغلو الصادرات',
+        dept_unassigned: 'غير مُعيَّن',
+        dept_documentation: 'التوثيق',
+        dept_importCheckers: 'مدققو الواردات',
+        dept_importOps: 'مشغلو الواردات',
+        dept_cargoOps: 'عمليات الشحن الصادر/الوارد',
+        shift_off: 'إجازة',
+        shift_annual: 'إجازة سنوية',
+        shift_sick: 'إجازة مرضية',
+        shift_training: 'تدريب',
+        shift_standby: 'احتياط',
+        shift_leave: 'إجازة'
       }
     };
 
@@ -637,16 +684,18 @@
       dateTag.textContent = formatted;
     }
 
-    function toggleLang() {
+    async function toggleLang() {
       currentLang = currentLang === 'ar' ? 'en' : 'ar';
       localStorage.setItem('rosterDiffLang', currentLang);
       localStorage.setItem('rosterLang', currentLang);
       applyLanguageUi();
-      if (currentPanel === 'absence') {
-        renderAbsencePanel(currentDiffKind);
-      } else if (lastDiffData) {
-        renderDiffRows(lastDiffData, currentDiffKind);
-      }
+      try {
+        if (currentPanel === 'absence') {
+          await renderAbsencePanel(currentDiffKind);
+        } else if (lastDiffData) {
+          await renderDiffRows(lastDiffData, currentDiffKind);
+        }
+      } catch (_) {}
     }
     window.toggleLang = toggleLang;
 
@@ -722,6 +771,21 @@
       return (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || localStorage.getItem('savedEmpId') || '').trim();
     }
 
+    async function paintWelcomeName(kind, empId, enFull) {
+      const nameEl = document.getElementById('welcomeName');
+      if (!nameEl) return;
+      const en = String(enFull || empId || '').trim();
+      if (currentLang === 'ar') {
+        const lookup = await getArabicNameLookup(kind);
+        const shown = displayEmployeeName(empId, en, lookup);
+        const first = String(shown).replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
+        nameEl.textContent = first || empId;
+        return;
+      }
+      const first = en.replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
+      nameEl.textContent = first || empId;
+    }
+
     function updateWelcomeChip(kind) {
       const root = getSiteRootPath();
       const myBtn = document.getElementById('myScheduleBtn');
@@ -737,6 +801,8 @@
       if (!empId) {
         welcome.classList.remove('visible');
         welcome.removeAttribute('href');
+        welcome.dataset.loadedEmp = '';
+        welcome.dataset.enName = '';
         nameEl.textContent = '';
         if (myBtn) {
           myBtn.classList.remove('is-hidden');
@@ -750,8 +816,13 @@
       welcome.title = t('welcomeTitle');
       welcome.classList.add('visible');
 
-      if (welcome.dataset.loadedEmp === empId && nameEl.textContent) return;
+      if (welcome.dataset.loadedEmp === empId && welcome.dataset.enName) {
+        paintWelcomeName(kind, empId, welcome.dataset.enName);
+        return;
+      }
+
       welcome.dataset.loadedEmp = empId;
+      welcome.dataset.enName = empId;
       nameEl.textContent = empId;
 
       const schedulePath = kind === 'import'
@@ -761,11 +832,16 @@
       fetch(`${root}/${schedulePath}?ts=${Date.now()}`)
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
-          if (!data || !data.name) return;
-          const firstName = String(data.name).replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
-          if (firstName) nameEl.textContent = firstName;
+          if (!data || !data.name) {
+            paintWelcomeName(kind, empId, empId);
+            return;
+          }
+          welcome.dataset.enName = String(data.name).trim();
+          paintWelcomeName(kind, empId, welcome.dataset.enName);
         })
-        .catch(() => {});
+        .catch(() => {
+          paintWelcomeName(kind, empId, empId);
+        });
     }
 
     async function activatePanel(panel) {
@@ -779,7 +855,10 @@
     }
 
     function getSiteRootPath() {
+      if (location.protocol === 'file:') return '';
       const path = location.pathname || '/';
+      const diffIdx = path.indexOf('/roster-diff');
+      if (diffIdx >= 0) return path.slice(0, diffIdx) || '';
       if (path.includes('/roster-site/')) return '/roster-site';
       if (location.hostname && location.hostname.endsWith('github.io')) {
         const segs = path.split('/').filter(Boolean);
@@ -823,8 +902,9 @@
       const month = Number(m[2]) - 1;
       const d = Number(day);
       const dt = new Date(year, month, d);
-      if (Number.isNaN(dt.getTime())) return `Day ${day}`;
-      return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (Number.isNaN(dt.getTime())) return t('dayFallback', { day });
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
     function formatAbsenceDate(dateStr) {
@@ -845,15 +925,33 @@
       return dt.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     }
 
+    function extractEmpId(v) {
+      const s = String(v || '').trim();
+      if (!s) return '';
+      const tail = s.match(/(\d{3,})\s*$/);
+      if (tail) return tail[1];
+      const any = s.match(/(\d{3,})/);
+      return any ? any[1] : '';
+    }
+
     function normalizeId(v) {
-      return String(v || '').replace(/\D+/g, '').trim();
+      return extractEmpId(v) || String(v || '').replace(/\D+/g, '').trim();
     }
 
     function idsMatch(a, b) {
-      const na = normalizeId(a);
-      const nb = normalizeId(b);
+      const na = extractEmpId(a);
+      const nb = extractEmpId(b);
       if (!na || !nb) return false;
-      return na === nb || na.includes(nb) || nb.includes(na);
+      return na === nb;
+    }
+
+    function isSavedEmployee(savedEmpId, empId, employeeName) {
+      if (!savedEmpId) return false;
+      const saved = extractEmpId(savedEmpId) || String(savedEmpId).trim();
+      if (!saved) return false;
+      if (idsMatch(empId, saved) || idsMatch(employeeName, saved)) return true;
+      const en = String(employeeName || '');
+      return en === saved || en.endsWith(' - ' + saved) || en.includes(saved);
     }
 
     function normalizeName(v) {
@@ -863,6 +961,134 @@
         .replace(/[^a-z0-9\u0600-\u06ff]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
+    }
+
+    const nameLangCache = { export: null, import: null, loading: {} };
+
+    function translateDepartment(dept) {
+      const raw = String(dept || '').trim();
+      if (!raw) return t('dept_other');
+      const key = raw.toLowerCase();
+      const map = {
+        'other': 'dept_other',
+        'officers': 'dept_officers',
+        'supervisors': 'dept_supervisors',
+        'load control': 'dept_loadControl',
+        'export checker': 'dept_exportChecker',
+        'export operators': 'dept_exportOps',
+        'unassigned': 'dept_unassigned',
+        'documentation': 'dept_documentation',
+        'import checkers': 'dept_importCheckers',
+        'import checker': 'dept_importCheckers',
+        'import operators': 'dept_importOps',
+        'import ops': 'dept_importOps',
+        'cargo - exp/imp operation': 'dept_cargoOps',
+        'cargo - exp/imp operations': 'dept_cargoOps',
+      };
+      return map[key] ? t(map[key]) : raw;
+    }
+
+    function translateShiftValue(code) {
+      const raw = String(code || '').trim();
+      if (!raw || raw === '-') return '-';
+      if (currentLang !== 'ar') return raw;
+      const u = raw.toUpperCase();
+      if (/^(OFF|OFF\s*DAY)$/i.test(raw) || u === 'O') return t('shift_off');
+      if (/^(LV|AL|ANNUAL|ANNUAL\s*LEAVE)$/i.test(raw)) return t('shift_annual');
+      if (/^(SL|SICK|SICK\s*LEAVE)$/i.test(raw)) return t('shift_sick');
+      if (/^(TR|TRAINING)$/i.test(raw)) return t('shift_training');
+      if (/^(ST|STANDBY)$/i.test(raw)) return t('shift_standby');
+      if (/^(LEAVE|L)$/i.test(raw)) return t('shift_leave');
+      return raw;
+    }
+
+    function ingestArabicNamePair(byId, byEn, arFull, enFull) {
+      const ar = String(arFull || '').trim();
+      const en = String(enFull || '').trim();
+      if (!ar || !en) return;
+      const id = extractEmpId(en) || extractEmpId(ar);
+      const enName = en.replace(/-\s*\d+\s*$/, '').trim();
+      const arName = ar.replace(/-\s*\d+\s*$/, '').trim();
+      if (id && !byId.has(id)) byId.set(id, arName || ar);
+      if (enName) byEn.set(normalizeName(enName), arName || ar);
+    }
+
+    async function getArabicNameLookup(kind) {
+      const k = kind === 'import' ? 'import' : 'export';
+      if (nameLangCache[k]) return nameLangCache[k];
+      if (nameLangCache.loading[k]) return nameLangCache.loading[k];
+
+      nameLangCache.loading[k] = (async () => {
+        const root = getSiteRootPath();
+        const byId = new Map();
+        const byEn = new Map();
+
+        try {
+          const res = await fetch(`${root}/roster-diff/names-ar.json?ts=${Date.now()}`);
+          if (res.ok) {
+            const json = await res.json();
+            const pack = (json && json[k]) || {};
+            Object.entries(pack.byId || {}).forEach(([id, ar]) => {
+              if (id && ar) byId.set(String(id), String(ar));
+            });
+            Object.entries(pack.byEn || {}).forEach(([en, ar]) => {
+              if (en && ar) byEn.set(normalizeName(en), String(ar));
+            });
+          }
+        } catch (_) {}
+
+        if (!byId.size && !byEn.size) {
+          const urls = k === 'import'
+            ? [`${root}/import/`, `${root}/import/index.html`, `${root}/import/now/`]
+            : [`${root}/`, `${root}/index.html`, `${root}/now/`];
+          for (const url of urls) {
+            try {
+              const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}ts=${Date.now()}`);
+              if (!res.ok) continue;
+              const html = await res.text();
+              try {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.querySelectorAll('[data-name-ar]').forEach((el) => {
+                  ingestArabicNamePair(byId, byEn, el.getAttribute('data-name-ar'), el.textContent || '');
+                });
+              } catch (_) {
+                const re = /data-name-ar="([^"]+)"[^>]*>([^<]+)</gi;
+                let m;
+                while ((m = re.exec(html))) ingestArabicNamePair(byId, byEn, m[1], m[2]);
+              }
+              if (byId.size || byEn.size) break;
+            } catch (_) {}
+          }
+        }
+
+        const lookup = { byId, byEn };
+        nameLangCache[k] = lookup;
+        delete nameLangCache.loading[k];
+        return lookup;
+      })();
+
+      return nameLangCache.loading[k];
+    }
+
+    function displayEmployeeName(empId, employeeName, nameLookup) {
+      const enFull = String(employeeName || '-').trim();
+      const enName = enFull.replace(/-\s*\d+\s*$/, '').trim() || enFull;
+      const id = extractEmpId(empId) || extractEmpId(enFull);
+      if (currentLang === 'ar' && nameLookup) {
+        const ar =
+          (id && nameLookup.byId.get(id)) ||
+          nameLookup.byEn.get(normalizeName(enName));
+        if (ar) return id ? `${ar} - ${id}` : ar;
+      }
+      return enFull;
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
     }
 
     async function getDeptLookup(kind) {
@@ -878,7 +1104,7 @@
           const idToDept = new Map();
           const nameToDept = new Map();
           ((json && json.employees) || []).forEach((e) => {
-            const empId = String((e && e.id) || '').trim();
+            const empId = extractEmpId((e && e.id) || '') || String((e && e.id) || '').trim();
             const dep = String((e && e.department) || '').trim();
             const nm = normalizeName((e && e.name) || '');
             if (empId && dep && !idToDept.has(empId)) idToDept.set(empId, dep);
@@ -891,32 +1117,42 @@
     }
 
     function resolveDepartment(empId, employeeName, lookup) {
-      const id = normalizeId(empId);
+      const id = extractEmpId(empId) || extractEmpId(employeeName);
       if (id && lookup.idToDept.has(id)) return lookup.idToDept.get(id);
       const nameKey = normalizeName(employeeName);
       if (nameKey && lookup.nameToDept.has(nameKey)) return lookup.nameToDept.get(nameKey);
       return 'Other';
     }
 
+    function appendMineEmptyNotice(diffList) {
+      const empty = document.createElement('div');
+      empty.className = 'mineChangeEmpty';
+      empty.setAttribute('data-mine-empty', '1');
+      empty.textContent = t('noChangeMine');
+      diffList.appendChild(empty);
+    }
+
     async function renderDiffRows(data, kind) {
       const err = document.getElementById('errors');
       const summary = document.getElementById('summary');
       const diffList = document.getElementById('diffList');
-      const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
-      const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
-      const savedEmpId = (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || '').trim();
+      const savedEmpId = getSavedEmpIdForKind(kind);
       err.textContent = '';
       diffList.innerHTML = '';
       const rows = (data && data.changes) || [];
       summary.textContent = '';
       if (!rows.length) {
+        if (savedEmpId) appendMineEmptyNotice(diffList);
         err.textContent = t('noDiffFound');
         lastSummaryStats = null;
         updateSummaryText();
         return;
       }
 
-      const lookup = await getDeptLookup(kind);
+      const [lookup, nameLookup] = await Promise.all([
+        getDeptLookup(kind),
+        getArabicNameLookup(kind),
+      ]);
       const grouped = new Map();
       rows.forEach((x) => {
         const key = `${x.emp_id || ''}||${x.name || '-'}`;
@@ -926,11 +1162,15 @@
       const groups = Array.from(grouped.entries()).map(([key, changes]) => {
         const [empId, name] = key.split('||');
         const employeeName = (name || '-').trim();
-        const idLike = (empId || '').replace(/^name:/, '').trim();
-        const matchSaved = !!savedEmpId && (idsMatch(empId, savedEmpId) || idsMatch(idLike, savedEmpId) || employeeName.includes(savedEmpId));
+        const matchSaved = isSavedEmployee(savedEmpId, empId, employeeName);
         const department = resolveDepartment(empId, employeeName, lookup);
         return { empId, employeeName, changes, matchSaved, department };
       });
+
+      if (savedEmpId && !groups.some((g) => g.matchSaved)) {
+        appendMineEmptyNotice(diffList);
+      }
+
       const byDept = new Map();
       groups.forEach((g) => {
         if (!byDept.has(g.department)) byDept.set(g.department, []);
@@ -964,16 +1204,17 @@
         deptRows.className = 'deptRows';
         d.employees.forEach((g, empIdx) => {
           const details = document.createElement('details');
-          details.className = 'empFold';
+          details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
           if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+          const shownName = displayEmployeeName(g.empId, g.employeeName, nameLookup);
           const rowsHtml = g.changes
             .sort((a, b) => Number(a.day) - Number(b.day))
-            .map((c) => `<div class="changeRow"><span class="changeDay">${c.day}</span><span class="changeDate">${formatDiffDate(c.day, data.month)}</span><span class="changeFlow"><span class="changeOld">${c.v1 || '-'}</span> → <span class="changeNew">${c.v2 || '-'}</span></span></div>`)
+            .map((c) => `<div class="changeRow"><span class="changeDay">${c.day}</span><span class="changeDate">${formatDiffDate(c.day, data.month)}</span><span class="changeFlow"><span class="changeOld">${escapeHtml(translateShiftValue(c.v1))}</span> → <span class="changeNew">${escapeHtml(translateShiftValue(c.v2))}</span></span></div>`)
             .join('');
-          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${g.employeeName}</span></span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
           deptRows.appendChild(details);
         });
-        deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${d.department}</span></span><span class="empCount">${d.totalChanges}</span></summary>`;
+        deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalChanges}</span></summary>`;
         deptDetails.appendChild(deptRows);
         diffList.appendChild(deptDetails);
       });
@@ -1000,9 +1241,7 @@
 
       try {
         const root = getSiteRootPath();
-        const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
-        const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
-        const savedEmpId = (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || '').trim();
+        const savedEmpId = getSavedEmpIdForKind(kind);
 
         const absRes = await fetch(`${root}/absence-data.json?ts=${Date.now()}`);
         if (!absRes.ok) throw new Error('Could not load absence data.');
@@ -1013,7 +1252,10 @@
           return;
         }
 
-        const lookup = await getDeptLookup(kind);
+        const [lookup, nameLookup] = await Promise.all([
+          getDeptLookup(kind),
+          getArabicNameLookup(kind),
+        ]);
         const byEmp = new Map();
 
         records.forEach((rec) => {
@@ -1050,12 +1292,7 @@
 
         const groups = Array.from(byEmp.values()).map((g) => {
           const uniqDates = Array.from(new Set(g.dates)).sort((a, b) => b.localeCompare(a));
-          const idLike = String(g.empId || '').trim();
-          const matchSaved =
-            !!savedEmpId &&
-            (idsMatch(g.empId, savedEmpId) ||
-              idsMatch(idLike, savedEmpId) ||
-              String(g.employeeName || '').includes(savedEmpId));
+          const matchSaved = isSavedEmployee(savedEmpId, g.empId, g.employeeName);
           const department =
             g.section ||
             resolveDepartment(g.empId, g.employeeName, lookup) ||
@@ -1122,6 +1359,7 @@
             const details = document.createElement('details');
             details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
             if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+            const shownName = displayEmployeeName(g.empId, g.empId ? `${g.employeeName} - ${g.empId}` : g.employeeName, nameLookup);
             const rowsHtml = g.dates
               .map((dateStr, i) => {
                 const dayNum = String(dateStr || '').match(/^\d{4}-\d{2}-(\d{2})$/);
@@ -1129,10 +1367,10 @@
                 return `<div class="changeRow"><span class="changeDay">${day}</span><span class="changeDate">${formatAbsenceDate(dateStr)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`;
               })
               .join('');
-            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${g.employeeName}${g.empId ? ` - ${g.empId}` : ''}</span></span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
             deptRows.appendChild(details);
           });
-          deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${d.department}</span></span><span class="empCount">${d.totalDays}</span></summary>`;
+          deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalDays}</span></summary>`;
           deptDetails.appendChild(deptRows);
           diffList.appendChild(deptDetails);
         });
