@@ -3837,7 +3837,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260705d';
+  var ver = '20260715a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3900,4 +3900,12 @@ setSummaryChipHrefs();
     if (T.en) { T.en.titleEyebrow = 'Import'; T.en.titleMain = 'Duty Roster'; }
     if (T.ar) { T.ar.titleEyebrow = 'الوارد'; T.ar.titleMain = 'جدول المناوبات'; }
   }
-  if (typeof applyLang === 'function' && typeof LANG !== 'undefined'
+  if (typeof applyLang === 'function' && typeof LANG !== 'undefined') {
+    applyLang(LANG);
+  }
+})();
+
+</script>
+
+</body>
+</html>
