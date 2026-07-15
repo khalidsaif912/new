@@ -75,6 +75,7 @@
       if (lbl) lbl.textContent = t('btn');
       else btn.textContent = t('btn');
     }
+    ensureAlumniButton();
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
     var title = document.getElementById('siteAppsTitle');
@@ -274,10 +275,51 @@
     });
   }
 
+  function alumniLabel() {
+    return lang() === 'ar' ? 'زملاء سابقون' : 'Former Colleagues';
+  }
+
+  function alumniPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/alumni/';
+    return 'https://khalidsaif912.github.io/new/docs/alumni/';
+  }
+
+  function ensureAlumniButton() {
+    var btn = document.getElementById('alumniBtn');
+    var footer = document.querySelector('.footer');
+    if (!btn) {
+      if (!footer || !footer.parentNode) return;
+      var nav = document.createElement('nav');
+      nav.className = 'quickActions alumniBar';
+      nav.setAttribute('aria-label', 'Former colleagues');
+      nav.innerHTML =
+        '<a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="#">' +
+        '<span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>' +
+        '<span class="roster-cta-label"></span></a>';
+      footer.parentNode.insertBefore(nav, footer);
+      btn = document.getElementById('alumniBtn');
+    }
+    if (!btn) return;
+    btn.href = alumniPageUrl();
+    var lbl = btn.querySelector('.roster-cta-label');
+    if (lbl) lbl.textContent = alumniLabel();
+    if (!document.getElementById('alumniBtnForceCss')) {
+      var style = document.createElement('style');
+      style.id = 'alumniBtnForceCss';
+      style.textContent = [
+        '.quickActions.alumniBar{display:grid!important;grid-template-columns:1fr!important;margin:12px 2px 4px!important;padding:0!important;width:100%!important;max-width:100%!important;visibility:visible!important;opacity:1!important;}',
+        '.alumniBar .roster-cta-btn,#alumniBtn.roster-cta-btn{display:flex!important;align-items:center!important;justify-content:center!important;grid-column:1/-1!important;width:100%!important;min-height:50px!important;border-radius:14px!important;border:2px solid #0f766e!important;background:#ecfdf5!important;color:#0f766e!important;font-size:15px!important;font-weight:800!important;box-shadow:0 2px 10px rgba(15,118,110,.16)!important;text-decoration:none!important;}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+  }
+
   function init() {
     injectCompactStyles();
+    ensureAlumniButton();
     bindUi();
     applyI18n();
+    ensureAlumniButton();
     patchCalcLink();
     patchQuicklistLink();
   }

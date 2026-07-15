@@ -861,20 +861,26 @@
     }
     .rosterCopyBar .roster-cta-btn { grid-column: 3 / span 2; }
     .quickActions.alumniBar {
-      margin-top: 10px;
-      padding: 0 2px;
+      margin: 12px 2px 4px;
+      padding: 0;
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr;
       width: 100%;
       max-width: 100%;
       margin-inline: auto;
     }
-    .alumniBar .roster-cta-btn { grid-column: 2 / span 4; }
-    .roster-cta-btn--alumni {
+    .alumniBar .roster-cta-btn,
+    #alumniBtn.roster-cta-btn {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 50px;
+      border-radius: 14px;
+      border: 2px solid #0f766e;
       background: #ecfdf5;
-      border-color: #a7f3d0;
       color: #0f766e;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: 0 2px 10px rgba(15,118,110,.16);
     }
     .roster-cta-btn--alumni:hover { background: #d1fae5; }
     .shiftCopySheet {
@@ -3892,7 +3898,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260715b';
+  var ver = '20260715c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
