@@ -213,6 +213,19 @@
       white-space:nowrap;
     }
     .welcomeChip { display:none; text-decoration:none; cursor:pointer; }
+    .welcomeChip.visible { display:flex; }
+    .welcomeChip .chipLabel {
+      max-width:96px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .waveHand {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:0;
+    }
+    #myScheduleBtn.is-hidden { display:none !important; }
     .quickActions {
       margin-top:20px;
       display:flex;
@@ -488,6 +501,10 @@
         <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
         <div class="chipLabel">My Schedule</div>
       </a>
+      <a href="#" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
+        <div class="chipVal"><span class="waveHand" aria-hidden="true">👋</span></div>
+        <div class="chipLabel" id="welcomeName"></div>
+      </a>
       <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
         <div class="chipVal" id="compareChipIcon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
         <div class="chipLabel" id="compareChipLabel">Diff</div>
@@ -536,6 +553,7 @@
         chipExport: 'Export',
         chipTraining: 'Training',
         chipMySchedule: 'My Schedule',
+        welcomeTitle: 'Open my schedule',
         chipExpDiff: 'Exp Diff',
         chipImpDiff: 'Imp Diff',
         switchDiff: 'Switch Diff',
@@ -565,6 +583,7 @@
         chipExport: 'الصادر',
         chipTraining: 'التدريب',
         chipMySchedule: 'جدولي',
+        welcomeTitle: 'افتح جدولي',
         chipExpDiff: 'فرق الصادر',
         chipImpDiff: 'فرق الوارد',
         switchDiff: 'تبديل نوع الفروقات',
@@ -661,12 +680,15 @@
       const exportLbl = document.querySelector('#exportBtn .chipLabel');
       const trainingLbl = document.querySelector('#trainingBtn .chipLabel');
       const scheduleLbl = document.querySelector('#myScheduleBtn .chipLabel');
+      const welcome = document.getElementById('welcomeChip');
       if (exportLbl) exportLbl.textContent = t('chipExport');
       if (trainingLbl) trainingLbl.textContent = t('chipTraining');
       if (scheduleLbl) scheduleLbl.textContent = t('chipMySchedule');
+      if (welcome) welcome.title = t('welcomeTitle');
       updateSummaryText();
       updateDateTag();
       applyDiffModeUi(currentDiffKind);
+      updateWelcomeChip(currentDiffKind);
     }
 
     function updateSourceMeta(data) {
@@ -691,6 +713,59 @@
         tabRosterDiff.classList.toggle('active', currentPanel === 'diff');
         tabAbsence.classList.toggle('active', currentPanel === 'absence');
       }
+      updateWelcomeChip(currentDiffKind);
+    }
+
+    function getSavedEmpIdForKind(kind) {
+      const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
+      const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
+      return (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || localStorage.getItem('savedEmpId') || '').trim();
+    }
+
+    function updateWelcomeChip(kind) {
+      const root = getSiteRootPath();
+      const myBtn = document.getElementById('myScheduleBtn');
+      const welcome = document.getElementById('welcomeChip');
+      const nameEl = document.getElementById('welcomeName');
+      if (!welcome || !nameEl) return;
+
+      const empId = getSavedEmpIdForKind(kind);
+      const scheduleBase = kind === 'import'
+        ? `${root}/import/my-schedules/index.html`
+        : `${root}/my-schedules/index.html`;
+
+      if (!empId) {
+        welcome.classList.remove('visible');
+        welcome.removeAttribute('href');
+        nameEl.textContent = '';
+        if (myBtn) {
+          myBtn.classList.remove('is-hidden');
+          myBtn.href = `${root}/my-schedules/`;
+        }
+        return;
+      }
+
+      if (myBtn) myBtn.classList.add('is-hidden');
+      welcome.href = `${scheduleBase}?emp=${encodeURIComponent(empId)}`;
+      welcome.title = t('welcomeTitle');
+      welcome.classList.add('visible');
+
+      if (welcome.dataset.loadedEmp === empId && nameEl.textContent) return;
+      welcome.dataset.loadedEmp = empId;
+      nameEl.textContent = empId;
+
+      const schedulePath = kind === 'import'
+        ? `import/schedules/${encodeURIComponent(empId)}.json`
+        : `schedules/${encodeURIComponent(empId)}.json`;
+
+      fetch(`${root}/${schedulePath}?ts=${Date.now()}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data || !data.name) return;
+          const firstName = String(data.name).replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
+          if (firstName) nameEl.textContent = firstName;
+        })
+        .catch(() => {});
     }
 
     async function activatePanel(panel) {
@@ -734,6 +809,7 @@
         loadDiff(currentDiffKind === 'export' ? 'import' : 'export');
       };
       applyDiffModeUi(initialKind);
+      updateWelcomeChip(initialKind);
       compareBtn.title = t('switchDiff');
       tabRosterDiff.onclick = () => activatePanel('diff');
       tabAbsence.onclick = () => activatePanel('absence');
