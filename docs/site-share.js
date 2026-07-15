@@ -137,11 +137,18 @@
     var root = getSiteRootPath();
     var sub = getCanonicalSharePath();
     try {
-      var u = new URL(root + sub, location.origin);
+      var u = new URL((root || '') + (sub || '/'), location.origin);
       u.hash = '';
+      u.search = '';
+      // Always keep a trailing slash for directory shares (avoids odd redirects)
+      if (!/\.[a-z0-9]+$/i.test(u.pathname) && !u.pathname.endsWith('/')) {
+        u.pathname += '/';
+      }
       return u.toString();
     } catch (e) {
-      return (location.origin || '') + root + sub;
+      var path = (root || '') + (sub || '/');
+      if (!path.endsWith('/') && !/\.[a-z0-9]+$/i.test(path)) path += '/';
+      return (location.origin || '') + path;
     }
   }
 
@@ -252,8 +259,10 @@
     var url = getShareUrl();
     var urlEl = document.getElementById('siteShareUrl');
     if (urlEl) {
-      urlEl.textContent = url;
+      if ('value' in urlEl) urlEl.value = url;
+      else urlEl.textContent = url;
       urlEl.setAttribute('title', url);
+      urlEl.setAttribute('data-url', url);
     }
     applyI18n();
     sheet.classList.add('open');
@@ -286,9 +295,12 @@
     );
   }
 
-  function copyLink() {
+  function copyLink(e) {
+    if (e && e.preventDefault) e.preventDefault();
     var url = getShareUrl();
     var copyBtn = document.getElementById('siteShareCopyBtn');
+    var urlEl = document.getElementById('siteShareUrl');
+
     function done() {
       if (!copyBtn) return;
       copyBtn.dataset.copied = '1';
@@ -300,23 +312,71 @@
         setModalBtnLabel('siteShareCopyBtn', 'link', t('copy'));
       }, 2000);
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(done).catch(fallback);
-    } else {
-      fallback();
+
+    function selectVisibleUrl() {
+      if (!urlEl) return;
+      try {
+        if (urlEl.select) {
+          urlEl.focus();
+          urlEl.select();
+          urlEl.setSelectionRange(0, (urlEl.value || '').length);
+        } else if (window.getSelection && document.createRange) {
+          var range = document.createRange();
+          range.selectNodeContents(urlEl);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } catch (err) {}
     }
-    function fallback() {
+
+    function copySync() {
+      try {
+        if (urlEl && urlEl.tagName === 'INPUT') {
+          urlEl.value = url;
+          urlEl.focus();
+          urlEl.select();
+          urlEl.setSelectionRange(0, url.length);
+          if (document.execCommand('copy')) return true;
+        }
+      } catch (err1) {}
       var ta = document.createElement('textarea');
       ta.value = url;
-      ta.style.cssText = 'position:fixed;left:-9999px';
+      ta.setAttribute('readonly', '');
+      ta.setAttribute('aria-hidden', 'true');
+      ta.style.cssText =
+        'position:fixed;top:0;left:0;width:2px;height:2px;padding:0;border:0;opacity:0.01;';
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
       try {
-        document.execCommand('copy');
-        done();
-      } catch (e) {}
+        ta.setSelectionRange(0, ta.value.length);
+      } catch (err2) {}
+      var ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (err3) {}
       document.body.removeChild(ta);
+      return !!ok;
     }
+
+    // Sync copy first — keeps the user gesture (critical for iOS after touch polyfills)
+    if (copySync()) {
+      done();
+      return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(url)
+        .then(done)
+        .catch(function () {
+          selectVisibleUrl();
+        });
+      return;
+    }
+
+    selectVisibleUrl();
   }
 
   function bindUi() {
@@ -364,7 +424,7 @@
           '<h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>' +
           '<p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>' +
           '<div class="siteShareQr" id="siteShareQr"></div>' +
-          '<p class="siteShareUrl" id="siteShareUrl"></p>' +
+          '<input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>' +
           '<div class="siteShareActions">' +
             '<button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">' +
               '<span class="roster-cta-icon">' + ICONS.share + '</span><span class="roster-cta-label">Share</span></button>' +
@@ -402,6 +462,7 @@
     },
     open: openModal,
     close: closeModal,
+    getUrl: getShareUrl,
   };
 
   if (document.readyState === 'loading') {

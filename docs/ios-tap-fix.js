@@ -36,6 +36,23 @@
   var SKIP_SELECTOR =
     '.datePickerWrapper, .siteShareSheet.open, .siteAppsSheet.open, .captureSheet.open, #banner-picker';
 
+  var GESTURE_IDS = {
+    siteShareCopyBtn: 1,
+    siteShareWhatsAppBtn: 1,
+    siteShareNativeBtn: 1,
+    siteShareCloseBtn: 1,
+    siteAppsCloseBtn: 1,
+  };
+
+  function needsNativeGesture(el) {
+    if (!el) return false;
+    if (el.id && GESTURE_IDS[el.id]) return true;
+    if (el.closest && el.closest('#siteShareCopyBtn, #siteShareWhatsAppBtn, #siteShareNativeBtn, #siteShareCloseBtn')) {
+      return true;
+    }
+    return false;
+  }
+
   function siteRootUrl() {
     if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();
     var path = location.pathname || '/';
@@ -140,6 +157,8 @@
   function onPointerEnd(e) {
     var el = targetFromEvent(e);
     if (!el) return;
+    // Keep the real user gesture for clipboard / WhatsApp / share APIs
+    if (needsNativeGesture(el)) return;
     lastTouchAt = Date.now();
     lastTouchEl = el;
     if (e.cancelable) e.preventDefault();

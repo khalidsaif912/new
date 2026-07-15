@@ -513,6 +513,9 @@ SITE_SHARE_CSS = r"""    /* ═══════ SITE SHARE MODAL ════�
       padding: 10px;
     }
     .siteShareUrl {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
       font-size: 11px;
       color: #475569;
       word-break: break-all;
@@ -521,6 +524,10 @@ SITE_SHARE_CSS = r"""    /* ═══════ SITE SHARE MODAL ════�
       padding: 8px 10px;
       background: #f1f5f9;
       border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      direction: ltr;
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     .siteShareActions {
       display: grid;
@@ -544,7 +551,7 @@ SITE_SHARE_MODAL_HTML = f"""<div id="siteShareSheet" class="siteShareSheet" aria
     <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
     <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
     <div class="siteShareQr" id="siteShareQr"></div>
-    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>
     <div class="siteShareActions">
       <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
         <span class="roster-cta-icon">{SVG_SHARE_OUT}</span>

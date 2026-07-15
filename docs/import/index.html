@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../ios-tap-fix.js?v=20260705d"></script>
+  <script defer src="../ios-tap-fix.js?v=20260715a"></script>
   <title>Import Duty Roster</title>
   
   <script>
@@ -769,8 +769,11 @@
       background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
     }
     .siteShareUrl {
+      display:block; width:100%; box-sizing:border-box;
       font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
       margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
+      border:1px solid #e2e8f0; direction:ltr; text-align:left;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     .siteShareActions {
       display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
@@ -1871,7 +1874,7 @@
     <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
     <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
     <div class="siteShareQr" id="siteShareQr"></div>
-    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>
     <div class="siteShareActions">
       <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
         <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
@@ -3897,12 +3900,4 @@ setSummaryChipHrefs();
     if (T.en) { T.en.titleEyebrow = 'Import'; T.en.titleMain = 'Duty Roster'; }
     if (T.ar) { T.ar.titleEyebrow = 'الوارد'; T.ar.titleMain = 'جدول المناوبات'; }
   }
-  if (typeof applyLang === 'function' && typeof LANG !== 'undefined') {
-    applyLang(LANG);
-  }
-})();
-
-</script>
-
-</body>
-</html>
+  if (typeof applyLang === 'function' && typeof LANG !== 'undefined'
