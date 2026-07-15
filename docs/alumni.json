@@ -1,0 +1,185 @@
+{
+  "title": "Former Colleagues",
+  "titleAr": "زملاء سابقون",
+  "subtitle": "In appreciation of colleagues who served with us",
+  "subtitleAr": "تقديراً لزملاء خدموا معنا",
+  "generated_from": {
+    "export_old": "rosters/2026-02.xlsx",
+    "export_new": "rosters/2026-07.xlsx",
+    "import_old": "import-rosters/2026-03.xlsx",
+    "import_new": "import-rosters/2026-07.xlsx"
+  },
+  "people": [
+    {
+      "id": "82653",
+      "name": "Ahmed Al Sabii",
+      "nameAr": "أحمد السابعي",
+      "department": "Export Operators",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8647",
+      "name": "Issa Al Douyani",
+      "nameAr": "عيسى الضوياني",
+      "department": "Export Operators",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82545",
+      "name": "Marhoon Al Kiyumi",
+      "nameAr": "مرهون الكيومي",
+      "department": "Export Checker",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8714",
+      "name": "Mohana Al Subhi",
+      "nameAr": "مهنا الصبحي",
+      "department": "Export Operators",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82615",
+      "name": "Rashid Al Farsi",
+      "nameAr": "راشد الفارسي",
+      "department": "Export Checker",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8542",
+      "name": "Salim Al Harassi",
+      "nameAr": "سالم الحراصي",
+      "department": "Export Operators",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8722",
+      "name": "Salim Sulieman",
+      "nameAr": "سالم سليمان",
+      "department": "Export Operators",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8611",
+      "name": "Waleed Al Siyabi",
+      "nameAr": "وليد السيابي",
+      "department": "Export Checker",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8646",
+      "name": "Yousuf Al Jaradi",
+      "nameAr": "يوسف الجرادي",
+      "department": "Export Checker",
+      "kind": "export",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82428",
+      "name": "Abdullah Al Maharbi",
+      "nameAr": "عبدالله المحاربي",
+      "department": "Flight Dispatch (Import)",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82427",
+      "name": "Ahmed Al Oraimi",
+      "nameAr": "أحمد العريمي",
+      "department": "Flight Dispatch (Export)",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82559",
+      "name": "Badar Al Busaidi",
+      "nameAr": "بدر البوسعيدي",
+      "department": "Import Checkers",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8608",
+      "name": "Badar Al Rezaiqi",
+      "nameAr": "بدر الرزيقي",
+      "department": "Release Control",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82664",
+      "name": "Haifa Al Balushi",
+      "nameAr": "هيفاء البلوشي",
+      "department": "Documentation",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "8336",
+      "name": "Khalid Al Balushi",
+      "nameAr": "خالد البلوشي",
+      "department": "Import Checkers",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82431",
+      "name": "Mahmood Al Balushi",
+      "nameAr": "محمود البلوشي",
+      "department": "Flight Dispatch (Export)",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82049",
+      "name": "Majid Al Ghafri",
+      "nameAr": "ماجد الغافري",
+      "department": "Import Checkers",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "80481",
+      "name": "Salim Al Maawali",
+      "nameAr": "سالم المعولي",
+      "department": "Import Checkers",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "82642",
+      "name": "Sanad Al Harthi",
+      "nameAr": "سند الحارثي",
+      "department": "Import Checkers",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    }
+  ]
+}

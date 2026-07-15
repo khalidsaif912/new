@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>زملاء سابقون · Former Colleagues</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+    }
+    .topBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .homeBtn, .langToggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(15,23,42,.06);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
+      color: #fff;
+      border-radius: 20px;
+      padding: 22px 18px 20px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(15,118,110,.18);
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -36px; left: -20px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: -24px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+    }
+    .header p {
+      margin: 8px 0 0;
+      font-size: 13px;
+      opacity: .92;
+      line-height: 1.45;
+      position: relative;
+      z-index: 1;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 6px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      border-radius: 12px;
+      min-height: 42px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #64748b;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.active {
+      background: #ecfdf5;
+      color: #0f766e;
+      box-shadow: inset 0 0 0 1px #a7f3d0;
+    }
+    .summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+    .list { display: grid; gap: 10px; }
+    .deptTitle {
+      margin: 6px 2px 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: .02em;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 14px 12px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.04);
+    }
+    .cardName {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.35;
+      margin: 0 0 4px;
+    }
+    .cardNameEn {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      margin: 0 0 10px;
+      direction: ltr;
+      unicode-bidi: plaintext;
+    }
+    body:not(.ar) .cardNameEn { display: none; }
+    body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .pill.id { background: #ecfeff; color: #0e7490; }
+    .pill.dept { background: #f0fdf4; color: #166534; }
+    .note {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .empty, .error {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px 16px;
+      text-align: center;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .error { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
+    .footNote {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body class="ar">
+  <div class="wrap">
+    <div class="topBar">
+      <a class="homeBtn" id="homeBtn" href="../">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M6.5 10.5V20h11V10.5"/></svg>
+        <span id="homeLbl">الرئيسية</span>
+      </a>
+      <button type="button" class="langToggle" id="langToggle">EN</button>
+    </div>
+
+    <header class="header">
+      <h1 id="pageTitle">زملاء سابقون</h1>
+      <p id="pageSub">تقديراً لزملاء خدموا معنا</p>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" id="tabExport" data-kind="export">الصادر</button>
+      <button type="button" class="tab" id="tabImport" data-kind="import">الوارد</button>
+    </div>
+
+    <div class="summary" id="summary">—</div>
+    <div class="list" id="list"></div>
+    <div class="footNote" id="footNote"></div>
+  </div>
+
+  <script>
+    let currentLang = (localStorage.getItem('rosterLang') === 'en') ? 'en' : 'ar';
+    let currentKind = 'export';
+    let data = null;
+
+    const DEPT_AR = {
+      'Export Operators': 'مشغلو الصادرات',
+      'Export Checker': 'مدقق الصادرات',
+      'Export Checkers': 'مدققو الصادرات',
+      'Officers': 'الضباط',
+      'Supervisors': 'المشرفون',
+      'Load Control': 'مراقبة الحمولة',
+      'Documentation': 'التوثيق',
+      'Import Checkers': 'مدققو الواردات',
+      'Import Operators': 'مشغلو الواردات',
+      'Release Control': 'مراقبة الإفراج',
+      'Flight Dispatch (Import)': 'تسيير الرحلات (وارد)',
+      'Flight Dispatch (Export)': 'تسيير الرحلات (صادر)'
+    };
+
+    const I18N = {
+      ar: {
+        home: 'الرئيسية',
+        lang: 'EN',
+        export: 'الصادر',
+        import: 'الوارد',
+        summary: '{n} زميل · {d} أقسام',
+        empty: 'لا توجد أسماء في هذا القسم بعد.',
+        id: 'الرقم',
+        loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
+        foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.'
+      },
+      en: {
+        home: 'Home',
+        lang: 'ع',
+        export: 'Export',
+        import: 'Import',
+        summary: '{n} colleagues · {d} departments',
+        empty: 'No names in this section yet.',
+        id: 'ID',
+        loadFail: 'Could not load former colleagues list.',
+        foot: 'We keep their names in appreciation of their service with us.'
+      }
+    };
+
+    function t(key, vars) {
+      let s = (I18N[currentLang] || I18N.ar)[key] || key;
+      if (vars) Object.keys(vars).forEach((k) => { s = s.replace('{' + k + '}', String(vars[k])); });
+      return s;
+    }
+
+    function getSiteRootPath() {
+      if (location.protocol === 'file:') return '..';
+      const path = location.pathname || '/';
+      const idx = path.indexOf('/alumni');
+      if (idx >= 0) return path.slice(0, idx) || '';
+      if (path.includes('/roster-site/')) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        const segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '..';
+    }
+
+    function deptLabel(dept) {
+      if (currentLang === 'ar') return DEPT_AR[dept] || dept;
+      return dept;
+    }
+
+    function applyUi() {
+      document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      document.body.classList.toggle('ar', currentLang === 'ar');
+      document.getElementById('homeLbl').textContent = t('home');
+      document.getElementById('langToggle').textContent = t('lang');
+      document.getElementById('tabExport').textContent = t('export');
+      document.getElementById('tabImport').textContent = t('import');
+      document.getElementById('footNote').textContent = t('foot');
+      if (data) {
+        document.getElementById('pageTitle').textContent =
+          currentLang === 'ar' ? (data.titleAr || data.title) : (data.title || data.titleAr);
+        document.getElementById('pageSub').textContent =
+          currentLang === 'ar' ? (data.subtitleAr || data.subtitle) : (data.subtitle || data.subtitleAr);
+      }
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('list');
+      const summary = document.getElementById('summary');
+      list.innerHTML = '';
+      if (!data) return;
+      const people = (data.people || []).filter((p) => p.kind === currentKind);
+      const byDept = new Map();
+      people.forEach((p) => {
+        const d = p.department || 'Other';
+        if (!byDept.has(d)) byDept.set(d, []);
+        byDept.get(d).push(p);
+      });
+      summary.textContent = t('summary', { n: people.length, d: byDept.size });
+      if (!people.length) {
+        list.innerHTML = '<div class="empty">' + t('empty') + '</div>';
+        return;
+      }
+      Array.from(byDept.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .forEach(([dept, rows]) => {
+          const h = document.createElement('div');
+          h.className = 'deptTitle';
+          h.textContent = deptLabel(dept);
+          list.appendChild(h);
+          rows
+            .slice()
+            .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+            .forEach((p) => {
+              const card = document.createElement('article');
+              card.className = 'card';
+              const mainName = currentLang === 'ar'
+                ? (p.nameAr || p.name)
+                : (p.name || p.nameAr);
+              const secondary = currentLang === 'ar' ? (p.name || '') : '';
+              const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
+              card.innerHTML =
+                '<h2 class="cardName"></h2>' +
+                (secondary ? '<p class="cardNameEn"></p>' : '') +
+                '<div class="meta">' +
+                '<span class="pill id">' + t('id') + ' ' + escapeHtml(p.id || '-') + '</span>' +
+                '<span class="pill dept"></span>' +
+                '</div>' +
+                (note ? '<p class="note"></p>' : '');
+              card.querySelector('.cardName').textContent = mainName || '-';
+              if (secondary) card.querySelector('.cardNameEn').textContent = secondary;
+              card.querySelector('.pill.dept').textContent = deptLabel(p.department || '');
+              if (note) card.querySelector('.note').textContent = note;
+              list.appendChild(card);
+            });
+        });
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('rosterLang', currentLang);
+      applyUi();
+    });
+    document.getElementById('tabExport').addEventListener('click', () => {
+      currentKind = 'export';
+      document.getElementById('tabExport').classList.add('active');
+      document.getElementById('tabImport').classList.remove('active');
+      render();
+    });
+    document.getElementById('tabImport').addEventListener('click', () => {
+      currentKind = 'import';
+      document.getElementById('tabImport').classList.add('active');
+      document.getElementById('tabExport').classList.remove('active');
+      render();
+    });
+
+    (async function init() {
+      const root = getSiteRootPath();
+      document.getElementById('homeBtn').href = root + '/';
+      try {
+        const res = await fetch(root + '/alumni.json?ts=' + Date.now());
+        if (!res.ok) throw new Error('fail');
+        data = await res.json();
+        applyUi();
+      } catch (e) {
+        document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
+        applyUi();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -816,6 +816,23 @@
       margin-inline: auto;
     }
     .rosterCopyBar .roster-cta-btn { grid-column: 3 / span 2; }
+    .quickActions.alumniBar {
+      margin-top: 10px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    .alumniBar .roster-cta-btn { grid-column: 2 / span 4; }
+    .roster-cta-btn--alumni {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #0f766e;
+    }
+    .roster-cta-btn--alumni:hover { background: #d1fae5; }
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -1740,6 +1757,13 @@
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M11.5 13h5M11.5 16h3"/></svg></span>
     <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
   </button>
+</nav>
+
+<nav class="quickActions alumniBar" aria-label="Former colleagues">
+  <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="../alumni/">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span class="roster-cta-label">Former Colleagues</span>
+  </a>
 </nav>
 
 
@@ -2782,7 +2806,7 @@ var T = {
     offday:'Off Day', annualLeave:'Annual Leave', sickLeave:'Sick Leave',
     training:'Training', standby:'Standby', other:'Other',
     from:'FROM', to:'TO',
-    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
+    viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps', alumni:'Former Colleagues',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
@@ -2795,7 +2819,7 @@ var T = {
     offday:'إجازة', annualLeave:'إجازة سنوية', sickLeave:'إجازة مرضية',
     training:'تدريب', standby:'احتياط', other:'أخرى',
     from:'من', to:'إلى',
-    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
+    viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات', alumni:'زملاء سابقون',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
@@ -2892,6 +2916,7 @@ function applyLang(lang) {
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
+  setCtaLabel('alumniBtn', t.alumni);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   if(window.rosterSiteShiftCopy && window.rosterSiteShiftCopy.setLang) window.rosterSiteShiftCopy.setLang();
@@ -2930,6 +2955,8 @@ function setSummaryChipHrefs() {
   if (imp) imp.href = base + '/import/';
   if (trn) trn.href = base + '/training/';
   if (diff) diff.href = base + '/roster-diff/index.html';
+  var alumni = document.getElementById('alumniBtn');
+  if (alumni) alumni.href = base + '/alumni/';
   if (welcome) {
     var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
     var wbase = base + '/my-schedules/index.html';
