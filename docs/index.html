@@ -769,40 +769,68 @@
     /* ═══════ RELATED APPS MODAL ═══════ */
     .siteAppsSheet {
       position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      background:rgba(15,23,42,.45); z-index:10002; padding:10px;
       pointer-events:none; visibility:hidden;
+      overscroll-behavior:none;
     }
     .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteAppsCard {
-      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
-      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
-      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      width:min(100%,380px); max-height:calc(100vh - 20px); max-height:calc(100dvh - 20px);
+      overflow:hidden; display:flex; flex-direction:column;
+      background:#fff; border-radius:16px;
+      padding:12px 12px 10px; border:1px solid rgba(15,23,42,.1);
       box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
     }
-    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
-    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
-    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
+    .siteAppsTitle { font-size:15px; font-weight:800; color:#0f172a; margin:0 0 2px; flex-shrink:0; }
+    .siteAppsHint { font-size:11px; color:#64748b; margin:0 0 8px; line-height:1.35; flex-shrink:0; }
+    .siteAppsGrid {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+      text-align:start; min-height:0; flex:1 1 auto; align-content:start;
+    }
     .siteAppsLink {
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+      min-height:0; padding:8px 6px; border-radius:12px; border:1px solid #e2e8f0;
       background:#f8fafc; text-decoration:none; color:#0f172a;
       -webkit-tap-highlight-color:transparent;
     }
     .siteAppsLink-icon {
-      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
-      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
-      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      display:flex; align-items:center; justify-content:center; width:34px; height:34px;
+      border-radius:10px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06); flex-shrink:0;
     }
-    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
-    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
+    .siteAppsLink-icon svg { width:18px; height:18px; }
+    .siteAppsLink-text { display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; }
+    .siteAppsLink-title { font-size:11px; font-weight:800; line-height:1.2; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:9px; font-weight:600; color:#64748b; line-height:1.25; text-align:center; }
     .siteAppsLink--games {
-      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
-      padding-inline:14px; gap:12px;
+      grid-column:1 / -1; flex-direction:row; min-height:48px; justify-content:flex-start;
+      padding:8px 12px; gap:10px;
     }
-    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-text { align-items:flex-start; flex:1; }
     .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
-    .siteAppsCloseWrap { margin-top:4px; }
-    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
+    .siteAppsCloseWrap { margin-top:2px; flex-shrink:0; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; min-height:40px; padding-top:8px; padding-bottom:8px; }
+    @media (max-height:720px) {
+      .siteAppsHint { display:none; }
+      .siteAppsCard { padding:10px 10px 8px; border-radius:14px; }
+      .siteAppsGrid { gap:6px; margin-bottom:6px; }
+      .siteAppsLink { padding:6px 5px; gap:4px; }
+      .siteAppsLink-icon { width:30px; height:30px; border-radius:8px; }
+      .siteAppsLink-icon svg { width:16px; height:16px; }
+      .siteAppsLink-title { font-size:10.5px; }
+      .siteAppsLink-sub { display:none; }
+      .siteAppsLink--games { min-height:42px; padding:6px 10px; }
+      .siteAppsTitle { font-size:14px; }
+    }
+    @media (max-height:560px) {
+      .siteAppsSheet { padding:6px; }
+      .siteAppsCard { max-height:calc(100vh - 12px); max-height:calc(100dvh - 12px); padding:8px; }
+      .siteAppsGrid { gap:5px; }
+      .siteAppsLink { padding:5px 4px; border-radius:10px; }
+      .siteAppsLink-icon { width:26px; height:26px; }
+      .siteAppsLink-icon svg { width:14px; height:14px; }
+      .siteAppsCloseWrap .roster-cta-btn { min-height:36px; padding-top:6px; padding-bottom:6px; font-size:13px; }
+    }
 
     /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
     .quickActions.rosterCopyBar {

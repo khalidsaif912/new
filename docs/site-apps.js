@@ -212,6 +212,51 @@
     });
   }
 
+  function injectCompactStyles() {
+    if (document.getElementById('siteAppsCompactCss')) return;
+    var style = document.createElement('style');
+    style.id = 'siteAppsCompactCss';
+    style.textContent = [
+      '.siteAppsSheet{padding:10px!important;overscroll-behavior:none;}',
+      '.siteAppsCard{width:min(100%,380px)!important;max-height:calc(100vh - 20px)!important;max-height:calc(100dvh - 20px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:12px 12px 10px!important;border-radius:16px!important;-webkit-overflow-scrolling:auto!important;}',
+      '.siteAppsTitle{font-size:15px!important;margin:0 0 2px!important;flex-shrink:0;}',
+      '.siteAppsHint{font-size:11px!important;margin:0 0 8px!important;line-height:1.35!important;flex-shrink:0;}',
+      '.siteAppsGrid{gap:8px!important;margin-bottom:8px!important;min-height:0;flex:1 1 auto;align-content:start;}',
+      '.siteAppsLink{min-height:0!important;padding:8px 6px!important;gap:5px!important;border-radius:12px!important;}',
+      '.siteAppsLink-icon{width:34px!important;height:34px!important;border-radius:10px!important;flex-shrink:0;}',
+      '.siteAppsLink-icon svg{width:18px!important;height:18px!important;}',
+      '.siteAppsLink-text{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;}',
+      '.siteAppsLink-title{font-size:11px!important;line-height:1.2!important;}',
+      '.siteAppsLink-sub{font-size:9px!important;line-height:1.25!important;}',
+      '.siteAppsLink--games{min-height:48px!important;padding:8px 12px!important;gap:10px!important;}',
+      '.siteAppsLink--games .siteAppsLink-text{align-items:flex-start;flex:1;}',
+      '.siteAppsCloseWrap{margin-top:2px!important;flex-shrink:0;}',
+      '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:40px;padding-top:8px;padding-bottom:8px;}',
+      '@media (max-height:720px){',
+      '.siteAppsHint{display:none!important;}',
+      '.siteAppsCard{padding:10px 10px 8px!important;border-radius:14px!important;}',
+      '.siteAppsGrid{gap:6px!important;margin-bottom:6px!important;}',
+      '.siteAppsLink{padding:6px 5px!important;gap:4px!important;}',
+      '.siteAppsLink-icon{width:30px!important;height:30px!important;border-radius:8px!important;}',
+      '.siteAppsLink-icon svg{width:16px!important;height:16px!important;}',
+      '.siteAppsLink-title{font-size:10.5px!important;}',
+      '.siteAppsLink-sub{display:none!important;}',
+      '.siteAppsLink--games{min-height:42px!important;padding:6px 10px!important;}',
+      '.siteAppsTitle{font-size:14px!important;}',
+      '}',
+      '@media (max-height:560px){',
+      '.siteAppsSheet{padding:6px!important;}',
+      '.siteAppsCard{max-height:calc(100vh - 12px)!important;max-height:calc(100dvh - 12px)!important;padding:8px!important;}',
+      '.siteAppsGrid{gap:5px!important;}',
+      '.siteAppsLink{padding:5px 4px!important;border-radius:10px!important;}',
+      '.siteAppsLink-icon{width:26px!important;height:26px!important;}',
+      '.siteAppsLink-icon svg{width:14px!important;height:14px!important;}',
+      '.siteAppsCloseWrap .roster-cta-btn{min-height:36px;padding-top:6px;padding-bottom:6px;font-size:13px;}',
+      '}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
   function bindUi() {
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
@@ -230,6 +275,7 @@
   }
 
   function init() {
+    injectCompactStyles();
     bindUi();
     applyI18n();
     patchCalcLink();
