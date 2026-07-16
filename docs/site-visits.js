@@ -60,8 +60,9 @@
     var url = API + encodeURIComponent(name) + (doUp ? '/up' : '');
     return fetch(url, { cache: 'no-store' })
       .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
+        if (res.ok) return res.json();
+        if (res.status === 400 || res.status === 404) return { count: 0 };
+        throw new Error('HTTP ' + res.status);
       })
       .then(function (data) {
         return data && typeof data.count === 'number' ? data.count : null;
