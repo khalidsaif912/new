@@ -288,9 +288,14 @@
     .footNote {
       margin-top: 18px;
       text-align: center;
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.6;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.65;
+    }
+    body.roster-bg-textured .footNote {
+      color: #1e293b;
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
     }
     .footerShare {
       margin-top: 10px;
@@ -559,17 +564,17 @@
       margin: 14px 0 2px;
       padding: 6px 0;
     }
+    .tributeModBar[hidden] { display: none !important; }
     .tributeModBtn {
       border: 0;
       background: transparent;
-      color: #64748b;
+      color: #475569;
       font: inherit;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 800;
       letter-spacing: .01em;
       cursor: pointer;
       padding: 4px 8px;
-      opacity: .72;
       text-decoration: underline;
       text-underline-offset: 3px;
       text-decoration-color: #94a3b8;
@@ -577,15 +582,13 @@
     }
     .tributeModBtn:hover,
     .tributeModBtn:focus-visible {
-      opacity: 1;
-      color: #334155;
+      color: #0f172a;
       text-decoration-color: #64748b;
     }
     #tributeModState {
       font-size: 11px;
       font-weight: 700;
       color: #64748b;
-      opacity: .8;
     }
   </style>
 </head>
@@ -647,7 +650,7 @@
           <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
         </form>
       </details>
-      <div class="tributeModBar" id="tributeModBar">
+      <div class="tributeModBar" id="tributeModBar" hidden>
         <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
         <span id="tributeModState"></span>
       </div>
@@ -678,7 +681,9 @@
     const RATE_MS = 20000;
     const MOD_PIN = '912';
     const MOD_KEY = 'alumniTributeMod';
+    const MOD_REVEAL_KEY = 'alumniTributeModReveal';
     let modUnlocked = sessionStorage.getItem(MOD_KEY) === '1';
+    let modRevealed = sessionStorage.getItem(MOD_REVEAL_KEY) === '1';
 
     const DEPT_AR = {
       'Export Operators': 'مشغلو الصادرات',
@@ -999,11 +1004,47 @@
     }
 
     function updateModBar() {
+      const bar = document.getElementById('tributeModBar');
       const btn = document.getElementById('tributeModBtn');
       const state = document.getElementById('tributeModState');
-      if (!btn || !state) return;
+      if (!bar || !btn || !state) return;
+      bar.hidden = !modRevealed;
       btn.textContent = modUnlocked ? t('modLock') : t('modUnlock');
       state.textContent = modUnlocked ? t('modOn') : '';
+    }
+
+    function revealModBar() {
+      modRevealed = true;
+      sessionStorage.setItem(MOD_REVEAL_KEY, '1');
+      if (currentKind !== 'tributes') setActiveTab('tributes');
+      updateModBar();
+      const bar = document.getElementById('tributeModBar');
+      bar?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function bindTopBtnModReveal() {
+      let taps = 0;
+      let resetTimer = null;
+      function attach() {
+        const topBtn = document.getElementById('bgScrollTopBtn');
+        if (!topBtn || topBtn.dataset.modRevealBound === '1') return !!topBtn;
+        topBtn.dataset.modRevealBound = '1';
+        topBtn.addEventListener('click', () => {
+          taps += 1;
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => { taps = 0; }, 1000);
+          if (taps >= 3) {
+            taps = 0;
+            revealModBar();
+          }
+        });
+        return true;
+      }
+      if (attach()) return;
+      const iv = setInterval(() => {
+        if (attach()) clearInterval(iv);
+      }, 250);
+      setTimeout(() => clearInterval(iv), 8000);
     }
 
     function toggleModMode() {
@@ -1339,6 +1380,8 @@
     (async function init() {
       const root = getSiteRootPath();
       document.getElementById('homeBtn').href = root + '/';
+      updateModBar();
+      bindTopBtnModReveal();
       try {
         data = await loadAlumniData();
         applyUi();
