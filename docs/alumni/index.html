@@ -740,6 +740,20 @@
     let tributeMessages = [];
     let tributesLoading = false;
 
+    const TAB_KEY = 'alumniActiveTab';
+
+    function getSavedTab() {
+      try {
+        const k = sessionStorage.getItem(TAB_KEY);
+        if (k === 'export' || k === 'import' || k === 'tributes') return k;
+      } catch (e) {}
+      return 'export';
+    }
+
+    function rememberTab(kind) {
+      try { sessionStorage.setItem(TAB_KEY, kind); } catch (e) {}
+    }
+
     const MANTLE_NS = 'roster-alumni-tributes';
     const MANTLE_KEY = '90faa716d4bfea99e331c89c800accc7a22d07e2e3b4cda8c62be3b411a452bd';
     const MANTLE_INDEX = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
@@ -1140,7 +1154,9 @@
     }
 
     function setActiveTab(kind) {
+      if (kind !== 'export' && kind !== 'import' && kind !== 'tributes') kind = 'export';
       currentKind = kind;
+      rememberTab(kind);
       document.getElementById('tabExport').classList.toggle('active', kind === 'export');
       document.getElementById('tabImport').classList.toggle('active', kind === 'import');
       document.getElementById('tabTributes').classList.toggle('active', kind === 'tributes');
@@ -1446,7 +1462,7 @@
     function openComposeFromShare() {
       try {
         const params = new URLSearchParams(location.search || '');
-        if (params.get('compose') !== '1' && location.hash !== '#compose') return;
+        if (params.get('compose') !== '1' && location.hash !== '#compose') return false;
         setActiveTab('tributes');
         const compose = document.getElementById('tributeCompose');
         if (compose) compose.open = true;
@@ -1455,23 +1471,27 @@
           document.getElementById('tributeMsg')?.focus();
           compose?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 80);
-      } catch (e) {}
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
 
     (async function init() {
       const root = getSiteRootPath();
       document.getElementById('homeBtn').href = root + '/';
+      currentKind = getSavedTab();
       updateModBar();
       bindTopBtnModReveal();
       try {
         data = await loadAlumniData();
         applyUi();
         await loadTributes().catch(() => {});
-        openComposeFromShare();
+        if (!openComposeFromShare()) setActiveTab(currentKind);
       } catch (e) {
         document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
         applyUi();
-        openComposeFromShare();
+        if (!openComposeFromShare()) setActiveTab(currentKind);
       }
     })();
   </script>
