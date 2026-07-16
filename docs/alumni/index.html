@@ -254,25 +254,7 @@
       line-height: 1.35;
       margin: 0;
     }
-    .cardNameEn {
-      font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
-      margin: 0;
-      direction: ltr;
-      unicode-bidi: plaintext;
-    }
     body.ar .cardName { direction: rtl; unicode-bidi: plaintext; }
-    body.ar .cardNameEn {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #334155;
-      margin-top: 3px;
-      padding-top: 4px;
-      border-top: 1px dashed #cbd5e1;
-    }
-    body:not(.ar) .cardNameEn { display: none; }
     body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
     .note {
       margin: 4px 0 0;
@@ -487,14 +469,11 @@
               const row = document.createElement('article');
               row.className = 'empRow' + (i % 2 ? ' empRowAlt' : '');
               const mainName = currentLang === 'ar' ? (p.nameAr || p.name) : (p.name || p.nameAr);
-              const secondary = p.name || '';
               const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
               row.innerHTML =
                 '<h2 class="cardName"></h2>' +
-                '<p class="cardNameEn" lang="en" dir="ltr"></p>' +
                 (note ? '<p class="note"></p>' : '');
               row.querySelector('.cardName').textContent = mainName || '-';
-              row.querySelector('.cardNameEn').textContent = secondary;
               if (note) row.querySelector('.note').textContent = note;
               card.appendChild(row);
             });
