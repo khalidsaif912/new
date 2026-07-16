@@ -427,6 +427,49 @@
       font-weight: 700;
       color: #94a3b8;
     }
+    .tributeCardHead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .tributeDelete {
+      flex-shrink: 0;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      border-radius: 10px;
+      min-width: 34px;
+      min-height: 34px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeModBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .tributeModBtn {
+      border: 0;
+      background: transparent;
+      color: #1e40af;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 4px 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
   </style>
 </head>
 <body class="ar">
@@ -478,6 +521,10 @@
         <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
       </form>
       <div class="summary" id="tributeSummary">—</div>
+      <div class="tributeModBar" id="tributeModBar">
+        <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
+        <span id="tributeModState"></span>
+      </div>
       <div class="tributeWall" id="tributeWall"></div>
     </div>
 
@@ -497,6 +544,9 @@
     const MSG_MAX = 280;
     const RATE_KEY = 'alumniTributeLastAt';
     const RATE_MS = 20000;
+    const MOD_PIN = '912';
+    const MOD_KEY = 'alumniTributeMod';
+    let modUnlocked = sessionStorage.getItem(MOD_KEY) === '1';
 
     const DEPT_AR = {
       'Export Operators': 'مشغلو الصادرات',
@@ -541,7 +591,15 @@
         tributeRate: 'انتظر قليلاً قبل إرسال رسالة أخرى.',
         tributeNeed: 'أدخل اسمك ورسالة قصيرة.',
         countTpl: '{n} / {m}',
-        toPrefix: 'إلى: '
+        toPrefix: 'إلى: ',
+        modUnlock: 'إدارة الرسائل',
+        modLock: 'إغلاق الإدارة',
+        modOn: 'وضع الحذف مفعّل',
+        modAsk: 'أدخل رمز الإدارة لحذف الرسائل:',
+        modBad: 'رمز غير صحيح.',
+        modConfirm: 'حذف هذه الرسالة؟',
+        modDeleted: 'تم حذف الرسالة.',
+        modDeleteFail: 'تعذر الحذف.'
       },
       en: {
         eyebrow: 'Tribute',
@@ -570,7 +628,15 @@
         tributeRate: 'Please wait a moment before posting again.',
         tributeNeed: 'Enter your name and a short message.',
         countTpl: '{n} / {m}',
-        toPrefix: 'To: '
+        toPrefix: 'To: ',
+        modUnlock: 'Moderate messages',
+        modLock: 'Exit moderation',
+        modOn: 'Delete mode on',
+        modAsk: 'Enter the moderation PIN to delete messages:',
+        modBad: 'Incorrect PIN.',
+        modConfirm: 'Delete this message?',
+        modDeleted: 'Message deleted.',
+        modDeleteFail: 'Could not delete.'
       }
     };
 
@@ -674,6 +740,20 @@
       }
     }
 
+    async function writeTributeList(list) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const putRes = await fetch(MANTLE_INDEX, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ messages: list })
+      });
+      if (!putRes.ok) throw new Error('write');
+      tributeMessages = list;
+    }
+
     async function saveTribute(msg) {
       const headers = {
         'Content-Type': 'application/json',
@@ -685,13 +765,47 @@
       const list = Array.isArray(cur.messages) ? cur.messages.slice() : [];
       list.unshift(msg);
       if (list.length > 180) list.length = 180;
-      const putRes = await fetch(MANTLE_INDEX, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ messages: list })
-      });
-      if (!putRes.ok) throw new Error('write');
-      tributeMessages = list;
+      await writeTributeList(list);
+    }
+
+    async function deleteTributeById(id) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = (Array.isArray(cur.messages) ? cur.messages : []).filter((m) => String(m.id) !== String(id));
+      await writeTributeList(list);
+    }
+
+    function updateModBar() {
+      const btn = document.getElementById('tributeModBtn');
+      const state = document.getElementById('tributeModState');
+      if (!btn || !state) return;
+      btn.textContent = modUnlocked ? t('modLock') : t('modUnlock');
+      state.textContent = modUnlocked ? t('modOn') : '';
+    }
+
+    function toggleModMode() {
+      if (modUnlocked) {
+        modUnlocked = false;
+        sessionStorage.removeItem(MOD_KEY);
+        updateModBar();
+        renderTributes();
+        return;
+      }
+      const pin = window.prompt(t('modAsk'), '');
+      if (pin === null) return;
+      if (String(pin).trim() !== MOD_PIN) {
+        window.alert(t('modBad'));
+        return;
+      }
+      modUnlocked = true;
+      sessionStorage.setItem(MOD_KEY, '1');
+      updateModBar();
+      renderTributes();
     }
 
     function deptLabel(dept) {
@@ -777,6 +891,7 @@
       const wall = document.getElementById('tributeWall');
       const summary = document.getElementById('tributeSummary');
       summary.textContent = t('tributeSummary', { n: tributeMessages.length });
+      updateModBar();
       if (!tributeMessages.length) {
         wall.innerHTML = '<div class="empty">' + escapeHtml(t('tributeEmpty')) + '</div>';
         return;
@@ -786,15 +901,41 @@
         const from = escapeHtml(msg.from || '');
         const to = escapeHtml(resolveToName(msg));
         const date = escapeHtml(formatTributeDate(msg.at));
+        const id = escapeHtml(msg.id || '');
+        const delBtn = modUnlocked
+          ? ('<button type="button" class="tributeDelete" data-del-id="' + id + '" title="' + escapeHtml(t('modConfirm')) + '" aria-label="Delete">×</button>')
+          : '';
         return (
           '<article class="tributeCard">' +
-            '<p class="tributeText">' + text + '</p>' +
+            '<div class="tributeCardHead">' +
+              '<p class="tributeText">' + text + '</p>' +
+              delBtn +
+            '</div>' +
             '<p class="tributeBy">' + from + '</p>' +
             '<p class="tributeTo">' + escapeHtml(t('toPrefix')) + to + '</p>' +
             '<p class="tributeDate">' + date + '</p>' +
           '</article>'
         );
       }).join('');
+      wall.querySelectorAll('[data-del-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-del-id');
+          if (!id || !window.confirm(t('modConfirm'))) return;
+          btn.disabled = true;
+          try {
+            await deleteTributeById(id);
+            renderTributes();
+            const status = document.getElementById('tributeStatus');
+            if (status) {
+              status.className = 'tributeStatus ok';
+              status.textContent = t('modDeleted');
+            }
+          } catch (e) {
+            btn.disabled = false;
+            window.alert(t('modDeleteFail'));
+          }
+        });
+      });
     }
 
     function applyUi() {
@@ -895,6 +1036,7 @@
     document.getElementById('tabExport').addEventListener('click', () => setActiveTab('export'));
     document.getElementById('tabImport').addEventListener('click', () => setActiveTab('import'));
     document.getElementById('tabTributes').addEventListener('click', () => setActiveTab('tributes'));
+    document.getElementById('tributeModBtn').addEventListener('click', toggleModMode);
     document.getElementById('tributeMsg').addEventListener('input', updateTributeCount);
 
     document.getElementById('tributeForm').addEventListener('submit', async (e) => {
