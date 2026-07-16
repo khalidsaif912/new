@@ -861,28 +861,24 @@
     }
     .rosterCopyBar .roster-cta-btn { grid-column: 3 / span 2; }
     .quickActions.alumniBar {
-      margin: 12px 2px 4px;
-      padding: 0;
+      margin-top: 10px;
+      padding: 0 2px;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
       width: 100%;
       max-width: 100%;
       margin-inline: auto;
     }
-    .alumniBar .roster-cta-btn,
-    #alumniBtn.roster-cta-btn {
-      grid-column: 1 / -1;
-      width: 100%;
-      min-height: 50px;
-      border-radius: 14px;
-      border: 2px solid #0f766e;
-      background: #ecfdf5;
+    .alumniBar .roster-cta-btn { grid-column: 3 / span 2; }
+    .roster-cta-btn--alumni {
+      background: #f0fdfa;
+      border-color: #99f6e4;
       color: #0f766e;
-      font-size: 15px;
-      font-weight: 800;
-      box-shadow: 0 2px 10px rgba(15,118,110,.16);
     }
-    .roster-cta-btn--alumni:hover { background: #d1fae5; }
+    @media (hover: hover) {
+      .roster-cta-btn--alumni:hover { background: #ccfbf1; }
+    }
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -3898,7 +3894,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260715c';
+  var ver = '20260716a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');

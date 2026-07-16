@@ -307,8 +307,8 @@
       var style = document.createElement('style');
       style.id = 'alumniBtnForceCss';
       style.textContent = [
-        '.quickActions.alumniBar{display:grid!important;grid-template-columns:1fr!important;margin:12px 2px 4px!important;padding:0!important;width:100%!important;max-width:100%!important;visibility:visible!important;opacity:1!important;}',
-        '.alumniBar .roster-cta-btn,#alumniBtn.roster-cta-btn{display:flex!important;align-items:center!important;justify-content:center!important;grid-column:1/-1!important;width:100%!important;min-height:50px!important;border-radius:14px!important;border:2px solid #0f766e!important;background:#ecfdf5!important;color:#0f766e!important;font-size:15px!important;font-weight:800!important;box-shadow:0 2px 10px rgba(15,118,110,.16)!important;text-decoration:none!important;}'
+        '.quickActions.alumniBar{display:grid!important;grid-template-columns:repeat(6,1fr)!important;gap:10px!important;margin-top:10px!important;padding:0 2px!important;width:100%!important;max-width:100%!important;visibility:visible!important;opacity:1!important;}',
+        '.alumniBar .roster-cta-btn,#alumniBtn.roster-cta-btn{grid-column:3 / span 2!important;background:#f0fdfa!important;border:1.5px solid #99f6e4!important;color:#0f766e!important;border-radius:999px!important;min-height:44px!important;font-size:13px!important;font-weight:700!important;box-shadow:none!important;}'
       ].join('');
       document.head.appendChild(style);
     }
