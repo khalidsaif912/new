@@ -1,16 +1,16 @@
 /**
  * Site visitor counts (today + this month).
- * Mounted outside `.footer` so applyLang innerHTML rewrites cannot wipe the numbers.
+ * Uses Abacus as primary counter (CounterAPI fallback). Mounted outside `.footer`.
  */
 (function () {
   'use strict';
 
-  var NS = 'roster-site-new';
-  var API = 'https://api.counterapi.dev/v1/' + NS + '/';
+  var NS = 'khalidsaif912.github.io';
   var COUNTED_KEY = 'rosterVisitCountedDay';
-  var CACHE_KEY = 'rosterVisitCountsV1';
+  var CACHE_KEY = 'rosterVisitCountsV2';
   var cached = { day: null, month: null, dayKey: '', monthKey: '' };
   var booted = false;
+  var loading = false;
 
   var I18N = {
     en: { day: 'Visitors today:', month: 'This month:' },
@@ -50,16 +50,13 @@
   function formatCount(n) {
     var num = Number(n);
     if (!isFinite(num) || num < 0) return '--';
-    try {
-      return String(Math.floor(num));
-    } catch (e) {
-      return String(Math.floor(num));
-    }
+    return String(Math.floor(num));
   }
 
   function readPersisted(keys) {
     try {
       var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) raw = localStorage.getItem('rosterVisitCountsV1');
       if (!raw) return;
       var data = JSON.parse(raw);
       if (!data) return;
@@ -84,16 +81,69 @@
     } catch (e) {}
   }
 
-  function fetchCount(name, doUp) {
-    var url = API + name + (doUp ? '/up' : '');
-    return fetch(url, { cache: 'no-store', mode: 'cors' })
-      .then(function (res) {
-        if (res.ok) return res.json();
-        if (res.status === 400 || res.status === 404) return { count: doUp ? null : 0 };
-        throw new Error('HTTP ' + res.status);
+  function xhrJson(url) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.timeout = 8000;
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch (e) {
+              reject(e);
+            }
+          } else {
+            reject(new Error('HTTP ' + xhr.status));
+          }
+        };
+        xhr.onerror = function () { reject(new Error('xhr error')); };
+        xhr.ontimeout = function () { reject(new Error('xhr timeout')); };
+        xhr.send();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  function fetchJson(url) {
+    if (typeof fetch === 'function') {
+      return fetch(url, { cache: 'no-store', mode: 'cors' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .catch(function () {
+          return xhrJson(url);
+        });
+    }
+    return xhrJson(url);
+  }
+
+  function parseCount(data) {
+    if (data == null) return null;
+    if (typeof data.value === 'number') return data.value;
+    if (typeof data.count === 'number') return data.count;
+    return null;
+  }
+
+  function requestCount(key, doUp) {
+    var abacusHit = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
+    var abacusGet = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
+    var counterUp = 'https://api.counterapi.dev/v1/roster-site-new/' + key + '/up';
+    var counterGet = 'https://api.counterapi.dev/v1/roster-site-new/' + key;
+
+    var primary = doUp ? abacusHit : abacusGet;
+    var secondary = doUp ? counterUp : counterGet;
+
+    return fetchJson(primary)
+      .then(parseCount)
+      .catch(function () {
+        return fetchJson(secondary).then(parseCount);
       })
-      .then(function (data) {
-        return data && typeof data.count === 'number' ? data.count : null;
+      .catch(function () {
+        return null;
       });
   }
 
@@ -113,7 +163,6 @@
     host = document.createElement('div');
     host.id = 'siteVisitsHost';
     host.className = 'siteVisitsHost';
-    host.setAttribute('dir', 'auto');
     host.style.cssText =
       'margin:-4px 0 10px;padding:0 12px;text-align:center;font-size:12px;' +
       'line-height:1.9;color:#94a3b8;font-family:inherit;';
@@ -124,11 +173,8 @@
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
       '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>';
 
-    if (footer.nextSibling) {
-      footer.parentNode.insertBefore(host, footer.nextSibling);
-    } else {
-      footer.parentNode.appendChild(host);
-    }
+    if (footer.nextSibling) footer.parentNode.insertBefore(host, footer.nextSibling);
+    else footer.parentNode.appendChild(host);
     return host;
   }
 
@@ -145,10 +191,10 @@
   function paintCounts() {
     var dayEl = document.getElementById('siteVisitsDay');
     var monthEl = document.getElementById('siteVisitsMonth');
-    if (dayEl && cached.day != null && !isNaN(cached.day)) {
+    if (dayEl && cached.day != null && !isNaN(Number(cached.day))) {
       dayEl.textContent = formatCount(cached.day);
     }
-    if (monthEl && cached.month != null && !isNaN(cached.month)) {
+    if (monthEl && cached.month != null && !isNaN(Number(cached.month))) {
       monthEl.textContent = formatCount(cached.month);
     }
   }
@@ -174,26 +220,65 @@
   }
 
   function loadCounts() {
+    if (loading) return Promise.resolve();
+    loading = true;
     var keys = muscatYmd();
-    var dayName = 'day-' + keys.day;
-    var monthName = 'month-' + keys.month;
-    var shouldUp = !alreadyCounted(keys.day);
+    var dayKey = 'day-' + keys.day;
+    var monthKey = 'month-' + keys.month;
+    var counted = alreadyCounted(keys.day);
+    var hasCache = cached.day != null && cached.month != null;
 
-    var dayPromise = fetchCount(dayName, shouldUp).catch(function () { return null; });
-    var monthPromise = fetchCount(monthName, shouldUp).catch(function () { return null; });
+    // Stuck state: flagged as counted but no numbers saved (common after failed API).
+    if (counted && !hasCache) {
+      try { localStorage.removeItem(COUNTED_KEY); } catch (e) {}
+      counted = false;
+    }
 
-    return Promise.all([dayPromise, monthPromise]).then(function (vals) {
-      var dayVal = vals[0];
-      var monthVal = vals[1];
-      if (dayVal != null) cached.day = dayVal;
-      if (monthVal != null) cached.month = monthVal;
+    var shouldUp = !counted;
+
+    // Optimistic local bump so the UI is never stuck on -- for a first visit.
+    if (shouldUp) {
+      cached.day = Number(cached.day || 0) + 1;
+      cached.month = Number(cached.month || 0) + 1;
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
-      if (shouldUp && (dayVal != null || monthVal != null)) markCounted(keys.day);
-      if (cached.day != null || cached.month != null) persistCounts(keys);
       paint();
-      return vals;
-    });
+      persistCounts(keys);
+    }
+
+    return Promise.all([
+      requestCount(dayKey, shouldUp),
+      requestCount(monthKey, shouldUp)
+    ])
+      .then(function (vals) {
+        if (vals[0] != null) cached.day = vals[0];
+        if (vals[1] != null) cached.month = vals[1];
+        cached.dayKey = keys.day;
+        cached.monthKey = keys.month;
+        if (shouldUp) markCounted(keys.day);
+        persistCounts(keys);
+        paint();
+
+        // If still empty, force one hit attempt even for returning visitors.
+        if (cached.day == null || cached.month == null) {
+          return Promise.all([
+            requestCount(dayKey, true),
+            requestCount(monthKey, true)
+          ]).then(function (vals2) {
+            if (vals2[0] != null) cached.day = vals2[0];
+            if (vals2[1] != null) cached.month = vals2[1];
+            markCounted(keys.day);
+            persistCounts(keys);
+            paint();
+          });
+        }
+      })
+      .catch(function () {
+        paint();
+      })
+      .then(function () {
+        loading = false;
+      });
   }
 
   function hookLang() {
@@ -220,20 +305,16 @@
     readPersisted(keys);
     hookLang();
     paint();
-    loadCounts()
-      .catch(function () { paint(); })
-      .then(function () {
-        // Retry once if numbers still missing (slow network / first counter create).
-        if (cached.day == null || cached.month == null) {
-          return new Promise(function (resolve) { setTimeout(resolve, 700); }).then(loadCounts);
-        }
-      })
-      .catch(function () { paint(); });
-    window.setTimeout(paint, 300);
-    window.setTimeout(paint, 1000);
+    loadCounts().then(function () {
+      if (cached.day == null || cached.month == null) {
+        return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
+      }
+    });
+    window.setTimeout(paint, 250);
+    window.setTimeout(paint, 900);
     window.setTimeout(function () {
-      if (cached.day == null || cached.month == null) loadCounts().catch(function () {});
-    }, 2000);
+      if (cached.day == null || cached.month == null) loadCounts();
+    }, 1800);
   }
 
   window.rosterSiteVisits = {

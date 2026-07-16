@@ -3149,7 +3149,7 @@ startSummarySwitchLoop();
     if (document.getElementById('bgTextureShuffleBtn')) return;
     try {
       var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260716f';
+      var src = root + '/bg-texture-shuffle.js?v=20260716g';
       if (document.querySelector('script[data-local-src="' + src + '"]')) return;
       var s = document.createElement('script');
       s.src = src;
@@ -3428,7 +3428,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260716f';
+  var ver = '20260716g';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
