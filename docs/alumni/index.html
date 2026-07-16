@@ -292,6 +292,48 @@
       color: #94a3b8;
       line-height: 1.6;
     }
+    .footerShare {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      padding: 0 4px 2px;
+    }
+    .alumniShareBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid #86efac;
+      background: #ecfdf5;
+      color: #166534;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(22,101,52,.1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .alumniShareBtn:active { transform: translateY(1px); }
+    .alumniShareIcon { display: inline-flex; line-height: 0; }
+    .footer {
+      margin-top: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      padding: 8px 4px 2px;
+    }
+    body.roster-bg-textured .deptCard,
+    body.roster-bg-textured .tributeCompose,
+    body.roster-bg-textured .tributeCard,
+    body.roster-bg-textured .tabs,
+    body.roster-bg-textured .empty,
+    body.roster-bg-textured .error {
+      background: rgba(255,255,255,.92);
+    }
     .tributesPanel[hidden], .peoplePanel[hidden] { display: none !important; }
     .tributeCompose {
       background: #fff;
@@ -574,6 +616,13 @@
     </div>
 
     <div class="footNote" id="footNote"></div>
+    <div class="footerShare">
+      <button type="button" class="alumniShareBtn" id="shareSiteBtn">
+        <span class="alumniShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span class="roster-cta-label">مشاركة</span>
+      </button>
+    </div>
+    <div class="footer" id="alumniFooter"></div>
     <div class="tributeModBar" id="tributeModBar" hidden>
       <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
       <span id="tributeModState"></span>
@@ -625,6 +674,7 @@
         loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
         foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.',
         homeTitle: 'الرئيسية',
+        share: 'مشاركة',
         formTitle: 'اترك كلمة شكر',
         formHint: 'رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.',
         to: 'إلى',
@@ -662,6 +712,7 @@
         loadFail: 'Could not load former colleagues list.',
         foot: 'We keep their names in appreciation of their service with us.',
         homeTitle: 'Home',
+        share: 'Share',
         formTitle: 'Leave a thank-you note',
         formHint: 'A short message for one colleague or everyone — visible to all here.',
         to: 'To',
@@ -1082,6 +1133,8 @@
       document.getElementById('footNote').textContent = t('foot');
       document.getElementById('homeBtn').title = t('homeTitle');
       document.getElementById('homeBtn').setAttribute('aria-label', t('homeTitle'));
+      const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
+      if (shareLbl) shareLbl.textContent = t('share');
       document.getElementById('tributeFormTitle').textContent = t('formTitle');
       document.getElementById('tributeFormHint').textContent = t('formHint');
       const setLabel = (id, text) => {
@@ -1164,6 +1217,8 @@
       currentLang = currentLang === 'ar' ? 'en' : 'ar';
       localStorage.setItem('rosterLang', currentLang);
       applyUi();
+      try { document.dispatchEvent(new Event('rosterLangChange')); } catch (e) {}
+      if (window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
     });
     document.getElementById('tabExport').addEventListener('click', () => setActiveTab('export'));
     document.getElementById('tabImport').addEventListener('click', () => setActiveTab('import'));
@@ -1233,18 +1288,37 @@
       }
     });
 
+    function openComposeFromShare() {
+      try {
+        const params = new URLSearchParams(location.search || '');
+        if (params.get('compose') !== '1' && location.hash !== '#compose') return;
+        setActiveTab('tributes');
+        const compose = document.getElementById('tributeCompose');
+        if (compose) compose.open = true;
+        ensureTributeFromName();
+        setTimeout(() => {
+          document.getElementById('tributeMsg')?.focus();
+          compose?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 80);
+      } catch (e) {}
+    }
+
     (async function init() {
       const root = getSiteRootPath();
       document.getElementById('homeBtn').href = root + '/';
       try {
         data = await loadAlumniData();
         applyUi();
-        loadTributes().catch(() => {});
+        await loadTributes().catch(() => {});
+        openComposeFromShare();
       } catch (e) {
         document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
         applyUi();
+        openComposeFromShare();
       }
     })();
   </script>
+  <script defer src="../site-share.js?v=20260716alumni"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260716alumni"></script>
 </body>
 </html>

@@ -73,18 +73,63 @@
     },
   };
 
+  var I18N_ALUMNI = {
+    en: {
+      btn: 'Share',
+      title: 'Share former colleagues',
+      hint: 'Choose what to share, then scan or copy the link',
+      share: 'Share',
+      whatsapp: 'WhatsApp',
+      copy: 'Copy link',
+      copied: 'Copied!',
+      close: 'Close',
+      shareText: 'Former Colleagues — a tribute page',
+      shareTextCompose: 'Leave a thank-you note for former colleagues',
+      chooseTitle: 'What would you like to share?',
+      choosePage: 'Alumni page',
+      chooseCompose: 'Write a thank-you message',
+      back: 'Back',
+    },
+    ar: {
+      btn: 'مشاركة',
+      title: 'مشاركة زملاء سابقون',
+      hint: 'اختر ماذا تشارك، ثم امسح الرمز أو انسخ الرابط',
+      share: 'مشاركة',
+      whatsapp: 'واتساب',
+      copy: 'نسخ الرابط',
+      copied: 'تم النسخ!',
+      close: 'إغلاق',
+      shareText: 'زملاء سابقون — صفحة تكريم',
+      shareTextCompose: 'اترك كلمة شكر لزميل سابق',
+      chooseTitle: 'ماذا تريد أن تشارك؟',
+      choosePage: 'صفحة زملاء سابقون',
+      chooseCompose: 'كتابة رسالة شكر',
+      back: 'رجوع',
+    },
+  };
+
+  var alumniShareMode = null; // null | 'page' | 'compose'
+
   function isTrainingPage() {
     return /\/training(\/|$)/.test(location.pathname || '');
   }
 
+  function isAlumniPage() {
+    return /\/alumni(\/|$)/.test(location.pathname || '');
+  }
+
   function activeI18n() {
-    var pack = isTrainingPage() ? I18N_TRAINING : I18N;
+    var pack = isAlumniPage() ? I18N_ALUMNI : isTrainingPage() ? I18N_TRAINING : I18N;
     return pack[lang()] || pack.en;
   }
 
   function t(key) {
     var pack = activeI18n();
-    var fallback = isTrainingPage() ? I18N_TRAINING.en : I18N.en;
+    var fallback = isAlumniPage()
+      ? I18N_ALUMNI.en
+      : isTrainingPage()
+        ? I18N_TRAINING.en
+        : I18N.en;
     return pack[key] || fallback[key] || key;
   }
 
@@ -128,6 +173,7 @@
       return '/training/archive/';
     }
     if (/\/training(\/|$)/.test(path)) return '/training/';
+    if (/\/alumni(\/|$)/.test(path)) return '/alumni/';
     if (/\/roster-diff(\/|$)/.test(path)) return '/roster-diff/';
     if (/\/a-cup-of-book(\/|$)/.test(path)) return '/a-cup-of-book/';
     return '/';
@@ -140,19 +186,27 @@
       var u = new URL((root || '') + (sub || '/'), location.origin);
       u.hash = '';
       u.search = '';
-      // Always keep a trailing slash for directory shares (avoids odd redirects)
       if (!/\.[a-z0-9]+$/i.test(u.pathname) && !u.pathname.endsWith('/')) {
         u.pathname += '/';
+      }
+      if (isAlumniPage() && alumniShareMode === 'compose') {
+        u.searchParams.set('compose', '1');
       }
       return u.toString();
     } catch (e) {
       var path = (root || '') + (sub || '/');
       if (!path.endsWith('/') && !/\.[a-z0-9]+$/i.test(path)) path += '/';
+      if (isAlumniPage() && alumniShareMode === 'compose') {
+        path += (path.indexOf('?') >= 0 ? '&' : '?') + 'compose=1';
+      }
       return (location.origin || '') + path;
     }
   }
 
   function getShareMessage() {
+    if (isAlumniPage() && alumniShareMode === 'compose') {
+      return t('shareTextCompose') + '\n' + getShareUrl();
+    }
     return t('shareText') + '\n' + getShareUrl();
   }
 
@@ -199,8 +253,32 @@
     if (!sheet) return;
     var title = document.getElementById('siteShareTitle');
     var hint = document.getElementById('siteShareHint');
-    if (title) title.textContent = t('title');
-    if (hint) hint.textContent = t('hint');
+    if (title) {
+      title.textContent =
+        isAlumniPage() && !alumniShareMode ? t('chooseTitle') : t('title');
+    }
+    if (hint) {
+      hint.textContent =
+        isAlumniPage() && !alumniShareMode ? t('hint') : t('hint');
+    }
+    var choosePage = document.getElementById('siteShareChoosePage');
+    var chooseCompose = document.getElementById('siteShareChooseCompose');
+    if (choosePage) {
+      var pl = choosePage.querySelector('.roster-cta-label');
+      if (pl) pl.textContent = t('choosePage');
+      else choosePage.textContent = t('choosePage');
+    }
+    if (chooseCompose) {
+      var cl = chooseCompose.querySelector('.roster-cta-label');
+      if (cl) cl.textContent = t('chooseCompose');
+      else chooseCompose.textContent = t('chooseCompose');
+    }
+    var backBtn = document.getElementById('siteShareBackBtn');
+    if (backBtn) {
+      var bl = backBtn.querySelector('.roster-cta-label');
+      if (bl) bl.textContent = t('back');
+      else backBtn.textContent = t('back');
+    }
     setModalBtnLabel('siteShareNativeBtn', 'share', t('share'));
     setModalBtnLabel('siteShareWhatsAppBtn', 'whatsapp', t('whatsapp'));
     var copyBtn = document.getElementById('siteShareCopyBtn');
@@ -209,6 +287,35 @@
     }
     setModalBtnLabel('siteShareCloseBtn', null, t('close'));
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
+  }
+
+  function setAlumniShareView(mode) {
+    alumniShareMode = mode;
+    var choose = document.getElementById('siteShareChoose');
+    var tools = document.getElementById('siteShareTools');
+    var backBtn = document.getElementById('siteShareBackBtn');
+    var title = document.getElementById('siteShareTitle');
+    var hint = document.getElementById('siteShareHint');
+    if (choose) choose.hidden = !!mode;
+    if (tools) tools.hidden = !mode;
+    if (backBtn) backBtn.hidden = !mode;
+    if (title) title.textContent = mode ? t('title') : t('chooseTitle');
+    if (hint) hint.textContent = t('hint');
+    if (!mode) return;
+    var url = getShareUrl();
+    var urlEl = document.getElementById('siteShareUrl');
+    if (urlEl) {
+      if ('value' in urlEl) urlEl.value = url;
+      else urlEl.textContent = url;
+      urlEl.setAttribute('title', url);
+      urlEl.setAttribute('data-url', url);
+    }
+    renderQr(url);
+    var nativeBtn = document.getElementById('siteShareNativeBtn');
+    if (nativeBtn) {
+      nativeBtn.style.display =
+        navigator.share && typeof navigator.share === 'function' ? '' : 'none';
+    }
   }
 
   function renderQr(url) {
@@ -256,6 +363,13 @@
     var sheet = document.getElementById('siteShareSheet');
     if (!sheet) return;
     closeAppsIfOpen();
+    applyI18n();
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    if (isAlumniPage()) {
+      setAlumniShareView(null);
+      return;
+    }
     var url = getShareUrl();
     var urlEl = document.getElementById('siteShareUrl');
     if (urlEl) {
@@ -264,9 +378,12 @@
       urlEl.setAttribute('title', url);
       urlEl.setAttribute('data-url', url);
     }
-    applyI18n();
-    sheet.classList.add('open');
-    sheet.setAttribute('aria-hidden', 'false');
+    var choose = document.getElementById('siteShareChoose');
+    var tools = document.getElementById('siteShareTools');
+    var backBtn = document.getElementById('siteShareBackBtn');
+    if (choose) choose.hidden = true;
+    if (tools) tools.hidden = false;
+    if (backBtn) backBtn.hidden = true;
     renderQr(url);
     var nativeBtn = document.getElementById('siteShareNativeBtn');
     if (nativeBtn) {
@@ -280,6 +397,7 @@
     if (!sheet) return;
     sheet.classList.remove('open');
     sheet.setAttribute('aria-hidden', 'true');
+    alumniShareMode = null;
   }
 
   function shareNative() {
@@ -386,6 +504,15 @@
       e.preventDefault();
       openModal();
     });
+    document.getElementById('siteShareChoosePage')?.addEventListener('click', function () {
+      setAlumniShareView('page');
+    });
+    document.getElementById('siteShareChooseCompose')?.addEventListener('click', function () {
+      setAlumniShareView('compose');
+    });
+    document.getElementById('siteShareBackBtn')?.addEventListener('click', function () {
+      setAlumniShareView(null);
+    });
     document.getElementById('siteShareNativeBtn')?.addEventListener('click', shareNative);
     document.getElementById('siteShareWhatsAppBtn')?.addEventListener('click', shareWhatsApp);
     document.getElementById('siteShareCopyBtn')?.addEventListener('click', copyLink);
@@ -402,15 +529,27 @@
 
   function injectStyles() {
     if (document.getElementById(STYLE_ID)) return;
-    if (document.querySelector('style') && document.querySelector('.siteShareSheet')) {
-      var test = getComputedStyle(document.querySelector('.siteShareSheet'));
-      if (test && test.display === 'none') return;
-    }
     var style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
       '.siteShareSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);z-index:10001;padding:16px;pointer-events:none;visibility:hidden}',
       '.siteShareSheet.open{display:flex;pointer-events:auto;visibility:visible}',
+      '.siteShareCard{width:min(420px,100%);background:#fff;border-radius:20px;padding:18px 16px 14px;box-shadow:0 20px 50px rgba(15,23,42,.28);border:1px solid #e2e8f0}',
+      '.siteShareTitle{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px}',
+      '.siteShareHint{font-size:12px;color:#64748b;margin:0 0 14px;line-height:1.4}',
+      '.siteShareQr{display:flex;justify-content:center;align-items:center;min-height:220px;margin:0 0 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px}',
+      '.siteShareUrl{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font-size:12px;color:#334155;background:#f8fafc;margin:0 0 12px;box-sizing:border-box}',
+      '.siteShareActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}',
+      '.siteShareActions .roster-cta-btn,.siteShareChoose .roster-cta-btn,.siteShareCloseWrap .roster-cta-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:42px;border-radius:999px;border:1px solid #cbd5e1;background:#f8fafc;font:inherit;font-size:13px;font-weight:800;color:#0f172a;cursor:pointer;padding:8px 12px;-webkit-tap-highlight-color:transparent}',
+      '.siteShareActions .roster-cta-btn--share,.siteShareChoose .roster-cta-btn--share{background:#ecfdf5;border-color:#86efac;color:#166534}',
+      '.siteShareActions .roster-cta-btn--compare{background:#fffbeb;border-color:#fcd34d;color:#92400e;grid-column:1/-1}',
+      '.siteShareActions .roster-cta-btn--roster{background:#eff6ff;border-color:#93c5fd;color:#1e40af}',
+      '.siteShareChoose{display:grid;gap:10px;margin:0 0 12px}',
+      '.siteShareChoose .roster-cta-btn--alumni{background:#ecfdf5;border-color:#5eead4;color:#0f766e}',
+      '.siteShareChoose .roster-cta-btn--compose{background:#eff6ff;border-color:#93c5fd;color:#1e40af}',
+      '.siteShareCloseWrap{display:grid;gap:8px;margin-top:4px}',
+      '.siteShareCloseWrap .roster-cta-btn--muted{background:#f1f5f9;border-color:#cbd5e1;color:#475569}',
+      '.roster-cta-icon{display:inline-flex;line-height:0}',
     ].join('');
     document.head.appendChild(style);
   }
@@ -423,17 +562,27 @@
         '<div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">' +
           '<h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>' +
           '<p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>' +
-          '<div class="siteShareQr" id="siteShareQr"></div>' +
-          '<input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>' +
-          '<div class="siteShareActions">' +
-            '<button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">' +
-              '<span class="roster-cta-icon">' + ICONS.share + '</span><span class="roster-cta-label">Share</span></button>' +
-            '<button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">' +
-              '<span class="roster-cta-icon">' + ICONS.whatsapp + '</span><span class="roster-cta-label">WhatsApp</span></button>' +
-            '<button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">' +
-              '<span class="roster-cta-icon">' + ICONS.link + '</span><span class="roster-cta-label">Copy link</span></button>' +
+          '<div class="siteShareChoose" id="siteShareChoose" hidden>' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--alumni" id="siteShareChoosePage">' +
+              '<span class="roster-cta-label">Alumni page</span></button>' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--compose" id="siteShareChooseCompose">' +
+              '<span class="roster-cta-label">Write a thank-you message</span></button>' +
+          '</div>' +
+          '<div id="siteShareTools">' +
+            '<div class="siteShareQr" id="siteShareQr"></div>' +
+            '<input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>' +
+            '<div class="siteShareActions">' +
+              '<button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">' +
+                '<span class="roster-cta-icon">' + ICONS.share + '</span><span class="roster-cta-label">Share</span></button>' +
+              '<button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">' +
+                '<span class="roster-cta-icon">' + ICONS.whatsapp + '</span><span class="roster-cta-label">WhatsApp</span></button>' +
+              '<button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">' +
+                '<span class="roster-cta-icon">' + ICONS.link + '</span><span class="roster-cta-label">Copy link</span></button>' +
+            '</div>' +
           '</div>' +
           '<div class="siteShareCloseWrap">' +
+            '<button type="button" class="roster-cta-btn roster-cta-btn--muted" id="siteShareBackBtn" hidden>' +
+              '<span class="roster-cta-label">Back</span></button>' +
             '<button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">' +
               '<span class="roster-cta-label">Close</span></button>' +
           '</div>' +
