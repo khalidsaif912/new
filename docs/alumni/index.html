@@ -63,6 +63,66 @@
       line-height: 1.1;
       color: #fff;
     }
+    .headerDecor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .floatEmo {
+      position: absolute;
+      font-size: 18px;
+      line-height: 1;
+      opacity: .42;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.12));
+      animation: emoFloat 5.5s ease-in-out infinite;
+    }
+    .floatEmo:nth-child(1) { top: 14px; inset-inline-start: 52px; font-size: 16px; animation-delay: 0s; }
+    .floatEmo:nth-child(2) { top: 18px; inset-inline-end: 54px; font-size: 15px; animation-delay: .8s; }
+    .floatEmo:nth-child(3) { bottom: 16px; inset-inline-start: 22%; font-size: 14px; animation-delay: 1.6s; opacity: .34; }
+    .floatEmo:nth-child(4) { bottom: 18px; inset-inline-end: 18%; font-size: 15px; animation-delay: 2.2s; opacity: .36; }
+    @keyframes emoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .tabEmo {
+      display: inline-block;
+      margin-inline-end: 4px;
+      font-size: 14px;
+      line-height: 1;
+      vertical-align: -1px;
+    }
+    .summaryEmo {
+      font-size: 14px;
+      line-height: 1;
+    }
+    .composeEmo {
+      display: inline-block;
+      margin-inline-end: 6px;
+      font-size: 16px;
+      vertical-align: -2px;
+    }
+    .tributeHeart {
+      position: absolute;
+      top: 10px;
+      inset-inline-end: 12px;
+      font-size: 13px;
+      opacity: .55;
+      line-height: 1;
+    }
+    .emptyEmo {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    .footEmo {
+      display: inline-block;
+      margin-inline-end: 6px;
+      font-size: 14px;
+      vertical-align: -2px;
+    }
     .bannerTitleEyebrow {
       display: block;
       font-size: 11px;
@@ -540,6 +600,7 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 8px;
+      padding-inline-end: 22px;
     }
     .tributeDelete {
       flex-shrink: 0;
@@ -595,6 +656,12 @@
 <body class="ar">
   <div class="wrap">
     <header class="header">
+      <div class="headerDecor" aria-hidden="true">
+        <span class="floatEmo">✨</span>
+        <span class="floatEmo">💙</span>
+        <span class="floatEmo">🕊️</span>
+        <span class="floatEmo">🌟</span>
+      </div>
       <a class="homeBtn" id="homeBtn" href="../" title="Home" aria-label="Home">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M6.5 10.5V20h11V10.5"/></svg>
       </a>
@@ -610,9 +677,9 @@
     </header>
 
     <div class="tabs" role="tablist">
-      <button type="button" class="tab active" id="tabExport" data-kind="export">الصادر</button>
-      <button type="button" class="tab" id="tabImport" data-kind="import">الوارد</button>
-      <button type="button" class="tab" id="tabTributes" data-kind="tributes">رسائل شكر</button>
+      <button type="button" class="tab active" id="tabExport" data-kind="export"><span class="tabLabel">الصادر</span></button>
+      <button type="button" class="tab" id="tabImport" data-kind="import"><span class="tabLabel">الوارد</span></button>
+      <button type="button" class="tab" id="tabTributes" data-kind="tributes"><span class="tabEmo" aria-hidden="true">💌</span><span class="tabLabel">رسائل شكر</span></button>
     </div>
 
     <div class="peoplePanel" id="peoplePanel">
@@ -626,7 +693,7 @@
       <details class="tributeCompose" id="tributeCompose">
         <summary class="tributeComposeSummary">
           <span>
-            <span id="tributeFormTitle">اترك كلمة شكر</span>
+            <span id="tributeFormTitle"><span class="composeEmo" aria-hidden="true">💌</span>اترك كلمة شكر</span>
             <span class="tributeComposeSummarySub" id="tributeFormHint">رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.</span>
           </span>
         </summary>
@@ -1147,10 +1214,15 @@
     function renderTributes() {
       const wall = document.getElementById('tributeWall');
       const summary = document.getElementById('tributeSummary');
-      summary.textContent = t('tributeSummary', { n: tributeMessages.length });
+      summary.innerHTML =
+        '<span class="summaryEmo" aria-hidden="true">💌</span>' +
+        escapeHtml(t('tributeSummary', { n: tributeMessages.length }));
       updateModBar();
       if (!tributeMessages.length) {
-        wall.innerHTML = '<div class="empty">' + escapeHtml(t('tributeEmpty')) + '</div>';
+        wall.innerHTML =
+          '<div class="empty"><span class="emptyEmo" aria-hidden="true">🌸</span>' +
+          escapeHtml(t('tributeEmpty')) +
+          '</div>';
         return;
       }
       wall.innerHTML = tributeMessages.map((msg) => {
@@ -1164,6 +1236,7 @@
           : '';
         return (
           '<article class="tributeCard">' +
+            '<span class="tributeHeart" aria-hidden="true">💕</span>' +
             '<div class="tributeCardHead">' +
               '<p class="tributeText">' + text + '</p>' +
               delBtn +
@@ -1201,15 +1274,23 @@
       document.body.classList.toggle('ar', currentLang === 'ar');
       document.getElementById('langToggleLabel').textContent = t('lang');
       document.getElementById('pageEyebrow').textContent = t('eyebrow');
-      document.getElementById('tabExport').textContent = t('export');
-      document.getElementById('tabImport').textContent = t('import');
-      document.getElementById('tabTributes').textContent = t('tributes');
-      document.getElementById('footNote').textContent = t('foot');
+      const setTabLabel = (id, text) => {
+        const tab = document.getElementById(id);
+        const lbl = tab && tab.querySelector('.tabLabel');
+        if (lbl) lbl.textContent = text;
+        else if (tab) tab.textContent = text;
+      };
+      setTabLabel('tabExport', t('export'));
+      setTabLabel('tabImport', t('import'));
+      setTabLabel('tabTributes', t('tributes'));
+      document.getElementById('footNote').innerHTML =
+        '<span class="footEmo" aria-hidden="true">💙</span>' + escapeHtml(t('foot'));
       document.getElementById('homeBtn').title = t('homeTitle');
       document.getElementById('homeBtn').setAttribute('aria-label', t('homeTitle'));
       const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
       if (shareLbl) shareLbl.textContent = t('share');
-      document.getElementById('tributeFormTitle').textContent = t('formTitle');
+      document.getElementById('tributeFormTitle').innerHTML =
+        '<span class="composeEmo" aria-hidden="true">💌</span>' + escapeHtml(t('formTitle'));
       document.getElementById('tributeFormHint').textContent = t('formHint');
       const setLabel = (id, text) => {
         const el = document.getElementById(id);
