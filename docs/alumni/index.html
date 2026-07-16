@@ -293,28 +293,58 @@
       line-height: 1.6;
     }
     .tributesPanel[hidden], .peoplePanel[hidden] { display: none !important; }
-    .tributeForm {
+    .tributeCompose {
       background: #fff;
       border: 1px solid #dbe4f5;
       border-radius: 18px;
-      padding: 16px 14px;
       box-shadow: 0 2px 10px rgba(30,64,175,.06);
-      margin-bottom: 12px;
-      display: grid;
-      gap: 10px;
+      margin-top: 12px;
+      overflow: hidden;
     }
-    .tributeFormTitle {
-      margin: 0;
-      font-size: 15px;
+    .tributeComposeSummary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
       font-weight: 800;
       color: #1e3a8a;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-    .tributeFormHint {
-      margin: -4px 0 2px;
-      font-size: 12px;
-      color: #64748b;
-      line-height: 1.45;
+    .tributeComposeSummary::-webkit-details-marker { display: none; }
+    .tributeComposeSummary::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-inline-end: 2px solid #64748b;
+      border-bottom: 2px solid #64748b;
+      transform: rotate(45deg);
+      transition: transform .18s ease;
+      flex-shrink: 0;
+      margin-top: -4px;
+    }
+    .tributeCompose[open] .tributeComposeSummary::after {
+      transform: rotate(225deg);
+      margin-top: 4px;
+    }
+    .tributeComposeSummarySub {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
       font-weight: 600;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .tributeForm {
+      padding: 0 14px 16px;
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid #eef2ff;
+      padding-top: 14px;
     }
     .tributeLabel {
       display: grid;
@@ -512,29 +542,35 @@
     </div>
 
     <div class="tributesPanel" id="tributesPanel" hidden>
-      <form class="tributeForm" id="tributeForm">
-        <h2 class="tributeFormTitle" id="tributeFormTitle">اترك كلمة شكر</h2>
-        <p class="tributeFormHint" id="tributeFormHint">رسالة قصيرة لزميل سابق — تظهر للجميع هنا.</p>
-        <label class="tributeLabel" id="tributeToLabel">إلى
-          <select class="tributeSelect" id="tributeTo" required>
-            <option value="__all__">لجميع الزملاء السابقين</option>
-          </select>
-        </label>
-        <label class="tributeLabel" id="tributeFromLabel">من
-          <input class="tributeField" id="tributeFrom" type="text" maxlength="60" autocomplete="name" required>
-        </label>
-        <label class="tributeLabel" id="tributeMsgLabel">الرسالة
-          <textarea class="tributeArea" id="tributeMsg" maxlength="280" required></textarea>
-        </label>
-        <div class="tributeMetaRow">
-          <span id="tributeCount">0 / 280</span>
-          <span id="tributeAnonHint"></span>
-        </div>
-        <button class="tributeSubmit" id="tributeSubmit" type="submit">نشر الرسالة</button>
-        <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
-      </form>
       <div class="summary" id="tributeSummary">—</div>
       <div class="tributeWall" id="tributeWall"></div>
+      <details class="tributeCompose" id="tributeCompose">
+        <summary class="tributeComposeSummary">
+          <span>
+            <span id="tributeFormTitle">اترك كلمة شكر</span>
+            <span class="tributeComposeSummarySub" id="tributeFormHint">رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.</span>
+          </span>
+        </summary>
+        <form class="tributeForm" id="tributeForm">
+          <label class="tributeLabel" id="tributeToLabel">إلى
+            <select class="tributeSelect" id="tributeTo" required>
+              <option value="__all__">جميع الزملاء السابقين</option>
+            </select>
+          </label>
+          <label class="tributeLabel" id="tributeFromLabel">من
+            <input class="tributeField" id="tributeFrom" type="text" maxlength="60" autocomplete="name" required>
+          </label>
+          <label class="tributeLabel" id="tributeMsgLabel">الرسالة
+            <textarea class="tributeArea" id="tributeMsg" maxlength="280" required></textarea>
+          </label>
+          <div class="tributeMetaRow">
+            <span id="tributeCount">0 / 280</span>
+            <span id="tributeAnonHint"></span>
+          </div>
+          <button class="tributeSubmit" id="tributeSubmit" type="submit">نشر الرسالة</button>
+          <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
+        </form>
+      </details>
     </div>
 
     <div class="footNote" id="footNote"></div>
@@ -1139,6 +1175,12 @@
       if (fromInp && (fromInp.value || '').trim()) fromInp.dataset.autofilled = '0';
     });
 
+    document.getElementById('tributeCompose').addEventListener('toggle', () => {
+      if (document.getElementById('tributeCompose').open) {
+        ensureTributeFromName();
+        setTimeout(() => document.getElementById('tributeMsg')?.focus(), 40);
+      }
+    });
     document.getElementById('tributeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const status = document.getElementById('tributeStatus');
@@ -1181,6 +1223,8 @@
         renderTributes();
         status.className = 'tributeStatus ok';
         status.textContent = t('tributeOk');
+        const compose = document.getElementById('tributeCompose');
+        if (compose) compose.open = false;
       } catch (err) {
         status.className = 'tributeStatus err';
         status.textContent = t('tributeErr');
