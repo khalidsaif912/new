@@ -259,6 +259,8 @@
       direction: ltr;
       unicode-bidi: plaintext;
     }
+    body.ar .cardName { direction: rtl; unicode-bidi: plaintext; }
+    body.ar .cardNameEn { display: block; }
     body:not(.ar) .cardNameEn { display: none; }
     body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
     .meta {
@@ -472,15 +474,15 @@
               const row = document.createElement('article');
               row.className = 'empRow' + (i % 2 ? ' empRowAlt' : '');
               const mainName = currentLang === 'ar' ? (p.nameAr || p.name) : (p.name || p.nameAr);
-              const secondary = currentLang === 'ar' ? (p.name || '') : '';
+              const secondary = p.name || '';
               const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
               row.innerHTML =
                 '<h2 class="cardName"></h2>' +
-                (secondary ? '<p class="cardNameEn"></p>' : '') +
+                '<p class="cardNameEn"></p>' +
                 '<div class="meta"><span class="pill id"></span></div>' +
                 (note ? '<p class="note"></p>' : '');
               row.querySelector('.cardName').textContent = mainName || '-';
-              if (secondary) row.querySelector('.cardNameEn').textContent = secondary;
+              row.querySelector('.cardNameEn').textContent = secondary;
               row.querySelector('.pill.id').textContent = t('id') + ' ' + (p.id || '-');
               if (note) row.querySelector('.note').textContent = note;
               card.appendChild(row);
