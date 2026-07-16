@@ -451,24 +451,35 @@
     .tributeModBar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 0 0 10px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
+      justify-content: center;
+      gap: 8px;
+      margin: 22px 0 0;
+      padding-top: 4px;
     }
+    .tributeModBar[hidden] { display: none !important; }
     .tributeModBtn {
       border: 0;
       background: transparent;
-      color: #1e40af;
+      color: #c5cedb;
       font: inherit;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .02em;
       cursor: pointer;
-      padding: 4px 0;
-      text-decoration: underline;
-      text-underline-offset: 2px;
+      padding: 2px 4px;
+      opacity: .55;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeModBtn:hover,
+    .tributeModBtn:focus-visible {
+      opacity: .85;
+      color: #94a3b8;
+    }
+    #tributeModState {
+      font-size: 10px;
+      font-weight: 600;
+      color: #cbd5e1;
+      opacity: .7;
     }
   </style>
 </head>
@@ -523,14 +534,14 @@
         <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
       </form>
       <div class="summary" id="tributeSummary">—</div>
-      <div class="tributeModBar" id="tributeModBar">
-        <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
-        <span id="tributeModState"></span>
-      </div>
       <div class="tributeWall" id="tributeWall"></div>
     </div>
 
     <div class="footNote" id="footNote"></div>
+    <div class="tributeModBar" id="tributeModBar" hidden>
+      <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
+      <span id="tributeModState"></span>
+    </div>
   </div>
 
   <script>
@@ -909,6 +920,7 @@
       const showTributes = kind === 'tributes';
       peoplePanel.hidden = showTributes;
       tributesPanel.hidden = !showTributes;
+      document.getElementById('tributeModBar').hidden = !showTributes;
       if (showTributes) {
         fillTributeForm();
         renderTributes();
