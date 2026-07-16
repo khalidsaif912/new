@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>زملاء سابقون · Former Colleagues</title>
   <style>
     :root {
@@ -260,7 +263,15 @@
       unicode-bidi: plaintext;
     }
     body.ar .cardName { direction: rtl; unicode-bidi: plaintext; }
-    body.ar .cardNameEn { display: block; }
+    body.ar .cardNameEn {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 3px;
+      padding-top: 4px;
+      border-top: 1px dashed #cbd5e1;
+    }
     body:not(.ar) .cardNameEn { display: none; }
     body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
     .note {
@@ -380,6 +391,8 @@
     function getSiteRootPath() {
       if (location.protocol === 'file:') return '..';
       const path = location.pathname || '/';
+      const ghDocs = path.match(/^(\/[^/]+\/docs)(?=\/|$)/);
+      if (ghDocs) return ghDocs[1];
       const idx = path.indexOf('/alumni');
       if (idx >= 0) return path.slice(0, idx) || '';
       if (path.includes('/roster-site/')) return '/roster-site';
@@ -389,6 +402,25 @@
         return segs.length ? '/' + segs[0] : '';
       }
       return '..';
+    }
+
+    async function loadAlumniData() {
+      const roots = [];
+      const primary = getSiteRootPath();
+      if (primary) roots.push(primary);
+      if (location.hostname && location.hostname.endsWith('github.io')) roots.push('/new/docs');
+      roots.push('..');
+      const seen = new Set();
+      for (const root of roots) {
+        if (!root || seen.has(root)) continue;
+        seen.add(root);
+        try {
+          const res = await fetch(root + '/alumni.json?ts=' + Date.now());
+          if (!res.ok) continue;
+          return await res.json();
+        } catch (e) { /* try next root */ }
+      }
+      throw new Error('fail');
     }
 
     function deptLabel(dept) {
@@ -459,7 +491,7 @@
               const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
               row.innerHTML =
                 '<h2 class="cardName"></h2>' +
-                '<p class="cardNameEn"></p>' +
+                '<p class="cardNameEn" lang="en" dir="ltr"></p>' +
                 (note ? '<p class="note"></p>' : '');
               row.querySelector('.cardName').textContent = mainName || '-';
               row.querySelector('.cardNameEn').textContent = secondary;
@@ -492,9 +524,7 @@
       const root = getSiteRootPath();
       document.getElementById('homeBtn').href = root + '/';
       try {
-        const res = await fetch(root + '/alumni.json?ts=' + Date.now());
-        if (!res.ok) throw new Error('fail');
-        data = await res.json();
+        data = await loadAlumniData();
         applyUi();
       } catch (e) {
         document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
