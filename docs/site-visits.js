@@ -7,8 +7,9 @@
 
   var NS = 'roster-site-new';
   var API = 'https://api.counterapi.dev/v1/' + NS + '/';
-  var STORAGE_KEY = 'rosterVisitCountedDay';
-  var cached = { day: null, month: null };
+  var COUNTED_KEY = 'rosterVisitCountedDay';
+  var CACHE_KEY = 'rosterVisitCountsV1';
+  var cached = { day: null, month: null, dayKey: '', monthKey: '' };
   var booted = false;
 
   var I18N = {
@@ -56,9 +57,36 @@
     }
   }
 
+  function readPersisted(keys) {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (!data) return;
+      if (data.dayKey === keys.day && typeof data.day === 'number') cached.day = data.day;
+      if (data.monthKey === keys.month && typeof data.month === 'number') cached.month = data.month;
+      cached.dayKey = keys.day;
+      cached.monthKey = keys.month;
+    } catch (e) {}
+  }
+
+  function persistCounts(keys) {
+    try {
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          dayKey: keys.day,
+          monthKey: keys.month,
+          day: cached.day,
+          month: cached.month
+        })
+      );
+    } catch (e) {}
+  }
+
   function fetchCount(name, doUp) {
     var url = API + encodeURIComponent(name) + (doUp ? '/up' : '');
-    return fetch(url, { cache: 'no-store' })
+    return fetch(url, { cache: 'no-store', mode: 'cors' })
       .then(function (res) {
         if (res.ok) return res.json();
         if (res.status === 400 || res.status === 404) return { count: 0 };
@@ -117,7 +145,7 @@
 
   function alreadyCounted(dayKey) {
     try {
-      return localStorage.getItem(STORAGE_KEY) === dayKey;
+      return localStorage.getItem(COUNTED_KEY) === dayKey;
     } catch (e) {
       return false;
     }
@@ -125,7 +153,7 @@
 
   function markCounted(dayKey) {
     try {
-      localStorage.setItem(STORAGE_KEY, dayKey);
+      localStorage.setItem(COUNTED_KEY, dayKey);
     } catch (e) {}
   }
 
@@ -141,9 +169,29 @@
     ]).then(function (vals) {
       if (vals[0] != null) cached.day = vals[0];
       if (vals[1] != null) cached.month = vals[1];
+      cached.dayKey = keys.day;
+      cached.monthKey = keys.month;
       if (shouldUp) markCounted(keys.day);
+      persistCounts(keys);
       paint();
     });
+  }
+
+  function hookFooterMutations() {
+    var footer = document.querySelector('.footer');
+    if (!footer || footer.__siteVisitsObs) return;
+    footer.__siteVisitsObs = true;
+    var timer = null;
+    var obs = new MutationObserver(function () {
+      if (document.getElementById('siteVisitsRow') && document.getElementById('siteVisitsDay')) {
+        // Row still intact — just refresh labels/numbers if needed.
+        if (cached.day != null || cached.month != null) paintCounts();
+        return;
+      }
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(paint, 0);
+    });
+    obs.observe(footer, { childList: true, subtree: true });
   }
 
   function hookLang() {
@@ -152,8 +200,14 @@
     var orig = window.applyLang;
     if (typeof orig === 'function') {
       window.applyLang = function (l) {
+        var dayN = cached.day;
+        var monthN = cached.month;
         orig(l);
-        window.setTimeout(paint, 0);
+        window.setTimeout(function () {
+          if (dayN != null) cached.day = dayN;
+          if (monthN != null) cached.month = monthN;
+          paint();
+        }, 0);
       };
     }
     document.addEventListener('click', function (e) {
@@ -166,11 +220,17 @@
   function boot() {
     if (booted) return;
     booted = true;
+    var keys = muscatYmd();
+    readPersisted(keys);
     hookLang();
+    hookFooterMutations();
     paint();
     loadCounts().catch(function () {
       paint();
     });
+    // Re-assert after late footer rewrites (lang / texture controls).
+    window.setTimeout(paint, 400);
+    window.setTimeout(paint, 1200);
   }
 
   window.rosterSiteVisits = {

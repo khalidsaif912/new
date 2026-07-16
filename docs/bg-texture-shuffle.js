@@ -67,7 +67,7 @@
     var st = document.createElement('style');
     st.id = 'bgTextureShuffleStyles';
     st.textContent =
-      '.bgTextureShuffleWrap{margin-top:8px;display:flex;justify-content:center;align-items:center;gap:6px;}' +
+      '.bgTextureShuffleWrap{margin-top:8px;display:flex;justify-content:center;align-items:center;gap:6px;direction:ltr;}' +
       '.bgTextureShuffleWrap .roster-cta-btn{' +
       'min-height:0;padding:5px 12px;font-size:11px;font-weight:600;gap:6px;}' +
       '.bgTextureShuffleWrap .roster-cta-icon{width:16px;height:16px;}' +
@@ -247,16 +247,16 @@
     refreshBtn.addEventListener('click', function () {
       refreshBtn.disabled = true;
       try {
-        var url = new URL(location.href);
-        url.searchParams.set('_r', String(Date.now()));
-        location.replace(url.toString());
-      } catch (e) {
+        // Keep last visitor totals across reload, then hard-refresh the page.
         location.reload();
+      } catch (e) {
+        location.href = location.href;
       }
     });
 
-    wrap.appendChild(btn);
+    // Physical LTR order: top · background · refresh (refresh to the right of background)
     wrap.appendChild(topBtn);
+    wrap.appendChild(btn);
     wrap.appendChild(refreshBtn);
     footer.appendChild(wrap);
 
