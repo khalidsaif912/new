@@ -91,7 +91,9 @@
       (isIOSDevice()
         ? ''
         : 'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);') +
-      'border-top-color:rgba(148,163,184,.28)!important;}';
+      'border-top-color:rgba(148,163,184,.28)!important;}' +
+      'body.roster-bg-textured [data-bg-texture-mount]{background:transparent!important;' +
+      'backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;}';
     document.head.appendChild(st);
   }
 
@@ -200,8 +202,11 @@
   }
 
   function injectButton() {
-    var footer = document.querySelector('.footer');
-    if (!footer || document.getElementById('bgTextureShuffleBtn')) return;
+    if (document.getElementById('bgTextureShuffleBtn')) return;
+    var footer =
+      document.querySelector('[data-bg-texture-mount]') ||
+      document.querySelector('.footer');
+    if (!footer) return;
 
     var wrap = document.createElement('div');
     wrap.className = 'bgTextureShuffleWrap';

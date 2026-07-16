@@ -318,13 +318,44 @@
     }
     .alumniShareBtn:active { transform: translateY(1px); }
     .alumniShareIcon { display: inline-flex; line-height: 0; }
-    .footer {
-      margin-top: 8px;
-      text-align: center;
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.5;
-      padding: 8px 4px 2px;
+    .alumniBgMount {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 0;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    body.roster-bg-textured .alumniBgMount {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    .alumniBgMount .bgTextureShuffleWrap {
+      margin-top: 0;
+      width: auto;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(196,181,253,.55);
+      box-shadow: 0 2px 10px rgba(91,33,182,.08);
+      gap: 4px;
+    }
+    body.roster-bg-textured .alumniBgMount .bgTextureShuffleWrap {
+      background: rgba(255,255,255,.78);
+    }
+    .alumniBgMount .roster-cta-btn--texture {
+      border-radius: 999px;
+      padding: 6px 10px;
+      min-height: 28px;
+      box-shadow: none;
+    }
+    .alumniBgMount .bgScrollTopBtn,
+    .alumniBgMount .bgRefreshBtn {
+      border-radius: 999px;
+      width: 30px;
+      height: 30px;
     }
     body.roster-bg-textured .deptCard,
     body.roster-bg-textured .tributeCompose,
@@ -622,7 +653,7 @@
         <span class="roster-cta-label">مشاركة</span>
       </button>
     </div>
-    <div class="footer" id="alumniFooter"></div>
+    <div class="alumniBgMount" id="alumniFooter" data-bg-texture-mount></div>
     <div class="tributeModBar" id="tributeModBar" hidden>
       <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
       <span id="tributeModState"></span>
@@ -1319,6 +1350,6 @@
     })();
   </script>
   <script defer src="../site-share.js?v=20260716alumni"></script>
-  <script defer src="../bg-texture-shuffle.js?v=20260716alumni"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260716alumni2"></script>
 </body>
 </html>
