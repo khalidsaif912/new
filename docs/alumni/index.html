@@ -343,7 +343,7 @@
         lang: 'EN',
         export: 'الصادر',
         import: 'الوارد',
-        summary: '{n} زميل · {d} أقسام',
+        summary: '{n} زملاء · {d} أقسام',
         empty: 'لا توجد أسماء في هذا القسم بعد.',
         id: 'الرقم',
         loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
@@ -364,9 +364,17 @@
       }
     };
 
+    function toArabicDigits(n) {
+      return String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
     function t(key, vars) {
       let s = (I18N[currentLang] || I18N.ar)[key] || key;
-      if (vars) Object.keys(vars).forEach((k) => { s = s.replace('{' + k + '}', String(vars[k])); });
+      if (vars) Object.keys(vars).forEach((k) => {
+        let v = String(vars[k]);
+        if (currentLang === 'ar' && /^\d+$/.test(v)) v = toArabicDigits(v);
+        s = s.replace('{' + k + '}', v);
+      });
       return s;
     }
 
