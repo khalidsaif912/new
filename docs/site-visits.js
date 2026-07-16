@@ -152,20 +152,37 @@
     if (legacy && legacy.parentNode) legacy.parentNode.removeChild(legacy);
   }
 
+  function placeHostInFooter(host, footer) {
+    var buttons = footer.querySelector('.bgTextureShuffleWrap');
+    if (buttons) {
+      footer.insertBefore(host, buttons);
+    } else {
+      footer.appendChild(host);
+    }
+  }
+
   function ensureHost() {
     removeLegacyFooterRow();
-    var host = document.getElementById('siteVisitsHost');
-    if (host) return host;
-
     var footer = document.querySelector('.footer');
-    if (!footer || !footer.parentNode) return null;
+    if (!footer) return null;
+
+    var host = document.getElementById('siteVisitsHost');
+    if (host) {
+      // Keep the counter inside the footer frame, above the action buttons.
+      if (host.parentNode !== footer) placeHostInFooter(host, footer);
+      else {
+        var buttons = footer.querySelector('.bgTextureShuffleWrap');
+        if (buttons && host.nextSibling !== buttons) footer.insertBefore(host, buttons);
+      }
+      return host;
+    }
 
     host = document.createElement('div');
     host.id = 'siteVisitsHost';
     host.className = 'siteVisitsHost';
     host.style.cssText =
-      'margin:-4px 0 10px;padding:0 12px;text-align:center;font-size:12px;' +
-      'line-height:1.9;color:#94a3b8;font-family:inherit;';
+      'margin:2px 0 8px;padding:0;text-align:center;font-size:12px;' +
+      'line-height:1.7;color:#94a3b8;font-family:inherit;';
     host.innerHTML =
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel"></strong> ' +
       '<strong style="color:#1e40af;" id="siteVisitsDay">--</strong>' +
@@ -173,8 +190,7 @@
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
       '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>';
 
-    if (footer.nextSibling) footer.parentNode.insertBefore(host, footer.nextSibling);
-    else footer.parentNode.appendChild(host);
+    placeHostInFooter(host, footer);
     return host;
   }
 
@@ -298,12 +314,25 @@
     });
   }
 
+  function hookFooter() {
+    var footer = document.querySelector('.footer');
+    if (!footer || footer.__siteVisitsObs) return;
+    footer.__siteVisitsObs = true;
+    var timer = null;
+    var obs = new MutationObserver(function () {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(paint, 0);
+    });
+    obs.observe(footer, { childList: true, subtree: false });
+  }
+
   function boot() {
     if (booted) return;
     booted = true;
     var keys = muscatYmd();
     readPersisted(keys);
     hookLang();
+    hookFooter();
     paint();
     loadCounts().then(function () {
       if (cached.day == null || cached.month == null) {
