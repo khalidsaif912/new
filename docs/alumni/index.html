@@ -700,6 +700,90 @@
       } catch (e) { return ''; }
     }
 
+    function cleanDisplayName(name) {
+      return String(name || '')
+        .replace(/^(mr|mrs|ms|miss|dr)\.?\s+/i, '')
+        .trim();
+    }
+
+    function rememberRosterName(empId, fullName) {
+      const name = cleanDisplayName(fullName);
+      const id = String(empId || '').trim();
+      if (!name) return name;
+      try {
+        localStorage.setItem('exportSavedEmpName', name);
+        localStorage.setItem('savedEmpName', name);
+        if (id && localStorage.getItem('importSavedEmpId') === id) {
+          localStorage.setItem('importSavedEmpName', name);
+        }
+      } catch (e) {}
+      return name;
+    }
+
+    function getSchedulesBase() {
+      const root = getSiteRootPath();
+      if (root === '..') return '../schedules/';
+      return root.replace(/\/$/, '') + '/schedules/';
+    }
+
+    function getImportSchedulesBase() {
+      return getSchedulesBase().replace(/\/schedules\/$/, '/import/schedules/');
+    }
+
+    function fetchRosterDisplayName(empId, done) {
+      if (!empId || !/^\d+$/.test(empId)) { done(''); return; }
+      const urls = [
+        getSchedulesBase() + encodeURIComponent(empId) + '.json',
+        getImportSchedulesBase() + encodeURIComponent(empId) + '.json'
+      ];
+      function tryNext(i) {
+        if (i >= urls.length) { done(''); return; }
+        fetch(urls[i])
+          .then((r) => (r.ok ? r.json() : null))
+          .then((json) => {
+            if (json && json.name) done(json.name);
+            else tryNext(i + 1);
+          })
+          .catch(() => tryNext(i + 1));
+      }
+      tryNext(0);
+    }
+
+    function applyFromName(name, fromInp) {
+      const cleaned = cleanDisplayName(name);
+      if (!cleaned || !fromInp) return;
+      fromInp.value = cleaned;
+      fromInp.dataset.autofilled = '1';
+    }
+
+    function ensureTributeFromName() {
+      const fromInp = document.getElementById('tributeFrom');
+      if (!fromInp) return;
+      const current = (fromInp.value || '').trim();
+      const wasAuto = fromInp.dataset.autofilled === '1';
+      if (current && !wasAuto) return;
+
+      const rosterName = getRosterName();
+      if (rosterName) {
+        applyFromName(rosterName, fromInp);
+        return;
+      }
+
+      const empId = getRosterId();
+      if (!empId) return;
+      if (!current) fromInp.placeholder = empId;
+      fetchRosterDisplayName(empId, (fullName) => {
+        if (!fullName) return;
+        const still = document.getElementById('tributeFrom');
+        if (!still) return;
+        const now = (still.value || '').trim();
+        if (now && still.dataset.autofilled !== '1') return;
+        const saved = rememberRosterName(empId, fullName);
+        applyFromName(saved || fullName, still);
+        still.placeholder = '';
+      });
+    }
+
     function personDisplayName(p) {
       if (!p) return '';
       return currentLang === 'ar' ? (p.nameAr || p.name || '') : (p.name || p.nameAr || '');
@@ -856,10 +940,7 @@
           toSel.appendChild(opt);
         });
       if (prev && [...toSel.options].some((o) => o.value === prev)) toSel.value = prev;
-      if (!fromInp.value) {
-        const rosterName = getRosterName();
-        if (rosterName) fromInp.value = rosterName.replace(/^(mr|mrs|ms|miss|dr)\.?\s+/i, '').trim();
-      }
+      ensureTributeFromName();
       updateTributeCount();
     }
 
@@ -1038,6 +1119,10 @@
     document.getElementById('tabTributes').addEventListener('click', () => setActiveTab('tributes'));
     document.getElementById('tributeModBtn').addEventListener('click', toggleModMode);
     document.getElementById('tributeMsg').addEventListener('input', updateTributeCount);
+    document.getElementById('tributeFrom').addEventListener('input', () => {
+      const fromInp = document.getElementById('tributeFrom');
+      if (fromInp && (fromInp.value || '').trim()) fromInp.dataset.autofilled = '0';
+    });
 
     document.getElementById('tributeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
