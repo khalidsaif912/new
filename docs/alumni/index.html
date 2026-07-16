@@ -556,33 +556,36 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin: 22px 0 0;
-      padding-top: 4px;
+      margin: 14px 0 2px;
+      padding: 6px 0;
     }
-    .tributeModBar[hidden] { display: none !important; }
     .tributeModBtn {
       border: 0;
       background: transparent;
-      color: #c5cedb;
+      color: #64748b;
       font: inherit;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .02em;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .01em;
       cursor: pointer;
-      padding: 2px 4px;
-      opacity: .55;
+      padding: 4px 8px;
+      opacity: .72;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: #94a3b8;
       -webkit-tap-highlight-color: transparent;
     }
     .tributeModBtn:hover,
     .tributeModBtn:focus-visible {
-      opacity: .85;
-      color: #94a3b8;
+      opacity: 1;
+      color: #334155;
+      text-decoration-color: #64748b;
     }
     #tributeModState {
-      font-size: 10px;
-      font-weight: 600;
-      color: #cbd5e1;
-      opacity: .7;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      opacity: .8;
     }
   </style>
 </head>
@@ -644,6 +647,10 @@
           <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
         </form>
       </details>
+      <div class="tributeModBar" id="tributeModBar">
+        <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
+        <span id="tributeModState"></span>
+      </div>
     </div>
 
     <div class="footNote" id="footNote"></div>
@@ -654,10 +661,6 @@
       </button>
     </div>
     <div class="alumniBgMount" id="alumniFooter" data-bg-texture-mount></div>
-    <div class="tributeModBar" id="tributeModBar" hidden>
-      <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
-      <span id="tributeModState"></span>
-    </div>
   </div>
 
   <script>
@@ -1038,7 +1041,6 @@
       const showTributes = kind === 'tributes';
       peoplePanel.hidden = showTributes;
       tributesPanel.hidden = !showTributes;
-      document.getElementById('tributeModBar').hidden = !showTributes;
       if (showTributes) {
         fillTributeForm();
         renderTributes();
