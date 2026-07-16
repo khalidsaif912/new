@@ -263,25 +263,6 @@
     body.ar .cardNameEn { display: block; }
     body:not(.ar) .cardNameEn { display: none; }
     body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 3px 9px;
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .pill.id {
-      background: #e8f1ff;
-      color: #1e40af;
-      border: 1px solid #bfdbfe;
-    }
     .note {
       margin: 4px 0 0;
       padding: 9px 11px;
@@ -479,11 +460,9 @@
               row.innerHTML =
                 '<h2 class="cardName"></h2>' +
                 '<p class="cardNameEn"></p>' +
-                '<div class="meta"><span class="pill id"></span></div>' +
                 (note ? '<p class="note"></p>' : '');
               row.querySelector('.cardName').textContent = mainName || '-';
               row.querySelector('.cardNameEn').textContent = secondary;
-              row.querySelector('.pill.id').textContent = t('id') + ' ' + (p.id || '-');
               if (note) row.querySelector('.note').textContent = note;
               card.appendChild(row);
             });
