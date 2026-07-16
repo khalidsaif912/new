@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from roster_cta_snippets import (  # noqa: E402
     APPLY_LANG_NEW,
     CTA_CSS,
+    SHIFT_COPY_CSS,
     APPLY_LANG_BAD_LINE,
     CHIP_AFTERNOON_HTML,
     CHIP_ALL_HTML,
@@ -37,7 +38,6 @@ from roster_cta_snippets import (  # noqa: E402
     SITE_SHARE_CSS,
     SITE_SHARE_MODAL_HTML,
     SVG_APPS_BTN,
-    SVG_BELL,
     SVG_COMPARE,
     LANG_TOGGLE_CSS,
     LANG_TOGGLE_HTML,
@@ -45,21 +45,27 @@ from roster_cta_snippets import (  # noqa: E402
     APPLY_LANG_LANG_BTN_OLD,
     export_cta_html,
     import_cta_html,
+    SHIFT_COPY_MODAL_HTML,
+    secondary_bar_html,
     I18N_CMP_AR,
     I18N_CMP_EN,
     I18N_APPS_AR,
     I18N_APPS_EN,
     I18N_SHARE_AR,
     I18N_SHARE_EN,
-    I18N_SUB_AR,
-    I18N_SUB_EN,
     I18N_VIEWFULL_AR,
     I18N_VIEWFULL_EN,
 )
 
 CTA_CSS_RE = re.compile(
-    r"    /\* ═══════ QUICK ACTIONS ═══════ \*/\s*.*?"
+    r"    /\* ═══════ QUICK ACTIONS(?: — see scripts/roster_cta_snippets\.py)? ═══════ \*/\s*.*?"
     r"(?=    /\* ═══════ (?:SITE SHARE|SITE APPS|FOOTER|SHARE/SAVE))",
+    re.DOTALL,
+)
+
+SHIFT_COPY_CSS_RE = re.compile(
+    r"    /\* ═══════ SHIFT COPY \(bottom button \+ modal\) ═══════ \*/\s*.*?"
+    r"(?=    \.shiftCopySheet)",
     re.DOTALL,
 )
 
@@ -151,9 +157,21 @@ COMPARE_BTN_ICON_RE = re.compile(
     r'(<(?:a|button)[^>]*\bid="compareBtn"[^>]*>\s*<span class="roster-cta-icon">).*?(</span>)',
     re.DOTALL | re.IGNORECASE,
 )
-SUBSCRIBE_BTN_ICON_RE = re.compile(
-    r'(<(?:a|button)[^>]*\bid="subscribeBtn"[^>]*>\s*<span class="roster-cta-icon">).*?(</span>)',
+SUBSCRIBE_BTN_RE = re.compile(
+    r'\s*<a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn"[^>]*>.*?</a>\s*',
     re.DOTALL | re.IGNORECASE,
+)
+SET_CTA_SUBSCRIBE_RE = re.compile(
+    r"\s*setCtaLabel\('subscribeBtn', t\.subscribe\);\n",
+)
+SET_LOCAL_SUBSCRIBE_RE = re.compile(
+    r"\s*var c2 = document\.getElementById\('subscribeBtn'\);\s*\n"
+    r"\s*if \(c1\) c1\.href = root \+ '/now/';\s*\n"
+    r"\s*if \(c2\) c2\.href = root \+ '/subscribe/';",
+)
+SET_LOCAL_SUBSCRIBE_RE2 = re.compile(
+    r"\s*var c2 = document\.getElementById\('subscribeBtn'\);\s*\n"
+    r"\s*if \(c2\) c2\.href = root \+ '/subscribe/';",
 )
 
 
@@ -170,8 +188,7 @@ def patch_legacy_btn_wrap(html: str) -> str:
     if 'class="btnWrap"' not in html:
         return html
     cta_href = _extract_href(html, "ctaBtn", "#")
-    sub_href = _extract_href(html, "subscribeBtn", "#")
-    block = export_cta_html(cta_href=cta_href, subscribe_href=sub_href)
+    block = export_cta_html(cta_href=cta_href)
     html = LEGACY_CTA_HTML_RE.sub("  <!-- ════ CTA ════ -->\n" + block, html, count=1)
     if ".roster-cta-btn--roster" not in html:
         if "/* ═══════ QUICK ACTIONS ═══════ */" in html:
@@ -188,11 +205,10 @@ ROSTER_NAV_RE = re.compile(
 
 
 def patch_export_cta(html: str) -> str:
-    if 'id="subscribeBtn"' not in html:
+    if 'id="ctaBtn"' not in html:
         return html
     cta_href = _extract_href(html, "ctaBtn", "#")
-    sub_href = _extract_href(html, "subscribeBtn", "#")
-    block = export_cta_html(cta_href=cta_href, subscribe_href=sub_href)
+    block = export_cta_html(cta_href=cta_href)
     m = ROSTER_NAV_RE.search(html)
     if m:
         return ROSTER_NAV_RE.sub(block.strip(), html, count=1)
@@ -225,7 +241,7 @@ def patch_import_cta(html: str) -> str:
 
 CTA_LANG_APPLY_RE = re.compile(
     r"  var c1=document\.getElementById\('ctaBtn'\); if\(c1\) c1\.textContent=t\.viewFull;\s*"
-    r"  var c2=document\.getElementById\('subscribeBtn'\); if\(c2\) c2\.textContent=t\.subscribe;\s*"
+    r"(?:  var c2=document\.getElementById\('subscribeBtn'\); if\(c2\) c2\.textContent=t\.subscribe;\s*)?"
     r"(?:  var c3=document\.getElementById\('compareBtn'\); if\(c3\) c3\.textContent=t\.compare;\s*)?"
     r"(?:  var c4=document\.getElementById\('shareSiteBtn'\); if\(c4\) c4\.textContent=t\.shareSite;\s*)?"
     r"(?:  var c5=document\.getElementById\('moreAppsBtn'\); if\(c5\) c5\.textContent=t\.moreApps;\s*)?",
@@ -353,7 +369,13 @@ def replace_apps_modal_block(html: str) -> str:
     end = html.find('<div id="captureBusy"', start + 1)
     if end < 0:
         return html
-    return html[:start] + SITE_APPS_MODAL_HTML.strip() + "\n\n" + html[end:]
+    shift_block = ""
+    if 'id="shiftCopySheet"' in html[start:end]:
+        sc_start = html.find('<div id="shiftCopySheet"', start)
+        if sc_start >= 0:
+            shift_block = html[sc_start:end].strip() + "\n\n"
+    apps_block = SITE_APPS_MODAL_HTML.strip() + "\n\n"
+    return html[:start] + apps_block + shift_block + html[end:]
 
 
 def patch_site_share(html: str) -> str:
@@ -594,15 +616,76 @@ def patch_compare_cta_icon(html: str) -> str:
     return COMPARE_BTN_ICON_RE.sub(r"\1" + SVG_COMPARE + r"\2", html, count=1)
 
 
-def patch_subscribe_bell_icon(html: str) -> str:
-    if 'id="subscribeBtn"' not in html:
+def patch_remove_subscribe(html: str) -> str:
+    html = SUBSCRIBE_BTN_RE.sub("\n", html)
+    html = SET_CTA_SUBSCRIBE_RE.sub("\n", html)
+    html = SET_LOCAL_SUBSCRIBE_RE.sub(
+        "\n  if (c1) c1.href = root + '/now/';",
+        html,
+    )
+    html = SET_LOCAL_SUBSCRIBE_RE2.sub("", html)
+    return html
+
+
+def patch_shift_copy_css(html: str) -> str:
+    if 'id="copyShiftBtn"' not in html:
         return html
-    m = SUBSCRIBE_BTN_ICON_RE.search(html)
-    if not m:
+    if "/* ═══════ SHIFT COPY (bottom button + modal) ═══════ */" in html:
+        return SHIFT_COPY_CSS_RE.sub(SHIFT_COPY_CSS, html, count=1)
+    anchor = "    /* ═══════ SITE SHARE MODAL ═══════ */"
+    if anchor in html:
+        return html.replace(anchor, SHIFT_COPY_CSS + "\n" + anchor, 1)
+    return html
+
+
+def patch_shift_copy_modal(html: str) -> str:
+    if 'id="copyShiftBtn"' not in html or 'id="shiftCopySheet"' in html:
         return html
-    inner = m.group(0)
-    if "#ca8a04" in inner or "📩" in inner or "<img" in inner:
-        return SUBSCRIBE_BTN_ICON_RE.sub(r"\1" + SVG_BELL + r"\2", html, count=1)
+    marker = '<div id="captureBusy"'
+    pos = html.find(marker)
+    if pos < 0:
+        return html
+    return html[:pos] + SHIFT_COPY_MODAL_HTML.strip() + "\n\n" + html[pos:]
+
+
+SECONDARY_BARS_RE = re.compile(
+    r"(?:  <!-- ════ COPY SHIFT ════ -->\s*)?"
+    r"(?:<nav class=\"quickActions (?:rosterCopyBar|alumniBar|secondaryBar)\"[^>]*>.*?</nav>\s*)+",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def patch_secondary_bar(html: str) -> str:
+    """Merge Copy Shift + Former Colleagues into one 2-column secondary bar."""
+    has_copy = 'id="copyShiftBtn"' in html
+    has_alumni = 'id="alumniBtn"' in html
+    if not has_copy and not has_alumni:
+        return html
+    alumni_href = _extract_href(html, "alumniBtn", "#")
+    block = secondary_bar_html(
+        include_copy=has_copy,
+        include_alumni=has_alumni,
+        alumni_href=alumni_href,
+    )
+    if not block:
+        return html
+    m = SECONDARY_BARS_RE.search(html)
+    if m:
+        return SECONDARY_BARS_RE.sub(
+            "  <!-- ════ SECONDARY ACTIONS ════ -->\n" + block + "\n",
+            html,
+            count=1,
+        )
+    # Insert after main CTA nav when bars are missing as a group.
+    cta = ROSTER_NAV_RE.search(html)
+    if cta and (has_copy or has_alumni):
+        insert_at = cta.end()
+        return (
+            html[:insert_at]
+            + "\n\n  <!-- ════ SECONDARY ACTIONS ════ -->\n"
+            + block
+            + html[insert_at:]
+        )
     return html
 
 
@@ -646,16 +729,19 @@ def patch_roster_icons_script(html: str) -> str:
 
 
 def patch_css_and_js(html: str) -> str:
-    if "/* ═══════ QUICK ACTIONS ═══════ */" in html:
+    if "/* ═══════ QUICK ACTIONS" in html:
         html = CTA_CSS_RE.sub(CTA_CSS, html, count=1)
     elif "/* ═══════ CTA ═══════ */" in html and 'id="ctaBtn"' in html:
         html = LEGACY_CTA_CSS_RE.sub(CTA_CSS, html, count=1)
+    html = patch_shift_copy_css(html)
     html = patch_site_share(html)
     html = patch_site_apps(html)
+    html = patch_shift_copy_modal(html)
+    html = patch_secondary_bar(html)
     html = patch_summary_chips(html)
     html = patch_lang_toggle(html)
     html = patch_compare_cta_icon(html)
-    html = patch_subscribe_bell_icon(html)
+    html = patch_remove_subscribe(html)
     html = patch_broken_script_lines(html)
     html = patch_roster_icons_script(html)
     html = APPLY_LANG_BAD_LINE.sub("", html)
@@ -672,11 +758,9 @@ def patch_css_and_js(html: str) -> str:
     html = patch_apply_lang_more_apps(html)
     for old, new in (
         ("viewFull:'📋 Full Roster'", I18N_VIEWFULL_EN),
-        ("subscribe:'📩 Subscribe'", I18N_SUB_EN),
         ("compare:'📊 Compare'", I18N_CMP_EN),
         ("shareSite:'🔗 Share Site'", I18N_SHARE_EN),
         ("viewFull:'📋 الجدول الكامل'", I18N_VIEWFULL_AR),
-        ("subscribe:'📩 اشتراك'", I18N_SUB_AR),
         ("compare:'📊 مقارنة'", I18N_CMP_AR),
         ("shareSite:'🔗 مشاركة الموقع'", I18N_SHARE_AR),
     ):
@@ -691,12 +775,10 @@ def patch_file(path: Path) -> bool:
     updated = raw
     if 'class="btnWrap"' in updated and "roster-cta-btn--roster" not in updated:
         updated = patch_legacy_btn_wrap(updated)
-    elif 'class="importBottom"' in updated and 'id="subscribeBtn"' not in updated:
-        updated = patch_import_cta(updated)
-    elif 'id="subscribeBtn"' in updated:
+    elif 'id="ctaBtn"' in updated and (
+        "roster-cta" in updated or 'class="importBottom"' in updated
+    ):
         updated = patch_export_cta(updated)
-    elif 'id="ctaBtn"' in updated and "roster-cta" in updated:
-        updated = patch_export_cta(updated) if 'id="subscribeBtn"' in updated else patch_import_cta(updated)
     updated = patch_css_and_js(updated)
     if updated != raw:
         path.write_text(updated, encoding="utf-8", newline="\n")

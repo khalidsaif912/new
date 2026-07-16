@@ -524,7 +524,7 @@ def main() -> int:
         print("ERROR: export script too short; template extraction failed")
         return 1
 
-    cta_html = import_cta_html(cta_href="{BASE}/now/", subscribe_href="{BASE}/subscribe/")
+    cta_html = import_cta_html(cta_href="{BASE}/now/")
     bootstrap_js = import_bootstrap_script()
     load_block = LOAD_LOCAL_ENHANCEMENTS_IMPORT.strip()
 

@@ -526,13 +526,14 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
+      --cta-max: min(100%, 440px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--cta-gap);
       width: 100%;
-      max-width: 100%;
+      max-width: var(--cta-max);
       margin-inline: auto;
     }
     .roster-cta-btn {
@@ -581,11 +582,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       border-color: #b8c9f5;
       color: #1e3a8a;
     }
-    .roster-cta-btn--subscribe {
-      background: #ffffff;
-      border-color: #d4c4f7;
-      color: #1f2937;
-    }
     .roster-cta-btn--compare {
       background: #fffbeb;
       border-color: #fcd34d;
@@ -612,25 +608,8 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       color: #475569;
     }
     .roster-cta--import {
-      grid-template-columns: 1fr 1fr;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) {
-      grid-template-columns: repeat(6, 1fr);
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
-      grid-column: 1 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
-      grid-column: 3 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
-      grid-column: 5 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
-      grid-column: 2 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
-      grid-column: 4 / span 2;
+      grid-template-columns: repeat(2, 1fr);
+      max-width: var(--cta-max);
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -638,7 +617,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
-      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
@@ -663,6 +641,37 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       .roster-cta-icon { width: 16px; height: 16px; }
       .roster-cta-icon svg { width: 16px; height: 16px; }
       .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
+    }
+    .quickActions.secondaryBar,
+    .quickActions.rosterCopyBar,
+    .quickActions.alumniBar {
+      margin-top: 10px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--cta-gap, 10px);
+      width: 100%;
+      max-width: var(--cta-max, min(100%, 440px));
+      margin-inline: auto;
+    }
+    .quickActions.secondaryBar:not(:has(> :nth-child(2))),
+    .quickActions.rosterCopyBar:not(:has(> :nth-child(2))),
+    .quickActions.alumniBar:not(:has(> :nth-child(2))) {
+      grid-template-columns: 1fr;
+    }
+    .secondaryBar .roster-cta-btn,
+    .rosterCopyBar .roster-cta-btn,
+    .alumniBar .roster-cta-btn {
+      width: 100%;
+      min-width: 0;
+    }
+    .roster-cta-btn--alumni {
+      background: #f0fdfa;
+      border-color: #99f6e4;
+      color: #0f766e;
+    }
+    @media (hover: hover) {
+      .roster-cta-btn--alumni:hover { background: #ccfbf1; }
     }
     /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
@@ -715,6 +724,9 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       padding: 10px;
     }
     .siteShareUrl {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
       font-size: 11px;
       color: #475569;
       word-break: break-all;
@@ -723,6 +735,10 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       padding: 8px 10px;
       background: #f1f5f9;
       border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      direction: ltr;
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     .siteShareActions {
       display: grid;
@@ -1651,10 +1667,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
     <span class="roster-cta-label">Full Roster</span>
   </a>
-  <a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn" href="#">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M18 14V9a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg></span>
-    <span class="roster-cta-label">Subscribe</span>
-  </a>
   <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></span>
     <span class="roster-cta-label">Compare</span>
@@ -1989,7 +2001,6 @@ function applyLang(lang) {
     else el.textContent = text;
   }
   setCtaLabel('ctaBtn', t.viewFull);
-  setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
@@ -2057,9 +2068,7 @@ function setSummaryChipHrefs() {
 function setLocalCtaLinks() {
   var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
-  var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
-  if (c2) c2.href = root + '/subscribe/';
 }
 function goToTraining(e) {
   if (e) e.preventDefault();

@@ -320,13 +320,14 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
+      --cta-max: min(100%, 440px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--cta-gap);
       width: 100%;
-      max-width: 100%;
+      max-width: var(--cta-max);
       margin-inline: auto;
     }
     .roster-cta-btn {
@@ -375,11 +376,6 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       border-color: #b8c9f5;
       color: #1e3a8a;
     }
-    .roster-cta-btn--subscribe {
-      background: #ffffff;
-      border-color: #d4c4f7;
-      color: #1f2937;
-    }
     .roster-cta-btn--compare {
       background: #fffbeb;
       border-color: #fcd34d;
@@ -406,25 +402,8 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       color: #475569;
     }
     .roster-cta--import {
-      grid-template-columns: 1fr 1fr;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) {
-      grid-template-columns: repeat(6, 1fr);
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
-      grid-column: 1 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
-      grid-column: 3 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
-      grid-column: 5 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
-      grid-column: 2 / span 2;
-    }
-    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
-      grid-column: 4 / span 2;
+      grid-template-columns: repeat(2, 1fr);
+      max-width: var(--cta-max);
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -432,7 +411,6 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
-      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
       .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
@@ -457,6 +435,37 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       .roster-cta-icon { width: 16px; height: 16px; }
       .roster-cta-icon svg { width: 16px; height: 16px; }
       .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
+    }
+    .quickActions.secondaryBar,
+    .quickActions.rosterCopyBar,
+    .quickActions.alumniBar {
+      margin-top: 10px;
+      padding: 0 2px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--cta-gap, 10px);
+      width: 100%;
+      max-width: var(--cta-max, min(100%, 440px));
+      margin-inline: auto;
+    }
+    .quickActions.secondaryBar:not(:has(> :nth-child(2))),
+    .quickActions.rosterCopyBar:not(:has(> :nth-child(2))),
+    .quickActions.alumniBar:not(:has(> :nth-child(2))) {
+      grid-template-columns: 1fr;
+    }
+    .secondaryBar .roster-cta-btn,
+    .rosterCopyBar .roster-cta-btn,
+    .alumniBar .roster-cta-btn {
+      width: 100%;
+      min-width: 0;
+    }
+    .roster-cta-btn--alumni {
+      background: #f0fdfa;
+      border-color: #99f6e4;
+      color: #0f766e;
+    }
+    @media (hover: hover) {
+      .roster-cta-btn--alumni:hover { background: #ccfbf1; }
     }
 """
 
@@ -829,6 +838,14 @@ SVG_COPY_SHIFT = (
     '<path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'
     '<path d="M11.5 13h5M11.5 16h3"/></svg>'
 )
+SVG_ALUMNI = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
+    'stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>'
+    '<circle cx="9" cy="7" r="4"/>'
+    '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>'
+    '<path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+)
 
 
 def _shift_opt_svg(paths: str, stroke: str) -> str:
@@ -913,14 +930,38 @@ def _shift_copy_option(shift_key: str) -> str:
     )
 
 
-SHIFT_COPY_BUTTON_HTML = (
-    '<nav class="quickActions rosterCopyBar" aria-label="Copy on-duty list">\n'
-    '  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">\n'
-    f'    <span class="roster-cta-icon">{SVG_COPY_SHIFT}</span>\n'
-    '    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>\n'
-    "  </button>\n"
-    "</nav>\n"
-)
+def secondary_bar_html(
+    *,
+    include_copy: bool = True,
+    include_alumni: bool = True,
+    alumni_href: str = "#",
+) -> str:
+    """Bottom row: Copy Shift + Former Colleagues side-by-side when both exist."""
+    parts: list[str] = []
+    if include_copy:
+        parts.append(
+            '  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">\n'
+            f'    <span class="roster-cta-icon">{SVG_COPY_SHIFT}</span>\n'
+            '    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>\n'
+            "  </button>\n"
+        )
+    if include_alumni:
+        parts.append(
+            f'  <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="{alumni_href}">\n'
+            f'    <span class="roster-cta-icon">{SVG_ALUMNI}</span>\n'
+            '    <span class="roster-cta-label">Former Colleagues</span>\n'
+            "  </a>\n"
+        )
+    if not parts:
+        return ""
+    return (
+        '<nav class="quickActions secondaryBar" aria-label="More actions">\n'
+        + "".join(parts)
+        + "</nav>\n"
+    )
+
+
+SHIFT_COPY_BUTTON_HTML = secondary_bar_html(include_copy=True, include_alumni=False)
 
 SHIFT_COPY_MODAL_HTML = (
     '<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">\n'
@@ -946,17 +987,6 @@ SHIFT_COPY_MODAL_HTML = (
 
 # Plain-CSS (single braces). Interpolated into the page <style> f-string.
 SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
-    .quickActions.rosterCopyBar {
-      margin-top: 10px;
-      padding: 0 2px;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      width: 100%;
-      max-width: 100%;
-      margin-inline: auto;
-    }
-    .rosterCopyBar .roster-cta-btn { grid-column: 3 / span 2; }
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -1055,21 +1085,12 @@ def _btn(
 
 def export_cta_html(
     cta_href: str = "#",
-    subscribe_href: str = "#",
     compare_onclick: str = ' onclick="goToRosterDiff(event)"',
 ) -> str:
     compare_extra = f' href="#"{compare_onclick}'
     return (
         '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
         + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
-        + _btn(
-            "a",
-            "roster-cta-btn--subscribe",
-            "subscribeBtn",
-            "Subscribe",
-            SVG_BELL,
-            f' href="{subscribe_href}"',
-        )
         + _btn(
             "a",
             "roster-cta-btn--compare",
@@ -1130,13 +1151,11 @@ def import_summary_bar_html(total_emp: int) -> str:
 
 def import_cta_html(
     cta_href: str = "{BASE}/now/",
-    subscribe_href: str = "{BASE}/subscribe/",
     compare_onclick: str = ' onclick="goToRosterDiff(event)"',
 ) -> str:
-    """Identical markup/grid classes as export duty pages (6-column pill layout)."""
+    """Identical markup/grid classes as export duty pages (2×2 pill layout)."""
     return export_cta_html(
         cta_href=cta_href,
-        subscribe_href=subscribe_href,
         compare_onclick=compare_onclick,
     )
 
@@ -1170,7 +1189,6 @@ APPLY_LANG_NEW = """  function setCtaLabel(id, text) {
     else el.textContent = text;
   }
   setCtaLabel('ctaBtn', t.viewFull);
-  setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
