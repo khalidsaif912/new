@@ -1656,6 +1656,13 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">{last_updated}</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
+    <div id="siteVisitsRow" class="siteVisitsRow">
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">Visitors today:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsDay">—</strong>
+      <span aria-hidden="true"> · </span>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">This month:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsMonth">—</strong>
+    </div>
   </div>
 
 </div>
@@ -2679,15 +2686,26 @@ function applyLang(lang) {{
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   if(window.rosterSiteShiftCopy && window.rosterSiteShiftCopy.setLang) window.rosterSiteShiftCopy.setLang();
+  if(window.rosterSiteVisits && window.rosterSiteVisits.setLang) window.rosterSiteVisits.setLang();
   var footer=document.querySelector('.footer');
   if(footer) {{
+    var dayEl=document.getElementById('siteVisitsDay');
+    var monthEl=document.getElementById('siteVisitsMonth');
+    var dayN=dayEl?dayEl.textContent:'—';
+    var monthN=monthEl?monthEl.textContent:'—';
     var h=footer.innerHTML;
     if(isAr) {{
       h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
+      h=h.replace('Visitors today:','زوار اليوم:'); h=h.replace('This month:','هذا الشهر:');
     }} else {{
       h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
+      h=h.replace('زوار اليوم:','Visitors today:'); h=h.replace('هذا الشهر:','This month:');
     }}
     footer.innerHTML=h;
+    dayEl=document.getElementById('siteVisitsDay');
+    monthEl=document.getElementById('siteVisitsMonth');
+    if(dayEl) dayEl.textContent=dayN;
+    if(monthEl) monthEl.textContent=monthN;
   }}
   localStorage.setItem('rosterLang',lang);
   LANG=lang;

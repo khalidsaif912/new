@@ -1213,7 +1213,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260716b"
+IOS_PERF_VER = "20260716c"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1229,6 +1229,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
+  addScript(root + '/site-visits.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -1260,6 +1261,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     document.body.appendChild(s);
   }
   addScript(root + '/site-last-updated.js?v=' + ver);
+  addScript(root + '/site-visits.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);

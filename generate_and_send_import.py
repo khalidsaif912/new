@@ -885,6 +885,13 @@ def build_duty_html(
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">{dt.datetime.now().strftime('%d%b%Y / %H:%M').upper()}</strong>
     <br>Total: <strong id="importTotalEmployees">{total_emp} employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">{parsed.get('source_filename') or parsed['sheet']}</strong>
+    <div id="siteVisitsRow" class="siteVisitsRow">
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">Visitors today:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsDay">—</strong>
+      <span aria-hidden="true"> · </span>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">This month:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsMonth">—</strong>
+    </div>
   </div>
 """
 
