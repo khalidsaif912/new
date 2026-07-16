@@ -29,9 +29,24 @@
     '<path d="M12 19V6"/><path d="M6 12l6-6 6 6"/>' +
   '</svg>';
 
+  var REFRESH_ICON =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/>' +
+  '</svg>';
+
   var I18N = {
-    en: { btn: 'Shuffle background', title: 'New random color and texture', top: 'Back to top' },
-    ar: { btn: 'خلفية عشوائية', title: 'لون ونقش عشوائي جديد', top: 'العودة إلى الأعلى' },
+    en: {
+      btn: 'Shuffle background',
+      title: 'New random color and texture',
+      top: 'Back to top',
+      refresh: 'Refresh site'
+    },
+    ar: {
+      btn: 'خلفية عشوائية',
+      title: 'لون ونقش عشوائي جديد',
+      top: 'العودة إلى الأعلى',
+      refresh: 'تحديث الموقع'
+    },
   };
 
   function lang() {
@@ -59,13 +74,14 @@
       '.bgTextureShuffleWrap .roster-cta-icon svg{width:16px;height:16px;}' +
       '.roster-cta-btn--texture{background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6;}' +
       '@media (hover:hover){.roster-cta-btn--texture:hover{background:#ede9fe;}}' +
-      '.bgScrollTopBtn{display:inline-flex;align-items:center;justify-content:center;' +
+      '.bgScrollTopBtn,.bgRefreshBtn{display:inline-flex;align-items:center;justify-content:center;' +
       'width:28px;height:28px;padding:0;border-radius:9px;cursor:pointer;flex:none;' +
       'border:1px solid #c4b5fd;background:#f5f3ff;line-height:0;' +
       '-webkit-tap-highlight-color:transparent;transition:background .15s ease,transform .15s ease;}' +
-      '.bgScrollTopBtn:active{transform:scale(.92);}' +
-      '.bgScrollTopBtn svg{width:16px;height:16px;display:block;}' +
-      '@media (hover:hover){.bgScrollTopBtn:hover{background:#ede9fe;}}' +
+      '.bgScrollTopBtn:active,.bgRefreshBtn:active{transform:scale(.92);}' +
+      '.bgScrollTopBtn svg,.bgRefreshBtn svg{width:16px;height:16px;display:block;}' +
+      '.bgRefreshBtn{border-color:#93c5fd;background:#eff6ff;}' +
+      '@media (hover:hover){.bgScrollTopBtn:hover{background:#ede9fe;}.bgRefreshBtn:hover{background:#dbeafe;}}' +
       'html.roster-bg-textured,body.roster-bg-textured{background-attachment:' +
       (isIOSDevice() ? 'scroll' : 'fixed') +
       ';background-repeat:repeat;}' +
@@ -221,8 +237,27 @@
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     });
 
+    var refreshBtn = document.createElement('button');
+    refreshBtn.type = 'button';
+    refreshBtn.id = 'bgRefreshBtn';
+    refreshBtn.className = 'bgRefreshBtn';
+    refreshBtn.title = t('refresh');
+    refreshBtn.setAttribute('aria-label', t('refresh'));
+    refreshBtn.innerHTML = REFRESH_ICON;
+    refreshBtn.addEventListener('click', function () {
+      refreshBtn.disabled = true;
+      try {
+        var url = new URL(location.href);
+        url.searchParams.set('_r', String(Date.now()));
+        location.replace(url.toString());
+      } catch (e) {
+        location.reload();
+      }
+    });
+
     wrap.appendChild(btn);
     wrap.appendChild(topBtn);
+    wrap.appendChild(refreshBtn);
     footer.appendChild(wrap);
 
     document.addEventListener('rosterLangChange', function () {
@@ -231,6 +266,8 @@
       btn.setAttribute('aria-label', t('title'));
       topBtn.title = t('top');
       topBtn.setAttribute('aria-label', t('top'));
+      refreshBtn.title = t('refresh');
+      refreshBtn.setAttribute('aria-label', t('refresh'));
     });
   }
 
