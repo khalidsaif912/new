@@ -24,6 +24,22 @@
       storeSub: 'Electronics & gadgets',
       wcvote: 'World Cup Fan Vote',
       wcvoteSub: 'Vote for your team',
+      alumni: 'Former Colleagues',
+      spotlightBtn: 'Explore something random',
+      spotlightBtnSub: 'A quick surprise from the site',
+      spotlightTitle: 'A random pick for you',
+      spotlightHint: 'Open a random tool, game, list, or reading page from the roster site.',
+      spotlightOpen: 'Open now',
+      spotlightShuffle: 'Another pick',
+      spotlightClose: 'Maybe later',
+      pickGames: 'Picture clues',
+      pickGamesSub: 'Memory challenge',
+      pickCode: 'Hazmat sticker quiz',
+      pickCodeSub: 'Fast image-code challenge',
+      pickQuicklist: 'QuickList',
+      pickQuicklistSub: 'Shopping and home lists',
+      pickBook: 'A Cup of Book',
+      pickBookSub: 'Open the reading page',
     },
     ar: {
       btn: 'تطبيقات',
@@ -44,6 +60,22 @@
       storeSub: 'أجهزة وتسوق',
       wcvote: 'تصويت جماهير كأس العالم',
       wcvoteSub: 'صوّت لمنتخبك',
+      alumni: 'زملاء سابقون',
+      spotlightBtn: 'اقتراح عشوائي',
+      spotlightBtnSub: 'شيء جميل من الموقع',
+      spotlightTitle: 'شيء عشوائي لك',
+      spotlightHint: 'افتح لعبة أو أداة أو قائمة أو صفحة قراءة بشكل عشوائي من محتوى الموقع.',
+      spotlightOpen: 'افتح الآن',
+      spotlightShuffle: 'اقتراح آخر',
+      spotlightClose: 'لاحقًا',
+      pickGames: 'لعبة قرائن الصور',
+      pickGamesSub: 'تحدي صور سريع',
+      pickCode: 'لعبة كود الملصق',
+      pickCodeSub: 'تحدي سريع للملصقات',
+      pickQuicklist: 'قائمة مشتريات المنزل',
+      pickQuicklistSub: 'قوائم وملاحظات المنزل',
+      pickBook: 'A Cup of Book',
+      pickBookSub: 'نافذة قراءة عشوائية',
     },
   };
 
@@ -76,6 +108,7 @@
       else btn.textContent = t('btn');
     }
     ensureAlumniButton();
+    ensureSpotlightButton();
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
     var title = document.getElementById('siteAppsTitle');
@@ -102,6 +135,9 @@
       if (val && val !== subKey) el.textContent = val;
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
+    if (document.getElementById('spotlightSheet')) {
+      paintSpotlightPopup(currentSpotlightItem());
+    }
   }
 
   function openModal() {
@@ -144,6 +180,59 @@
       return getSiteRootUrl() + '/QuickList/index.html';
     }
     return 'https://khalidsaif912.github.io/new/docs/QuickList/index.html';
+  }
+
+  function bookPageUrl() {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl() + '/a-cup-of-book/';
+    }
+    return 'https://khalidsaif912.github.io/new/docs/a-cup-of-book/';
+  }
+
+  function spotlightItems() {
+    return [
+      {
+        id: 'pairs',
+        title: t('pickGames'),
+        sub: t('pickGamesSub'),
+        href: 'https://dgr-exp.netlify.app/m1/pairs.html',
+        external: true,
+        classes: 'roster-cta-btn--apps',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="8" rx="2"/><rect x="13" y="4" width="8" height="8" rx="2"/><rect x="8" y="13" width="8" height="8" rx="2"/></svg>'
+      },
+      {
+        id: 'code',
+        title: t('pickCode'),
+        sub: t('pickCodeSub'),
+        href: 'https://dgr-exp.netlify.app/q/q',
+        external: true,
+        classes: 'roster-cta-btn--texture',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8 4 12l4 4"/><path d="M16 8l4 4-4 4"/><path d="m14 4-4 16"/></svg>'
+      },
+      {
+        id: 'quicklist',
+        title: t('pickQuicklist'),
+        sub: t('pickQuicklistSub'),
+        href: quicklistPageUrl(),
+        external: false,
+        classes: 'roster-cta-btn--texture',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m5 6 1 1 2-2"/><path d="m5 12 1 1 2-2"/><path d="m5 18 1 1 2-2"/></svg>'
+      },
+      {
+        id: 'book',
+        title: t('pickBook'),
+        sub: t('pickBookSub'),
+        href: bookPageUrl(),
+        external: false,
+        classes: 'roster-cta-btn--alumni',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>'
+      }
+    ];
+  }
+
+  function randomSpotlight(excludeId) {
+    var items = spotlightItems().filter(function (item) { return item.id !== excludeId; });
+    return items[Math.floor(Math.random() * items.length)];
   }
 
   function patchCalcLink() {
@@ -213,11 +302,42 @@
     });
   }
 
+  function openHref(item) {
+    if (!item || !item.href) return;
+    if (item.external) {
+      window.open(item.href, '_blank', 'noopener');
+      return;
+    }
+    window.location.assign(item.href);
+  }
+
   function injectCompactStyles() {
     if (document.getElementById('siteAppsCompactCss')) return;
     var style = document.createElement('style');
     style.id = 'siteAppsCompactCss';
     style.textContent = [
+      '.quickActions.secondaryBar{max-width:min(100%,540px)!important;margin-top:8px!important;gap:8px!important;}',
+      '.secondaryBar .roster-cta-btn{min-height:46px!important;padding:10px 10px!important;font-size:12.5px!important;}',
+      '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;}',
+      '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
+      '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
+      '.spotlightBar .spotlightBtn{width:100%!important;justify-content:flex-start!important;text-align:start!important;min-height:54px!important;padding:12px 14px!important;gap:10px!important;}',
+      '.spotlightBtnLabel{display:flex!important;flex-direction:column!important;align-items:flex-start!important;min-width:0!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;}',
+      '.spotlightBtnTitle{font-size:13px!important;font-weight:800!important;color:inherit!important;}',
+      '.spotlightBtnSub{font-size:10px!important;font-weight:600!important;color:#64748b!important;}',
+      '.spotlightSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.52);padding:16px;z-index:10004;pointer-events:none;visibility:hidden;}',
+      '.spotlightSheet.open{display:flex;pointer-events:auto;visibility:visible;}',
+      '.spotlightCard{width:min(100%,390px);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);border:1px solid rgba(148,163,184,.24);border-radius:22px;padding:20px 16px 14px;box-shadow:0 24px 60px rgba(15,23,42,.28);text-align:center;position:relative;}',
+      '.spotlightBadge{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;margin:0 auto 10px;background:linear-gradient(135deg,#ede9fe 0%,#dbeafe 100%);color:#5b21b6;font-size:20px;font-weight:800;}',
+      '.spotlightTitle{margin:0 0 4px;font-size:18px;font-weight:900;color:#0f172a;}',
+      '.spotlightHint{margin:0 0 14px;font-size:12px;line-height:1.5;color:#64748b;}',
+      '.spotlightPreview{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0;text-align:start;margin-bottom:12px;}',
+      '.spotlightPreviewIcon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;flex-shrink:0;}',
+      '.spotlightPreviewText{min-width:0;flex:1;}',
+      '.spotlightPreviewTitle{font-size:14px;font-weight:800;color:#0f172a;line-height:1.25;}',
+      '.spotlightPreviewSub{font-size:11px;font-weight:600;color:#64748b;line-height:1.35;margin-top:3px;}',
+      '.spotlightActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}',
+      '.spotlightCloseWrap .roster-cta-btn{width:100%;}',
       '.siteAppsSheet{padding:10px!important;overscroll-behavior:none;}',
       '.siteAppsCard{width:min(100%,380px)!important;max-height:calc(100vh - 20px)!important;max-height:calc(100dvh - 20px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:12px 12px 10px!important;border-radius:16px!important;-webkit-overflow-scrolling:auto!important;}',
       '.siteAppsTitle{font-size:15px!important;margin:0 0 2px!important;flex-shrink:0;}',
@@ -276,7 +396,7 @@
   }
 
   function alumniLabel() {
-    return lang() === 'ar' ? 'زملاء سابقون' : 'Former Colleagues';
+    return t('alumni');
   }
 
   function alumniPageUrl() {
@@ -286,42 +406,163 @@
 
   function ensureAlumniButton() {
     var btn = document.getElementById('alumniBtn');
-    var footer = document.querySelector('.footer');
     if (!btn) {
-      if (!footer || !footer.parentNode) return;
-      var nav = document.createElement('nav');
-      nav.className = 'quickActions alumniBar';
-      nav.setAttribute('aria-label', 'Former colleagues');
-      nav.innerHTML =
-        '<a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="#">' +
+      var secondary = document.querySelector('.quickActions.secondaryBar');
+      if (!secondary) return;
+      var a = document.createElement('a');
+      a.className = 'roster-cta-btn roster-cta-btn--alumni';
+      a.id = 'alumniBtn';
+      a.href = '#';
+      a.innerHTML =
         '<span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>' +
-        '<span class="roster-cta-label"></span></a>';
-      footer.parentNode.insertBefore(nav, footer);
+        '<span class="roster-cta-label"></span>';
+      secondary.appendChild(a);
       btn = document.getElementById('alumniBtn');
     }
     if (!btn) return;
     btn.href = alumniPageUrl();
     var lbl = btn.querySelector('.roster-cta-label');
     if (lbl) lbl.textContent = alumniLabel();
-    if (!document.getElementById('alumniBtnForceCss')) {
-      var style = document.createElement('style');
-      style.id = 'alumniBtnForceCss';
-      style.textContent = [
-        '.quickActions.alumniBar{display:grid!important;grid-template-columns:repeat(6,1fr)!important;gap:10px!important;margin-top:10px!important;padding:0 2px!important;width:100%!important;max-width:100%!important;visibility:visible!important;opacity:1!important;}',
-        '.alumniBar .roster-cta-btn,#alumniBtn.roster-cta-btn{grid-column:3 / span 2!important;background:#f0fdfa!important;border:1.5px solid #99f6e4!important;color:#0f766e!important;border-radius:999px!important;min-height:44px!important;font-size:13px!important;font-weight:700!important;box-shadow:none!important;}'
-      ].join('');
-      document.head.appendChild(style);
+  }
+
+  function ensureSpotlightButton() {
+    var footer = document.querySelector('.footer');
+    if (!footer || !footer.parentNode) return;
+    var bar = document.getElementById('spotlightBar');
+    if (!bar) {
+      bar = document.createElement('nav');
+      bar.id = 'spotlightBar';
+      bar.className = 'quickActions spotlightBar';
+      bar.setAttribute('aria-label', 'Random suggestion');
+      bar.innerHTML =
+        '<button type="button" class="roster-cta-btn roster-cta-btn--roster spotlightBtn" id="spotlightBtn">' +
+        '<span class="roster-cta-icon" id="spotlightBtnIcon" aria-hidden="true"></span>' +
+        '<span class="roster-cta-label spotlightBtnLabel">' +
+        '<span class="spotlightBtnTitle" id="spotlightBtnTitle"></span>' +
+        '<span class="spotlightBtnSub" id="spotlightBtnSub"></span>' +
+        '</span></button>';
+      footer.parentNode.insertBefore(bar, footer);
     }
+    var item = randomSpotlight();
+    bar.dataset.itemId = item.id;
+    var btn = document.getElementById('spotlightBtn');
+    if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + item.classes;
+    var icon = document.getElementById('spotlightBtnIcon');
+    if (icon) icon.innerHTML = item.icon;
+    var title = document.getElementById('spotlightBtnTitle');
+    if (title) title.textContent = item.title;
+    var sub = document.getElementById('spotlightBtnSub');
+    if (sub) sub.textContent = item.sub || t('spotlightBtnSub');
+  }
+
+  function currentSpotlightItem() {
+    var bar = document.getElementById('spotlightBar');
+    var item = spotlightItems().find(function (x) {
+      return bar && x.id === bar.dataset.itemId;
+    });
+    return item || randomSpotlight();
+  }
+
+  function ensureSpotlightPopup() {
+    var sheet = document.getElementById('spotlightSheet');
+    if (sheet) return sheet;
+    sheet = document.createElement('div');
+    sheet.id = 'spotlightSheet';
+    sheet.className = 'spotlightSheet';
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.innerHTML =
+      '<div class="spotlightCard" role="dialog" aria-labelledby="spotlightTitle">' +
+      '<div class="spotlightBadge">✦</div>' +
+      '<h2 class="spotlightTitle" id="spotlightTitle"></h2>' +
+      '<p class="spotlightHint" id="spotlightHint"></p>' +
+      '<div class="spotlightPreview">' +
+      '<div class="spotlightPreviewIcon" id="spotlightPreviewIcon"></div>' +
+      '<div class="spotlightPreviewText">' +
+      '<div class="spotlightPreviewTitle" id="spotlightPreviewTitle"></div>' +
+      '<div class="spotlightPreviewSub" id="spotlightPreviewSub"></div>' +
+      '</div></div>' +
+      '<div class="spotlightActions">' +
+      '<button type="button" class="roster-cta-btn roster-cta-btn--roster" id="spotlightOpenBtn"><span class="roster-cta-label"></span></button>' +
+      '<button type="button" class="roster-cta-btn roster-cta-btn--texture" id="spotlightShuffleBtn"><span class="roster-cta-label"></span></button>' +
+      '</div>' +
+      '<div class="spotlightCloseWrap">' +
+      '<button type="button" class="roster-cta-btn roster-cta-btn--muted" id="spotlightCloseBtn"><span class="roster-cta-label"></span></button>' +
+      '</div></div>';
+    document.body.appendChild(sheet);
+    return sheet;
+  }
+
+  function paintSpotlightPopup(item) {
+    ensureSpotlightPopup();
+    document.getElementById('spotlightTitle').textContent = t('spotlightTitle');
+    document.getElementById('spotlightHint').textContent = t('spotlightHint');
+    document.getElementById('spotlightPreviewIcon').innerHTML = item.icon;
+    document.getElementById('spotlightPreviewTitle').textContent = item.title;
+    document.getElementById('spotlightPreviewSub').textContent = item.sub;
+    document.querySelector('#spotlightOpenBtn .roster-cta-label').textContent = t('spotlightOpen');
+    document.querySelector('#spotlightShuffleBtn .roster-cta-label').textContent = t('spotlightShuffle');
+    document.querySelector('#spotlightCloseBtn .roster-cta-label').textContent = t('spotlightClose');
+    document.getElementById('spotlightSheet').dataset.itemId = item.id;
+  }
+
+  function openSpotlightPopup() {
+    var item = currentSpotlightItem();
+    paintSpotlightPopup(item);
+    var sheet = document.getElementById('spotlightSheet');
+    if (!sheet) return;
+    closeShareIfOpen();
+    closeModal();
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSpotlightPopup() {
+    var sheet = document.getElementById('spotlightSheet');
+    if (!sheet) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function bindSpotlightUi() {
+    document.getElementById('spotlightBtn')?.addEventListener('click', function (e) {
+      e.preventDefault();
+      openSpotlightPopup();
+    });
+    document.getElementById('spotlightOpenBtn')?.addEventListener('click', function () {
+      closeSpotlightPopup();
+      openHref(currentSpotlightItem());
+    });
+    document.getElementById('spotlightShuffleBtn')?.addEventListener('click', function () {
+      paintSpotlightPopup(randomSpotlight(currentSpotlightItem().id));
+    });
+    document.getElementById('spotlightCloseBtn')?.addEventListener('click', closeSpotlightPopup);
+    document.getElementById('spotlightSheet')?.addEventListener('click', function (e) {
+      if (e.target === e.currentTarget) closeSpotlightPopup();
+    });
   }
 
   function init() {
     injectCompactStyles();
     ensureAlumniButton();
+    ensureSpotlightButton();
+    ensureSpotlightPopup();
     bindUi();
+    bindSpotlightUi();
     applyI18n();
     ensureAlumniButton();
+    ensureSpotlightButton();
     patchCalcLink();
     patchQuicklistLink();
+    try {
+      if (!sessionStorage.getItem('spotlightShown')) {
+        sessionStorage.setItem('spotlightShown', '1');
+        window.setTimeout(openSpotlightPopup, 700);
+      }
+    } catch (e) {
+      window.setTimeout(openSpotlightPopup, 700);
+    }
   }
 
   window.rosterSiteApps = {
