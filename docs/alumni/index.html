@@ -505,7 +505,9 @@
         <h2 class="tributeFormTitle" id="tributeFormTitle">اترك كلمة شكر</h2>
         <p class="tributeFormHint" id="tributeFormHint">رسالة قصيرة لزميل سابق — تظهر للجميع هنا.</p>
         <label class="tributeLabel" id="tributeToLabel">إلى
-          <select class="tributeSelect" id="tributeTo" required></select>
+          <select class="tributeSelect" id="tributeTo" required>
+            <option value="__all__">لجميع الزملاء السابقين</option>
+          </select>
         </label>
         <label class="tributeLabel" id="tributeFromLabel">من
           <input class="tributeField" id="tributeFrom" type="text" maxlength="60" autocomplete="name" required>
@@ -577,12 +579,12 @@
         foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.',
         homeTitle: 'الرئيسية',
         formTitle: 'اترك كلمة شكر',
-        formHint: 'رسالة قصيرة لزميل سابق — تظهر للجميع هنا.',
+        formHint: 'رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.',
         to: 'إلى',
         from: 'من',
         message: 'الرسالة',
         submit: 'نشر الرسالة',
-        everyone: 'لجميع الزملاء السابقين',
+        everyone: 'جميع الزملاء السابقين',
         tributeSummary: '{n} رسالة',
         tributeEmpty: 'كن أول من يترك كلمة شكر.',
         tributeLoadFail: 'تعذر تحميل الرسائل. حاول مرة أخرى.',
@@ -614,7 +616,7 @@
         foot: 'We keep their names in appreciation of their service with us.',
         homeTitle: 'Home',
         formTitle: 'Leave a thank-you note',
-        formHint: 'A short message for a former colleague — visible to everyone here.',
+        formHint: 'A short message for one colleague or everyone — visible to all here.',
         to: 'To',
         from: 'From',
         message: 'Message',
@@ -924,10 +926,10 @@
     function fillTributeForm() {
       const toSel = document.getElementById('tributeTo');
       const fromInp = document.getElementById('tributeFrom');
-      const prev = toSel.value;
+      const prev = toSel.value || '__all__';
       toSel.innerHTML = '';
       const optAll = document.createElement('option');
-      optAll.value = '';
+      optAll.value = '__all__';
       optAll.textContent = t('everyone');
       toSel.appendChild(optAll);
       const people = (data && data.people) ? data.people.slice() : [];
@@ -940,6 +942,7 @@
           toSel.appendChild(opt);
         });
       if (prev && [...toSel.options].some((o) => o.value === prev)) toSel.value = prev;
+      else toSel.value = '__all__';
       ensureTributeFromName();
       updateTributeCount();
     }
@@ -1132,7 +1135,8 @@
       status.textContent = '';
       const from = (document.getElementById('tributeFrom').value || '').trim().slice(0, 60);
       const text = (document.getElementById('tributeMsg').value || '').trim().slice(0, MSG_MAX);
-      const toId = document.getElementById('tributeTo').value || '';
+      const toRaw = document.getElementById('tributeTo').value || '__all__';
+      const toId = toRaw === '__all__' ? '' : toRaw;
       if (!from || !text) {
         status.className = 'tributeStatus err';
         status.textContent = t('tributeNeed');
@@ -1144,7 +1148,9 @@
         status.textContent = t('tributeRate');
         return;
       }
-      const toPerson = (data && data.people || []).find((p) => String(p.id) === String(toId));
+      const toPerson = toId
+        ? (data && data.people || []).find((p) => String(p.id) === String(toId))
+        : null;
       const msg = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
         from,
