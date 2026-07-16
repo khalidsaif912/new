@@ -629,11 +629,11 @@
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
-      --cta-max: min(100%, 440px);
+      --cta-max: min(100%, 680px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--cta-gap);
       width: 100%;
       max-width: var(--cta-max);
@@ -685,11 +685,6 @@
       border-color: #b8c9f5;
       color: #1e3a8a;
     }
-    .roster-cta-btn--compare {
-      background: #fffbeb;
-      border-color: #fcd34d;
-      color: #1f2937;
-    }
     .roster-cta-btn--share {
       background: #ecfdf5;
       border-color: #86efac;
@@ -711,7 +706,7 @@
       color: #475569;
     }
     .roster-cta--import {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       max-width: var(--cta-max);
     }
     @media (hover: hover) {
@@ -720,7 +715,6 @@
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
-      .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--texture:hover { background: #ede9fe; }
@@ -1881,10 +1875,6 @@
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
     <span class="roster-cta-label">Full Roster</span>
   </a>
-  <a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn" href="#" onclick="goToRosterDiff(event)">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></span>
-    <span class="roster-cta-label">Compare</span>
-  </a>
   <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
     <span class="roster-cta-label">Share Site</span>
@@ -2964,7 +2954,6 @@ function applyLang(lang) {
     else el.textContent = text;
   }
   setCtaLabel('ctaBtn', t.viewFull);
-  setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();

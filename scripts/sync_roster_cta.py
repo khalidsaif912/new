@@ -157,12 +157,19 @@ COMPARE_BTN_ICON_RE = re.compile(
     r'(<(?:a|button)[^>]*\bid="compareBtn"[^>]*>\s*<span class="roster-cta-icon">).*?(</span>)',
     re.DOTALL | re.IGNORECASE,
 )
+COMPARE_BTN_RE = re.compile(
+    r'\s*<a class="roster-cta-btn roster-cta-btn--compare" id="compareBtn"[^>]*>.*?</a>\s*',
+    re.DOTALL | re.IGNORECASE,
+)
 SUBSCRIBE_BTN_RE = re.compile(
     r'\s*<a class="roster-cta-btn roster-cta-btn--subscribe" id="subscribeBtn"[^>]*>.*?</a>\s*',
     re.DOTALL | re.IGNORECASE,
 )
 SET_CTA_SUBSCRIBE_RE = re.compile(
     r"\s*setCtaLabel\('subscribeBtn', t\.subscribe\);\n",
+)
+SET_CTA_COMPARE_RE = re.compile(
+    r"\s*setCtaLabel\('compareBtn', t\.compare\);\n",
 )
 SET_LOCAL_SUBSCRIBE_RE = re.compile(
     r"\s*var c2 = document\.getElementById\('subscribeBtn'\);\s*\n"
@@ -627,6 +634,12 @@ def patch_remove_subscribe(html: str) -> str:
     return html
 
 
+def patch_remove_compare(html: str) -> str:
+    html = COMPARE_BTN_RE.sub("\n", html)
+    html = SET_CTA_COMPARE_RE.sub("\n", html)
+    return html
+
+
 def patch_shift_copy_css(html: str) -> str:
     if 'id="copyShiftBtn"' not in html:
         return html
@@ -661,10 +674,11 @@ def patch_secondary_bar(html: str) -> str:
     has_alumni = 'id="alumniBtn"' in html
     if not has_copy and not has_alumni:
         return html
+    include_alumni = has_alumni or has_copy
     alumni_href = _extract_href(html, "alumniBtn", "#")
     block = secondary_bar_html(
         include_copy=has_copy,
-        include_alumni=has_alumni,
+        include_alumni=include_alumni,
         alumni_href=alumni_href,
     )
     if not block:
@@ -687,6 +701,15 @@ def patch_secondary_bar(html: str) -> str:
             + html[insert_at:]
         )
     return html
+
+
+def cleanup_secondary_comments(html: str) -> str:
+    return re.sub(
+        r'(?:\s*<!-- ════ SECONDARY ACTIONS ════ -->\s*){2,}',
+        "\n\n  <!-- ════ SECONDARY ACTIONS ════ -->\n",
+        html,
+        flags=re.IGNORECASE,
+    )
 
 
 def patch_broken_script_lines(html: str) -> str:
@@ -738,9 +761,11 @@ def patch_css_and_js(html: str) -> str:
     html = patch_site_apps(html)
     html = patch_shift_copy_modal(html)
     html = patch_secondary_bar(html)
+    html = cleanup_secondary_comments(html)
     html = patch_summary_chips(html)
     html = patch_lang_toggle(html)
     html = patch_compare_cta_icon(html)
+    html = patch_remove_compare(html)
     html = patch_remove_subscribe(html)
     html = patch_broken_script_lines(html)
     html = patch_roster_icons_script(html)

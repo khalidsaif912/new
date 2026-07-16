@@ -320,11 +320,11 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
-      --cta-max: min(100%, 440px);
+      --cta-max: min(100%, 680px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--cta-gap);
       width: 100%;
       max-width: var(--cta-max);
@@ -376,11 +376,6 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       border-color: #b8c9f5;
       color: #1e3a8a;
     }
-    .roster-cta-btn--compare {
-      background: #fffbeb;
-      border-color: #fcd34d;
-      color: #1f2937;
-    }
     .roster-cta-btn--share {
       background: #ecfdf5;
       border-color: #86efac;
@@ -402,7 +397,7 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
       color: #475569;
     }
     .roster-cta--import {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       max-width: var(--cta-max);
     }
     @media (hover: hover) {
@@ -411,7 +406,6 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
-      .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--texture:hover { background: #ede9fe; }
@@ -1085,20 +1079,10 @@ def _btn(
 
 def export_cta_html(
     cta_href: str = "#",
-    compare_onclick: str = ' onclick="goToRosterDiff(event)"',
 ) -> str:
-    compare_extra = f' href="#"{compare_onclick}'
     return (
         '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
         + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
-        + _btn(
-            "a",
-            "roster-cta-btn--compare",
-            "compareBtn",
-            "Compare",
-            SVG_COMPARE,
-            compare_extra,
-        )
         + _btn(
             "button",
             "roster-cta-btn--share shareSiteBtn",
@@ -1151,12 +1135,10 @@ def import_summary_bar_html(total_emp: int) -> str:
 
 def import_cta_html(
     cta_href: str = "{BASE}/now/",
-    compare_onclick: str = ' onclick="goToRosterDiff(event)"',
 ) -> str:
-    """Identical markup/grid classes as export duty pages (2×2 pill layout)."""
+    """Identical markup/grid classes as export duty pages (3 top + 2 bottom layout)."""
     return export_cta_html(
         cta_href=cta_href,
-        compare_onclick=compare_onclick,
     )
 
 
