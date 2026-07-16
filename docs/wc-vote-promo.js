@@ -535,7 +535,8 @@
 
   function init() {
     injectStyles();
-    startPodiumPolling();
+    // Defer Firestore polling so it does not compete with first paint on mobile.
+    window.setTimeout(startPodiumPolling, 12000);
     showFloatingDot();
     try {
       if ((new URLSearchParams(location.search).get('wcvote') || '') === '1') {

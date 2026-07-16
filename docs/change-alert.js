@@ -211,8 +211,14 @@
     return /\/roster-site\/my-schedules\/index\.html$/.test(path) || /\/roster-site\/my-schedules\/?$/.test(path) || /\/my-schedules\/index\.html$/.test(path) || /\/my-schedules\/?$/.test(path);
   }
 
+  function cacheBustHourly(url) {
+    var sep = url.indexOf('?') >= 0 ? '&' : '?';
+    return url + sep + 'v=' + Math.floor(Date.now() / 3600000);
+  }
+
   function fetchJson(url) {
-    return fetch(url, { cache: 'no-store' }).then(function (res) {
+    // Allow short browser caching; hourly bust keeps alerts reasonably fresh.
+    return fetch(cacheBustHourly(url), { cache: 'default' }).then(function (res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
     });
@@ -1045,7 +1051,7 @@ function renderGlobalGuestAlerts() {
 
   Promise.all([
     fetchJson(diffUrl).catch(function () { return null; }),
-    fetchJson(base + 'absence-data.json?ts=' + Date.now()).catch(function () { return null; })
+    fetchJson(base + 'absence-data.json').catch(function () { return null; })
   ]).then(function (arr) {
     if (getEmployeeId()) return;
     var diffData = arr[0];
@@ -1127,7 +1133,7 @@ function renderForEmployee(empId) {
           if (personal) return personal;
           return buildOrgWideAlertFromDiff(diffData, lang);
         }).catch(function () { return null; });
-      var absPromise = fetchJson(base + 'absence-data.json?ts=' + Date.now())
+      var absPromise = fetchJson(base + 'absence-data.json')
         .then(function (absData) { return findAbsenceDates(empId, empName, absData); })
         .catch(function () { return []; });
       return Promise.all([diffPromise, absPromise]).then(function (arr) {
@@ -1203,8 +1209,8 @@ function boot() {
 
   function start() {
     boot();
-    setTimeout(boot, 1200);
-    setTimeout(boot, 3500);
+    // One delayed retry in case another script sets the saved employee id shortly after load.
+    setTimeout(boot, 1800);
   }
 
   if (document.readyState === 'loading') {

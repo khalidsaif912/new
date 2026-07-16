@@ -28,18 +28,14 @@
       spotlightBtn: 'Explore something random',
       spotlightBtnSub: 'A quick surprise from the site',
       spotlightTitle: 'A random pick for you',
-      spotlightHint: 'Open a random tool, game, list, or reading page from the roster site.',
+      spotlightHint: 'Open a random app, game, tool, or former colleagues page from the site.',
       spotlightOpen: 'Open now',
       spotlightShuffle: 'Another pick',
       spotlightClose: 'Maybe later',
-      pickGames: 'Picture clues',
-      pickGamesSub: 'Memory challenge',
-      pickCode: 'Hazmat sticker quiz',
-      pickCodeSub: 'Fast image-code challenge',
-      pickQuicklist: 'QuickList',
-      pickQuicklistSub: 'Shopping and home lists',
       pickBook: 'A Cup of Book',
       pickBookSub: 'Open the reading page',
+      pickAlumni: 'Former Colleagues',
+      pickAlumniSub: 'Tribute to colleagues who served with us',
     },
     ar: {
       btn: 'تطبيقات',
@@ -64,18 +60,14 @@
       spotlightBtn: 'اقتراح عشوائي',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'شيء عشوائي لك',
-      spotlightHint: 'افتح لعبة أو أداة أو قائمة أو صفحة قراءة بشكل عشوائي من محتوى الموقع.',
+      spotlightHint: 'افتح تطبيقاً أو لعبة أو أداة أو صفحة الزملاء السابقين بشكل عشوائي.',
       spotlightOpen: 'افتح الآن',
       spotlightShuffle: 'اقتراح آخر',
       spotlightClose: 'لاحقًا',
-      pickGames: 'لعبة قرائن الصور',
-      pickGamesSub: 'تحدي صور سريع',
-      pickCode: 'لعبة كود الملصق',
-      pickCodeSub: 'تحدي سريع للملصقات',
-      pickQuicklist: 'قائمة مشتريات المنزل',
-      pickQuicklistSub: 'قوائم وملاحظات المنزل',
       pickBook: 'A Cup of Book',
       pickBookSub: 'نافذة قراءة عشوائية',
+      pickAlumni: 'زملاء سابقون',
+      pickAlumniSub: 'تكريم زملاء خدموا معنا',
     },
   };
 
@@ -189,34 +181,75 @@
     return 'https://khalidsaif912.github.io/new/docs/a-cup-of-book/';
   }
 
+  function alumniPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/alumni/';
+    return 'https://khalidsaif912.github.io/new/docs/alumni/';
+  }
+
   function spotlightItems() {
     return [
       {
-        id: 'pairs',
-        title: t('pickGames'),
-        sub: t('pickGamesSub'),
-        href: 'https://dgr-exp.netlify.app/m1/pairs.html',
+        id: 'wcvote',
+        title: t('wcvote'),
+        sub: t('wcvoteSub'),
+        href: 'https://match-accb0.web.app/?utm_source=roster-site&utm_medium=spotlight',
         external: true,
         classes: 'roster-cta-btn--apps',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="8" rx="2"/><rect x="13" y="4" width="8" height="8" rx="2"/><rect x="8" y="13" width="8" height="8" rx="2"/></svg>'
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="#00d4ff"/></svg>'
       },
       {
-        id: 'code',
-        title: t('pickCode'),
-        sub: t('pickCodeSub'),
-        href: 'https://dgr-exp.netlify.app/q/q',
+        id: 'flights',
+        title: t('flights'),
+        sub: t('flightsSub'),
+        href: 'https://khalidsaif912.github.io/live-flights/',
+        external: true,
+        classes: 'roster-cta-btn--apps',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg>'
+      },
+      {
+        id: 'labels',
+        title: t('labels'),
+        sub: t('labelsSub'),
+        href: 'https://lbit.netlify.app/',
         external: true,
         classes: 'roster-cta-btn--texture',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8 4 12l4 4"/><path d="M16 8l4 4-4 4"/><path d="m14 4-4 16"/></svg>'
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>'
+      },
+      {
+        id: 'calc',
+        title: t('calc'),
+        sub: t('calcSub'),
+        href: calcPageUrl(),
+        external: false,
+        classes: 'roster-cta-btn--roster',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/></svg>'
       },
       {
         id: 'quicklist',
-        title: t('pickQuicklist'),
-        sub: t('pickQuicklistSub'),
+        title: t('quicklist'),
+        sub: t('quicklistSub'),
         href: quicklistPageUrl(),
         external: false,
         classes: 'roster-cta-btn--texture',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m5 6 1 1 2-2"/><path d="m5 12 1 1 2-2"/><path d="m5 18 1 1 2-2"/></svg>'
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>'
+      },
+      {
+        id: 'store',
+        title: t('store'),
+        sub: t('storeSub'),
+        href: 'https://mystore-96d8e.web.app',
+        external: true,
+        classes: 'roster-cta-btn--roster',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18"/><path d="M5 6h14l1 4H4z"/><path d="M6 10v10h12V10"/><path d="M9 14h6"/></svg>'
+      },
+      {
+        id: 'games',
+        title: t('games'),
+        sub: t('gamesSub'),
+        href: 'https://dgr-exp.netlify.app/',
+        external: true,
+        classes: 'roster-cta-btn--apps',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>'
       },
       {
         id: 'book',
@@ -226,6 +259,15 @@
         external: false,
         classes: 'roster-cta-btn--alumni',
         icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>'
+      },
+      {
+        id: 'alumni',
+        title: t('pickAlumni'),
+        sub: t('pickAlumniSub'),
+        href: alumniPageUrl(),
+        external: false,
+        classes: 'roster-cta-btn--alumni',
+        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
       }
     ];
   }
@@ -304,6 +346,7 @@
 
   function openHref(item) {
     if (!item || !item.href) return;
+    if (item.id === 'calc') rememberCalcReturnUrl();
     if (item.external) {
       window.open(item.href, '_blank', 'noopener');
       return;
@@ -397,11 +440,6 @@
 
   function alumniLabel() {
     return t('alumni');
-  }
-
-  function alumniPageUrl() {
-    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/alumni/';
-    return 'https://khalidsaif912.github.io/new/docs/alumni/';
   }
 
   function ensureAlumniButton() {

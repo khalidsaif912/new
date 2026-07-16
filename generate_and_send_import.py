@@ -1004,7 +1004,28 @@ def build_duty_html(
 {CAPTURE_DOM_HTML}
 {SITE_SHARE_MODAL_HTML}
 {SITE_APPS_MODAL_HTML}
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+var __html2canvasLoading = null;
+function ensureHtml2Canvas() {{
+  if (typeof html2canvas === 'function') return Promise.resolve(html2canvas);
+  if (__html2canvasLoading) return __html2canvasLoading;
+  __html2canvasLoading = new Promise(function(resolve, reject) {{
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    s.async = true;
+    s.onload = function() {{
+      if (typeof html2canvas === 'function') resolve(html2canvas);
+      else reject(new Error('html2canvas missing'));
+    }};
+    s.onerror = function() {{
+      __html2canvasLoading = null;
+      reject(new Error('html2canvas load failed'));
+    }};
+    document.head.appendChild(s);
+  }});
+  return __html2canvasLoading;
+}}
+</script>
 
 <script>
 {import_bootstrap_script()}
