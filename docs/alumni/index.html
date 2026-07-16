@@ -19,146 +19,243 @@
       font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
       color: #0f172a;
       -webkit-font-smoothing: antialiased;
+      touch-action: manipulation;
     }
     .wrap {
       max-width: 680px;
       margin: 0 auto;
-      padding: calc(14px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
-    }
-    .topBar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .homeBtn, .langToggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 40px;
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      background: #fff;
-      color: #0f172a;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(15,23,42,.06);
-      -webkit-tap-highlight-color: transparent;
+      padding: calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
     }
     .header {
-      background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
+      background: linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
       color: #fff;
+      padding: 26px 18px 24px;
       border-radius: 20px;
-      padding: 22px 18px 20px;
       text-align: center;
-      box-shadow: 0 4px 18px rgba(15,118,110,.18);
-      margin-bottom: 14px;
+      box-shadow: 0 4px 16px rgba(30,64,175,.14);
       position: relative;
       overflow: hidden;
+      margin-bottom: 14px;
     }
     .header::before {
       content: '';
       position: absolute;
-      top: -36px; left: -20px;
-      width: 120px; height: 120px;
+      top: -30px; right: -40px;
+      width: 140px; height: 140px;
       border-radius: 50%;
       background: rgba(255,255,255,.08);
     }
     .header::after {
       content: '';
       position: absolute;
-      bottom: -40px; right: -24px;
-      width: 140px; height: 140px;
+      bottom: -50px; left: -30px;
+      width: 160px; height: 160px;
       border-radius: 50%;
-      background: rgba(255,255,255,.07);
+      background: rgba(255,255,255,.06);
     }
-    .header h1 {
+    .bannerTitle {
       margin: 0;
-      font-size: 26px;
+      position: relative;
+      z-index: 1;
+      line-height: 1.1;
+      color: #fff;
+    }
+    .bannerTitleEyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      opacity: .88;
+      margin-bottom: 5px;
+    }
+    body.ar .bannerTitleEyebrow {
+      letter-spacing: .06em;
+      text-transform: none;
+      font-size: 12px;
+    }
+    .bannerTitleMain {
+      display: block;
+      font-size: 28px;
       font-weight: 800;
+      letter-spacing: -.03em;
+    }
+    body.ar .bannerTitleMain {
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+    .bannerSub {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.45;
+      opacity: .92;
       position: relative;
       z-index: 1;
     }
-    .header p {
-      margin: 8px 0 0;
-      font-size: 13px;
-      opacity: .92;
-      line-height: 1.45;
-      position: relative;
-      z-index: 1;
+    .langToggle {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      background: transparent;
+      border: none;
+      min-width: auto;
+      height: auto;
+      padding: 4px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #fff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.ar .langToggle { right: 12px; left: auto; }
+    .langToggle-icon { line-height: 0; display: flex; }
+    .langToggle-icon svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,.65);
+    }
+    .homeBtn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      color: #fff;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.ar .homeBtn { left: 12px; right: auto; }
+    .homeBtn svg {
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
     }
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 0;
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #dbe4f5;
       border-radius: 16px;
-      padding: 6px;
+      overflow: hidden;
       margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+      box-shadow: 0 1px 4px rgba(30,64,175,.06);
     }
     .tab {
       border: 0;
-      background: transparent;
-      border-radius: 12px;
-      min-height: 42px;
+      background: #f8fafc;
+      min-height: 46px;
       font-weight: 800;
       font-size: 14px;
       color: #64748b;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      border-bottom: 3px solid transparent;
     }
     .tab.active {
-      background: #ecfdf5;
-      color: #0f766e;
-      box-shadow: inset 0 0 0 1px #a7f3d0;
+      background: #eff6ff;
+      color: #1e40af;
+      border-bottom-color: #2563eb;
     }
     .summary {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #475569;
-      margin-bottom: 12px;
-    }
-    .list { display: grid; gap: 10px; }
-    .deptTitle {
-      margin: 6px 2px 0;
+      padding: 7px 14px;
       font-size: 12px;
       font-weight: 800;
-      color: #64748b;
-      letter-spacing: .02em;
+      color: #1e40af;
+      margin-bottom: 12px;
     }
-    .card {
+    .list { display: grid; gap: 12px; }
+    .deptCard {
       background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 14px 14px 12px;
-      box-shadow: 0 1px 4px rgba(15,23,42,.04);
+      border: 1px solid #dbe4f5;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(30,64,175,.06);
     }
+    .deptAccent {
+      height: 5px;
+      background: linear-gradient(to right, #2563eb, #2563ebcc);
+    }
+    .deptHead {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 2px solid #2563eb18;
+    }
+    .deptIcon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb15;
+      color: #2563eb;
+      flex-shrink: 0;
+    }
+    .deptTitle {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+    .deptCount {
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb22;
+      color: #1e40af;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .empRow {
+      display: grid;
+      gap: 6px;
+      padding: 12px 14px;
+      border-top: 1px solid #eef2ff;
+    }
+    .empRow:first-of-type { border-top: 0; }
+    .empRowAlt { background: #f8faff; }
     .cardName {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: #0f172a;
       line-height: 1.35;
-      margin: 0 0 4px;
+      margin: 0;
     }
     .cardNameEn {
       font-size: 12px;
       font-weight: 700;
       color: #64748b;
-      margin: 0 0 10px;
+      margin: 0;
       direction: ltr;
       unicode-bidi: plaintext;
     }
@@ -168,62 +265,70 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-top: 2px;
     }
     .pill {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
       border-radius: 999px;
-      padding: 4px 10px;
+      padding: 3px 9px;
       font-size: 11px;
       font-weight: 800;
-      background: #f1f5f9;
-      color: #334155;
     }
-    .pill.id { background: #ecfeff; color: #0e7490; }
-    .pill.dept { background: #f0fdf4; color: #166534; }
+    .pill.id {
+      background: #e8f1ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
     .note {
-      margin: 10px 0 0;
-      padding: 10px 12px;
+      margin: 4px 0 0;
+      padding: 9px 11px;
       border-radius: 12px;
-      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-      color: #475569;
-      font-size: 13px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #334155;
+      font-size: 12px;
       line-height: 1.5;
       font-weight: 600;
     }
     .empty, .error {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #dbe4f5;
       border-radius: 16px;
       padding: 22px 16px;
       text-align: center;
       color: #64748b;
       font-weight: 700;
     }
-    .error { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
+    .error {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
     .footNote {
-      margin-top: 16px;
+      margin-top: 18px;
       text-align: center;
       font-size: 12px;
       color: #94a3b8;
-      line-height: 1.5;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body class="ar">
   <div class="wrap">
-    <div class="topBar">
-      <a class="homeBtn" id="homeBtn" href="../">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M6.5 10.5V20h11V10.5"/></svg>
-        <span id="homeLbl">الرئيسية</span>
-      </a>
-      <button type="button" class="langToggle" id="langToggle">EN</button>
-    </div>
-
     <header class="header">
-      <h1 id="pageTitle">زملاء سابقون</h1>
-      <p id="pageSub">تقديراً لزملاء خدموا معنا</p>
+      <a class="homeBtn" id="homeBtn" href="../" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M6.5 10.5V20h11V10.5"/></svg>
+      </a>
+      <button type="button" class="langToggle" id="langToggle" title="Switch language">
+        <span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span class="langToggle-label" id="langToggleLabel">EN</span>
+      </button>
+      <h1 class="bannerTitle">
+        <span class="bannerTitleEyebrow" id="pageEyebrow">تكريم</span>
+        <span class="bannerTitleMain" id="pageTitle">زملاء سابقون</span>
+      </h1>
+      <p class="bannerSub" id="pageSub">تقديراً لزملاء خدموا معنا</p>
     </header>
 
     <div class="tabs" role="tablist">
@@ -258,7 +363,7 @@
 
     const I18N = {
       ar: {
-        home: 'الرئيسية',
+        eyebrow: 'تكريم',
         lang: 'EN',
         export: 'الصادر',
         import: 'الوارد',
@@ -266,10 +371,11 @@
         empty: 'لا توجد أسماء في هذا القسم بعد.',
         id: 'الرقم',
         loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
-        foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.'
+        foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.',
+        homeTitle: 'الرئيسية'
       },
       en: {
-        home: 'Home',
+        eyebrow: 'Tribute',
         lang: 'ع',
         export: 'Export',
         import: 'Import',
@@ -277,7 +383,8 @@
         empty: 'No names in this section yet.',
         id: 'ID',
         loadFail: 'Could not load former colleagues list.',
-        foot: 'We keep their names in appreciation of their service with us.'
+        foot: 'We keep their names in appreciation of their service with us.',
+        homeTitle: 'Home'
       }
     };
 
@@ -310,11 +417,13 @@
       document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
       document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
       document.body.classList.toggle('ar', currentLang === 'ar');
-      document.getElementById('homeLbl').textContent = t('home');
-      document.getElementById('langToggle').textContent = t('lang');
+      document.getElementById('langToggleLabel').textContent = t('lang');
+      document.getElementById('pageEyebrow').textContent = t('eyebrow');
       document.getElementById('tabExport').textContent = t('export');
       document.getElementById('tabImport').textContent = t('import');
       document.getElementById('footNote').textContent = t('foot');
+      document.getElementById('homeBtn').title = t('homeTitle');
+      document.getElementById('homeBtn').setAttribute('aria-label', t('homeTitle'));
       if (data) {
         document.getElementById('pageTitle').textContent =
           currentLang === 'ar' ? (data.titleAr || data.title) : (data.title || data.titleAr);
@@ -344,44 +453,40 @@
       Array.from(byDept.entries())
         .sort((a, b) => a[0].localeCompare(b[0]))
         .forEach(([dept, rows]) => {
-          const h = document.createElement('div');
-          h.className = 'deptTitle';
-          h.textContent = deptLabel(dept);
-          list.appendChild(h);
+          const card = document.createElement('section');
+          card.className = 'deptCard';
+          card.innerHTML =
+            '<div class="deptAccent"></div>' +
+            '<div class="deptHead">' +
+            '<div class="deptIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/><rect x="9" y="14" width="2" height="3"/><rect x="13" y="14" width="2" height="3"/></svg></div>' +
+            '<div class="deptTitle"></div>' +
+            '<span class="deptCount"></span>' +
+            '</div>';
+          card.querySelector('.deptTitle').textContent = deptLabel(dept);
+          card.querySelector('.deptCount').textContent = String(rows.length);
+
           rows
             .slice()
             .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
-            .forEach((p) => {
-              const card = document.createElement('article');
-              card.className = 'card';
-              const mainName = currentLang === 'ar'
-                ? (p.nameAr || p.name)
-                : (p.name || p.nameAr);
+            .forEach((p, i) => {
+              const row = document.createElement('article');
+              row.className = 'empRow' + (i % 2 ? ' empRowAlt' : '');
+              const mainName = currentLang === 'ar' ? (p.nameAr || p.name) : (p.name || p.nameAr);
               const secondary = currentLang === 'ar' ? (p.name || '') : '';
               const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
-              card.innerHTML =
+              row.innerHTML =
                 '<h2 class="cardName"></h2>' +
                 (secondary ? '<p class="cardNameEn"></p>' : '') +
-                '<div class="meta">' +
-                '<span class="pill id">' + t('id') + ' ' + escapeHtml(p.id || '-') + '</span>' +
-                '<span class="pill dept"></span>' +
-                '</div>' +
+                '<div class="meta"><span class="pill id"></span></div>' +
                 (note ? '<p class="note"></p>' : '');
-              card.querySelector('.cardName').textContent = mainName || '-';
-              if (secondary) card.querySelector('.cardNameEn').textContent = secondary;
-              card.querySelector('.pill.dept').textContent = deptLabel(p.department || '');
-              if (note) card.querySelector('.note').textContent = note;
-              list.appendChild(card);
+              row.querySelector('.cardName').textContent = mainName || '-';
+              if (secondary) row.querySelector('.cardNameEn').textContent = secondary;
+              row.querySelector('.pill.id').textContent = t('id') + ' ' + (p.id || '-');
+              if (note) row.querySelector('.note').textContent = note;
+              card.appendChild(row);
             });
+          list.appendChild(card);
         });
-    }
-
-    function escapeHtml(s) {
-      return String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
     }
 
     document.getElementById('langToggle').addEventListener('click', () => {
