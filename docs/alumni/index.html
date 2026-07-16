@@ -152,7 +152,7 @@
     }
     .tabs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 0;
       background: #fff;
       border: 1px solid #dbe4f5;
@@ -166,16 +166,20 @@
       background: #f8fafc;
       min-height: 46px;
       font-weight: 800;
-      font-size: 14px;
+      font-size: 13px;
       color: #64748b;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       border-bottom: 3px solid transparent;
+      padding: 0 6px;
     }
     .tab.active {
       background: #eff6ff;
       color: #1e40af;
       border-bottom-color: #2563eb;
+    }
+    @media (max-width: 420px) {
+      .tab { font-size: 12px; }
     }
     .summary {
       display: inline-flex;
@@ -288,6 +292,141 @@
       color: #94a3b8;
       line-height: 1.6;
     }
+    .tributesPanel[hidden], .peoplePanel[hidden] { display: none !important; }
+    .tributeForm {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 18px;
+      padding: 16px 14px;
+      box-shadow: 0 2px 10px rgba(30,64,175,.06);
+      margin-bottom: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .tributeFormTitle {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+    .tributeFormHint {
+      margin: -4px 0 2px;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+    .tributeLabel {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+    }
+    .tributeField, .tributeSelect, .tributeArea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      background: #f8fafc;
+      outline: none;
+    }
+    .tributeField:focus, .tributeSelect:focus, .tributeArea:focus {
+      border-color: #60a5fa;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .tributeArea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .tributeMetaRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .tributeSubmit {
+      border: 0;
+      border-radius: 12px;
+      min-height: 46px;
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeSubmit:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+    .tributeStatus {
+      min-height: 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .tributeStatus.ok { color: #15803d; }
+    .tributeStatus.err { color: #b91c1c; }
+    .tributeWall {
+      display: grid;
+      gap: 10px;
+    }
+    .tributeCard {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 1px 6px rgba(30,64,175,.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .tributeCard::before {
+      content: '';
+      position: absolute;
+      inset-inline-start: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(#2563eb, #0ea5e9);
+    }
+    .tributeText {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #0f172a;
+      font-weight: 600;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tributeBy {
+      margin: 10px 0 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #1e40af;
+    }
+    .tributeTo {
+      margin: 4px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .tributeDate {
+      margin: 8px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body class="ar">
@@ -310,10 +449,38 @@
     <div class="tabs" role="tablist">
       <button type="button" class="tab active" id="tabExport" data-kind="export">الصادر</button>
       <button type="button" class="tab" id="tabImport" data-kind="import">الوارد</button>
+      <button type="button" class="tab" id="tabTributes" data-kind="tributes">رسائل شكر</button>
     </div>
 
-    <div class="summary" id="summary">—</div>
-    <div class="list" id="list"></div>
+    <div class="peoplePanel" id="peoplePanel">
+      <div class="summary" id="summary">—</div>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="tributesPanel" id="tributesPanel" hidden>
+      <form class="tributeForm" id="tributeForm">
+        <h2 class="tributeFormTitle" id="tributeFormTitle">اترك كلمة شكر</h2>
+        <p class="tributeFormHint" id="tributeFormHint">رسالة قصيرة لزميل سابق — تظهر للجميع هنا.</p>
+        <label class="tributeLabel" id="tributeToLabel">إلى
+          <select class="tributeSelect" id="tributeTo" required></select>
+        </label>
+        <label class="tributeLabel" id="tributeFromLabel">من
+          <input class="tributeField" id="tributeFrom" type="text" maxlength="60" autocomplete="name" required>
+        </label>
+        <label class="tributeLabel" id="tributeMsgLabel">الرسالة
+          <textarea class="tributeArea" id="tributeMsg" maxlength="280" required></textarea>
+        </label>
+        <div class="tributeMetaRow">
+          <span id="tributeCount">0 / 280</span>
+          <span id="tributeAnonHint"></span>
+        </div>
+        <button class="tributeSubmit" id="tributeSubmit" type="submit">نشر الرسالة</button>
+        <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
+      </form>
+      <div class="summary" id="tributeSummary">—</div>
+      <div class="tributeWall" id="tributeWall"></div>
+    </div>
+
     <div class="footNote" id="footNote"></div>
   </div>
 
@@ -321,6 +488,15 @@
     let currentLang = (localStorage.getItem('rosterLang') === 'en') ? 'en' : 'ar';
     let currentKind = 'export';
     let data = null;
+    let tributeMessages = [];
+    let tributesLoading = false;
+
+    const MANTLE_NS = 'roster-alumni-tributes';
+    const MANTLE_KEY = '90faa716d4bfea99e331c89c800accc7a22d07e2e3b4cda8c62be3b411a452bd';
+    const MANTLE_INDEX = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
+    const MSG_MAX = 280;
+    const RATE_KEY = 'alumniTributeLastAt';
+    const RATE_MS = 20000;
 
     const DEPT_AR = {
       'Export Operators': 'مشغلو الصادرات',
@@ -343,24 +519,58 @@
         lang: 'EN',
         export: 'الصادر',
         import: 'الوارد',
+        tributes: 'رسائل شكر',
         summary: '{n} زملاء · {d} أقسام',
         empty: 'لا توجد أسماء في هذا القسم بعد.',
         id: 'الرقم',
         loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
         foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.',
-        homeTitle: 'الرئيسية'
+        homeTitle: 'الرئيسية',
+        formTitle: 'اترك كلمة شكر',
+        formHint: 'رسالة قصيرة لزميل سابق — تظهر للجميع هنا.',
+        to: 'إلى',
+        from: 'من',
+        message: 'الرسالة',
+        submit: 'نشر الرسالة',
+        everyone: 'لجميع الزملاء السابقين',
+        tributeSummary: '{n} رسالة',
+        tributeEmpty: 'كن أول من يترك كلمة شكر.',
+        tributeLoadFail: 'تعذر تحميل الرسائل. حاول مرة أخرى.',
+        tributeOk: 'تم نشر رسالتك. شكراً لك.',
+        tributeErr: 'تعذر النشر. حاول لاحقاً.',
+        tributeRate: 'انتظر قليلاً قبل إرسال رسالة أخرى.',
+        tributeNeed: 'أدخل اسمك ورسالة قصيرة.',
+        countTpl: '{n} / {m}',
+        toPrefix: 'إلى: '
       },
       en: {
         eyebrow: 'Tribute',
         lang: 'ع',
         export: 'Export',
         import: 'Import',
+        tributes: 'Thanks',
         summary: '{n} colleagues · {d} departments',
         empty: 'No names in this section yet.',
         id: 'ID',
         loadFail: 'Could not load former colleagues list.',
         foot: 'We keep their names in appreciation of their service with us.',
-        homeTitle: 'Home'
+        homeTitle: 'Home',
+        formTitle: 'Leave a thank-you note',
+        formHint: 'A short message for a former colleague — visible to everyone here.',
+        to: 'To',
+        from: 'From',
+        message: 'Message',
+        submit: 'Post message',
+        everyone: 'All former colleagues',
+        tributeSummary: '{n} messages',
+        tributeEmpty: 'Be the first to leave a thank-you note.',
+        tributeLoadFail: 'Could not load messages. Try again.',
+        tributeOk: 'Your message was posted. Thank you.',
+        tributeErr: 'Could not post. Try again later.',
+        tributeRate: 'Please wait a moment before posting again.',
+        tributeNeed: 'Enter your name and a short message.',
+        countTpl: '{n} / {m}',
+        toPrefix: 'To: '
       }
     };
 
@@ -378,6 +588,14 @@
       return s;
     }
 
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
     function getSiteRootPath() {
       if (location.protocol === 'file:') return '..';
       const path = location.pathname || '/';
@@ -392,6 +610,33 @@
         return segs.length ? '/' + segs[0] : '';
       }
       return '..';
+    }
+
+    function getRosterName() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpName') ||
+          localStorage.getItem('savedEmpName') ||
+          localStorage.getItem('importSavedEmpName') ||
+          ''
+        ).trim();
+      } catch (e) { return ''; }
+    }
+
+    function getRosterId() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          ''
+        ).trim();
+      } catch (e) { return ''; }
+    }
+
+    function personDisplayName(p) {
+      if (!p) return '';
+      return currentLang === 'ar' ? (p.nameAr || p.name || '') : (p.name || p.nameAr || '');
     }
 
     async function loadAlumniData() {
@@ -413,9 +658,143 @@
       throw new Error('fail');
     }
 
+    async function loadTributes() {
+      tributesLoading = true;
+      try {
+        const res = await fetch(MANTLE_INDEX + '?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('fail');
+        const json = await res.json();
+        tributeMessages = Array.isArray(json.messages) ? json.messages.slice() : [];
+        tributeMessages.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+      } catch (e) {
+        tributeMessages = [];
+        throw e;
+      } finally {
+        tributesLoading = false;
+      }
+    }
+
+    async function saveTribute(msg) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = Array.isArray(cur.messages) ? cur.messages.slice() : [];
+      list.unshift(msg);
+      if (list.length > 180) list.length = 180;
+      const putRes = await fetch(MANTLE_INDEX, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ messages: list })
+      });
+      if (!putRes.ok) throw new Error('write');
+      tributeMessages = list;
+    }
+
     function deptLabel(dept) {
       if (currentLang === 'ar') return DEPT_AR[dept] || dept;
       return dept;
+    }
+
+    function setActiveTab(kind) {
+      currentKind = kind;
+      document.getElementById('tabExport').classList.toggle('active', kind === 'export');
+      document.getElementById('tabImport').classList.toggle('active', kind === 'import');
+      document.getElementById('tabTributes').classList.toggle('active', kind === 'tributes');
+      const peoplePanel = document.getElementById('peoplePanel');
+      const tributesPanel = document.getElementById('tributesPanel');
+      const showTributes = kind === 'tributes';
+      peoplePanel.hidden = showTributes;
+      tributesPanel.hidden = !showTributes;
+      if (showTributes) {
+        fillTributeForm();
+        renderTributes();
+        if (!tributeMessages.length && !tributesLoading) {
+          loadTributes().then(renderTributes).catch(() => {
+            document.getElementById('tributeWall').innerHTML =
+              '<div class="error">' + escapeHtml(t('tributeLoadFail')) + '</div>';
+          });
+        }
+      } else {
+        renderPeople();
+      }
+    }
+
+    function fillTributeForm() {
+      const toSel = document.getElementById('tributeTo');
+      const fromInp = document.getElementById('tributeFrom');
+      const prev = toSel.value;
+      toSel.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = '';
+      optAll.textContent = t('everyone');
+      toSel.appendChild(optAll);
+      const people = (data && data.people) ? data.people.slice() : [];
+      people
+        .sort((a, b) => personDisplayName(a).localeCompare(personDisplayName(b), currentLang === 'ar' ? 'ar' : 'en'))
+        .forEach((p) => {
+          const opt = document.createElement('option');
+          opt.value = String(p.id || '');
+          opt.textContent = personDisplayName(p);
+          toSel.appendChild(opt);
+        });
+      if (prev && [...toSel.options].some((o) => o.value === prev)) toSel.value = prev;
+      if (!fromInp.value) {
+        const rosterName = getRosterName();
+        if (rosterName) fromInp.value = rosterName.replace(/^(mr|mrs|ms|miss|dr)\.?\s+/i, '').trim();
+      }
+      updateTributeCount();
+    }
+
+    function updateTributeCount() {
+      const n = (document.getElementById('tributeMsg').value || '').length;
+      document.getElementById('tributeCount').textContent = t('countTpl', { n, m: MSG_MAX });
+    }
+
+    function formatTributeDate(at) {
+      const d = new Date(Number(at) || Date.now());
+      try {
+        return d.toLocaleDateString(currentLang === 'ar' ? 'ar-OM' : 'en-GB', {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+      } catch (e) {
+        return d.toISOString().slice(0, 10);
+      }
+    }
+
+    function resolveToName(msg) {
+      if (!msg) return '';
+      if (!msg.toId) return t('everyone');
+      const p = (data && data.people || []).find((x) => String(x.id) === String(msg.toId));
+      if (p) return personDisplayName(p);
+      return msg.toName || msg.toId;
+    }
+
+    function renderTributes() {
+      const wall = document.getElementById('tributeWall');
+      const summary = document.getElementById('tributeSummary');
+      summary.textContent = t('tributeSummary', { n: tributeMessages.length });
+      if (!tributeMessages.length) {
+        wall.innerHTML = '<div class="empty">' + escapeHtml(t('tributeEmpty')) + '</div>';
+        return;
+      }
+      wall.innerHTML = tributeMessages.map((msg) => {
+        const text = escapeHtml(msg.text || '');
+        const from = escapeHtml(msg.from || '');
+        const to = escapeHtml(resolveToName(msg));
+        const date = escapeHtml(formatTributeDate(msg.at));
+        return (
+          '<article class="tributeCard">' +
+            '<p class="tributeText">' + text + '</p>' +
+            '<p class="tributeBy">' + from + '</p>' +
+            '<p class="tributeTo">' + escapeHtml(t('toPrefix')) + to + '</p>' +
+            '<p class="tributeDate">' + date + '</p>' +
+          '</article>'
+        );
+      }).join('');
     }
 
     function applyUi() {
@@ -426,19 +805,38 @@
       document.getElementById('pageEyebrow').textContent = t('eyebrow');
       document.getElementById('tabExport').textContent = t('export');
       document.getElementById('tabImport').textContent = t('import');
+      document.getElementById('tabTributes').textContent = t('tributes');
       document.getElementById('footNote').textContent = t('foot');
       document.getElementById('homeBtn').title = t('homeTitle');
       document.getElementById('homeBtn').setAttribute('aria-label', t('homeTitle'));
+      document.getElementById('tributeFormTitle').textContent = t('formTitle');
+      document.getElementById('tributeFormHint').textContent = t('formHint');
+      const setLabel = (id, text) => {
+        const el = document.getElementById(id);
+        const control = el.querySelector('select, input, textarea');
+        el.textContent = '';
+        el.appendChild(document.createTextNode(text));
+        if (control) el.appendChild(control);
+      };
+      setLabel('tributeToLabel', t('to'));
+      setLabel('tributeFromLabel', t('from'));
+      setLabel('tributeMsgLabel', t('message'));
+      document.getElementById('tributeSubmit').textContent = t('submit');
       if (data) {
         document.getElementById('pageTitle').textContent =
           currentLang === 'ar' ? (data.titleAr || data.title) : (data.title || data.titleAr);
         document.getElementById('pageSub').textContent =
           currentLang === 'ar' ? (data.subtitleAr || data.subtitle) : (data.subtitle || data.subtitleAr);
       }
-      render();
+      if (currentKind === 'tributes') {
+        fillTributeForm();
+        renderTributes();
+      } else {
+        renderPeople();
+      }
     }
 
-    function render() {
+    function renderPeople() {
       const list = document.getElementById('list');
       const summary = document.getElementById('summary');
       list.innerHTML = '';
@@ -476,7 +874,7 @@
             .forEach((p, i) => {
               const row = document.createElement('article');
               row.className = 'empRow' + (i % 2 ? ' empRowAlt' : '');
-              const mainName = currentLang === 'ar' ? (p.nameAr || p.name) : (p.name || p.nameAr);
+              const mainName = personDisplayName(p);
               const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
               row.innerHTML =
                 '<h2 class="cardName"></h2>' +
@@ -494,17 +892,56 @@
       localStorage.setItem('rosterLang', currentLang);
       applyUi();
     });
-    document.getElementById('tabExport').addEventListener('click', () => {
-      currentKind = 'export';
-      document.getElementById('tabExport').classList.add('active');
-      document.getElementById('tabImport').classList.remove('active');
-      render();
-    });
-    document.getElementById('tabImport').addEventListener('click', () => {
-      currentKind = 'import';
-      document.getElementById('tabImport').classList.add('active');
-      document.getElementById('tabExport').classList.remove('active');
-      render();
+    document.getElementById('tabExport').addEventListener('click', () => setActiveTab('export'));
+    document.getElementById('tabImport').addEventListener('click', () => setActiveTab('import'));
+    document.getElementById('tabTributes').addEventListener('click', () => setActiveTab('tributes'));
+    document.getElementById('tributeMsg').addEventListener('input', updateTributeCount);
+
+    document.getElementById('tributeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('tributeStatus');
+      const btn = document.getElementById('tributeSubmit');
+      status.className = 'tributeStatus';
+      status.textContent = '';
+      const from = (document.getElementById('tributeFrom').value || '').trim().slice(0, 60);
+      const text = (document.getElementById('tributeMsg').value || '').trim().slice(0, MSG_MAX);
+      const toId = document.getElementById('tributeTo').value || '';
+      if (!from || !text) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeNeed');
+        return;
+      }
+      const last = Number(localStorage.getItem(RATE_KEY) || 0);
+      if (Date.now() - last < RATE_MS) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeRate');
+        return;
+      }
+      const toPerson = (data && data.people || []).find((p) => String(p.id) === String(toId));
+      const msg = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        from,
+        text,
+        toId: toId || '',
+        toName: toPerson ? personDisplayName(toPerson) : '',
+        empId: getRosterId(),
+        at: Date.now()
+      };
+      btn.disabled = true;
+      try {
+        await saveTribute(msg);
+        localStorage.setItem(RATE_KEY, String(Date.now()));
+        document.getElementById('tributeMsg').value = '';
+        updateTributeCount();
+        renderTributes();
+        status.className = 'tributeStatus ok';
+        status.textContent = t('tributeOk');
+      } catch (err) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeErr');
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     (async function init() {
@@ -513,6 +950,7 @@
       try {
         data = await loadAlumniData();
         applyUi();
+        loadTributes().catch(() => {});
       } catch (e) {
         document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
         applyUi();
