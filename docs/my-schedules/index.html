@@ -1860,7 +1860,7 @@
         </div>`;
       setTimeout(()=>dismissToast(),10000);
     }
-    function confirmSave(id){ localStorage.setItem('exportSavedEmpId',id); localStorage.removeItem('savedEmpId'); dismissToast(); if(data) renderSchedule(); }
+    function confirmSave(id){ localStorage.setItem('exportSavedEmpId',id); localStorage.removeItem('savedEmpId'); if(data&&data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); } dismissToast(); if(data) renderSchedule(); }
     function dismissToast(){ const m=document.getElementById('toastMount'); m.innerHTML=''; m.style.display='none'; }
     function changeMyId(){ openIdActionModal('change'); }
     
@@ -1893,6 +1893,8 @@
       if(_pendingIdAction==='change'){
         localStorage.removeItem('exportSavedEmpId');
         localStorage.removeItem('savedEmpId');
+        localStorage.removeItem('exportSavedEmpName');
+        localStorage.removeItem('savedEmpName');
         closeIdActionModal();
         // If page opened with ?emp=..., remove it so ID doesn't look "stuck".
         try{
@@ -1906,7 +1908,7 @@
         if(inp) inp.value='';
         if(data) renderSchedule();
       }else if(_pendingIdAction==='pin'){
-        if(data&&data.id){ localStorage.setItem('exportSavedEmpId',data.id); localStorage.removeItem('savedEmpId'); }
+        if(data&&data.id){ localStorage.setItem('exportSavedEmpId',data.id); localStorage.removeItem('savedEmpId'); if(data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); } }
         closeIdActionModal();
         if(data) renderSchedule();
       }else{

@@ -884,8 +884,8 @@ body{
 <script>
 (function(){
   const SAVED_QUERY_KEY = 'trainingSavedQuery';
-  const ROSTER_EMP_ID_KEYS = ['exportSavedEmpId', 'savedEmpId'];
-  const ROSTER_EMP_NAME_KEYS = ['exportSavedEmpName', 'savedEmpName'];
+  const ROSTER_EMP_ID_KEYS = ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'];
+  const ROSTER_EMP_NAME_KEYS = ['exportSavedEmpName', 'savedEmpName', 'importSavedEmpName'];
   const cards = Array.from(document.querySelectorAll('.courseCard'));
   const searchToggle = document.getElementById('searchToggle');
   const filtersBox = document.getElementById('filtersBox');
@@ -929,6 +929,16 @@ body{
     }
     return '';
   }
+  function rememberRosterName(empId, fullName){
+    const name = (fullName || '').trim();
+    const id = (empId || '').trim();
+    if(!name || !id) return;
+    localStorage.setItem('exportSavedEmpName', name);
+    localStorage.setItem('savedEmpName', name);
+    if(localStorage.getItem('importSavedEmpId') === id){
+      localStorage.setItem('importSavedEmpName', name);
+    }
+  }
   function getSavedQuery(){
     const rosterId = getRosterSavedEmpId();
     if(rosterId) return rosterId;
@@ -946,10 +956,13 @@ body{
     }
     localStorage.setItem(SAVED_QUERY_KEY, trimmed);
     if(/^\d+$/.test(trimmed)){
+      const prevId = (localStorage.getItem('exportSavedEmpId') || '').trim();
       localStorage.setItem('exportSavedEmpId', trimmed);
       localStorage.removeItem('savedEmpId');
-      localStorage.removeItem('exportSavedEmpName');
-      localStorage.removeItem('savedEmpName');
+      if(prevId && prevId !== trimmed){
+        localStorage.removeItem('exportSavedEmpName');
+        localStorage.removeItem('savedEmpName');
+      }
     }
   }
   function getSchedulesBase(){
@@ -957,12 +970,28 @@ body{
     if(window.location.pathname.includes('/roster-site/')) return '/roster-site/schedules/';
     return '/schedules/';
   }
+  function getImportSchedulesBase(){
+    const base = getSchedulesBase();
+    if(base.includes('/import/schedules/')) return base;
+    return base.replace(/\/schedules\/$/, '/import/schedules/');
+  }
   function fetchRosterDisplayName(empId, done){
     if(!empId || !/^\d+$/.test(empId)){ done(''); return; }
-    fetch(getSchedulesBase() + encodeURIComponent(empId) + '.json')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => done((data && data.name) ? data.name : ''))
-      .catch(() => done(''));
+    const urls = [
+      getSchedulesBase() + encodeURIComponent(empId) + '.json',
+      getImportSchedulesBase() + encodeURIComponent(empId) + '.json'
+    ];
+    function tryNext(i){
+      if(i >= urls.length){ done(''); return; }
+      fetch(urls[i])
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if(data && data.name) done(data.name);
+          else tryNext(i + 1);
+        })
+        .catch(() => tryNext(i + 1));
+    }
+    tryNext(0);
   }
 
   function norm(v){ return (v || '').toLowerCase().trim(); }
@@ -1093,21 +1122,31 @@ body{
     let displayName = '';
     let staffCode = '';
     const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+    const rosterName = getRosterSavedEmpName();
     if(primary){
       displayName = firstName(primary.name) || primary.name;
       staffCode = primary.code;
+      if(staffCode && primary.name) rememberRosterName(staffCode, primary.name);
       savedChip.classList.remove('savedEmpty');
       savedName.textContent = displayName;
       savedNo.textContent = staffCode ? ('#' + staffCode) : '';
     } else if(raw){
       staffCode = /^\d+$/.test(raw) ? raw : (getRosterSavedEmpId() || '');
-      displayName = firstName(raw) || raw;
+      if(rosterName){
+        displayName = firstName(rosterName) || rosterName;
+      } else if(staffCode && /^\d+$/.test(raw)){
+        displayName = ar ? 'جاري التحميل…' : 'Loading…';
+      } else {
+        displayName = firstName(raw) || raw;
+      }
       savedChip.classList.remove('savedEmpty');
       savedName.textContent = displayName;
       savedNo.textContent = staffCode ? ('#' + staffCode) : '';
       if(staffCode){
         fetchRosterDisplayName(staffCode, (fullName) => {
-          if(!fullName || getSavedQuery() !== staffCode) return;
+          if(!fullName) return;
+          if(getSavedQuery() !== staffCode && getRosterSavedEmpId() !== staffCode) return;
+          rememberRosterName(staffCode, fullName);
           const label = firstName(fullName) || fullName;
           savedName.textContent = label;
           renderMyTrainingPanel(staffCode, findAllSavedSessions(staffCode), label, staffCode);
@@ -1124,7 +1163,25 @@ body{
   function openStaffModal(){
     if(!staffModal) return;
     const current = getSavedQuery();
+    const rosterName = getRosterSavedEmpName();
     if(staffInput) staffInput.value = current;
+    const sub = staffModal.querySelector('.staffModalSub');
+    if(sub){
+      const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+      if(current && rosterName){
+        sub.textContent = ar
+          ? ('محفوظ من الروستر: ' + rosterName)
+          : ('Saved from roster: ' + rosterName);
+      } else if(current){
+        sub.textContent = ar
+          ? 'تم جلب بياناتك من الروستر تلقائياً. يمكنك التعديل أو المسح.'
+          : 'Loaded automatically from your roster. You can edit or clear.';
+      } else {
+        sub.textContent = ar
+          ? 'يستخدم رقمك المحفوظ في الروستر إن وجد، أو أدخل الرقم / الاسم'
+          : 'Uses your roster saved ID if available, or enter staff number / name';
+      }
+    }
     staffModal.classList.add('open');
     staffModal.setAttribute('aria-hidden','false');
     setTimeout(() => staffInput?.focus(), 30);
@@ -1169,7 +1226,9 @@ body{
     closeStaffModal();
   });
   staffSave?.addEventListener('click', () => {
-    const value = (staffInput?.value || '').trim();
+    let value = (staffInput?.value || '').trim();
+    const idMatch = value.match(/^(\d{3,})/);
+    if(idMatch) value = idMatch[1];
     persistSavedQuery(value);
     refreshSaved();
     applyFilters();
