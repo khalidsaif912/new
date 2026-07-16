@@ -1656,13 +1656,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">{last_updated}</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
-    <div id="siteVisitsRow" class="siteVisitsRow">
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">Visitors today:</strong>
-      <strong style="color:#1e40af;" id="siteVisitsDay">—</strong>
-      <span aria-hidden="true"> · </span>
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">This month:</strong>
-      <strong style="color:#1e40af;" id="siteVisitsMonth">—</strong>
-    </div>
   </div>
 
 </div>

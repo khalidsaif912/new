@@ -1,6 +1,6 @@
 /**
- * Site visitor counts (today + this month) for the roster footer.
- * Uses CounterAPI (no backend). Counts once per browser per Muscat calendar day.
+ * Site visitor counts (today + this month).
+ * Mounted outside `.footer` so applyLang innerHTML rewrites cannot wipe the numbers.
  */
 (function () {
   'use strict';
@@ -49,9 +49,9 @@
 
   function formatCount(n) {
     var num = Number(n);
-    if (!isFinite(num) || num < 0) return '—';
+    if (!isFinite(num) || num < 0) return '--';
     try {
-      return num.toLocaleString(lang() === 'ar' ? 'ar-OM' : 'en-US');
+      return String(Math.floor(num));
     } catch (e) {
       return String(Math.floor(num));
     }
@@ -63,8 +63,8 @@
       if (!raw) return;
       var data = JSON.parse(raw);
       if (!data) return;
-      if (data.dayKey === keys.day && typeof data.day === 'number') cached.day = data.day;
-      if (data.monthKey === keys.month && typeof data.month === 'number') cached.month = data.month;
+      if (data.dayKey === keys.day && data.day != null) cached.day = Number(data.day);
+      if (data.monthKey === keys.month && data.month != null) cached.month = Number(data.month);
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
     } catch (e) {}
@@ -85,11 +85,11 @@
   }
 
   function fetchCount(name, doUp) {
-    var url = API + encodeURIComponent(name) + (doUp ? '/up' : '');
+    var url = API + name + (doUp ? '/up' : '');
     return fetch(url, { cache: 'no-store', mode: 'cors' })
       .then(function (res) {
         if (res.ok) return res.json();
-        if (res.status === 400 || res.status === 404) return { count: 0 };
+        if (res.status === 400 || res.status === 404) return { count: doUp ? null : 0 };
         throw new Error('HTTP ' + res.status);
       })
       .then(function (data) {
@@ -97,29 +97,39 @@
       });
   }
 
-  function ensureRow() {
-    var footer = document.querySelector('.footer');
-    if (!footer) return null;
-    var row = document.getElementById('siteVisitsRow');
-    if (row) return row;
+  function removeLegacyFooterRow() {
+    var legacy = document.querySelector('.footer #siteVisitsRow');
+    if (legacy && legacy.parentNode) legacy.parentNode.removeChild(legacy);
+  }
 
-    row = document.createElement('div');
-    row.id = 'siteVisitsRow';
-    row.className = 'siteVisitsRow';
-    row.innerHTML =
+  function ensureHost() {
+    removeLegacyFooterRow();
+    var host = document.getElementById('siteVisitsHost');
+    if (host) return host;
+
+    var footer = document.querySelector('.footer');
+    if (!footer || !footer.parentNode) return null;
+
+    host = document.createElement('div');
+    host.id = 'siteVisitsHost';
+    host.className = 'siteVisitsHost';
+    host.setAttribute('dir', 'auto');
+    host.style.cssText =
+      'margin:-4px 0 10px;padding:0 12px;text-align:center;font-size:12px;' +
+      'line-height:1.9;color:#94a3b8;font-family:inherit;';
+    host.innerHTML =
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsDay">—</strong>' +
+      '<strong style="color:#1e40af;" id="siteVisitsDay">--</strong>' +
       '<span aria-hidden="true"> · </span>' +
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsMonth">—</strong>';
+      '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>';
 
-    var texture = footer.querySelector('.bgTextureShuffleWrap');
-    if (texture) {
-      footer.insertBefore(row, texture);
+    if (footer.nextSibling) {
+      footer.parentNode.insertBefore(host, footer.nextSibling);
     } else {
-      footer.appendChild(row);
+      footer.parentNode.appendChild(host);
     }
-    return row;
+    return host;
   }
 
   function paintLabels() {
@@ -128,17 +138,23 @@
     var monthLbl = document.getElementById('siteVisitsMonthLabel');
     if (dayLbl) dayLbl.textContent = pack.day;
     if (monthLbl) monthLbl.textContent = pack.month;
+    var host = document.getElementById('siteVisitsHost');
+    if (host) host.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
   }
 
   function paintCounts() {
     var dayEl = document.getElementById('siteVisitsDay');
     var monthEl = document.getElementById('siteVisitsMonth');
-    if (dayEl && cached.day != null) dayEl.textContent = formatCount(cached.day);
-    if (monthEl && cached.month != null) monthEl.textContent = formatCount(cached.month);
+    if (dayEl && cached.day != null && !isNaN(cached.day)) {
+      dayEl.textContent = formatCount(cached.day);
+    }
+    if (monthEl && cached.month != null && !isNaN(cached.month)) {
+      monthEl.textContent = formatCount(cached.month);
+    }
   }
 
   function paint() {
-    if (!ensureRow()) return;
+    if (!ensureHost()) return;
     paintLabels();
     paintCounts();
   }
@@ -163,35 +179,21 @@
     var monthName = 'month-' + keys.month;
     var shouldUp = !alreadyCounted(keys.day);
 
-    return Promise.all([
-      fetchCount(dayName, shouldUp),
-      fetchCount(monthName, shouldUp)
-    ]).then(function (vals) {
-      if (vals[0] != null) cached.day = vals[0];
-      if (vals[1] != null) cached.month = vals[1];
+    var dayPromise = fetchCount(dayName, shouldUp).catch(function () { return null; });
+    var monthPromise = fetchCount(monthName, shouldUp).catch(function () { return null; });
+
+    return Promise.all([dayPromise, monthPromise]).then(function (vals) {
+      var dayVal = vals[0];
+      var monthVal = vals[1];
+      if (dayVal != null) cached.day = dayVal;
+      if (monthVal != null) cached.month = monthVal;
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
-      if (shouldUp) markCounted(keys.day);
-      persistCounts(keys);
+      if (shouldUp && (dayVal != null || monthVal != null)) markCounted(keys.day);
+      if (cached.day != null || cached.month != null) persistCounts(keys);
       paint();
+      return vals;
     });
-  }
-
-  function hookFooterMutations() {
-    var footer = document.querySelector('.footer');
-    if (!footer || footer.__siteVisitsObs) return;
-    footer.__siteVisitsObs = true;
-    var timer = null;
-    var obs = new MutationObserver(function () {
-      if (document.getElementById('siteVisitsRow') && document.getElementById('siteVisitsDay')) {
-        // Row still intact — just refresh labels/numbers if needed.
-        if (cached.day != null || cached.month != null) paintCounts();
-        return;
-      }
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(paint, 0);
-    });
-    obs.observe(footer, { childList: true, subtree: true });
   }
 
   function hookLang() {
@@ -200,14 +202,8 @@
     var orig = window.applyLang;
     if (typeof orig === 'function') {
       window.applyLang = function (l) {
-        var dayN = cached.day;
-        var monthN = cached.month;
         orig(l);
-        window.setTimeout(function () {
-          if (dayN != null) cached.day = dayN;
-          if (monthN != null) cached.month = monthN;
-          paint();
-        }, 0);
+        window.setTimeout(paint, 0);
       };
     }
     document.addEventListener('click', function (e) {
@@ -223,14 +219,21 @@
     var keys = muscatYmd();
     readPersisted(keys);
     hookLang();
-    hookFooterMutations();
     paint();
-    loadCounts().catch(function () {
-      paint();
-    });
-    // Re-assert after late footer rewrites (lang / texture controls).
-    window.setTimeout(paint, 400);
-    window.setTimeout(paint, 1200);
+    loadCounts()
+      .catch(function () { paint(); })
+      .then(function () {
+        // Retry once if numbers still missing (slow network / first counter create).
+        if (cached.day == null || cached.month == null) {
+          return new Promise(function (resolve) { setTimeout(resolve, 700); }).then(loadCounts);
+        }
+      })
+      .catch(function () { paint(); });
+    window.setTimeout(paint, 300);
+    window.setTimeout(paint, 1000);
+    window.setTimeout(function () {
+      if (cached.day == null || cached.month == null) loadCounts().catch(function () {});
+    }, 2000);
   }
 
   window.rosterSiteVisits = {
