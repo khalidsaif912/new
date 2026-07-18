@@ -550,6 +550,85 @@
     };
   }
 
+  var CHROME_FADE_MS = 5000;
+  var CHROME_DIM_OPACITY = '0.1';
+  var chromeFadeTimer = null;
+
+  function getHeaderChromeEls() {
+    return Array.from(
+      document.querySelectorAll(
+        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker'
+      )
+    );
+  }
+
+  function injectChromeFadeStyles() {
+    if (document.getElementById('header-chrome-fade-css')) return;
+    var style = document.createElement('style');
+    style.id = 'header-chrome-fade-css';
+    style.textContent = [
+      '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,#datePicker{',
+      'transition:opacity .55s ease!important;',
+      '}',
+      'html.header-chrome-dim #langToggle,',
+      'html.header-chrome-dim #banner-changer-btn,',
+      'html.header-chrome-dim #dateTag,',
+      'html.header-chrome-dim .header .dateTag,',
+      'html.header-chrome-dim #datePicker{',
+      'opacity:' + CHROME_DIM_OPACITY + '!important;',
+      '}',
+      'html.header-chrome-dim #langToggle:hover,',
+      'html.header-chrome-dim #langToggle:focus-visible,',
+      'html.header-chrome-dim #banner-changer-btn:hover,',
+      'html.header-chrome-dim #banner-changer-btn:focus-visible,',
+      'html.header-chrome-dim #dateTag:hover,',
+      'html.header-chrome-dim .header .dateTag:hover{',
+      'opacity:1!important;',
+      '}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function setHeaderChromeDim(dim) {
+    document.documentElement.classList.toggle('header-chrome-dim', !!dim);
+  }
+
+  function scheduleHeaderChromeFade() {
+    if (chromeFadeTimer) clearTimeout(chromeFadeTimer);
+    setHeaderChromeDim(false);
+    chromeFadeTimer = setTimeout(function () {
+      setHeaderChromeDim(true);
+    }, CHROME_FADE_MS);
+  }
+
+  function bindHeaderChromeFade() {
+    injectChromeFadeStyles();
+    scheduleHeaderChromeFade();
+    getHeaderChromeEls().forEach(function (el) {
+      if (el.dataset.chromeFadeBound === '1') return;
+      el.dataset.chromeFadeBound = '1';
+      function wake() {
+        scheduleHeaderChromeFade();
+      }
+      el.addEventListener('pointerdown', wake);
+      el.addEventListener('focusin', wake);
+      el.addEventListener('mouseenter', wake);
+    });
+    // Banner button may be created slightly later — rebind once.
+    setTimeout(function () {
+      getHeaderChromeEls().forEach(function (el) {
+        if (el.dataset.chromeFadeBound === '1') return;
+        el.dataset.chromeFadeBound = '1';
+        function wake() {
+          scheduleHeaderChromeFade();
+        }
+        el.addEventListener('pointerdown', wake);
+        el.addEventListener('focusin', wake);
+        el.addEventListener('mouseenter', wake);
+      });
+    }, 400);
+  }
+
   function init() {
     injectReadabilityStyles();
     const saved = getSavedBanner();
@@ -557,6 +636,7 @@
       applyBanner(saved);
     }
     createChangerBtn();
+    bindHeaderChromeFade();
     var resizeTimer;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
