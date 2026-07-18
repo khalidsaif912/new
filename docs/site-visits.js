@@ -361,10 +361,37 @@
     }
   }
 
+  function detectDevice() {
+    try {
+      var ua = String(navigator.userAgent || '');
+      var touch = Number(navigator.maxTouchPoints || 0);
+      var coarse = false;
+      try {
+        coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+      } catch (e1) {}
+      if (/iPhone/i.test(ua)) return 'iPhone';
+      if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && touch > 1)) return 'iPad';
+      if (/Android/i.test(ua)) {
+        if (/Mobile/i.test(ua) || (coarse && touch > 0)) return 'Android';
+        return 'Android Tablet';
+      }
+      if (/Windows Phone|IEMobile/i.test(ua)) return 'Windows Phone';
+      if (/Windows NT/i.test(ua)) return 'Windows';
+      if (/Mac OS X|Macintosh/i.test(ua)) return 'Mac';
+      if (/Linux/i.test(ua)) return touch > 0 || coarse ? 'Linux Tablet' : 'Linux';
+      if (/CrOS/i.test(ua)) return 'Chromebook';
+      if (coarse || touch > 1) return 'Mobile';
+      return 'Other';
+    } catch (e) {
+      return 'Other';
+    }
+  }
+
   var VISIT_LOG_NS = 'roster-site-visits';
   var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
-  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDay';
+  // v2: include device type; forces one re-log after deploy for same-day visitors.
+  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV2';
 
   function logIdentifiedVisit() {
     var ident = getRosterIdentity();
@@ -379,6 +406,7 @@
       'Content-Type': 'application/json',
       'X-Mantle-Key': VISIT_LOG_KEY
     };
+    var device = detectDevice();
 
     fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
@@ -396,7 +424,8 @@
           name: ident.name || '',
           day: keys.day,
           at: now,
-          page: pagePathLabel()
+          page: pagePathLabel(),
+          device: device
         });
         if (kept.length > 400) kept.length = 400;
         return fetch(VISIT_LOG_URL, {

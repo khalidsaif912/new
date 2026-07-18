@@ -95,7 +95,17 @@
       border-radius: 14px;
       padding: 12px 14px;
     }
-    .rowName { font-size: 14px; font-weight: 800; color: #f1f5f9; margin: 0 0 4px; }
+    .rowName { font-size: 14px; font-weight: 800; color: #f1f5f9; margin: 0 0 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .rowDevice {
+      font-size: 11px;
+      font-weight: 700;
+      color: #93c5fd;
+      background: #1e3a8a55;
+      border: 1px solid #3b82f655;
+      border-radius: 999px;
+      padding: 2px 8px;
+      line-height: 1.4;
+    }
     .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
     .empty, .error {
       text-align: center;
@@ -210,6 +220,26 @@
         return map[page] || page || '—';
       }
 
+      function deviceLabel(device) {
+        const map = {
+          iPhone: 'آيفون',
+          iPad: 'آيباد',
+          Android: 'أندرويد',
+          'Android Tablet': 'تابلت أندرويد',
+          'Windows Phone': 'ويندوز فون',
+          Windows: 'ويندوز',
+          Mac: 'ماك',
+          Linux: 'لينكس',
+          'Linux Tablet': 'تابلت لينكس',
+          Chromebook: 'كروم بوك',
+          Mobile: 'جوال',
+          Other: 'أخرى'
+        };
+        const key = String(device || '').trim();
+        if (!key) return '';
+        return map[key] || key;
+      }
+
       function unlock() {
         sessionStorage.setItem(AUTH_KEY, '1');
         gate.hidden = true;
@@ -277,18 +307,25 @@
           return;
         }
         list.innerHTML = rows.map((r) => {
-          const name = (r.name || '').trim() || 'بدون اسم محفوظ';
-          const id = r.id || '—';
           return (
             '<article class="row">' +
-              '<p class="rowName"></p>' +
+              '<p class="rowName"><span class="rowNameText"></span></p>' +
               '<p class="rowMeta"></p>' +
             '</article>'
           );
         }).join('');
         Array.from(list.children).forEach((el, i) => {
           const r = rows[i];
-          el.querySelector('.rowName').textContent = ((r.name || '').trim() || 'بدون اسم محفوظ');
+          const nameEl = el.querySelector('.rowName');
+          const textEl = el.querySelector('.rowNameText');
+          textEl.textContent = ((r.name || '').trim() || 'بدون اسم محفوظ');
+          const device = deviceLabel(r.device);
+          if (device) {
+            const badge = document.createElement('span');
+            badge.className = 'rowDevice';
+            badge.textContent = device;
+            nameEl.appendChild(badge);
+          }
           el.querySelector('.rowMeta').textContent =
             '#' + (r.id || '—') +
             ' · ' + formatTime(r.at) +

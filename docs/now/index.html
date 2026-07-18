@@ -3448,7 +3448,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260718i';
+  var ver = '20260718j';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3477,6 +3477,7 @@ function goToRosterDiff(event) {
     window.addEventListener('load', function() { setTimeout(loadSecondary, 120); }, { once: true });
   }
 })();
+
 
 
 // Employee row: tap → schedule; long-press → next 5 shifts preview
