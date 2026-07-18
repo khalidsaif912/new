@@ -30,16 +30,11 @@
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
 
   const availableBanners = [
-    'banner1.jpg',
     'banner2.jpg',
-    'banner3.jpg',
-    'banner4.jpg',
-    'banner5.jpg',
     'banner6.jpg',
     'banner7.jpg',
     'banner8.jpg',
     'banner9.jpg',
-    'banner10.jpg',
     'banner11.jpg',
     'banner12.jpg',
     'banner14.jpg',
@@ -47,12 +42,6 @@
     'banner16.jpg',
     'banner17.jpg',
     'banner19.jpg',
-    'banner22.jpg',
-    'banner23.jpg',
-    'banner24.jpg',
-    'banner25.jpg',
-    'banner26.jpg',
-    'banner27.jpg',
     'banner28.jpg',
     'banner29.jpg'
   ];
