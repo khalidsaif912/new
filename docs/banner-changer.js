@@ -408,6 +408,11 @@
     img.src = src;
   }
 
+  function bannerNumberLabel(name) {
+    const m = String(name || '').match(/banner(\d+)\.jpg/i);
+    return m ? m[1] : '';
+  }
+
   function showBannerPicker() {
     if (document.getElementById('banner-picker')) return;
 
@@ -452,19 +457,46 @@
     const lazyImgs = [];
 
     availableBanners.forEach(function (name) {
+      const num = bannerNumberLabel(name);
       const wrap = document.createElement('div');
       wrap.style.cssText =
-        'border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid ' +
+        'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid ' +
         (name === current ? '#e0bd63' : 'transparent') +
         ';transition:border .15s;';
       const img = document.createElement('img');
-      img.alt = '';
+      img.alt = num ? ('بانر ' + num) : '';
       img.dataset.src = bannerUrl(name);
       img.style.cssText = 'width:100%;height:70px;object-fit:cover;display:block;background:#2a2b31;';
       img.onerror = function () {
         wrap.style.display = 'none';
       };
+      const badge = document.createElement('span');
+      badge.textContent = num || '—';
+      badge.setAttribute('aria-hidden', 'true');
+      badge.style.cssText = [
+        'position:absolute',
+        'top:6px',
+        'inset-inline-start:6px',
+        'z-index:2',
+        'min-width:24px',
+        'height:24px',
+        'padding:0 7px',
+        'border-radius:999px',
+        'display:inline-flex',
+        'align-items:center',
+        'justify-content:center',
+        'background:rgba(15,23,42,.82)',
+        'border:1px solid rgba(255,255,255,.35)',
+        'color:#fff',
+        'font-size:12px',
+        'font-weight:800',
+        'line-height:1',
+        'letter-spacing:.02em',
+        'box-shadow:0 1px 4px rgba(0,0,0,.35)',
+        'pointer-events:none'
+      ].join(';');
       wrap.appendChild(img);
+      wrap.appendChild(badge);
       grid.appendChild(wrap);
       lazyImgs.push(img);
       (function (bannerName) {
@@ -478,6 +510,7 @@
         }
         wrap.setAttribute('role', 'button');
         wrap.setAttribute('tabindex', '0');
+        wrap.setAttribute('aria-label', num ? ('بانر رقم ' + num) : 'بانر');
         wrap.style.touchAction = 'manipulation';
         wrap.style.webkitTapHighlightColor = 'transparent';
         wrap.addEventListener('click', pick);
