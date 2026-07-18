@@ -82,6 +82,8 @@
       '.bgScrollTopBtn svg,.bgRefreshBtn svg{width:16px;height:16px;display:block;}' +
       '.bgRefreshBtn{border-color:#93c5fd;background:#eff6ff;}' +
       '@media (hover:hover){.bgScrollTopBtn:hover{background:#ede9fe;}.bgRefreshBtn:hover{background:#dbeafe;}}' +
+      '.deskLogHotspot{width:28px;height:28px;border:0;padding:0;margin:0;background:transparent;' +
+      'flex:none;cursor:default;opacity:0;-webkit-tap-highlight-color:transparent;}' +
       'html.roster-bg-textured,body.roster-bg-textured{background-attachment:' +
       (isIOSDevice() ? 'scroll' : 'fixed') +
       ';background-repeat:repeat;}' +
@@ -259,10 +261,37 @@
       }
     });
 
-    // Physical LTR order: top · background · refresh (refresh to the right of background)
+    var deskHot = document.createElement('button');
+    deskHot.type = 'button';
+    deskHot.id = 'deskLogHotspot';
+    deskHot.className = 'deskLogHotspot';
+    deskHot.setAttribute('aria-hidden', 'true');
+    deskHot.tabIndex = -1;
+    var deskTaps = 0;
+    var deskTimer = null;
+    deskHot.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      deskTaps += 1;
+      if (deskTimer) clearTimeout(deskTimer);
+      deskTimer = setTimeout(function () {
+        deskTaps = 0;
+      }, 1400);
+      if (deskTaps >= 5) {
+        deskTaps = 0;
+        if (deskTimer) clearTimeout(deskTimer);
+        var root = getSiteRootPath();
+        var base = root || '';
+        if (location.protocol === 'file:') base = '..';
+        location.href = base.replace(/\/$/, '') + '/desk-log/';
+      }
+    });
+
+    // Physical LTR order: top · background · refresh · (hidden desk hotspot to the right)
     wrap.appendChild(topBtn);
     wrap.appendChild(btn);
     wrap.appendChild(refreshBtn);
+    wrap.appendChild(deskHot);
     footer.appendChild(wrap);
 
     document.addEventListener('rosterLangChange', function () {
