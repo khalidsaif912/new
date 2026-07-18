@@ -564,7 +564,7 @@
   function getHeaderChromeEls() {
     return Array.from(
       document.querySelectorAll(
-        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker'
+        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker, .bannerTitle, .page-title'
       )
     );
   }
@@ -574,22 +574,31 @@
     var style = document.createElement('style');
     style.id = 'header-chrome-fade-css';
     style.textContent = [
-      '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,#datePicker{',
+      '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,',
+      '.bannerTitle,.page-title{',
       'transition:opacity .55s ease!important;',
       '}',
       'html.header-chrome-dim #langToggle,',
       'html.header-chrome-dim #banner-changer-btn,',
       'html.header-chrome-dim #dateTag,',
       'html.header-chrome-dim .header .dateTag,',
-      'html.header-chrome-dim #datePicker{',
+      'html.header-chrome-dim .bannerTitle,',
+      'html.header-chrome-dim .page-title{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
       '}',
+      /* Sticky :hover on touch keeps controls at full opacity — only desktop. */
+      '@media (hover:hover) and (pointer:fine){',
       'html.header-chrome-dim #langToggle:hover,',
       'html.header-chrome-dim #langToggle:focus-visible,',
       'html.header-chrome-dim #banner-changer-btn:hover,',
       'html.header-chrome-dim #banner-changer-btn:focus-visible,',
       'html.header-chrome-dim #dateTag:hover,',
       'html.header-chrome-dim .header .dateTag:hover{',
+      'opacity:1!important;',
+      '}',
+      '}',
+      'html.header-chrome-dim #langToggle:focus-visible,',
+      'html.header-chrome-dim #banner-changer-btn:focus-visible{',
       'opacity:1!important;',
       '}'
     ].join('');
@@ -608,31 +617,32 @@
     }, CHROME_FADE_MS);
   }
 
+  function bindChromeWake(el) {
+    if (!el || el.dataset.chromeFadeBound === '1') return;
+    el.dataset.chromeFadeBound = '1';
+    function wake() {
+      scheduleHeaderChromeFade();
+    }
+    el.addEventListener('pointerdown', wake);
+    el.addEventListener('focusin', wake);
+    el.addEventListener('mouseenter', wake);
+  }
+
   function bindHeaderChromeFade() {
     injectChromeFadeStyles();
     scheduleHeaderChromeFade();
-    getHeaderChromeEls().forEach(function (el) {
-      if (el.dataset.chromeFadeBound === '1') return;
-      el.dataset.chromeFadeBound = '1';
-      function wake() {
+    getHeaderChromeEls().forEach(bindChromeWake);
+    // Any tap on the header wakes chrome (needed on touch; no sticky hover).
+    document.querySelectorAll('.header, .topbar').forEach(function (header) {
+      if (header.dataset.chromeHeaderWake === '1') return;
+      header.dataset.chromeHeaderWake = '1';
+      header.addEventListener('pointerdown', function () {
         scheduleHeaderChromeFade();
-      }
-      el.addEventListener('pointerdown', wake);
-      el.addEventListener('focusin', wake);
-      el.addEventListener('mouseenter', wake);
+      });
     });
     // Banner button may be created slightly later — rebind once.
     setTimeout(function () {
-      getHeaderChromeEls().forEach(function (el) {
-        if (el.dataset.chromeFadeBound === '1') return;
-        el.dataset.chromeFadeBound = '1';
-        function wake() {
-          scheduleHeaderChromeFade();
-        }
-        el.addEventListener('pointerdown', wake);
-        el.addEventListener('focusin', wake);
-        el.addEventListener('mouseenter', wake);
-      });
+      getHeaderChromeEls().forEach(bindChromeWake);
     }, 400);
   }
 
