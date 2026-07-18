@@ -239,7 +239,15 @@
 
   function getSavedBanner() {
     const name = localStorage.getItem(BANNER_KEY) || null;
-    return name && BANNER_NAME_RE.test(name) ? name : null;
+    if (!name || !BANNER_NAME_RE.test(name)) return null;
+    // Drop deleted/missing choices so iOS doesn't keep requesting a 404 image.
+    if (availableBanners.indexOf(name) === -1) {
+      try {
+        localStorage.removeItem(BANNER_KEY);
+      } catch (_) {}
+      return null;
+    }
+    return name;
   }
 
   function saveBannerChoice(name) {
@@ -255,6 +263,12 @@
     return bannerUrl(name) + '?live=' + encodeURIComponent(name.replace(/\.jpg$/i, ''));
   }
 
+  function bannerPaintUrl(name) {
+    // Avoid cache-busting query on iOS — it often breaks CSS background paint/cache.
+    if (isIOSDevice()) return bannerUrl(name);
+    return bannerLiveUrl(name);
+  }
+
   function forceBannerRepaint(targets) {
     if (isIOSDevice()) return;
     targets.forEach(function (el) {
@@ -265,9 +279,58 @@
     });
   }
 
+  function removeIosBannerLayers(el) {
+    el.querySelectorAll('.roster-banner-ios-img').forEach(function (node) {
+      node.remove();
+    });
+  }
+
+  function ensureIosBannerLayer(el, url, pos) {
+    var img = el.querySelector('.roster-banner-ios-img');
+    if (!img) {
+      img = document.createElement('img');
+      img.className = 'roster-banner-ios-img';
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.decoding = 'async';
+      img.loading = 'eager';
+      if (el.firstChild) el.insertBefore(img, el.firstChild);
+      else el.appendChild(img);
+    }
+    img.style.cssText = [
+      'position:absolute',
+      'inset:0',
+      'width:100%',
+      'height:100%',
+      'object-fit:cover',
+      'object-position:' + pos,
+      'z-index:0',
+      'pointer-events:none',
+      'border-radius:inherit',
+      '-webkit-transform:translateZ(0)',
+      'transform:translateZ(0)'
+    ].join(';');
+    if (img.getAttribute('data-src') !== url) {
+      img.setAttribute('data-src', url);
+      img.onerror = function () {
+        // One retry with a soft cache-buster if the first load fails.
+        if (img.dataset.retry === '1') return;
+        img.dataset.retry = '1';
+        img.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ios=' + Date.now();
+      };
+      img.onload = function () {
+        img.dataset.retry = '0';
+      };
+      img.src = url;
+    } else if (!img.getAttribute('src')) {
+      img.src = url;
+    }
+    return img;
+  }
+
   function syncEarlyBannerStyle(name) {
     if (!name) return;
-    const url = bannerLiveUrl(name);
+    const url = bannerPaintUrl(name);
     const pos = getBannerPosition(name);
     const prev = document.getElementById('banner-early-style');
     if (prev) prev.remove();
@@ -280,7 +343,7 @@
       EARLY_CLASS +
       ' .topbar{background-image:url("' +
       url.replace(/"/g, '') +
-      '")!important;background-size:cover!important;background-position:' +
+      '")!important;background-size:cover!important;-webkit-background-size:cover!important;background-position:' +
       pos +
       '!important;background-repeat:no-repeat!important}' +
       'html.' +
@@ -291,7 +354,10 @@
       EARLY_CLASS +
       ' .header::after,html.' +
       EARLY_CLASS +
-      ' .topbar::after{opacity:0!important}';
+      ' .topbar::after{opacity:0!important}' +
+      '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit}' +
+      '.header.has-custom-banner > :not(.roster-banner-ios-img),' +
+      '.topbar.has-custom-banner > :not(.roster-banner-ios-img){position:relative;z-index:1}';
     document.head.appendChild(early);
     document.documentElement.classList.add(EARLY_CLASS);
     var preload = document.querySelector('link[data-banner-preload="1"]');
@@ -299,14 +365,24 @@
   }
 
   function paintBannerOnTargets(targets, name) {
-    const url = bannerLiveUrl(name);
+    const url = bannerPaintUrl(name);
     const pos = getBannerPosition(name);
+    const ios = isIOSDevice();
     targets.forEach(function (el) {
       el.setAttribute('data-banner', name);
+      if (getComputedStyle(el).position === 'static') {
+        el.style.position = 'relative';
+      }
       el.style.setProperty('background-image', "url('" + url + "')", 'important');
       el.style.setProperty('background-size', 'cover', 'important');
+      el.style.setProperty('-webkit-background-size', 'cover', 'important');
       el.style.setProperty('background-position', pos, 'important');
       el.style.setProperty('background-repeat', 'no-repeat', 'important');
+      if (ios) {
+        ensureIosBannerLayer(el, url, pos);
+      } else {
+        removeIosBannerLayers(el);
+      }
     });
   }
 
@@ -320,6 +396,12 @@
     warmBannerCache(url);
     requestAnimationFrame(function () {
       forceBannerRepaint(targets);
+      // iOS sometimes paints blank until a second pass after layout.
+      if (isIOSDevice()) {
+        setTimeout(function () {
+          paintBannerOnTargets(targets, name);
+        }, 120);
+      }
     });
   }
 
@@ -330,8 +412,10 @@
       el.removeAttribute('data-banner');
       el.style.removeProperty('background-image');
       el.style.removeProperty('background-size');
+      el.style.removeProperty('-webkit-background-size');
       el.style.removeProperty('background-position');
       el.style.removeProperty('background-repeat');
+      removeIosBannerLayers(el);
     });
     setCustomBannerActive(false);
     const early = document.getElementById('banner-early-style');
@@ -670,6 +754,12 @@
     const saved = getSavedBanner();
     if (saved) {
       applyBanner(saved);
+    } else {
+      // Remove early paint if choice was deleted or invalid (common iOS blank banner).
+      const early = document.getElementById('banner-early-style');
+      if (early) early.remove();
+      document.documentElement.classList.remove(EARLY_CLASS);
+      getBannerTargets().forEach(removeIosBannerLayers);
     }
     createChangerBtn();
     bindHeaderChromeFade();
