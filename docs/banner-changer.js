@@ -564,26 +564,41 @@
   function getHeaderChromeEls() {
     return Array.from(
       document.querySelectorAll(
-        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker, .bannerTitle, .page-title'
+        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker'
       )
     );
   }
 
+  function getHeaderTitleEls() {
+    return Array.from(
+      document.querySelectorAll('#pageTitle, h1.bannerTitle, .header > .bannerTitle, .topbar .page-title')
+    );
+  }
+
   function injectChromeFadeStyles() {
-    if (document.getElementById('header-chrome-fade-css')) return;
-    var style = document.createElement('style');
-    style.id = 'header-chrome-fade-css';
+    var style = document.getElementById('header-chrome-fade-css');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'header-chrome-fade-css';
+      document.head.appendChild(style);
+    }
     style.textContent = [
       '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,',
-      '.bannerTitle,.page-title{',
+      '#pageTitle,.bannerTitle,.bannerTitleEyebrow,.bannerTitleMain,',
+      '.page-title,.page-title-eyebrow,.page-title-main{',
       'transition:opacity .55s ease!important;',
       '}',
       'html.header-chrome-dim #langToggle,',
       'html.header-chrome-dim #banner-changer-btn,',
       'html.header-chrome-dim #dateTag,',
       'html.header-chrome-dim .header .dateTag,',
+      'html.header-chrome-dim #pageTitle,',
       'html.header-chrome-dim .bannerTitle,',
-      'html.header-chrome-dim .page-title{',
+      'html.header-chrome-dim .bannerTitleEyebrow,',
+      'html.header-chrome-dim .bannerTitleMain,',
+      'html.header-chrome-dim .page-title,',
+      'html.header-chrome-dim .page-title-eyebrow,',
+      'html.header-chrome-dim .page-title-main{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
       '}',
       /* Sticky :hover on touch keeps controls at full opacity — only desktop. */
@@ -602,11 +617,15 @@
       'opacity:1!important;',
       '}'
     ].join('');
-    document.head.appendChild(style);
   }
 
   function setHeaderChromeDim(dim) {
     document.documentElement.classList.toggle('header-chrome-dim', !!dim);
+    // Inline fallback so title always dims even if CSS is cached/overridden.
+    getHeaderTitleEls().forEach(function (el) {
+      if (dim) el.style.setProperty('opacity', CHROME_DIM_OPACITY, 'important');
+      else el.style.removeProperty('opacity');
+    });
   }
 
   function scheduleHeaderChromeFade() {
