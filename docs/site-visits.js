@@ -361,7 +361,81 @@
     }
   }
 
-  function detectDevice() {
+  function screenKey() {
+    var w = Math.min(Number(screen.width) || 0, Number(screen.height) || 0);
+    var h = Math.max(Number(screen.width) || 0, Number(screen.height) || 0);
+    var dpr = Math.round((Number(window.devicePixelRatio) || 1) * 10) / 10;
+    return { w: w, h: h, dpr: dpr, key: w + 'x' + h + '@' + dpr };
+  }
+
+  function guessIphoneModel() {
+    // Approximate marketing names — Safari hides the exact model in UA.
+    var s = screenKey();
+    var map = {
+      '320x568@2': 'iPhone SE (1st)',
+      '375x667@2': 'iPhone SE / 8',
+      '414x736@3': 'iPhone 8 Plus',
+      '375x812@3': 'iPhone X / XS / 11 Pro',
+      '414x896@2': 'iPhone 11 / XR',
+      '414x896@3': 'iPhone 11 Pro Max / XS Max',
+      '360x780@3': 'iPhone 12/13 mini',
+      '390x844@3': 'iPhone 12 / 13 / 14',
+      '393x852@3': 'iPhone 14 Pro / 15 / 16',
+      '428x926@3': 'iPhone 12–14 Pro Max / 15 Plus',
+      '430x932@3': 'iPhone 16 Plus',
+      '402x874@3': 'iPhone 16 Pro',
+      '440x956@3': 'iPhone 16 Pro Max',
+      '420x912@3': 'iPhone 17',
+      '446x970@3': 'iPhone 17 Pro Max'
+    };
+    if (map[s.key]) return map[s.key];
+    var loose = {
+      '320x568': 'iPhone SE (1st)',
+      '375x667': 'iPhone SE / 8',
+      '414x736': 'iPhone 8 Plus',
+      '375x812': 'iPhone X–11 Pro',
+      '414x896': 'iPhone 11 / XR family',
+      '360x780': 'iPhone mini',
+      '390x844': 'iPhone 12–14',
+      '393x852': 'iPhone 14 Pro / 15 / 16',
+      '428x926': 'iPhone Pro Max / Plus',
+      '430x932': 'iPhone 16 Plus',
+      '402x874': 'iPhone 16 Pro',
+      '440x956': 'iPhone 16 Pro Max'
+    };
+    return loose[s.w + 'x' + s.h] || '';
+  }
+
+  function guessIpadModel() {
+    var s = screenKey();
+    var map = {
+      '768x1024@2': 'iPad',
+      '810x1080@2': 'iPad 10th',
+      '820x1180@2': 'iPad Air',
+      '834x1112@2': 'iPad Air / Pro 10.5',
+      '834x1194@2': 'iPad Pro 11',
+      '1024x1366@2': 'iPad Pro 12.9'
+    };
+    return map[s.key] || 'iPad';
+  }
+
+  function parseAndroidModel(ua) {
+    var m = ua.match(/Android[^;]*;\s*([^;)]+?)(?:\s+Build|\s*\)|;)/i);
+    if (!m) return '';
+    var model = String(m[1] || '').trim().replace(/\s+Build.*$/i, '').trim();
+    if (!model || /^(wv|Mobile|Linux)$/i.test(model)) return '';
+    return model.slice(0, 48);
+  }
+
+  function parseWindowsModel(ua) {
+    if (/Windows NT 10\.0/i.test(ua)) return 'Windows 10/11';
+    if (/Windows NT 6\.3/i.test(ua)) return 'Windows 8.1';
+    if (/Windows NT 6\.1/i.test(ua)) return 'Windows 7';
+    return 'Windows';
+  }
+
+  function detectDeviceInfoSync() {
+    var info = { device: 'Other', model: '' };
     try {
       var ua = String(navigator.userAgent || '');
       var touch = Number(navigator.maxTouchPoints || 0);
@@ -369,29 +443,99 @@
       try {
         coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
       } catch (e1) {}
-      if (/iPhone/i.test(ua)) return 'iPhone';
-      if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && touch > 1)) return 'iPad';
-      if (/Android/i.test(ua)) {
-        if (/Mobile/i.test(ua) || (coarse && touch > 0)) return 'Android';
-        return 'Android Tablet';
+
+      if (/iPhone/i.test(ua)) {
+        info.device = 'iPhone';
+        info.model = guessIphoneModel() || 'iPhone';
+        return info;
       }
-      if (/Windows Phone|IEMobile/i.test(ua)) return 'Windows Phone';
-      if (/Windows NT/i.test(ua)) return 'Windows';
-      if (/Mac OS X|Macintosh/i.test(ua)) return 'Mac';
-      if (/Linux/i.test(ua)) return touch > 0 || coarse ? 'Linux Tablet' : 'Linux';
-      if (/CrOS/i.test(ua)) return 'Chromebook';
-      if (coarse || touch > 1) return 'Mobile';
-      return 'Other';
-    } catch (e) {
-      return 'Other';
-    }
+      if (/iPad/i.test(ua) || (navigator.platform === 'MacIntel' && touch > 1)) {
+        info.device = 'iPad';
+        info.model = guessIpadModel() || 'iPad';
+        return info;
+      }
+      if (/Android/i.test(ua)) {
+        var androidModel = parseAndroidModel(ua);
+        if (/Mobile/i.test(ua) || (coarse && touch > 0)) {
+          info.device = 'Android';
+          info.model = androidModel || 'Android';
+        } else {
+          info.device = 'Android Tablet';
+          info.model = androidModel || 'Android Tablet';
+        }
+        return info;
+      }
+      if (/Windows Phone|IEMobile/i.test(ua)) {
+        info.device = 'Windows Phone';
+        info.model = 'Windows Phone';
+        return info;
+      }
+      if (/Windows NT/i.test(ua)) {
+        info.device = 'Windows';
+        info.model = parseWindowsModel(ua);
+        return info;
+      }
+      if (/Mac OS X|Macintosh/i.test(ua)) {
+        info.device = 'Mac';
+        info.model = 'Mac';
+        return info;
+      }
+      if (/CrOS/i.test(ua)) {
+        info.device = 'Chromebook';
+        info.model = 'Chromebook';
+        return info;
+      }
+      if (/Linux/i.test(ua)) {
+        info.device = touch > 0 || coarse ? 'Linux Tablet' : 'Linux';
+        info.model = info.device;
+        return info;
+      }
+      if (coarse || touch > 1) {
+        info.device = 'Mobile';
+        info.model = 'Mobile';
+      }
+    } catch (e) {}
+    return info;
+  }
+
+  function detectDeviceInfo() {
+    var info = detectDeviceInfoSync();
+    try {
+      if (navigator.userAgentData && typeof navigator.userAgentData.getHighEntropyValues === 'function') {
+        return navigator.userAgentData
+          .getHighEntropyValues(['model', 'platform', 'platformVersion'])
+          .then(function (hints) {
+            var hintModel = String((hints && hints.model) || '').trim();
+            if (hintModel && hintModel !== 'Unknown' && hintModel !== 'K') {
+              info.model = hintModel;
+            }
+            var plat = String((hints && hints.platform) || '').toLowerCase();
+            if (plat.indexOf('android') >= 0 && info.device.indexOf('Android') < 0) {
+              info.device = 'Android';
+            } else if (plat.indexOf('windows') >= 0) {
+              info.device = 'Windows';
+              if (!info.model || info.model === 'Windows') {
+                var ver = String((hints && hints.platformVersion) || '').split('.')[0];
+                info.model = ver ? 'Windows ' + ver : info.model;
+              }
+            } else if (plat === 'macos') {
+              info.device = 'Mac';
+            }
+            return info;
+          })
+          .catch(function () {
+            return info;
+          });
+      }
+    } catch (e) {}
+    return Promise.resolve(info);
   }
 
   var VISIT_LOG_NS = 'roster-site-visits';
   var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
-  // v2: include device type; forces one re-log after deploy for same-day visitors.
-  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV2';
+  // v3: include device model; forces one re-log after deploy for same-day visitors.
+  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV3';
 
   function logIdentifiedVisit() {
     var ident = getRosterIdentity();
@@ -406,36 +550,39 @@
       'Content-Type': 'application/json',
       'X-Mantle-Key': VISIT_LOG_KEY
     };
-    var device = detectDevice();
 
-    fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('read');
-        return r.json();
-      })
-      .then(function (cur) {
-        var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
-        var now = Date.now();
-        var kept = list.filter(function (row) {
-          return !(row && String(row.id) === String(ident.id) && String(row.day) === keys.day);
-        });
-        kept.unshift({
-          id: ident.id,
-          name: ident.name || '',
-          day: keys.day,
-          at: now,
-          page: pagePathLabel(),
-          device: device
-        });
-        if (kept.length > 400) kept.length = 400;
-        return fetch(VISIT_LOG_URL, {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify({ log: kept })
-        }).then(function (r) {
-          if (!r.ok) throw new Error('write');
-          try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
-        });
+    detectDeviceInfo()
+      .then(function (dev) {
+        return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error('read');
+            return r.json();
+          })
+          .then(function (cur) {
+            var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
+            var now = Date.now();
+            var kept = list.filter(function (row) {
+              return !(row && String(row.id) === String(ident.id) && String(row.day) === keys.day);
+            });
+            kept.unshift({
+              id: ident.id,
+              name: ident.name || '',
+              day: keys.day,
+              at: now,
+              page: pagePathLabel(),
+              device: (dev && dev.device) || 'Other',
+              model: (dev && dev.model) || ''
+            });
+            if (kept.length > 400) kept.length = 400;
+            return fetch(VISIT_LOG_URL, {
+              method: 'POST',
+              headers: headers,
+              body: JSON.stringify({ log: kept })
+            }).then(function (r) {
+              if (!r.ok) throw new Error('write');
+              try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
+            });
+          });
       })
       .catch(function () {});
   }

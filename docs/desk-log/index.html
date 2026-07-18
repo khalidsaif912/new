@@ -88,6 +88,63 @@
     }
     .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
     .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .deviceStats {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .deviceStats h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #e2e8f0;
+    }
+    .deviceStatsNote {
+      margin: 0 0 10px;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .deviceTypeList { display: grid; gap: 8px; }
+    .deviceTypeRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #0f172a88;
+      border: 1px solid #33415555;
+    }
+    .deviceTypeName { font-size: 13px; font-weight: 800; color: #f1f5f9; }
+    .deviceTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
+    .deviceModelList {
+      grid-column: 1 / -1;
+      margin: 2px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 4px;
+    }
+    .deviceModelList li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .deviceModelList li b { color: #cbd5e1; font-weight: 800; }
+    .deviceStatsEmpty {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      text-align: center;
+      padding: 8px 0 2px;
+    }
     .list { display: grid; gap: 8px; }
     .row {
       background: #1e293b;
@@ -155,6 +212,11 @@
       <div class="stat"><b id="statToday">0</b><span>اليوم</span></div>
       <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
     </div>
+    <section class="deviceStats" id="deviceStats">
+      <h2>إحصائية الأجهزة</h2>
+      <p class="deviceStatsNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+      <div class="deviceTypeList" id="deviceTypeList"></div>
+    </section>
     <div class="list" id="list"></div>
   </div>
 
@@ -240,6 +302,76 @@
         return map[key] || key;
       }
 
+      function rowDeviceText(r) {
+        const type = deviceLabel(r.device);
+        const model = String(r.model || '').trim();
+        if (type && model && model !== r.device && model !== type) {
+          // Avoid "آيفون · iPhone" duplication when model is generic.
+          if (model === 'iPhone' || model === 'Android' || model === 'iPad' || model === 'Windows') {
+            return type;
+          }
+          return type + ' · ' + model;
+        }
+        return type || model || '';
+      }
+
+      function buildDeviceStats(rows) {
+        const byType = new Map();
+        rows.forEach((r) => {
+          if (!r) return;
+          const type = String(r.device || '').trim() || 'Other';
+          const model = String(r.model || '').trim() || type;
+          if (!byType.has(type)) byType.set(type, { count: 0, models: new Map() });
+          const bucket = byType.get(type);
+          bucket.count += 1;
+          bucket.models.set(model, (bucket.models.get(model) || 0) + 1);
+        });
+        return Array.from(byType.entries())
+          .map(([type, data]) => ({
+            type,
+            count: data.count,
+            models: Array.from(data.models.entries())
+              .map(([model, count]) => ({ model, count }))
+              .sort((a, b) => b.count - a.count || a.model.localeCompare(b.model))
+          }))
+          .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+      }
+
+      function renderDeviceStats(rows) {
+        const host = document.getElementById('deviceTypeList');
+        if (!host) return;
+        const stats = buildDeviceStats(rows);
+        if (!stats.length) {
+          host.innerHTML = '<div class="deviceStatsEmpty">لا بيانات أجهزة في هذا النطاق بعد.</div>';
+          return;
+        }
+        host.innerHTML = stats.map((s) => {
+          const showModels = s.models.length > 1 || (s.models[0] && s.models[0].model !== s.type);
+          const modelsHtml = showModels
+            ? '<ul class="deviceModelList">' +
+              s.models.map((m) =>
+                '<li><span>' + escapeHtml(m.model) + '</span><b>' + m.count + '</b></li>'
+              ).join('') +
+              '</ul>'
+            : '';
+          return (
+            '<div class="deviceTypeRow">' +
+              '<div class="deviceTypeName">' + escapeHtml(deviceLabel(s.type) || s.type) + '</div>' +
+              '<div class="deviceTypeCount">' + s.count + '</div>' +
+              modelsHtml +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function escapeHtml(s) {
+        return String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
       function unlock() {
         sessionStorage.setItem(AUTH_KEY, '1');
         gate.hidden = true;
@@ -301,6 +433,7 @@
           c.classList.toggle('active', c.getAttribute('data-filter') === filter);
         });
         const rows = filtered();
+        renderDeviceStats(rows);
         const list = document.getElementById('list');
         if (!rows.length) {
           list.innerHTML = '<div class="empty">لا توجد زيارات مسجّلة في هذا النطاق بعد.</div>';
@@ -319,7 +452,7 @@
           const nameEl = el.querySelector('.rowName');
           const textEl = el.querySelector('.rowNameText');
           textEl.textContent = ((r.name || '').trim() || 'بدون اسم محفوظ');
-          const device = deviceLabel(r.device);
+          const device = rowDeviceText(r);
           if (device) {
             const badge = document.createElement('span');
             badge.className = 'rowDevice';
