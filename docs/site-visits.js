@@ -326,6 +326,91 @@
     obs.observe(footer, { childList: true, subtree: false });
   }
 
+  function getRosterIdentity() {
+    try {
+      var id = (
+        localStorage.getItem('exportSavedEmpId') ||
+        localStorage.getItem('savedEmpId') ||
+        localStorage.getItem('importSavedEmpId') ||
+        ''
+      ).trim();
+      var name = (
+        localStorage.getItem('exportSavedEmpName') ||
+        localStorage.getItem('savedEmpName') ||
+        localStorage.getItem('importSavedEmpName') ||
+        ''
+      ).trim();
+      if (!id || !/^\d+$/.test(id)) return null;
+      return { id: id, name: name };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function pagePathLabel() {
+    try {
+      var p = location.pathname || '/';
+      if (/\/alumni(\/|$)/.test(p)) return 'alumni';
+      if (/\/training(\/|$)/.test(p)) return 'training';
+      if (/\/my-schedules(\/|$)/.test(p)) return 'my-schedules';
+      if (/\/import(\/|$)/.test(p)) return 'import';
+      if (/\/date\//.test(p)) return 'roster';
+      return 'home';
+    } catch (e) {
+      return 'site';
+    }
+  }
+
+  var VISIT_LOG_NS = 'roster-site-visits';
+  var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
+  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDay';
+
+  function logIdentifiedVisit() {
+    var ident = getRosterIdentity();
+    if (!ident) return;
+    var keys = muscatYmd();
+    var stamp = keys.day + ':' + ident.id;
+    try {
+      if (localStorage.getItem(VISIT_LOGGED_KEY) === stamp) return;
+    } catch (e) {}
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'X-Mantle-Key': VISIT_LOG_KEY
+    };
+
+    fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('read');
+        return r.json();
+      })
+      .then(function (cur) {
+        var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
+        var now = Date.now();
+        var kept = list.filter(function (row) {
+          return !(row && String(row.id) === String(ident.id) && String(row.day) === keys.day);
+        });
+        kept.unshift({
+          id: ident.id,
+          name: ident.name || '',
+          day: keys.day,
+          at: now,
+          page: pagePathLabel()
+        });
+        if (kept.length > 400) kept.length = 400;
+        return fetch(VISIT_LOG_URL, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ log: kept })
+        }).then(function (r) {
+          if (!r.ok) throw new Error('write');
+          try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
+        });
+      })
+      .catch(function () {});
+  }
+
   function boot() {
     if (booted) return;
     booted = true;
@@ -339,6 +424,8 @@
         return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
       }
     });
+    // Identified staff log (once/day) — delayed so it never blocks the counter UI.
+    window.setTimeout(logIdentifiedVisit, 1200);
     window.setTimeout(paint, 250);
     window.setTimeout(paint, 900);
     window.setTimeout(function () {

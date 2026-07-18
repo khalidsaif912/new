@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>·</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .gate, .app { max-width: 560px; margin: 0 auto; padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)); }
+    .gate { text-align: center; padding-top: 18vh; }
+    .gate h1 { font-size: 18px; margin: 0 0 8px; color: #94a3b8; font-weight: 700; }
+    .gate p { margin: 0 0 16px; font-size: 13px; color: #64748b; }
+    .gate input {
+      width: min(220px, 100%);
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: .2em;
+      outline: none;
+    }
+    .gate input:focus { border-color: #60a5fa; }
+    .gate button, .toolbar button, .chip {
+      border: 0;
+      border-radius: 12px;
+      min-height: 42px;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .gate button {
+      margin-top: 12px;
+      background: #2563eb;
+      color: #fff;
+      width: min(220px, 100%);
+    }
+    .gateErr { min-height: 20px; margin-top: 10px; color: #f87171; font-size: 13px; font-weight: 700; }
+    .app[hidden], .gate[hidden] { display: none !important; }
+    .head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .head h1 { margin: 0; font-size: 20px; font-weight: 800; color: #f8fafc; }
+    .head p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; line-height: 1.45; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .chip {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      min-height: 36px;
+      font-size: 12px;
+    }
+    .chip.active { background: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
+    .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .list { display: grid; gap: 8px; }
+    .row {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .rowName { font-size: 14px; font-weight: 800; color: #f1f5f9; margin: 0 0 4px; }
+    .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
+    .empty, .error {
+      text-align: center;
+      padding: 28px 14px;
+      border-radius: 14px;
+      border: 1px dashed #334155;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .error { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
+    .lockOut {
+      background: transparent;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      font-size: 12px;
+      min-height: 34px;
+      padding: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="gate" id="gate">
+    <h1>دخول خاص</h1>
+    <p>أدخل الرمز للمتابعة</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="12" autocomplete="off" autofocus>
+    <div>
+      <button type="button" id="pinBtn">دخول</button>
+    </div>
+    <div class="gateErr" id="gateErr"></div>
+  </div>
+
+  <div class="app" id="app" hidden>
+    <div class="head">
+      <div>
+        <h1>سجل الزوار</h1>
+        <p>موظفون حفظوا رقمهم في الروستر ودخلوا الموقع (مرة واحدة في اليوم لكل رقم).</p>
+      </div>
+      <button type="button" class="lockOut" id="lockOut">قفل</button>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
+      <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
+      <button type="button" class="chip" data-filter="all" id="fAll">الكل</button>
+      <button type="button" class="chip" id="refreshBtn">تحديث</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="statToday">0</b><span>اليوم</span></div>
+      <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <script>
+    (function () {
+      const PIN = '912';
+      const AUTH_KEY = 'rosterVisitDeskAuth';
+      const MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/index';
+      const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+      let filter = 'today';
+      let log = [];
+
+      const gate = document.getElementById('gate');
+      const app = document.getElementById('app');
+      const pinInput = document.getElementById('pinInput');
+      const gateErr = document.getElementById('gateErr');
+
+      function muscatParts() {
+        try {
+          const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Muscat',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hour12: false
+          }).formatToParts(new Date());
+          const map = {};
+          parts.forEach((p) => { if (p.type !== 'literal') map[p.type] = p.value; });
+          return {
+            day: map.year + '-' + map.month + '-' + map.day,
+            month: map.year + '-' + map.month
+          };
+        } catch (e) {
+          const d = new Date();
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return { day: y + '-' + m + '-' + day, month: y + '-' + m };
+        }
+      }
+
+      function formatTime(at) {
+        try {
+          return new Date(Number(at) || Date.now()).toLocaleString('ar-OM', {
+            timeZone: 'Asia/Muscat',
+            hour: '2-digit',
+            minute: '2-digit',
+            day: 'numeric',
+            month: 'short'
+          });
+        } catch (e) {
+          return String(at || '');
+        }
+      }
+
+      function pageLabel(page) {
+        const map = {
+          home: 'الرئيسية',
+          roster: 'الروستر',
+          alumni: 'زملاء سابقون',
+          training: 'التدريب',
+          'my-schedules': 'جدولي',
+          import: 'الوارد'
+        };
+        return map[page] || page || '—';
+      }
+
+      function unlock() {
+        sessionStorage.setItem(AUTH_KEY, '1');
+        gate.hidden = true;
+        app.hidden = false;
+        loadLog();
+      }
+
+      function lock() {
+        sessionStorage.removeItem(AUTH_KEY);
+        app.hidden = true;
+        gate.hidden = false;
+        pinInput.value = '';
+        gateErr.textContent = '';
+        setTimeout(() => pinInput.focus(), 30);
+      }
+
+      function tryPin() {
+        const v = (pinInput.value || '').trim();
+        if (v !== PIN) {
+          gateErr.textContent = 'رمز غير صحيح';
+          pinInput.select();
+          return;
+        }
+        unlock();
+      }
+
+      async function loadLog() {
+        const list = document.getElementById('list');
+        list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        try {
+          const res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('fail');
+          const json = await res.json();
+          log = Array.isArray(json.log) ? json.log.slice() : [];
+          log.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+          render();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحميل السجل</div>';
+        }
+      }
+
+      function filtered() {
+        const keys = muscatParts();
+        if (filter === 'today') return log.filter((r) => r && r.day === keys.day);
+        if (filter === 'month') return log.filter((r) => r && String(r.day || '').startsWith(keys.month));
+        return log.slice();
+      }
+
+      function render() {
+        const keys = muscatParts();
+        const todayN = log.filter((r) => r && r.day === keys.day).length;
+        const monthN = log.filter((r) => r && String(r.day || '').startsWith(keys.month)).length;
+        document.getElementById('statToday').textContent = String(todayN);
+        document.getElementById('statMonth').textContent = String(monthN);
+        document.querySelectorAll('.chip[data-filter]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-filter') === filter);
+        });
+        const rows = filtered();
+        const list = document.getElementById('list');
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">لا توجد زيارات مسجّلة في هذا النطاق بعد.</div>';
+          return;
+        }
+        list.innerHTML = rows.map((r) => {
+          const name = (r.name || '').trim() || 'بدون اسم محفوظ';
+          const id = r.id || '—';
+          return (
+            '<article class="row">' +
+              '<p class="rowName"></p>' +
+              '<p class="rowMeta"></p>' +
+            '</article>'
+          );
+        }).join('');
+        Array.from(list.children).forEach((el, i) => {
+          const r = rows[i];
+          el.querySelector('.rowName').textContent = ((r.name || '').trim() || 'بدون اسم محفوظ');
+          el.querySelector('.rowMeta').textContent =
+            '#' + (r.id || '—') +
+            ' · ' + formatTime(r.at) +
+            ' · ' + pageLabel(r.page);
+        });
+      }
+
+      document.getElementById('pinBtn').addEventListener('click', tryPin);
+      pinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') tryPin();
+      });
+      document.getElementById('lockOut').addEventListener('click', lock);
+      document.getElementById('refreshBtn').addEventListener('click', loadLog);
+      document.querySelectorAll('.chip[data-filter]').forEach((c) => {
+        c.addEventListener('click', () => {
+          filter = c.getAttribute('data-filter') || 'today';
+          render();
+        });
+      });
+
+      if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();
+      else setTimeout(() => pinInput.focus(), 50);
+    })();
+  </script>
+</body>
+</html>
