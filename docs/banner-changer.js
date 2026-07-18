@@ -44,7 +44,8 @@
     'banner19.jpg',
     'banner28.jpg',
     'banner29.jpg',
-    'banner30.jpg'
+    'banner30.jpg',
+    'banner31.jpg'
   ];
 
   /** Per-banner crop/scrim tuning (logo-left layouts, etc.). */
@@ -60,6 +61,12 @@
       positionMobile: '50% 42%',
       scrim:
         'linear-gradient(to right,rgba(8,16,40,.42) 0%,rgba(8,16,40,.18) 48%,rgba(8,16,40,.28) 100%)',
+    },
+    'banner31.jpg': {
+      position: '50% 48%',
+      positionMobile: '50% 45%',
+      scrim:
+        'linear-gradient(to right,rgba(20,8,12,.45) 0%,rgba(20,8,12,.2) 50%,rgba(20,8,12,.32) 100%)',
     },
   };
 
