@@ -602,19 +602,67 @@
       gap: 8px;
       padding-inline-end: 22px;
     }
-    .tributeDelete {
+    .tributeDelete,
+    .tributePinBtn {
       flex-shrink: 0;
-      border: 1px solid #fecaca;
-      background: #fef2f2;
-      color: #b91c1c;
       border-radius: 10px;
       min-width: 34px;
       min-height: 34px;
       font: inherit;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 800;
       line-height: 1;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeDelete {
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 16px;
+    }
+    .tributePinBtn {
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+      color: #b45309;
+    }
+    .tributePinBtn.is-pinned {
+      border-color: #fbbf24;
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .tributeModActions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tributeCard.is-pinned {
+      border-color: #fbbf24;
+      box-shadow: 0 2px 12px rgba(245,158,11,.16);
+    }
+    .tributePinnedBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0 0 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .alumniModHotspot {
+      width: 28px;
+      height: 30px;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      flex: none;
+      cursor: default;
+      opacity: 0;
       -webkit-tap-highlight-color: transparent;
     }
     .tributeModBar {
@@ -813,12 +861,18 @@
         toPrefix: 'إلى: ',
         modUnlock: 'إدارة الرسائل',
         modLock: 'إغلاق الإدارة',
-        modOn: 'وضع الحذف مفعّل',
-        modAsk: 'أدخل رمز الإدارة لحذف الرسائل:',
+        modOn: 'وضع الإدارة مفعّل',
+        modAsk: 'أدخل رمز الإدارة:',
         modBad: 'رمز غير صحيح.',
         modConfirm: 'حذف هذه الرسالة؟',
         modDeleted: 'تم حذف الرسالة.',
-        modDeleteFail: 'تعذر الحذف.'
+        modDeleteFail: 'تعذر الحذف.',
+        pin: 'تثبيت',
+        unpin: 'إلغاء التثبيت',
+        pinned: 'مثبّتة',
+        pinOk: 'تم تثبيت الرسالة.',
+        unpinOk: 'تم إلغاء التثبيت.',
+        pinFail: 'تعذر تحديث التثبيت.'
       },
       en: {
         eyebrow: 'Tribute',
@@ -851,12 +905,18 @@
         toPrefix: 'To: ',
         modUnlock: 'Moderate messages',
         modLock: 'Exit moderation',
-        modOn: 'Delete mode on',
-        modAsk: 'Enter the moderation PIN to delete messages:',
+        modOn: 'Moderation mode on',
+        modAsk: 'Enter the moderation PIN:',
         modBad: 'Incorrect PIN.',
         modConfirm: 'Delete this message?',
         modDeleted: 'Message deleted.',
-        modDeleteFail: 'Could not delete.'
+        modDeleteFail: 'Could not delete.',
+        pin: 'Pin',
+        unpin: 'Unpin',
+        pinned: 'Pinned',
+        pinOk: 'Message pinned.',
+        unpinOk: 'Message unpinned.',
+        pinFail: 'Could not update pin.'
       }
     };
 
@@ -1035,7 +1095,7 @@
         if (!res.ok) throw new Error('fail');
         const json = await res.json();
         tributeMessages = Array.isArray(json.messages) ? json.messages.slice() : [];
-        tributeMessages.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+        sortTributeMessages();
       } catch (e) {
         tributeMessages = [];
         throw e;
@@ -1044,7 +1104,17 @@
       }
     }
 
+    function sortTributeMessages() {
+      tributeMessages.sort((a, b) => {
+        const ap = a && a.pinned ? 1 : 0;
+        const bp = b && b.pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return (Number(b.at) || 0) - (Number(a.at) || 0);
+      });
+    }
+
     async function writeTributeList(list) {
+      sortTributeMessagesList(list);
       const headers = {
         'Content-Type': 'application/json',
         'X-Mantle-Key': MANTLE_KEY
@@ -1056,6 +1126,16 @@
       });
       if (!putRes.ok) throw new Error('write');
       tributeMessages = list;
+      sortTributeMessages();
+    }
+
+    function sortTributeMessagesList(list) {
+      list.sort((a, b) => {
+        const ap = a && a.pinned ? 1 : 0;
+        const bp = b && b.pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return (Number(b.at) || 0) - (Number(a.at) || 0);
+      });
     }
 
     async function saveTribute(msg) {
@@ -1084,6 +1164,26 @@
       await writeTributeList(list);
     }
 
+    async function setTributePinned(id, pinned) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = Array.isArray(cur.messages) ? cur.messages.slice() : [];
+      let found = false;
+      list.forEach((m) => {
+        if (String(m.id) === String(id)) {
+          m.pinned = !!pinned;
+          found = true;
+        }
+      });
+      if (!found) throw new Error('missing');
+      await writeTributeList(list);
+    }
+
     function updateModBar() {
       const bar = document.getElementById('tributeModBar');
       const btn = document.getElementById('tributeModBtn');
@@ -1103,14 +1203,26 @@
       bar?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function bindTopBtnModReveal() {
+    function bindRefreshRightModReveal() {
       let taps = 0;
       let resetTimer = null;
       function attach() {
-        const topBtn = document.getElementById('bgScrollTopBtn');
-        if (!topBtn || topBtn.dataset.modRevealBound === '1') return !!topBtn;
-        topBtn.dataset.modRevealBound = '1';
-        topBtn.addEventListener('click', () => {
+        const wrap =
+          document.querySelector('.alumniBgMount .bgTextureShuffleWrap') ||
+          document.querySelector('.bgTextureShuffleWrap');
+        const refresh = document.getElementById('bgRefreshBtn');
+        if (!wrap || !refresh) return false;
+        if (document.getElementById('alumniModHotspot')) return true;
+        const hot = document.createElement('button');
+        hot.type = 'button';
+        hot.id = 'alumniModHotspot';
+        hot.className = 'alumniModHotspot';
+        hot.setAttribute('aria-hidden', 'true');
+        hot.tabIndex = -1;
+        wrap.appendChild(hot);
+        hot.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           taps += 1;
           clearTimeout(resetTimer);
           resetTimer = setTimeout(() => { taps = 0; }, 1000);
@@ -1247,15 +1359,22 @@
         const to = escapeHtml(resolveToName(msg));
         const date = escapeHtml(formatTributeDate(msg.at));
         const id = escapeHtml(msg.id || '');
-        const delBtn = modUnlocked
-          ? ('<button type="button" class="tributeDelete" data-del-id="' + id + '" title="' + escapeHtml(t('modConfirm')) + '" aria-label="Delete">×</button>')
-          : '';
+        const pinned = !!(msg && msg.pinned);
+        let modActions = '';
+        if (modUnlocked) {
+          modActions =
+            '<div class="tributeModActions">' +
+              '<button type="button" class="tributePinBtn' + (pinned ? ' is-pinned' : '') + '" data-pin-id="' + id + '" data-pinned="' + (pinned ? '1' : '0') + '" title="' + escapeHtml(pinned ? t('unpin') : t('pin')) + '">' + (pinned ? '📌' : '📍') + '</button>' +
+              '<button type="button" class="tributeDelete" data-del-id="' + id + '" title="' + escapeHtml(t('modConfirm')) + '" aria-label="Delete">×</button>' +
+            '</div>';
+        }
         return (
-          '<article class="tributeCard">' +
+          '<article class="tributeCard' + (pinned ? ' is-pinned' : '') + '">' +
             '<span class="tributeHeart" aria-hidden="true">💕</span>' +
+            (pinned ? ('<div class="tributePinnedBadge">📌 ' + escapeHtml(t('pinned')) + '</div>') : '') +
             '<div class="tributeCardHead">' +
               '<p class="tributeText">' + text + '</p>' +
-              delBtn +
+              modActions +
             '</div>' +
             '<p class="tributeBy">' + from + '</p>' +
             '<p class="tributeTo">' + escapeHtml(t('toPrefix')) + to + '</p>' +
@@ -1279,6 +1398,26 @@
           } catch (e) {
             btn.disabled = false;
             window.alert(t('modDeleteFail'));
+          }
+        });
+      });
+      wall.querySelectorAll('[data-pin-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-pin-id');
+          const wasPinned = btn.getAttribute('data-pinned') === '1';
+          if (!id) return;
+          btn.disabled = true;
+          try {
+            await setTributePinned(id, !wasPinned);
+            renderTributes();
+            const status = document.getElementById('tributeStatus');
+            if (status) {
+              status.className = 'tributeStatus ok';
+              status.textContent = wasPinned ? t('unpinOk') : t('pinOk');
+            }
+          } catch (e) {
+            btn.disabled = false;
+            window.alert(t('pinFail'));
           }
         });
       });
@@ -1482,7 +1621,7 @@
       document.getElementById('homeBtn').href = root + '/';
       currentKind = getSavedTab();
       updateModBar();
-      bindTopBtnModReveal();
+      bindRefreshRightModReveal();
       try {
         data = await loadAlumniData();
         applyUi();
