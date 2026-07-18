@@ -180,6 +180,33 @@
       "kind": "import",
       "note": "",
       "noteAr": ""
+    },
+    {
+      "id": "alumni-delivery-mubarak-hashimi",
+      "name": "Mubarak Al Hashimi",
+      "nameAr": "مبارك الهاشمي",
+      "department": "Delivery",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "alumni-delivery-salam-shukeili",
+      "name": "Salam Al Shukeili",
+      "nameAr": "سلام الشكيلي",
+      "department": "Delivery",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
+    },
+    {
+      "id": "alumni-delivery-rashid-kharusi",
+      "name": "Rashid Al Kharusi",
+      "nameAr": "راشد الخروصي",
+      "department": "Delivery",
+      "kind": "import",
+      "note": "",
+      "noteAr": ""
     }
   ]
 }
