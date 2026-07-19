@@ -537,6 +537,8 @@
     const grid = document.getElementById('bannerGrid');
     const lazyImgs = [];
 
+    buildChromeFadeSettingsCell(grid);
+
     availableBanners.forEach(function (name) {
       const num = bannerNumberLabel(name);
       const wrap = document.createElement('div');
@@ -643,7 +645,26 @@
 
   var CHROME_FADE_MS = 5000;
   var CHROME_DIM_OPACITY = '0.1';
+  var CHROME_FADE_KEY = 'roster_banner_chrome_fade';
   var chromeFadeTimer = null;
+
+  /** off | title (keep title) | all */
+  function getChromeFadeMode() {
+    try {
+      var v = localStorage.getItem(CHROME_FADE_KEY) || 'all';
+      if (v === 'off' || v === 'title' || v === 'all') return v;
+    } catch (e) {}
+    return 'all';
+  }
+
+  function setChromeFadeMode(mode) {
+    if (mode !== 'off' && mode !== 'title' && mode !== 'all') mode = 'all';
+    try {
+      localStorage.setItem(CHROME_FADE_KEY, mode);
+    } catch (e) {}
+    injectChromeFadeStyles();
+    scheduleHeaderChromeFade();
+  }
 
   function getHeaderChromeEls() {
     return Array.from(
@@ -666,26 +687,53 @@
       style.id = 'header-chrome-fade-css';
       document.head.appendChild(style);
     }
-    style.textContent = [
+    var mode = getChromeFadeMode();
+    var rules = [
       '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,',
       '#pageTitle,.bannerTitle,.bannerTitleEyebrow,.bannerTitleMain,',
       '.page-title,.page-title-eyebrow,.page-title-main{',
       'transition:opacity .55s ease!important;',
-      '}',
+      '}'
+    ];
+    if (mode === 'off') {
+      style.textContent = rules.join('');
+      return;
+    }
+    rules.push(
       'html.header-chrome-dim #langToggle,',
       'html.header-chrome-dim #banner-changer-btn,',
       'html.header-chrome-dim #dateTag,',
-      'html.header-chrome-dim .header .dateTag,',
-      'html.header-chrome-dim #pageTitle,',
-      'html.header-chrome-dim .bannerTitle,',
-      'html.header-chrome-dim .bannerTitleEyebrow,',
-      'html.header-chrome-dim .bannerTitleMain,',
-      'html.header-chrome-dim .page-title,',
-      'html.header-chrome-dim .page-title-eyebrow,',
-      'html.header-chrome-dim .page-title-main{',
+      'html.header-chrome-dim .header .dateTag{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
-      '}',
-      /* Sticky :hover on touch keeps controls at full opacity — only desktop. */
+      '}'
+    );
+    if (mode === 'all') {
+      rules.push(
+        'html.header-chrome-dim #pageTitle,',
+        'html.header-chrome-dim .bannerTitle,',
+        'html.header-chrome-dim .bannerTitleEyebrow,',
+        'html.header-chrome-dim .bannerTitleMain,',
+        'html.header-chrome-dim .page-title,',
+        'html.header-chrome-dim .page-title-eyebrow,',
+        'html.header-chrome-dim .page-title-main{',
+        'opacity:' + CHROME_DIM_OPACITY + '!important;',
+        '}'
+      );
+    } else {
+      // title mode: force title fully visible while controls dim
+      rules.push(
+        'html.header-chrome-dim #pageTitle,',
+        'html.header-chrome-dim .bannerTitle,',
+        'html.header-chrome-dim .bannerTitleEyebrow,',
+        'html.header-chrome-dim .bannerTitleMain,',
+        'html.header-chrome-dim .page-title,',
+        'html.header-chrome-dim .page-title-eyebrow,',
+        'html.header-chrome-dim .page-title-main{',
+        'opacity:1!important;',
+        '}'
+      );
+    }
+    rules.push(
       '@media (hover:hover) and (pointer:fine){',
       'html.header-chrome-dim #langToggle:hover,',
       'html.header-chrome-dim #langToggle:focus-visible,',
@@ -700,21 +748,27 @@
       'html.header-chrome-dim #banner-changer-btn:focus-visible{',
       'opacity:1!important;',
       '}'
-    ].join('');
+    );
+    style.textContent = rules.join('');
   }
 
   function setHeaderChromeDim(dim) {
+    var mode = getChromeFadeMode();
+    if (mode === 'off') dim = false;
     document.documentElement.classList.toggle('header-chrome-dim', !!dim);
-    // Inline fallback so title always dims even if CSS is cached/overridden.
     getHeaderTitleEls().forEach(function (el) {
-      if (dim) el.style.setProperty('opacity', CHROME_DIM_OPACITY, 'important');
-      else el.style.removeProperty('opacity');
+      if (dim && mode === 'all') {
+        el.style.setProperty('opacity', CHROME_DIM_OPACITY, 'important');
+      } else {
+        el.style.removeProperty('opacity');
+      }
     });
   }
 
   function scheduleHeaderChromeFade() {
     if (chromeFadeTimer) clearTimeout(chromeFadeTimer);
     setHeaderChromeDim(false);
+    if (getChromeFadeMode() === 'off') return;
     chromeFadeTimer = setTimeout(function () {
       setHeaderChromeDim(true);
     }, CHROME_FADE_MS);
@@ -735,7 +789,6 @@
     injectChromeFadeStyles();
     scheduleHeaderChromeFade();
     getHeaderChromeEls().forEach(bindChromeWake);
-    // Any tap on the header wakes chrome (needed on touch; no sticky hover).
     document.querySelectorAll('.header, .topbar').forEach(function (header) {
       if (header.dataset.chromeHeaderWake === '1') return;
       header.dataset.chromeHeaderWake = '1';
@@ -743,10 +796,49 @@
         scheduleHeaderChromeFade();
       });
     });
-    // Banner button may be created slightly later — rebind once.
     setTimeout(function () {
       getHeaderChromeEls().forEach(bindChromeWake);
     }, 400);
+  }
+
+  function buildChromeFadeSettingsCell(grid) {
+    var mode = getChromeFadeMode();
+    var cell = document.createElement('div');
+    cell.id = 'bannerChromeFadeSettings';
+    cell.style.cssText = [
+      'border-radius:10px',
+      'border:1.5px dashed rgba(224,189,99,.45)',
+      'background:rgba(255,255,255,.04)',
+      'padding:8px 7px',
+      'display:flex',
+      'flex-direction:column',
+      'justify-content:center',
+      'gap:5px',
+      'min-height:70px',
+      'box-sizing:border-box'
+    ].join(';');
+    cell.innerHTML =
+      '<div style="color:#f5ead8;font-size:11px;font-weight:800;line-height:1.2;margin-bottom:2px;">إخفاء العناصر</div>' +
+      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
+      '<input type="radio" name="bannerChromeFade" value="off" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">بدون إخفاء</label>' +
+      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
+      '<input type="radio" name="bannerChromeFade" value="title" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إبقاء العنوان</label>' +
+      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
+      '<input type="radio" name="bannerChromeFade" value="all" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إخفاء الكل</label>';
+    grid.appendChild(cell);
+    cell.querySelectorAll('input[name="bannerChromeFade"]').forEach(function (input) {
+      if (input.value === mode) input.checked = true;
+      input.addEventListener('change', function () {
+        if (!input.checked) return;
+        setChromeFadeMode(input.value);
+      });
+      input.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    });
+    cell.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
   }
 
   function init() {
