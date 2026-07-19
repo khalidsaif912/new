@@ -19,6 +19,8 @@ from roster_cta_snippets import (  # noqa: E402
 
 MARKER = "wc-vote-promo.js"
 INJECT_LINE = "    addScript(root + '/wc-vote-promo.js?v=' + ver);"
+CELEBRATE_MARKER = "wc-final-celebrate.js"
+CELEBRATE_LINE = "    addScript(root + '/wc-final-celebrate.js?v=' + ver);"
 
 LOAD_SECONDARY_RE = re.compile(
     r"(function loadSecondary\(\) \{[\s\S]*?)(  \})",
@@ -40,25 +42,42 @@ INDEX_LOAD = {
 def patch_load_block(text: str) -> tuple[str, bool]:
     if "function loadSecondary()" not in text:
         return text, False
-    if MARKER in text:
-        return text, False
+    changed = False
 
-    def repl(m: re.Match[str]) -> str:
-        body = m.group(1)
-        if MARKER in body:
-            return m.group(0)
-        if "site-share.js" in body:
-            body = body.replace(
-                "addScript(root + '/site-share.js?v=' + ver);",
-                "addScript(root + '/site-share.js?v=' + ver);\n" + INJECT_LINE,
+    if MARKER not in text:
+
+        def repl(m: re.Match[str]) -> str:
+            body = m.group(1)
+            if MARKER in body:
+                return m.group(0)
+            if "site-share.js" in body:
+                body = body.replace(
+                    "addScript(root + '/site-share.js?v=' + ver);",
+                    "addScript(root + '/site-share.js?v=' + ver);\n" + INJECT_LINE,
+                    1,
+                )
+            else:
+                body = body.rstrip() + "\n" + INJECT_LINE + "\n"
+            return body + m.group(2)
+
+        new_text, n = LOAD_SECONDARY_RE.subn(repl, text, count=1)
+        if n > 0:
+            text = new_text
+            changed = True
+
+    if CELEBRATE_MARKER not in text and MARKER in text:
+        if INJECT_LINE in text and CELEBRATE_LINE not in text:
+            text = text.replace(INJECT_LINE, INJECT_LINE + "\n" + CELEBRATE_LINE, 1)
+            changed = True
+        elif "wc-vote-promo.js?v=' + ver);" in text and CELEBRATE_LINE not in text:
+            text = text.replace(
+                "addScript(root + '/wc-vote-promo.js?v=' + ver);",
+                "addScript(root + '/wc-vote-promo.js?v=' + ver);\n" + CELEBRATE_LINE,
                 1,
             )
-        else:
-            body = body.rstrip() + "\n" + INJECT_LINE + "\n"
-        return body + m.group(2)
+            changed = True
 
-    new_text, n = LOAD_SECONDARY_RE.subn(repl, text, count=1)
-    return new_text, n > 0
+    return text, changed
 
 
 def patch_site_apps_modal(text: str) -> tuple[str, bool]:

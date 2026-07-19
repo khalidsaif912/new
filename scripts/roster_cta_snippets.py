@@ -1217,7 +1217,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260719c"
+IOS_PERF_VER = "20260719d"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1239,6 +1239,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
+    addScript(root + '/wc-final-celebrate.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
@@ -1271,6 +1272,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
+    addScript(root + '/wc-final-celebrate.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
