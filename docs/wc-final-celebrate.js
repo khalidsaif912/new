@@ -22,10 +22,13 @@
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var MANTLE_URL = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
   var LOCAL_WINNER_KEY = 'rosterWcFinalWinner_v1';
+  var CONFIRMED_KEY = 'rosterWcFinalConfirmed_v2';
   var BURST_SESSION_KEY = 'rosterWcFinalBurstSession_v1';
   var BURST_DAY_KEY = 'rosterWcFinalBurstDay_v2';
   var BURST_PER_DAY = 3;
   var PIN = '912';
+  // Do not celebrate until ESPN marks the final as completed.
+  var WAIT_FOR_MATCH_END = true;
   var BURST_MS = 5000;
   var POLL_MS = 45000;
 
@@ -130,6 +133,30 @@
     };
   }
 
+  function clearUnconfirmedWinnerCache() {
+    try {
+      if (localStorage.getItem(CONFIRMED_KEY) === '1') return;
+      localStorage.removeItem(LOCAL_WINNER_KEY);
+    } catch (e) {}
+  }
+
+  function markMatchConfirmed(team) {
+    if (!team) return;
+    try {
+      localStorage.setItem(CONFIRMED_KEY, '1');
+      localStorage.setItem(LOCAL_WINNER_KEY, team.id);
+    } catch (e) {}
+  }
+
+  function readConfirmedWinner() {
+    try {
+      if (localStorage.getItem(CONFIRMED_KEY) !== '1') return null;
+      return readLocalWinner();
+    } catch (e) {
+      return null;
+    }
+  }
+
   function fetchMantleWinner() {
     return fetch(MANTLE_URL + '?ts=' + nowMs(), {
       headers: mantleHeaders(),
@@ -140,7 +167,8 @@
         return r.json();
       })
       .then(function (data) {
-        var id = data && data.winner;
+        if (!data || !data.confirmed) return null;
+        var id = data.winner;
         return id && TEAMS[id] ? TEAMS[id] : null;
       })
       .catch(function () {
@@ -151,6 +179,7 @@
   function publishMantleWinner(team, meta) {
     var body = {
       winner: team.id,
+      confirmed: true,
       at: nowMs(),
       source: (meta && meta.source) || 'espn',
       score: (meta && meta.score) || '',
@@ -223,23 +252,27 @@
 
   function resolveWinner() {
     if (state.winner) return Promise.resolve(state.winner);
-    var local = readLocalWinner();
-    if (local) {
-      state.winner = local;
-      return Promise.resolve(local);
+
+    var confirmed = readConfirmedWinner();
+    if (confirmed) {
+      state.winner = confirmed;
+      return Promise.resolve(confirmed);
     }
-    return fetchMantleWinner().then(function (m) {
-      if (m) {
-        state.winner = m;
-        writeLocalWinner(m);
-        return m;
-      }
-      return fetchEspnWinner().then(function (hit) {
-        if (!hit || !hit.team) return null;
+
+    // Before kickoff/final whistle: poll ESPN only (ignore old test caches).
+    return fetchEspnWinner().then(function (hit) {
+      if (hit && hit.team) {
         state.winner = hit.team;
-        writeLocalWinner(hit.team);
+        markMatchConfirmed(hit.team);
         publishMantleWinner(hit.team, hit);
         return hit.team;
+      }
+      // Fallback: another client already confirmed via Mantle after match end.
+      return fetchMantleWinner().then(function (m) {
+        if (!m) return null;
+        state.winner = m;
+        markMatchConfirmed(m);
+        return m;
       });
     });
   }
@@ -696,12 +729,13 @@
   }
 
   function checkUrlForce() {
+    // Manual URL force disabled until after the final — use console force if needed.
+    if (WAIT_FOR_MATCH_END) return false;
     try {
       var q = new URLSearchParams(location.search || '');
       var win = (q.get('wcwin') || q.get('wcCelebrate') || '').toLowerCase();
       var pin = q.get('wcpin') || '';
       var demo = q.get('wcdemo') === '1';
-      // Survive redirects that may drop query once (session stash).
       if (!win) {
         try {
           var pending = sessionStorage.getItem('rosterWcFinalPending_v1');
@@ -722,6 +756,7 @@
       }
       if ((win === 'argentina' || win === 'spain') && pin === PIN) {
         var team = TEAMS[win];
+        markMatchConfirmed(team);
         publishMantleWinner(team, { source: 'manual-url', score: '' });
         celebrate(team, { forceBurst: true });
         try {
@@ -741,10 +776,11 @@
   }
 
   function boot() {
-    // URL / manual force must run even if celebrate window parsing fails.
+    clearUnconfirmedWinnerCache();
     if (checkUrlForce()) return;
     if (!inCelebrateWindow()) return;
     tick();
+    // Keep polling until ESPN/Mantle confirms the final is over.
     state.pollTimer = setInterval(function () {
       if (!inCelebrateWindow()) {
         clearInterval(state.pollTimer);
@@ -764,6 +800,7 @@
       unlockAudio();
       var team = TEAMS[String(teamId || '').toLowerCase()];
       if (!team) return false;
+      markMatchConfirmed(team);
       publishMantleWinner(team, { source: 'manual', score: '' });
       celebrate(team, { forceBurst: true });
       return true;
@@ -779,6 +816,7 @@
         winner: state.winner && state.winner.id,
         until: END_ISO_MUSCAT,
         active: inCelebrateWindow(),
+        waitingForMatch: WAIT_FOR_MATCH_END && !readConfirmedWinner() && !state.winner,
         sound: soundEnabled && audioUnlocked,
         burstsToday: day.count,
         burstsMax: BURST_PER_DAY
