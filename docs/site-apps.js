@@ -359,9 +359,16 @@
     var style = document.createElement('style');
     style.id = 'siteAppsCompactCss';
     style.textContent = [
-      '.quickActions.secondaryBar{max-width:min(100%,540px)!important;margin-top:8px!important;gap:8px!important;}',
-      '.secondaryBar .roster-cta-btn{min-height:46px!important;padding:10px 10px!important;font-size:12.5px!important;}',
-      '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;}',
+      '.quickActions.secondaryBar{max-width:min(100%,540px)!important;margin-top:8px!important;gap:8px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}',
+      '.secondaryBar .roster-cta-btn{min-height:46px!important;padding:10px 10px!important;font-size:12.5px!important;width:100%!important;min-width:0!important;}',
+      '#alumniBtn.roster-cta-btn--alumni,a.roster-cta-btn--alumni{',
+      'display:inline-flex!important;align-items:center!important;justify-content:center!important;',
+      'gap:8px!important;background:#f0fdfa!important;border:1.5px solid #99f6e4!important;',
+      'border-radius:999px!important;color:#0f766e!important;text-decoration:none!important;',
+      'box-shadow:none!important;font-weight:700!important;',
+      '}',
+      '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;color:inherit!important;}',
+      '#alumniBtn .roster-cta-icon svg{stroke:#0f766e!important;}',
       '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
       '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
       '.spotlightBar .spotlightBtn{width:min(100%,320px)!important;justify-content:center!important;text-align:center!important;min-height:50px!important;padding:10px 16px!important;gap:8px!important;margin-inline:auto!important;}',
@@ -458,6 +465,7 @@
       btn = document.getElementById('alumniBtn');
     }
     if (!btn) return;
+    btn.className = 'roster-cta-btn roster-cta-btn--alumni';
     btn.href = alumniPageUrl();
     var lbl = btn.querySelector('.roster-cta-label');
     if (lbl) lbl.textContent = alumniLabel();

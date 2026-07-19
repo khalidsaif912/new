@@ -751,11 +751,59 @@ def patch_roster_icons_script(html: str) -> str:
     return html_out
 
 
+def patch_alumni_css(html: str) -> str:
+    """Restore alumni + secondaryBar styles if a roster regen dropped them."""
+    if ".roster-cta-btn--alumni" in html and ".quickActions.secondaryBar" in html:
+        return html
+    snippet = (
+        "    .quickActions.secondaryBar,\n"
+        "    .quickActions.rosterCopyBar,\n"
+        "    .quickActions.alumniBar {\n"
+        "      margin-top: 10px;\n"
+        "      padding: 0 2px;\n"
+        "      display: grid;\n"
+        "      grid-template-columns: repeat(2, 1fr);\n"
+        "      gap: var(--cta-gap, 10px);\n"
+        "      width: 100%;\n"
+        "      max-width: var(--cta-max, min(100%, 440px));\n"
+        "      margin-inline: auto;\n"
+        "    }\n"
+        "    .quickActions.secondaryBar:not(:has(> :nth-child(2))),\n"
+        "    .quickActions.rosterCopyBar:not(:has(> :nth-child(2))),\n"
+        "    .quickActions.alumniBar:not(:has(> :nth-child(2))) {\n"
+        "      grid-template-columns: 1fr;\n"
+        "    }\n"
+        "    .secondaryBar .roster-cta-btn,\n"
+        "    .rosterCopyBar .roster-cta-btn,\n"
+        "    .alumniBar .roster-cta-btn {\n"
+        "      width: 100%;\n"
+        "      min-width: 0;\n"
+        "    }\n"
+        "    .roster-cta-btn--alumni {\n"
+        "      background: #f0fdfa;\n"
+        "      border-color: #99f6e4;\n"
+        "      color: #0f766e;\n"
+        "    }\n"
+        "    @media (hover: hover) {\n"
+        "      .roster-cta-btn--alumni:hover { background: #ccfbf1; }\n"
+        "    }\n"
+    )
+    for needle in (
+        "    /* ═══════ SITE SHARE MODAL ═══════ */",
+        "    /* ═══════ SHIFT COPY",
+        "    /* ═══════ RELATED APPS MODAL ═══════ */",
+    ):
+        if needle in html:
+            return html.replace(needle, snippet + "\n" + needle, 1)
+    return html
+
+
 def patch_css_and_js(html: str) -> str:
     if "/* ═══════ QUICK ACTIONS" in html:
         html = CTA_CSS_RE.sub(CTA_CSS, html, count=1)
     elif "/* ═══════ CTA ═══════ */" in html and 'id="ctaBtn"' in html:
         html = LEGACY_CTA_CSS_RE.sub(CTA_CSS, html, count=1)
+    html = patch_alumni_css(html)
     html = patch_shift_copy_css(html)
     html = patch_site_share(html)
     html = patch_site_apps(html)

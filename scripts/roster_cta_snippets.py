@@ -955,7 +955,11 @@ def secondary_bar_html(
     )
 
 
-SHIFT_COPY_BUTTON_HTML = secondary_bar_html(include_copy=True, include_alumni=False)
+SHIFT_COPY_BUTTON_HTML = secondary_bar_html(
+    include_copy=True,
+    include_alumni=True,
+    alumni_href="alumni/",
+)
 
 SHIFT_COPY_MODAL_HTML = (
     '<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">\n'
@@ -1213,7 +1217,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260718m"
+IOS_PERF_VER = "20260719a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
