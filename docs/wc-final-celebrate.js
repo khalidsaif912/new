@@ -269,13 +269,22 @@
     var style = document.createElement('style');
     style.id = 'wc-final-celebrate-css';
     style.textContent = [
-      '#wcFinalFx{position:fixed;inset:0;z-index:120000;pointer-events:none;overflow:hidden;}',
-      '#wcFinalFx canvas{position:absolute;inset:0;width:100%;height:100%;}',
-      '#wcFinalBadge{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:120001;',
-      'pointer-events:none;background:rgba(15,23,42,.82);color:#fff;border:1px solid rgba(255,255,255,.25);',
-      'border-radius:999px;padding:8px 14px;font:800 13px/1.2 system-ui,-apple-system,sans-serif;',
-      'box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;transition:opacity .35s ease;max-width:92vw;text-align:center;}',
-      '#wcFinalBadge.show{opacity:1;}'
+      '#wcFinalFx{position:fixed;inset:0;z-index:2147483000;pointer-events:none;overflow:hidden;}',
+      '#wcFinalFx canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}',
+      '#wcFinalBadge{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147483001;',
+      'pointer-events:none;background:rgba(15,23,42,.88);color:#fff;border:1px solid rgba(255,255,255,.35);',
+      'border-radius:999px;padding:10px 16px;font:800 14px/1.25 system-ui,-apple-system,sans-serif;',
+      'box-shadow:0 10px 32px rgba(0,0,0,.35);opacity:0;transition:opacity .35s ease;max-width:92vw;text-align:center;}',
+      '#wcFinalBadge.show{opacity:1;}',
+      '#wcFinalHero{position:fixed;inset:0;z-index:2147482990;display:flex;align-items:center;justify-content:center;',
+      'pointer-events:none;background:rgba(2,6,23,.42);opacity:0;transition:opacity .35s ease;}',
+      '#wcFinalHero.show{opacity:1;}',
+      '#wcFinalHero .wcFinalHeroCard{text-align:center;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.55);',
+      'padding:18px 22px;border-radius:22px;background:rgba(15,23,42,.55);border:1px solid rgba(255,255,255,.22);',
+      'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
+      '#wcFinalHero .wcFinalHeroEmoji{font-size:42px;line-height:1;margin-bottom:8px;}',
+      '#wcFinalHero .wcFinalHeroTitle{font:800 18px/1.2 system-ui,-apple-system,sans-serif;margin-bottom:6px;}',
+      '#wcFinalHero .wcFinalHeroTeam{font:900 28px/1.15 system-ui,-apple-system,sans-serif;letter-spacing:.01em;}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -425,37 +434,82 @@
     }, 28000);
   }
 
-  function celebrate(team) {
+  function celebrate(team, opts) {
+    opts = opts || {};
     if (!team || !inCelebrateWindow()) return;
     state.winner = team;
     writeLocalWinner(team);
     applyWinnerBanner(team);
     injectStyles();
+
+    var forceBurst = !!opts.forceBurst;
     var already = false;
     try {
       already = sessionStorage.getItem(BURST_KEY) === '1';
     } catch (e) {}
+    if (forceBurst) {
+      try {
+        sessionStorage.removeItem(BURST_KEY);
+      } catch (e0) {}
+      already = false;
+    }
     if (!already) {
       try {
         sessionStorage.setItem(BURST_KEY, '1');
       } catch (e2) {}
-      runFireworks(BURST_MS, 1.15);
+      runFireworks(BURST_MS, 1.35);
       showBadge(team, false);
+      showHeroOverlay(team);
     } else {
       showBadge(team, true);
     }
     startAmbient();
   }
 
+  function showHeroOverlay(team) {
+    var old = document.getElementById('wcFinalHero');
+    if (old) old.remove();
+    var ar = langIsAr();
+    var name = ar ? team.labelAr : team.labelEn;
+    var hero = document.createElement('div');
+    hero.id = 'wcFinalHero';
+    hero.setAttribute('role', 'status');
+    hero.innerHTML =
+      '<div class="wcFinalHeroCard">' +
+      '<div class="wcFinalHeroEmoji">🏆</div>' +
+      '<div class="wcFinalHeroTitle">' +
+      (ar ? 'أبطال العالم' : 'World Champions') +
+      '</div>' +
+      '<div class="wcFinalHeroTeam">' +
+      name +
+      '</div>' +
+      '</div>';
+    document.body.appendChild(hero);
+    requestAnimationFrame(function () {
+      hero.classList.add('show');
+    });
+    setTimeout(function () {
+      hero.classList.remove('show');
+      setTimeout(function () {
+        if (hero.parentNode) hero.remove();
+      }, 400);
+    }, BURST_MS);
+  }
+
   function checkUrlForce() {
     try {
       var q = new URLSearchParams(location.search || '');
-      var win = (q.get('wcwin') || '').toLowerCase();
+      var win = (q.get('wcwin') || q.get('wcCelebrate') || '').toLowerCase();
       var pin = q.get('wcpin') || '';
+      var demo = q.get('wcdemo') === '1';
+      if (demo && (win === 'argentina' || win === 'spain')) {
+        celebrate(TEAMS[win], { forceBurst: true });
+        return true;
+      }
       if ((win === 'argentina' || win === 'spain') && pin === PIN) {
         var team = TEAMS[win];
         publishMantleWinner(team, { source: 'manual-url', score: '' });
-        celebrate(team);
+        celebrate(team, { forceBurst: true });
         return true;
       }
     } catch (e) {}
@@ -473,7 +527,6 @@
     if (!inCelebrateWindow()) return;
     if (checkUrlForce()) return;
     tick();
-    // Poll until winner known or window ends.
     state.pollTimer = setInterval(function () {
       if (!inCelebrateWindow()) {
         clearInterval(state.pollTimer);
@@ -493,7 +546,7 @@
       var team = TEAMS[String(teamId || '').toLowerCase()];
       if (!team) return false;
       publishMantleWinner(team, { source: 'manual', score: '' });
-      celebrate(team);
+      celebrate(team, { forceBurst: true });
       return true;
     },
     status: function () {
@@ -505,11 +558,21 @@
     }
   };
 
+  // Boot ASAP — do not wait for idle secondary scripts only.
+  function startBoot() {
+    try {
+      boot();
+    } catch (err) {
+      try {
+        console.warn('[wc-final]', err);
+      } catch (e) {}
+    }
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(boot, 900);
+      setTimeout(startBoot, 200);
     });
   } else {
-    setTimeout(boot, 900);
+    setTimeout(startBoot, 200);
   }
 })();
