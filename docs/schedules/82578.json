@@ -1839,9 +1839,9 @@
         "day": 22,
         "day_name_ar": "الأربعاء",
         "day_name_en": "Wednesday",
-        "shift_code": "ME06",
-        "shift_label": "🌅 Morning (ME06)",
-        "shift_group": "Morning"
+        "shift_code": "NE22",
+        "shift_label": "🌙 Night (NE22)",
+        "shift_group": "Night"
       },
       {
         "date": "2026-07-23",
