@@ -589,6 +589,9 @@
     });
   }
 
+  // Temporarily disable auto random-pick popup (WC celebration period).
+  var SPOTLIGHT_AUTO_POPUP = false;
+
   function init() {
     injectCompactStyles();
     ensureAlumniButton();
@@ -601,6 +604,7 @@
     ensureSpotlightButton();
     patchCalcLink();
     patchQuicklistLink();
+    if (!SPOTLIGHT_AUTO_POPUP) return;
     try {
       if (!sessionStorage.getItem('spotlightShown')) {
         sessionStorage.setItem('spotlightShown', '1');

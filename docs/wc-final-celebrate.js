@@ -27,6 +27,10 @@
   var BURST_MS = 5000;
   var POLL_MS = 45000;
 
+  var audioCtx = null;
+  var audioUnlocked = false;
+  var soundEnabled = true;
+
   var TEAMS = {
     argentina: {
       id: 'argentina',
@@ -269,6 +273,123 @@
     document.documentElement.classList.add('roster-banner-early');
   }
 
+  function ensureAudio() {
+    if (!soundEnabled) return null;
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(function () {});
+      }
+      return audioCtx;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function unlockAudio() {
+    if (audioUnlocked) {
+      ensureAudio();
+      return;
+    }
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      var buf = ctx.createBuffer(1, 1, 22050);
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+      audioUnlocked = true;
+    } catch (e) {}
+  }
+
+  function bindAudioUnlock() {
+    var once = function () {
+      unlockAudio();
+      document.removeEventListener('pointerdown', once, true);
+      document.removeEventListener('touchstart', once, true);
+      document.removeEventListener('keydown', once, true);
+    };
+    document.addEventListener('pointerdown', once, true);
+    document.addEventListener('touchstart', once, true);
+    document.addEventListener('keydown', once, true);
+  }
+
+  function playCrackle(vol) {
+    var ctx = ensureAudio();
+    if (!ctx || !audioUnlocked) return;
+    vol = vol == null ? 0.28 : vol;
+    try {
+      var sz = Math.floor(ctx.sampleRate * 0.08);
+      var buf = ctx.createBuffer(1, sz, ctx.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < sz; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sz, 3);
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      src.connect(g);
+      g.connect(ctx.destination);
+      src.start(ctx.currentTime);
+    } catch (e) {}
+  }
+
+  function playBoom(vol) {
+    var ctx = ensureAudio();
+    if (!ctx || !audioUnlocked) return;
+    vol = vol == null ? 0.55 : vol;
+    try {
+      var sz = Math.floor(ctx.sampleRate * 0.65);
+      var buf = ctx.createBuffer(1, sz, ctx.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < sz; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sz, 2);
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+      var f = ctx.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.setValueAtTime(900, ctx.currentTime);
+      f.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.55);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+      src.connect(f);
+      f.connect(g);
+      g.connect(ctx.destination);
+      src.start(ctx.currentTime);
+      setTimeout(function () {
+        playCrackle(vol * 0.55);
+      }, 50);
+      setTimeout(function () {
+        playCrackle(vol * 0.4);
+      }, 140);
+      setTimeout(function () {
+        playCrackle(vol * 0.3);
+      }, 280);
+    } catch (e) {}
+  }
+
+  function playLaunch(vol) {
+    var ctx = ensureAudio();
+    if (!ctx || !audioUnlocked) return;
+    vol = vol == null ? 0.14 : vol;
+    try {
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.type = 'sine';
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.frequency.setValueAtTime(140, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.28);
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  }
+
   function injectStyles() {
     if (document.getElementById('wc-final-celebrate-css')) return;
     var style = document.createElement('style');
@@ -282,7 +403,7 @@
       'box-shadow:0 10px 32px rgba(0,0,0,.35);opacity:0;transition:opacity .35s ease;max-width:92vw;text-align:center;}',
       '#wcFinalBadge.show{opacity:1;}',
       '#wcFinalHero{position:fixed;inset:0;z-index:2147482990;display:flex;align-items:center;justify-content:center;',
-      'pointer-events:none;background:rgba(2,6,23,.42);opacity:0;transition:opacity .35s ease;}',
+      'pointer-events:auto;background:rgba(2,6,23,.42);opacity:0;transition:opacity .35s ease;cursor:default;}',
       '#wcFinalHero.show{opacity:1;}',
       '#wcFinalHero .wcFinalHeroCard{text-align:center;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.55);',
       'padding:18px 22px;border-radius:22px;background:rgba(15,23,42,.55);border:1px solid rgba(255,255,255,.22);',
@@ -345,7 +466,10 @@
     var colors = (state.winner && state.winner.colors) || ['#fff', '#fbbf24', '#38bdf8'];
     intensity = intensity || 1;
 
+    var soundVol = Math.max(0.25, Math.min(1, intensity));
+
     function boom(x, y) {
+      playBoom(0.45 * soundVol);
       var n = Math.floor((28 + Math.random() * 24) * intensity);
       for (var i = 0; i < n; i++) {
         var ang = (Math.PI * 2 * i) / n + Math.random() * 0.2;
@@ -364,6 +488,7 @@
     }
 
     function launch() {
+      playLaunch(0.12 * soundVol);
       rockets.push({
         x: 40 + Math.random() * (window.innerWidth - 80),
         y: window.innerHeight + 10,
@@ -443,6 +568,7 @@
     opts = opts || {};
     if (!team) return;
     if (!opts.forceBurst && !inCelebrateWindow()) return;
+    unlockAudio();
     state.winner = team;
     writeLocalWinner(team);
     applyWinnerBanner(team);
@@ -490,6 +616,13 @@
       name +
       '</div>' +
       '</div>';
+    hero.addEventListener(
+      'pointerdown',
+      function () {
+        unlockAudio();
+      },
+      { once: true }
+    );
     document.body.appendChild(hero);
     requestAnimationFrame(function () {
       hero.classList.add('show');
@@ -568,20 +701,29 @@
   window.rosterWcFinal = {
     force: function (teamId, pin) {
       if (String(pin || '') !== PIN) return false;
+      unlockAudio();
       var team = TEAMS[String(teamId || '').toLowerCase()];
       if (!team) return false;
       publishMantleWinner(team, { source: 'manual', score: '' });
       celebrate(team, { forceBurst: true });
       return true;
     },
+    mute: function (off) {
+      if (typeof off === 'boolean') soundEnabled = !off;
+      else soundEnabled = !soundEnabled;
+      return soundEnabled;
+    },
     status: function () {
       return {
         winner: state.winner && state.winner.id,
         until: END_ISO_MUSCAT,
-        active: inCelebrateWindow()
+        active: inCelebrateWindow(),
+        sound: soundEnabled && audioUnlocked
       };
     }
   };
+
+  bindAudioUnlock();
 
   // Boot ASAP — do not wait for idle secondary scripts only.
   function startBoot() {
