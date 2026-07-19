@@ -741,6 +741,78 @@
     @media (hover: hover) {
       .roster-cta-btn--alumni:hover { background: #ccfbf1; }
     }
+    /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
+    .shiftCopySheet {
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
+      pointer-events: none; visibility: hidden;
+    }
+    .shiftCopySheet.open { display: flex; pointer-events: auto; visibility: visible; }
+    .shiftCopyCard {
+      width: min(100%, 380px); background: #fff; border-radius: 18px; padding: 18px 16px 14px;
+      border: 1px solid rgba(15,23,42,.1); box-shadow: 0 20px 48px rgba(15,23,42,.22);
+      text-align: center;
+    }
+    .shiftCopyTitle { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
+    .shiftCopyHint { font-size: 12px; color: #64748b; margin: 0 0 14px; line-height: 1.4; }
+    .shiftCopyGrid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 6px; }
+    .shiftCopyOpt {
+      display: flex; align-items: center; gap: 12px;
+      min-height: 52px; padding: 8px 10px 8px 14px; border-radius: 14px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc;
+      font: inherit; text-align: start; -webkit-tap-highlight-color: transparent;
+    }
+    .shiftCopyOpt-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px; background: #fff;
+      border: 1px solid #e2e8f0; flex-shrink: 0;
+    }
+    .shiftCopyOpt-main {
+      flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0;
+    }
+    .shiftCopyOpt-label { font-size: 14px; font-weight: 800; color: #1e293b; }
+    .shiftCopyOpt-count {
+      min-width: 26px; padding: 2px 8px; border-radius: 999px;
+      font-size: 12px; font-weight: 800; color: #475569;
+      background: #eef2f7; border: 1px solid #e2e8f0; text-align: center;
+    }
+    .shiftCopyOpt-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .shiftCopyAct {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
+      border: 1.5px solid #e2e8f0; background: #fff; font: inherit;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .shiftCopyAct:active { transform: scale(.94); }
+    .shiftCopyAct svg { display: block; }
+    .shiftCopyAct--share { background: #ecfdf5; border-color: #86efac; }
+    .shiftCopyOpt.is-empty { opacity: .5; }
+    .shiftCopyOpt.is-empty .shiftCopyAct { pointer-events: none; }
+    .shiftCopyOpt--morning { border-color: #fcd34d; background: #fffbeb; }
+    .shiftCopyOpt--morning .shiftCopyOpt-icon { background: #fef9c3; border-color: #fde68a; }
+    .shiftCopyOpt--afternoon { border-color: #fdba74; background: #fff7ed; }
+    .shiftCopyOpt--afternoon .shiftCopyOpt-icon { background: #ffedd5; border-color: #fed7aa; }
+    .shiftCopyOpt--night { border-color: #c4b5fd; background: #f5f3ff; }
+    .shiftCopyOpt--night .shiftCopyOpt-icon { background: #ede9fe; border-color: #ddd6fe; }
+    .shiftCopyOpt--annual { border-color: #fca5a5; background: #fef2f2; }
+    .shiftCopyOpt--annual .shiftCopyOpt-icon { background: #fee2e2; border-color: #fecaca; }
+    .shiftCopyOpt--training { border-color: #d8b4fe; background: #faf5ff; }
+    .shiftCopyOpt--training .shiftCopyOpt-icon { background: #f3e8ff; border-color: #e9d5ff; }
+    .shiftCopyStatus {
+      min-height: 18px; margin: 10px 0 12px; font-size: 12.5px; font-weight: 700;
+      line-height: 1.4; color: #64748b;
+    }
+    .shiftCopyStatus.is-ok { color: #166534; }
+    .shiftCopyStatus.is-err { color: #b91c1c; }
+    .shiftCopyCloseWrap { margin-top: 2px; }
+    .shiftCopyCloseWrap .roster-cta-btn { width: 100%; }
+    body.ar .shiftCopyOpt { text-align: start; }
+    @media (hover: hover) {
+      .shiftCopyAct--copy:hover { background: #f1f5f9; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
+      .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
+    }
+
     /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
       position: fixed;
@@ -1839,7 +1911,6 @@
     <span class="roster-cta-label">Apps</span>
   </button>
 </nav>
-
 
   <!-- ════ SECONDARY ACTIONS ════ -->
 <nav class="quickActions secondaryBar" aria-label="More actions">
@@ -3377,7 +3448,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260719b';
+  var ver = '20260719c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');

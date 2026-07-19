@@ -259,7 +259,47 @@
     else doCopy(shiftKey);
   }
 
+  function injectShiftCopyStyles() {
+    if (document.getElementById("shift-copy-hide-css")) return;
+    var style = document.createElement("style");
+    style.id = "shift-copy-hide-css";
+    style.textContent = [
+      ".shiftCopySheet{",
+      "position:fixed!important;inset:0!important;display:none!important;",
+      "align-items:center!important;justify-content:center!important;",
+      "background:rgba(15,23,42,.45)!important;z-index:10003!important;padding:16px!important;",
+      "pointer-events:none!important;visibility:hidden!important;",
+      "}",
+      ".shiftCopySheet.open{",
+      "display:flex!important;pointer-events:auto!important;visibility:visible!important;",
+      "}",
+      ".shiftCopyCard{",
+      "width:min(100%,380px);background:#fff;border-radius:18px;padding:18px 16px 14px;",
+      "border:1px solid rgba(15,23,42,.1);box-shadow:0 20px 48px rgba(15,23,42,.22);text-align:center;",
+      "}",
+      ".shiftCopyTitle{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px;}",
+      ".shiftCopyHint{font-size:12px;color:#64748b;margin:0 0 14px;line-height:1.4;}",
+      ".shiftCopyGrid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:6px;}",
+      ".shiftCopyOpt{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 10px 8px 14px;",
+      "border-radius:14px;border:1.5px solid #e2e8f0;background:#f8fafc;font:inherit;text-align:start;}",
+      ".shiftCopyOpt-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;",
+      "border-radius:12px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0;}",
+      ".shiftCopyOpt-main{flex:1;display:flex;align-items:center;gap:8px;min-width:0;}",
+      ".shiftCopyOpt-label{font-size:14px;font-weight:800;color:#1e293b;}",
+      ".shiftCopyOpt-count{min-width:26px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:800;",
+      "color:#475569;background:#eef2f7;border:1px solid #e2e8f0;text-align:center;}",
+      ".shiftCopyOpt-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}",
+      ".shiftCopyAct{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;",
+      "border-radius:12px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;padding:0;}",
+      ".shiftCopyStatus{min-height:18px;font-size:12px;font-weight:700;color:#166534;margin:4px 0 8px;}",
+      ".shiftCopyCloseWrap .roster-cta-btn{width:100%;}",
+      ".shiftCopyOpt.is-empty{opacity:.5;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
   function bind() {
+    injectShiftCopyStyles();
     refs();
     var openBtn = document.getElementById("copyShiftBtn");
     if (openBtn && !openBtn.__shiftCopyBound) {

@@ -641,13 +641,21 @@ def patch_remove_compare(html: str) -> str:
 
 
 def patch_shift_copy_css(html: str) -> str:
-    if 'id="copyShiftBtn"' not in html:
+    if 'id="copyShiftBtn"' not in html and 'id="shiftCopySheet"' not in html:
         return html
-    if "/* ═══════ SHIFT COPY (bottom button + modal) ═══════ */" in html:
-        return SHIFT_COPY_CSS_RE.sub(SHIFT_COPY_CSS, html, count=1)
-    anchor = "    /* ═══════ SITE SHARE MODAL ═══════ */"
-    if anchor in html:
-        return html.replace(anchor, SHIFT_COPY_CSS + "\n" + anchor, 1)
+    # Prefer presence of the hide rule, not only the section comment.
+    if ".shiftCopySheet {" in html or ".shiftCopySheet{" in html:
+        if "/* ═══════ SHIFT COPY (bottom button + modal) ═══════ */" in html:
+            return SHIFT_COPY_CSS_RE.sub(SHIFT_COPY_CSS, html, count=1)
+        return html
+    for anchor in (
+        "    /* ═══════ SITE SHARE MODAL ═══════ */",
+        "    /* ═══════ RELATED APPS MODAL ═══════ */",
+        "</style>",
+    ):
+        if anchor in html:
+            insert = SHIFT_COPY_CSS + ("\n" if anchor != "</style>" else "\n  ")
+            return html.replace(anchor, insert + anchor, 1)
     return html
 
 
