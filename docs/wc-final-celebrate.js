@@ -22,7 +22,9 @@
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var MANTLE_URL = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
   var LOCAL_WINNER_KEY = 'rosterWcFinalWinner_v1';
-  var BURST_KEY = 'rosterWcFinalBurst_v1';
+  var BURST_SESSION_KEY = 'rosterWcFinalBurstSession_v1';
+  var BURST_DAY_KEY = 'rosterWcFinalBurstDay_v2';
+  var BURST_PER_DAY = 3;
   var PIN = '912';
   var BURST_MS = 5000;
   var POLL_MS = 45000;
@@ -564,6 +566,78 @@
     }, 28000);
   }
 
+  function muscatTodayIso() {
+    var now = new Date();
+    var muscat = new Date(
+      now.getTime() + 4 * 60 * 60 * 1000 + now.getTimezoneOffset() * 60 * 1000
+    );
+    return (
+      muscat.getFullYear() +
+      '-' +
+      String(muscat.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(muscat.getDate()).padStart(2, '0')
+    );
+  }
+
+  function readDayBurstState() {
+    try {
+      var raw = localStorage.getItem(BURST_DAY_KEY);
+      if (!raw) return { date: muscatTodayIso(), count: 0 };
+      var parsed = JSON.parse(raw);
+      var today = muscatTodayIso();
+      if (!parsed || parsed.date !== today) return { date: today, count: 0 };
+      return { date: today, count: Math.max(0, Number(parsed.count) || 0) };
+    } catch (e) {
+      return { date: muscatTodayIso(), count: 0 };
+    }
+  }
+
+  function writeDayBurstState(stateDay) {
+    try {
+      localStorage.setItem(BURST_DAY_KEY, JSON.stringify(stateDay));
+    } catch (e) {}
+  }
+
+  function sessionBurstDone() {
+    try {
+      return sessionStorage.getItem(BURST_SESSION_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markSessionBurst() {
+    try {
+      sessionStorage.setItem(BURST_SESSION_KEY, '1');
+    } catch (e) {}
+  }
+
+  function clearSessionBurst() {
+    try {
+      sessionStorage.removeItem(BURST_SESSION_KEY);
+    } catch (e) {}
+  }
+
+  /** Full fireworks+hero allowed for this open (max 3 opens/day). */
+  function takeBurstSlot(force) {
+    if (force) {
+      clearSessionBurst();
+      markSessionBurst();
+      return true;
+    }
+    if (sessionBurstDone()) return false;
+    var day = readDayBurstState();
+    if (day.count >= BURST_PER_DAY) {
+      markSessionBurst();
+      return false;
+    }
+    day.count += 1;
+    writeDayBurstState(day);
+    markSessionBurst();
+    return true;
+  }
+
   function celebrate(team, opts) {
     opts = opts || {};
     if (!team) return;
@@ -574,21 +648,7 @@
     applyWinnerBanner(team);
     injectStyles();
 
-    var forceBurst = !!opts.forceBurst;
-    var already = false;
-    try {
-      already = sessionStorage.getItem(BURST_KEY) === '1';
-    } catch (e) {}
-    if (forceBurst) {
-      try {
-        sessionStorage.removeItem(BURST_KEY);
-      } catch (e0) {}
-      already = false;
-    }
-    if (!already) {
-      try {
-        sessionStorage.setItem(BURST_KEY, '1');
-      } catch (e2) {}
+    if (takeBurstSlot(!!opts.forceBurst)) {
       runFireworks(BURST_MS, 1.35);
       showBadge(team, false);
       showHeroOverlay(team);
@@ -714,11 +774,14 @@
       return soundEnabled;
     },
     status: function () {
+      var day = readDayBurstState();
       return {
         winner: state.winner && state.winner.id,
         until: END_ISO_MUSCAT,
         active: inCelebrateWindow(),
-        sound: soundEnabled && audioUnlocked
+        sound: soundEnabled && audioUnlocked,
+        burstsToday: day.count,
+        burstsMax: BURST_PER_DAY
       };
     }
   };
