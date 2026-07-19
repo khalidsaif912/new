@@ -41,7 +41,7 @@ EXPORT_BLOCK = """
   }
 
   function redirectToDate(iso, isNowPage) {
-    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
   }
 
   // ═══════════════════════════════════════════════════
@@ -54,7 +54,7 @@ EXPORT_BLOCK = """
 
     if (!path.includes('/date/')) {
       var baseRoot = path.replace(/\\/now\\/?$/, '/').replace(/\\/+$/, '');
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
       return true;
     }
 
@@ -126,7 +126,7 @@ IMPORT_BLOCK = """
   }
 
   function redirectToDate(iso, isNowPage) {
-    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
   }
 
   // ═══════════════════════════════════════════════════
@@ -140,7 +140,7 @@ IMPORT_BLOCK = """
 
     if (!hasDateInPath) {
       var baseRoot = path.replace(/\\/now\\/?$/, '/').replace(/\\/+$/, '');
-      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(baseRoot + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
       return true;
     }
 

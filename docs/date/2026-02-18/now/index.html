@@ -1650,7 +1650,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
   }
 
   function redirectToDate(iso, isNowPage) {
-    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
   }
 
   // ═══════════════════════════════════════════════════
@@ -1662,7 +1662,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
       return true;
     }
 
@@ -1718,7 +1718,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     var target = base + '/date/' + picker.value + '/';
     if (isNowPage) target += 'now/';
 
-    window.location.href = target;
+    window.location.href = target + (location.search || '') + (location.hash || '');
   });
 
 })();

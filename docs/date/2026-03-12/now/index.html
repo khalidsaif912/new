@@ -1850,7 +1850,7 @@ function goToEmployeeSchedule(empName) {
   }
 
   function redirectToDate(iso, isNowPage) {
-    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
   }
 
   // ═══════════════════════════════════════════════════
@@ -1862,7 +1862,7 @@ function goToEmployeeSchedule(empName) {
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : '') + (location.search || '') + (location.hash || ''));
       return true;
     }
 
@@ -1918,7 +1918,7 @@ function goToEmployeeSchedule(empName) {
     var target = base + '/date/' + picker.value + '/';
     if (isNowPage) target += 'now/';
 
-    window.location.href = target;
+    window.location.href = target + (location.search || '') + (location.hash || '');
   });
 
 })();
@@ -2298,7 +2298,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260719f';
+  var ver = '20260719g';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -2310,10 +2310,11 @@ function goToRosterDiff(event) {
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
+    addScript(root + '/wc-final-celebrate.js?v=' + ver);
+  addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/wc-vote-promo.js?v=' + ver);
-    addScript(root + '/wc-final-celebrate.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

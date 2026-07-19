@@ -11,7 +11,7 @@
       if (window.location.pathname && window.location.pathname.endsWith('/')) {
         target = window.location.pathname + 'docs/';
       }
-      window.location.replace(target);
+      window.location.replace(target + (location.search || '') + (location.hash || ''));
     })();
   </script>
 </head>

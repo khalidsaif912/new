@@ -65,17 +65,22 @@ def patch_load_block(text: str) -> tuple[str, bool]:
             text = new_text
             changed = True
 
-    if CELEBRATE_MARKER not in text and MARKER in text:
-        if INJECT_LINE in text and CELEBRATE_LINE not in text:
-            text = text.replace(INJECT_LINE, INJECT_LINE + "\n" + CELEBRATE_LINE, 1)
-            changed = True
-        elif "wc-vote-promo.js?v=' + ver);" in text and CELEBRATE_LINE not in text:
-            text = text.replace(
-                "addScript(root + '/wc-vote-promo.js?v=' + ver);",
-                "addScript(root + '/wc-vote-promo.js?v=' + ver);\n" + CELEBRATE_LINE,
-                1,
-            )
-            changed = True
+    # Prefer primary load for celebrate (before idle secondary).
+    sec_celebrate = "    " + CELEBRATE_LINE.strip()
+    if sec_celebrate + "\n" in text:
+        text = text.replace(sec_celebrate + "\n", "", 1)
+        changed = True
+    primary_anchor = "  addScript(root + '/site-visits.js?v=' + ver);\n"
+    if (
+        CELEBRATE_MARKER in text
+        and primary_anchor in text
+        and CELEBRATE_LINE not in text.split("function loadSecondary()")[0]
+    ):
+        text = text.replace(primary_anchor, primary_anchor + CELEBRATE_LINE + "\n", 1)
+        changed = True
+    elif CELEBRATE_MARKER not in text and primary_anchor in text:
+        text = text.replace(primary_anchor, primary_anchor + CELEBRATE_LINE + "\n", 1)
+        changed = True
 
     return text, changed
 

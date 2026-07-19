@@ -58,11 +58,16 @@
   }
 
   function endMs() {
-    return Date.parse(END_ISO_MUSCAT);
+    var t = Date.parse(END_ISO_MUSCAT);
+    if (!isNaN(t)) return t;
+    // Fallback: 2026-07-20 18:00 Muscat = 14:00 UTC
+    return Date.UTC(2026, 6, 20, 14, 0, 0);
   }
 
   function inCelebrateWindow() {
-    return nowMs() < endMs();
+    var end = endMs();
+    if (isNaN(end)) return true;
+    return nowMs() < end;
   }
 
   function langIsAr() {
@@ -436,7 +441,8 @@
 
   function celebrate(team, opts) {
     opts = opts || {};
-    if (!team || !inCelebrateWindow()) return;
+    if (!team) return;
+    if (!opts.forceBurst && !inCelebrateWindow()) return;
     state.winner = team;
     writeLocalWinner(team);
     applyWinnerBanner(team);
@@ -502,6 +508,21 @@
       var win = (q.get('wcwin') || q.get('wcCelebrate') || '').toLowerCase();
       var pin = q.get('wcpin') || '';
       var demo = q.get('wcdemo') === '1';
+      // Survive redirects that may drop query once (session stash).
+      if (!win) {
+        try {
+          var pending = sessionStorage.getItem('rosterWcFinalPending_v1');
+          if (pending) {
+            win = String(pending).toLowerCase();
+            pin = PIN;
+            sessionStorage.removeItem('rosterWcFinalPending_v1');
+          }
+        } catch (e0) {}
+      } else if ((win === 'argentina' || win === 'spain') && pin === PIN) {
+        try {
+          sessionStorage.setItem('rosterWcFinalPending_v1', win);
+        } catch (e1) {}
+      }
       if (demo && (win === 'argentina' || win === 'spain')) {
         celebrate(TEAMS[win], { forceBurst: true });
         return true;
@@ -510,6 +531,9 @@
         var team = TEAMS[win];
         publishMantleWinner(team, { source: 'manual-url', score: '' });
         celebrate(team, { forceBurst: true });
+        try {
+          sessionStorage.removeItem('rosterWcFinalPending_v1');
+        } catch (e2) {}
         return true;
       }
     } catch (e) {}
@@ -524,8 +548,9 @@
   }
 
   function boot() {
-    if (!inCelebrateWindow()) return;
+    // URL / manual force must run even if celebrate window parsing fails.
     if (checkUrlForce()) return;
+    if (!inCelebrateWindow()) return;
     tick();
     state.pollTimer = setInterval(function () {
       if (!inCelebrateWindow()) {
