@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var END_ISO_MUSCAT = '2026-07-20T06:00:00+04:00';
+  var END_ISO_MUSCAT = '2026-07-20T18:00:00+04:00';
   var MATCH_DATE = '20260719'; // ESPN date key
   var ESPN_URL =
     'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=' +
