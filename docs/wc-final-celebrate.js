@@ -23,13 +23,11 @@
   var MANTLE_URL = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
   var LOCAL_WINNER_KEY = 'rosterWcFinalWinner_v1';
   var CONFIRMED_KEY = 'rosterWcFinalConfirmed_v2';
-  var BURST_SESSION_KEY = 'rosterWcFinalBurstSession_v1';
-  var BURST_DAY_KEY = 'rosterWcFinalBurstDay_v2';
-  var BURST_PER_DAY = 3;
   var PIN = '912';
-  // Do not celebrate until ESPN marks the final as completed.
-  var WAIT_FOR_MATCH_END = true;
-  var BURST_MS = 5000;
+  // Spain won — celebrate Spain every visit until END_ISO_MUSCAT, then never again.
+  var LOCKED_WINNER_ID = 'spain';
+  var WAIT_FOR_MATCH_END = false;
+  var BURST_MS = 5500;
   var POLL_MS = 45000;
 
   var audioCtx = null;
@@ -251,6 +249,12 @@
   }
 
   function resolveWinner() {
+    if (LOCKED_WINNER_ID && TEAMS[LOCKED_WINNER_ID]) {
+      var locked = TEAMS[LOCKED_WINNER_ID];
+      state.winner = locked;
+      markMatchConfirmed(locked);
+      return Promise.resolve(locked);
+    }
     if (state.winner) return Promise.resolve(state.winner);
 
     var confirmed = readConfirmedWinner();
@@ -259,7 +263,6 @@
       return Promise.resolve(confirmed);
     }
 
-    // Before kickoff/final whistle: poll ESPN only (ignore old test caches).
     return fetchEspnWinner().then(function (hit) {
       if (hit && hit.team) {
         state.winner = hit.team;
@@ -267,7 +270,6 @@
         publishMantleWinner(hit.team, hit);
         return hit.team;
       }
-      // Fallback: another client already confirmed via Mantle after match end.
       return fetchMantleWinner().then(function (m) {
         if (!m) return null;
         state.winner = m;
@@ -445,7 +447,19 @@
       'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
       '#wcFinalHero .wcFinalHeroEmoji{font-size:42px;line-height:1;margin-bottom:8px;}',
       '#wcFinalHero .wcFinalHeroTitle{font:800 18px/1.2 system-ui,-apple-system,sans-serif;margin-bottom:6px;}',
-      '#wcFinalHero .wcFinalHeroTeam{font:900 28px/1.15 system-ui,-apple-system,sans-serif;letter-spacing:.01em;}'
+      '#wcFinalHero .wcFinalHeroTeam{font:900 28px/1.15 system-ui,-apple-system,sans-serif;letter-spacing:.01em;}',
+      '#wcFinalFlagWrap{position:fixed;left:50%;top:12%;transform:translateX(-50%);z-index:2147483002;',
+      'pointer-events:none;width:min(72vw,280px);opacity:0;transition:opacity .4s ease;}',
+      '#wcFinalFlagWrap.show{opacity:1;}',
+      '#wcFinalFlagWrap .wcFinalPole{position:absolute;left:6px;top:-8px;width:6px;height:118%;',
+      'border-radius:4px;background:linear-gradient(90deg,#cbd5e1,#64748b,#94a3b8);box-shadow:0 0 8px rgba(0,0,0,.35);}',
+      '#wcFinalFlagWrap .wcFinalFlag{display:block;width:100%;height:auto;margin-left:14px;',
+      'transform-origin:left center;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));',
+      'animation:wcFlagWave 1.1s ease-in-out infinite;}',
+      '@keyframes wcFlagWave{',
+      '0%,100%{transform:perspective(500px) rotateY(-8deg) skewY(-1.5deg) scaleY(1);}',
+      '50%{transform:perspective(500px) rotateY(10deg) skewY(1.5deg) scaleY(.97);}',
+      '}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -599,76 +613,32 @@
     }, 28000);
   }
 
-  function muscatTodayIso() {
-    var now = new Date();
-    var muscat = new Date(
-      now.getTime() + 4 * 60 * 60 * 1000 + now.getTimezoneOffset() * 60 * 1000
-    );
+  function spainFlagSvg() {
     return (
-      muscat.getFullYear() +
-      '-' +
-      String(muscat.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(muscat.getDate()).padStart(2, '0')
+      '<svg class="wcFinalFlag" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<rect width="750" height="500" fill="#AA151B"/>' +
+      '<rect y="125" width="750" height="250" fill="#F1BF00"/>' +
+      '</svg>'
     );
   }
 
-  function readDayBurstState() {
-    try {
-      var raw = localStorage.getItem(BURST_DAY_KEY);
-      if (!raw) return { date: muscatTodayIso(), count: 0 };
-      var parsed = JSON.parse(raw);
-      var today = muscatTodayIso();
-      if (!parsed || parsed.date !== today) return { date: today, count: 0 };
-      return { date: today, count: Math.max(0, Number(parsed.count) || 0) };
-    } catch (e) {
-      return { date: muscatTodayIso(), count: 0 };
-    }
-  }
-
-  function writeDayBurstState(stateDay) {
-    try {
-      localStorage.setItem(BURST_DAY_KEY, JSON.stringify(stateDay));
-    } catch (e) {}
-  }
-
-  function sessionBurstDone() {
-    try {
-      return sessionStorage.getItem(BURST_SESSION_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function markSessionBurst() {
-    try {
-      sessionStorage.setItem(BURST_SESSION_KEY, '1');
-    } catch (e) {}
-  }
-
-  function clearSessionBurst() {
-    try {
-      sessionStorage.removeItem(BURST_SESSION_KEY);
-    } catch (e) {}
-  }
-
-  /** Full fireworks+hero allowed for this open (max 3 opens/day). */
-  function takeBurstSlot(force) {
-    if (force) {
-      clearSessionBurst();
-      markSessionBurst();
-      return true;
-    }
-    if (sessionBurstDone()) return false;
-    var day = readDayBurstState();
-    if (day.count >= BURST_PER_DAY) {
-      markSessionBurst();
-      return false;
-    }
-    day.count += 1;
-    writeDayBurstState(day);
-    markSessionBurst();
-    return true;
+  function showWavingFlag(team) {
+    var old = document.getElementById('wcFinalFlagWrap');
+    if (old) old.remove();
+    if (!team || team.id !== 'spain') return;
+    var wrap = document.createElement('div');
+    wrap.id = 'wcFinalFlagWrap';
+    wrap.innerHTML = '<div class="wcFinalPole" aria-hidden="true"></div>' + spainFlagSvg();
+    document.body.appendChild(wrap);
+    requestAnimationFrame(function () {
+      wrap.classList.add('show');
+    });
+    setTimeout(function () {
+      wrap.classList.remove('show');
+      setTimeout(function () {
+        if (wrap.parentNode) wrap.remove();
+      }, 400);
+    }, BURST_MS + 400);
   }
 
   function celebrate(team, opts) {
@@ -678,16 +648,14 @@
     unlockAudio();
     state.winner = team;
     writeLocalWinner(team);
+    markMatchConfirmed(team);
     applyWinnerBanner(team);
     injectStyles();
-
-    if (takeBurstSlot(!!opts.forceBurst)) {
-      runFireworks(BURST_MS, 1.35);
-      showBadge(team, false);
-      showHeroOverlay(team);
-    } else {
-      showBadge(team, true);
-    }
+    // Always full celebration on every visit while the window is open.
+    runFireworks(BURST_MS, 1.35);
+    showWavingFlag(team);
+    showBadge(team, false);
+    showHeroOverlay(team);
     startAmbient();
   }
 
@@ -776,22 +744,12 @@
   }
 
   function boot() {
-    clearUnconfirmedWinnerCache();
-    if (checkUrlForce()) return;
     if (!inCelebrateWindow()) return;
-    tick();
-    // Keep polling until ESPN/Mantle confirms the final is over.
-    state.pollTimer = setInterval(function () {
-      if (!inCelebrateWindow()) {
-        clearInterval(state.pollTimer);
-        return;
-      }
-      if (state.winner) {
-        clearInterval(state.pollTimer);
-        return;
-      }
-      tick();
-    }, POLL_MS);
+    if (checkUrlForce()) return;
+    // Locked Spain celebration on every visit until 18:00 Muscat.
+    resolveWinner().then(function (team) {
+      if (team) celebrate(team, { forceBurst: true });
+    });
   }
 
   window.rosterWcFinal = {
@@ -811,15 +769,12 @@
       return soundEnabled;
     },
     status: function () {
-      var day = readDayBurstState();
       return {
         winner: state.winner && state.winner.id,
+        locked: LOCKED_WINNER_ID,
         until: END_ISO_MUSCAT,
         active: inCelebrateWindow(),
-        waitingForMatch: WAIT_FOR_MATCH_END && !readConfirmedWinner() && !state.winner,
-        sound: soundEnabled && audioUnlocked,
-        burstsToday: day.count,
-        burstsMax: BURST_PER_DAY
+        sound: soundEnabled && audioUnlocked
       };
     }
   };
