@@ -858,30 +858,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.07); }
     }
-    .siteAppsLink--wcvote {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      min-height: 72px;
-      justify-content: flex-start;
-      padding-inline: 14px;
-      gap: 12px;
-      background: linear-gradient(135deg, #0a1520 0%, #1a2744 100%);
-      border-color: rgba(255, 215, 0, 0.45);
-    }
-    .siteAppsLink--wcvote .siteAppsLink-icon {
-      background: rgba(255, 215, 0, 0.12);
-      border-color: rgba(255, 215, 0, 0.35);
-      flex-shrink: 0;
-    }
-    .siteAppsLink--wcvote .siteAppsLink-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      flex: 1;
-    }
-    .siteAppsLink--wcvote .siteAppsLink-title { color: #FFD700; text-align: start; }
-    .siteAppsLink--wcvote .siteAppsLink-sub { color: #e8f4f8; text-align: start; }
     .siteAppsLink--store,
     .siteAppsLink--games {
       grid-column: 1 / -1;
@@ -2254,7 +2230,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260719j';
+  var ver = '20260720a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -2269,7 +2245,6 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/wc-vote-promo.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

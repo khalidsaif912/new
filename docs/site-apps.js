@@ -22,8 +22,6 @@
       gamesSub: 'Roster games hub',
       store: 'Mobhar Store · متجر مُبهر',
       storeSub: 'Electronics & gadgets',
-      wcvote: 'World Cup Fan Vote',
-      wcvoteSub: 'Vote for your team',
       alumni: 'Former Colleagues',
       spotlightBtn: 'Explore something random',
       spotlightBtnSub: 'A quick surprise from the site',
@@ -54,8 +52,6 @@
       gamesSub: 'مركز ألعاب الروستر',
       store: 'متجر مُبهر · Mobhar Store',
       storeSub: 'أجهزة وتسوق',
-      wcvote: 'تصويت جماهير كأس العالم',
-      wcvoteSub: 'صوّت لمنتخبك',
       alumni: 'زملاء سابقون',
       spotlightBtn: 'اقتراح عشوائي',
       spotlightBtnSub: 'شيء جميل من الموقع',
@@ -188,15 +184,6 @@
 
   function spotlightItems() {
     return [
-      {
-        id: 'wcvote',
-        title: t('wcvote'),
-        sub: t('wcvoteSub'),
-        href: 'https://match-accb0.web.app/?utm_source=roster-site&utm_medium=spotlight',
-        external: true,
-        classes: 'roster-cta-btn--apps',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#0a1520" stroke="#FFD700" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="14" r="2" fill="#00d4ff"/></svg>'
-      },
       {
         id: 'flights',
         title: t('flights'),
