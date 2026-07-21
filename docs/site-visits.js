@@ -537,6 +537,50 @@
   // v3: include device model; forces one re-log after deploy for same-day visitors.
   var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV3';
 
+  function docsBasePath() {
+    try {
+      var m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
+      return m ? m[1] : '/docs/';
+    } catch (e) {
+      return '/docs/';
+    }
+  }
+
+  function cleanEmployeeName(name) {
+    return String(name || '')
+      .replace(/\s*[-–—]\s*\d+\s*$/, '')
+      .trim();
+  }
+
+  function resolveEmployeeName(id, fallbackName) {
+    var known = cleanEmployeeName(fallbackName);
+    if (known) return Promise.resolve(known);
+    var empId = String(id || '').trim();
+    if (!empId) return Promise.resolve('');
+    var base = docsBasePath();
+    var urls = [
+      base + 'schedules/' + encodeURIComponent(empId) + '.json',
+      base + 'import/schedules/' + encodeURIComponent(empId) + '.json'
+    ];
+    function tryNext(i) {
+      if (i >= urls.length) return Promise.resolve('');
+      return fetch(urls[i] + '?ts=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('miss');
+          return r.json();
+        })
+        .then(function (json) {
+          var n = cleanEmployeeName(json && json.name);
+          if (n) return n;
+          return tryNext(i + 1);
+        })
+        .catch(function () {
+          return tryNext(i + 1);
+        });
+    }
+    return tryNext(0);
+  }
+
   function logIdentifiedVisit() {
     var ident = getRosterIdentity();
     if (!ident) return;
@@ -551,8 +595,19 @@
       'X-Mantle-Key': VISIT_LOG_KEY
     };
 
-    detectDeviceInfo()
-      .then(function (dev) {
+    Promise.all([detectDeviceInfo(), resolveEmployeeName(ident.id, ident.name)])
+      .then(function (pair) {
+        var dev = pair[0];
+        var resolvedName = pair[1] || '';
+        // Persist resolved name locally for later visits.
+        if (resolvedName) {
+          try {
+            if (!localStorage.getItem('exportSavedEmpName') && !localStorage.getItem('savedEmpName') && !localStorage.getItem('importSavedEmpName')) {
+              localStorage.setItem('exportSavedEmpName', resolvedName);
+              localStorage.setItem('savedEmpName', resolvedName);
+            }
+          } catch (e3) {}
+        }
         return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
           .then(function (r) {
             if (!r.ok) throw new Error('read');
@@ -566,7 +621,7 @@
             });
             kept.unshift({
               id: ident.id,
-              name: ident.name || '',
+              name: resolvedName || '',
               day: keys.day,
               at: now,
               page: pagePathLabel(),

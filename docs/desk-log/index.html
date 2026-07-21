@@ -228,11 +228,89 @@
       const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
       let filter = 'today';
       let log = [];
+      let nameById = Object.create(null);
 
       const gate = document.getElementById('gate');
       const app = document.getElementById('app');
       const pinInput = document.getElementById('pinInput');
       const gateErr = document.getElementById('gateErr');
+
+      function docsBase() {
+        try {
+          const m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
+          return m ? m[1] : '../';
+        } catch (e) {
+          return '../';
+        }
+      }
+
+      function cleanName(name) {
+        return String(name || '')
+          .replace(/\s*[-–—]\s*\d+\s*$/, '')
+          .trim();
+      }
+
+      function rememberName(id, name) {
+        const key = String(id || '').trim();
+        const n = cleanName(name);
+        if (!key || !n) return;
+        if (!nameById[key]) nameById[key] = n;
+      }
+
+      function displayName(r) {
+        const id = String((r && r.id) || '').trim();
+        const fromRow = cleanName(r && r.name);
+        if (fromRow) return fromRow;
+        if (id && nameById[id]) return nameById[id];
+        return '';
+      }
+
+      async function loadNameDirectory() {
+        const base = docsBase();
+        try {
+          const res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            const list = Array.isArray(json && json.employees) ? json.employees : [];
+            list.forEach((emp) => rememberName(emp && emp.id, emp && emp.name));
+          }
+        } catch (e) {}
+
+        (log || []).forEach((r) => rememberName(r && r.id, r && r.name));
+
+        const missing = Array.from(new Set(
+          (log || [])
+            .map((r) => String((r && r.id) || '').trim())
+            .filter((id) => id && !nameById[id])
+        ));
+        if (!missing.length) return;
+
+        const fetchOne = async (id) => {
+          const urls = [
+            base + 'schedules/' + encodeURIComponent(id) + '.json',
+            base + 'import/schedules/' + encodeURIComponent(id) + '.json'
+          ];
+          for (const url of urls) {
+            try {
+              const res = await fetch(url + '?ts=' + Date.now(), { cache: 'no-store' });
+              if (!res.ok) continue;
+              const json = await res.json();
+              rememberName(id, json && json.name);
+              if (nameById[id]) return;
+            } catch (e) {}
+          }
+        };
+
+        const concurrency = 6;
+        let idx = 0;
+        async function worker() {
+          while (idx < missing.length) {
+            const i = idx++;
+            await fetchOne(missing[i]);
+          }
+        }
+        await Promise.all(Array.from({ length: Math.min(concurrency, missing.length) }, worker));
+      }
 
       function muscatParts() {
         try {
@@ -410,6 +488,7 @@
           const json = await res.json();
           log = Array.isArray(json.log) ? json.log.slice() : [];
           log.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+          await loadNameDirectory();
           render();
         } catch (e) {
           list.innerHTML = '<div class="error">تعذر تحميل السجل</div>';
@@ -451,7 +530,8 @@
           const r = rows[i];
           const nameEl = el.querySelector('.rowName');
           const textEl = el.querySelector('.rowNameText');
-          textEl.textContent = ((r.name || '').trim() || 'بدون اسم محفوظ');
+          const name = displayName(r);
+          textEl.textContent = name || 'بدون اسم محفوظ';
           const device = rowDeviceText(r);
           if (device) {
             const badge = document.createElement('span');
@@ -459,10 +539,13 @@
             badge.textContent = device;
             nameEl.appendChild(badge);
           }
-          el.querySelector('.rowMeta').textContent =
-            '#' + (r.id || '—') +
-            ' · ' + formatTime(r.at) +
-            ' · ' + pageLabel(r.page);
+          const metaParts = [
+            '#' + (r.id || '—')
+          ];
+          if (name) metaParts.push(name);
+          metaParts.push(formatTime(r.at));
+          metaParts.push(pageLabel(r.page));
+          el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
         });
       }
 
