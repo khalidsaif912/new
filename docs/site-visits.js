@@ -534,8 +534,9 @@
   var VISIT_LOG_NS = 'roster-site-visits';
   var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
-  // v3: include device model; forces one re-log after deploy for same-day visitors.
-  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV3';
+  // v4: also log guests without saved employee id (once/day per device).
+  var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV4';
+  var GUEST_ID_KEY = 'rosterVisitGuestId';
 
   function docsBasePath() {
     try {
@@ -556,7 +557,7 @@
     var known = cleanEmployeeName(fallbackName);
     if (known) return Promise.resolve(known);
     var empId = String(id || '').trim();
-    if (!empId) return Promise.resolve('');
+    if (!empId || !/^\d+$/.test(empId)) return Promise.resolve('');
     var base = docsBasePath();
     var urls = [
       base + 'schedules/' + encodeURIComponent(empId) + '.json',
@@ -581,26 +582,67 @@
     return tryNext(0);
   }
 
-  function logIdentifiedVisit() {
+  function getOrCreateGuestId() {
+    try {
+      var existing = String(localStorage.getItem(GUEST_ID_KEY) || '').trim();
+      if (/^g-[a-z0-9]+$/i.test(existing)) return existing;
+    } catch (e) {}
+    var id = 'g-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+    try { localStorage.setItem(GUEST_ID_KEY, id); } catch (e2) {}
+    return id;
+  }
+
+  function visitHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'X-Mantle-Key': VISIT_LOG_KEY
+    };
+  }
+
+  function postVisitRow(row, stamp) {
+    var headers = visitHeaders();
+    return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('read');
+        return r.json();
+      })
+      .then(function (cur) {
+        var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
+        var kept = list.filter(function (item) {
+          return !(item && String(item.id) === String(row.id) && String(item.day) === String(row.day));
+        });
+        kept.unshift(row);
+        if (kept.length > 500) kept.length = 500;
+        return fetch(VISIT_LOG_URL, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ log: kept })
+        }).then(function (r) {
+          if (!r.ok) throw new Error('write');
+          try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
+        });
+      });
+  }
+
+  function logSiteVisit() {
     var ident = getRosterIdentity();
-    if (!ident) return;
     var keys = muscatYmd();
-    var stamp = keys.day + ':' + ident.id;
+    var isGuest = !ident;
+    var visitId = isGuest ? getOrCreateGuestId() : ident.id;
+    var stamp = keys.day + ':' + visitId;
     try {
       if (localStorage.getItem(VISIT_LOGGED_KEY) === stamp) return;
     } catch (e) {}
 
-    var headers = {
-      'Content-Type': 'application/json',
-      'X-Mantle-Key': VISIT_LOG_KEY
-    };
+    var namePromise = isGuest
+      ? Promise.resolve('')
+      : resolveEmployeeName(ident.id, ident.name);
 
-    Promise.all([detectDeviceInfo(), resolveEmployeeName(ident.id, ident.name)])
+    Promise.all([detectDeviceInfo(), namePromise])
       .then(function (pair) {
         var dev = pair[0];
         var resolvedName = pair[1] || '';
-        // Persist resolved name locally for later visits.
-        if (resolvedName) {
+        if (!isGuest && resolvedName) {
           try {
             if (!localStorage.getItem('exportSavedEmpName') && !localStorage.getItem('savedEmpName') && !localStorage.getItem('importSavedEmpName')) {
               localStorage.setItem('exportSavedEmpName', resolvedName);
@@ -608,36 +650,16 @@
             }
           } catch (e3) {}
         }
-        return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
-          .then(function (r) {
-            if (!r.ok) throw new Error('read');
-            return r.json();
-          })
-          .then(function (cur) {
-            var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
-            var now = Date.now();
-            var kept = list.filter(function (row) {
-              return !(row && String(row.id) === String(ident.id) && String(row.day) === keys.day);
-            });
-            kept.unshift({
-              id: ident.id,
-              name: resolvedName || '',
-              day: keys.day,
-              at: now,
-              page: pagePathLabel(),
-              device: (dev && dev.device) || 'Other',
-              model: (dev && dev.model) || ''
-            });
-            if (kept.length > 400) kept.length = 400;
-            return fetch(VISIT_LOG_URL, {
-              method: 'POST',
-              headers: headers,
-              body: JSON.stringify({ log: kept })
-            }).then(function (r) {
-              if (!r.ok) throw new Error('write');
-              try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
-            });
-          });
+        return postVisitRow({
+          id: visitId,
+          name: resolvedName || '',
+          guest: !!isGuest,
+          day: keys.day,
+          at: Date.now(),
+          page: pagePathLabel(),
+          device: (dev && dev.device) || 'Other',
+          model: (dev && dev.model) || ''
+        }, stamp);
       })
       .catch(function () {});
   }
@@ -655,8 +677,8 @@
         return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
       }
     });
-    // Identified staff log (once/day) — delayed so it never blocks the counter UI.
-    window.setTimeout(logIdentifiedVisit, 1200);
+    // Visit log (staff or guest, once/day) — delayed so it never blocks the counter UI.
+    window.setTimeout(logSiteVisit, 1200);
     window.setTimeout(paint, 250);
     window.setTimeout(paint, 900);
     window.setTimeout(function () {

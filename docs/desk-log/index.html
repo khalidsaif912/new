@@ -163,6 +163,11 @@
       padding: 2px 8px;
       line-height: 1.4;
     }
+    .rowDevice.guest {
+      color: #fcd34d;
+      background: #78350f55;
+      border-color: #f59e0b55;
+    }
     .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
     .empty, .error {
       text-align: center;
@@ -198,7 +203,7 @@
     <div class="head">
       <div>
         <h1>سجل الزوار</h1>
-        <p>موظفون حفظوا رقمهم في الروستر ودخلوا الموقع (مرة واحدة في اليوم لكل رقم).</p>
+        <p>موظفين حفظوا رقمهم + زوار بدون رقم (مرة واحدة في اليوم لكل جهاز/رقم).</p>
       </div>
       <button type="button" class="lockOut" id="lockOut">قفل</button>
     </div>
@@ -257,7 +262,15 @@
         if (!nameById[key]) nameById[key] = n;
       }
 
+      function isGuestRow(r) {
+        if (!r) return false;
+        if (r.guest === true) return true;
+        const id = String(r.id || '').trim();
+        return /^g-/i.test(id) || !/^\d+$/.test(id);
+      }
+
       function displayName(r) {
+        if (isGuestRow(r)) return 'زائر بدون رقم';
         const id = String((r && r.id) || '').trim();
         const fromRow = cleanName(r && r.name);
         if (fromRow) return fromRow;
@@ -281,7 +294,7 @@
         const missing = Array.from(new Set(
           (log || [])
             .map((r) => String((r && r.id) || '').trim())
-            .filter((id) => id && !nameById[id])
+            .filter((id) => id && /^\d+$/.test(id) && !nameById[id])
         ));
         if (!missing.length) return;
 
@@ -530,6 +543,7 @@
           const r = rows[i];
           const nameEl = el.querySelector('.rowName');
           const textEl = el.querySelector('.rowNameText');
+          const guest = isGuestRow(r);
           const name = displayName(r);
           textEl.textContent = name || 'بدون اسم محفوظ';
           const device = rowDeviceText(r);
@@ -539,10 +553,21 @@
             badge.textContent = device;
             nameEl.appendChild(badge);
           }
-          const metaParts = [
-            '#' + (r.id || '—')
-          ];
-          if (name) metaParts.push(name);
+          if (guest) {
+            const guestBadge = document.createElement('span');
+            guestBadge.className = 'rowDevice guest';
+            guestBadge.textContent = 'ضيف';
+            nameEl.appendChild(guestBadge);
+          }
+          const metaParts = [];
+          if (guest) {
+            metaParts.push('ضيف');
+            const shortId = String(r.id || '').replace(/^g-/i, '').slice(0, 8);
+            if (shortId) metaParts.push(shortId);
+          } else {
+            metaParts.push('#' + (r.id || '—'));
+            if (name) metaParts.push(name);
+          }
           metaParts.push(formatTime(r.at));
           metaParts.push(pageLabel(r.page));
           el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
