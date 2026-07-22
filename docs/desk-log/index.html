@@ -169,6 +169,80 @@
       border-color: #f59e0b55;
     }
     .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
+    .phoneRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .phoneRowMain { min-width: 0; flex: 1; }
+    .phoneRow .rowName { margin-bottom: 6px; }
+    .phoneDigits {
+      display: inline-flex;
+      align-items: center;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      color: #e0f2fe;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin: 0 0 6px;
+    }
+    .phoneActions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .phoneAct {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,.22);
+      transition: transform .12s ease, filter .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .phoneAct:active { transform: scale(.96); }
+    .phoneAct svg { width: 20px; height: 20px; display: block; }
+    .phoneAct--call {
+      background: linear-gradient(145deg, #22c55e, #15803d);
+    }
+    .phoneAct--copy {
+      background: linear-gradient(145deg, #38bdf8, #0284c7);
+    }
+    .phoneToast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(12px);
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 20;
+    }
+    .phoneToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
     .empty, .error {
       text-align: center;
       padding: 28px 14px;
@@ -519,12 +593,58 @@
         unlock();
       }
 
+      function digitsOnly(phone) {
+        return String(phone || '').replace(/\D/g, '');
+      }
+
       function formatPhone(phone) {
-        const p = String(phone || '').replace(/\D/g, '');
+        const p = digitsOnly(phone);
         if (p.length === 11 && p.startsWith('968')) {
           return '+968 ' + p.slice(3, 7) + ' ' + p.slice(7);
         }
-        return String(phone || '—');
+        if (p.length === 8) {
+          return p.slice(0, 4) + ' ' + p.slice(4);
+        }
+        return p || '—';
+      }
+
+      function telHref(phone) {
+        const p = digitsOnly(phone);
+        if (!p) return '#';
+        return 'tel:+' + (p.startsWith('968') ? p : ('968' + p));
+      }
+
+      function showPhoneToast(text) {
+        let toast = document.getElementById('phoneToast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'phoneToast';
+          toast.className = 'phoneToast';
+          document.body.appendChild(toast);
+        }
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(showPhoneToast._t);
+        showPhoneToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
+
+      async function copyPhone(phone) {
+        const text = formatPhone(phone);
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(digitsOnly(phone) || text);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = digitsOnly(phone) || text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          showPhoneToast('تم نسخ الرقم');
+        } catch (e) {
+          showPhoneToast('تعذر النسخ');
+        }
       }
 
       async function loadPhones() {
@@ -560,25 +680,35 @@
           list.innerHTML = '<div class="empty">لا توجد أرقام محفوظة بعد.</div>';
           return;
         }
-        list.innerHTML = phones.map(() =>
-          '<article class="row">' +
-            '<p class="rowName"><span class="rowNameText"></span></p>' +
-            '<p class="rowMeta"></p>' +
-          '</article>'
-        ).join('');
-        Array.from(list.children).forEach((el, i) => {
-          const r = phones[i];
+        const callSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6A2 2 0 0 1 22 16.9z" fill="currentColor"/></svg>';
+        const copySvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+        list.innerHTML = phones.map((r) => {
           const id = String((r && r.id) || '').trim();
-          const name = cleanName(r && r.name) || nameById[id] || '';
-          el.querySelector('.rowNameText').textContent = name || ('موظف #' + (id || '—'));
-          const phoneBadge = document.createElement('span');
-          phoneBadge.className = 'rowDevice';
-          phoneBadge.textContent = formatPhone(r && r.phone);
-          el.querySelector('.rowName').appendChild(phoneBadge);
-          const metaParts = [];
-          if (id) metaParts.push('#' + id);
-          metaParts.push(formatTime(r && r.at));
-          el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
+          const name = cleanName(r && r.name) || nameById[id] || ('موظف #' + (id || '—'));
+          const phone = digitsOnly(r && r.phone);
+          const nice = formatPhone(phone);
+          const href = telHref(phone);
+          return (
+            '<article class="row phoneRow" data-phone="' + escapeHtml(phone) + '">' +
+              '<div class="phoneRowMain">' +
+                '<p class="rowName"><span class="rowNameText">' + escapeHtml(name) + '</span></p>' +
+                '<div class="phoneDigits" dir="ltr">' + escapeHtml(nice) + '</div>' +
+                '<p class="rowMeta">' + escapeHtml((id ? '#' + id + ' · ' : '') + formatTime(r && r.at)) + '</p>' +
+              '</div>' +
+              '<div class="phoneActions">' +
+                '<a class="phoneAct phoneAct--call" href="' + href + '" title="اتصال" aria-label="اتصال">' + callSvg + '</a>' +
+                '<button type="button" class="phoneAct phoneAct--copy" data-copy="1" title="نسخ" aria-label="نسخ">' + copySvg + '</button>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+
+        list.querySelectorAll('[data-copy="1"]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const row = btn.closest('[data-phone]');
+            copyPhone(row && row.getAttribute('data-phone'));
+          });
         });
       }
 
