@@ -785,7 +785,8 @@
       document.body.appendChild(sheet);
 
       document.getElementById('rosterPhoneNo').addEventListener('click', function () {
-        markPhonePromptDone(ident.id);
+        var cur = getRosterIdentity();
+        if (cur) markPhonePromptDone(cur.id);
         closePhonePrompt();
       });
       document.getElementById('rosterPhoneYes').addEventListener('click', function () {
@@ -800,6 +801,8 @@
         closePhonePrompt();
       });
       document.getElementById('rosterPhoneSave').addEventListener('click', function () {
+        var cur = getRosterIdentity();
+        if (!cur) return;
         var msg = document.getElementById('rosterPhoneMsg');
         var input = document.getElementById('rosterPhoneInput');
         var phone = normalizeOmanPhone(input && input.value);
@@ -816,15 +819,15 @@
         }
         var saveBtn = document.getElementById('rosterPhoneSave');
         if (saveBtn) saveBtn.disabled = true;
-        resolveEmployeeName(ident.id, ident.name).then(function (name) {
+        resolveEmployeeName(cur.id, cur.name).then(function (name) {
           return savePhoneToMantle({
-            id: ident.id,
-            name: name || ident.name || '',
+            id: cur.id,
+            name: name || cur.name || '',
             phone: phone,
             at: Date.now()
           });
         }).then(function () {
-          markPhonePromptDone(ident.id);
+          markPhonePromptDone(cur.id);
           try { localStorage.setItem('exportSavedPhone', phone); } catch (e) {}
           if (msg) {
             msg.className = 'rosterPhoneMsg';
