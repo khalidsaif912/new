@@ -252,13 +252,35 @@
       font-weight: 700;
     }
     .error { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
-    .lockOut {
+    .headActions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      flex-shrink: 0;
+    }
+    .lockOut, .homeOut {
       background: transparent;
       border: 1px solid #475569;
       color: #cbd5e1;
       font-size: 12px;
       min-height: 34px;
       padding: 0 12px;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .homeOut {
+      background: #1e3a8a55;
+      border-color: #3b82f655;
+      color: #dbeafe;
     }
   </style>
 </head>
@@ -271,6 +293,9 @@
       <button type="button" id="pinBtn">دخول</button>
     </div>
     <div class="gateErr" id="gateErr"></div>
+    <div style="margin-top:18px">
+      <a class="homeOut" id="gateHomeOut" href="../index.html" style="display:inline-flex;min-width:160px">🏠 الرئيسية</a>
+    </div>
   </div>
 
   <div class="app" id="app" hidden>
@@ -279,7 +304,10 @@
         <h1>سجل الزوار</h1>
         <p>موظفين حفظوا رقمهم + زوار بدون رقم (مرة واحدة في اليوم لكل جهاز/رقم).</p>
       </div>
-      <button type="button" class="lockOut" id="lockOut">قفل</button>
+      <div class="headActions">
+        <a class="homeOut" id="homeOut" href="../index.html">🏠 الرئيسية</a>
+        <button type="button" class="lockOut" id="lockOut">قفل</button>
+      </div>
     </div>
     <div class="toolbar" id="mainTabs">
       <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
@@ -341,6 +369,19 @@
           return '../';
         }
       }
+
+      function homeUrl() {
+        try {
+          const base = docsBase();
+          if (base && base !== '../') return base.replace(/\/?$/, '/') + 'index.html';
+        } catch (e) {}
+        return '../index.html';
+      }
+
+      const homeOut = document.getElementById('homeOut');
+      if (homeOut) homeOut.href = homeUrl();
+      const gateHomeOut = document.getElementById('gateHomeOut');
+      if (gateHomeOut) gateHomeOut.href = homeUrl();
 
       function cleanName(name) {
         return String(name || '')
