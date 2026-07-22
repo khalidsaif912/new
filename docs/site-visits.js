@@ -715,8 +715,7 @@
       '.rosterPhoneForm{display:none;text-align:right;margin-top:4px;}',
       '.rosterPhoneForm.open{display:block;}',
       '.rosterPhoneForm label{display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;}',
-      '.rosterPhoneForm input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;margin-bottom:10px;}',
-      '.rosterPhoneForm .hint{font-size:11px;color:#64748b;margin:-4px 0 12px;font-weight:600;}',
+      '.rosterPhoneForm input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;margin-bottom:12px;}',
       '.rosterPhoneSave{width:100%;background:#0f766e;color:#fff;margin-bottom:8px;}',
       '.rosterPhoneCancel{width:100%;background:#e2e8f0;color:#334155;}',
       '.rosterPhoneMsg{min-height:18px;margin-top:8px;font-size:12px;font-weight:800;color:#0f766e;}',
@@ -729,6 +728,8 @@
     var headers = visitHeaders();
     return fetch(PHONE_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
+        // First save: document may not exist yet (404) — treat as empty list.
+        if (r.status === 404) return {};
         if (!r.ok) throw new Error('read');
         return r.json().catch(function () { return {}; });
       })
@@ -776,8 +777,7 @@
         '<div class="rosterPhoneForm" id="rosterPhoneForm">' +
         '<h2>أدخل رقم هاتفك النقال</h2>' +
         '<label for="rosterPhoneInput">رقم الجوال</label>' +
-        '<input id="rosterPhoneInput" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="9XXXXXXX أو 9689XXXXXXX" dir="ltr">' +
-        '<div class="hint">يُحفظ للاطلاع من سجل الزوار فقط (للمشرف).</div>' +
+        '<input id="rosterPhoneInput" type="text" inputmode="numeric" autocomplete="off" maxlength="15" placeholder="9XXXXXXX" dir="ltr">' +
         '<button type="button" class="rosterPhoneSave" id="rosterPhoneSave">حفظ الرقم</button>' +
         '<button type="button" class="rosterPhoneCancel" id="rosterPhoneCancel">إلغاء</button>' +
         '<div class="rosterPhoneMsg" id="rosterPhoneMsg"></div>' +
