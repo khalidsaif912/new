@@ -77,6 +77,81 @@
     return pack[key] || I18N.en[key] || key;
   }
 
+  function appsAsset(name) {
+    var root = typeof getSiteRootUrl === 'function' ? getSiteRootUrl() : '';
+    return root + '/assets/icons/' + name;
+  }
+
+  /* Flat illustrated icons (Flaticon-like: bold outline + color fills) */
+  var APP_ICONS = {
+    flights:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/>' +
+      '<path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<circle cx="40" cy="34" r="2.2" fill="#fff"/>' +
+      '</svg>',
+    labels:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<path d="M10 12h24l18 18-6 6L28 18H10z" fill="#6ee7b7"/>' +
+      '<circle cx="22" cy="24" r="4.2" fill="#fff" stroke="#0f172a" stroke-width="2"/>' +
+      '<path d="M30 42l8-8" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>' +
+      '</svg>',
+    calc:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="12" y="6" width="40" height="52" rx="8" fill="#fbbf24" stroke="#0f172a" stroke-width="2.4"/>' +
+      '<rect x="18" y="12" width="28" height="12" rx="4" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/>' +
+      '<rect x="18" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '<rect x="31" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '<rect x="44" y="30" width="4" height="8" rx="1.5" fill="#fb7185" stroke="#0f172a" stroke-width="1.6"/>' +
+      '<rect x="18" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '<rect x="31" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '<rect x="44" y="42" width="4" height="8" rx="1.5" fill="#38bdf8" stroke="#0f172a" stroke-width="1.6"/>' +
+      '</svg>',
+    quicklist:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<path d="M18 18h28l4 34H14l4-34z" fill="#c4b5fd" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<path d="M22 18a10 10 0 0 1 20 0" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M18 18h28l-2 10H20z" fill="#a78bfa"/>' +
+      '<circle cx="26" cy="40" r="2.4" fill="#0f172a"/><circle cx="38" cy="40" r="2.4" fill="#0f172a"/>' +
+      '</svg>',
+    store:
+      '<svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/>' +
+      '<path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/>' +
+      '<rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '<rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
+      '</svg>',
+    games: null
+  };
+
+  function gamesIconHtml() {
+    return (
+      '<img class="siteAppsFlatImg" src="' +
+      appsAsset('app-games.png') +
+      '" width="30" height="30" alt="" decoding="async">'
+    );
+  }
+
+  function iconForApp(id) {
+    if (id === 'games') return gamesIconHtml();
+    return APP_ICONS[id] || '';
+  }
+
+  function upgradeAppIcons() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    grid.querySelectorAll('.siteAppsLink[data-app-id]').forEach(function (link) {
+      var id = link.getAttribute('data-app-id');
+      var icon = link.querySelector('.siteAppsLink-icon');
+      var html = iconForApp(id);
+      if (icon && html) icon.innerHTML = html;
+    });
+  }
+
   function closeShareIfOpen() {
     var share = document.getElementById('siteShareSheet');
     if (share && share.classList.contains('open')) {
@@ -133,6 +208,7 @@
     if (!sheet) return;
     closeShareIfOpen();
     applyI18n();
+    upgradeAppIcons();
     patchCalcLink();
     patchQuicklistLink();
     sheet.classList.add('open');
@@ -191,7 +267,7 @@
         href: 'https://khalidsaif912.github.io/live-flights/',
         external: true,
         classes: 'roster-cta-btn--apps',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg>'
+        icon: iconForApp('flights')
       },
       {
         id: 'labels',
@@ -200,7 +276,7 @@
         href: 'https://lbit.netlify.app/',
         external: true,
         classes: 'roster-cta-btn--texture',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>'
+        icon: iconForApp('labels')
       },
       {
         id: 'calc',
@@ -209,7 +285,7 @@
         href: calcPageUrl(),
         external: false,
         classes: 'roster-cta-btn--roster',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/></svg>'
+        icon: iconForApp('calc')
       },
       {
         id: 'quicklist',
@@ -218,7 +294,7 @@
         href: quicklistPageUrl(),
         external: false,
         classes: 'roster-cta-btn--texture',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>'
+        icon: iconForApp('quicklist')
       },
       {
         id: 'store',
@@ -227,7 +303,7 @@
         href: 'https://mystore-96d8e.web.app',
         external: true,
         classes: 'roster-cta-btn--roster',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18"/><path d="M5 6h14l1 4H4z"/><path d="M6 10v10h12V10"/><path d="M9 14h6"/></svg>'
+        icon: iconForApp('store')
       },
       {
         id: 'games',
@@ -236,7 +312,7 @@
         href: 'https://dgr-exp.netlify.app/',
         external: true,
         classes: 'roster-cta-btn--apps',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>'
+        icon: iconForApp('games')
       },
       {
         id: 'book',
@@ -245,7 +321,7 @@
         href: bookPageUrl(),
         external: false,
         classes: 'roster-cta-btn--alumni',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>'
+        icon: '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/></svg>'
       },
       {
         id: 'alumni',
@@ -254,7 +330,7 @@
         href: alumniPageUrl(),
         external: false,
         classes: 'roster-cta-btn--alumni',
-        icon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+        icon: '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><circle cx="24" cy="22" r="10" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><circle cx="42" cy="24" r="8" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M8 54c2-10 10-16 16-16s14 6 16 16" fill="#ccfbf1" stroke="#0f172a" stroke-width="2.2"/><path d="M34 54c1-8 7-12 12-12s9 4 10 12" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/></svg>'
       }
     ];
   }
@@ -369,46 +445,57 @@
       '.spotlightTitle{margin:0 0 4px;font-size:18px;font-weight:900;color:#0f172a;}',
       '.spotlightHint{margin:0 0 14px;font-size:12px;line-height:1.5;color:#64748b;}',
       '.spotlightPreview{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0;text-align:start;margin-bottom:12px;}',
-      '.spotlightPreviewIcon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;flex-shrink:0;}',
+      '.spotlightPreviewIcon{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;flex-shrink:0;overflow:hidden;}',
+      '.spotlightPreviewIcon svg,.spotlightPreviewIcon img{width:30px;height:30px;object-fit:contain;display:block;}',
       '.spotlightPreviewText{min-width:0;flex:1;}',
       '.spotlightPreviewTitle{font-size:14px;font-weight:800;color:#0f172a;line-height:1.25;}',
       '.spotlightPreviewSub{font-size:11px;font-weight:600;color:#64748b;line-height:1.35;margin-top:3px;}',
       '.spotlightActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}',
       '.spotlightCloseWrap .roster-cta-btn{width:100%;}',
-      '.siteAppsSheet{padding:10px!important;overscroll-behavior:none;}',
-      '.siteAppsCard{width:min(100%,380px)!important;max-height:calc(100vh - 20px)!important;max-height:calc(100dvh - 20px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:12px 12px 10px!important;border-radius:16px!important;-webkit-overflow-scrolling:auto!important;}',
-      '.siteAppsTitle{font-size:15px!important;margin:0 0 2px!important;flex-shrink:0;}',
-      '.siteAppsHint{font-size:11px!important;margin:0 0 8px!important;line-height:1.35!important;flex-shrink:0;}',
-      '.siteAppsGrid{gap:8px!important;margin-bottom:8px!important;min-height:0;flex:1 1 auto;align-content:start;}',
-      '.siteAppsLink{min-height:0!important;padding:8px 6px!important;gap:5px!important;border-radius:12px!important;}',
-      '.siteAppsLink-icon{width:34px!important;height:34px!important;border-radius:10px!important;flex-shrink:0;}',
-      '.siteAppsLink-icon svg{width:18px!important;height:18px!important;}',
-      '.siteAppsLink-text{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;}',
-      '.siteAppsLink-title{font-size:11px!important;line-height:1.2!important;}',
-      '.siteAppsLink-sub{font-size:9px!important;line-height:1.25!important;}',
-      '.siteAppsLink--games{min-height:48px!important;padding:8px 12px!important;gap:10px!important;}',
-      '.siteAppsLink--games .siteAppsLink-text{align-items:flex-start;flex:1;}',
-      '.siteAppsCloseWrap{margin-top:2px!important;flex-shrink:0;}',
-      '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:40px;padding-top:8px;padding-bottom:8px;}',
+      '.siteAppsSheet{padding:12px!important;overscroll-behavior:none;background:rgba(15,23,42,.5)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}',
+      '.siteAppsCard{width:min(100%,400px)!important;max-height:calc(100vh - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px 14px 12px!important;border-radius:22px!important;border:1px solid rgba(148,163,184,.22)!important;background:linear-gradient(180deg,#ffffff 0%,#f5f9ff 100%)!important;box-shadow:0 28px 70px rgba(15,23,42,.28)!important;-webkit-overflow-scrolling:auto!important;}',
+      '.siteAppsTitle{font-size:17px!important;margin:0 0 2px!important;flex-shrink:0;letter-spacing:-.01em;}',
+      '.siteAppsHint{font-size:12px!important;margin:0 0 12px!important;line-height:1.4!important;flex-shrink:0;color:#64748b!important;}',
+      '.siteAppsGrid{gap:10px!important;margin-bottom:10px!important;min-height:0;flex:1 1 auto;align-content:start;}',
+      '.siteAppsLink{min-height:0!important;padding:12px 8px!important;gap:8px!important;border-radius:16px!important;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 4px 14px rgba(15,23,42,.04)!important;}',
+      '.siteAppsLink-icon{width:48px!important;height:48px!important;border-radius:16px!important;flex-shrink:0;box-shadow:0 6px 14px rgba(15,23,42,.08)!important;}',
+      '.siteAppsLink-icon svg,.siteAppsFlatSvg{width:30px!important;height:30px!important;display:block;}',
+      '.siteAppsFlatImg{width:30px!important;height:30px!important;object-fit:contain;display:block;filter:drop-shadow(0 2px 4px rgba(15,23,42,.12));}',
+      '.siteAppsLink-text{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}',
+      '.siteAppsLink-title{font-size:12px!important;line-height:1.25!important;font-weight:800!important;}',
+      '.siteAppsLink-sub{font-size:10px!important;line-height:1.3!important;}',
+      '.siteAppsLink--flights .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
+      '.siteAppsLink--labels .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
+      '.siteAppsLink--calc .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
+      '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
+      '.siteAppsLink--store{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
+      '.siteAppsLink--games{background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
+      '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
+      '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
+      '.siteAppsLink--store,.siteAppsLink--games{min-height:64px!important;padding:10px 14px!important;gap:12px!important;}',
+      '.siteAppsLink--store .siteAppsLink-text,.siteAppsLink--games .siteAppsLink-text{align-items:flex-start;flex:1;}',
+      '.siteAppsCloseWrap{margin-top:4px!important;flex-shrink:0;}',
+      '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:42px;padding-top:9px;padding-bottom:9px;border-radius:14px!important;}',
+      '@media (hover:hover){.siteAppsLink:hover{transform:translateY(-2px)!important;box-shadow:0 10px 22px rgba(15,23,42,.1)!important;}}',
       '@media (max-height:720px){',
       '.siteAppsHint{display:none!important;}',
-      '.siteAppsCard{padding:10px 10px 8px!important;border-radius:14px!important;}',
-      '.siteAppsGrid{gap:6px!important;margin-bottom:6px!important;}',
-      '.siteAppsLink{padding:6px 5px!important;gap:4px!important;}',
-      '.siteAppsLink-icon{width:30px!important;height:30px!important;border-radius:8px!important;}',
-      '.siteAppsLink-icon svg{width:16px!important;height:16px!important;}',
-      '.siteAppsLink-title{font-size:10.5px!important;}',
+      '.siteAppsCard{padding:12px 12px 10px!important;border-radius:18px!important;}',
+      '.siteAppsGrid{gap:8px!important;margin-bottom:8px!important;}',
+      '.siteAppsLink{padding:8px 6px!important;gap:6px!important;}',
+      '.siteAppsLink-icon{width:42px!important;height:42px!important;border-radius:14px!important;}',
+      '.siteAppsLink-icon svg,.siteAppsFlatSvg,.siteAppsFlatImg{width:26px!important;height:26px!important;}',
+      '.siteAppsLink-title{font-size:11px!important;}',
       '.siteAppsLink-sub{display:none!important;}',
-      '.siteAppsLink--games{min-height:42px!important;padding:6px 10px!important;}',
-      '.siteAppsTitle{font-size:14px!important;}',
+      '.siteAppsLink--store,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
+      '.siteAppsTitle{font-size:15px!important;}',
       '}',
       '@media (max-height:560px){',
-      '.siteAppsSheet{padding:6px!important;}',
-      '.siteAppsCard{max-height:calc(100vh - 12px)!important;max-height:calc(100dvh - 12px)!important;padding:8px!important;}',
-      '.siteAppsGrid{gap:5px!important;}',
-      '.siteAppsLink{padding:5px 4px!important;border-radius:10px!important;}',
-      '.siteAppsLink-icon{width:26px!important;height:26px!important;}',
-      '.siteAppsLink-icon svg{width:14px!important;height:14px!important;}',
+      '.siteAppsSheet{padding:8px!important;}',
+      '.siteAppsCard{max-height:calc(100vh - 16px)!important;max-height:calc(100dvh - 16px)!important;padding:10px!important;}',
+      '.siteAppsGrid{gap:6px!important;}',
+      '.siteAppsLink{padding:6px 5px!important;border-radius:12px!important;}',
+      '.siteAppsLink-icon{width:34px!important;height:34px!important;}',
+      '.siteAppsLink-icon svg,.siteAppsFlatSvg,.siteAppsFlatImg{width:22px!important;height:22px!important;}',
       '.siteAppsCloseWrap .roster-cta-btn{min-height:36px;padding-top:6px;padding-bottom:6px;font-size:13px;}',
       '}'
     ].join('');
@@ -418,6 +505,7 @@
   function bindUi() {
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
+    upgradeAppIcons();
     document.getElementById('moreAppsBtn')?.addEventListener('click', function (e) {
       e.preventDefault();
       openModal();

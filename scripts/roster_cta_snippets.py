@@ -57,48 +57,52 @@ SVG_APPS_BTN = (
     '</svg>'
 )
 SVG_APP_FLIGHT = (
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>'
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/>'
+    '<path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
+    '<path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>'
+    '<circle cx="40" cy="34" r="2.2" fill="#fff"/>'
     '</svg>'
 )
 SVG_APP_LABEL = (
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>'
-    '<path d="M7 7h.01"/>'
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
+    '<path d="M10 12h24l18 18-6 6L28 18H10z" fill="#6ee7b7"/>'
+    '<circle cx="22" cy="24" r="4.2" fill="#fff" stroke="#0f172a" stroke-width="2"/>'
+    '<path d="M30 42l8-8" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>'
     '</svg>'
 )
 SVG_APP_CALC = (
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<rect x="4" y="2" width="16" height="20" rx="2"/>'
-    '<path d="M8 6h8M8 10h8M8 14h2M12 14h2M8 18h2M12 18h2"/>'
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<rect x="12" y="6" width="40" height="52" rx="8" fill="#fbbf24" stroke="#0f172a" stroke-width="2.4"/>'
+    '<rect x="18" y="12" width="28" height="12" rx="4" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/>'
+    '<rect x="18" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
+    '<rect x="31" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
+    '<rect x="44" y="30" width="4" height="8" rx="1.5" fill="#fb7185" stroke="#0f172a" stroke-width="1.6"/>'
+    '<rect x="18" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
+    '<rect x="31" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
+    '<rect x="44" y="42" width="4" height="8" rx="1.5" fill="#38bdf8" stroke="#0f172a" stroke-width="1.6"/>'
     '</svg>'
 )
 SVG_APP_CART = (
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>'
-    '<path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>'
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<path d="M18 18h28l4 34H14l4-34z" fill="#c4b5fd" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
+    '<path d="M22 18a10 10 0 0 1 20 0" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>'
+    '<path d="M18 18h28l-2 10H20z" fill="#a78bfa"/>'
+    '<circle cx="26" cy="40" r="2.4" fill="#0f172a"/><circle cx="38" cy="40" r="2.4" fill="#0f172a"/>'
     '</svg>'
 )
 SVG_APP_GAME = (
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M6 12h4"/><path d="M8 10v4"/>'
-    '<path d="M15 13h.01"/><path d="M18 11h.01"/>'
-    '<rect x="2" y="6" width="20" height="12" rx="2"/>'
-    '</svg>'
+    '<img class="siteAppsFlatImg" src="https://khalidsaif912.github.io/new/docs/assets/icons/app-games.png" width="30" height="30" alt="" decoding="async">'
 )
 SVG_APP_STORE = (
-    '<svg class="siteAppsStoreSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" '
-    'stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M3 10h18"/>'
-    '<path d="M5 10l1.5-5h11L19 10"/>'
-    '<path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/>'
-    '<path d="M10 20v-5h4v5"/>'
-    '<path d="M12 7V5"/>'
+    '<svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/>'
+    '<path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
+    '<path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/>'
+    '<rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/>'
+    '<rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
+    '<rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
     '</svg>'
 )
 
@@ -1179,7 +1183,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'تطبيقات'"
 
 # ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
-IOS_PERF_VER = "20260720b"
+IOS_PERF_VER = "20260722a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
