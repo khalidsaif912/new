@@ -534,9 +534,11 @@
   var VISIT_LOG_NS = 'roster-site-visits';
   var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
+  var PHONE_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/phones';
   // v4: also log guests without saved employee id (once/day per device).
   var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV4';
   var GUEST_ID_KEY = 'rosterVisitGuestId';
+  var PHONE_PROMPT_KEY = 'rosterPhonePromptDone';
 
   function docsBasePath() {
     try {
@@ -664,6 +666,212 @@
       .catch(function () {});
   }
 
+  function phonePromptDoneFor(empId) {
+    try {
+      var raw = String(localStorage.getItem(PHONE_PROMPT_KEY) || '');
+      var list = raw ? raw.split(',').map(function (x) { return x.trim(); }) : [];
+      return list.indexOf(String(empId)) >= 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markPhonePromptDone(empId) {
+    try {
+      var id = String(empId || '').trim();
+      if (!id) return;
+      var raw = String(localStorage.getItem(PHONE_PROMPT_KEY) || '');
+      var list = raw ? raw.split(',').map(function (x) { return x.trim(); }).filter(Boolean) : [];
+      if (list.indexOf(id) < 0) list.push(id);
+      localStorage.setItem(PHONE_PROMPT_KEY, list.join(','));
+    } catch (e) {}
+  }
+
+  function normalizeOmanPhone(raw) {
+    var p = String(raw || '').replace(/\D/g, '');
+    if (p.startsWith('00')) p = p.slice(2);
+    if (p.length === 8) p = '968' + p;
+    return p;
+  }
+
+  function isValidOmanMobile(raw) {
+    return /^968[79]\d{7}$/.test(normalizeOmanPhone(raw));
+  }
+
+  function ensurePhonePromptCss() {
+    if (document.getElementById('rosterPhonePromptCss')) return;
+    var style = document.createElement('style');
+    style.id = 'rosterPhonePromptCss';
+    style.textContent = [
+      '.rosterPhoneSheet{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}',
+      '.rosterPhoneSheet.open{display:flex;}',
+      '.rosterPhoneCard{width:min(100%,400px);background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid rgba(148,163,184,.28);border-radius:20px;padding:18px 16px 14px;box-shadow:0 24px 60px rgba(15,23,42,.28);text-align:center;}',
+      '.rosterPhoneCard h2{margin:0 0 8px;font-size:17px;font-weight:900;color:#0f172a;}',
+      '.rosterPhoneCard p{margin:0 0 14px;font-size:13px;line-height:1.55;color:#475569;font-weight:600;}',
+      '.rosterPhoneActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}',
+      '.rosterPhoneActions button,.rosterPhoneForm button{min-height:44px;border:0;border-radius:14px;font:inherit;font-weight:800;cursor:pointer;}',
+      '.rosterPhoneYes{background:#2563eb;color:#fff;}',
+      '.rosterPhoneNo{background:#e2e8f0;color:#334155;}',
+      '.rosterPhoneForm{display:none;text-align:right;margin-top:4px;}',
+      '.rosterPhoneForm.open{display:block;}',
+      '.rosterPhoneForm label{display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;}',
+      '.rosterPhoneForm input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;margin-bottom:10px;}',
+      '.rosterPhoneForm .hint{font-size:11px;color:#64748b;margin:-4px 0 12px;font-weight:600;}',
+      '.rosterPhoneSave{width:100%;background:#0f766e;color:#fff;margin-bottom:8px;}',
+      '.rosterPhoneCancel{width:100%;background:#e2e8f0;color:#334155;}',
+      '.rosterPhoneMsg{min-height:18px;margin-top:8px;font-size:12px;font-weight:800;color:#0f766e;}',
+      '.rosterPhoneMsg.err{color:#dc2626;}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function savePhoneToMantle(row) {
+    var headers = visitHeaders();
+    return fetch(PHONE_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('read');
+        return r.json().catch(function () { return {}; });
+      })
+      .then(function (cur) {
+        var list = Array.isArray(cur && cur.phones) ? cur.phones.slice() : [];
+        var kept = list.filter(function (item) {
+          return !(item && String(item.id) === String(row.id));
+        });
+        kept.unshift(row);
+        if (kept.length > 800) kept.length = 800;
+        return fetch(PHONE_LOG_URL, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ phones: kept })
+        }).then(function (r) {
+          if (!r.ok) throw new Error('write');
+        });
+      });
+  }
+
+  function openPhonePrompt() {
+    var ident = getRosterIdentity();
+    if (!ident) return;
+    if (phonePromptDoneFor(ident.id)) return;
+    try {
+      if (/\/desk-log(\/|$)/.test(location.pathname || '')) return;
+    } catch (e0) {}
+
+    ensurePhonePromptCss();
+    var sheet = document.getElementById('rosterPhoneSheet');
+    if (!sheet) {
+      sheet = document.createElement('div');
+      sheet.id = 'rosterPhoneSheet';
+      sheet.className = 'rosterPhoneSheet';
+      sheet.setAttribute('aria-hidden', 'true');
+      sheet.innerHTML =
+        '<div class="rosterPhoneCard" role="dialog" aria-labelledby="rosterPhoneTitle">' +
+        '<div id="rosterPhoneAsk">' +
+        '<h2 id="rosterPhoneTitle">إضافة رقم الهاتف</h2>' +
+        '<p>رقم هاتفك موجود في هاتف المشرف، هل ترغب في إضافته في الموقع؟</p>' +
+        '<div class="rosterPhoneActions">' +
+        '<button type="button" class="rosterPhoneYes" id="rosterPhoneYes">نعم</button>' +
+        '<button type="button" class="rosterPhoneNo" id="rosterPhoneNo">لا</button>' +
+        '</div></div>' +
+        '<div class="rosterPhoneForm" id="rosterPhoneForm">' +
+        '<h2>أدخل رقم هاتفك النقال</h2>' +
+        '<label for="rosterPhoneInput">رقم الجوال</label>' +
+        '<input id="rosterPhoneInput" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="9XXXXXXX أو 9689XXXXXXX" dir="ltr">' +
+        '<div class="hint">يُحفظ للاطلاع من سجل الزوار فقط (للمشرف).</div>' +
+        '<button type="button" class="rosterPhoneSave" id="rosterPhoneSave">حفظ الرقم</button>' +
+        '<button type="button" class="rosterPhoneCancel" id="rosterPhoneCancel">إلغاء</button>' +
+        '<div class="rosterPhoneMsg" id="rosterPhoneMsg"></div>' +
+        '</div></div>';
+      document.body.appendChild(sheet);
+
+      document.getElementById('rosterPhoneNo').addEventListener('click', function () {
+        markPhonePromptDone(ident.id);
+        closePhonePrompt();
+      });
+      document.getElementById('rosterPhoneYes').addEventListener('click', function () {
+        document.getElementById('rosterPhoneAsk').style.display = 'none';
+        document.getElementById('rosterPhoneForm').classList.add('open');
+        setTimeout(function () {
+          var inp = document.getElementById('rosterPhoneInput');
+          if (inp) inp.focus();
+        }, 40);
+      });
+      document.getElementById('rosterPhoneCancel').addEventListener('click', function () {
+        closePhonePrompt();
+      });
+      document.getElementById('rosterPhoneSave').addEventListener('click', function () {
+        var msg = document.getElementById('rosterPhoneMsg');
+        var input = document.getElementById('rosterPhoneInput');
+        var phone = normalizeOmanPhone(input && input.value);
+        if (!isValidOmanMobile(phone)) {
+          if (msg) {
+            msg.className = 'rosterPhoneMsg err';
+            msg.textContent = 'أدخل رقم جوال عماني صحيح (يبدأ بـ 7 أو 9).';
+          }
+          return;
+        }
+        if (msg) {
+          msg.className = 'rosterPhoneMsg';
+          msg.textContent = 'جاري الحفظ…';
+        }
+        var saveBtn = document.getElementById('rosterPhoneSave');
+        if (saveBtn) saveBtn.disabled = true;
+        resolveEmployeeName(ident.id, ident.name).then(function (name) {
+          return savePhoneToMantle({
+            id: ident.id,
+            name: name || ident.name || '',
+            phone: phone,
+            at: Date.now()
+          });
+        }).then(function () {
+          markPhonePromptDone(ident.id);
+          try { localStorage.setItem('exportSavedPhone', phone); } catch (e) {}
+          if (msg) {
+            msg.className = 'rosterPhoneMsg';
+            msg.textContent = 'تم حفظ رقمك بنجاح ✅';
+          }
+          setTimeout(closePhonePrompt, 900);
+        }).catch(function () {
+          if (saveBtn) saveBtn.disabled = false;
+          if (msg) {
+            msg.className = 'rosterPhoneMsg err';
+            msg.textContent = 'تعذر الحفظ، حاول مرة أخرى.';
+          }
+        });
+      });
+      sheet.addEventListener('click', function (e) {
+        if (e.target === sheet) closePhonePrompt();
+      });
+    }
+
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    var ask = document.getElementById('rosterPhoneAsk');
+    var form = document.getElementById('rosterPhoneForm');
+    var msg = document.getElementById('rosterPhoneMsg');
+    var input = document.getElementById('rosterPhoneInput');
+    var saveBtn = document.getElementById('rosterPhoneSave');
+    if (ask) ask.style.display = '';
+    if (form) form.classList.remove('open');
+    if (msg) { msg.textContent = ''; msg.className = 'rosterPhoneMsg'; }
+    if (input) input.value = '';
+    if (saveBtn) saveBtn.disabled = false;
+  }
+
+  function closePhonePrompt() {
+    var sheet = document.getElementById('rosterPhoneSheet');
+    if (!sheet) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+  }
+
+  function maybeAskPhone() {
+    var ident = getRosterIdentity();
+    if (!ident) return;
+    if (phonePromptDoneFor(ident.id)) return;
+    openPhonePrompt();
+  }
+
   function boot() {
     if (booted) return;
     booted = true;
@@ -679,6 +887,7 @@
     });
     // Visit log (staff or guest, once/day) — delayed so it never blocks the counter UI.
     window.setTimeout(logSiteVisit, 1200);
+    window.setTimeout(maybeAskPhone, 2200);
     window.setTimeout(paint, 250);
     window.setTimeout(paint, 900);
     window.setTimeout(function () {

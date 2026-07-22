@@ -207,22 +207,39 @@
       </div>
       <button type="button" class="lockOut" id="lockOut">قفل</button>
     </div>
-    <div class="toolbar">
-      <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
-      <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
-      <button type="button" class="chip" data-filter="all" id="fAll">الكل</button>
-      <button type="button" class="chip" id="refreshBtn">تحديث</button>
+    <div class="toolbar" id="mainTabs">
+      <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
+      <button type="button" class="chip" data-view="phones" id="tabPhones">أرقام الهواتف</button>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="statToday">0</b><span>اليوم</span></div>
-      <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
+    <div id="visitsPanel">
+      <div class="toolbar">
+        <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
+        <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
+        <button type="button" class="chip" data-filter="all" id="fAll">الكل</button>
+        <button type="button" class="chip" id="refreshBtn">تحديث</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statToday">0</b><span>اليوم</span></div>
+        <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
+      </div>
+      <section class="deviceStats" id="deviceStats">
+        <h2>إحصائية الأجهزة</h2>
+        <p class="deviceStatsNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+        <div class="deviceTypeList" id="deviceTypeList"></div>
+      </section>
+      <div class="list" id="list"></div>
     </div>
-    <section class="deviceStats" id="deviceStats">
-      <h2>إحصائية الأجهزة</h2>
-      <p class="deviceStatsNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
-      <div class="deviceTypeList" id="deviceTypeList"></div>
-    </section>
-    <div class="list" id="list"></div>
+    <div id="phonesPanel" hidden>
+      <div class="toolbar">
+        <button type="button" class="chip" id="refreshPhonesBtn">تحديث</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statPhones">0</b><span>أرقام محفوظة</span></div>
+        <div class="stat"><b id="statPhonesHint">خاص</b><span>للمشرف فقط</span></div>
+      </div>
+      <p class="deviceStatsNote" style="margin-bottom:12px">أرقام الجوال التي أضافها الموظفون من نافذة الموقع. لا تظهر للعامة.</p>
+      <div class="list" id="phonesList"></div>
+    </div>
   </div>
 
   <script>
@@ -230,9 +247,12 @@
       const PIN = '912';
       const AUTH_KEY = 'rosterVisitDeskAuth';
       const MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/index';
+      const PHONES_URL = 'https://mantledb.sh/v2/roster-site-visits/phones';
       const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
       let filter = 'today';
+      let view = 'visits';
       let log = [];
+      let phones = [];
       let nameById = Object.create(null);
 
       const gate = document.getElementById('gate');
@@ -467,7 +487,7 @@
         sessionStorage.setItem(AUTH_KEY, '1');
         gate.hidden = true;
         app.hidden = false;
-        loadLog();
+        setView(view);
       }
 
       function lock() {
@@ -479,6 +499,17 @@
         setTimeout(() => pinInput.focus(), 30);
       }
 
+      function setView(next) {
+        view = next === 'phones' ? 'phones' : 'visits';
+        document.getElementById('visitsPanel').hidden = view !== 'visits';
+        document.getElementById('phonesPanel').hidden = view !== 'phones';
+        document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-view') === view);
+        });
+        if (view === 'phones') loadPhones();
+        else loadLog();
+      }
+
       function tryPin() {
         const v = (pinInput.value || '').trim();
         if (v !== PIN) {
@@ -487,6 +518,62 @@
           return;
         }
         unlock();
+      }
+
+      function formatPhone(phone) {
+        const p = String(phone || '').replace(/\D/g, '');
+        if (p.length === 11 && p.startsWith('968')) {
+          return '+968 ' + p.slice(3, 7) + ' ' + p.slice(7);
+        }
+        return String(phone || '—');
+      }
+
+      async function loadPhones() {
+        const list = document.getElementById('phonesList');
+        list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        try {
+          const res = await fetch(PHONES_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('fail');
+          const json = await res.json().catch(() => ({}));
+          phones = Array.isArray(json.phones) ? json.phones.slice() : [];
+          phones.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+          phones.forEach((r) => rememberName(r && r.id, r && r.name));
+          renderPhones();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحميل أرقام الهواتف</div>';
+        }
+      }
+
+      function renderPhones() {
+        document.getElementById('statPhones').textContent = String(phones.length);
+        const list = document.getElementById('phonesList');
+        if (!phones.length) {
+          list.innerHTML = '<div class="empty">لا توجد أرقام محفوظة بعد.</div>';
+          return;
+        }
+        list.innerHTML = phones.map(() =>
+          '<article class="row">' +
+            '<p class="rowName"><span class="rowNameText"></span></p>' +
+            '<p class="rowMeta"></p>' +
+          '</article>'
+        ).join('');
+        Array.from(list.children).forEach((el, i) => {
+          const r = phones[i];
+          const id = String((r && r.id) || '').trim();
+          const name = cleanName(r && r.name) || nameById[id] || '';
+          el.querySelector('.rowNameText').textContent = name || ('موظف #' + (id || '—'));
+          const phoneBadge = document.createElement('span');
+          phoneBadge.className = 'rowDevice';
+          phoneBadge.textContent = formatPhone(r && r.phone);
+          el.querySelector('.rowName').appendChild(phoneBadge);
+          const metaParts = [];
+          if (id) metaParts.push('#' + id);
+          metaParts.push(formatTime(r && r.at));
+          el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
+        });
       }
 
       async function loadLog() {
@@ -580,6 +667,12 @@
       });
       document.getElementById('lockOut').addEventListener('click', lock);
       document.getElementById('refreshBtn').addEventListener('click', loadLog);
+      document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
+      document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
+        c.addEventListener('click', () => {
+          setView(c.getAttribute('data-view') || 'visits');
+        });
+      });
       document.querySelectorAll('.chip[data-filter]').forEach((c) => {
         c.addEventListener('click', () => {
           filter = c.getAttribute('data-filter') || 'today';
