@@ -712,13 +712,14 @@
       '.rosterPhoneActions button,.rosterPhoneForm button{min-height:44px;border:0;border-radius:14px;font:inherit;font-weight:800;cursor:pointer;}',
       '.rosterPhoneYes{background:#2563eb;color:#fff;}',
       '.rosterPhoneNo{background:#e2e8f0;color:#334155;}',
-      '.rosterPhoneForm{display:none;text-align:right;margin-top:4px;}',
+      '.rosterPhoneForm{display:none;text-align:center;margin-top:4px;}',
       '.rosterPhoneForm.open{display:block;}',
-      '.rosterPhoneForm label{display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;}',
-      '.rosterPhoneForm input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;font-size:16px;direction:ltr;text-align:left;margin-bottom:12px;}',
-      '.rosterPhoneSave{width:100%;background:#0f766e;color:#fff;margin-bottom:8px;}',
-      '.rosterPhoneCancel{width:100%;background:#e2e8f0;color:#334155;}',
-      '.rosterPhoneMsg{min-height:18px;margin-top:8px;font-size:12px;font-weight:800;color:#0f766e;}',
+      '.rosterPhoneForm h2{text-align:center;}',
+      '.rosterPhoneForm input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;font-size:16px;direction:ltr;text-align:center;margin:0 0 14px;}',
+      '.rosterPhoneFormActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}',
+      '.rosterPhoneSave{width:100%;background:#0f766e;color:#fff;margin:0;}',
+      '.rosterPhoneCancel{width:100%;background:#e2e8f0;color:#334155;margin:0;}',
+      '.rosterPhoneMsg{min-height:18px;margin-top:10px;font-size:12px;font-weight:800;color:#0f766e;text-align:center;}',
       '.rosterPhoneMsg.err{color:#dc2626;}'
     ].join('');
     document.head.appendChild(style);
@@ -776,10 +777,11 @@
         '</div></div>' +
         '<div class="rosterPhoneForm" id="rosterPhoneForm">' +
         '<h2>أدخل رقم هاتفك النقال</h2>' +
-        '<label for="rosterPhoneInput">رقم الجوال</label>' +
         '<input id="rosterPhoneInput" type="text" inputmode="numeric" autocomplete="off" maxlength="15" placeholder="9XXXXXXX" dir="ltr">' +
+        '<div class="rosterPhoneFormActions">' +
         '<button type="button" class="rosterPhoneSave" id="rosterPhoneSave">حفظ الرقم</button>' +
         '<button type="button" class="rosterPhoneCancel" id="rosterPhoneCancel">إلغاء</button>' +
+        '</div>' +
         '<div class="rosterPhoneMsg" id="rosterPhoneMsg"></div>' +
         '</div></div>';
       document.body.appendChild(sheet);
