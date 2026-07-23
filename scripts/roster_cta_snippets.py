@@ -8,7 +8,7 @@ ICON_VER = "20260521b"
 ICON_DIFF = f"/assets/icons/diff-calendar.png?v={ICON_VER}"
 ICON_FLIGHT = f"/assets/icons/flight.png?v={ICON_VER}"
 
-# ── SVG icons (CTA + share modal — same on all pages) ──
+# â”€â”€ SVG icons (CTA + share modal â€” same on all pages) â”€â”€
 SVG_CLIPBOARD = (
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
     'stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -37,7 +37,7 @@ SVG_LINK = (
     '<path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/>'
     '<path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg>'
 )
-# Compare CTA — line icon matching roster / subscribe / share (not PNG emoji)
+# Compare CTA â€” line icon matching roster / subscribe / share (not PNG emoji)
 SVG_COMPARE = (
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
     'stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -119,7 +119,7 @@ def _chip_val(inner: str) -> str:
     return f'<div class="chipVal">{inner}</div>'
 
 
-# ── Summary chip icons (line SVG — same style as bottom CTA bar) ──
+# â”€â”€ Summary chip icons (line SVG â€” same style as bottom CTA bar) â”€â”€
 SVG_CHIP_SCHEDULE = _chip_svg(
     '<rect x="3" y="4" width="18" height="18" rx="2"/>'
     '<path d="M16 2v4M8 2v4M3 10h18"/>'
@@ -198,7 +198,7 @@ LANG_TOGGLE_HTML = (
     '<button class="langToggle" id="langToggle" onclick="toggleLang()" '
     'type="button" title="Switch language">'
     f'<span class="langToggle-icon">{SVG_LANG_GLOBE}</span>'
-    '<span class="langToggle-label" id="langToggleLabel">ع</span>'
+    '<span class="langToggle-label" id="langToggleLabel">Ø¹</span>'
     '</button>'
 )
 LANG_TOGGLE_CSS = r"""    .langToggle {
@@ -313,7 +313,7 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     }
 """
 
-CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ */
+CTA_CSS = r"""    /* â•â•â•â•â•â•â• QUICK ACTIONS â•â•â•â•â•â•â• */
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
@@ -462,7 +462,7 @@ CTA_CSS = r"""    /* ═══════ QUICK ACTIONS ═══════ *
 
 CTA_CSS_PY = CTA_CSS.replace("{", "{{").replace("}", "}}")
 
-SITE_SHARE_CSS = r"""    /* ═══════ SITE SHARE MODAL ═══════ */
+SITE_SHARE_CSS = r"""    /* â•â•â•â•â•â•â• SITE SHARE MODAL â•â•â•â•â•â•â• */
     .siteShareSheet {
       position: fixed;
       inset: 0;
@@ -575,7 +575,7 @@ SITE_SHARE_MODAL_HTML = f"""<div id="siteShareSheet" class="siteShareSheet" aria
 </div>
 """
 
-SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ═══════ */
+SITE_APPS_CSS = r"""    /* â•â•â•â•â•â•â• RELATED APPS MODAL â•â•â•â•â•â•â• */
     .siteAppsSheet {
       position: fixed;
       inset: 0;
@@ -767,7 +767,7 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon">{SVG_APP_STORE}</span>
         <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store · متجر مُبهر</span>
+          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Â· Ù…ØªØ¬Ø± Ù…ÙØ¨Ù‡Ø±</span>
           <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
         </span>
       </a>
@@ -788,9 +788,9 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
 </div>
 """
 
-# ═══════════════════════════════════════════════════════════════════════
-# SHIFT COPY — bottom button + modal to copy on-duty names as WhatsApp text
-# ═══════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# SHIFT COPY â€” bottom button + modal to copy on-duty names as WhatsApp text
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 SVG_COPY_SHIFT = (
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" '
     'stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -950,7 +950,7 @@ SHIFT_COPY_MODAL_HTML = (
 )
 
 # Plain-CSS (single braces). Interpolated into the page <style> f-string.
-SHIFT_COPY_CSS = """    /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
+SHIFT_COPY_CSS = """    /* â•â•â•â•â•â•â• SHIFT COPY (bottom button + modal) â•â•â•â•â•â•â• */
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -1072,7 +1072,7 @@ def export_cta_html(
 
 
 def import_summary_bar_html(total_emp: int) -> str:
-    """Mirror export duty-page summary chips (Employees → My Schedule → cross-link → Welcome → Training → Diff)."""
+    """Mirror export duty-page summary chips (Employees â†’ My Schedule â†’ cross-link â†’ Welcome â†’ Training â†’ Diff)."""
     return f"""
   <div class="summaryBar">
     <div class="summaryChip" id="summarySwitchChip">
@@ -1172,17 +1172,17 @@ REMOVE_ICON_JS_RE2 = re.compile(
 )
 
 I18N_VIEWFULL_EN = "viewFull:'Full Roster'"
-I18N_VIEWFULL_AR = "viewFull:'الجدول الكامل'"
+I18N_VIEWFULL_AR = "viewFull:'Ø§Ù„Ø¬Ø¯ÙˆÙ„ Ø§Ù„ÙƒØ§Ù…Ù„'"
 I18N_SUB_EN = "subscribe:'Subscribe'"
-I18N_SUB_AR = "subscribe:'اشتراك'"
+I18N_SUB_AR = "subscribe:'Ø§Ø´ØªØ±Ø§Ùƒ'"
 I18N_CMP_EN = "compare:'Compare'"
-I18N_CMP_AR = "compare:'مقارنة'"
+I18N_CMP_AR = "compare:'Ù…Ù‚Ø§Ø±Ù†Ø©'"
 I18N_SHARE_EN = "shareSite:'Share Site'"
-I18N_SHARE_AR = "shareSite:'مشاركة الموقع'"
+I18N_SHARE_AR = "shareSite:'Ù…Ø´Ø§Ø±ÙƒØ© Ø§Ù„Ù…ÙˆÙ‚Ø¹'"
 I18N_APPS_EN = "moreApps:'Apps'"
-I18N_APPS_AR = "moreApps:'تطبيقات'"
+I18N_APPS_AR = "moreApps:'ØªØ·Ø¨ÙŠÙ‚Ø§Øª'"
 
-# ── iOS performance: defer heavy scripts, no duplicate ios-tap-fix ──
+# â”€â”€ iOS performance: defer heavy scripts, no duplicate ios-tap-fix â”€â”€
 IOS_PERF_VER = "20260723a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
@@ -1200,7 +1200,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
-  addScript(root + '/emp-contact.js?v=20260723s');
+  addScript(root + '/emp-contact.js?v=20260723t');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);

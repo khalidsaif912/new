@@ -169,14 +169,14 @@
       'padding:0 0 0 8px;margin:0;position:relative;z-index:2;',
       '-webkit-tap-highlight-color:transparent;',
       '}',
-      /* Invisible full-height hit zone on the right (keeps code/arrow fixed). */
+      /* Invisible hit zone on the right of the name row only (not the open panel). */
       '.empTrailHit{',
-      'position:absolute;top:0;right:0;bottom:0;width:78px;z-index:1;',
+      'position:absolute;top:0;right:0;height:40px;width:78px;z-index:1;',
       'cursor:pointer;-webkit-tap-highlight-color:transparent;',
       '}',
       '.empMain{min-width:0;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:0;position:relative}',
-      '.empBlock{position:relative;background:transparent}',
-      '.empBlock > .empRow{align-items:flex-start}',
+      '.empBlock{position:relative;background:transparent;display:flex;flex-direction:column}',
+      '.empBlock > .empRow{align-items:center}',
       '.empContactToggle,.empStatusHit{',
       'display:inline-flex;align-items:center;justify-content:center;',
       'padding:0;margin:0;border:none;cursor:pointer;',
@@ -193,26 +193,27 @@
       '.empBlock.is-open .empContactToggle{color:#0284c7}',
       '.empBlock.is-open .empContactToggle svg{transform:rotate(180deg)}',
       '.empStatusHit{font:inherit;font-size:13px;font-weight:600;line-height:1.2}',
-      /* In-flow under name (no popup window) */
+      /* Full-width under the employee row so all 5 codes fit */
       '.empContactShell{',
       'display:grid;grid-template-rows:0fr;',
       'transition:grid-template-rows .28s cubic-bezier(.22,1,.36,1);',
+      'width:100%;box-sizing:border-box;',
       '}',
       '.empBlock.is-open .empContactShell{grid-template-rows:1fr}',
       '.empContactShell > .empContactClip{min-height:0;overflow:hidden;background:transparent;border:0;box-shadow:none}',
       '.empContactPanel{',
-      'display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:6px;',
-      'padding:0;opacity:0;transform:translateY(-3px);',
+      'display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:5px;',
+      'padding:0 14px;opacity:0;transform:translateY(-3px);',
       'transition:opacity .22s ease,transform .22s ease,padding .22s ease;',
-      'min-width:0;overflow:hidden;',
+      'min-width:0;box-sizing:border-box;width:100%;',
       '}',
-      '.empBlock.is-open .empContactPanel{padding:6px 0 2px;opacity:1;transform:translateY(0)}',
+      '.empBlock.is-open .empContactPanel{padding:4px 14px 8px;opacity:1;transform:translateY(0)}',
       '.empContactActs{',
       'display:inline-flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;',
-      'gap:6px;min-height:28px;flex:0 0 auto;',
+      'gap:5px;min-height:26px;flex:0 0 auto;',
       '}',
       '.empContactAct{',
-      'width:28px;height:28px;border-radius:8px;flex:0 0 auto;',
+      'width:26px;height:26px;border-radius:8px;flex:0 0 auto;',
       'display:inline-flex;align-items:center;justify-content:center;',
       'text-decoration:none;border:1px solid rgba(148,163,184,.28);',
       'background:rgba(255,255,255,.45);backdrop-filter:blur(8px);',
@@ -222,27 +223,27 @@
       '}',
       '.empContactAct .empContactLbl{display:none}',
       '.empContactAct:active{transform:scale(.94)}',
-      '.empContactAct svg{display:block;width:14px;height:14px}',
+      '.empContactAct svg{display:block;width:13px;height:13px}',
       '.empContactAct--call{color:#047857;border-color:rgba(16,185,129,.28);background:rgba(16,185,129,.10)}',
       '.empContactAct--wa{color:#128C7E;border-color:rgba(18,140,126,.30);background:rgba(37,211,102,.12)}',
       '.empContactAct--mail{color:#0369a1;border-color:rgba(14,165,233,.28);background:rgba(14,165,233,.10)}',
       '.empContactAct.is-muted{opacity:.55}',
       '.empContactSep{',
-      'width:1px;align-self:center;height:18px;min-height:18px;margin:0 1px;',
+      'width:1px;align-self:center;height:16px;min-height:16px;margin:0 2px;',
       'background:rgba(148,163,184,.45);flex:0 0 auto;',
       '}',
       '.empContactShifts{',
-      'display:inline-flex;flex-wrap:nowrap;gap:4px;align-items:center;',
-      'min-height:22px;min-width:0;flex:1 1 auto;overflow:hidden;',
+      'display:inline-flex;flex-wrap:nowrap;gap:2px;align-items:center;',
+      'min-height:22px;min-width:0;flex:1 1 auto;',
       '}',
       '.empContactShiftLine{',
-      'display:inline-flex;flex-wrap:nowrap;align-items:center;gap:3px;',
+      'display:inline-flex;flex-wrap:nowrap;align-items:center;gap:2px;',
       'font:800 11px/1.2 system-ui,Segoe UI,sans-serif;',
-      'letter-spacing:.01em;white-space:nowrap;max-width:100%;overflow:hidden;',
+      'letter-spacing:0;white-space:nowrap;',
       '}',
-      '.empContactShiftCode{color:#64748b}',
+      '.empContactShiftCode{color:#64748b;flex:0 0 auto}',
       '.empContactShiftCode.is-today{color:#0f766e}',
-      '.empContactShiftSep{color:#cbd5e1;font-weight:700;padding:0 1px}',
+      '.empContactShiftSep{color:#cbd5e1;font-weight:700;padding:0;flex:0 0 auto}',
       '.empContactShiftsEmpty{',
       'font:600 11px/1.3 system-ui,Segoe UI,sans-serif;color:#94a3b8;',
       '}',
@@ -767,13 +768,37 @@
   }
 
   function ensurePanelUnderName(row) {
-    var main = ensureMain(row);
-    if (!main) return null;
-    var shell = main.querySelector('.empContactShell');
+    var block = ensureBlock(row);
+    if (!block) return null;
+    ensureMain(row);
+
+    // Migrate older shell that lived under the name (too narrow on mobile).
+    var main = row.querySelector('.empMain');
+    var oldShell = main && main.querySelector('.empContactShell');
+    if (oldShell && oldShell.parentElement !== block) {
+      var hitMove = block.querySelector('.empTrailHit');
+      if (hitMove) block.insertBefore(oldShell, hitMove);
+      else block.appendChild(oldShell);
+    }
+
+    var shell = null;
+    Array.prototype.slice.call(block.children).some(function (ch) {
+      if (ch.classList && ch.classList.contains('empContactShell')) {
+        shell = ch;
+        return true;
+      }
+      return false;
+    });
+    if (!shell) shell = block.querySelector('.empContactShell');
+
     if (shell) {
+      if (shell.parentElement !== block) {
+        var hit = block.querySelector('.empTrailHit');
+        if (hit) block.insertBefore(shell, hit);
+        else block.appendChild(shell);
+      }
       var actsExisting = shell.querySelector('.empContactActs');
       if (actsExisting) ensureWaButton(actsExisting);
-      // Upgrade older markup if needed.
       if (!shell.querySelector('.empContactShifts')) {
         var panel = shell.querySelector('.empContactPanel');
         if (panel && !panel.querySelector('.empContactActs')) {
@@ -796,6 +821,7 @@
       }
       return shell;
     }
+
     shell = document.createElement('div');
     shell.className = 'empContactShell';
     shell.innerHTML =
@@ -823,7 +849,9 @@
       t('المناوبات القادمة', 'Upcoming shifts') +
       '"></div>' +
       '</div></div>';
-    main.appendChild(shell);
+    var trailHit = block.querySelector('.empTrailHit');
+    if (trailHit) block.insertBefore(shell, trailHit);
+    else block.appendChild(shell);
     return shell;
   }
 
@@ -1067,8 +1095,10 @@
   }
 
   function enhanceRow(row) {
-    if (!row || row.dataset.empContact === '1') return;
+    if (!row) return;
     if (!row.querySelector('.empStatus, .empStatusHit')) return;
+
+    var first = row.dataset.empContact !== '1';
     row.dataset.empContact = '1';
 
     var block = ensureBlock(row);
@@ -1077,7 +1107,6 @@
 
     var status = row.querySelector('.empStatus, .empStatusHit');
     if (status && !status.classList.contains('empStatusHit')) {
-      // Convert span status into button-like hit target while keeping look.
       status.classList.add('empStatusHit');
       status.setAttribute('role', 'button');
       status.setAttribute('tabindex', '0');
