@@ -8,29 +8,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-OLD_BIND = """    rowEl.addEventListener('pointerdown', function(ev) {
-      if (ev.button !== 0 && ev.button !== undefined) return;
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = setTimeout(function() {
-        longPressTimer = null;
-        suppressClickFor = rowEl;
-        showPreviewForRow(rowEl, null);
-      }, LONG_PRESS_MS);
-    });
-    rowEl.addEventListener('pointerup', function() {
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = null;
-    });
-    rowEl.addEventListener('pointercancel', function() {
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = null;
-    });
-    rowEl.addEventListener('pointerleave', function() {
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = null;
-    });"""
+NEW_BIND = """    rowEl.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      goToEmployeeSchedule(empNameFromRow(rowEl));
+    }, true);"""
 
-NEW_BIND = """    rowEl.addEventListener('pointerdown', function(ev) {
+# Legacy long-press bind kept only so older pages can be migrated away from it.
+OLD_BIND_LONGPRESS = """    rowEl.addEventListener('pointerdown', function(ev) {
       if (ev.button !== 0 && ev.button !== undefined) return;
       longPressRow = rowEl;
       longPressMoved = false;
@@ -61,6 +45,8 @@ NEW_BIND = """    rowEl.addEventListener('pointerdown', function(ev) {
     rowEl.addEventListener('contextmenu', function(ev) {
       if (suppressClickFor === rowEl) ev.preventDefault();
     });"""
+
+OLD_BIND = OLD_BIND_LONGPRESS
 
 VARS_NEEDLE = "  var suppressClickFor = null;\n"
 VARS_INSERT = (
@@ -164,17 +150,17 @@ def patch_file(path: Path) -> bool:
 
     if OLD_BIND in text:
         text = text.replace(OLD_BIND, NEW_BIND, 1)
-    elif NEW_BIND.split("pointermove")[0] not in text and "longPressRow = rowEl" not in text:
-        # already has mouseenter-only old block
-        pass
 
-    if FLATTEN_OLD in text:
-        text = text.replace(FLATTEN_OLD, FLATTEN_NEW, 1)
-
+    if "long-press → next 5 shifts preview" in text:
+        text = text.replace(
+            "// Employee row: tap → schedule; long-press → next 5 shifts preview",
+            "// Employee row: tap → schedule",
+            1,
+        )
     if "long-press (touch)" in text:
         text = text.replace(
             "// Employee row: tap → schedule; long-press (touch) → next 5 shifts preview",
-            "// Employee row: tap → schedule; long-press → next 5 shifts preview",
+            "// Employee row: tap → schedule",
             1,
         )
 

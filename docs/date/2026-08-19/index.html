@@ -2646,7 +2646,7 @@ function goToRosterDiff(event) {
   }
 })();
 
-// Employee row: tap → schedule; long-press → next 5 shifts preview
+// Employee row: tap → schedule
 (function initEmployeeNextShiftPreview() {
   var tooltip = document.createElement('div');
   tooltip.className = 'nextShiftTooltip';
@@ -2825,45 +2825,7 @@ function goToRosterDiff(event) {
     if (!rowEl || rowEl.dataset.nextShiftBound === '1') return;
     rowEl.dataset.nextShiftBound = '1';
 
-    rowEl.addEventListener('pointerdown', function(ev) {
-      if (ev.button !== 0 && ev.button !== undefined) return;
-      longPressRow = rowEl;
-      longPressMoved = false;
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = setTimeout(function() {
-        longPressTimer = null;
-        if (longPressRow !== rowEl || longPressMoved) return;
-        suppressClickFor = rowEl;
-        showPreviewForRow(rowEl, null);
-      }, LONG_PRESS_MS);
-    });
-    rowEl.addEventListener('pointermove', function(ev) {
-      if (longPressRow !== rowEl) return;
-      if (typeof ev.movementX === 'number' && (Math.abs(ev.movementX) > 8 || Math.abs(ev.movementY) > 8)) {
-        longPressMoved = true;
-      }
-    });
-    rowEl.addEventListener('pointerup', function() {
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = null;
-      longPressRow = null;
-    });
-    rowEl.addEventListener('pointercancel', function() {
-      if (longPressTimer) clearTimeout(longPressTimer);
-      longPressTimer = null;
-      longPressRow = null;
-    });
-    rowEl.addEventListener('contextmenu', function(ev) {
-      if (suppressClickFor === rowEl) ev.preventDefault();
-    });
-
     rowEl.addEventListener('click', function(ev) {
-      if (suppressClickFor === rowEl) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        suppressClickFor = null;
-        return;
-      }
       ev.preventDefault();
       goToEmployeeSchedule(empNameFromRow(rowEl));
     }, true);
