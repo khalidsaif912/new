@@ -1029,8 +1029,18 @@
 
       var hit = isContactUi(ev.target);
       if (!hit) return;
-      halt(ev);
+
+      // Important: do NOT preventDefault on pointerdown/touchstart — that cancels the
+      // subsequent click, so the chevron/code would appear dead. Only stop bubbling
+      // so the row does not navigate to "My Schedule".
+      if (ev.type === 'pointerdown' || ev.type === 'touchstart') {
+        if (typeof ev.stopPropagation === 'function') ev.stopPropagation();
+        if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
+        return;
+      }
+
       if (ev.type !== 'click') return;
+      halt(ev);
 
       if (holdTriggered) {
         holdTriggered = false;
@@ -1038,7 +1048,9 @@
       }
 
       // Right column hit zone (or code/arrow) opens/closes menu.
-      var trailHit = ev.target.closest('.empTrailHit, .empRowTrail');
+      var trailHit = ev.target.closest(
+        '.empTrailHit, .empRowTrail, .empContactToggle, .empStatusHit'
+      );
       if (trailHit) {
         toggleFrom(trailHit.closest('.empBlock') || trailHit);
         return;
