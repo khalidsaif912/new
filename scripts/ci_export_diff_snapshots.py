@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from roster_app.cache_io import month_key_from_filename  # noqa: E402
+from roster_app.cache_io import month_key_from_filename, workbook_content_fingerprint  # noqa: E402
 
 PRE_RUN_OLD = "_pre_run_old.xlsx"
 PRE_RUN_OLD_SOURCE_NAME = "_pre_run_old_source_name.txt"
@@ -152,6 +152,12 @@ def after_generate() -> int:
     shutil.copy2(new_path, backup / "current.xlsx")
     shutil.copy2(new_path, last_ingested)
     last_hash_f.write_text(incoming_hash, encoding="utf-8")
+    try:
+        fp = workbook_content_fingerprint(new_path.read_bytes())
+        (backup / "last_content_fp.txt").write_text(fp, encoding="utf-8")
+        print(f"[ci_export_diff] after: content fingerprint {fp[:16]}..")
+    except Exception as e:
+        print(f"[ci_export_diff] after: fingerprint skipped ({e})")
     if pre_old.is_file():
         shutil.copy2(pre_old, backup / "previous.xlsx")
 

@@ -39,7 +39,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
-from roster_app.cache_io import looks_like_roster_month_filename, month_key_from_filename  # noqa: E402
+from roster_app.cache_io import looks_like_roster_month_filename, month_key_from_filename, workbook_content_fingerprint  # noqa: E402
 from roster_app.text_utils import append_range_suffix  # noqa: E402
 from roster_app import name_i18n  # noqa: E402
 from roster_cta_snippets import (  # noqa: E402
@@ -1370,6 +1370,10 @@ def main() -> None:
         ver_dir.mkdir(parents=True, exist_ok=True)
         (ver_dir / "last_hash.txt").write_text(file_hash, encoding="utf-8")
         (ver_dir / "last_ingested.xlsx").write_bytes(data)
+        try:
+            (ver_dir / "last_content_fp.txt").write_text(workbook_content_fingerprint(data), encoding="utf-8")
+        except Exception as e:
+            print(f"Warning: could not store import content fingerprint: {e}")
     sheet = find_sheet_for_date(str(xlsx_path), sheet_hint)
     parsed = parse_month_sheet(str(xlsx_path), sheet)
     parsed["source_filename"] = source_filename

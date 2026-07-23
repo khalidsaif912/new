@@ -5,6 +5,8 @@ Decide whether CI should regenerate roster pages (export or import).
 Detects changes by:
   1) Source filename text URL (EXPORT_SOURCE_NAME_URL / IMPORT_SOURCE_NAME_URL)
   2) SHA-256 of the remote Excel file (same name, updated workbook)
+  3) Logical workbook fingerprint (cell values) — catches same-name overwrites
+     even when ZIP/metadata or CDN quirks make byte hashes unreliable
 
 Does NOT mutate last_filename.txt / import_last_filename.txt — those are updated
 only after a successful generate_* run.
@@ -30,7 +32,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from roster_app.cache_io import download_excel, looks_like_roster_month_filename, month_key_from_filename  # noqa: E402
+from roster_app.cache_io import (  # noqa: E402
+    download_excel_with_meta,
+    looks_like_roster_month_filename,
+    month_key_from_filename,
+    workbook_content_fingerprint,
+)
 
 MUSCAT = timezone(timedelta(hours=4))
 
@@ -39,7 +46,15 @@ def _http_get_text(url: str) -> str:
     last_err: Exception | None = None
     for attempt in range(1, 4):
         try:
-            r = requests.get(url, timeout=25)
+            bust = url
+            if url:
+                sep = "&" if "?" in url else "?"
+                bust = f"{url}{sep}_cb={int(time.time() * 1000)}"
+            r = requests.get(
+                bust,
+                timeout=25,
+                headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+            )
             r.raise_for_status()
             return r.text.strip()
         except requests.RequestException as e:
@@ -61,10 +76,17 @@ def _read_text(path: Path) -> str:
         return ""
 
 
-def _stored_hash(rosters_kind: str, month_key: str) -> str:
+def _versions_dir(rosters_kind: str, month_key: str) -> Path:
     base = ROOT / ("rosters" if rosters_kind == "export" else "import-rosters")
-    p = base / ".versions" / month_key / "last_hash.txt"
-    return _read_text(p)
+    return base / ".versions" / month_key
+
+
+def _stored_hash(rosters_kind: str, month_key: str) -> str:
+    return _read_text(_versions_dir(rosters_kind, month_key) / "last_hash.txt")
+
+
+def _stored_content_fp(rosters_kind: str, month_key: str) -> str:
+    return _read_text(_versions_dir(rosters_kind, month_key) / "last_content_fp.txt")
 
 
 def _cached_xlsx_hash(rosters_kind: str, month_key: str) -> str:
@@ -87,6 +109,51 @@ def _write_github_output(pairs: dict[str, str]) -> None:
 def _email_window(now: datetime) -> bool:
     email_hours = {5, 13, 21}
     return now.hour in email_hours and now.minute < 20
+
+
+def _detect_excel_change(rosters_kind: str, month_key: str, excel_url: str) -> tuple[bool, str, str]:
+    """Return (content_changed, remote_hash, remote_content_fp)."""
+    data, meta = download_excel_with_meta(excel_url)
+    remote_hash = _sha256_bytes(data)
+    remote_fp = ""
+    try:
+        remote_fp = workbook_content_fingerprint(data)
+    except Exception as e:
+        print(f"::warning::Workbook fingerprint failed ({e}); falling back to byte hash only")
+
+    stored = _stored_hash(rosters_kind, month_key)
+    cached = _cached_xlsx_hash(rosters_kind, month_key)
+    stored_fp = _stored_content_fp(rosters_kind, month_key)
+
+    print(
+        f"Remote meta: size={meta.get('content_length') or '?'} "
+        f"last_modified={meta.get('last_modified') or 'n/a'} etag={meta.get('etag') or 'n/a'}"
+    )
+
+    content_changed = False
+    if not stored and not cached and not stored_fp:
+        content_changed = True
+        print("No prior hash/fingerprint for month; treat Excel as new")
+    elif stored and stored != remote_hash:
+        content_changed = True
+        print(f"Excel hash changed (stored): {stored[:12]}.. -> {remote_hash[:12]}..")
+    elif cached and cached != remote_hash:
+        content_changed = True
+        print(f"Excel hash changed (cached xlsx): {cached[:12]}.. -> {remote_hash[:12]}..")
+    elif remote_fp and stored_fp and stored_fp != remote_fp:
+        content_changed = True
+        print(f"Excel content fingerprint changed: {stored_fp[:12]}.. -> {remote_fp[:12]}..")
+    elif remote_fp and not stored_fp and (stored or cached):
+        # First fingerprint baseline after upgrade: if byte hash already matches, do not force.
+        if (stored and stored == remote_hash) or (cached and cached == remote_hash):
+            print("Fingerprint baseline missing; byte hash unchanged — no force reprocess")
+        else:
+            content_changed = True
+            print("Fingerprint baseline missing and byte hash differs — process")
+    else:
+        print("Excel hash/fingerprint unchanged")
+
+    return content_changed, remote_hash, remote_fp
 
 
 def gate_export() -> int:
@@ -112,23 +179,10 @@ def gate_export() -> int:
 
     content_changed = False
     remote_hash = ""
+    remote_fp = ""
     if excel_url and month_key:
         try:
-            data = download_excel(excel_url)
-            remote_hash = _sha256_bytes(data)
-            stored = _stored_hash("export", month_key)
-            cached = _cached_xlsx_hash("export", month_key)
-            if not stored and not cached:
-                content_changed = True
-                print("No prior hash for month; treat Excel as new")
-            elif stored and stored != remote_hash:
-                content_changed = True
-                print(f"Excel hash changed (stored): {stored[:12]}.. -> {remote_hash[:12]}..")
-            elif cached and cached != remote_hash:
-                content_changed = True
-                print(f"Excel hash changed (cached xlsx): {cached[:12]}.. -> {remote_hash[:12]}..")
-            else:
-                print("Excel hash unchanged")
+            content_changed, remote_hash, remote_fp = _detect_excel_change("export", month_key, excel_url)
         except Exception as e:
             print(f"::warning::Could not download export Excel for hash check: {e}")
             content_changed = name_changed
@@ -161,6 +215,7 @@ def gate_export() -> int:
             "old_filename": old_name,
             "month_key": month_key,
             "remote_hash": remote_hash,
+            "remote_content_fp": remote_fp,
         }
     )
     return 0
@@ -187,20 +242,10 @@ def gate_import() -> int:
 
     content_changed = False
     remote_hash = ""
+    remote_fp = ""
     if excel_url and month_key:
         try:
-            data = download_excel(excel_url)
-            remote_hash = _sha256_bytes(data)
-            stored = _stored_hash("import", month_key)
-            cached = _cached_xlsx_hash("import", month_key)
-            if not stored and not cached:
-                content_changed = True
-            elif stored and stored != remote_hash:
-                content_changed = True
-            elif cached and cached != remote_hash:
-                content_changed = True
-            else:
-                print("Import Excel hash unchanged")
+            content_changed, remote_hash, remote_fp = _detect_excel_change("import", month_key, excel_url)
         except Exception as e:
             print(f"::warning::Could not download import Excel for hash check: {e}")
             content_changed = name_changed
@@ -228,6 +273,7 @@ def gate_import() -> int:
             "old_filename": old_name,
             "month_key": month_key,
             "remote_hash": remote_hash,
+            "remote_content_fp": remote_fp,
         }
     )
     return 0

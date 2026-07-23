@@ -1,6 +1,8 @@
+import hashlib
 import json
 import os
 import re
+import time
 from io import BytesIO
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
@@ -19,17 +21,45 @@ def _add_or_replace_query_param(url: str, key: str, value: str) -> str:
     return urlunparse(u._replace(query=urlencode(qs, doseq=True)))
 
 
-def _normalize_sharepoint_download_url(url: str) -> str:
+def _normalize_sharepoint_download_url(url: str, *, cache_bust: bool = True) -> str:
     if not url:
         return url
     u = urlparse(url)
     host = (u.netloc or "").lower()
     if ("sharepoint.com" not in host) and ("onedrive.live.com" not in host) and ("1drv.ms" not in host):
-        return url
-
-    out = _add_or_replace_query_param(url, "download", "1")
-    out = _add_or_replace_query_param(out, "web", "0")
+        out = url
+    else:
+        out = _add_or_replace_query_param(url, "download", "1")
+        out = _add_or_replace_query_param(out, "web", "0")
+    # Bust CDN/proxy caches when the sharing link is reused for an overwritten file.
+    if cache_bust:
+        out = _add_or_replace_query_param(out, "_cb", str(int(time.time() * 1000)))
     return out
+
+
+def workbook_content_fingerprint(data: bytes) -> str:
+    """
+    Logical fingerprint of sheet cell values (ignores ZIP/xlsx metadata noise).
+    Used to detect same-filename overwrites even when CDN/metadata quirks occur.
+    """
+    wb = load_workbook(BytesIO(data), read_only=True, data_only=True)
+    h = hashlib.sha256()
+    try:
+        for sheet_name in wb.sheetnames:
+            h.update(sheet_name.encode("utf-8", errors="replace"))
+            h.update(b"\0")
+            ws = wb[sheet_name]
+            for row in ws.iter_rows(values_only=True):
+                for cell in row:
+                    if cell is None:
+                        h.update(b"|")
+                    else:
+                        h.update(str(cell).encode("utf-8", errors="replace"))
+                        h.update(b"|")
+                h.update(b"\n")
+    finally:
+        wb.close()
+    return h.hexdigest()
 
 
 def _file_signature_hex16(data: bytes) -> str:
@@ -53,6 +83,12 @@ def _is_png_signature(data: bytes) -> bool:
 
 def download_excel(url: str) -> bytes:
     """Download Excel bytes from SharePoint with browser-like session flow."""
+    data, _meta = download_excel_with_meta(url)
+    return data
+
+
+def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
+    """Download Excel bytes and return response metadata useful for change detection."""
     if not url:
         raise ValueError("EXCEL_URL is empty")
     session = requests.Session()
@@ -66,12 +102,15 @@ def download_excel(url: str) -> bytes:
             "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*;q=0.8"
         ),
         "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
     }
 
-    warmup = session.get(url, headers=headers, allow_redirects=True, timeout=30)
+    warmup_url = _normalize_sharepoint_download_url(url, cache_bust=True)
+    warmup = session.get(warmup_url, headers=headers, allow_redirects=True, timeout=30)
     warmup.raise_for_status()
 
-    requested_url = _normalize_sharepoint_download_url(url)
+    requested_url = _normalize_sharepoint_download_url(url, cache_bust=True)
     r = session.get(requested_url, headers=headers, allow_redirects=True, timeout=60)
     r.raise_for_status()
 
@@ -81,6 +120,12 @@ def download_excel(url: str) -> bytes:
     data = r.content or b""
     ctype = (r.headers.get("Content-Type") or "").lower()
     sig16 = _file_signature_hex16(data)
+    meta = {
+        "etag": (r.headers.get("ETag") or r.headers.get("Etag") or "").strip(),
+        "last_modified": (r.headers.get("Last-Modified") or "").strip(),
+        "content_length": str(len(data)),
+        "content_type": ctype,
+    }
 
     print(f"  Requested URL: {requested_url}")
     print(f"  Final URL: {r.url}")
@@ -88,6 +133,8 @@ def download_excel(url: str) -> bytes:
     for idx, u in enumerate(redirect_urls, start=1):
         print(f"    {idx}. {u}")
     print(f"  Content-Type: {ctype or 'unknown'}")
+    print(f"  Last-Modified: {meta['last_modified'] or 'n/a'}")
+    print(f"  ETag: {meta['etag'] or 'n/a'}")
     print(f"  First 16 bytes hex: {sig16}")
     print(f"  File size: {len(data):,} bytes")
 
@@ -104,11 +151,16 @@ def download_excel(url: str) -> bytes:
             f"Downloaded file is not recognized as Excel payload (Content-Type: {ctype or 'unknown'}; signature: {sig16})"
         )
 
-    return data
+    return data, meta
 
 
 def download_text(url: str) -> str:
-    r = requests.get(url, timeout=30)
+    bust = _add_or_replace_query_param(url, "_cb", str(int(time.time() * 1000))) if url else url
+    r = requests.get(
+        bust or url,
+        timeout=30,
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
     r.raise_for_status()
     return r.text.strip()
 

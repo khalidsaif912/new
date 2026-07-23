@@ -221,11 +221,12 @@ If these are removed/reset:
 - GitHub Pages deploys new static output
 
 ## Same roster filename but content changed
-- If filename does not change, automatic detection may miss change.
-- Mitigations:
-  - enforce filename versioning upstream, or
-  - rely on mandatory refresh windows, or
-  - implement hash-based compare (future enhancement).
+- CI compares **SHA-256** of the Excel bytes and a **logical content fingerprint**
+  (cell values) under `rosters/.versions/{YYYY-MM}/`.
+- Downloads use cache-busting (`_cb=…`) + `Cache-Control: no-cache` so SharePoint/CDN
+  is less likely to serve a stale copy when the file was overwritten in place.
+- If either hash or fingerprint differs → regenerate pages + rebuild roster-diff.
+- Prefer renaming versions upstream (`Version 5` → `Version 5.1` → `Version 6`) when possible.
 
 ## Training list changed
 - Training workflow runs every 30 minutes
