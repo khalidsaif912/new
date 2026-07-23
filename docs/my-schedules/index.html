@@ -1589,6 +1589,30 @@
     </div>
   </div>
 
+  <!-- ADMIN SECRET MODAL (protect saving ID 8715) -->
+  <div class="modal" id="adminSecretModal" role="dialog" aria-modal="true" style="align-items:center;padding:20px">
+    <div class="modal-backdrop" onclick="closeAdminSecretModal()"></div>
+    <div class="modal-sheet" style="border-radius:20px;max-width:400px;width:100%">
+      <div class="modal-head" style="border-bottom:none;padding-bottom:8px">
+        <div>
+          <div class="modal-title" id="adminSecretTitle">Protected ID</div>
+          <div class="modal-sub" id="adminSecretSub">Enter the secret code</div>
+        </div>
+        <button class="modal-close" onclick="closeAdminSecretModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding-top:4px">
+        <input id="adminSecretInput" type="password" autocomplete="off" dir="ltr"
+          style="width:100%;height:44px;border-radius:12px;border:1px solid rgba(148,163,184,.35);padding:0 14px;font-size:16px;background:rgba(15,23,42,.04);outline:none"
+          placeholder="Secret code"/>
+        <div id="adminSecretMsg" style="margin-top:10px;font-size:13px;color:#b91c1c;min-height:18px"></div>
+      </div>
+      <div class="modal-foot" style="gap:10px;justify-content:space-between;padding:0 22px 22px">
+        <button class="tbtn" style="flex:1;height:42px" onclick="closeAdminSecretModal()" id="adminSecretCancel">Cancel</button>
+        <button class="tbtn primary" style="flex:1;height:42px" onclick="confirmAdminSecret()" id="adminSecretOk">Confirm</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- TIPS MODAL -->
   <div class="modal" id="tipsModal" role="dialog" aria-modal="true">
@@ -1702,7 +1726,12 @@
         idActPin:'Set as My ID?',
         idActPinSub:'Save this ID on this device for faster access.',
         cancel:'Cancel',
-        ok:'OK'
+        ok:'OK',
+        secretTitle:'Protected ID',
+        secretSub:'Enter the secret code to save ID 8715 on this device.',
+        secretPh:'Secret code',
+        secretBad:'Incorrect secret code',
+        secretOk:'Confirm'
       },
       ar:{
         title:'جدولي',sub:'أدخل رقمك الوظيفي',
@@ -1726,7 +1755,12 @@
         idActPin:'هل تريد حفظ الرقم الوظيفي؟',
         idActPinSub:'سيتم حفظ هذا الرقم على هذا الجهاز لفتح الجدول بسرعة.',
         cancel:'إلغاء',
-        ok:'موافق'
+        ok:'موافق',
+        secretTitle:'رقم محمي',
+        secretSub:'أدخل الرقم السري لحفظ الرقم الوظيفي 8715 على هذا الجهاز.',
+        secretPh:'الرقم السري',
+        secretBad:'الرقم السري غير صحيح',
+        secretOk:'تأكيد'
       }
     };
 
@@ -1860,7 +1894,77 @@
         </div>`;
       setTimeout(()=>dismissToast(),10000);
     }
-    function confirmSave(id){ localStorage.setItem('exportSavedEmpId',id); localStorage.removeItem('savedEmpId'); if(data&&data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); } dismissToast(); if(data) renderSchedule(); }
+    const ADMIN_ID='8715';
+    const ADMIN_SECRET='K8715s';
+    let _pendingSecretKind=null; // 'save' | 'pin'
+    let _pendingSecretId=null;
+    function isProtectedEmpId(id){ return String(id||'')===ADMIN_ID; }
+    function openAdminSecretModal(kind,id){
+      _pendingSecretKind=kind;
+      _pendingSecretId=id!=null?String(id):null;
+      const m=document.getElementById('adminSecretModal');
+      if(!m) return;
+      document.getElementById('adminSecretTitle').textContent=t('secretTitle');
+      document.getElementById('adminSecretSub').textContent=t('secretSub');
+      document.getElementById('adminSecretCancel').textContent=t('cancel');
+      document.getElementById('adminSecretOk').textContent=t('secretOk');
+      const inp=document.getElementById('adminSecretInput');
+      const msg=document.getElementById('adminSecretMsg');
+      if(inp){ inp.value=''; inp.placeholder=t('secretPh'); }
+      if(msg) msg.textContent='';
+      m.classList.add('open');
+      setTimeout(()=>{ if(inp) inp.focus(); },40);
+      if(inp && !inp._adminSecretBound){
+        inp._adminSecretBound=true;
+        inp.addEventListener('keydown',function(ev){
+          if(ev.key==='Enter'){ ev.preventDefault(); confirmAdminSecret(); }
+        });
+      }
+    }
+    function closeAdminSecretModal(){
+      const m=document.getElementById('adminSecretModal');
+      if(m) m.classList.remove('open');
+      _pendingSecretKind=null;
+      _pendingSecretId=null;
+      const inp=document.getElementById('adminSecretInput');
+      const msg=document.getElementById('adminSecretMsg');
+      if(inp) inp.value='';
+      if(msg) msg.textContent='';
+    }
+    function confirmAdminSecret(){
+      const inp=document.getElementById('adminSecretInput');
+      const msg=document.getElementById('adminSecretMsg');
+      if(String(inp&&inp.value||'')!==ADMIN_SECRET){
+        if(msg) msg.textContent=t('secretBad');
+        if(inp){ inp.focus(); inp.select&&inp.select(); }
+        return;
+      }
+      const kind=_pendingSecretKind;
+      const sid=_pendingSecretId;
+      closeAdminSecretModal();
+      if(kind==='save') applySaveEmpId(sid);
+      else if(kind==='pin') applyPinEmpId();
+    }
+    function applySaveEmpId(id){
+      localStorage.setItem('exportSavedEmpId',id);
+      localStorage.removeItem('savedEmpId');
+      if(data&&data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); }
+      dismissToast();
+      if(data) renderSchedule();
+    }
+    function applyPinEmpId(){
+      if(data&&data.id){
+        localStorage.setItem('exportSavedEmpId',data.id);
+        localStorage.removeItem('savedEmpId');
+        if(data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); }
+      }
+      closeIdActionModal();
+      if(data) renderSchedule();
+    }
+    function confirmSave(id){
+      if(isProtectedEmpId(id)){ dismissToast(); openAdminSecretModal('save',id); return; }
+      applySaveEmpId(id);
+    }
     function dismissToast(){ const m=document.getElementById('toastMount'); m.innerHTML=''; m.style.display='none'; }
     function changeMyId(){ openIdActionModal('change'); }
     
@@ -1908,9 +2012,12 @@
         if(inp) inp.value='';
         if(data) renderSchedule();
       }else if(_pendingIdAction==='pin'){
-        if(data&&data.id){ localStorage.setItem('exportSavedEmpId',data.id); localStorage.removeItem('savedEmpId'); if(data.name){ localStorage.setItem('exportSavedEmpName',data.name); localStorage.setItem('savedEmpName',data.name); } }
-        closeIdActionModal();
-        if(data) renderSchedule();
+        if(data&&isProtectedEmpId(data.id)){
+          closeIdActionModal();
+          openAdminSecretModal('pin',data.id);
+          return;
+        }
+        applyPinEmpId();
       }else{
         closeIdActionModal();
       }
