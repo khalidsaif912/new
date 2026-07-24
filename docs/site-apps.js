@@ -23,13 +23,14 @@
       store: 'Mobhar Store · متجر مُبهر',
       storeSub: 'Electronics & gadgets',
       alumni: 'Former Colleagues',
-      spotlightBtn: 'Explore something random',
-      spotlightBtnSub: 'A quick surprise from the site',
-      spotlightTitle: 'A random pick for you',
-      spotlightHint: 'Open a random app, game, tool, or former colleagues page from the site.',
+      spotlightBtn: 'Surprise me',
+      spotlightBtnSub: 'A quick pick from the site',
+      spotlightTitle: 'For you',
+      spotlightHint: 'Tap the card to open',
       spotlightOpen: 'Open now',
       spotlightShuffle: 'Another pick',
-      spotlightClose: 'Maybe later',
+      spotlightClose: 'Close',
+      spotlightTap: 'Tap to open',
       pickBook: 'A Cup of Book',
       pickBookSub: 'Open the reading page',
       pickAlumni: 'Former Colleagues',
@@ -53,13 +54,14 @@
       store: 'متجر مُبهر · Mobhar Store',
       storeSub: 'أجهزة وتسوق',
       alumni: 'زملاء سابقون',
-      spotlightBtn: 'اقتراح عشوائي',
+      spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
-      spotlightTitle: 'شيء عشوائي لك',
-      spotlightHint: 'افتح تطبيقاً أو لعبة أو أداة أو صفحة الزملاء السابقين بشكل عشوائي.',
+      spotlightTitle: 'اقتراح لك',
+      spotlightHint: 'اضغط على البطاقة للفتح',
       spotlightOpen: 'افتح الآن',
       spotlightShuffle: 'اقتراح آخر',
-      spotlightClose: 'لاحقًا',
+      spotlightClose: 'إغلاق',
+      spotlightTap: 'اضغط للفتح',
       pickBook: 'A Cup of Book',
       pickBookSub: 'نافذة قراءة عشوائية',
       pickAlumni: 'زملاء سابقون',
@@ -433,25 +435,37 @@
       '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;color:inherit!important;}',
       '#alumniBtn .roster-cta-icon svg{stroke:#0f766e!important;}',
       '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
-      '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
-      '.spotlightBar .spotlightBtn{width:min(100%,320px)!important;justify-content:center!important;text-align:center!important;min-height:50px!important;padding:10px 16px!important;gap:8px!important;margin-inline:auto!important;}',
-      '.spotlightBtnLabel{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;}',
-      '.spotlightBtnTitle{font-size:13px!important;font-weight:800!important;color:inherit!important;}',
-      '.spotlightBtnSub{font-size:10px!important;font-weight:600!important;color:#64748b!important;}',
-      '.spotlightSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.52);padding:16px;z-index:10004;pointer-events:none;visibility:hidden;}',
+      '.quickActions.spotlightBar{display:none!important;}',
+      '.spotlightSheet{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.45);padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));z-index:10004;pointer-events:none;visibility:hidden;}',
+      '@media (min-width:520px){.spotlightSheet{align-items:center;padding:16px;}}',
       '.spotlightSheet.open{display:flex;pointer-events:auto;visibility:visible;}',
-      '.spotlightCard{width:min(100%,390px);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);border:1px solid rgba(148,163,184,.24);border-radius:22px;padding:20px 16px 14px;box-shadow:0 24px 60px rgba(15,23,42,.28);text-align:center;position:relative;}',
-      '.spotlightBadge{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;margin:0 auto 10px;background:linear-gradient(135deg,#ede9fe 0%,#dbeafe 100%);color:#5b21b6;font-size:20px;font-weight:800;}',
-      '.spotlightTitle{margin:0 0 4px;font-size:18px;font-weight:900;color:#0f172a;}',
-      '.spotlightHint{margin:0 0 14px;font-size:12px;line-height:1.5;color:#64748b;}',
-      '.spotlightPreview{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0;text-align:start;margin-bottom:12px;}',
-      '.spotlightPreviewIcon{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;flex-shrink:0;overflow:hidden;}',
-      '.spotlightPreviewIcon svg,.spotlightPreviewIcon img{width:30px;height:30px;object-fit:contain;display:block;}',
-      '.spotlightPreviewText{min-width:0;flex:1;}',
-      '.spotlightPreviewTitle{font-size:14px;font-weight:800;color:#0f172a;line-height:1.25;}',
-      '.spotlightPreviewSub{font-size:11px;font-weight:600;color:#64748b;line-height:1.35;margin-top:3px;}',
-      '.spotlightActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}',
-      '.spotlightCloseWrap .roster-cta-btn{width:100%;}',
+      '.spotlightCard{width:min(100%,320px);background:linear-gradient(180deg,#ffffff 0%,#f7faff 100%);border:1px solid rgba(148,163,184,.22);border-radius:20px;padding:14px 14px 12px;box-shadow:0 18px 48px rgba(15,23,42,.28);text-align:center;position:relative;animation:spotlightPop .22s ease-out;}',
+      '@keyframes spotlightPop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}',
+      '.spotlightCloseX{position:absolute;top:8px;inset-inline-end:8px;width:28px;height:28px;border:none;border-radius:999px;background:rgba(15,23,42,.06);color:#64748b;font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;}',
+      '.spotlightBadge{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;margin:0 auto 8px;overflow:hidden;background:linear-gradient(135deg,#fef3c7 0%,#dbeafe 100%);box-shadow:0 4px 12px rgba(15,23,42,.08);}',
+      '.spotlightBadge img{width:28px;height:28px;object-fit:contain;display:block;}',
+      '.spotlightTitle{margin:0 0 2px;font-size:16px;font-weight:900;color:#0f172a;}',
+      '.spotlightHint{margin:0 0 10px;font-size:11px;line-height:1.4;color:#64748b;}',
+      '.spotlightPreview{display:flex;align-items:center;gap:10px;padding:11px;border-radius:16px;background:#fff;border:1.5px solid #dbeafe;text-align:start;margin:0;cursor:pointer;width:100%;font:inherit;color:inherit;box-shadow:0 6px 16px rgba(37,99,235,.08);transition:transform .15s,box-shadow .15s,border-color .15s;}',
+      '.spotlightPreview:hover,.spotlightPreview:focus-visible{transform:translateY(-1px);border-color:#93c5fd;box-shadow:0 10px 22px rgba(37,99,235,.14);outline:none;}',
+      '.spotlightPreviewIcon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;flex-shrink:0;overflow:hidden;}',
+      '.spotlightPreviewIcon svg,.spotlightPreviewIcon img{width:28px;height:28px;object-fit:contain;display:block;}',
+      '.spotlightPreviewText{min-width:0;flex:1;text-align:start;}',
+      '.spotlightPreviewTitle{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.25;}',
+      '.spotlightPreviewSub{font-size:10.5px;font-weight:600;color:#64748b;line-height:1.35;margin-top:2px;}',
+      '.spotlightPreviewGo{flex-shrink:0;font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:999px;padding:5px 8px;white-space:nowrap;}',
+      '#spotlightEmojiBtn{position:absolute;z-index:31;width:40px;height:40px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
+      '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
+      '#spotlightEmojiBtn img{width:30px;height:30px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
+      '#spotlightEmojiBtn.corner-bl{left:12px;bottom:12px;right:auto;top:auto;}',
+      '#spotlightEmojiBtn.corner-br{right:12px;bottom:12px;left:auto;top:auto;}',
+      '@media (max-width:720px){#spotlightEmojiBtn{width:44px;height:44px;}#spotlightEmojiBtn img{width:32px;height:32px;}}',
+      'html.header-chrome-dim #spotlightEmojiBtn{opacity:.22!important;filter:saturate(.55)!important;}',
+      '.langToggle,.banner-changer-btn,#banner-changer-btn{border-radius:999px!important;}',
+      '.langToggle{width:40px!important;min-height:40px!important;padding:4px!important;background:rgba(255,255,255,.14)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;box-shadow:0 4px 14px rgba(0,0,0,.18),inset 0 0 0 1px rgba(255,255,255,.22)!important;}',
+      '#banner-changer-btn{width:40px!important;height:40px!important;background:rgba(255,255,255,.14)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;box-shadow:0 4px 14px rgba(0,0,0,.18),inset 0 0 0 1px rgba(255,255,255,.22)!important;}',
+      '@media (max-width:720px){.langToggle,#banner-changer-btn{width:44px!important;height:44px!important;min-height:44px!important;}}',
+      '.spotlightActions,.spotlightCloseWrap{display:none!important;}',
       '.siteAppsSheet{padding:12px!important;overscroll-behavior:none;background:rgba(15,23,42,.5)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}',
       '.siteAppsCard{width:min(100%,400px)!important;max-height:calc(100vh - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px 14px 12px!important;border-radius:22px!important;border:1px solid rgba(148,163,184,.22)!important;background:linear-gradient(180deg,#ffffff 0%,#f5f9ff 100%)!important;box-shadow:0 28px 70px rgba(15,23,42,.28)!important;-webkit-overflow-scrolling:auto!important;}',
       '.siteAppsTitle{font-size:17px!important;margin:0 0 2px!important;flex-shrink:0;letter-spacing:-.01em;}',
@@ -546,40 +560,77 @@
     if (lbl) lbl.textContent = alumniLabel();
   }
 
-  function ensureSpotlightButton() {
-    var footer = document.querySelector('.footer');
-    if (!footer || !footer.parentNode) return;
-    var bar = document.getElementById('spotlightBar');
-    if (!bar) {
-      bar = document.createElement('nav');
-      bar.id = 'spotlightBar';
-      bar.className = 'quickActions spotlightBar';
-      bar.setAttribute('aria-label', 'Random suggestion');
-      bar.innerHTML =
-        '<button type="button" class="roster-cta-btn roster-cta-btn--roster spotlightBtn" id="spotlightBtn">' +
-        '<span class="roster-cta-icon" id="spotlightBtnIcon" aria-hidden="true"></span>' +
-        '<span class="roster-cta-label spotlightBtnLabel">' +
-        '<span class="spotlightBtnTitle" id="spotlightBtnTitle"></span>' +
-        '<span class="spotlightBtnSub" id="spotlightBtnSub"></span>' +
-        '</span></button>';
-      footer.parentNode.insertBefore(bar, footer);
+  var SPOTLIGHT_EMOJIS = [
+    'cool.png',
+    'cool2.png',
+    'grin.png',
+    'heart-eyes.png',
+    'starstruck.png',
+    'surprised.png',
+    'astonished.png',
+    'thinking.png',
+    'angry.png',
+    'frown.png'
+  ];
+
+  function emojiAssetUrl(name) {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl() + '/assets/emojis/' + name;
     }
-    var item = randomSpotlight();
-    bar.dataset.itemId = item.id;
-    var btn = document.getElementById('spotlightBtn');
-    if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + item.classes;
-    var icon = document.getElementById('spotlightBtnIcon');
-    if (icon) icon.innerHTML = item.icon;
-    var title = document.getElementById('spotlightBtnTitle');
-    if (title) title.textContent = item.title;
-    var sub = document.getElementById('spotlightBtnSub');
-    if (sub) sub.textContent = item.sub || t('spotlightBtnSub');
+    return 'https://khalidsaif912.github.io/new/docs/assets/emojis/' + name;
+  }
+
+  function pickRandomEmoji() {
+    return SPOTLIGHT_EMOJIS[Math.floor(Math.random() * SPOTLIGHT_EMOJIS.length)];
+  }
+
+  function pickRandomCorner() {
+    return Math.random() < 0.5 ? 'corner-bl' : 'corner-br';
+  }
+
+  function ensureSpotlightEmojiButton() {
+    var header = document.querySelector('.header, .topbar');
+    if (!header) return;
+    if (getComputedStyle(header).position === 'static') {
+      header.style.position = 'relative';
+    }
+    var btn = document.getElementById('spotlightEmojiBtn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'spotlightEmojiBtn';
+      btn.type = 'button';
+      btn.innerHTML = '<img alt="" width="30" height="30" decoding="async">';
+      header.appendChild(btn);
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openSpotlightPopup(true);
+      });
+    }
+    var emoji = pickRandomEmoji();
+    var corner = pickRandomCorner();
+    btn.className = corner;
+    btn.title = t('spotlightBtn');
+    btn.setAttribute('aria-label', t('spotlightBtn'));
+    var img = btn.querySelector('img');
+    if (img) {
+      img.src = emojiAssetUrl(emoji);
+      img.alt = '';
+    }
+    btn.dataset.emoji = emoji;
+  }
+
+  function ensureSpotlightButton() {
+    /* Bottom suggestion bar replaced by banner emoji button. */
+    var bar = document.getElementById('spotlightBar');
+    if (bar) bar.style.display = 'none';
+    ensureSpotlightEmojiButton();
   }
 
   function currentSpotlightItem() {
-    var bar = document.getElementById('spotlightBar');
+    var sheet = document.getElementById('spotlightSheet');
     var item = spotlightItems().find(function (x) {
-      return bar && x.id === bar.dataset.itemId;
+      return sheet && x.id === sheet.dataset.itemId;
     });
     return item || randomSpotlight();
   }
@@ -593,41 +644,42 @@
     sheet.setAttribute('aria-hidden', 'true');
     sheet.innerHTML =
       '<div class="spotlightCard" role="dialog" aria-labelledby="spotlightTitle">' +
-      '<div class="spotlightBadge">✦</div>' +
+      '<button type="button" class="spotlightCloseX" id="spotlightCloseBtn" aria-label="Close">×</button>' +
+      '<div class="spotlightBadge" id="spotlightBadge"></div>' +
       '<h2 class="spotlightTitle" id="spotlightTitle"></h2>' +
       '<p class="spotlightHint" id="spotlightHint"></p>' +
-      '<div class="spotlightPreview">' +
+      '<button type="button" class="spotlightPreview" id="spotlightPreviewBtn">' +
       '<div class="spotlightPreviewIcon" id="spotlightPreviewIcon"></div>' +
       '<div class="spotlightPreviewText">' +
       '<div class="spotlightPreviewTitle" id="spotlightPreviewTitle"></div>' +
       '<div class="spotlightPreviewSub" id="spotlightPreviewSub"></div>' +
-      '</div></div>' +
-      '<div class="spotlightActions">' +
-      '<button type="button" class="roster-cta-btn roster-cta-btn--roster" id="spotlightOpenBtn"><span class="roster-cta-label"></span></button>' +
-      '<button type="button" class="roster-cta-btn roster-cta-btn--texture" id="spotlightShuffleBtn"><span class="roster-cta-label"></span></button>' +
       '</div>' +
-      '<div class="spotlightCloseWrap">' +
-      '<button type="button" class="roster-cta-btn roster-cta-btn--muted" id="spotlightCloseBtn"><span class="roster-cta-label"></span></button>' +
-      '</div></div>';
+      '<span class="spotlightPreviewGo" id="spotlightPreviewGo"></span>' +
+      '</button></div>';
     document.body.appendChild(sheet);
     return sheet;
   }
 
   function paintSpotlightPopup(item) {
     ensureSpotlightPopup();
+    var emojiBtn = document.getElementById('spotlightEmojiBtn');
+    var badge = document.getElementById('spotlightBadge');
+    if (badge) {
+      var emoji = (emojiBtn && emojiBtn.dataset.emoji) || pickRandomEmoji();
+      badge.innerHTML = '<img src="' + emojiAssetUrl(emoji) + '" alt="" width="28" height="28">';
+    }
     document.getElementById('spotlightTitle').textContent = t('spotlightTitle');
     document.getElementById('spotlightHint').textContent = t('spotlightHint');
     document.getElementById('spotlightPreviewIcon').innerHTML = item.icon;
     document.getElementById('spotlightPreviewTitle').textContent = item.title;
     document.getElementById('spotlightPreviewSub').textContent = item.sub;
-    document.querySelector('#spotlightOpenBtn .roster-cta-label').textContent = t('spotlightOpen');
-    document.querySelector('#spotlightShuffleBtn .roster-cta-label').textContent = t('spotlightShuffle');
-    document.querySelector('#spotlightCloseBtn .roster-cta-label').textContent = t('spotlightClose');
+    var go = document.getElementById('spotlightPreviewGo');
+    if (go) go.textContent = t('spotlightTap');
     document.getElementById('spotlightSheet').dataset.itemId = item.id;
   }
 
-  function openSpotlightPopup() {
-    var item = currentSpotlightItem();
+  function openSpotlightPopup(fresh) {
+    var item = fresh ? randomSpotlight() : currentSpotlightItem();
     paintSpotlightPopup(item);
     var sheet = document.getElementById('spotlightSheet');
     if (!sheet) return;
@@ -647,20 +699,19 @@
   }
 
   function bindSpotlightUi() {
-    document.getElementById('spotlightBtn')?.addEventListener('click', function (e) {
-      e.preventDefault();
-      openSpotlightPopup();
-    });
-    document.getElementById('spotlightOpenBtn')?.addEventListener('click', function () {
+    ensureSpotlightPopup();
+    document.getElementById('spotlightPreviewBtn')?.addEventListener('click', function () {
+      var item = currentSpotlightItem();
       closeSpotlightPopup();
-      openHref(currentSpotlightItem());
-    });
-    document.getElementById('spotlightShuffleBtn')?.addEventListener('click', function () {
-      paintSpotlightPopup(randomSpotlight(currentSpotlightItem().id));
+      openHref(item);
     });
     document.getElementById('spotlightCloseBtn')?.addEventListener('click', closeSpotlightPopup);
     document.getElementById('spotlightSheet')?.addEventListener('click', function (e) {
       if (e.target === e.currentTarget) closeSpotlightPopup();
+    });
+    document.addEventListener('keydown', function (e) {
+      var sheet = document.getElementById('spotlightSheet');
+      if (e.key === 'Escape' && sheet && sheet.classList.contains('open')) closeSpotlightPopup();
     });
   }
 

@@ -2119,7 +2119,7 @@ function buildBannerHeaderForSnapshot() {
   if (!liveHeader) return null;
   var clone = liveHeader.cloneNode(true);
   clone.className = 'header captureBannerHeader';
-  clone.querySelectorAll('.langToggle, #banner-changer-btn, #datePicker').forEach(function(el) {
+  clone.querySelectorAll('.langToggle, #banner-changer-btn, #spotlightEmojiBtn, #datePicker').forEach(function(el) {
     el.remove();
   });
   var bg = getBannerBackgroundForSnapshot();
@@ -3240,7 +3240,7 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260724e);
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

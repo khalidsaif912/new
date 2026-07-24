@@ -2472,7 +2472,7 @@ function buildBannerHeaderForSnapshot() {
   if (!liveHeader) return null;
   var clone = liveHeader.cloneNode(true);
   clone.className = 'header captureBannerHeader';
-  clone.querySelectorAll('.langToggle, #banner-changer-btn, #datePicker').forEach(function(el) {
+  clone.querySelectorAll('.langToggle, #banner-changer-btn, #spotlightEmojiBtn, #datePicker').forEach(function(el) {
     el.remove();
   });
   var bg = getBannerBackgroundForSnapshot();
@@ -3924,7 +3924,7 @@ setSummaryChipHrefs();
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260724e);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);

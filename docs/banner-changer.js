@@ -669,7 +669,7 @@
   function getHeaderChromeEls() {
     return Array.from(
       document.querySelectorAll(
-        '#langToggle, .langToggle, #banner-changer-btn, #dateTag, .header .dateTag, #datePicker'
+        '#langToggle, .langToggle, #banner-changer-btn, #spotlightEmojiBtn, #dateTag, .header .dateTag, #datePicker'
       )
     );
   }
@@ -689,7 +689,7 @@
     }
     var mode = getChromeFadeMode();
     var rules = [
-      '#langToggle,#banner-changer-btn,#dateTag,.header .dateTag,',
+      '#langToggle,#banner-changer-btn,#spotlightEmojiBtn,#dateTag,.header .dateTag,',
       '#pageTitle,.bannerTitle,.bannerTitleEyebrow,.bannerTitleMain,',
       '.page-title,.page-title-eyebrow,.page-title-main{',
       'transition:opacity .55s ease!important;',
@@ -702,6 +702,7 @@
     rules.push(
       'html.header-chrome-dim #langToggle,',
       'html.header-chrome-dim #banner-changer-btn,',
+      'html.header-chrome-dim #spotlightEmojiBtn,',
       'html.header-chrome-dim #dateTag,',
       'html.header-chrome-dim .header .dateTag{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
@@ -739,13 +740,16 @@
       'html.header-chrome-dim #langToggle:focus-visible,',
       'html.header-chrome-dim #banner-changer-btn:hover,',
       'html.header-chrome-dim #banner-changer-btn:focus-visible,',
+      'html.header-chrome-dim #spotlightEmojiBtn:hover,',
+      'html.header-chrome-dim #spotlightEmojiBtn:focus-visible,',
       'html.header-chrome-dim #dateTag:hover,',
       'html.header-chrome-dim .header .dateTag:hover{',
       'opacity:1!important;',
       '}',
       '}',
       'html.header-chrome-dim #langToggle:focus-visible,',
-      'html.header-chrome-dim #banner-changer-btn:focus-visible{',
+      'html.header-chrome-dim #banner-changer-btn:focus-visible,',
+      'html.header-chrome-dim #spotlightEmojiBtn:focus-visible{',
       'opacity:1!important;',
       '}'
     );
