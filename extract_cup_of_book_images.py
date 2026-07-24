@@ -48,12 +48,28 @@ def sniff_image(data: bytes, fallback_name: str) -> tuple[str, int, int]:
     return mime_type, image.width, image.height
 
 
-def is_likely_content_image(width: int, height: int, name: str) -> bool:
+def is_likely_content_image(width: int, height: int, name: str, data: bytes | None = None) -> bool:
     lower = name.lower()
     if width < 500 or height < 500:
         return False
-    if any(token in lower for token in ("logo", "icon", "signature", "footer", "header", "avatar")):
+    if width / max(height, 1) >= 2.2:
         return False
+    if any(token in lower for token in ("logo", "icon", "signature", "footer", "header", "avatar", "transom")):
+        return False
+    if data:
+        try:
+            with Image.open(BytesIO(data)) as img:
+                # Mostly solid dark plate = email logo chrome.
+                rgb = img.convert("RGB")
+                w, h = rgb.size
+                step = max(1, (w * h) // 80_000)
+                pixels = list(rgb.getdata())
+                dark = sum(1 for i in range(0, len(pixels), step) if pixels[i][0] < 18 and pixels[i][1] < 18 and pixels[i][2] < 18)
+                counted = max(1, (len(pixels) + step - 1) // step)
+                if h < 900 and (dark / counted) >= 0.70:
+                    return False
+        except Exception:
+            pass
     return True
 
 
@@ -101,7 +117,9 @@ def html_to_images(share_url: str, timeout: int = 120) -> list[ImageCandidate]:
             img_response.raise_for_status()
             data = img_response.content
             mime_type, width, height = sniff_image(data, f"remote_{i}")
-            if is_likely_content_image(width, height, Path(urlparse(img_url).path).name or f"remote_{i}"):
+            if is_likely_content_image(
+                width, height, Path(urlparse(img_url).path).name or f"remote_{i}", data=data
+            ):
                 candidates.append(
                     ImageCandidate(
                         name=Path(urlparse(img_url).path).name or f"remote_{i}.bin",
@@ -135,7 +153,7 @@ def msg_to_images(msg_path: Path) -> list[ImageCandidate]:
             mime_type, width, height = sniff_image(data, name)
         except Exception:
             continue
-        if is_likely_content_image(width, height, name):
+        if is_likely_content_image(width, height, name, data=data):
             candidates.append(
                 ImageCandidate(
                     name=name,

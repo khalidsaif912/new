@@ -155,6 +155,72 @@ def convert_to_jpeg_bytes(payload: bytes) -> bytes:
         raise DownloadValidationError(f"Failed to decode image with Pillow: {exc}") from exc
 
 
+def _near_black_ratio(img: Image.Image, sample_max: int = 120_000) -> float:
+    """Fraction of nearly-black pixels (logo banners are mostly solid black)."""
+    rgb = img.convert("RGB")
+    w, h = rgb.size
+    total = w * h
+    step = max(1, total // sample_max)
+    pixels = list(rgb.getdata())
+    dark = 0
+    counted = 0
+    for i in range(0, len(pixels), step):
+        r, g, b = pixels[i]
+        counted += 1
+        if r < 18 and g < 18 and b < 18:
+            dark += 1
+    return (dark / counted) if counted else 0.0
+
+
+def is_logo_or_email_chrome(img: Image.Image) -> bool:
+    """
+    Reject email logos / banners (e.g. TRANSOM Cargo red-on-black),
+    keep real poster images which are tall content photos.
+    """
+    w, h = img.size
+    if w < 80 or h < 80:
+        return True
+    # Real A Cup of Book posts are tall posters; logos are short/wide.
+    if h < 500:
+        return True
+    aspect = w / max(h, 1)
+    if aspect >= 2.2:
+        return True
+    # Solid dark logo plate (TRANSOM Cargo ~90% black).
+    if h < 900 and _near_black_ratio(img) >= 0.70:
+        return True
+    return False
+
+
+def reject_if_logo(payload: bytes) -> None:
+    try:
+        with Image.open(BytesIO(payload)) as img:
+            if is_logo_or_email_chrome(img):
+                w, h = img.size
+                raise DownloadValidationError(
+                    f"Skipped logo/banner image from email chrome ({w}x{h})."
+                )
+    except UnidentifiedImageError as exc:
+        raise DownloadValidationError(f"Failed to inspect image: {exc}") from exc
+
+
+def remove_logo_like_cup_images(image_dir: Path) -> int:
+    """Delete already-saved cup images that look like logos/banners."""
+    removed = 0
+    for path in list(existing_image_files(image_dir)):
+        try:
+            with Image.open(path) as img:
+                if not is_logo_or_email_chrome(img):
+                    continue
+        except (UnidentifiedImageError, OSError) as exc:
+            print(f"Could not inspect {path.name}: {exc}")
+            continue
+        path.unlink(missing_ok=True)
+        removed += 1
+        print(f"Removed logo/banner image: {path.name}")
+    return removed
+
+
 def download_image(url: str) -> tuple[bytes, str, str]:
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; CupOfBookBot/1.0; +https://github.com/actions)",
@@ -196,6 +262,7 @@ def main() -> int:
 
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     remove_duplicate_cup_images(IMAGE_DIR)
+    remove_logo_like_cup_images(IMAGE_DIR)
 
     try:
         payload, content_type, final_url = download_image(normalized_url)
@@ -208,6 +275,13 @@ def main() -> int:
         sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
         return 1
 
+    try:
+        reject_if_logo(payload)
+    except DownloadValidationError as exc:
+        print(str(exc), file=sys.stderr)
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
+        return 0
+
     existing_files = list(existing_image_files(IMAGE_DIR))
     existing_hashes = {file_sha256(p) for p in existing_files}
 
@@ -218,6 +292,13 @@ def main() -> int:
         return 0
 
     jpg_payload = convert_to_jpeg_bytes(payload)
+    try:
+        reject_if_logo(jpg_payload)
+    except DownloadValidationError as exc:
+        print(str(exc), file=sys.stderr)
+        sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
+        return 0
+
     jpg_hash = bytes_sha256(jpg_payload)
     if jpg_hash in existing_hashes:
         print("Image already exists (same content after JPEG normalize), skipping new file")
@@ -229,6 +310,7 @@ def main() -> int:
     print(f"Saved new image: {target_path.as_posix()}")
 
     remove_duplicate_cup_images(IMAGE_DIR)
+    remove_logo_like_cup_images(IMAGE_DIR)
     sync_index_html_files_list(INDEX_HTML, IMAGE_DIR)
 
     print(f"Content-Type: {content_type}")

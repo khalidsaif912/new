@@ -11,7 +11,7 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:#eef1f7;color:#18243a;font-family:'IBM Plex Sans Arabic','DM Sans',Tahoma,sans-serif;min-height:100dvh}
-    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 36px}
+    .wrap{max-width:820px;margin:0 auto;padding:16px 14px 36px}
 
     /* ── Header ── */
     .header{
@@ -19,6 +19,7 @@
       padding:22px 18px 18px;border-radius:20px;
       background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);
       box-shadow:0 8px 28px rgba(30,64,175,.25);
+      text-align:center;
     }
     .header::before{
       content:'';position:absolute;inset:0;pointer-events:none;
@@ -30,7 +31,7 @@
     .hCircle2{width:120px;height:120px;right:70px;bottom:-50px}
 
     /* ── Header text ── */
-    .heroText{position:relative;z-index:1;}
+    .heroText{position:relative;z-index:1;text-align:center}
     .heroText h1{font:900 28px/1.05 'Sora',sans-serif;color:#fff;letter-spacing:-.04em;margin:0}
     .heroText p{margin:5px 0 0;font-size:12px;color:rgba(255,255,255,.78);font-weight:700}
 
@@ -39,6 +40,7 @@
       position:relative;z-index:1;
       margin-top:14px;
       display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+      justify-content:center;
     }
     .car-btn{
       width:60px;height:60px;padding:3px;
@@ -62,7 +64,7 @@
 
     /* ── Header quick links ── */
     .quickLinks{
-      display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+      display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;
       margin-top:12px;position:relative;z-index:1;
     }
     .quickBtn{
@@ -86,8 +88,8 @@
       min-height:400px;padding:16px;
     }
     .viewer-screen img{
-      max-width:100%;max-height:74vh;
-      width:auto;height:auto;
+      max-width:560px;max-height:74vh;width:100%;
+      height:auto;
       object-fit:contain;border-radius:8px;
       display:block;
     }
