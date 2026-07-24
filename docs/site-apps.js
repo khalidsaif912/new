@@ -491,7 +491,11 @@
       '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;color:inherit!important;}',
       '#alumniBtn .roster-cta-icon svg{stroke:#0f766e!important;}',
       '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
-      '.quickActions.spotlightBar{display:none!important;}',
+      '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
+      '.spotlightBar .spotlightBtn{width:min(100%,320px)!important;justify-content:center!important;text-align:center!important;min-height:50px!important;padding:10px 16px!important;gap:8px!important;margin-inline:auto!important;}',
+      '.spotlightBtnLabel{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;}',
+      '.spotlightBtnTitle{font-size:13px!important;font-weight:800!important;color:inherit!important;}',
+      '.spotlightBtnSub{font-size:10px!important;font-weight:600!important;color:#64748b!important;}',
       '.spotlightSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:10004;pointer-events:none;visibility:hidden;}',
       '.spotlightSheet.open{display:flex;pointer-events:auto;visibility:visible;}',
       '.spotlightCard{width:min(100%,320px);background:linear-gradient(180deg,#ffffff 0%,#f7faff 100%);border:1px solid rgba(148,163,184,.22);border-radius:20px;padding:14px 14px 12px;box-shadow:0 18px 48px rgba(15,23,42,.28);text-align:center;position:relative;animation:spotlightPop .22s ease-out;}',
@@ -676,16 +680,44 @@
   }
 
   function ensureSpotlightButton() {
-    /* Bottom suggestion bar replaced by banner emoji button. */
-    var bar = document.getElementById('spotlightBar');
-    if (bar) bar.style.display = 'none';
+    var footer = document.querySelector('.footer');
+    if (footer && footer.parentNode) {
+      var bar = document.getElementById('spotlightBar');
+      if (!bar) {
+        bar = document.createElement('nav');
+        bar.id = 'spotlightBar';
+        bar.className = 'quickActions spotlightBar';
+        bar.setAttribute('aria-label', 'Random suggestion');
+        bar.innerHTML =
+          '<button type="button" class="roster-cta-btn roster-cta-btn--roster spotlightBtn" id="spotlightBtn">' +
+          '<span class="roster-cta-icon" id="spotlightBtnIcon" aria-hidden="true"></span>' +
+          '<span class="roster-cta-label spotlightBtnLabel">' +
+          '<span class="spotlightBtnTitle" id="spotlightBtnTitle"></span>' +
+          '<span class="spotlightBtnSub" id="spotlightBtnSub"></span>' +
+          '</span></button>';
+        footer.parentNode.insertBefore(bar, footer);
+      }
+      bar.style.display = '';
+      var item = randomSpotlight();
+      bar.dataset.itemId = item.id;
+      var btn = document.getElementById('spotlightBtn');
+      if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + item.classes;
+      var icon = document.getElementById('spotlightBtnIcon');
+      if (icon) icon.innerHTML = item.icon;
+      var title = document.getElementById('spotlightBtnTitle');
+      if (title) title.textContent = item.title;
+      var sub = document.getElementById('spotlightBtnSub');
+      if (sub) sub.textContent = item.sub || t('spotlightBtnSub');
+    }
     ensureSpotlightEmojiButton();
   }
 
   function currentSpotlightItem() {
     var sheet = document.getElementById('spotlightSheet');
+    var bar = document.getElementById('spotlightBar');
+    var id = (sheet && sheet.dataset.itemId) || (bar && bar.dataset.itemId);
     var item = spotlightItems().find(function (x) {
-      return sheet && x.id === sheet.dataset.itemId;
+      return id && x.id === id;
     });
     return item || randomSpotlight();
   }
@@ -755,6 +787,10 @@
 
   function bindSpotlightUi() {
     ensureSpotlightPopup();
+    document.getElementById('spotlightBtn')?.addEventListener('click', function (e) {
+      e.preventDefault();
+      openSpotlightPopup(false);
+    });
     document.getElementById('spotlightPreviewBtn')?.addEventListener('click', function () {
       var item = currentSpotlightItem();
       closeSpotlightPopup();
