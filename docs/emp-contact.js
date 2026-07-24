@@ -6,6 +6,7 @@
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var ADMIN_ID = '8715';
   var ADMIN_SECRET = 'K8715s';
+  var EMAIL_DOMAIN = 'hq.omanair.com';
   var phoneById = Object.create(null);
   var emailById = Object.create(null);
   var phonesReady = false;
@@ -51,6 +52,19 @@
       .replace(/\s*[-–—]\s*\d+\s*$/, '')
       .replace(/\s*\(\s*Inventory\s*\)\s*$/i, '')
       .trim();
+  }
+
+  /** Company email pattern: {employeeId}@hq.omanair.com */
+  function defaultEmailForId(id) {
+    id = String(id || '').trim();
+    if (!/^\d+$/.test(id)) return '';
+    return id + '@' + EMAIL_DOMAIN;
+  }
+
+  function emailForId(id) {
+    var stored = emailById[String(id || '')] || '';
+    if (stored) return stored;
+    return defaultEmailForId(id);
   }
 
   function digitsOnly(phone) {
@@ -460,9 +474,9 @@
         : t('إضافة / تعديل الرقم', 'Add / edit phone');
     sub.textContent = (target.name || '') + ' — ' + target.id;
     phoneIn.value = phoneById[target.id] ? String(phoneById[target.id]).replace(/^968/, '') : '';
-    emailIn.value = emailById[target.id] || '';
+    emailIn.value = emailById[target.id] || defaultEmailForId(target.id) || '';
     phoneIn.placeholder = t('رقم الجوال', 'Mobile number');
-    emailIn.placeholder = t('البريد (اختياري)', 'Email (optional)');
+    emailIn.placeholder = defaultEmailForId(target.id) || t('البريد (اختياري)', 'Email (optional)');
     saveBtn.textContent = t('حفظ', 'Save');
     cancelBtn.textContent = t('إلغاء', 'Cancel');
     msg.className = 'empContactMsg';
@@ -868,7 +882,7 @@
     if (!row) return;
     var id = empIdFromRow(row);
     var phone = phoneById[id] || '';
-    var email = emailById[id] || '';
+    var email = emailForId(id);
     var call = block.querySelector('[data-act="call"]');
     var wa = block.querySelector('[data-act="wa"]');
     var mail = block.querySelector('[data-act="mail"]');
