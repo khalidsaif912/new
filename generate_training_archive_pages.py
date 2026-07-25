@@ -465,12 +465,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .savedChip:hover .savedIcon{transform:translateY(-2px) scale(1.04)}
 .savedLines{min-width:0;flex:0 0 auto;width:100%}
 .savedName{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;text-transform:none}
-.savedNo{
-  display:block;font-size:8px;font-weight:700;color:#6366f1;margin-top:2px;
-  letter-spacing:.03em;line-height:1;
-}
 .savedEmpty .savedName{color:#1e40af}
-.savedEmpty .savedNo{display:none}
 .myTrainingPanel{
   margin-top:14px;padding:14px 14px 12px;border-radius:18px;
   background:linear-gradient(165deg,#fff 0%,#f0fdfa 100%);
@@ -984,7 +979,6 @@ PAGE_JS = r"""
   const clearBtn = document.getElementById('clearFilters');
   const savedChip = document.getElementById('savedChip');
   const savedName = document.getElementById('savedName');
-  const savedNo = document.getElementById('savedNo');
   const staffModal = document.getElementById('staffModal');
   const staffInput = document.getElementById('staffInput');
   const staffSave = document.getElementById('staffSave');
@@ -1242,7 +1236,6 @@ PAGE_JS = r"""
       if(staffCode && primary.name) rememberRosterName(staffCode, primary.name);
       savedChip.classList.remove('savedEmpty');
       savedName.textContent = displayName;
-      savedNo.textContent = staffCode ? ('#' + staffCode) : '';
     } else if(raw){
       staffCode = /^\d+$/.test(raw) ? raw : (getRosterSavedEmpId() || '');
       if(rosterName){
@@ -1254,7 +1247,6 @@ PAGE_JS = r"""
       }
       savedChip.classList.remove('savedEmpty');
       savedName.textContent = displayName;
-      savedNo.textContent = staffCode ? ('#' + staffCode) : '';
       if(staffCode){
         fetchRosterDisplayName(staffCode, (fullName) => {
           if(!fullName) return;
@@ -1268,7 +1260,6 @@ PAGE_JS = r"""
     } else {
       savedChip.classList.add('savedEmpty');
       savedName.textContent = ar ? 'موظفي' : 'My Staff';
-      savedNo.textContent = '';
     }
     renderMyTrainingPanel(raw, sessions, displayName, staffCode);
   }
@@ -1994,7 +1985,6 @@ def build_top_dock(month_courses: list[dict], in_archive: bool = False) -> str:
     {DOCK_SAVED_ICON}
     <div class="savedLines">
       <div class="savedName" id="savedName">My Staff</div>
-      <div class="savedNo" id="savedNo"></div>
     </div>
   </button>
 </div>
