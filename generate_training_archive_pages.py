@@ -1743,7 +1743,7 @@ def course_icon_url(icon: str, in_archive: bool) -> str:
     if not rel:
         return ""
     base = "../../assets/" if in_archive else "../assets/"
-    return f"{base}{rel}?v=20260725g"
+    return f"{base}{rel}?v=20260725h"
 
 
 def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: bool = False) -> str:
