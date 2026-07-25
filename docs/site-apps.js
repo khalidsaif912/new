@@ -220,7 +220,8 @@
       if (val && val !== subKey) el.textContent = val;
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
-    if (document.getElementById('spotlightSheet')) {
+    var spotlight = document.getElementById('spotlightSheet');
+    if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
     }
   }
@@ -698,7 +699,13 @@
         footer.parentNode.insertBefore(bar, footer);
       }
       bar.style.display = '';
-      var item = randomSpotlight();
+      var item = null;
+      if (bar.dataset.itemId) {
+        item = spotlightItems().find(function (x) {
+          return x.id === bar.dataset.itemId;
+        }) || null;
+      }
+      if (!item) item = randomSpotlight();
       bar.dataset.itemId = item.id;
       var btn = document.getElementById('spotlightBtn');
       if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + item.classes;
@@ -715,7 +722,12 @@
   function currentSpotlightItem() {
     var sheet = document.getElementById('spotlightSheet');
     var bar = document.getElementById('spotlightBar');
-    var id = (sheet && sheet.dataset.itemId) || (bar && bar.dataset.itemId);
+    var sheetOpen = !!(sheet && sheet.classList.contains('open'));
+    // Prefer the visible bottom-button pick unless the popup is already open.
+    var id =
+      (sheetOpen && sheet.dataset.itemId) ||
+      (bar && bar.dataset.itemId) ||
+      (sheet && sheet.dataset.itemId);
     var item = spotlightItems().find(function (x) {
       return id && x.id === id;
     });
@@ -789,7 +801,18 @@
     ensureSpotlightPopup();
     document.getElementById('spotlightBtn')?.addEventListener('click', function (e) {
       e.preventDefault();
-      openSpotlightPopup(false);
+      var bar = document.getElementById('spotlightBar');
+      var item = spotlightItems().find(function (x) {
+        return bar && x.id === bar.dataset.itemId;
+      }) || randomSpotlight();
+      paintSpotlightPopup(item);
+      var sheet = document.getElementById('spotlightSheet');
+      if (!sheet) return;
+      closeShareIfOpen();
+      closeModal();
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
     });
     document.getElementById('spotlightPreviewBtn')?.addEventListener('click', function () {
       var item = currentSpotlightItem();
