@@ -398,10 +398,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
 }
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
+.courseTitleRow{
+  display:flex;align-items:flex-start;gap:8px;min-width:0;
+}
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-height:0;font-family:'Sora',sans-serif;
+  min-width:0;flex:1;font-family:'Sora',sans-serif;
 }
 .courseTitleAr{
   margin-top:4px;
@@ -428,8 +431,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   min-width:36px;height:36px;padding:0 10px;border-radius:999px;
   font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
 }
-.courseBadgePair{display:inline-flex;align-items:center;gap:6px}
 .courseInfoBtn{
+  flex:0 0 auto;align-self:center;
   background:rgba(255,255,255,.94);color:#2563eb;
   min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
   font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
@@ -759,7 +762,10 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">☢️</div>
     <div class="courseTitleWrap">
-      <div class="courseTitle">DGR-CBTA-OPS</div>
+      <div class="courseTitleRow">
+        <div class="courseTitle">DGR-CBTA-OPS</div>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+      </div>
       <div class="courseTitleAr">لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -770,10 +776,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseBadges">
       
       <span class="badge dateBadge">29 April</span>
-      <div class="courseBadgePair">
-        <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
     </div>
   </summary>
   <div class="courseBody">

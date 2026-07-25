@@ -570,10 +570,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
 }
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
+.courseTitleRow{
+  display:flex;align-items:flex-start;gap:8px;min-width:0;
+}
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-height:0;font-family:'Sora',sans-serif;
+  min-width:0;flex:1;font-family:'Sora',sans-serif;
 }
 .courseTitleAr{
   margin-top:4px;
@@ -600,8 +603,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   min-width:36px;height:36px;padding:0 10px;border-radius:999px;
   font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
 }
-.courseBadgePair{display:inline-flex;align-items:center;gap:6px}
 .courseInfoBtn{
+  flex:0 0 auto;align-self:center;
   background:rgba(255,255,255,.94);color:#2563eb;
   min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
   font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
@@ -1726,7 +1729,10 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">{emoji_html}</div>
     <div class="courseTitleWrap">
-      <div class="courseTitle">{title_en_html}</div>
+      <div class="courseTitleRow">
+        <div class="courseTitle">{title_en_html}</div>
+        {info_btn}
+      </div>
       <div class="courseTitleAr">{title_ar_html}</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> {course["venue"]}</span>
@@ -1737,10 +1743,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     <div class="courseBadges">
       {today_badge}
       <span class="badge dateBadge">{date_range_label(course["date"], course_end)}</span>
-      <div class="courseBadgePair">
-        <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
-        {info_btn}
-      </div>
+      <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
     </div>
   </summary>
   <div class="courseBody">
