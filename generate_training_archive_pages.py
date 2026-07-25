@@ -575,10 +575,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   overflow:hidden;
 }
 .courseIcon.hasImg{
-  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.2);
-  box-shadow:0 6px 18px rgba(15,23,42,.14);
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.55));
+  padding:6px;border-color:rgba(255,255,255,.9);
+  box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
 }
-.courseIconImg{width:100%;height:100%;object-fit:cover;display:block}
+.courseIconImg{width:100%;height:100%;object-fit:contain;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
 .courseTitleRow{
   display:flex;align-items:flex-start;gap:8px;min-width:0;
@@ -661,9 +662,10 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   overflow:hidden;
 }
 .courseInfoEmoji.hasImg{
-  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.18);
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(241,245,249,.9));
+  padding:10px;border-color:rgba(255,255,255,.95);
 }
-.courseInfoEmoji img{width:100%;height:100%;object-fit:cover;display:block}
+.courseInfoEmoji img{width:100%;height:100%;object-fit:contain;display:block}
 @keyframes courseInfoPop{
   0%{transform:scale(.6) translateY(10px);opacity:0}
   100%{transform:scale(1) translateY(0);opacity:1}
@@ -1730,7 +1732,7 @@ def course_icon_url(icon: str, in_archive: bool) -> str:
     if not rel:
         return ""
     base = "../../assets/" if in_archive else "../assets/"
-    return f"{base}{rel}?v=20260725f"
+    return f"{base}{rel}?v=20260725g"
 
 
 def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: bool = False) -> str:

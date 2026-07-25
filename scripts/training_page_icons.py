@@ -166,8 +166,8 @@ ICON_CSS = """
   font-size:26px!important;line-height:1!important;color:inherit;
   overflow:hidden;
 }
-.courseIcon.hasImg{padding:0!important}
-.courseIconImg,.courseIcon img{width:100%;height:100%;object-fit:cover;display:block}
+.courseIcon.hasImg{padding:6px!important;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.55))!important}
+.courseIconImg,.courseIcon img{width:100%;height:100%;object-fit:contain;display:block}
 .courseIcon svg{display:block;width:24px;height:24px}
 .peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
 .badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
