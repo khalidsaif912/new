@@ -270,6 +270,8 @@ html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:row-reverse}
 html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
 html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
 html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
+html[lang="ar"] .myTrainingItem,body.ar .myTrainingItem{direction:rtl;text-align:right}
+html[lang="ar"] .myTrainingTime,body.ar .myTrainingTime{unicode-bidi:isolate}
 html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
 html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
 html[lang="ar"] .courseInfoDesc,body.ar .courseInfoDesc{direction:rtl}
@@ -941,6 +943,7 @@ PAGE_JS = r"""
   const myTrainingCountLbl = document.getElementById('myTrainingCountLbl');
   const myTrainingList = document.getElementById('myTrainingList');
   const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTH_SHORT_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
   function getRosterSavedEmpId(){
     for(const key of ROSTER_EMP_ID_KEYS){
@@ -1041,6 +1044,7 @@ PAGE_JS = r"""
       code: row.querySelector('.empCode')?.textContent?.trim() || '',
       name: row.querySelector('.empName')?.textContent?.trim() || '',
       title: card.dataset.courseTitle || card.querySelector('.courseTitle')?.textContent?.trim() || '',
+      titleAr: card.dataset.courseTitleAr || card.querySelector('.courseTitleAr')?.textContent?.trim() || '',
       dateIso: card.dataset.courseDate || '',
       dateEnd: card.dataset.courseEnd || card.dataset.courseDate || '',
       venue: card.dataset.venue || '',
@@ -1070,10 +1074,20 @@ PAGE_JS = r"""
     const sessions = findAllSavedSessions(raw);
     return sessions.length ? sessions[0] : null;
   }
-  function formatSessionDate(iso){
+  function formatSessionDate(iso, isAr){
     if(!iso || iso.split('-').length < 3) return {dayNum:'—', mon:''};
     const parts = iso.split('-');
-    return {dayNum:String(+parts[2]), mon:MONTH_SHORT[+parts[1]-1] || ''};
+    const monList = isAr ? MONTH_SHORT_AR : MONTH_SHORT;
+    return {dayNum:String(+parts[2]), mon:monList[+parts[1]-1] || ''};
+  }
+  function formatSessionTime(time, isAr){
+    const raw = String(time || '').trim();
+    if(!raw) return '';
+    const m = raw.match(/(\d{1,2}:\d{2})\s*(?:to|–|-|—|إلى)\s*(\d{1,2}:\d{2})/i);
+    if(m){
+      return isAr ? ('من ' + m[1] + ' إلى ' + m[2]) : (m[1] + ' to ' + m[2]);
+    }
+    return isAr ? raw.replace(/\bto\b/gi, 'إلى') : raw;
   }
   function scrollToSession(session){
     if(!session?.card) return;
@@ -1107,17 +1121,22 @@ PAGE_JS = r"""
       return;
     }
     myTrainingList.innerHTML = sessions.map((session, idx) => {
-      const d = formatSessionDate(session.dateIso);
+      const d = formatSessionDate(session.dateIso, ar);
       const cls = ['myTrainingItem', session.isPast ? 'is-past' : '', session.isToday ? 'is-today' : ''].filter(Boolean).join(' ');
-      const range = session.dateLabel || (d.mon + ' ' + d.dayNum);
+      const title = ar ? (session.titleAr || session.title) : session.title;
+      const venue = translateVenueValue(session.venue || '', ar) || (d.mon + ' ' + d.dayNum);
+      const timeTxt = formatSessionTime(session.time || '', ar);
+      const safeTitle = String(title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeVenue = String(venue || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeTime = String(timeTxt || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       return (
         '<button type="button" class="' + cls + '" data-session-idx="' + idx + '">' +
           '<div class="myTrainingDate"><span class="dayNum">' + d.dayNum + '</span>' + d.mon + '</div>' +
           '<div class="myTrainingMeta">' +
-            '<div class="myTrainingCourse">' + session.title + '</div>' +
-            '<div class="myTrainingVenue">' + (session.venue || range) + '</div>' +
+            '<div class="myTrainingCourse">' + safeTitle + '</div>' +
+            '<div class="myTrainingVenue">' + safeVenue + '</div>' +
           '</div>' +
-          '<div class="myTrainingTime">' + (session.time || '') + '</div>' +
+          '<div class="myTrainingTime">' + safeTime + '</div>' +
         '</button>'
       );
     }).join('');
