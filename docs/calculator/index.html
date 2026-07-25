@@ -579,10 +579,23 @@
         .pallet-stage {
             position: relative;
             width: 92%;
+            min-height: 28px;
+            padding: 6px 0 4px;
             line-height: 0;
             transform-origin: 50% 0%;
             transform: perspective(280px) rotateX(12deg);
             filter: drop-shadow(0 2px 4px rgba(92, 16, 16, 0.18));
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+            transition: filter 0.18s ease, transform 0.18s ease;
+        }
+
+        .pallet-stage.is-long-pressing {
+            filter: drop-shadow(0 2px 8px rgba(25, 118, 210, 0.45)) brightness(1.08);
+            transform: perspective(280px) rotateX(12deg) scale(1.04);
         }
 
         .pallet-stage::before {
@@ -1166,6 +1179,34 @@
             background: #d0d0d0;
         }
 
+        .repeat-parts-input {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0 0 18px 0;
+            padding: 12px 14px;
+            border: 2px solid #bbdefb;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-align: center;
+            color: #1565c0;
+            background: #fff;
+            outline: none;
+            direction: ltr;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .repeat-parts-input:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+        }
+
+        .repeat-parts-hint {
+            margin: -4px 0 14px 0 !important;
+            font-size: 0.88rem !important;
+            color: #546e7a !important;
+        }
+
         @media (max-width: 768px), (hover: none) and (pointer: coarse) {
             html {
                 font-size: 17px;
@@ -1595,12 +1636,26 @@
         </div>
     </div>
 
+    <!-- REPEAT PARTS (long-press pallet) -->
+    <div class="custom-alert-overlay" id="repeatPartsOverlay">
+        <div class="custom-alert-content">
+            <h3>تكرار الجزء</h3>
+            <p id="repeatPartsHint" class="repeat-parts-hint"></p>
+            <input id="repeatPartsInput" class="repeat-parts-input" type="number" min="2" inputmode="numeric" placeholder="عدد المرات" aria-label="عدد مرات التكرار" />
+            <div class="alert-buttons">
+                <button type="button" class="alert-btn alert-btn-cancel" onclick="closeRepeatPartsDialog()">إلغاء</button>
+                <button type="button" class="alert-btn alert-btn-ok" onclick="confirmRepeatParts()">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <script>
         var shipments = {};
         var activeTab = null;
         var pendingConfirmCallback = null;
+        var pendingRepeat = null;
 
         // CUSTOM ALERT
         function showCustomAlert(message, title) {
@@ -1643,7 +1698,203 @@
             if (e.target.id === 'customConfirmOverlay') {
                 closeCustomConfirm();
             }
+            if (e.target.id === 'repeatPartsOverlay') {
+                closeRepeatPartsDialog();
+            }
         });
+
+        function openRepeatPartsDialog(awb, index) {
+            var data = shipments[awb];
+            if (!data || !data.parts[index]) return;
+
+            var qty = parseInt(data.parts[index].quantity, 10) || 0;
+            if (qty <= 0) {
+                showCustomAlert('أدخل كمية الجزء أولاً ثم اضغط مطولاً على البليت للتكرار', 'تكرار الجزء');
+                return;
+            }
+
+            var usedWithoutThis = getTotalUsed(awb) - qty;
+            var remainingCapacity = data.quantity - usedWithoutThis;
+            var maxTimes = Math.floor(remainingCapacity / qty);
+            if (maxTimes < 2) {
+                showCustomAlert('لا توجد كمية كافية لتكرار هذا الجزء', 'تكرار الجزء');
+                return;
+            }
+
+            pendingRepeat = { awb: awb, index: index, qty: qty, maxTimes: maxTimes };
+            document.getElementById('repeatPartsHint').textContent =
+                'الكمية الحالية: ' + qty + ' — أدخل عدد المرات (حد أقصى ' + maxTimes + ')';
+            var input = document.getElementById('repeatPartsInput');
+            input.value = '';
+            input.max = String(maxTimes);
+            document.getElementById('repeatPartsOverlay').classList.add('active');
+            setTimeout(function() {
+                input.focus();
+                input.select();
+            }, 80);
+        }
+
+        function closeRepeatPartsDialog() {
+            document.getElementById('repeatPartsOverlay').classList.remove('active');
+            pendingRepeat = null;
+        }
+
+        function confirmRepeatParts() {
+            if (!pendingRepeat) return;
+
+            var awb = pendingRepeat.awb;
+            var index = pendingRepeat.index;
+            var qty = pendingRepeat.qty;
+            var maxTimes = pendingRepeat.maxTimes;
+            var data = shipments[awb];
+            if (!data || !data.parts[index]) {
+                closeRepeatPartsDialog();
+                return;
+            }
+
+            var times = parseInt(document.getElementById('repeatPartsInput').value, 10);
+            if (!times || times < 2) {
+                showCustomAlert('أدخل عدداً من 2 فأكثر', 'تكرار الجزء');
+                return;
+            }
+            if (times > maxTimes) {
+                showCustomAlert('الحد الأقصى للتكرار: ' + maxTimes, 'تكرار الجزء');
+                return;
+            }
+
+            data.parts[index].quantity = qty;
+            for (var i = 1; i < times; i++) {
+                data.parts.splice(index + i, 0, { quantity: qty, color: 'default' });
+            }
+
+            closeRepeatPartsDialog();
+            updateTabContent(awb);
+            updateTabStatus(awb);
+            saveData();
+            setStatus('تم تكرار الجزء ×' + times + ' (كل جزء ' + qty + ')');
+        }
+
+        (function setupPalletRepeatLongPress() {
+            var LONG_MS = 450;
+            var MOVE_PX = 28;
+            var timer = null;
+            var startX = 0;
+            var startY = 0;
+            var pressStage = null;
+            var pressAwb = null;
+            var pressIndex = -1;
+            var openedByHold = false;
+
+            function findPalletStage(target) {
+                if (!target || !target.closest) return null;
+                var stage = target.closest('.pallet-stage');
+                if (!stage) return null;
+                var row = stage.closest('.part-row');
+                if (!row || row.classList.contains('ghost-part')) return null;
+                return stage;
+            }
+
+            function clearPress() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                if (pressStage) {
+                    pressStage.classList.remove('is-long-pressing');
+                    pressStage = null;
+                }
+                pressAwb = null;
+                pressIndex = -1;
+            }
+
+            function fireRepeat() {
+                var awb = pressAwb;
+                var index = pressIndex;
+                clearPress();
+                if (!awb || index < 0) return;
+                openedByHold = true;
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(18); } catch (err) {}
+                }
+                openRepeatPartsDialog(awb, index);
+                setTimeout(function() { openedByHold = false; }, 400);
+            }
+
+            function beginPress(stage, clientX, clientY) {
+                var row = stage.closest('.part-row');
+                if (!row) return;
+                var awb = row.getAttribute('data-awb');
+                var index = parseInt(row.getAttribute('data-index'), 10);
+                if (!awb || isNaN(index)) return;
+
+                clearPress();
+                pressStage = stage;
+                pressAwb = awb;
+                pressIndex = index;
+                startX = clientX;
+                startY = clientY;
+                stage.classList.add('is-long-pressing');
+                timer = setTimeout(fireRepeat, LONG_MS);
+            }
+
+            function movePress(clientX, clientY) {
+                if (!timer) return;
+                if (Math.abs(clientX - startX) > MOVE_PX || Math.abs(clientY - startY) > MOVE_PX) {
+                    clearPress();
+                }
+            }
+
+            document.addEventListener('touchstart', function(e) {
+                var stage = findPalletStage(e.target);
+                if (!stage) return;
+                if (e.touches.length !== 1) {
+                    clearPress();
+                    return;
+                }
+                var t = e.touches[0];
+                beginPress(stage, t.clientX, t.clientY);
+            }, { passive: true, capture: true });
+
+            document.addEventListener('touchmove', function(e) {
+                if (!timer || !e.touches.length) return;
+                var t = e.touches[0];
+                movePress(t.clientX, t.clientY);
+            }, { passive: true, capture: true });
+
+            document.addEventListener('touchend', clearPress, { capture: true });
+            document.addEventListener('touchcancel', clearPress, { capture: true });
+
+            document.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return;
+                if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+                var stage = findPalletStage(e.target);
+                if (!stage) return;
+                beginPress(stage, e.clientX, e.clientY);
+            }, true);
+
+            document.addEventListener('mousemove', function(e) {
+                movePress(e.clientX, e.clientY);
+            }, true);
+
+            document.addEventListener('mouseup', clearPress, true);
+            document.addEventListener('mouseleave', clearPress, true);
+
+            document.addEventListener('contextmenu', function(e) {
+                if (findPalletStage(e.target) || openedByHold) {
+                    e.preventDefault();
+                }
+            }, true);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key !== 'Enter') return;
+                var overlay = document.getElementById('repeatPartsOverlay');
+                if (!overlay || !overlay.classList.contains('active')) return;
+                if (e.target && e.target.id === 'repeatPartsInput') {
+                    e.preventDefault();
+                    confirmRepeatParts();
+                }
+            });
+        })();
 
         // MODAL INFO
 
