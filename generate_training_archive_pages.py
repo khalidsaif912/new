@@ -1138,9 +1138,10 @@ PAGE_JS = r"""
 
   function nameTranslationsUrl(){
     const path = window.location.pathname || '';
-    if(path.includes('/training/archive/')) return '../../name_translations.json';
-    if(path.includes('/training/')) return '../name_translations.json';
-    return '../name_translations.json';
+    const ver = '20260725b';
+    if(path.includes('/training/archive/')) return '../../name_translations.json?v=' + ver;
+    if(path.includes('/training/')) return '../name_translations.json?v=' + ver;
+    return '../name_translations.json?v=' + ver;
   }
 
   function normalizeNameKey(name){
@@ -1164,11 +1165,11 @@ PAGE_JS = r"""
   }
 
   function ensureNameMap(done){
-    if(NAME_AR_MAP){ done(NAME_AR_MAP); return; }
+    if(NAME_AR_MAP && Object.keys(NAME_AR_MAP).length){ done(NAME_AR_MAP); return; }
     NAME_AR_WAITERS.push(done);
     if(NAME_AR_LOADING) return;
     NAME_AR_LOADING = true;
-    fetch(nameTranslationsUrl(), { cache: 'force-cache' })
+    fetch(nameTranslationsUrl(), { cache: 'no-store' })
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
         NAME_AR_MAP = (data && data.names) ? data.names : {};
@@ -1177,19 +1178,20 @@ PAGE_JS = r"""
       .finally(() => {
         NAME_AR_LOADING = false;
         const waiters = NAME_AR_WAITERS.splice(0, NAME_AR_WAITERS.length);
-        waiters.forEach(fn => fn(NAME_AR_MAP));
+        waiters.forEach(fn => fn(NAME_AR_MAP || {}));
       });
   }
 
   function applyEmployeeNames(isAr){
     document.querySelectorAll('.empName').forEach(el => {
-      if(el.dataset.nameEn === undefined) el.dataset.nameEn = el.textContent;
-      const en = el.dataset.nameEn;
-      let ar = el.getAttribute('data-name-ar') || '';
-      if(!ar){
-        ar = arabicForEnglishName(en);
-        if(ar) el.setAttribute('data-name-ar', ar);
+      const current = (el.textContent || '').trim();
+      if(!el.dataset.nameEn){
+        // Keep English original only; ignore already-translated Arabic text.
+        if(current && !/[\u0600-\u06FF]/.test(current)) el.dataset.nameEn = current;
       }
+      const en = el.dataset.nameEn || current;
+      const ar = arabicForEnglishName(en);
+      if(ar) el.setAttribute('data-name-ar', ar);
       el.textContent = (isAr && ar) ? ar : en;
     });
   }
