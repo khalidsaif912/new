@@ -307,7 +307,12 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 }
 .myTrainingDate .dayNum{font-size:17px;display:block;line-height:1;font-family:'Sora',sans-serif}
 .myTrainingMeta{min-width:0}
-.myTrainingCourse{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.myTrainingCourse{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:'Sora',sans-serif}
+.myTrainingCourseAr{
+  margin-top:2px;font-size:11px;font-weight:700;line-height:1.35;color:var(--muted);
+  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
 .myTrainingVenue{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .myTrainingTime{font-size:11px;font-weight:700;color:#0f766e;white-space:nowrap}
 .myTrainingEmpty{
@@ -1244,17 +1249,23 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     myTrainingList.innerHTML = sessions.map((session, idx) => {
       const d = formatSessionDate(session.dateIso, ar);
       const cls = ['myTrainingItem', session.isPast ? 'is-past' : '', session.isToday ? 'is-today' : ''].filter(Boolean).join(' ');
-      const title = ar ? (session.titleAr || session.title) : session.title;
+      const titleEn = session.title || '';
+      const titleAr = session.titleAr || '';
       const venue = translateVenueValue(session.venue || '', ar) || (d.mon + ' ' + d.dayNum);
       const timeTxt = formatSessionTime(session.time || '', ar);
-      const safeTitle = String(title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeTitleEn = String(titleEn).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeTitleAr = String(titleAr).replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const safeVenue = String(venue || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const safeTime = String(timeTxt || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const arLine = (titleAr && titleAr !== titleEn)
+        ? ('<div class="myTrainingCourseAr">' + safeTitleAr + '</div>')
+        : '';
       return (
         '<button type="button" class="' + cls + '" data-session-idx="' + idx + '">' +
           '<div class="myTrainingDate"><span class="dayNum">' + d.dayNum + '</span>' + d.mon + '</div>' +
           '<div class="myTrainingMeta">' +
-            '<div class="myTrainingCourse">' + safeTitle + '</div>' +
+            '<div class="myTrainingCourse">' + safeTitleEn + '</div>' +
+            arLine +
             '<div class="myTrainingVenue">' + safeVenue + '</div>' +
           '</div>' +
           '<div class="myTrainingTime">' + safeTime + '</div>' +
