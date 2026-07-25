@@ -1405,7 +1405,7 @@ PAGE_JS = r"""
       search: 'Search',
       searchPh: 'Search staff / course',
       clear: 'Clear',
-      roster: 'Roster',
+      roster: 'Home',
       myStaff: 'My Staff',
       myTrainingTitle: 'My training dates',
       sessions: 'Sessions',
@@ -1437,7 +1437,7 @@ PAGE_JS = r"""
       search: 'بحث',
       searchPh: 'ابحث عن موظف / دورة',
       clear: 'مسح',
-      roster: 'الروستر',
+      roster: 'الرئيسية',
       myStaff: 'موظفي',
       myTrainingTitle: 'مواعيد التدريب',
       sessions: 'دورات',
@@ -1583,8 +1583,14 @@ PAGE_JS = r"""
 
     const searchLbl = document.querySelector('#searchToggle .dockLabel');
     if(searchLbl) searchLbl.textContent = t.search;
-    const rosterLbl = document.querySelector('#rosterHomeBtn .rosterLabel');
-    if(rosterLbl) rosterLbl.textContent = t.roster;
+    const rosterLbl = document.querySelector('#rosterHomeBtn .rosterLabel') || document.getElementById('homeDockLabel');
+    if(rosterLbl){
+      const en = rosterLbl.getAttribute('data-label-en') || t.roster;
+      const ar = rosterLbl.getAttribute('data-label-ar') || t.roster;
+      rosterLbl.textContent = isAr ? ar : en;
+    }
+    const rosterBtn = document.getElementById('rosterHomeBtn');
+    if(rosterBtn) rosterBtn.setAttribute('aria-label', isAr ? 'الرئيسية' : 'Home');
     if(searchInput) searchInput.placeholder = t.searchPh;
     if(searchBtn) searchBtn.textContent = t.search;
     if(clearBtn) clearBtn.textContent = t.clear;
@@ -1976,7 +1982,7 @@ def build_top_dock(month_courses: list[dict], in_archive: bool = False) -> str:
   <div class="dockCard statChip" id="statSwitchChip">
     <div class="statsTicker">{"".join(faces)}</div>
   </div>
-  <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Roster site">
+  <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Home">
     {DOCK_ROSTER_INNER}
   </button>
   <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">

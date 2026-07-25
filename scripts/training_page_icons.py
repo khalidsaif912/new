@@ -32,8 +32,10 @@ PAGE_TITLE_HTML = (
     f'<span class="pageTitleText">Training Courses</span></h1>'
 )
 
-SVG_DOCK_ROSTER = _svg(
-    '<path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/>',
+SVG_DOCK_HOME = _svg(
+    '<path d="M3 10.5 12 3l9 7.5"/>'
+    '<path d="M5.5 9.5V20h13V9.5"/>'
+    '<path d="M10 20v-6h4v6"/>',
     size=22,
     stroke="#2563eb",
     extra_class="dockSvg",
@@ -54,8 +56,9 @@ SVG_DOCK_USER = _svg(
 
 DOCK_ROSTER_INNER = (
     f'<div class="rosterInner">'
-    f'<span class="rosterIconWrap">{SVG_DOCK_ROSTER}</span>'
-    f'<span class="rosterLabel">Roster</span></div>'
+    f'<span class="rosterIconWrap">{SVG_DOCK_HOME}</span>'
+    f'<span class="rosterLabel" id="homeDockLabel" '
+    f'data-label-en="Home" data-label-ar="الرئيسية">Home</span></div>'
 )
 DOCK_SEARCH_INNER = (
     f'<div class="dockValue searchGlyph">{SVG_DOCK_SEARCH}</div>'
