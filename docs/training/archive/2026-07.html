@@ -597,14 +597,17 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 .quickBtn{display:inline-flex;align-items:center;gap:6px}
 .quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
 .quickBtn-icon svg{display:block}
-.rosterIconWrap,.otherIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon,.courseIcon{
+.rosterIconWrap,.otherIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon{
   line-height:0;display:inline-flex;align-items:center;justify-content:center;
   transition:transform .28s ease
 }
 .rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
 #otherPageBtn:hover .otherIconWrap{transform:translateY(-5px) scale(1.06)}
-.courseIcon{font-size:0;color:var(--accent,#2563eb)}
-.courseIcon svg{display:block}
+.courseIcon{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  font-size:26px!important;line-height:1!important;color:inherit;
+}
+.courseIcon svg{display:block;width:24px;height:24px}
 .peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
 .badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
 
