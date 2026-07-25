@@ -23,6 +23,7 @@ from training_page_icons import (  # noqa: E402
 )
 
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+MONTH_SHORT_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 IOS_TOUCH_VER = "20260525c"
 
 # Meaningful course emoji + Arabic title + short description.
@@ -266,7 +267,7 @@ body{
 html[lang="ar"] body,body.ar{direction:rtl}
 html[lang="ar"] .langBar,body.ar .langBar{right:auto;left:18px}
 html[lang="ar"] .courseHead,body.ar .courseHead{flex-direction:row-reverse}
-html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:row-reverse}
+html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:column;align-items:center}
 html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
 html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
 html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
@@ -618,13 +619,10 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 }
 .courseIconImg{width:100%;height:100%;object-fit:contain;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
-.courseTitleRow{
-  display:flex;align-items:flex-start;gap:8px;min-width:0;
-}
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-width:0;flex:1;font-family:'Sora',sans-serif;
+  min-width:0;font-family:'Sora',sans-serif;
 }
 .courseTitleAr{
   margin-top:4px;
@@ -636,8 +634,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
 .miniDot{color:rgba(148,163,184,.9);font-weight:700}
 .courseBadges{
-  position:relative;z-index:1;align-self:start;display:flex;flex-direction:column;gap:8px;
-  align-items:flex-end;padding-top:4px;
+  position:relative;z-index:1;align-self:start;display:flex;flex-direction:column;gap:6px;
+  align-items:center;padding-top:2px;
 }
 .badge{
   display:inline-flex;align-items:center;justify-content:center;gap:5px;
@@ -645,23 +643,40 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.75);
   white-space:nowrap;
 }
-.dateBadge{background:rgba(255,255,255,.88);color:var(--text-on-acc,var(--blue2));border:1px solid rgba(255,255,255,.6)}
-.peopleBadge{
-  background:rgba(255,255,255,.94);color:#334155;
-  min-width:36px;height:36px;padding:0 10px;border-radius:999px;
-  font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
+.courseChip{
+  width:48px;min-width:48px;height:48px;padding:0;box-sizing:border-box;
+  border-radius:16px;gap:1px;
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88));
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 4px 12px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  color:var(--text-on-acc,#334155);
+  font-weight:900;line-height:1;
 }
-.courseInfoBtn{
-  flex:0 0 auto;align-self:center;
-  background:rgba(255,255,255,.94);color:#2563eb;
-  min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
-  font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+.dateBadge.courseChip{letter-spacing:0}
+.chipPrimary{
+  font-size:14px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
+  color:var(--text-on-acc,var(--blue2));
+}
+.chipSecondary{
+  font-size:9px;font-weight:700;letter-spacing:.02em;line-height:1.1;
+  color:var(--text-on-acc,var(--blue2));opacity:.72;margin-top:2px;
+  text-transform:uppercase;
+}
+.peopleBadge.courseChip{
+  flex-direction:row;gap:3px;font-size:12px;color:#334155;
+}
+.peopleBadge.courseChip .peopleIconSvg{width:12px;height:12px;margin:0;flex-shrink:0}
+.courseInfoBtn.courseChip{
+  border:1px solid rgba(255,255,255,.85);color:#2563eb;font-size:18px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
   transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  align-self:center;
 }
-.courseInfoBtn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(37,99,235,.16);background:#eff6ff}
-.courseInfoBtn:active{transform:translateY(0)}
+.courseInfoBtn.courseChip:hover{
+  transform:translateY(-1px);box-shadow:0 8px 16px rgba(37,99,235,.16);background:#eff6ff;
+}
+.courseInfoBtn.courseChip:active{transform:translateY(0)}
 .courseInfoMark{
   display:inline-block;line-height:1;
   animation:courseQPulse 2.1s ease-in-out infinite;
@@ -673,8 +688,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   50%{transform:scale(1.08) rotate(8deg)}
   75%{transform:scale(1.14) rotate(-6deg)}
 }
-.courseInfoModal{
-  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+.todayBadge{
+  background:var(--today-badge-bg);color:var(--today-badge-c);
+  min-width:48px;height:auto;padding:5px 8px;border-radius:999px;font-size:9px;
+}
+.courseInfoModal{  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(15,23,42,.45);backdrop-filter:blur(10px);z-index:60;padding:20px;
 }
 .courseInfoModal.open{display:flex}
@@ -728,7 +746,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;cursor:pointer;
   box-shadow:0 8px 22px rgba(29,78,216,.28);
 }
-.todayBadge{background:var(--today-badge-bg);color:var(--today-badge-c)}
 .courseBody{padding:16px 18px 20px}
 .courseCard[open] .courseBody{padding-top:18px}
 .rowsWrap{
@@ -890,8 +907,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
-  .peopleBadge,.courseInfoBtn{min-width:32px;width:32px;height:32px;font-size:10px}
-  .courseInfoBtn{font-size:14px}
+  .courseChip{width:44px;min-width:44px;height:44px;border-radius:14px}
+  .chipPrimary{font-size:13px}
+  .chipSecondary{font-size:8px}
+  .peopleBadge.courseChip{font-size:11px}
+  .courseInfoBtn.courseChip{font-size:16px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
@@ -1734,6 +1754,23 @@ def date_range_label(start_iso: str, end_iso: str | None) -> str:
     return f"{day_s} {MONTH_NAMES_AR[int(month_s)-1]} – {day_e} {MONTH_NAMES_AR[int(month_e)-1]}"
 
 
+def date_chip_html(start_iso: str, end_iso: str | None) -> str:
+    _, month_s, day_s = start_iso.split("-")
+    mon = MONTH_SHORT_EN[int(month_s) - 1]
+    if not end_iso or end_iso == start_iso:
+        primary = str(int(day_s))
+    else:
+        _, month_e, day_e = end_iso.split("-")
+        primary = f"{int(day_s)}–{int(day_e)}"
+        if month_s != month_e:
+            mon = MONTH_SHORT_EN[int(month_e) - 1]
+    return (
+        f'<span class="badge dateBadge courseChip" title="{html_module.escape(date_range_label(start_iso, end_iso), quote=True)}">'
+        f'<span class="chipPrimary">{html_module.escape(primary)}</span>'
+        f'<span class="chipSecondary">{html_module.escape(mon)}</span></span>'
+    )
+
+
 def load_data(path: Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     if "months" not in data or not isinstance(data["months"], list):
@@ -1824,7 +1861,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     info_btn = ""
     if desc_ar or desc_en:
         info_btn = (
-            f'<button class="courseInfoBtn" type="button" aria-label="Course info" '
+            f'<button class="courseInfoBtn courseChip" type="button" aria-label="Course info" '
             f'data-course-emoji="{emoji_attr}" data-course-icon="{icon_attr}" '
             f'data-course-title="{title_attr}" '
             f'data-course-title-ar="{title_ar_attr}" data-course-desc-ar="{desc_ar_attr}" '
@@ -1837,10 +1874,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     <div class="headGlow"></div>
     {icon_block}
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">{title_en_html}</div>
-        {info_btn}
-      </div>
+      <div class="courseTitle">{title_en_html}</div>
       <div class="courseTitleAr">{title_ar_html}</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> {course["venue"]}</span>
@@ -1850,8 +1884,9 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     </div>
     <div class="courseBadges">
       {today_badge}
-      <span class="badge dateBadge">{date_range_label(course["date"], course_end)}</span>
-      <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
+      {date_chip_html(course["date"], course_end)}
+      <span class="badge peopleBadge courseChip">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
+      {info_btn}
     </div>
   </summary>
   <div class="courseBody">

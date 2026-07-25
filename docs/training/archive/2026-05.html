@@ -92,7 +92,7 @@ body{
 html[lang="ar"] body,body.ar{direction:rtl}
 html[lang="ar"] .langBar,body.ar .langBar{right:auto;left:18px}
 html[lang="ar"] .courseHead,body.ar .courseHead{flex-direction:row-reverse}
-html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:row-reverse}
+html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:column;align-items:center}
 html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
 html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
 html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
@@ -444,13 +444,10 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 }
 .courseIconImg{width:100%;height:100%;object-fit:contain;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
-.courseTitleRow{
-  display:flex;align-items:flex-start;gap:8px;min-width:0;
-}
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-width:0;flex:1;font-family:'Sora',sans-serif;
+  min-width:0;font-family:'Sora',sans-serif;
 }
 .courseTitleAr{
   margin-top:4px;
@@ -462,8 +459,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
 .miniDot{color:rgba(148,163,184,.9);font-weight:700}
 .courseBadges{
-  position:relative;z-index:1;align-self:start;display:flex;flex-direction:column;gap:8px;
-  align-items:flex-end;padding-top:4px;
+  position:relative;z-index:1;align-self:start;display:flex;flex-direction:column;gap:6px;
+  align-items:center;padding-top:2px;
 }
 .badge{
   display:inline-flex;align-items:center;justify-content:center;gap:5px;
@@ -471,23 +468,40 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.75);
   white-space:nowrap;
 }
-.dateBadge{background:rgba(255,255,255,.88);color:var(--text-on-acc,var(--blue2));border:1px solid rgba(255,255,255,.6)}
-.peopleBadge{
-  background:rgba(255,255,255,.94);color:#334155;
-  min-width:36px;height:36px;padding:0 10px;border-radius:999px;
-  font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
+.courseChip{
+  width:48px;min-width:48px;height:48px;padding:0;box-sizing:border-box;
+  border-radius:16px;gap:1px;
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88));
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 4px 12px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  color:var(--text-on-acc,#334155);
+  font-weight:900;line-height:1;
 }
-.courseInfoBtn{
-  flex:0 0 auto;align-self:center;
-  background:rgba(255,255,255,.94);color:#2563eb;
-  min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
-  font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+.dateBadge.courseChip{letter-spacing:0}
+.chipPrimary{
+  font-size:14px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
+  color:var(--text-on-acc,var(--blue2));
+}
+.chipSecondary{
+  font-size:9px;font-weight:700;letter-spacing:.02em;line-height:1.1;
+  color:var(--text-on-acc,var(--blue2));opacity:.72;margin-top:2px;
+  text-transform:uppercase;
+}
+.peopleBadge.courseChip{
+  flex-direction:row;gap:3px;font-size:12px;color:#334155;
+}
+.peopleBadge.courseChip .peopleIconSvg{width:12px;height:12px;margin:0;flex-shrink:0}
+.courseInfoBtn.courseChip{
+  border:1px solid rgba(255,255,255,.85);color:#2563eb;font-size:18px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
   transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  align-self:center;
 }
-.courseInfoBtn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(37,99,235,.16);background:#eff6ff}
-.courseInfoBtn:active{transform:translateY(0)}
+.courseInfoBtn.courseChip:hover{
+  transform:translateY(-1px);box-shadow:0 8px 16px rgba(37,99,235,.16);background:#eff6ff;
+}
+.courseInfoBtn.courseChip:active{transform:translateY(0)}
 .courseInfoMark{
   display:inline-block;line-height:1;
   animation:courseQPulse 2.1s ease-in-out infinite;
@@ -499,8 +513,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   50%{transform:scale(1.08) rotate(8deg)}
   75%{transform:scale(1.14) rotate(-6deg)}
 }
-.courseInfoModal{
-  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+.todayBadge{
+  background:var(--today-badge-bg);color:var(--today-badge-c);
+  min-width:48px;height:auto;padding:5px 8px;border-radius:999px;font-size:9px;
+}
+.courseInfoModal{  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(15,23,42,.45);backdrop-filter:blur(10px);z-index:60;padding:20px;
 }
 .courseInfoModal.open{display:flex}
@@ -554,7 +571,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;cursor:pointer;
   box-shadow:0 8px 22px rgba(29,78,216,.28);
 }
-.todayBadge{background:var(--today-badge-bg);color:var(--today-badge-c)}
 .courseBody{padding:16px 18px 20px}
 .courseCard[open] .courseBody{padding-top:18px}
 .rowsWrap{
@@ -716,8 +732,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
-  .peopleBadge,.courseInfoBtn{min-width:32px;width:32px;height:32px;font-size:10px}
-  .courseInfoBtn{font-size:14px}
+  .courseChip{width:44px;min-width:44px;height:44px;border-radius:14px}
+  .chipPrimary{font-size:13px}
+  .chipSecondary{font-size:8px}
+  .peopleBadge.courseChip{font-size:11px}
+  .courseInfoBtn.courseChip{font-size:16px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
@@ -822,10 +841,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">📦</div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">Cargo Warehouse Operations (CWO) (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📦" data-course-icon="" data-course-title="Cargo Warehouse Operations (CWO) (refresher)" data-course-title-ar="عمليات مستودع الشحن (تجديد)" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">Cargo Warehouse Operations (CWO) (refresher)</div>
       <div class="courseTitleAr">عمليات مستودع الشحن (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -835,8 +851,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">13–14 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>9</span>
+      <span class="badge dateBadge courseChip" title="13–14 May"><span class="chipPrimary">13–14</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>9</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="📦" data-course-icon="" data-course-title="Cargo Warehouse Operations (CWO) (refresher)" data-course-title-ar="عمليات مستودع الشحن (تجديد)" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -849,10 +866,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">🐾</div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">LAR (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🐾" data-course-icon="" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">LAR (refresher)</div>
       <div class="courseTitleAr">لوائح نقل الحيوانات الحية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -862,8 +876,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">12 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>17</span>
+      <span class="badge dateBadge courseChip" title="12 May"><span class="chipPrimary">12</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>17</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="🐾" data-course-icon="" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -876,10 +891,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">🧠</div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">Human Factors (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">Human Factors (refresher)</div>
       <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -889,8 +901,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">10 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>4</span>
+      <span class="badge dateBadge courseChip" title="10 May"><span class="chipPrimary">10</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>4</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -903,10 +916,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">📊</div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">SMS (initial)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📊" data-course-icon="" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">SMS (initial)</div>
       <div class="courseTitleAr">نظام إدارة السلامة (أساسي)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -916,8 +926,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">07 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
+      <span class="badge dateBadge courseChip" title="07 May"><span class="chipPrimary">7</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="📊" data-course-icon="" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -930,10 +941,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../../assets/course-icons/forklift.png?v=20260725h" alt=""></div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">Forklift (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">Forklift (refresher)</div>
       <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -943,8 +951,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">06 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <span class="badge dateBadge courseChip" title="06 May"><span class="chipPrimary">6</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -957,10 +966,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../../assets/course-icons/forklift.png?v=20260725h" alt=""></div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">Forklift (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">Forklift (refresher)</div>
       <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -970,8 +976,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">04 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <span class="badge dateBadge courseChip" title="04 May"><span class="chipPrimary">4</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
@@ -984,10 +991,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">🦺</div>
     <div class="courseTitleWrap">
-      <div class="courseTitleRow">
-        <div class="courseTitle">Airside Safety (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
-      </div>
+      <div class="courseTitle">Airside Safety (refresher)</div>
       <div class="courseTitleAr">سلامة ساحة المطار (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
@@ -997,8 +1001,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     </div>
     <div class="courseBadges">
       
-      <span class="badge dateBadge">03 May</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <span class="badge dateBadge courseChip" title="03 May"><span class="chipPrimary">3</span><span class="chipSecondary">May</span></span>
+      <span class="badge peopleBadge courseChip"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</span>
+      <button class="courseInfoBtn courseChip" type="button" aria-label="Course info" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
     </div>
   </summary>
   <div class="courseBody">
