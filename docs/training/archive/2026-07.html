@@ -1480,13 +1480,83 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     return (document.documentElement.lang === 'ar') ? 'ar' : 'en';
   }
 
+  let NAME_AR_MAP = null;
+  let NAME_AR_LOADING = false;
+  const NAME_AR_WAITERS = [];
+
+  function nameTranslationsUrl(){
+    const path = window.location.pathname || '';
+    if(path.includes('/training/archive/')) return '../../name_translations.json';
+    if(path.includes('/training/')) return '../name_translations.json';
+    return '../name_translations.json';
+  }
+
+  function normalizeNameKey(name){
+    return String(name || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  }
+
+  function arabicForEnglishName(en){
+    if(!NAME_AR_MAP || !en) return '';
+    const key = normalizeNameKey(en);
+    if(NAME_AR_MAP[key]) return NAME_AR_MAP[key];
+    const stripped = key.replace(/^(MR\.|MRS\.|MISS\.|MS\.)\s*/, '').trim();
+    const prefixes = ['', 'MR. ', 'MISS. ', 'MISS.', 'MRS. ', 'MS. ', 'MR.', 'MRS.', 'MS.'];
+    for(const p of prefixes){
+      const k = (p + stripped).trim();
+      if(NAME_AR_MAP[k]) return NAME_AR_MAP[k];
+    }
+    const compact = stripped.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    if(NAME_AR_MAP[compact]) return NAME_AR_MAP[compact];
+    if(NAME_AR_MAP['MR. ' + compact]) return NAME_AR_MAP['MR. ' + compact];
+    return '';
+  }
+
+  function ensureNameMap(done){
+    if(NAME_AR_MAP){ done(NAME_AR_MAP); return; }
+    NAME_AR_WAITERS.push(done);
+    if(NAME_AR_LOADING) return;
+    NAME_AR_LOADING = true;
+    fetch(nameTranslationsUrl(), { cache: 'force-cache' })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        NAME_AR_MAP = (data && data.names) ? data.names : {};
+      })
+      .catch(() => { NAME_AR_MAP = {}; })
+      .finally(() => {
+        NAME_AR_LOADING = false;
+        const waiters = NAME_AR_WAITERS.splice(0, NAME_AR_WAITERS.length);
+        waiters.forEach(fn => fn(NAME_AR_MAP));
+      });
+  }
+
+  function applyEmployeeNames(isAr){
+    document.querySelectorAll('.empName').forEach(el => {
+      if(el.dataset.nameEn === undefined) el.dataset.nameEn = el.textContent;
+      const en = el.dataset.nameEn;
+      let ar = el.getAttribute('data-name-ar') || '';
+      if(!ar){
+        ar = arabicForEnglishName(en);
+        if(ar) el.setAttribute('data-name-ar', ar);
+      }
+      el.textContent = (isAr && ar) ? ar : en;
+    });
+  }
+
+  function translateVenueValue(enVal, isAr){
+    const raw = String(enVal || '').trim();
+    if(!isAr) return raw;
+    if(/cargo training room/i.test(raw)) return 'قاعة تدريب الشحن';
+    return raw.replace(/\bto\b/gi, 'إلى');
+  }
+
   function applyTrainingLang(lang){
     const L = (lang === 'ar') ? 'ar' : 'en';
     const t = TRAIN_UI[L];
+    const isAr = L === 'ar';
     localStorage.setItem('rosterLang', L);
     document.documentElement.lang = L;
-    document.documentElement.setAttribute('dir', L === 'ar' ? 'rtl' : 'ltr');
-    document.body.classList.toggle('ar', L === 'ar');
+    document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+    document.body.classList.toggle('ar', isAr);
 
     const titleText = document.querySelector('#pageTitle .pageTitleText') || document.getElementById('pageTitle');
     if(titleText){
@@ -1538,9 +1608,29 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     document.querySelectorAll('.miniMeta').forEach(meta => {
       const strong = meta.querySelector('strong');
       if(!strong) return;
-      const key = (strong.textContent || '').trim().toLowerCase();
-      if(key === 'venue' || key === 'المكان') strong.textContent = t.venue;
-      if(key === 'time' || key === 'الوقت') strong.textContent = t.time;
+      let rest = '';
+      meta.childNodes.forEach(n => {
+        if(n !== strong && n.nodeType === 3) rest += n.textContent;
+      });
+      rest = rest.trim();
+      if(!meta.dataset.enRest) meta.dataset.enRest = rest;
+      const enRest = meta.dataset.enRest;
+      const labelKey = (strong.textContent || '').trim().toLowerCase();
+      const isVenue = labelKey === 'venue' || labelKey === 'المكان' || meta.dataset.kind === 'venue';
+      const isTime = labelKey === 'time' || labelKey === 'الوقت' || meta.dataset.kind === 'time';
+      if(isVenue) meta.dataset.kind = 'venue';
+      if(isTime) meta.dataset.kind = 'time';
+      strong.textContent = (meta.dataset.kind === 'venue') ? t.venue : t.time;
+      let textNode = null;
+      meta.childNodes.forEach(n => {
+        if(n !== strong && n.nodeType === 3){
+          if(!textNode) textNode = n;
+          else n.textContent = '';
+        }
+      });
+      const shown = ' ' + translateVenueValue(enRest, isAr);
+      if(textNode) textNode.textContent = shown;
+      else meta.appendChild(document.createTextNode(shown));
     });
     document.querySelectorAll('.todayBadge').forEach(el => { el.textContent = t.today; });
 
@@ -1557,6 +1647,9 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
       savedName.textContent = t.myStaff;
     }
     if(myTrainingTitle) myTrainingTitle.textContent = t.myTrainingTitle;
+
+    applyEmployeeNames(isAr);
+    ensureNameMap(() => applyEmployeeNames(isAr));
     refreshSaved();
   }
 
@@ -1566,6 +1659,7 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     applyTrainingLang(trainingLang() === 'ar' ? 'en' : 'ar');
   });
 
+  ensureNameMap(() => {});
   applyTrainingLang(trainingLang());
   refreshSaved();
   applyFilters();
