@@ -23,9 +23,11 @@
     </script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="حساب الكميات">
-    <meta name="theme-color" content="#2196F3">
+    <meta name="theme-color" content="#1976D2">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>حساب الكميات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,8 +75,8 @@
             color: white;
             padding: 12px 15px;
             padding-top: calc(12px + env(safe-area-inset-top, 0px));
-            padding-left: calc(15px + env(safe-area-inset-left, 0px));
-            padding-right: calc(15px + env(safe-area-inset-right, 0px));
+            padding-left: calc(108px + env(safe-area-inset-left, 0px));
+            padding-right: calc(62px + env(safe-area-inset-right, 0px));
             text-align: center;
             width: 100%;
             box-sizing: border-box;
@@ -86,31 +88,42 @@
         }
 
         .header-icon-btn {
-            position: absolute;
-            top: calc(8px + env(safe-area-inset-top, 0px));
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(0, 0, 0, 0.22);
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.38);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.1) 55%, rgba(0, 0, 0, 0.12) 100%);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
-            z-index: 1001;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: transform 0.2s ease, background 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            box-shadow:
+                0 4px 14px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45);
             text-decoration: none;
+            color: #fff;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .header-icon-btn--left {
+        .header-actions {
+            position: absolute;
+            top: calc(8px + env(safe-area-inset-top, 0px));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1001;
+        }
+
+        .header-actions--start {
             left: calc(10px + env(safe-area-inset-left, 0px));
         }
 
-        .header-icon-btn--right {
+        .header-actions--end {
             right: calc(10px + env(safe-area-inset-right, 0px));
         }
 
@@ -122,21 +135,88 @@
             pointer-events: none;
         }
 
+        .header-icon-btn--home img {
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+        }
+
         .header-icon-btn:hover {
-            background: rgba(0, 0, 0, 0.32);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.16) 55%, rgba(0, 0, 0, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.55);
+            box-shadow:
+                0 6px 16px rgba(0, 0, 0, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
         .header-icon-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.93);
         }
 
         .header-icon-btn.spinning svg {
             animation: refresh-spin 0.65s ease;
         }
 
+        .header-icon-btn.is-installed {
+            opacity: 0.55;
+        }
+
+        .header-icon-btn.is-hidden {
+            display: none;
+        }
+
         @keyframes refresh-spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        .pwa-help-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3200;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .pwa-help-overlay.active {
+            display: flex;
+        }
+
+        .pwa-help-sheet {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.22);
+            animation: slideUp 0.28s ease;
+        }
+
+        .pwa-help-sheet h3 {
+            margin: 0 0 8px;
+            color: #1565c0;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .pwa-help-sheet p,
+        .pwa-help-sheet ol {
+            margin: 0 0 14px;
+            color: #546e7a;
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+
+        .pwa-help-sheet ol {
+            padding-right: 1.2em;
+            padding-left: 0;
+        }
+
+        .pwa-help-sheet li {
+            margin-bottom: 6px;
         }
 
         .header h1.header-brand {
@@ -1248,6 +1328,8 @@
             .header {
                 padding: 14px 16px;
                 padding-top: calc(14px + env(safe-area-inset-top, 0px));
+                padding-left: calc(108px + env(safe-area-inset-left, 0px));
+                padding-right: calc(62px + env(safe-area-inset-right, 0px));
             }
 
             .header h1.header-brand {
@@ -1547,23 +1629,39 @@
             <svg width="0" height="0" style="position:absolute" aria-hidden="true">
                 <defs>
                     <linearGradient id="hdrIconGrad" x1="0" y1="0" x2="0" y2="24" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#4df1a1"/>
-                        <stop offset="48%" stop-color="#2dd4c8"/>
-                        <stop offset="100%" stop-color="#00a8ff"/>
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="55%" stop-color="#e3f2fd"/>
+                        <stop offset="100%" stop-color="#90caf9"/>
                     </linearGradient>
                 </defs>
             </svg>
-            <button type="button" class="header-icon-btn header-icon-btn--left" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
-                <svg viewBox="0 0 24 24" fill="none" stroke="url(#hdrIconGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M1 4v6h6"></path>
-                    <path d="M23 20v-6h-6"></path>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"></path>
-                    <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
-                </svg>
-            </button>
-            <a href="https://khalidsaif912.github.io/new/" class="header-icon-btn header-icon-btn--right" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
-                <img src="home-icon.png" alt="" width="22" height="22">
-            </a>
+            <div class="header-actions header-actions--start">
+                <button type="button" class="header-icon-btn" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="url(#hdrIconGrad)" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M1 4v6h6"></path>
+                        <path d="M23 20v-6h-6"></path>
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"></path>
+                        <path d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14"></path>
+                    </svg>
+                </button>
+                <button type="button" class="header-icon-btn" id="installPwaBtn" title="تثبيت كتطبيق" aria-label="تثبيت الصفحة كتطبيق">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="url(#hdrIconGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="6" y="2.5" width="12" height="19" rx="2.5"></rect>
+                        <path d="M12 8.5v6"></path>
+                        <path d="M9.5 12.5L12 15l2.5-2.5"></path>
+                        <circle cx="12" cy="18.5" r="0.9" fill="url(#hdrIconGrad)" stroke="none"></circle>
+                    </svg>
+                </button>
+            </div>
+            <div class="header-actions header-actions--end">
+                <a href="https://khalidsaif912.github.io/new/" class="header-icon-btn header-icon-btn--home" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="url(#hdrIconGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 10.5L12 3l9 7.5"></path>
+                        <path d="M5 9.5V21h14V9.5"></path>
+                        <path d="M9.5 21v-6.5h5V21"></path>
+                    </svg>
+                </a>
+            </div>
             <h1 class="header-brand">
                 <span class="header-titles">
                     <span class="header-title-line">حساب الكميات</span>
@@ -1687,6 +1785,17 @@
             </div>
             <div class="alert-buttons">
                 <button type="button" class="alert-btn alert-btn-cancel" onclick="closeRepeatPartsDialog()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL HELP -->
+    <div class="pwa-help-overlay" id="pwaHelpOverlay" onclick="if(event.target===this)closePwaHelp()">
+        <div class="pwa-help-sheet" role="dialog" aria-modal="true" aria-labelledby="pwaHelpTitle">
+            <h3 id="pwaHelpTitle">تثبيت كتطبيق</h3>
+            <div id="pwaHelpBody"></div>
+            <div class="alert-buttons">
+                <button type="button" class="alert-btn alert-btn-ok" onclick="closePwaHelp()">حسناً</button>
             </div>
         </div>
     </div>
@@ -2574,11 +2683,116 @@
             }
 
             var refreshBtn = document.getElementById('refreshBtn');
-            if (!refreshBtn) return;
-            refreshBtn.addEventListener('click', function(e) {
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    refreshCalculatorPage();
+                });
+            }
+
+            setupPwaInstallButton();
+        }
+
+        var deferredPwaPrompt = null;
+
+        function isCalculatorStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true;
+        }
+
+        function isIosDevice() {
+            return /iphone|ipad|ipod/i.test(navigator.userAgent || '') ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        function closePwaHelp() {
+            var overlay = document.getElementById('pwaHelpOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function showPwaHelp() {
+            var body = document.getElementById('pwaHelpBody');
+            if (!body) return;
+            if (isIosDevice()) {
+                body.innerHTML =
+                    '<p>لإضافة الصفحة كتطبيق على الشاشة الرئيسية:</p>' +
+                    '<ol>' +
+                    '<li>اضغط زر المشاركة في المتصفح</li>' +
+                    '<li>اختر <b>Add to Home Screen</b></li>' +
+                    '<li>اضغط <b>Add</b></li>' +
+                    '</ol>' +
+                    '<p>بعدها افتح التطبيق من الأيقونة مباشرة.</p>';
+            } else {
+                body.innerHTML =
+                    '<p>إذا لم تظهر نافذة التثبيت تلقائياً:</p>' +
+                    '<ol>' +
+                    '<li>افتح قائمة المتصفح (⋮)</li>' +
+                    '<li>اختر <b>تثبيت التطبيق</b> أو <b>إضافة إلى الشاشة الرئيسية</b></li>' +
+                    '</ol>' +
+                    '<p>بعد التثبيت افتحه من أيقونة التطبيق.</p>';
+            }
+            document.getElementById('pwaHelpOverlay').classList.add('active');
+        }
+
+        function updateInstallButtonState() {
+            var btn = document.getElementById('installPwaBtn');
+            if (!btn) return;
+            if (isCalculatorStandalone()) {
+                btn.classList.add('is-hidden');
+                return;
+            }
+            btn.classList.remove('is-hidden');
+            if (deferredPwaPrompt) {
+                btn.classList.remove('is-installed');
+                btn.title = 'تثبيت كتطبيق';
+                btn.setAttribute('aria-label', 'تثبيت الصفحة كتطبيق');
+            } else {
+                btn.title = 'طريقة التثبيت كتطبيق';
+                btn.setAttribute('aria-label', 'طريقة التثبيت كتطبيق');
+            }
+        }
+
+        function setupPwaInstallButton() {
+            var btn = document.getElementById('installPwaBtn');
+            if (!btn) return;
+
+            updateInstallButtonState();
+
+            window.addEventListener('beforeinstallprompt', function(e) {
                 e.preventDefault();
-                refreshCalculatorPage();
+                deferredPwaPrompt = e;
+                updateInstallButtonState();
             });
+
+            window.addEventListener('appinstalled', function() {
+                deferredPwaPrompt = null;
+                updateInstallButtonState();
+                setStatus('تم تثبيت التطبيق بنجاح');
+            });
+
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (isCalculatorStandalone()) {
+                    showCustomAlert('التطبيق مثبت ويعمل بالفعل', 'تثبيت كتطبيق');
+                    return;
+                }
+                if (deferredPwaPrompt) {
+                    var promptEvent = deferredPwaPrompt;
+                    deferredPwaPrompt = null;
+                    promptEvent.prompt();
+                    Promise.resolve(promptEvent.userChoice).then(function() {
+                        updateInstallButtonState();
+                    }).catch(function() {
+                        updateInstallButtonState();
+                    });
+                    return;
+                }
+                showPwaHelp();
+            });
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js?v=1').catch(function() {});
+            }
         }
 
         window.onload = function() {
