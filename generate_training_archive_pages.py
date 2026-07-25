@@ -25,51 +25,73 @@ from training_page_icons import (  # noqa: E402
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 IOS_TOUCH_VER = "20260525c"
 
-# Meaningful course emoji + Arabic title (shown under English title).
+# Meaningful course emoji + Arabic title + short description.
 COURSE_META: dict[str, dict[str, str]] = {
     "Forklift (refresher)": {
-        "ar": "رافعة شوكية (تجديد)",
+        "ar": "تشغيل الرافعة الشوكية (تجديد)",
         "emoji": "🏗️",
+        "desc_ar": "الاستخدام الآمن للرافعة الشوكية.",
+        "desc_en": "Safe forklift operation.",
     },
     "Human Factors (refresher)": {
         "ar": "العوامل البشرية (تجديد)",
         "emoji": "🧠",
+        "desc_ar": "الحد من الأخطاء البشرية وتحسين الأداء والسلامة.",
+        "desc_en": "Reduce human error and improve performance and safety.",
     },
     "Airside Safety (refresher)": {
-        "ar": "سلامة الجانب الجوي (تجديد)",
+        "ar": "سلامة ساحة المطار (تجديد)",
         "emoji": "🦺",
+        "desc_ar": "قواعد السلامة أثناء العمل بجوار الطائرات والمعدات.",
+        "desc_en": "Safety rules when working near aircraft and equipment.",
     },
     "SMS (initial)": {
         "ar": "نظام إدارة السلامة (أساسي)",
         "emoji": "📊",
+        "desc_ar": "مبادئ إدارة السلامة والإبلاغ عن المخاطر.",
+        "desc_en": "Safety management principles and hazard reporting.",
     },
     "LAR (refresher)": {
-        "ar": "لوائح الحيوانات الحية (تجديد)",
+        "ar": "لوائح نقل الحيوانات الحية (تجديد)",
         "emoji": "🐾",
+        "desc_ar": "إجراءات نقل الحيوانات الحية وفق المعايير الدولية.",
+        "desc_en": "Live animal transport procedures per international standards.",
     },
     "GDP-TCR (refresher)": {
-        "ar": "ممارسات التوزيع الجيد والتحكم بالحرارة (تجديد)",
+        "ar": "الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)",
         "emoji": "🌡️",
+        "desc_ar": "نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان.",
+        "desc_en": "Safe transport and storage of temperature-sensitive cargo.",
     },
     "DGR-CBTA-OPS (recurrent)": {
-        "ar": "البضائع الخطرة — العمليات (تجديد)",
+        "ar": "لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)",
         "emoji": "☢️",
+        "desc_ar": "التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA.",
+        "desc_en": "Safe handling of dangerous goods per IATA requirements.",
     },
     "DGR-CBTA-OPS": {
-        "ar": "البضائع الخطرة — العمليات",
+        "ar": "لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة",
         "emoji": "☢️",
+        "desc_ar": "التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA.",
+        "desc_en": "Safe handling of dangerous goods per IATA requirements.",
     },
     "CWO (Cargo Warehouse Operations)": {
         "ar": "عمليات مستودع الشحن",
         "emoji": "📦",
+        "desc_ar": "إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع.",
+        "desc_en": "Managing, receiving, storing, and handling cargo in the warehouse.",
     },
     "Cargo Warehouse Operations (CWO) (refresher)": {
         "ar": "عمليات مستودع الشحن (تجديد)",
         "emoji": "📦",
+        "desc_ar": "إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع.",
+        "desc_en": "Managing, receiving, storing, and handling cargo in the warehouse.",
     },
     "PCR (refresher)": {
-        "ar": "البضائع القابلة للتلف (تجديد)",
+        "ar": "لوائح الشحنات القابلة للتلف (تجديد)",
         "emoji": "❄️",
+        "desc_ar": "التعامل الصحيح مع الشحنات سريعة التلف.",
+        "desc_en": "Correct handling of perishable cargo.",
     },
     "Cargo Security Awareness (refresher)": {
         "ar": "التوعية بأمن الشحن (تجديد)",
@@ -89,25 +111,70 @@ def course_meta_for(title: str) -> dict[str, str]:
     # Fuzzy fallback by keywords.
     low = title.lower()
     if "forklift" in low:
-        return {"ar": "رافعة شوكية", "emoji": "🏗️"}
+        return {
+            "ar": "تشغيل الرافعة الشوكية",
+            "emoji": "🏗️",
+            "desc_ar": "الاستخدام الآمن للرافعة الشوكية.",
+            "desc_en": "Safe forklift operation.",
+        }
     if "human factor" in low:
-        return {"ar": "العوامل البشرية", "emoji": "🧠"}
+        return {
+            "ar": "العوامل البشرية",
+            "emoji": "🧠",
+            "desc_ar": "الحد من الأخطاء البشرية وتحسين الأداء والسلامة.",
+            "desc_en": "Reduce human error and improve performance and safety.",
+        }
     if "airside" in low:
-        return {"ar": "سلامة الجانب الجوي", "emoji": "🦺"}
+        return {
+            "ar": "سلامة ساحة المطار",
+            "emoji": "🦺",
+            "desc_ar": "قواعد السلامة أثناء العمل بجوار الطائرات والمعدات.",
+            "desc_en": "Safety rules when working near aircraft and equipment.",
+        }
     if "sms" in low:
-        return {"ar": "نظام إدارة السلامة", "emoji": "📊"}
+        return {
+            "ar": "نظام إدارة السلامة",
+            "emoji": "📊",
+            "desc_ar": "مبادئ إدارة السلامة والإبلاغ عن المخاطر.",
+            "desc_en": "Safety management principles and hazard reporting.",
+        }
     if "lar" in low:
-        return {"ar": "لوائح الحيوانات الحية", "emoji": "🐾"}
+        return {
+            "ar": "لوائح نقل الحيوانات الحية",
+            "emoji": "🐾",
+            "desc_ar": "إجراءات نقل الحيوانات الحية وفق المعايير الدولية.",
+            "desc_en": "Live animal transport procedures per international standards.",
+        }
     if "gdp" in low:
-        return {"ar": "ممارسات التوزيع الجيد", "emoji": "🌡️"}
+        return {
+            "ar": "الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة",
+            "emoji": "🌡️",
+            "desc_ar": "نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان.",
+            "desc_en": "Safe transport and storage of temperature-sensitive cargo.",
+        }
     if "dgr" in low and "acc" in low:
         return {"ar": "البضائع الخطرة — القبول", "emoji": "📝"}
     if "dgr" in low:
-        return {"ar": "البضائع الخطرة", "emoji": "☢️"}
+        return {
+            "ar": "لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة",
+            "emoji": "☢️",
+            "desc_ar": "التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA.",
+            "desc_en": "Safe handling of dangerous goods per IATA requirements.",
+        }
     if "cwo" in low or "warehouse" in low:
-        return {"ar": "عمليات مستودع الشحن", "emoji": "📦"}
+        return {
+            "ar": "عمليات مستودع الشحن",
+            "emoji": "📦",
+            "desc_ar": "إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع.",
+            "desc_en": "Managing, receiving, storing, and handling cargo in the warehouse.",
+        }
     if "pcr" in low or "perish" in low:
-        return {"ar": "البضائع القابلة للتلف", "emoji": "❄️"}
+        return {
+            "ar": "لوائح الشحنات القابلة للتلف",
+            "emoji": "❄️",
+            "desc_ar": "التعامل الصحيح مع الشحنات سريعة التلف.",
+            "desc_en": "Correct handling of perishable cargo.",
+        }
     if "security" in low:
         return {"ar": "أمن الشحن", "emoji": "🔐"}
     return {"ar": title, "emoji": "📘"}
@@ -203,6 +270,8 @@ html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
 html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
 html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
 html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
+html[lang="ar"] .courseInfoDesc,body.ar .courseInfoDesc{direction:rtl}
+html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .header{
   position:relative;overflow:hidden;
   padding:34px 26px 30px;border-radius:36px;
@@ -531,6 +600,77 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   min-width:36px;height:36px;padding:0 10px;border-radius:999px;
   font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
 }
+.courseBadgePair{display:inline-flex;align-items:center;gap:6px}
+.courseInfoBtn{
+  background:rgba(255,255,255,.94);color:#2563eb;
+  min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
+  font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.courseInfoBtn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(37,99,235,.16);background:#eff6ff}
+.courseInfoBtn:active{transform:translateY(0)}
+.courseInfoMark{
+  display:inline-block;line-height:1;
+  animation:courseQPulse 2.1s ease-in-out infinite;
+  transform-origin:50% 60%;
+}
+@keyframes courseQPulse{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  25%{transform:scale(1.14) rotate(-10deg)}
+  50%{transform:scale(1.08) rotate(8deg)}
+  75%{transform:scale(1.14) rotate(-6deg)}
+}
+.courseInfoModal{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.45);backdrop-filter:blur(10px);z-index:60;padding:20px;
+}
+.courseInfoModal.open{display:flex}
+.courseInfoCard{
+  width:min(100%,390px);position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#ffffff 0%,#f8fafc 55%,#eef6ff 100%);
+  border:1px solid rgba(255,255,255,.9);border-radius:30px;
+  box-shadow:0 28px 80px rgba(15,23,42,.28);padding:28px 24px 22px;text-align:center;
+}
+.courseInfoCard::before{
+  content:"";position:absolute;inset:auto -20% -30% -20%;height:55%;
+  background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.12),transparent 65%);
+  pointer-events:none;
+}
+.courseInfoEmoji{
+  position:relative;z-index:1;width:78px;height:78px;margin:0 auto 14px;
+  border-radius:24px;display:grid;place-items:center;font-size:42px;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.55));
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
+  animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+}
+@keyframes courseInfoPop{
+  0%{transform:scale(.6) translateY(10px);opacity:0}
+  100%{transform:scale(1) translateY(0);opacity:1}
+}
+.courseInfoTitle{
+  position:relative;z-index:1;font:800 17px/1.3 'Sora',sans-serif;color:var(--text);
+  letter-spacing:-.02em;
+}
+.courseInfoTitleAr{
+  position:relative;z-index:1;margin-top:6px;
+  font:700 14px/1.45 'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#334155;
+}
+.courseInfoDesc{
+  position:relative;z-index:1;margin:16px 0 0;padding:14px 14px;
+  border-radius:18px;background:rgba(255,255,255,.78);
+  border:1px solid rgba(15,23,42,.06);
+  font:600 14px/1.65 'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
+  color:#334155;text-wrap:pretty;
+}
+.courseInfoClose{
+  position:relative;z-index:1;margin-top:18px;width:100%;height:46px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;
+  font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;cursor:pointer;
+  box-shadow:0 8px 22px rgba(29,78,216,.28);
+}
 .todayBadge{background:var(--today-badge-bg);color:var(--today-badge-c)}
 .courseBody{padding:16px 18px 20px}
 .courseCard[open] .courseBody{padding-top:18px}
@@ -689,7 +829,8 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
-  .peopleBadge{min-width:32px;height:32px;font-size:10px}
+  .peopleBadge,.courseInfoBtn{min-width:32px;width:32px;height:32px;font-size:10px}
+  .courseInfoBtn{font-size:14px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
@@ -1187,7 +1328,9 @@ PAGE_JS = r"""
       sharePage: 'Share page',
       langBtn: 'ع',
       langTitle: 'Translate to Arabic',
-      chooseMonth: 'Choose month'
+      chooseMonth: 'Choose month',
+      courseInfoClose: 'Close',
+      courseInfoAria: 'Course info'
     },
     ar: {
       pageTitle: 'دورات التدريب',
@@ -1216,7 +1359,9 @@ PAGE_JS = r"""
       sharePage: 'مشاركة الصفحة',
       langBtn: 'EN',
       langTitle: 'الترجمة إلى الإنجليزية',
-      chooseMonth: 'اختر الشهر'
+      chooseMonth: 'اختر الشهر',
+      courseInfoClose: 'إغلاق',
+      courseInfoAria: 'وصف الدورة'
     }
   };
 
@@ -1391,6 +1536,12 @@ PAGE_JS = r"""
     const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
     if(shareLbl) shareLbl.textContent = t.sharePage;
 
+    const courseInfoClose = document.getElementById('courseInfoClose');
+    if(courseInfoClose) courseInfoClose.textContent = t.courseInfoClose;
+    document.querySelectorAll('.courseInfoBtn').forEach(btn => {
+      btn.setAttribute('aria-label', t.courseInfoAria);
+    });
+
     if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
       savedName.textContent = t.myStaff;
     }
@@ -1405,6 +1556,61 @@ PAGE_JS = r"""
     e.preventDefault();
     e.stopPropagation();
     applyTrainingLang(trainingLang() === 'ar' ? 'en' : 'ar');
+  });
+
+  const courseInfoModal = document.getElementById('courseInfoModal');
+  const courseInfoEmoji = document.getElementById('courseInfoEmoji');
+  const courseInfoTitle = document.getElementById('courseInfoTitle');
+  const courseInfoTitleAr = document.getElementById('courseInfoTitleAr');
+  const courseInfoDesc = document.getElementById('courseInfoDesc');
+  const courseInfoCloseBtn = document.getElementById('courseInfoClose');
+
+  function openCourseInfo(btn){
+    if(!courseInfoModal || !btn) return;
+    const isAr = trainingLang() === 'ar';
+    const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const titleEn = btn.getAttribute('data-course-title') || '';
+    const titleAr = btn.getAttribute('data-course-title-ar') || '';
+    const descAr = btn.getAttribute('data-course-desc-ar') || '';
+    const descEn = btn.getAttribute('data-course-desc-en') || '';
+    if(courseInfoEmoji) courseInfoEmoji.textContent = emoji;
+    if(courseInfoTitle){
+      courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
+    }
+    if(courseInfoTitleAr){
+      const secondary = isAr ? titleEn : titleAr;
+      courseInfoTitleAr.textContent = secondary && secondary !== (isAr ? titleAr : titleEn) ? secondary : '';
+      courseInfoTitleAr.hidden = !courseInfoTitleAr.textContent;
+    }
+    if(courseInfoDesc){
+      courseInfoDesc.textContent = isAr ? (descAr || descEn) : (descEn || descAr);
+      courseInfoDesc.dir = isAr ? 'rtl' : 'ltr';
+    }
+    courseInfoModal.classList.add('open');
+    courseInfoModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeCourseInfo(){
+    if(!courseInfoModal) return;
+    courseInfoModal.classList.remove('open');
+    courseInfoModal.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.courseInfoBtn');
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openCourseInfo(btn);
+  }, true);
+  courseInfoCloseBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeCourseInfo();
+  });
+  courseInfoModal?.addEventListener('click', (e) => {
+    if(e.target === courseInfoModal) closeCourseInfo();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeCourseInfo();
   });
 
   ensureNameMap(() => {});
@@ -1488,8 +1694,10 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     today_badge = '<span class="badge todayBadge">Today</span>' if is_today else ""
     open_attr = " open" if is_today else ""
     meta = course_meta_for(course["title"])
+    desc_ar = (meta.get("desc_ar") or "").strip()
+    desc_en = (meta.get("desc_en") or "").strip()
     search_text = " ".join(
-        [course["title"], meta["ar"], course.get("code", ""), course["venue"], course["time"]]
+        [course["title"], meta["ar"], course.get("code", ""), course["venue"], course["time"], desc_ar, desc_en]
         + [f'{m["no"]} {m["name"]}' for m in course.get("staff", [])]
     ).lower()
     pastel = theme_idx % 5
@@ -1500,6 +1708,18 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     title_ar_html = html_module.escape(meta["ar"])
     title_en_html = html_module.escape(course["title"])
     emoji_html = html_module.escape(meta["emoji"])
+    desc_ar_attr = html_module.escape(desc_ar, quote=True)
+    desc_en_attr = html_module.escape(desc_en, quote=True)
+    emoji_attr = html_module.escape(meta["emoji"], quote=True)
+    info_btn = ""
+    if desc_ar or desc_en:
+        info_btn = (
+            f'<button class="courseInfoBtn" type="button" aria-label="Course info" '
+            f'data-course-emoji="{emoji_attr}" data-course-title="{title_attr}" '
+            f'data-course-title-ar="{title_ar_attr}" data-course-desc-ar="{desc_ar_attr}" '
+            f'data-course-desc-en="{desc_en_attr}">'
+            f'<span class="courseInfoMark" aria-hidden="true">?</span></button>'
+        )
     return f'''
 <details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}" data-course-date="{course["date"]}" data-course-end="{course_end}" data-course-title="{title_attr}" data-course-title-ar="{title_ar_attr}" data-venue="{venue_attr}" data-time="{time_attr}"{open_attr}>
   <summary class="courseHead">
@@ -1517,7 +1737,10 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     <div class="courseBadges">
       {today_badge}
       <span class="badge dateBadge">{date_range_label(course["date"], course_end)}</span>
-      <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
+      <div class="courseBadgePair">
+        <span class="badge peopleBadge">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
+        {info_btn}
+      </div>
     </div>
   </summary>
   <div class="courseBody">
@@ -1658,6 +1881,15 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
         <button id="staffClear" class="staffBtn staffBtnGhost" type="button">Clear</button>
         <button id="staffSave" class="staffBtn staffBtnPrimary" type="button">Save</button>
       </div>
+    </div>
+  </div>
+  <div class="courseInfoModal" id="courseInfoModal" aria-hidden="true">
+    <div class="courseInfoCard" role="dialog" aria-modal="true" aria-labelledby="courseInfoTitle">
+      <div class="courseInfoEmoji" id="courseInfoEmoji" aria-hidden="true">📘</div>
+      <div class="courseInfoTitle" id="courseInfoTitle"></div>
+      <div class="courseInfoTitleAr" id="courseInfoTitleAr"></div>
+      <p class="courseInfoDesc" id="courseInfoDesc"></p>
+      <button class="courseInfoClose" id="courseInfoClose" type="button">Close</button>
     </div>
   </div>
 </div>

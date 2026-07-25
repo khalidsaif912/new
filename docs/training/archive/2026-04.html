@@ -98,6 +98,8 @@ html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
 html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
 html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
 html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
+html[lang="ar"] .courseInfoDesc,body.ar .courseInfoDesc{direction:rtl}
+html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .header{
   position:relative;overflow:hidden;
   padding:34px 26px 30px;border-radius:36px;
@@ -426,6 +428,77 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   min-width:36px;height:36px;padding:0 10px;border-radius:999px;
   font-size:11px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
 }
+.courseBadgePair{display:inline-flex;align-items:center;gap:6px}
+.courseInfoBtn{
+  background:rgba(255,255,255,.94);color:#2563eb;
+  min-width:36px;width:36px;height:36px;padding:0;border-radius:999px;border:none;
+  font-size:16px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.06);
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.courseInfoBtn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(37,99,235,.16);background:#eff6ff}
+.courseInfoBtn:active{transform:translateY(0)}
+.courseInfoMark{
+  display:inline-block;line-height:1;
+  animation:courseQPulse 2.1s ease-in-out infinite;
+  transform-origin:50% 60%;
+}
+@keyframes courseQPulse{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  25%{transform:scale(1.14) rotate(-10deg)}
+  50%{transform:scale(1.08) rotate(8deg)}
+  75%{transform:scale(1.14) rotate(-6deg)}
+}
+.courseInfoModal{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.45);backdrop-filter:blur(10px);z-index:60;padding:20px;
+}
+.courseInfoModal.open{display:flex}
+.courseInfoCard{
+  width:min(100%,390px);position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#ffffff 0%,#f8fafc 55%,#eef6ff 100%);
+  border:1px solid rgba(255,255,255,.9);border-radius:30px;
+  box-shadow:0 28px 80px rgba(15,23,42,.28);padding:28px 24px 22px;text-align:center;
+}
+.courseInfoCard::before{
+  content:"";position:absolute;inset:auto -20% -30% -20%;height:55%;
+  background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.12),transparent 65%);
+  pointer-events:none;
+}
+.courseInfoEmoji{
+  position:relative;z-index:1;width:78px;height:78px;margin:0 auto 14px;
+  border-radius:24px;display:grid;place-items:center;font-size:42px;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.55));
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
+  animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+}
+@keyframes courseInfoPop{
+  0%{transform:scale(.6) translateY(10px);opacity:0}
+  100%{transform:scale(1) translateY(0);opacity:1}
+}
+.courseInfoTitle{
+  position:relative;z-index:1;font:800 17px/1.3 'Sora',sans-serif;color:var(--text);
+  letter-spacing:-.02em;
+}
+.courseInfoTitleAr{
+  position:relative;z-index:1;margin-top:6px;
+  font:700 14px/1.45 'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#334155;
+}
+.courseInfoDesc{
+  position:relative;z-index:1;margin:16px 0 0;padding:14px 14px;
+  border-radius:18px;background:rgba(255,255,255,.78);
+  border:1px solid rgba(15,23,42,.06);
+  font:600 14px/1.65 'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
+  color:#334155;text-wrap:pretty;
+}
+.courseInfoClose{
+  position:relative;z-index:1;margin-top:18px;width:100%;height:46px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;
+  font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;cursor:pointer;
+  box-shadow:0 8px 22px rgba(29,78,216,.28);
+}
 .todayBadge{background:var(--today-badge-bg);color:var(--today-badge-c)}
 .courseBody{padding:16px 18px 20px}
 .courseCard[open] .courseBody{padding-top:18px}
@@ -584,7 +657,8 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
-  .peopleBadge{min-width:32px;height:32px;font-size:10px}
+  .peopleBadge,.courseInfoBtn{min-width:32px;width:32px;height:32px;font-size:10px}
+  .courseInfoBtn{font-size:14px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
@@ -680,13 +754,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 
   <section class="scheduleSection" aria-label="Training schedule">
     <div class="cards"><div class="pastLabel" id="pastSep">Previous sessions</div>
-<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops البضائع الخطرة — العمليات  cargo training room 08:00 to 15:00 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8" data-course-date="2026-04-29" data-course-end="2026-04-29" data-course-title="DGR-CBTA-OPS" data-course-title-ar="البضائع الخطرة — العمليات" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة  cargo training room 08:00 to 15:00 التعامل الآمن مع البضائع الخطرة وفق متطلبات iata. safe handling of dangerous goods per iata requirements. 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8" data-course-date="2026-04-29" data-course-end="2026-04-29" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
     <div class="courseIcon" aria-hidden="true">☢️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">DGR-CBTA-OPS</div>
-      <div class="courseTitleAr">البضائع الخطرة — العمليات</div>
+      <div class="courseTitleAr">لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -696,7 +770,10 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     <div class="courseBadges">
       
       <span class="badge dateBadge">29 April</span>
-      <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
+      <div class="courseBadgePair">
+        <span class="badge peopleBadge"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</span>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+      </div>
     </div>
   </summary>
   <div class="courseBody">
@@ -759,6 +836,15 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
         <button id="staffClear" class="staffBtn staffBtnGhost" type="button">Clear</button>
         <button id="staffSave" class="staffBtn staffBtnPrimary" type="button">Save</button>
       </div>
+    </div>
+  </div>
+  <div class="courseInfoModal" id="courseInfoModal" aria-hidden="true">
+    <div class="courseInfoCard" role="dialog" aria-modal="true" aria-labelledby="courseInfoTitle">
+      <div class="courseInfoEmoji" id="courseInfoEmoji" aria-hidden="true">📘</div>
+      <div class="courseInfoTitle" id="courseInfoTitle"></div>
+      <div class="courseInfoTitleAr" id="courseInfoTitleAr"></div>
+      <p class="courseInfoDesc" id="courseInfoDesc"></p>
+      <button class="courseInfoClose" id="courseInfoClose" type="button">Close</button>
     </div>
   </div>
 </div>
@@ -1198,7 +1284,9 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
       sharePage: 'Share page',
       langBtn: 'ع',
       langTitle: 'Translate to Arabic',
-      chooseMonth: 'Choose month'
+      chooseMonth: 'Choose month',
+      courseInfoClose: 'Close',
+      courseInfoAria: 'Course info'
     },
     ar: {
       pageTitle: 'دورات التدريب',
@@ -1227,7 +1315,9 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
       sharePage: 'مشاركة الصفحة',
       langBtn: 'EN',
       langTitle: 'الترجمة إلى الإنجليزية',
-      chooseMonth: 'اختر الشهر'
+      chooseMonth: 'اختر الشهر',
+      courseInfoClose: 'إغلاق',
+      courseInfoAria: 'وصف الدورة'
     }
   };
 
@@ -1402,6 +1492,12 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
     if(shareLbl) shareLbl.textContent = t.sharePage;
 
+    const courseInfoClose = document.getElementById('courseInfoClose');
+    if(courseInfoClose) courseInfoClose.textContent = t.courseInfoClose;
+    document.querySelectorAll('.courseInfoBtn').forEach(btn => {
+      btn.setAttribute('aria-label', t.courseInfoAria);
+    });
+
     if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
       savedName.textContent = t.myStaff;
     }
@@ -1416,6 +1512,61 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
     e.preventDefault();
     e.stopPropagation();
     applyTrainingLang(trainingLang() === 'ar' ? 'en' : 'ar');
+  });
+
+  const courseInfoModal = document.getElementById('courseInfoModal');
+  const courseInfoEmoji = document.getElementById('courseInfoEmoji');
+  const courseInfoTitle = document.getElementById('courseInfoTitle');
+  const courseInfoTitleAr = document.getElementById('courseInfoTitleAr');
+  const courseInfoDesc = document.getElementById('courseInfoDesc');
+  const courseInfoCloseBtn = document.getElementById('courseInfoClose');
+
+  function openCourseInfo(btn){
+    if(!courseInfoModal || !btn) return;
+    const isAr = trainingLang() === 'ar';
+    const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const titleEn = btn.getAttribute('data-course-title') || '';
+    const titleAr = btn.getAttribute('data-course-title-ar') || '';
+    const descAr = btn.getAttribute('data-course-desc-ar') || '';
+    const descEn = btn.getAttribute('data-course-desc-en') || '';
+    if(courseInfoEmoji) courseInfoEmoji.textContent = emoji;
+    if(courseInfoTitle){
+      courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
+    }
+    if(courseInfoTitleAr){
+      const secondary = isAr ? titleEn : titleAr;
+      courseInfoTitleAr.textContent = secondary && secondary !== (isAr ? titleAr : titleEn) ? secondary : '';
+      courseInfoTitleAr.hidden = !courseInfoTitleAr.textContent;
+    }
+    if(courseInfoDesc){
+      courseInfoDesc.textContent = isAr ? (descAr || descEn) : (descEn || descAr);
+      courseInfoDesc.dir = isAr ? 'rtl' : 'ltr';
+    }
+    courseInfoModal.classList.add('open');
+    courseInfoModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeCourseInfo(){
+    if(!courseInfoModal) return;
+    courseInfoModal.classList.remove('open');
+    courseInfoModal.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.courseInfoBtn');
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openCourseInfo(btn);
+  }, true);
+  courseInfoCloseBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeCourseInfo();
+  });
+  courseInfoModal?.addEventListener('click', (e) => {
+    if(e.target === courseInfoModal) closeCourseInfo();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeCourseInfo();
   });
 
   ensureNameMap(() => {});
