@@ -1179,32 +1179,65 @@
             background: #d0d0d0;
         }
 
-        .repeat-parts-input {
-            width: 100%;
-            box-sizing: border-box;
-            margin: 0 0 18px 0;
-            padding: 12px 14px;
-            border: 2px solid #bbdefb;
-            border-radius: 10px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            text-align: center;
-            color: #1565c0;
-            background: #fff;
-            outline: none;
-            direction: ltr;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .repeat-parts-input:focus {
-            border-color: #1976d2;
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
-        }
-
         .repeat-parts-hint {
             margin: -4px 0 14px 0 !important;
             font-size: 0.88rem !important;
             color: #546e7a !important;
+        }
+
+        .repeat-parts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 0 0 16px 0;
+            direction: ltr;
+        }
+
+        .repeat-parts-btn {
+            appearance: none;
+            border: 2px solid #bbdefb;
+            border-radius: 12px;
+            background: #fff;
+            color: #1565c0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            min-height: 52px;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease, opacity 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .repeat-parts-btn:hover:not(:disabled) {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .repeat-parts-btn:active:not(:disabled) {
+            transform: scale(0.96);
+            background: #1976d2;
+            border-color: #1565c0;
+            color: #fff;
+        }
+
+        .repeat-parts-btn:disabled {
+            opacity: 0.32;
+            cursor: not-allowed;
+            color: #90a4ae;
+            border-color: #eceff1;
+            background: #f5f7fa;
+        }
+
+        .part-row.is-long-pressing {
+            transform: scale(1.04);
+        }
+
+        .part-row.is-long-pressing .pallet-stage {
+            filter: drop-shadow(0 2px 8px rgba(25, 118, 210, 0.45)) brightness(1.08);
+        }
+
+        .part-row.is-long-pressing .number-3d {
+            color: #1e88e5;
         }
 
         @media (max-width: 768px), (hover: none) and (pointer: coarse) {
@@ -1636,15 +1669,24 @@
         </div>
     </div>
 
-    <!-- REPEAT PARTS (long-press pallet) -->
+    <!-- REPEAT PARTS (long-press part) -->
     <div class="custom-alert-overlay" id="repeatPartsOverlay">
         <div class="custom-alert-content">
             <h3>تكرار الجزء</h3>
             <p id="repeatPartsHint" class="repeat-parts-hint"></p>
-            <input id="repeatPartsInput" class="repeat-parts-input" type="number" min="2" inputmode="numeric" placeholder="عدد المرات" aria-label="عدد مرات التكرار" />
+            <div class="repeat-parts-grid" id="repeatPartsGrid" role="group" aria-label="عدد مرات التكرار">
+                <button type="button" class="repeat-parts-btn" data-times="2">2</button>
+                <button type="button" class="repeat-parts-btn" data-times="3">3</button>
+                <button type="button" class="repeat-parts-btn" data-times="4">4</button>
+                <button type="button" class="repeat-parts-btn" data-times="5">5</button>
+                <button type="button" class="repeat-parts-btn" data-times="6">6</button>
+                <button type="button" class="repeat-parts-btn" data-times="7">7</button>
+                <button type="button" class="repeat-parts-btn" data-times="8">8</button>
+                <button type="button" class="repeat-parts-btn" data-times="9">9</button>
+                <button type="button" class="repeat-parts-btn" data-times="10">10</button>
+            </div>
             <div class="alert-buttons">
                 <button type="button" class="alert-btn alert-btn-cancel" onclick="closeRepeatPartsDialog()">إلغاء</button>
-                <button type="button" class="alert-btn alert-btn-ok" onclick="confirmRepeatParts()">تأكيد</button>
             </div>
         </div>
     </div>
@@ -1709,7 +1751,7 @@
 
             var qty = parseInt(data.parts[index].quantity, 10) || 0;
             if (qty <= 0) {
-                showCustomAlert('أدخل كمية الجزء أولاً ثم اضغط مطولاً على البليت للتكرار', 'تكرار الجزء');
+                showCustomAlert('أدخل كمية الجزء أولاً ثم اضغط مطولاً للتكرار', 'تكرار الجزء');
                 return;
             }
 
@@ -1721,17 +1763,21 @@
                 return;
             }
 
+            if (document.activeElement && document.activeElement.blur) {
+                document.activeElement.blur();
+            }
+
             pendingRepeat = { awb: awb, index: index, qty: qty, maxTimes: maxTimes };
             document.getElementById('repeatPartsHint').textContent =
-                'الكمية الحالية: ' + qty + ' — أدخل عدد المرات (حد أقصى ' + maxTimes + ')';
-            var input = document.getElementById('repeatPartsInput');
-            input.value = '';
-            input.max = String(maxTimes);
+                'الكمية الحالية: ' + qty + ' — اختر عدد المرات (حد أقصى ' + maxTimes + ')';
+
+            var buttons = document.querySelectorAll('#repeatPartsGrid .repeat-parts-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                var times = parseInt(buttons[i].getAttribute('data-times'), 10);
+                buttons[i].disabled = times > maxTimes;
+            }
+
             document.getElementById('repeatPartsOverlay').classList.add('active');
-            setTimeout(function() {
-                input.focus();
-                input.select();
-            }, 80);
         }
 
         function closeRepeatPartsDialog() {
@@ -1739,7 +1785,7 @@
             pendingRepeat = null;
         }
 
-        function confirmRepeatParts() {
+        function confirmRepeatParts(times) {
             if (!pendingRepeat) return;
 
             var awb = pendingRepeat.awb;
@@ -1752,11 +1798,8 @@
                 return;
             }
 
-            var times = parseInt(document.getElementById('repeatPartsInput').value, 10);
-            if (!times || times < 2) {
-                showCustomAlert('أدخل عدداً من 2 فأكثر', 'تكرار الجزء');
-                return;
-            }
+            times = parseInt(times, 10);
+            if (!times || times < 2) return;
             if (times > maxTimes) {
                 showCustomAlert('الحد الأقصى للتكرار: ' + maxTimes, 'تكرار الجزء');
                 return;
@@ -1774,24 +1817,29 @@
             setStatus('تم تكرار الجزء ×' + times + ' (كل جزء ' + qty + ')');
         }
 
-        (function setupPalletRepeatLongPress() {
+        document.getElementById('repeatPartsGrid').addEventListener('click', function(e) {
+            var btn = e.target.closest('.repeat-parts-btn');
+            if (!btn || btn.disabled) return;
+            confirmRepeatParts(btn.getAttribute('data-times'));
+        });
+
+        (function setupPartRepeatLongPress() {
             var LONG_MS = 450;
             var MOVE_PX = 28;
             var timer = null;
             var startX = 0;
             var startY = 0;
-            var pressStage = null;
+            var pressRow = null;
             var pressAwb = null;
             var pressIndex = -1;
             var openedByHold = false;
 
-            function findPalletStage(target) {
+            function findPartRow(target) {
                 if (!target || !target.closest) return null;
-                var stage = target.closest('.pallet-stage');
-                if (!stage) return null;
-                var row = stage.closest('.part-row');
+                if (target.closest('.delete-part-btn')) return null;
+                var row = target.closest('.part-row');
                 if (!row || row.classList.contains('ghost-part')) return null;
-                return stage;
+                return row;
             }
 
             function clearPress() {
@@ -1799,9 +1847,9 @@
                     clearTimeout(timer);
                     timer = null;
                 }
-                if (pressStage) {
-                    pressStage.classList.remove('is-long-pressing');
-                    pressStage = null;
+                if (pressRow) {
+                    pressRow.classList.remove('is-long-pressing');
+                    pressRow = null;
                 }
                 pressAwb = null;
                 pressIndex = -1;
@@ -1820,20 +1868,18 @@
                 setTimeout(function() { openedByHold = false; }, 400);
             }
 
-            function beginPress(stage, clientX, clientY) {
-                var row = stage.closest('.part-row');
-                if (!row) return;
+            function beginPress(row, clientX, clientY) {
                 var awb = row.getAttribute('data-awb');
                 var index = parseInt(row.getAttribute('data-index'), 10);
                 if (!awb || isNaN(index)) return;
 
                 clearPress();
-                pressStage = stage;
+                pressRow = row;
                 pressAwb = awb;
                 pressIndex = index;
                 startX = clientX;
                 startY = clientY;
-                stage.classList.add('is-long-pressing');
+                row.classList.add('is-long-pressing');
                 timer = setTimeout(fireRepeat, LONG_MS);
             }
 
@@ -1845,14 +1891,14 @@
             }
 
             document.addEventListener('touchstart', function(e) {
-                var stage = findPalletStage(e.target);
-                if (!stage) return;
+                var row = findPartRow(e.target);
+                if (!row) return;
                 if (e.touches.length !== 1) {
                     clearPress();
                     return;
                 }
                 var t = e.touches[0];
-                beginPress(stage, t.clientX, t.clientY);
+                beginPress(row, t.clientX, t.clientY);
             }, { passive: true, capture: true });
 
             document.addEventListener('touchmove', function(e) {
@@ -1867,9 +1913,9 @@
             document.addEventListener('mousedown', function(e) {
                 if (e.button !== 0) return;
                 if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
-                var stage = findPalletStage(e.target);
-                if (!stage) return;
-                beginPress(stage, e.clientX, e.clientY);
+                var row = findPartRow(e.target);
+                if (!row) return;
+                beginPress(row, e.clientX, e.clientY);
             }, true);
 
             document.addEventListener('mousemove', function(e) {
@@ -1880,20 +1926,16 @@
             document.addEventListener('mouseleave', clearPress, true);
 
             document.addEventListener('contextmenu', function(e) {
-                if (findPalletStage(e.target) || openedByHold) {
+                if (findPartRow(e.target) || openedByHold) {
                     e.preventDefault();
                 }
             }, true);
 
-            document.addEventListener('keydown', function(e) {
-                if (e.key !== 'Enter') return;
-                var overlay = document.getElementById('repeatPartsOverlay');
-                if (!overlay || !overlay.classList.contains('active')) return;
-                if (e.target && e.target.id === 'repeatPartsInput') {
+            document.addEventListener('selectstart', function(e) {
+                if (timer && findPartRow(e.target)) {
                     e.preventDefault();
-                    confirmRepeatParts();
                 }
-            });
+            }, true);
         })();
 
         // MODAL INFO
