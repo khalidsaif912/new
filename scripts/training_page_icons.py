@@ -63,26 +63,24 @@ DOCK_SEARCH_INNER = (
 )
 DOCK_SAVED_ICON = f'<div class="savedIcon">{SVG_DOCK_USER}</div>'
 
-# A Cup of Book dock button — book + cup handle, warm brown
-SVG_DOCK_CUP = _svg(
-    '<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4H16v12.5A2.5 2.5 0 0 1 13.5 19H7.5A2.5 2.5 0 0 1 5 16.5z"/>'
-    '<path d="M5 6.5V16.5"/>'
-    '<path d="M8.5 8h5M8.5 11h5M8.5 14h3.5"/>'
-    '<path d="M16 7.5h2.2a2.1 2.1 0 0 1 0 4.2H16"/>',
-    size=24,
-    stroke="#9a3412",
-    extra_class="dockSvg cupDockSvg",
-)
-DOCK_CUP_INNER = (
-    f'<div class="otherPageInner">'
-    f'<span class="otherIconBadge" aria-hidden="true">'
-    f'<span class="otherIconWrap">{SVG_DOCK_CUP}</span>'
-    f'</span>'
-    f'<div class="dockLabel otherPageLabel" aria-label="A Cup of Book">'
-    f'<span class="dockLabelLine">A Cup of Book</span>'
-    f'<span class="dockLabelLineAr">كوب من كتاب</span>'
-    f'</div></div>'
-)
+# A Cup of Book dock button — steaming cup image
+def dock_cup_inner(in_archive: bool = False) -> str:
+    base = "../../assets/" if in_archive else "../assets/"
+    src = f"{base}course-icons/cup-of-book.png?v=20260725i"
+    return (
+        f'<div class="otherPageInner">'
+        f'<span class="otherIconBadge" aria-hidden="true">'
+        f'<img class="cupDockImg" src="{src}" alt="">'
+        f'</span>'
+        f'<div class="dockLabel otherPageLabel" aria-label="A Cup of Book">'
+        f'<span class="dockLabelLine">A Cup of Book</span>'
+        f'<span class="dockLabelLineAr">كوب من كتاب</span>'
+        f'</div></div>'
+    )
+
+
+# Keep a static fallback for imports that expect DOCK_CUP_INNER
+DOCK_CUP_INNER = dock_cup_inner(False)
 
 # Course card — one style; color from --accent on .courseIcon
 SVG_COURSE_ICON = _svg(
@@ -165,6 +163,7 @@ ICON_CSS = """
 .rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
 #otherPageBtn:hover .otherIconWrap{transform:none}
 .otherIconBadge{transition:transform .28s ease}
+.cupDockImg{width:100%;height:100%;object-fit:contain;display:block}
 .courseIcon{
   display:inline-flex!important;align-items:center;justify-content:center;
   font-size:26px!important;line-height:1!important;color:inherit;

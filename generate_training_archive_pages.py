@@ -11,7 +11,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
 from training_page_icons import (  # noqa: E402
     BACK_TRAINING_CHIP,
-    DOCK_CUP_INNER,
     DOCK_ROSTER_INNER,
     DOCK_SAVED_ICON,
     DOCK_SEARCH_INNER,
@@ -20,6 +19,7 @@ from training_page_icons import (  # noqa: E402
     QUICK_LINKS_BLOCK,
     SVG_COURSE_ICON,
     SVG_PEOPLE_BADGE,
+    dock_cup_inner,
 )
 
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -383,25 +383,26 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   gap:5px;min-height:26px;width:100%;padding-inline:0;
 }
 #otherPageBtn{
-  background:linear-gradient(180deg,#fffefb 0%,#fff7ed 100%);
-  border-color:rgba(154,52,18,.16);
+  background:linear-gradient(180deg,#f8fbff 0%,#eef6ff 100%);
+  border-color:rgba(37,99,235,.16);
   min-width:76px;padding:9px 10px 8px;
 }
 #otherPageBtn:hover{
-  border-color:rgba(154,52,18,.28);
-  box-shadow:0 8px 20px rgba(154,52,18,.14);
+  border-color:rgba(37,99,235,.28);
+  box-shadow:0 8px 20px rgba(37,99,235,.14);
 }
 .otherIconBadge{
   width:34px;height:34px;border-radius:12px;
   display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
-  background:linear-gradient(160deg,#fff 0%,#ffedd5 100%);
-  border:1px solid rgba(154,52,18,.14);
-  box-shadow:0 4px 12px rgba(154,52,18,.1),inset 0 1px 0 #fff;
+  background:linear-gradient(160deg,#fff 0%,#dbeafe 100%);
+  border:1px solid rgba(37,99,235,.14);
+  box-shadow:0 4px 12px rgba(37,99,235,.1),inset 0 1px 0 #fff;
   transition:transform .28s ease,box-shadow .28s ease;
+  overflow:hidden;padding:3px;
 }
 .otherIconWrap{line-height:0;display:inline-flex}
-.cupDockSvg{display:block}
-#otherPageBtn:hover .otherIconBadge{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 16px rgba(154,52,18,.16),inset 0 1px 0 #fff}
+.cupDockImg{width:100%;height:100%;object-fit:contain;display:block}
+#otherPageBtn:hover .otherIconBadge{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 16px rgba(37,99,235,.16),inset 0 1px 0 #fff}
 .otherIcon{
   width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
   filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
@@ -437,7 +438,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 }
 .otherPageLabel{
   margin-top:0;
-  color:#7c2d12;
+  color:#1e40af;
   text-transform:none;
   letter-spacing:.01em;
   font-size:9px;
@@ -456,7 +457,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   font-size:8px;
   font-weight:700;
   line-height:1.25;
-  color:#9a3412;
+  color:#2563eb;
   opacity:.82;
   font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
 }
@@ -643,21 +644,32 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.75);
   white-space:nowrap;
 }
-.courseChip{
-  width:48px!important;min-width:48px!important;max-width:48px!important;
-  height:48px!important;padding:0!important;box-sizing:border-box;
-  border-radius:16px!important;gap:1px;
-  display:inline-flex!important;flex-direction:column!important;
-  align-items:center!important;justify-content:center!important;
-  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88))!important;
-  border:1px solid rgba(255,255,255,.85)!important;
-  box-shadow:0 4px 12px rgba(15,23,42,.08),inset 0 1px 0 #fff!important;
-  color:var(--text-on-acc,#334155);
-  font-weight:900;line-height:1;margin:0!important;
+.metaTicker{
+  width:52px;height:52px;border-radius:18px;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88));
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 16px rgba(15,23,42,.1),inset 0 1px 0 #fff;
+  isolation:isolate;
 }
-.dateBadge.courseChip{letter-spacing:0}
+.metaTickerStage{position:relative;width:100%;height:100%}
+.metaFace{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  opacity:0;transform:translateY(110%) scale(.92);
+  transition:transform .55s cubic-bezier(.22,.7,.2,1),opacity .28s ease;
+  will-change:transform,opacity;pointer-events:none;
+  color:var(--text-on-acc,#334155);font-weight:900;line-height:1;
+  background:transparent;border:none;padding:0;width:100%;height:100%;
+  font-family:inherit;
+}
+.metaFace.is-active{opacity:1;transform:translateY(0) scale(1);z-index:2;pointer-events:auto}
+.metaFace.is-exit{opacity:0;transform:translateY(-110%) scale(.92);z-index:1}
+.metaFace[data-face="people"]{flex-direction:row;gap:3px;font-size:13px;color:#334155}
+.metaFace[data-face="people"] .peopleIconSvg{width:12px;height:12px;margin:0}
+.metaFace[data-face="info"]{color:#2563eb;font-size:20px;cursor:pointer}
+.metaFace[data-face="info"]:hover{background:rgba(239,246,255,.85)}
 .chipPrimary{
-  font-size:14px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
+  font-size:15px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
   color:var(--text-on-acc,var(--blue2));
 }
 .chipSecondary{
@@ -665,20 +677,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   color:var(--text-on-acc,var(--blue2));opacity:.72;margin-top:2px;
   text-transform:uppercase;
 }
-.peopleBadge.courseChip{
-  flex-direction:row;gap:3px;font-size:12px;color:#334155;
-}
-.peopleBadge.courseChip .peopleIconSvg{width:12px;height:12px;margin:0;flex-shrink:0}
-.courseInfoBtn.courseChip{
-  border:1px solid rgba(255,255,255,.85);color:#2563eb;font-size:18px;
-  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
-  align-self:center;
-}
-.courseInfoBtn.courseChip:hover{
-  transform:translateY(-1px);box-shadow:0 8px 16px rgba(37,99,235,.16);background:#eff6ff;
-}
-.courseInfoBtn.courseChip:active{transform:translateY(0)}
 .courseInfoMark{
   display:inline-block;line-height:1;
   animation:courseQPulse 2.1s ease-in-out infinite;
@@ -690,6 +688,15 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   50%{transform:scale(1.08) rotate(8deg)}
   75%{transform:scale(1.14) rotate(-6deg)}
 }
+.metaDots{
+  position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+  display:flex;gap:3px;z-index:3;pointer-events:none;
+}
+.metaDot{
+  width:4px;height:4px;border-radius:999px;background:rgba(148,163,184,.45);
+  transition:background .25s,transform .25s;
+}
+.metaDot.is-on{background:var(--accent,#2563eb);transform:scale(1.15)}
 .todayBadge{
   background:var(--today-badge-bg);color:var(--today-badge-c);
   min-width:48px;height:auto;padding:5px 8px;border-radius:999px;font-size:9px;
@@ -909,11 +916,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
-  .courseChip{width:44px;min-width:44px;height:44px;border-radius:14px}
+  .metaTicker{width:46px;height:46px;border-radius:15px}
   .chipPrimary{font-size:13px}
   .chipSecondary{font-size:8px}
-  .peopleBadge.courseChip{font-size:11px}
-  .courseInfoBtn.courseChip{font-size:16px}
+  .metaFace[data-face="people"]{font-size:12px}
+  .metaFace[data-face="info"]{font-size:18px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
@@ -1728,6 +1735,38 @@ PAGE_JS = r"""
     if(e.key === 'Escape') closeCourseInfo();
   });
 
+  function initMetaTickers(){
+    const tickers = Array.from(document.querySelectorAll('[data-meta-ticker]'));
+    tickers.forEach((ticker, cardIdx) => {
+      const faces = Array.from(ticker.querySelectorAll('.metaFace'));
+      const dots = Array.from(ticker.querySelectorAll('.metaDot'));
+      if(faces.length < 2) return;
+      let idx = Math.max(0, faces.findIndex(f => f.classList.contains('is-active')));
+      if(idx < 0) idx = 0;
+      function show(next){
+        const prev = faces[idx];
+        idx = next;
+        const cur = faces[idx];
+        faces.forEach(f => f.classList.remove('is-active', 'is-exit'));
+        if(prev && prev !== cur) prev.classList.add('is-exit');
+        cur.classList.add('is-active');
+        dots.forEach((d, i) => d.classList.toggle('is-on', i === idx));
+        window.setTimeout(() => {
+          faces.forEach(f => { if(f !== cur) f.classList.remove('is-exit'); });
+        }, 560);
+      }
+      const delay = 2200 + (cardIdx % 5) * 180;
+      window.setInterval(() => show((idx + 1) % faces.length), delay);
+      ticker.addEventListener('click', (e) => {
+        if(e.target.closest('.courseInfoBtn')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        show((idx + 1) % faces.length);
+      });
+    });
+  }
+  initMetaTickers();
+
   ensureNameMap(() => {});
   applyTrainingLang(trainingLang());
   refreshSaved();
@@ -1756,7 +1795,7 @@ def date_range_label(start_iso: str, end_iso: str | None) -> str:
     return f"{day_s} {MONTH_NAMES_AR[int(month_s)-1]} – {day_e} {MONTH_NAMES_AR[int(month_e)-1]}"
 
 
-def date_chip_html(start_iso: str, end_iso: str | None) -> str:
+def date_chip_parts(start_iso: str, end_iso: str | None) -> tuple[str, str]:
     _, month_s, day_s = start_iso.split("-")
     mon = MONTH_SHORT_EN[int(month_s) - 1]
     if not end_iso or end_iso == start_iso:
@@ -1766,6 +1805,11 @@ def date_chip_html(start_iso: str, end_iso: str | None) -> str:
         primary = f"{int(day_s)}–{int(day_e)}"
         if month_s != month_e:
             mon = MONTH_SHORT_EN[int(month_e) - 1]
+    return primary, mon
+
+
+def date_chip_html(start_iso: str, end_iso: str | None) -> str:
+    primary, mon = date_chip_parts(start_iso, end_iso)
     return (
         f'<span class="badge dateBadge courseChip" title="{html_module.escape(date_range_label(start_iso, end_iso), quote=True)}">'
         f'<span class="chipPrimary">{html_module.escape(primary)}</span>'
@@ -1860,16 +1904,24 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
         )
     else:
         icon_block = f'<div class="courseIcon" aria-hidden="true">{emoji_html}</div>'
-    info_btn = ""
+    info_face = ""
+    faces_count = 2
     if desc_ar or desc_en:
-        info_btn = (
-            f'<button class="courseInfoBtn courseChip" type="button" aria-label="Course info" '
+        faces_count = 3
+        info_face = (
+            f'<button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" '
             f'data-course-emoji="{emoji_attr}" data-course-icon="{icon_attr}" '
             f'data-course-title="{title_attr}" '
             f'data-course-title-ar="{title_ar_attr}" data-course-desc-ar="{desc_ar_attr}" '
             f'data-course-desc-en="{desc_en_attr}">'
             f'<span class="courseInfoMark" aria-hidden="true">?</span></button>'
         )
+    day_primary, day_mon = date_chip_parts(course["date"], course_end)
+    date_title = html_module.escape(date_range_label(course["date"], course_end), quote=True)
+    dots = "".join(
+        f'<span class="metaDot{" is-on" if i == 0 else ""}" data-dot="{i}"></span>'
+        for i in range(faces_count)
+    )
     return f'''
 <details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}" data-course-date="{course["date"]}" data-course-end="{course_end}" data-course-title="{title_attr}" data-course-title-ar="{title_ar_attr}" data-venue="{venue_attr}" data-time="{time_attr}"{open_attr}>
   <summary class="courseHead">
@@ -1886,9 +1938,17 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     </div>
     <div class="courseBadges">
       {today_badge}
-      {date_chip_html(course["date"], course_end)}
-      <span class="badge peopleBadge courseChip">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</span>
-      {info_btn}
+      <div class="metaTicker" data-meta-ticker title="{date_title}">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">{html_module.escape(day_primary)}</span>
+            <span class="chipSecondary">{html_module.escape(day_mon)}</span>
+          </div>
+          <div class="metaFace" data-face="people">{SVG_PEOPLE_BADGE}{len(course.get("staff", []))}</div>
+          {info_face}
+        </div>
+        <div class="metaDots">{dots}</div>
+      </div>
     </div>
   </summary>
   <div class="courseBody">
@@ -1922,7 +1982,7 @@ def build_top_dock(month_courses: list[dict], in_archive: bool = False) -> str:
     {DOCK_SEARCH_INNER}
   </button>
   <button class="dockCard dockAction" id="otherPageBtn" type="button" aria-label="A Cup of Book">
-    {DOCK_CUP_INNER}
+    {dock_cup_inner(in_archive)}
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
     {DOCK_SAVED_ICON}
