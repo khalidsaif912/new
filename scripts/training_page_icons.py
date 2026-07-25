@@ -63,22 +63,25 @@ DOCK_SEARCH_INNER = (
 )
 DOCK_SAVED_ICON = f'<div class="savedIcon">{SVG_DOCK_USER}</div>'
 
-# A Cup of Book dock button (book + cup — line icon, brown like label)
+# A Cup of Book dock button — book + cup handle, warm brown
 SVG_DOCK_CUP = _svg(
-    '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H15"/>'
-    '<path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/>'
-    '<path d="M17 8h2a2 2 0 0 1 0 4h-1"/>'
-    '<path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/>',
-    size=22,
-    stroke="#92400e",
-    extra_class="dockSvg",
+    '<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4H16v12.5A2.5 2.5 0 0 1 13.5 19H7.5A2.5 2.5 0 0 1 5 16.5z"/>'
+    '<path d="M5 6.5V16.5"/>'
+    '<path d="M8.5 8h5M8.5 11h5M8.5 14h3.5"/>'
+    '<path d="M16 7.5h2.2a2.1 2.1 0 0 1 0 4.2H16"/>',
+    size=24,
+    stroke="#9a3412",
+    extra_class="dockSvg cupDockSvg",
 )
 DOCK_CUP_INNER = (
     f'<div class="otherPageInner">'
+    f'<span class="otherIconBadge" aria-hidden="true">'
     f'<span class="otherIconWrap">{SVG_DOCK_CUP}</span>'
+    f'</span>'
     f'<div class="dockLabel otherPageLabel" aria-label="A Cup of Book">'
-    f'<span class="dockLabelLine">A Cup</span>'
-    f'<span class="dockLabelLine">of Book</span></div></div>'
+    f'<span class="dockLabelLine">A Cup of Book</span>'
+    f'<span class="dockLabelLineAr">كوب من كتاب</span>'
+    f'</div></div>'
 )
 
 # Course card — one style; color from --accent on .courseIcon
@@ -160,7 +163,8 @@ ICON_CSS = """
   transition:transform .28s ease
 }
 .rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
-#otherPageBtn:hover .otherIconWrap{transform:translateY(-5px) scale(1.06)}
+#otherPageBtn:hover .otherIconWrap{transform:none}
+.otherIconBadge{transition:transform .28s ease}
 .courseIcon{
   display:inline-flex!important;align-items:center;justify-content:center;
   font-size:26px!important;line-height:1!important;color:inherit;

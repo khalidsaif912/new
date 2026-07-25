@@ -379,8 +379,28 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .statsFace .dockLabel{margin-top:4px}
 .otherPageInner{
   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;min-height:26px;width:100%;padding-inline:0;
+  gap:5px;min-height:26px;width:100%;padding-inline:0;
 }
+#otherPageBtn{
+  background:linear-gradient(180deg,#fffefb 0%,#fff7ed 100%);
+  border-color:rgba(154,52,18,.16);
+  min-width:76px;padding:9px 10px 8px;
+}
+#otherPageBtn:hover{
+  border-color:rgba(154,52,18,.28);
+  box-shadow:0 8px 20px rgba(154,52,18,.14);
+}
+.otherIconBadge{
+  width:34px;height:34px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:linear-gradient(160deg,#fff 0%,#ffedd5 100%);
+  border:1px solid rgba(154,52,18,.14);
+  box-shadow:0 4px 12px rgba(154,52,18,.1),inset 0 1px 0 #fff;
+  transition:transform .28s ease,box-shadow .28s ease;
+}
+.otherIconWrap{line-height:0;display:inline-flex}
+.cupDockSvg{display:block}
+#otherPageBtn:hover .otherIconBadge{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 16px rgba(154,52,18,.16),inset 0 1px 0 #fff}
 .otherIcon{
   width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
   filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
@@ -415,18 +435,30 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   padding:0;
 }
 .otherPageLabel{
-  color:#5b3517;
+  margin-top:0;
+  color:#7c2d12;
   text-transform:none;
-  letter-spacing:.02em;
-  font-size:8.5px;
-  line-height:1.15;
+  letter-spacing:.01em;
+  font-size:9px;
+  line-height:1.2;
+  font-weight:800;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:0;
+  gap:1px;
   white-space:normal;
+  font-family:'Sora','Plus Jakarta Sans',sans-serif;
 }
 .dockLabelLine{display:block}
+.dockLabelLineAr{
+  display:block;
+  font-size:8px;
+  font-weight:700;
+  line-height:1.25;
+  color:#9a3412;
+  opacity:.82;
+  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+}
 .rosterLabel{color:#2563eb}
 .savedChip{
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;
@@ -832,6 +864,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
+  .dockLabelLineAr{font-size:7.5px}
+  #otherPageBtn{min-width:68px;padding:8px 8px 7px}
+  .otherIconBadge{width:30px;height:30px;border-radius:10px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
   .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
   .myTrainingTime{grid-column:2}
@@ -851,6 +886,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .statsValue{font-size:18px}
   .dockLabel,.rosterLabel,.savedName{font-size:8px}
   .otherPageLabel{font-size:7.5px}
+  .dockLabelLineAr{font-size:7px}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
@@ -1848,7 +1884,7 @@ def build_top_dock(month_courses: list[dict], in_archive: bool = False) -> str:
   <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
     {DOCK_SEARCH_INNER}
   </button>
-  <button class="dockCard dockAction" id="otherPageBtn" type="button">
+  <button class="dockCard dockAction" id="otherPageBtn" type="button" aria-label="A Cup of Book">
     {DOCK_CUP_INNER}
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">

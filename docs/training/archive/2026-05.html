@@ -205,8 +205,28 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .statsFace .dockLabel{margin-top:4px}
 .otherPageInner{
   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;min-height:26px;width:100%;padding-inline:0;
+  gap:5px;min-height:26px;width:100%;padding-inline:0;
 }
+#otherPageBtn{
+  background:linear-gradient(180deg,#fffefb 0%,#fff7ed 100%);
+  border-color:rgba(154,52,18,.16);
+  min-width:76px;padding:9px 10px 8px;
+}
+#otherPageBtn:hover{
+  border-color:rgba(154,52,18,.28);
+  box-shadow:0 8px 20px rgba(154,52,18,.14);
+}
+.otherIconBadge{
+  width:34px;height:34px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:linear-gradient(160deg,#fff 0%,#ffedd5 100%);
+  border:1px solid rgba(154,52,18,.14);
+  box-shadow:0 4px 12px rgba(154,52,18,.1),inset 0 1px 0 #fff;
+  transition:transform .28s ease,box-shadow .28s ease;
+}
+.otherIconWrap{line-height:0;display:inline-flex}
+.cupDockSvg{display:block}
+#otherPageBtn:hover .otherIconBadge{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 16px rgba(154,52,18,.16),inset 0 1px 0 #fff}
 .otherIcon{
   width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
   filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
@@ -241,18 +261,30 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   padding:0;
 }
 .otherPageLabel{
-  color:#5b3517;
+  margin-top:0;
+  color:#7c2d12;
   text-transform:none;
-  letter-spacing:.02em;
-  font-size:8.5px;
-  line-height:1.15;
+  letter-spacing:.01em;
+  font-size:9px;
+  line-height:1.2;
+  font-weight:800;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:0;
+  gap:1px;
   white-space:normal;
+  font-family:'Sora','Plus Jakarta Sans',sans-serif;
 }
 .dockLabelLine{display:block}
+.dockLabelLineAr{
+  display:block;
+  font-size:8px;
+  font-weight:700;
+  line-height:1.25;
+  color:#9a3412;
+  opacity:.82;
+  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+}
 .rosterLabel{color:#2563eb}
 .savedChip{
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;
@@ -658,6 +690,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
+  .dockLabelLineAr{font-size:7.5px}
+  #otherPageBtn{min-width:68px;padding:8px 8px 7px}
+  .otherIconBadge{width:30px;height:30px;border-radius:10px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
   .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
   .myTrainingTime{grid-column:2}
@@ -677,6 +712,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .statsValue{font-size:18px}
   .dockLabel,.rosterLabel,.savedName{font-size:8px}
   .otherPageLabel{font-size:7.5px}
+  .dockLabelLineAr{font-size:7px}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
@@ -699,7 +735,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   transition:transform .28s ease
 }
 .rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
-#otherPageBtn:hover .otherIconWrap{transform:translateY(-5px) scale(1.06)}
+#otherPageBtn:hover .otherIconWrap{transform:none}
+.otherIconBadge{transition:transform .28s ease}
 .courseIcon{
   display:inline-flex!important;align-items:center;justify-content:center;
   font-size:26px!important;line-height:1!important;color:inherit;
@@ -742,8 +779,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
     <div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel" data-key="search">Search</div>
   </button>
-  <button class="dockCard dockAction" id="otherPageBtn" type="button">
-    <div class="otherPageInner"><span class="otherIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H15"/><path d="M6.5 6H15v11H6.5A2.5 2.5 0 0 1 4 13.5V8.5A2.5 2.5 0 0 1 6.5 6z"/><path d="M17 8h2a2 2 0 0 1 0 4h-1"/><path d="M17.5 12v1.5a2 2 0 0 1-2 2h-1"/></svg></span><div class="dockLabel otherPageLabel" aria-label="A Cup of Book"><span class="dockLabelLine">A Cup</span><span class="dockLabelLine">of Book</span></div></div>
+  <button class="dockCard dockAction" id="otherPageBtn" type="button" aria-label="A Cup of Book">
+    <div class="otherPageInner"><span class="otherIconBadge" aria-hidden="true"><span class="otherIconWrap"><svg class="dockSvg cupDockSvg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#9a3412" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4H16v12.5A2.5 2.5 0 0 1 13.5 19H7.5A2.5 2.5 0 0 1 5 16.5z"/><path d="M5 6.5V16.5"/><path d="M8.5 8h5M8.5 11h5M8.5 14h3.5"/><path d="M16 7.5h2.2a2.1 2.1 0 0 1 0 4.2H16"/></svg></span></span><div class="dockLabel otherPageLabel" aria-label="A Cup of Book"><span class="dockLabelLine">A Cup of Book</span><span class="dockLabelLineAr">كوب من كتاب</span></div></div>
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
     <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
