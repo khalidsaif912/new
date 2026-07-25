@@ -72,10 +72,9 @@ def dock_cup_inner(in_archive: bool = False) -> str:
         f'<span class="otherIconBadge" aria-hidden="true">'
         f'<img class="cupDockImg" src="{src}" alt="">'
         f'</span>'
-        f'<div class="dockLabel otherPageLabel" aria-label="A Cup of Book">'
-        f'<span class="dockLabelLine">A Cup of Book</span>'
-        f'<span class="dockLabelLineAr">كوب من كتاب</span>'
-        f'</div></div>'
+        f'<div class="dockLabel otherPageLabel" id="cupBookLabel" '
+        f'data-label-en="A Cup of Book" data-label-ar="كوب من كتاب" '
+        f'aria-label="A Cup of Book">A Cup of Book</div></div>'
     )
 
 

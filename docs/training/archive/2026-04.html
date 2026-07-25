@@ -269,22 +269,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   font-size:9px;
   line-height:1.2;
   font-weight:800;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:1px;
-  white-space:normal;
-  font-family:'Sora','Plus Jakarta Sans',sans-serif;
-}
-.dockLabelLine{display:block}
-.dockLabelLineAr{
   display:block;
-  font-size:8px;
-  font-weight:700;
-  line-height:1.25;
-  color:#2563eb;
-  opacity:.82;
-  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  text-align:center;
+  white-space:normal;
+  max-width:100%;
+  font-family:'Sora','Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif;
 }
 .rosterLabel{color:#2563eb}
 .savedChip{
@@ -717,7 +706,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
-  .dockLabelLineAr{font-size:7.5px}
   #otherPageBtn{min-width:68px;padding:8px 8px 7px}
   .otherIconBadge{width:30px;height:30px;border-radius:10px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
@@ -739,7 +727,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .statsValue{font-size:18px}
   .dockLabel,.rosterLabel,.savedName{font-size:8px}
   .otherPageLabel{font-size:7.5px}
-  .dockLabelLineAr{font-size:7px}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
@@ -811,7 +798,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel" data-key="search">Search</div>
   </button>
   <button class="dockCard dockAction" id="otherPageBtn" type="button" aria-label="A Cup of Book">
-    <div class="otherPageInner"><span class="otherIconBadge" aria-hidden="true"><img class="cupDockImg" src="../../assets/course-icons/cup-of-book.png?v=20260725i" alt=""></span><div class="dockLabel otherPageLabel" aria-label="A Cup of Book"><span class="dockLabelLine">A Cup of Book</span><span class="dockLabelLineAr">كوب من كتاب</span></div></div>
+    <div class="otherPageInner"><span class="otherIconBadge" aria-hidden="true"><img class="cupDockImg" src="../../assets/course-icons/cup-of-book.png?v=20260725i" alt=""></span><div class="dockLabel otherPageLabel" id="cupBookLabel" data-label-en="A Cup of Book" data-label-ar="كوب من كتاب" aria-label="A Cup of Book">A Cup of Book</div></div>
   </button>
   <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
     <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
@@ -1409,7 +1396,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
       langTitle: 'Translate to Arabic',
       chooseMonth: 'Choose month',
       courseInfoClose: 'Close',
-      courseInfoAria: 'Course info'
+      courseInfoAria: 'Course info',
+      cupBook: 'A Cup of Book'
     },
     ar: {
       pageTitle: 'دورات التدريب',
@@ -1440,7 +1428,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
       langTitle: 'الترجمة إلى الإنجليزية',
       chooseMonth: 'اختر الشهر',
       courseInfoClose: 'إغلاق',
-      courseInfoAria: 'وصف الدورة'
+      courseInfoAria: 'وصف الدورة',
+      cupBook: 'كوب من كتاب'
     }
   };
 
@@ -1620,6 +1609,19 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     document.querySelectorAll('.courseInfoBtn').forEach(btn => {
       btn.setAttribute('aria-label', t.courseInfoAria);
     });
+    document.querySelectorAll('[data-meta-ticker].hasInfo').forEach(el => {
+      el.setAttribute('aria-label', t.courseInfoAria);
+    });
+
+    const cupLbl = document.getElementById('cupBookLabel');
+    if(cupLbl){
+      const en = cupLbl.getAttribute('data-label-en') || t.cupBook;
+      const ar = cupLbl.getAttribute('data-label-ar') || t.cupBook;
+      cupLbl.textContent = isAr ? ar : en;
+      cupLbl.setAttribute('aria-label', cupLbl.textContent);
+    }
+    const otherBtn = document.getElementById('otherPageBtn');
+    if(otherBtn && cupLbl) otherBtn.setAttribute('aria-label', cupLbl.textContent);
 
     if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
       savedName.textContent = t.myStaff;

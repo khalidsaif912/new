@@ -444,22 +444,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   font-size:9px;
   line-height:1.2;
   font-weight:800;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:1px;
-  white-space:normal;
-  font-family:'Sora','Plus Jakarta Sans',sans-serif;
-}
-.dockLabelLine{display:block}
-.dockLabelLineAr{
   display:block;
-  font-size:8px;
-  font-weight:700;
-  line-height:1.25;
-  color:#2563eb;
-  opacity:.82;
-  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  text-align:center;
+  white-space:normal;
+  max-width:100%;
+  font-family:'Sora','Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif;
 }
 .rosterLabel{color:#2563eb}
 .savedChip{
@@ -892,7 +881,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .dockValue{font-size:18px;height:24px}
   .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
   .otherPageLabel{font-size:8px}
-  .dockLabelLineAr{font-size:7.5px}
   #otherPageBtn{min-width:68px;padding:8px 8px 7px}
   .otherIconBadge{width:30px;height:30px;border-radius:10px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
@@ -914,7 +902,6 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   .statsValue{font-size:18px}
   .dockLabel,.rosterLabel,.savedName{font-size:8px}
   .otherPageLabel{font-size:7.5px}
-  .dockLabelLineAr{font-size:7px}
   .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
   .badge{padding:6px 10px;font-size:9px}
@@ -1445,7 +1432,8 @@ PAGE_JS = r"""
       langTitle: 'Translate to Arabic',
       chooseMonth: 'Choose month',
       courseInfoClose: 'Close',
-      courseInfoAria: 'Course info'
+      courseInfoAria: 'Course info',
+      cupBook: 'A Cup of Book'
     },
     ar: {
       pageTitle: 'دورات التدريب',
@@ -1476,7 +1464,8 @@ PAGE_JS = r"""
       langTitle: 'الترجمة إلى الإنجليزية',
       chooseMonth: 'اختر الشهر',
       courseInfoClose: 'إغلاق',
-      courseInfoAria: 'وصف الدورة'
+      courseInfoAria: 'وصف الدورة',
+      cupBook: 'كوب من كتاب'
     }
   };
 
@@ -1656,6 +1645,19 @@ PAGE_JS = r"""
     document.querySelectorAll('.courseInfoBtn').forEach(btn => {
       btn.setAttribute('aria-label', t.courseInfoAria);
     });
+    document.querySelectorAll('[data-meta-ticker].hasInfo').forEach(el => {
+      el.setAttribute('aria-label', t.courseInfoAria);
+    });
+
+    const cupLbl = document.getElementById('cupBookLabel');
+    if(cupLbl){
+      const en = cupLbl.getAttribute('data-label-en') || t.cupBook;
+      const ar = cupLbl.getAttribute('data-label-ar') || t.cupBook;
+      cupLbl.textContent = isAr ? ar : en;
+      cupLbl.setAttribute('aria-label', cupLbl.textContent);
+    }
+    const otherBtn = document.getElementById('otherPageBtn');
+    if(otherBtn && cupLbl) otherBtn.setAttribute('aria-label', cupLbl.textContent);
 
     if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
       savedName.textContent = t.myStaff;
