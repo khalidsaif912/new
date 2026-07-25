@@ -1081,8 +1081,12 @@ PAGE_JS = r"""
 
   function norm(v){ return (v || '').toLowerCase().trim(); }
   function firstName(name){
-    const cleaned = (name || '').replace(/^(mr|mrs|ms|dr)\.?\s+/i,'').trim();
-    return cleaned ? cleaned.split(/\s+/)[0] : '';
+    let cleaned = String(name || '').trim();
+    cleaned = cleaned.replace(/^(mr|mrs|miss|ms|dr)\.?\s+/i, '');
+    cleaned = cleaned.replace(/^(السيد|السيدة|الانسة|الآنسة|الاستاذ|الأستاذ|الاستاذه|الأستاذة)\.?\s+/u, '');
+    cleaned = cleaned.trim();
+    if(!cleaned) return '';
+    return cleaned.split(/\s+/)[0] || '';
   }
   function allRows(){ return Array.from(document.querySelectorAll('.empRow')); }
   function rowMatchesQuery(row, q){
