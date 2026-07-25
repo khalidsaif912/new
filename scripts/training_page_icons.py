@@ -164,7 +164,10 @@ ICON_CSS = """
 .courseIcon{
   display:inline-flex!important;align-items:center;justify-content:center;
   font-size:26px!important;line-height:1!important;color:inherit;
+  overflow:hidden;
 }
+.courseIcon.hasImg{padding:0!important}
+.courseIconImg,.courseIcon img{width:100%;height:100%;object-fit:cover;display:block}
 .courseIcon svg{display:block;width:24px;height:24px}
 .peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
 .badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
