@@ -390,7 +390,7 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 }
 .courseIcon{
   position:relative;z-index:1;align-self:start;margin-top:2px;
-  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:22px;
+  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:26px;line-height:1;
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
@@ -399,7 +399,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-height:2.6em;font-family:'Sora',sans-serif;
+  min-height:0;font-family:'Sora',sans-serif;
+}
+.courseTitleAr{
+  margin-top:4px;
+  font-size:13px;font-weight:700;line-height:1.35;color:var(--text-on-acc,var(--text));
+  opacity:.82;font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .courseSubRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;line-height:1.4;color:var(--muted)}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
@@ -671,12 +677,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 
   <section class="scheduleSection" aria-label="Training schedule">
     <div class="cards"><div class="pastLabel" id="pastSep">Previous sessions</div>
-<details class="courseCard is-past pastelT0" data-search="lar (refresher)  cargo training room 08:00 to 15:00 81300 mr. talal mahmood darwhish al balushi 81402 mr. mohammed ali salim al siyabi 82445 mr. al muthana ahmed salim al shanfari 82578 mr. raad hassan mohamed al farsi 82437 mr. marwan khalfan khamis al difai 8930 mr. fahim salim hamed al hasni 82555 mr. riyadh ahmed said al jabri 81991 mr. hilal khalaf khalfan al-shammakhi 82451 mr. ahmed amour said al harrasi 80833 mr. suleiman salim saif al maharbi 990347 mr. maqbool hussian haji al balishi 82286 mr. mahmood darwish habib al-shamsi 82667 mr. mossa khamis moosa al balushi" data-attendees="13" data-course-date="2026-06-29" data-course-end="2026-06-29" data-course-title="LAR (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="lar (refresher) لوائح الحيوانات الحية (تجديد)  cargo training room 08:00 to 15:00 81300 mr. talal mahmood darwhish al balushi 81402 mr. mohammed ali salim al siyabi 82445 mr. al muthana ahmed salim al shanfari 82578 mr. raad hassan mohamed al farsi 82437 mr. marwan khalfan khamis al difai 8930 mr. fahim salim hamed al hasni 82555 mr. riyadh ahmed said al jabri 81991 mr. hilal khalaf khalfan al-shammakhi 82451 mr. ahmed amour said al harrasi 80833 mr. suleiman salim saif al maharbi 990347 mr. maqbool hussian haji al balishi 82286 mr. mahmood darwish habib al-shamsi 82667 mr. mossa khamis moosa al balushi" data-attendees="13" data-course-date="2026-06-29" data-course-end="2026-06-29" data-course-title="LAR (refresher)" data-course-title-ar="لوائح الحيوانات الحية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🐾</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">LAR (refresher)</div>
+      <div class="courseTitleAr">لوائح الحيوانات الحية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -694,12 +701,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT1" data-search="pcr (refresher)  cargo training room 08:00 to 15:00 82550 mr. saleh ghuwainim mohsin said al aufi 8930 mr. fahim salim hamed al hasni 82445 mr. al muthana ahmed salim al shanfari 82577 mr. ali rashid salim al marjabi 82546 mr. saleh hamed saleh al rashdi 81409 mr. qasim salim qasim al muqbali 990737 mr. said hamood said al amri 8926 mr. salim mohammad hamed al masroori 82555 mr. riyadh ahmed said al jabri 82674 mr. mohammed yahya bader al mamari 82451 mr. ahmed amour said al harrasi 82476 mr. ahmed thunai masaud al rujaibi 82049 mr. majid said salim al-ghafri 82457 mr. adil ali murad al balushi 81983 mr. jabir nasser saif al-julandani 82113 mr. abdullah ali mohammed al sawaai 82660 mr. sulaiman rashid sulaiman al hatmi 82668 mr. ibrahim khalid mohamed al hadhrami" data-attendees="18" data-course-date="2026-06-25" data-course-end="2026-06-25" data-course-title="PCR (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT1" data-search="pcr (refresher) البضائع القابلة للتلف (تجديد)  cargo training room 08:00 to 15:00 82550 mr. saleh ghuwainim mohsin said al aufi 8930 mr. fahim salim hamed al hasni 82445 mr. al muthana ahmed salim al shanfari 82577 mr. ali rashid salim al marjabi 82546 mr. saleh hamed saleh al rashdi 81409 mr. qasim salim qasim al muqbali 990737 mr. said hamood said al amri 8926 mr. salim mohammad hamed al masroori 82555 mr. riyadh ahmed said al jabri 82674 mr. mohammed yahya bader al mamari 82451 mr. ahmed amour said al harrasi 82476 mr. ahmed thunai masaud al rujaibi 82049 mr. majid said salim al-ghafri 82457 mr. adil ali murad al balushi 81983 mr. jabir nasser saif al-julandani 82113 mr. abdullah ali mohammed al sawaai 82660 mr. sulaiman rashid sulaiman al hatmi 82668 mr. ibrahim khalid mohamed al hadhrami" data-attendees="18" data-course-date="2026-06-25" data-course-end="2026-06-25" data-course-title="PCR (refresher)" data-course-title-ar="البضائع القابلة للتلف (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">❄️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">PCR (refresher)</div>
+      <div class="courseTitleAr">البضائع القابلة للتلف (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -717,12 +725,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT2" data-search="cwo (cargo warehouse operations)  cargo training room 08:00 to 15:00 81404 mr. mohammed farid ali al amri 990752 mr. ali yousuf yaqoob al baluchi 82592 mr. mohammed juma salim al subhi 81393 mr. ali suleiman ali al farsi 82598 mr. khalil harib mohamed al mazroei 82661 mr. mohamed abdullah khatim al maskari 80335 mr. ericson saulo puno 82541 mr. mohammed marhoon rashid al wahaibi 990347 mr. maqbool hussian haji al balishi 82470 mr. waheb abdallah hamed al baraidai" data-attendees="10" data-course-date="2026-06-22" data-course-end="2026-06-24" data-course-title="CWO (Cargo Warehouse Operations)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT2" data-search="cwo (cargo warehouse operations) عمليات مستودع الشحن  cargo training room 08:00 to 15:00 81404 mr. mohammed farid ali al amri 990752 mr. ali yousuf yaqoob al baluchi 82592 mr. mohammed juma salim al subhi 81393 mr. ali suleiman ali al farsi 82598 mr. khalil harib mohamed al mazroei 82661 mr. mohamed abdullah khatim al maskari 80335 mr. ericson saulo puno 82541 mr. mohammed marhoon rashid al wahaibi 990347 mr. maqbool hussian haji al balishi 82470 mr. waheb abdallah hamed al baraidai" data-attendees="10" data-course-date="2026-06-22" data-course-end="2026-06-24" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">📦</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">CWO (Cargo Warehouse Operations)</div>
+      <div class="courseTitleAr">عمليات مستودع الشحن</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -740,12 +749,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT3" data-search="airside safety (refresher)  cargo training room 08:00 to 15:00 82420 mr. mohamed rashid mabiwa al saadi 82654 mr. ahmed rashid nasser al hadi 82658 mr. mohammed nasser said al mazroei 82661 mr. mohamed abdullah khatim al maskari 82665 mr. mahanad khalid abdullah al hadi 82667 mr. mossa khamis moosa al balushi 82550 mr. saleh ghuwainim mohsin said al aufi 81022 mr. faisal noor mohammad al balushi" data-attendees="8" data-course-date="2026-06-21" data-course-end="2026-06-21" data-course-title="Airside Safety (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT3" data-search="airside safety (refresher) سلامة الجانب الجوي (تجديد)  cargo training room 08:00 to 15:00 82420 mr. mohamed rashid mabiwa al saadi 82654 mr. ahmed rashid nasser al hadi 82658 mr. mohammed nasser said al mazroei 82661 mr. mohamed abdullah khatim al maskari 82665 mr. mahanad khalid abdullah al hadi 82667 mr. mossa khamis moosa al balushi 82550 mr. saleh ghuwainim mohsin said al aufi 81022 mr. faisal noor mohammad al balushi" data-attendees="8" data-course-date="2026-06-21" data-course-end="2026-06-21" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة الجانب الجوي (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🦺</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Airside Safety (refresher)</div>
+      <div class="courseTitleAr">سلامة الجانب الجوي (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -763,12 +773,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT4" data-search="forklift (refresher)  cargo training room 08:00 to 15:00 82474 mr. ali juma salim al muqbali 8901 mr. dingiri bandaralage nishautha udugama 82600 mr. habib mohammed janjan al balushi 8859 mr. sultan saif mohammad al riyami 82476 mr. ahmed thunai masaud al rujaibi 80831 mr. jaffer a redha mohammed al ajmi 82113 mr. abdullah ali mohammed al sawaai 82410 mr. said rashid saif al sadi 81404 mr. mohammed farid ali al amri 82658 mr. mohammed nasser said al mazroei" data-attendees="10" data-course-date="2026-06-16" data-course-end="2026-06-16" data-course-title="Forklift (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT4" data-search="forklift (refresher) رافعة شوكية (تجديد)  cargo training room 08:00 to 15:00 82474 mr. ali juma salim al muqbali 8901 mr. dingiri bandaralage nishautha udugama 82600 mr. habib mohammed janjan al balushi 8859 mr. sultan saif mohammad al riyami 82476 mr. ahmed thunai masaud al rujaibi 80831 mr. jaffer a redha mohammed al ajmi 82113 mr. abdullah ali mohammed al sawaai 82410 mr. said rashid saif al sadi 81404 mr. mohammed farid ali al amri 82658 mr. mohammed nasser said al mazroei" data-attendees="10" data-course-date="2026-06-16" data-course-end="2026-06-16" data-course-title="Forklift (refresher)" data-course-title-ar="رافعة شوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🏗️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">رافعة شوكية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -786,12 +797,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT0" data-search="forklift (refresher)  cargo training room 08:00 to 15:00 82466 mr. waleed salim abdullah al kharusi 82667 mr. mossa khamis moosa al balushi 82596 mr. hamed saif hamed al fulaiti 82666 mr. mohammed sulaiman khamis almaskari 80482 mr. waleed khalifa khamis al haddabi" data-attendees="5" data-course-date="2026-06-15" data-course-end="2026-06-15" data-course-title="Forklift (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="forklift (refresher) رافعة شوكية (تجديد)  cargo training room 08:00 to 15:00 82466 mr. waleed salim abdullah al kharusi 82667 mr. mossa khamis moosa al balushi 82596 mr. hamed saif hamed al fulaiti 82666 mr. mohammed sulaiman khamis almaskari 80482 mr. waleed khalifa khamis al haddabi" data-attendees="5" data-course-date="2026-06-15" data-course-end="2026-06-15" data-course-title="Forklift (refresher)" data-course-title-ar="رافعة شوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🏗️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">رافعة شوكية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -809,12 +821,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT1" data-search="dgr-cbta-acc-dg (acceptance staff)  cargo training room 08:00 to 15:00 81300 mr. talal mahmood darwhish al balushi 80276 mr. allan vianzon tajonera 82409 mr. qais salmeen suweilem al rashdi 81394 mr. fahad khalfan abdullah al khamisi 80235 mr. rodolfo cruz magcaling 8899 mr. rajaram sivaliwgam 82479 mr. al muhanad al waleed khalid al abri" data-attendees="7" data-course-date="2026-06-14" data-course-end="2026-06-20" data-course-title="DGR-CBTA-ACC-DG (Acceptance staff)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT1" data-search="dgr-cbta-acc-dg (acceptance staff) البضائع الخطرة — موظفو القبول  cargo training room 08:00 to 15:00 81300 mr. talal mahmood darwhish al balushi 80276 mr. allan vianzon tajonera 82409 mr. qais salmeen suweilem al rashdi 81394 mr. fahad khalfan abdullah al khamisi 80235 mr. rodolfo cruz magcaling 8899 mr. rajaram sivaliwgam 82479 mr. al muhanad al waleed khalid al abri" data-attendees="7" data-course-date="2026-06-14" data-course-end="2026-06-20" data-course-title="DGR-CBTA-ACC-DG (Acceptance staff)" data-course-title-ar="البضائع الخطرة — موظفو القبول" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">📝</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">DGR-CBTA-ACC-DG (Acceptance staff)</div>
+      <div class="courseTitleAr">البضائع الخطرة — موظفو القبول</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -832,12 +845,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT2" data-search="forklift (refresher)  cargo training room 08:00 to 15:00 82643 mr. mohamed sulaiman hamed al alawi 8336 mr. khalid yousuf yaqoob al baluschi 82574 mr. ali sultan amur al mamari 82577 mr. ali rashid salim al marjabi 82424 mr. riyadh mubarak juma al sulti 82464 mr. wisam abdulrahman sulaiman al kharousi 8591 mr. aziz zayed mohammad al bulushi 82550 mr. saleh ghuwainim mohsin said al aufi" data-attendees="8" data-course-date="2026-06-14" data-course-end="2026-06-14" data-course-title="Forklift (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT2" data-search="forklift (refresher) رافعة شوكية (تجديد)  cargo training room 08:00 to 15:00 82643 mr. mohamed sulaiman hamed al alawi 8336 mr. khalid yousuf yaqoob al baluschi 82574 mr. ali sultan amur al mamari 82577 mr. ali rashid salim al marjabi 82424 mr. riyadh mubarak juma al sulti 82464 mr. wisam abdulrahman sulaiman al kharousi 8591 mr. aziz zayed mohammad al bulushi 82550 mr. saleh ghuwainim mohsin said al aufi" data-attendees="8" data-course-date="2026-06-14" data-course-end="2026-06-14" data-course-title="Forklift (refresher)" data-course-title-ar="رافعة شوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🏗️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">رافعة شوكية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -855,12 +869,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT3" data-search="airside safety (refresher)  cargo training room 08:00 to 15:00 82660 mr. sulaiman rashid sulaiman al hatmi 82657 ms. bushra khamis mohammed al waheibi 82659 mr. ammar nasser hamed al hashmi 82663 mr. abedallah mohammed hamdon al sinawi 82666 mr. mohammed sulaiman khamis almaskari 8591 mr. aziz zayed mohammad al bulushi" data-attendees="6" data-course-date="2026-06-11" data-course-end="2026-06-11" data-course-title="Airside Safety (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT3" data-search="airside safety (refresher) سلامة الجانب الجوي (تجديد)  cargo training room 08:00 to 15:00 82660 mr. sulaiman rashid sulaiman al hatmi 82657 ms. bushra khamis mohammed al waheibi 82659 mr. ammar nasser hamed al hashmi 82663 mr. abedallah mohammed hamdon al sinawi 82666 mr. mohammed sulaiman khamis almaskari 8591 mr. aziz zayed mohammad al bulushi" data-attendees="6" data-course-date="2026-06-11" data-course-end="2026-06-11" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة الجانب الجوي (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🦺</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Airside Safety (refresher)</div>
+      <div class="courseTitleAr">سلامة الجانب الجوي (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -878,12 +893,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT4" data-search="dgr-cbta-ops (recurrent)  cargo training room 08:00 to 15:00 80481 mr. salim khamis salim al maawali 81399 mr. jamal nasser khamis al sinani 80215 mr. glendo nunez escober" data-attendees="3" data-course-date="2026-06-10" data-course-end="2026-06-10" data-course-title="DGR-CBTA-OPS (recurrent)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT4" data-search="dgr-cbta-ops (recurrent) البضائع الخطرة — العمليات (تجديد)  cargo training room 08:00 to 15:00 80481 mr. salim khamis salim al maawali 81399 mr. jamal nasser khamis al sinani 80215 mr. glendo nunez escober" data-attendees="3" data-course-date="2026-06-10" data-course-end="2026-06-10" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="البضائع الخطرة — العمليات (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">☢️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">DGR-CBTA-OPS (recurrent)</div>
+      <div class="courseTitleAr">البضائع الخطرة — العمليات (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -901,12 +917,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT0" data-search="sms (initial)  cargo training room 08:00 to 15:00 82661 mr. mohamed abdullah khatim al maskari 81404 mr. mohammed farid ali al amri 82651 mr. mazin murad ali al houti 82614 mr. mohamed saif khalfan al mawali" data-attendees="4" data-course-date="2026-06-08" data-course-end="2026-06-08" data-course-title="SMS (initial)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="sms (initial) نظام إدارة السلامة (أساسي)  cargo training room 08:00 to 15:00 82661 mr. mohamed abdullah khatim al maskari 81404 mr. mohammed farid ali al amri 82651 mr. mazin murad ali al houti 82614 mr. mohamed saif khalfan al mawali" data-attendees="4" data-course-date="2026-06-08" data-course-end="2026-06-08" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">📊</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">SMS (initial)</div>
+      <div class="courseTitleAr">نظام إدارة السلامة (أساسي)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -924,12 +941,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT1" data-search="cargo security awareness (refresher)  cargo training room 08:00 to 15:00 80709 mr. ibrahim habib darwish al zadjali 80137 mrs. zahra said sulieman al aufi 82450 miss. amal said ahmed saif al muqbali 81402 mr. mohammed ali salim al siyabi 82100 mr. yousuf yaqoob anad al-waheedi 82551 mr. omar mubarak musallam al obaidi" data-attendees="6" data-course-date="2026-06-07" data-course-end="2026-06-07" data-course-title="Cargo Security Awareness (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT1" data-search="cargo security awareness (refresher) التوعية بأمن الشحن (تجديد)  cargo training room 08:00 to 15:00 80709 mr. ibrahim habib darwish al zadjali 80137 mrs. zahra said sulieman al aufi 82450 miss. amal said ahmed saif al muqbali 81402 mr. mohammed ali salim al siyabi 82100 mr. yousuf yaqoob anad al-waheedi 82551 mr. omar mubarak musallam al obaidi" data-attendees="6" data-course-date="2026-06-07" data-course-end="2026-06-07" data-course-title="Cargo Security Awareness (refresher)" data-course-title-ar="التوعية بأمن الشحن (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🔐</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Cargo Security Awareness (refresher)</div>
+      <div class="courseTitleAr">التوعية بأمن الشحن (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -947,12 +965,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT2" data-search="gdp-tcr (refresher)  cargo training room 08:00 to 15:00 80695 mr. hosni mubarak juma al salti 82439 mr. ghaith zayed saif al habsi 82592 mr. mohammed juma salim al subhi 82555 mr. riyadh ahmed said al jabri 81348 mr. asad said ali al omari 82445 mr. al muthana ahmed salim al shanfari 82429 mr. zakariya mohamed yaqoob abdul karim al balushi 82468 mr. badar saif nasser al fulaiti 82467 mr. khamis juma khamis al hinai 82578 mr. raad hassan mohamed al farsi 82113 mr. abdullah ali mohammed al sawaai 80539 mr. jeffrey panopio lopez 82454 mr. hisham saif mubarak al maharbi 81399 mr. jamal nasser khamis al sinani 82473 mrs. alaa sulaiman hamdan al wahaibi 8195 mr. samaramannage jayantha chandranath 82654 mr. ahmed rashid nasser al hadi 990895 mr. mohammed khamis saleem al haddabi 82539 mr. abdullah khalaif rashid al aamri 82533 mr. majid nasser khamis al fakhri 8591 mr. aziz zayed mohammad al bulushi" data-attendees="21" data-course-date="2026-06-04" data-course-end="2026-06-04" data-course-title="GDP-TCR (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT2" data-search="gdp-tcr (refresher) ممارسات التوزيع الجيد والتحكم بالحرارة (تجديد)  cargo training room 08:00 to 15:00 80695 mr. hosni mubarak juma al salti 82439 mr. ghaith zayed saif al habsi 82592 mr. mohammed juma salim al subhi 82555 mr. riyadh ahmed said al jabri 81348 mr. asad said ali al omari 82445 mr. al muthana ahmed salim al shanfari 82429 mr. zakariya mohamed yaqoob abdul karim al balushi 82468 mr. badar saif nasser al fulaiti 82467 mr. khamis juma khamis al hinai 82578 mr. raad hassan mohamed al farsi 82113 mr. abdullah ali mohammed al sawaai 80539 mr. jeffrey panopio lopez 82454 mr. hisham saif mubarak al maharbi 81399 mr. jamal nasser khamis al sinani 82473 mrs. alaa sulaiman hamdan al wahaibi 8195 mr. samaramannage jayantha chandranath 82654 mr. ahmed rashid nasser al hadi 990895 mr. mohammed khamis saleem al haddabi 82539 mr. abdullah khalaif rashid al aamri 82533 mr. majid nasser khamis al fakhri 8591 mr. aziz zayed mohammad al bulushi" data-attendees="21" data-course-date="2026-06-04" data-course-end="2026-06-04" data-course-title="GDP-TCR (refresher)" data-course-title-ar="ممارسات التوزيع الجيد والتحكم بالحرارة (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🌡️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">GDP-TCR (refresher)</div>
+      <div class="courseTitleAr">ممارسات التوزيع الجيد والتحكم بالحرارة (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -970,12 +989,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT3" data-search="human factors (refresher)  cargo training room 08:00 to 15:00 80478 mr.faris yousuf mohammad al baluchi 80834 mr.said hamed khamis al amri 82532 mr. mohamed salim suruor al dughaishi 990465 mr.abdulfattah mubarak sulaiym al shekaili 82574 ali sultan amur al mamari 82583 mr. bader ali abdullah al shehi 82616 ahmed shafi humaid al hashemi 81025 mr.yahya ahmed sulaiman al masoudi" data-attendees="8" data-course-date="2026-06-03" data-course-end="2026-06-03" data-course-title="Human Factors (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT3" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 80478 mr.faris yousuf mohammad al baluchi 80834 mr.said hamed khamis al amri 82532 mr. mohamed salim suruor al dughaishi 990465 mr.abdulfattah mubarak sulaiym al shekaili 82574 ali sultan amur al mamari 82583 mr. bader ali abdullah al shehi 82616 ahmed shafi humaid al hashemi 81025 mr.yahya ahmed sulaiman al masoudi" data-attendees="8" data-course-date="2026-06-03" data-course-end="2026-06-03" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -993,12 +1013,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT4" data-search="human factors (refresher)  cargo training room 08:00 to 15:00 80316 mr.grethen jimeno domingo 81354 mr.mulham shakhboot hassan al saadi 82474 mr. ali juma salim al muqbali 82456 mr. ahmed darwish abdullah al farsi 990752 mr.ali yousuf yaqoob al baluchi" data-attendees="5" data-course-date="2026-06-02" data-course-end="2026-06-02" data-course-title="Human Factors (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT4" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 80316 mr.grethen jimeno domingo 81354 mr.mulham shakhboot hassan al saadi 82474 mr. ali juma salim al muqbali 82456 mr. ahmed darwish abdullah al farsi 990752 mr.ali yousuf yaqoob al baluchi" data-attendees="5" data-course-date="2026-06-02" data-course-end="2026-06-02" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>
@@ -1016,12 +1037,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
   </div>
 </details>
 
-<details class="courseCard is-past pastelT0" data-search="human factors (refresher)  cargo training room 08:00 to 15:00 990669 miss.jumana mansour sulaiman al hasni 81031 mrs. safiya salim abdullah al omairi 82590 mr. nasser mohammed said al mamari 81991 mr.hilal khalaf khalfan al-shammakhi 82464 mr. wisam abdulrahman sulaiman al kharousi 990754 mr.jabir abdulkarim yaqob al baluchi 82114 mr.mubarak hassan obaid al-nofli" data-attendees="7" data-course-date="2026-06-01" data-course-end="2026-06-01" data-course-title="Human Factors (refresher)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 990669 miss.jumana mansour sulaiman al hasni 81031 mrs. safiya salim abdullah al omairi 82590 mr. nasser mohammed said al mamari 81991 mr.hilal khalaf khalfan al-shammakhi 82464 mr. wisam abdulrahman sulaiman al kharousi 990754 mr.jabir abdulkarim yaqob al baluchi 82114 mr.mubarak hassan obaid al-nofli" data-attendees="7" data-course-date="2026-06-01" data-course-end="2026-06-01" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>

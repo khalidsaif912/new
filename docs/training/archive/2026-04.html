@@ -390,7 +390,7 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 }
 .courseIcon{
   position:relative;z-index:1;align-self:start;margin-top:2px;
-  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:22px;
+  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:26px;line-height:1;
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
@@ -399,7 +399,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-height:2.6em;font-family:'Sora',sans-serif;
+  min-height:0;font-family:'Sora',sans-serif;
+}
+.courseTitleAr{
+  margin-top:4px;
+  font-size:13px;font-weight:700;line-height:1.35;color:var(--text-on-acc,var(--text));
+  opacity:.82;font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .courseSubRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;line-height:1.4;color:var(--muted)}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
@@ -671,12 +677,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 
   <section class="scheduleSection" aria-label="Training schedule">
     <div class="cards"><div class="pastLabel" id="pastSep">Previous sessions</div>
-<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops  cargo training room 08:00 to 15:00 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8" data-course-date="2026-04-29" data-course-end="2026-04-29" data-course-title="DGR-CBTA-OPS" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+<details class="courseCard is-past pastelT0" data-search="dgr-cbta-ops البضائع الخطرة — العمليات  cargo training room 08:00 to 15:00 82496 mr. anwar nasser hamid al habsi 81032 mr. mohammed said fadhil al balushi 81409 mr. qasim salim qasim al muqbali 81258 mr. jaafar ibrahim hassan al balushi 82485 miss.marwa mohsin saleh al ismaili 82612 mr. ahmed said ibrahim al farsi 82600 mr. habib mohammed janjan al balushi 81301 mr. hayan hamed khalfan al ghannami" data-attendees="8" data-course-date="2026-04-29" data-course-end="2026-04-29" data-course-title="DGR-CBTA-OPS" data-course-title-ar="البضائع الخطرة — العمليات" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon"><svg class="courseIconSvg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+    <div class="courseIcon" aria-hidden="true">☢️</div>
     <div class="courseTitleWrap">
       <div class="courseTitle">DGR-CBTA-OPS</div>
+      <div class="courseTitleAr">البضائع الخطرة — العمليات</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
         <span class="miniDot">•</span>

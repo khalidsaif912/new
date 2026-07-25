@@ -25,6 +25,94 @@ from training_page_icons import (  # noqa: E402
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 IOS_TOUCH_VER = "20260525c"
 
+# Meaningful course emoji + Arabic title (shown under English title).
+COURSE_META: dict[str, dict[str, str]] = {
+    "Forklift (refresher)": {
+        "ar": "رافعة شوكية (تجديد)",
+        "emoji": "🏗️",
+    },
+    "Human Factors (refresher)": {
+        "ar": "العوامل البشرية (تجديد)",
+        "emoji": "🧠",
+    },
+    "Airside Safety (refresher)": {
+        "ar": "سلامة الجانب الجوي (تجديد)",
+        "emoji": "🦺",
+    },
+    "SMS (initial)": {
+        "ar": "نظام إدارة السلامة (أساسي)",
+        "emoji": "📊",
+    },
+    "LAR (refresher)": {
+        "ar": "لوائح الحيوانات الحية (تجديد)",
+        "emoji": "🐾",
+    },
+    "GDP-TCR (refresher)": {
+        "ar": "ممارسات التوزيع الجيد والتحكم بالحرارة (تجديد)",
+        "emoji": "🌡️",
+    },
+    "DGR-CBTA-OPS (recurrent)": {
+        "ar": "البضائع الخطرة — العمليات (تجديد)",
+        "emoji": "☢️",
+    },
+    "DGR-CBTA-OPS": {
+        "ar": "البضائع الخطرة — العمليات",
+        "emoji": "☢️",
+    },
+    "CWO (Cargo Warehouse Operations)": {
+        "ar": "عمليات مستودع الشحن",
+        "emoji": "📦",
+    },
+    "Cargo Warehouse Operations (CWO) (refresher)": {
+        "ar": "عمليات مستودع الشحن (تجديد)",
+        "emoji": "📦",
+    },
+    "PCR (refresher)": {
+        "ar": "البضائع القابلة للتلف (تجديد)",
+        "emoji": "❄️",
+    },
+    "Cargo Security Awareness (refresher)": {
+        "ar": "التوعية بأمن الشحن (تجديد)",
+        "emoji": "🔐",
+    },
+    "DGR-CBTA-ACC-DG (Acceptance staff)": {
+        "ar": "البضائع الخطرة — موظفو القبول",
+        "emoji": "📝",
+    },
+}
+
+
+def course_meta_for(title: str) -> dict[str, str]:
+    title = (title or "").strip()
+    if title in COURSE_META:
+        return COURSE_META[title]
+    # Fuzzy fallback by keywords.
+    low = title.lower()
+    if "forklift" in low:
+        return {"ar": "رافعة شوكية", "emoji": "🏗️"}
+    if "human factor" in low:
+        return {"ar": "العوامل البشرية", "emoji": "🧠"}
+    if "airside" in low:
+        return {"ar": "سلامة الجانب الجوي", "emoji": "🦺"}
+    if "sms" in low:
+        return {"ar": "نظام إدارة السلامة", "emoji": "📊"}
+    if "lar" in low:
+        return {"ar": "لوائح الحيوانات الحية", "emoji": "🐾"}
+    if "gdp" in low:
+        return {"ar": "ممارسات التوزيع الجيد", "emoji": "🌡️"}
+    if "dgr" in low and "acc" in low:
+        return {"ar": "البضائع الخطرة — القبول", "emoji": "📝"}
+    if "dgr" in low:
+        return {"ar": "البضائع الخطرة", "emoji": "☢️"}
+    if "cwo" in low or "warehouse" in low:
+        return {"ar": "عمليات مستودع الشحن", "emoji": "📦"}
+    if "pcr" in low or "perish" in low:
+        return {"ar": "البضائع القابلة للتلف", "emoji": "❄️"}
+    if "security" in low:
+        return {"ar": "أمن الشحن", "emoji": "🔐"}
+    return {"ar": title, "emoji": "📘"}
+
+
 CSS = """
 :root {
   --bg:#f4f7f9;
@@ -407,7 +495,7 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 }
 .courseIcon{
   position:relative;z-index:1;align-self:start;margin-top:2px;
-  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:22px;
+  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:26px;line-height:1;
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
@@ -416,7 +504,13 @@ html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row
 .courseTitle{
   font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
-  min-height:2.6em;font-family:'Sora',sans-serif;
+  min-height:0;font-family:'Sora',sans-serif;
+}
+.courseTitleAr{
+  margin-top:4px;
+  font-size:13px;font-weight:700;line-height:1.35;color:var(--text-on-acc,var(--text));
+  opacity:.82;font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .courseSubRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;line-height:1.4;color:var(--muted)}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
@@ -1393,18 +1487,27 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     past_cls = " is-past" if course["date"] < today_iso else ""
     today_badge = '<span class="badge todayBadge">Today</span>' if is_today else ""
     open_attr = " open" if is_today else ""
-    search_text = " ".join([course["title"], course.get("code", ""), course["venue"], course["time"]] + [f'{m["no"]} {m["name"]}' for m in course.get("staff", [])]).lower()
+    meta = course_meta_for(course["title"])
+    search_text = " ".join(
+        [course["title"], meta["ar"], course.get("code", ""), course["venue"], course["time"]]
+        + [f'{m["no"]} {m["name"]}' for m in course.get("staff", [])]
+    ).lower()
     pastel = theme_idx % 5
     venue_attr = html_module.escape(course["venue"], quote=True)
     time_attr = html_module.escape(course["time"], quote=True)
     title_attr = html_module.escape(course["title"], quote=True)
+    title_ar_attr = html_module.escape(meta["ar"], quote=True)
+    title_ar_html = html_module.escape(meta["ar"])
+    title_en_html = html_module.escape(course["title"])
+    emoji_html = html_module.escape(meta["emoji"])
     return f'''
-<details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}" data-course-date="{course["date"]}" data-course-end="{course_end}" data-course-title="{title_attr}" data-venue="{venue_attr}" data-time="{time_attr}"{open_attr}>
+<details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}" data-course-date="{course["date"]}" data-course-end="{course_end}" data-course-title="{title_attr}" data-course-title-ar="{title_ar_attr}" data-venue="{venue_attr}" data-time="{time_attr}"{open_attr}>
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon">{SVG_COURSE_ICON}</div>
+    <div class="courseIcon" aria-hidden="true">{emoji_html}</div>
     <div class="courseTitleWrap">
-      <div class="courseTitle">{course["title"]}</div>
+      <div class="courseTitle">{title_en_html}</div>
+      <div class="courseTitleAr">{title_ar_html}</div>
       <div class="courseSubRow">
         <span class="miniMeta"><strong>Venue</strong> {course["venue"]}</span>
         <span class="miniDot">•</span>
