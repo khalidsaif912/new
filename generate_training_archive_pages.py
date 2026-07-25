@@ -634,8 +634,8 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
 .miniDot{color:rgba(148,163,184,.9);font-weight:700}
 .courseBadges{
-  position:relative;z-index:1;align-self:start;display:flex;flex-direction:column;gap:6px;
-  align-items:center;padding-top:2px;
+  position:relative;z-index:1;align-self:start;display:flex!important;flex-direction:column!important;gap:6px!important;
+  align-items:center!important;padding-top:2px;
 }
 .badge{
   display:inline-flex;align-items:center;justify-content:center;gap:5px;
@@ -644,14 +644,16 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   white-space:nowrap;
 }
 .courseChip{
-  width:48px;min-width:48px;height:48px;padding:0;box-sizing:border-box;
-  border-radius:16px;gap:1px;
-  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88));
-  border:1px solid rgba(255,255,255,.85);
-  box-shadow:0 4px 12px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  width:48px!important;min-width:48px!important;max-width:48px!important;
+  height:48px!important;padding:0!important;box-sizing:border-box;
+  border-radius:16px!important;gap:1px;
+  display:inline-flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88))!important;
+  border:1px solid rgba(255,255,255,.85)!important;
+  box-shadow:0 4px 12px rgba(15,23,42,.08),inset 0 1px 0 #fff!important;
   color:var(--text-on-acc,#334155);
-  font-weight:900;line-height:1;
+  font-weight:900;line-height:1;margin:0!important;
 }
 .dateBadge.courseChip{letter-spacing:0}
 .chipPrimary{
