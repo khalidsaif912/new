@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -89,6 +89,15 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.12);
 }
 .langToggle:hover{background:rgba(255,255,255,.34);transform:scale(1.06)}
+html[lang="ar"] body,body.ar{direction:rtl}
+html[lang="ar"] .langBar,body.ar .langBar{right:auto;left:18px}
+html[lang="ar"] .courseHead,body.ar .courseHead{flex-direction:row-reverse}
+html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:row-reverse}
+html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
+html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
+html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
+html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
+html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
 .header{
   position:relative;overflow:hidden;
   padding:34px 26px 30px;border-radius:36px;
@@ -1399,7 +1408,165 @@ body{
       refreshSaved();
       applyFilters();
     }
+    if(e.key === 'rosterLang'){
+      applyTrainingLang(e.newValue === 'ar' ? 'ar' : 'en');
+    }
   });
+
+  const TRAIN_UI = {
+    en: {
+      pageTitle: 'Training Courses',
+      pageSubtitle: 'Visual schedule',
+      during: 'During',
+      search: 'Search',
+      searchPh: 'Search staff / course',
+      clear: 'Clear',
+      roster: 'Roster',
+      myStaff: 'My Staff',
+      myTrainingTitle: 'My training dates',
+      sessions: 'Sessions',
+      session: 'Session',
+      types: 'Types',
+      employees: 'Employees',
+      venues: 'Venues',
+      venue: 'Venue',
+      time: 'Time',
+      today: 'Today',
+      past: 'Previous sessions',
+      empty: 'No matching courses found.',
+      saveEmp: 'Save employee',
+      saveEmpSub: 'Uses your roster saved ID if available, or enter staff number / name',
+      saveEmpPh: 'e.g. 8715 or Khalid',
+      save: 'Save',
+      sharePage: 'Share page',
+      langBtn: 'ع',
+      langTitle: 'Translate to Arabic',
+      chooseMonth: 'Choose month'
+    },
+    ar: {
+      pageTitle: 'دورات التدريب',
+      pageSubtitle: 'جدول مرئي',
+      during: 'خلال',
+      search: 'بحث',
+      searchPh: 'ابحث عن موظف / دورة',
+      clear: 'مسح',
+      roster: 'الروستر',
+      myStaff: 'موظفي',
+      myTrainingTitle: 'مواعيد التدريب',
+      sessions: 'دورات',
+      session: 'دورة',
+      types: 'أنواع',
+      employees: 'موظفون',
+      venues: 'قاعات',
+      venue: 'المكان',
+      time: 'الوقت',
+      today: 'اليوم',
+      past: 'دورات سابقة',
+      empty: 'لا توجد دورات مطابقة.',
+      saveEmp: 'حفظ الموظف',
+      saveEmpSub: 'يستخدم رقمك المحفوظ في الروستر إن وجد، أو أدخل الرقم / الاسم',
+      saveEmpPh: 'مثال: 8715 أو خالد',
+      save: 'حفظ',
+      sharePage: 'مشاركة الصفحة',
+      langBtn: 'EN',
+      langTitle: 'الترجمة إلى الإنجليزية',
+      chooseMonth: 'اختر الشهر'
+    }
+  };
+
+  function trainingLang(){
+    const stored = localStorage.getItem('rosterLang');
+    if(stored === 'ar' || stored === 'en') return stored;
+    return (document.documentElement.lang === 'ar') ? 'ar' : 'en';
+  }
+
+  function applyTrainingLang(lang){
+    const L = (lang === 'ar') ? 'ar' : 'en';
+    const t = TRAIN_UI[L];
+    localStorage.setItem('rosterLang', L);
+    document.documentElement.lang = L;
+    document.documentElement.setAttribute('dir', L === 'ar' ? 'rtl' : 'ltr');
+    document.body.classList.toggle('ar', L === 'ar');
+
+    const titleText = document.querySelector('#pageTitle .pageTitleText') || document.getElementById('pageTitle');
+    if(titleText){
+      if(titleText.classList && titleText.classList.contains('pageTitleText')) titleText.textContent = t.pageTitle;
+      else {
+        const span = titleText.querySelector('.pageTitleText');
+        if(span) span.textContent = t.pageTitle;
+      }
+    }
+    const sub = document.getElementById('pageSubtitle');
+    if(sub) sub.textContent = t.pageSubtitle;
+
+    const dateTag = document.querySelector('.dateTag');
+    if(dateTag){
+      dateTag.childNodes.forEach(node => {
+        if(node.nodeType === 3){
+          const raw = node.textContent || '';
+          const trimmed = raw.trim();
+          if(!trimmed) return;
+          const range = trimmed.replace(/^(During|خلال)\s*/i, '').trim();
+          node.textContent = ' ' + t.during + ' ' + range + ' ';
+        }
+      });
+    }
+
+    const langBtn = document.getElementById('langToggle');
+    if(langBtn){
+      langBtn.textContent = t.langBtn;
+      langBtn.title = t.langTitle;
+      langBtn.setAttribute('aria-label', t.langTitle);
+    }
+
+    const searchLbl = document.querySelector('#searchToggle .dockLabel');
+    if(searchLbl) searchLbl.textContent = t.search;
+    const rosterLbl = document.querySelector('#rosterHomeBtn .rosterLabel');
+    if(rosterLbl) rosterLbl.textContent = t.roster;
+    if(searchInput) searchInput.placeholder = t.searchPh;
+    if(searchBtn) searchBtn.textContent = t.search;
+    if(clearBtn) clearBtn.textContent = t.clear;
+    if(emptyState) emptyState.textContent = t.empty;
+    if(pastSep) pastSep.textContent = t.past;
+    if(monthPicker) monthPicker.setAttribute('aria-label', t.chooseMonth);
+
+    const statLabels = [t.sessions, t.types, t.employees, t.venues];
+    document.querySelectorAll('.statsFace .dockLabel').forEach((el, i) => {
+      if(statLabels[i]) el.textContent = statLabels[i];
+    });
+
+    document.querySelectorAll('.miniMeta').forEach(meta => {
+      const strong = meta.querySelector('strong');
+      if(!strong) return;
+      const key = (strong.textContent || '').trim().toLowerCase();
+      if(key === 'venue' || key === 'المكان') strong.textContent = t.venue;
+      if(key === 'time' || key === 'الوقت') strong.textContent = t.time;
+    });
+    document.querySelectorAll('.todayBadge').forEach(el => { el.textContent = t.today; });
+
+    const staffTitle = document.querySelector('.staffModalTitle');
+    if(staffTitle) staffTitle.textContent = t.saveEmp;
+    if(staffInput) staffInput.placeholder = t.saveEmpPh;
+    if(staffClear) staffClear.textContent = t.clear;
+    if(staffSave) staffSave.textContent = t.save;
+
+    const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
+    if(shareLbl) shareLbl.textContent = t.sharePage;
+
+    if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
+      savedName.textContent = t.myStaff;
+    }
+    if(myTrainingTitle) myTrainingTitle.textContent = t.myTrainingTitle;
+    refreshSaved();
+  }
+
+  document.getElementById('langToggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    applyTrainingLang(trainingLang() === 'ar' ? 'en' : 'ar');
+  });
+
+  applyTrainingLang(trainingLang());
   refreshSaved();
   applyFilters();
 })();
