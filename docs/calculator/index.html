@@ -207,6 +207,34 @@
             align-items: flex-end;
         }
 
+        .shipment-fields {
+            overflow: hidden;
+            max-height: 72px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-bottom: 10px;
+            transition:
+                max-height 0.38s cubic-bezier(.22,.7,.2,1),
+                opacity 0.28s ease,
+                transform 0.38s cubic-bezier(.22,.7,.2,1),
+                margin 0.38s ease;
+        }
+
+        .shipment-form-card.is-collapsed .shipment-fields {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-18px);
+            margin-bottom: 0;
+            pointer-events: none;
+        }
+
+        .shipment-form-card.is-collapsed .btn-add-shipment {
+            background: linear-gradient(180deg, #66bb6a 0%, #43a047 50%, #2e7d32 100%);
+            box-shadow:
+                0 4px 14px rgba(46, 125, 50, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.24);
+        }
+
         .field-label {
             display: block;
             font-size: 0.78rem;
@@ -1484,12 +1512,12 @@
                             <input type="text" id="quantity" class="form-input" placeholder="QTY" aria-label="الكمية الكلية" dir="ltr" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
                         </div>
                     </div>
-                    <button type="button" class="btn-add-shipment" onclick="addShipment()">
+                    <button type="button" class="btn-add-shipment" id="addShipmentBtn" onclick="addShipment()">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                             <path d="M12 5v14"></path>
                             <path d="M5 12h14"></path>
                         </svg>
-                        <span>إضافة / تحديث الشحنة</span>
+                        <span id="addShipmentBtnLabel">إضافة / تحديث الشحنة</span>
                     </button>
                 </div>
             </div>
@@ -1648,7 +1676,40 @@
             if (e.target === this) closeInfoModal();
         });
 
+        function isShipmentFormCollapsed() {
+            var card = document.querySelector('.shipment-form-card');
+            return !!(card && card.classList.contains('is-collapsed'));
+        }
+
+        function setShipmentFormCollapsed(collapsed) {
+            var card = document.querySelector('.shipment-form-card');
+            var label = document.getElementById('addShipmentBtnLabel');
+            if (!card) return;
+            card.classList.toggle('is-collapsed', !!collapsed);
+            if (label) {
+                label.textContent = collapsed ? 'إضافة' : 'إضافة / تحديث الشحنة';
+            }
+            updateLayoutHeights();
+        }
+
+        function expandShipmentFormForEntry() {
+            setShipmentFormCollapsed(false);
+            setTimeout(function() {
+                var awbInput = document.getElementById('awb');
+                if (!awbInput) return;
+                awbInput.focus();
+                if (typeof awbInput.select === 'function') {
+                    try { awbInput.select(); } catch (e) {}
+                }
+            }, 320);
+        }
+
         function addShipment() {
+            if (isShipmentFormCollapsed()) {
+                expandShipmentFormForEntry();
+                return;
+            }
+
             var awbInput = document.getElementById('awb');
             var quantityInput = document.getElementById('quantity');
             var awb = awbInput.value.trim();
@@ -1682,11 +1743,10 @@
             
             updateCount();
             updateTabStatus(awb);
-            updateLayoutHeights();
             
             awbInput.value = '';
             quantityInput.value = '';
-            awbInput.focus();
+            setShipmentFormCollapsed(true);
             
             setTimeout(function() { 
                 switchTab(awb);
@@ -1695,6 +1755,7 @@
                     if (firstPartElement) {
                         firstPartElement.focus();
                     }
+                    updateLayoutHeights();
                 }, 100);
             }, 100);
             saveData();
