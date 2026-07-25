@@ -30,6 +30,7 @@ COURSE_META: dict[str, dict[str, str]] = {
     "Forklift (refresher)": {
         "ar": "تشغيل الرافعة الشوكية (تجديد)",
         "emoji": "🏗️",
+        "icon": "course-icons/forklift.png",
         "desc_ar": "الاستخدام الآمن للرافعة الشوكية.",
         "desc_en": "Safe forklift operation.",
     },
@@ -114,6 +115,7 @@ def course_meta_for(title: str) -> dict[str, str]:
         return {
             "ar": "تشغيل الرافعة الشوكية",
             "emoji": "🏗️",
+            "icon": "course-icons/forklift.png",
             "desc_ar": "الاستخدام الآمن للرافعة الشوكية.",
             "desc_en": "Safe forklift operation.",
         }
@@ -568,7 +570,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  overflow:hidden;
 }
+.courseIcon.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.2);
+  box-shadow:0 6px 18px rgba(15,23,42,.14);
+}
+.courseIconImg{width:100%;height:100%;object-fit:cover;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
 .courseTitleRow{
   display:flex;align-items:flex-start;gap:8px;min-width:0;
@@ -648,7 +656,12 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   border:1px solid rgba(255,255,255,.95);
   box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
   animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+  overflow:hidden;
 }
+.courseInfoEmoji.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.18);
+}
+.courseInfoEmoji img{width:100%;height:100%;object-fit:cover;display:block}
 @keyframes courseInfoPop{
   0%{transform:scale(.6) translateY(10px);opacity:0}
   100%{transform:scale(1) translateY(0);opacity:1}
@@ -1572,11 +1585,20 @@ PAGE_JS = r"""
     if(!courseInfoModal || !btn) return;
     const isAr = trainingLang() === 'ar';
     const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const icon = (btn.getAttribute('data-course-icon') || '').trim();
     const titleEn = btn.getAttribute('data-course-title') || '';
     const titleAr = btn.getAttribute('data-course-title-ar') || '';
     const descAr = btn.getAttribute('data-course-desc-ar') || '';
     const descEn = btn.getAttribute('data-course-desc-en') || '';
-    if(courseInfoEmoji) courseInfoEmoji.textContent = emoji;
+    if(courseInfoEmoji){
+      if(icon){
+        courseInfoEmoji.classList.add('hasImg');
+        courseInfoEmoji.innerHTML = '<img src="' + icon.replace(/"/g, '') + '" alt="">';
+      } else {
+        courseInfoEmoji.classList.remove('hasImg');
+        courseInfoEmoji.textContent = emoji;
+      }
+    }
     if(courseInfoTitle){
       courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
     }
@@ -1684,7 +1706,15 @@ def month_range_label(courses: list[dict]) -> str:
     return f"{start.day:02d} – {end.day:02d} {MONTH_NAMES_AR[end.month-1]}"
 
 
-def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
+def course_icon_url(icon: str, in_archive: bool) -> str:
+    rel = (icon or "").strip().lstrip("/")
+    if not rel:
+        return ""
+    base = "../../assets/" if in_archive else "../assets/"
+    return f"{base}{rel}?v=20260725f"
+
+
+def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: bool = False) -> str:
     rows = []
     for i, member in enumerate(course.get("staff", []), start=1):
         alt = " empRowAlt" if i % 2 == 0 else ""
@@ -1714,11 +1744,21 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
     desc_ar_attr = html_module.escape(desc_ar, quote=True)
     desc_en_attr = html_module.escape(desc_en, quote=True)
     emoji_attr = html_module.escape(meta["emoji"], quote=True)
+    icon_url = course_icon_url(meta.get("icon", ""), in_archive)
+    icon_attr = html_module.escape(icon_url, quote=True) if icon_url else ""
+    if icon_url:
+        icon_block = (
+            f'<div class="courseIcon hasImg" aria-hidden="true">'
+            f'<img class="courseIconImg" src="{icon_attr}" alt=""></div>'
+        )
+    else:
+        icon_block = f'<div class="courseIcon" aria-hidden="true">{emoji_html}</div>'
     info_btn = ""
     if desc_ar or desc_en:
         info_btn = (
             f'<button class="courseInfoBtn" type="button" aria-label="Course info" '
-            f'data-course-emoji="{emoji_attr}" data-course-title="{title_attr}" '
+            f'data-course-emoji="{emoji_attr}" data-course-icon="{icon_attr}" '
+            f'data-course-title="{title_attr}" '
             f'data-course-title-ar="{title_ar_attr}" data-course-desc-ar="{desc_ar_attr}" '
             f'data-course-desc-en="{desc_en_attr}">'
             f'<span class="courseInfoMark" aria-hidden="true">?</span></button>'
@@ -1727,7 +1767,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0) -> str:
 <details class="courseCard{past_cls} pastelT{pastel}" data-search="{search_text}" data-attendees="{len(course.get("staff", []))}" data-course-date="{course["date"]}" data-course-end="{course_end}" data-course-title="{title_attr}" data-course-title-ar="{title_ar_attr}" data-venue="{venue_attr}" data-time="{time_attr}"{open_attr}>
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon" aria-hidden="true">{emoji_html}</div>
+    {icon_block}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">{title_en_html}</div>
@@ -1800,13 +1840,13 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
     theme_i = 0
     card_parts: list[str] = []
     for c in upcoming:
-        card_parts.append(render_course(c, today_iso, theme_i))
+        card_parts.append(render_course(c, today_iso, theme_i, in_archive=in_archive))
         theme_i += 1
     cards = "".join(card_parts)
     if past:
         cards += '<div class="pastLabel" id="pastSep">Previous sessions</div>'
         for c in past:
-            cards += render_course(c, today_iso, theme_i)
+            cards += render_course(c, today_iso, theme_i, in_archive=in_archive)
             theme_i += 1
     page = f'''<!doctype html>
 <html lang="en">

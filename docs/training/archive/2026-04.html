@@ -396,7 +396,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  overflow:hidden;
 }
+.courseIcon.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.2);
+  box-shadow:0 6px 18px rgba(15,23,42,.14);
+}
+.courseIconImg{width:100%;height:100%;object-fit:cover;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
 .courseTitleRow{
   display:flex;align-items:flex-start;gap:8px;min-width:0;
@@ -476,7 +482,12 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   border:1px solid rgba(255,255,255,.95);
   box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
   animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+  overflow:hidden;
 }
+.courseInfoEmoji.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.18);
+}
+.courseInfoEmoji img{width:100%;height:100%;object-fit:cover;display:block}
 @keyframes courseInfoPop{
   0%{transform:scale(.6) translateY(10px);opacity:0}
   100%{transform:scale(1) translateY(0);opacity:1}
@@ -764,7 +775,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">DGR-CBTA-OPS</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-icon="" data-course-title="DGR-CBTA-OPS" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة</div>
       <div class="courseSubRow">
@@ -1528,11 +1539,20 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     if(!courseInfoModal || !btn) return;
     const isAr = trainingLang() === 'ar';
     const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const icon = (btn.getAttribute('data-course-icon') || '').trim();
     const titleEn = btn.getAttribute('data-course-title') || '';
     const titleAr = btn.getAttribute('data-course-title-ar') || '';
     const descAr = btn.getAttribute('data-course-desc-ar') || '';
     const descEn = btn.getAttribute('data-course-desc-en') || '';
-    if(courseInfoEmoji) courseInfoEmoji.textContent = emoji;
+    if(courseInfoEmoji){
+      if(icon){
+        courseInfoEmoji.classList.add('hasImg');
+        courseInfoEmoji.innerHTML = '<img src="' + icon.replace(/"/g, '') + '" alt="">';
+      } else {
+        courseInfoEmoji.classList.remove('hasImg');
+        courseInfoEmoji.textContent = emoji;
+      }
+    }
     if(courseInfoTitle){
       courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
     }

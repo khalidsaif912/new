@@ -396,7 +396,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
   border:1px solid rgba(255,255,255,.9);
   box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  overflow:hidden;
 }
+.courseIcon.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.2);
+  box-shadow:0 6px 18px rgba(15,23,42,.14);
+}
+.courseIconImg{width:100%;height:100%;object-fit:cover;display:block}
 .courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
 .courseTitleRow{
   display:flex;align-items:flex-start;gap:8px;min-width:0;
@@ -476,7 +482,12 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   border:1px solid rgba(255,255,255,.95);
   box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
   animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+  overflow:hidden;
 }
+.courseInfoEmoji.hasImg{
+  background:#0b0b0b;padding:0;border-color:rgba(255,255,255,.18);
+}
+.courseInfoEmoji img{width:100%;height:100%;object-fit:cover;display:block}
 @keyframes courseInfoPop{
   0%{transform:scale(.6) translateY(10px);opacity:0}
   100%{transform:scale(1) translateY(0);opacity:1}
@@ -764,7 +775,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Airside Safety (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🦺" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">سلامة ساحة المطار (تجديد)</div>
       <div class="courseSubRow">
@@ -791,7 +802,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">GDP-TCR (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🌡️" data-course-title="GDP-TCR (refresher)" data-course-title-ar="الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)" data-course-desc-ar="نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان." data-course-desc-en="Safe transport and storage of temperature-sensitive cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🌡️" data-course-icon="" data-course-title="GDP-TCR (refresher)" data-course-title-ar="الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)" data-course-desc-ar="نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان." data-course-desc-en="Safe transport and storage of temperature-sensitive cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)</div>
       <div class="courseSubRow">
@@ -818,7 +829,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">LAR (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🐾" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🐾" data-course-icon="" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">لوائح نقل الحيوانات الحية (تجديد)</div>
       <div class="courseSubRow">
@@ -845,7 +856,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">CWO (Cargo Warehouse Operations)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📦" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📦" data-course-icon="" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">عمليات مستودع الشحن</div>
       <div class="courseSubRow">
@@ -872,7 +883,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Human Factors (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
@@ -899,7 +910,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Human Factors (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
       <div class="courseSubRow">
@@ -926,7 +937,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">PCR (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="❄️" data-course-title="PCR (refresher)" data-course-title-ar="لوائح الشحنات القابلة للتلف (تجديد)" data-course-desc-ar="التعامل الصحيح مع الشحنات سريعة التلف." data-course-desc-en="Correct handling of perishable cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="❄️" data-course-icon="" data-course-title="PCR (refresher)" data-course-title-ar="لوائح الشحنات القابلة للتلف (تجديد)" data-course-desc-ar="التعامل الصحيح مع الشحنات سريعة التلف." data-course-desc-en="Correct handling of perishable cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">لوائح الشحنات القابلة للتلف (تجديد)</div>
       <div class="courseSubRow">
@@ -949,11 +960,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 <details class="courseCard is-past pastelT2" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 8930 mr. fahim salim hamed al hasni 80276 mr. allan vianzon tajonera 82114 mr. mubarak hassan obaid al-nofli 82130 mr. mohamed hamed hilal al toobi 82466 mr. waleed salim abdullah al kharusi" data-attendees="5" data-course-date="2026-07-09" data-course-end="2026-07-09" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon" aria-hidden="true">🏗️</div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../assets/course-icons/forklift.png?v=20260725f" alt=""></div>
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Forklift (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../assets/course-icons/forklift.png?v=20260725f" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
       <div class="courseSubRow">
@@ -976,11 +987,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 <details class="courseCard is-past pastelT3" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 80269 mr. fritzardo cruz magcaling 81259 mr. mohammed lauh murad al zadjali 81300 mr. talal mahmood darwhish al balushi 81983 mr. jabir nasser saif al-julandani 82441 mr. mudthir abdullah said al hajri 82579 mr. jihad sami mohammed al sarmi 82664 ms. haifa yousuf al balushi 990752 mr. ali yousuf yaqoob al baluchi 990799 mr. muneer ghulam haikal al balushi" data-attendees="9" data-course-date="2026-07-08" data-course-end="2026-07-08" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon" aria-hidden="true">🏗️</div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../assets/course-icons/forklift.png?v=20260725f" alt=""></div>
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Forklift (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../assets/course-icons/forklift.png?v=20260725f" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
       <div class="courseSubRow">
@@ -1003,11 +1014,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 <details class="courseCard is-past pastelT4" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 8715 mr. khalid saif said al raqadi 8859 mr. sultan saif mohammad al riyami 80335 mr. ericson saulo puno 80831 mr. jaffer a redha mohammed al ajmi 81032 mr. mohammed said fadhil al-balushi 81403 mr. mohammed anis mohammad al kharusi 82409 mr. qais salmeen suweilem al rashdi 82412 mr. qasim said khamis al gharibi 82547 mr. mazin mohammed amur al hajri 82596 mr. hamed saif hamed al fulaiti" data-attendees="10" data-course-date="2026-07-07" data-course-end="2026-07-07" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
   <summary class="courseHead">
     <div class="headGlow"></div>
-    <div class="courseIcon" aria-hidden="true">🏗️</div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../assets/course-icons/forklift.png?v=20260725f" alt=""></div>
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">Forklift (refresher)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../assets/course-icons/forklift.png?v=20260725f" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
       <div class="courseSubRow">
@@ -1034,7 +1045,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">SMS (initial)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📊" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="📊" data-course-icon="" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">نظام إدارة السلامة (أساسي)</div>
       <div class="courseSubRow">
@@ -1061,7 +1072,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="courseTitleWrap">
       <div class="courseTitleRow">
         <div class="courseTitle">DGR-CBTA-OPS (recurrent)</div>
-        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        <button class="courseInfoBtn" type="button" aria-label="Course info" data-course-emoji="☢️" data-course-icon="" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
       </div>
       <div class="courseTitleAr">لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)</div>
       <div class="courseSubRow">
@@ -1825,11 +1836,20 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     if(!courseInfoModal || !btn) return;
     const isAr = trainingLang() === 'ar';
     const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const icon = (btn.getAttribute('data-course-icon') || '').trim();
     const titleEn = btn.getAttribute('data-course-title') || '';
     const titleAr = btn.getAttribute('data-course-title-ar') || '';
     const descAr = btn.getAttribute('data-course-desc-ar') || '';
     const descEn = btn.getAttribute('data-course-desc-en') || '';
-    if(courseInfoEmoji) courseInfoEmoji.textContent = emoji;
+    if(courseInfoEmoji){
+      if(icon){
+        courseInfoEmoji.classList.add('hasImg');
+        courseInfoEmoji.innerHTML = '<img src="' + icon.replace(/"/g, '') + '" alt="">';
+      } else {
+        courseInfoEmoji.classList.remove('hasImg');
+        courseInfoEmoji.textContent = emoji;
+      }
+    }
     if(courseInfoTitle){
       courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
     }
