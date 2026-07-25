@@ -651,6 +651,9 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   box-shadow:0 6px 16px rgba(15,23,42,.1),inset 0 1px 0 #fff;
   isolation:isolate;
 }
+.metaTicker.hasInfo{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.metaTicker.hasInfo:hover{box-shadow:0 8px 18px rgba(37,99,235,.16),inset 0 1px 0 #fff;transform:translateY(-1px)}
+.metaTicker.hasInfo:active{transform:translateY(0)}
 .metaTickerStage{position:relative;width:100%;height:100%}
 .metaFace{
   position:absolute;inset:0;
@@ -662,12 +665,11 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   background:transparent;border:none;padding:0;width:100%;height:100%;
   font-family:inherit;
 }
-.metaFace.is-active{opacity:1;transform:translateY(0) scale(1);z-index:2;pointer-events:auto}
+.metaFace.is-active{opacity:1;transform:translateY(0) scale(1);z-index:2}
 .metaFace.is-exit{opacity:0;transform:translateY(-110%) scale(.92);z-index:1}
 .metaFace[data-face="people"]{flex-direction:row;gap:3px;font-size:13px;color:#334155}
 .metaFace[data-face="people"] .peopleIconSvg{width:12px;height:12px;margin:0}
-.metaFace[data-face="info"]{color:#2563eb;font-size:20px;cursor:pointer}
-.metaFace[data-face="info"]:hover{background:rgba(239,246,255,.85)}
+.metaFace[data-face="info"]{color:#2563eb;font-size:20px}
 .chipPrimary{
   font-size:15px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
   color:var(--text-on-acc,var(--blue2));
@@ -1718,11 +1720,11 @@ PAGE_JS = r"""
   }
 
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.courseInfoBtn');
-    if(!btn) return;
+    const ticker = e.target.closest('[data-meta-ticker].hasInfo');
+    if(!ticker) return;
     e.preventDefault();
     e.stopPropagation();
-    openCourseInfo(btn);
+    openCourseInfo(ticker);
   }, true);
   courseInfoCloseBtn?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1757,12 +1759,6 @@ PAGE_JS = r"""
       }
       const delay = 2200 + (cardIdx % 5) * 180;
       window.setInterval(() => show((idx + 1) % faces.length), delay);
-      ticker.addEventListener('click', (e) => {
-        if(e.target.closest('.courseInfoBtn')) return;
-        e.preventDefault();
-        e.stopPropagation();
-        show((idx + 1) % faces.length);
-      });
     });
   }
   initMetaTickers();
@@ -1906,8 +1902,16 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
         icon_block = f'<div class="courseIcon" aria-hidden="true">{emoji_html}</div>'
     info_face = ""
     faces_count = 2
+    ticker_info_attrs = ""
+    ticker_has_info = ""
     if desc_ar or desc_en:
         faces_count = 3
+        ticker_has_info = " hasInfo"
+        ticker_info_attrs = (
+            f' data-course-emoji="{emoji_attr}" data-course-icon="{icon_attr}" '
+            f'data-course-title="{title_attr}" data-course-title-ar="{title_ar_attr}" '
+            f'data-course-desc-ar="{desc_ar_attr}" data-course-desc-en="{desc_en_attr}"'
+        )
         info_face = (
             f'<button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" '
             f'data-course-emoji="{emoji_attr}" data-course-icon="{icon_attr}" '
@@ -1938,7 +1942,7 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     </div>
     <div class="courseBadges">
       {today_badge}
-      <div class="metaTicker" data-meta-ticker title="{date_title}">
+      <div class="metaTicker{ticker_has_info}" data-meta-ticker title="{date_title}"{ticker_info_attrs} role="button" tabindex="0" aria-label="Course info">
         <div class="metaTickerStage">
           <div class="metaFace is-active" data-face="date">
             <span class="chipPrimary">{html_module.escape(day_primary)}</span>
