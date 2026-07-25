@@ -89,6 +89,15 @@ body{
   box-shadow:0 4px 16px rgba(0,0,0,.12);
 }
 .langToggle:hover{background:rgba(255,255,255,.34);transform:scale(1.06)}
+html[lang="ar"] body,body.ar{direction:rtl}
+html[lang="ar"] .langBar,body.ar .langBar{right:auto;left:18px}
+html[lang="ar"] .courseHead,body.ar .courseHead{flex-direction:row-reverse}
+html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:row-reverse}
+html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
+html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
+html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
+html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
+html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
 .header{
   position:relative;overflow:hidden;
   padding:34px 26px 30px;border-radius:36px;
