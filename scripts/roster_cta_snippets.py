@@ -675,6 +675,7 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
     .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
     .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
       animation: siteAppsStorePulse 2.4s ease-in-out infinite;
@@ -763,6 +764,11 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-icon">{SVG_APP_CART}</span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
         <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--book" href="https://khalidsaif912.github.io/new/docs/a-cup-of-book/" data-app-id="book" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="book">A Cup of Book</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="book">Reading topics</span>
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon">{SVG_APP_STORE}</span>

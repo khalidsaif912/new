@@ -18,6 +18,8 @@
       calcSub: 'Shipment calc',
       quicklist: 'QuickList',
       quicklistSub: 'Shopping lists',
+      book: 'A Cup of Book',
+      bookSub: 'Reading topics',
       games: 'Memory Games',
       gamesSub: 'Roster games hub',
       gamePairs: 'Picture Pairs',
@@ -59,6 +61,8 @@
       calcSub: 'حساب الشحنات',
       quicklist: 'قوائم المشتريات',
       quicklistSub: 'سجل المنزل',
+      book: 'A Cup of Book',
+      bookSub: 'مواضيع القراءة',
       games: 'ألعاب الذاكرة',
       gamesSub: 'مركز ألعاب الروستر',
       gamePairs: 'قرائن الصور',
@@ -137,6 +141,12 @@
       '<path d="M22 18a10 10 0 0 1 20 0" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
       '<path d="M18 18h28l-2 10H20z" fill="#a78bfa"/>' +
       '<circle cx="26" cy="40" r="2.4" fill="#0f172a"/><circle cx="38" cy="40" r="2.4" fill="#0f172a"/>' +
+      '</svg>',
+    book:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>' +
       '</svg>',
     store:
       '<svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
@@ -220,6 +230,7 @@
       if (val && val !== subKey) el.textContent = val;
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
+    ensureBookAppLink();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
@@ -234,6 +245,7 @@
     upgradeAppIcons();
     patchCalcLink();
     patchQuicklistLink();
+    ensureBookAppLink();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -417,6 +429,51 @@
     link.removeAttribute('rel');
   }
 
+  function patchBookLink() {
+    var link = document.querySelector('.siteAppsLink--book');
+    if (!link) return;
+    link.href = bookPageUrl();
+    link.setAttribute('data-open-same', '1');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+  }
+
+  function ensureBookAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var existing = grid.querySelector('.siteAppsLink--book, [data-app-id="book"]');
+    if (existing) {
+      patchBookLink();
+      return;
+    }
+    var link = document.createElement('a');
+    link.className = 'siteAppsLink siteAppsLink--book';
+    link.setAttribute('data-app-id', 'book');
+    link.setAttribute('data-open-same', '1');
+    link.href = bookPageUrl();
+    link.innerHTML =
+      '<span class="siteAppsLink-icon">' +
+      (APP_ICONS.book || '') +
+      '</span>' +
+      '<span class="siteAppsLink-title" data-i18n="book">' +
+      t('book') +
+      '</span>' +
+      '<span class="siteAppsLink-sub" data-i18n-sub="book">' +
+      t('bookSub') +
+      '</span>';
+    var quicklist = grid.querySelector('.siteAppsLink--quicklist');
+    if (quicklist && quicklist.nextSibling) {
+      grid.insertBefore(link, quicklist.nextSibling);
+    } else if (quicklist) {
+      grid.appendChild(link);
+    } else {
+      var store = grid.querySelector('.siteAppsLink--store');
+      if (store) grid.insertBefore(link, store);
+      else grid.appendChild(link);
+    }
+    patchBookLink();
+  }
+
   function openCalcFromPwa(e) {
     var link = e.target.closest('a.siteAppsLink--calc');
     if (!link) return;
@@ -448,6 +505,7 @@
     if (!grid) return;
     patchCalcLink();
     patchQuicklistLink();
+    ensureBookAppLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
@@ -456,6 +514,13 @@
       }
       if (e.target.closest('a.siteAppsLink--quicklist')) {
         openQuicklistFromPwa(e);
+        return;
+      }
+      if (e.target.closest('a.siteAppsLink--book')) {
+        if (!isStandaloneApp()) return;
+        e.preventDefault();
+        closeModal();
+        window.location.assign(bookPageUrl());
         return;
       }
       var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
@@ -542,6 +607,7 @@
       '.siteAppsLink--labels .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
       '.siteAppsLink--calc .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
+      '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       '.siteAppsLink--store{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
       '.siteAppsLink--games{background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
@@ -844,6 +910,7 @@
     ensureSpotlightButton();
     patchCalcLink();
     patchQuicklistLink();
+    ensureBookAppLink();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {
       if (!sessionStorage.getItem('spotlightShown')) {
@@ -861,6 +928,7 @@
     close: closeModal,
     calcUrl: calcPageUrl,
     quicklistUrl: quicklistPageUrl,
+    bookUrl: bookPageUrl,
   };
 
   if (document.readyState === 'loading') {

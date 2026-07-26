@@ -55,6 +55,7 @@
       justify-content:center;
     }
     .car-btn{
+      position:relative;
       width:56px;height:56px;padding:3px;
       border-radius:10px;border:2px solid rgba(255,255,255,.20);
       background:rgba(255,255,255,.10);
@@ -73,6 +74,19 @@
       border-color:rgba(255,255,255,.55);
       transform:scale(1.06);
     }
+    .car-btn.is-new{
+      border-color:rgba(253,224,71,.95);
+      box-shadow:0 0 0 2px rgba(245,158,11,.35);
+    }
+    .car-new-badge{
+      position:absolute;top:2px;inset-inline-start:2px;z-index:2;
+      padding:2px 5px;border-radius:999px;
+      background:linear-gradient(135deg,#f59e0b,#ef4444);
+      color:#fff;font-size:8px;font-weight:900;line-height:1.1;
+      letter-spacing:.2px;
+      box-shadow:0 2px 6px rgba(0,0,0,.25);
+      pointer-events:none;
+    }
 
     /* ── Header quick links ── */
     .quickLinks{
@@ -85,8 +99,10 @@
       background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
       color:rgba(255,255,255,.92);font-size:11px;font-weight:800;
       text-decoration:none;transition:.2s;
+      cursor:pointer;font:inherit;
     }
     .quickBtn:hover{background:rgba(255,255,255,.25)}
+    button.quickBtn{appearance:none;-webkit-appearance:none}
 
     /* ── Viewer: centered, readable width ── */
     .viewer{
@@ -200,6 +216,10 @@
     <div class="trainStrip" id="trainStrip"></div>
 
     <div class="quickLinks">
+      <button type="button" class="quickBtn" id="shareBookBtn" aria-label="مشاركة الصفحة">
+        <span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span>مشاركة</span>
+      </button>
       <a class="quickBtn" href="../training/"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Training schedule</span></a>
       <a class="quickBtn" href="../" aria-label="العودة إلى الروستر الصادر"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span>الصادر</span></a>
       <a class="quickBtn" href="../import/" aria-label="الذهاب إلى الروستر الوارد"><span class="quickBtn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></span><span>الوارد</span></a>
@@ -227,6 +247,12 @@
 <script>
 (function(){
   var FILES = ["cup_of_book_01.jpg", "cup_of_book_02.jpg", "cup_of_book_03.jpg", "cup_of_book_04.jpg", "cup_of_book_05.jpg", "cup_of_book_06.jpg", "cup_of_book_07.jpg", "cup_of_book_09.jpg", "cup_of_book_10.jpg", "cup_of_book_11.jpg", "cup_of_book_12.jpg"];
+  // Newest topic first (highest cup_of_book_NN number)
+  FILES.sort(function(a, b) {
+    var na = parseInt((a.match(/(\d+)/) || [0, 0])[1], 10);
+    var nb = parseInt((b.match(/(\d+)/) || [0, 0])[1], 10);
+    return nb - na;
+  });
   var BASE = 'images/';
   var loaded = [];
   var cur = 0;
@@ -238,12 +264,15 @@
   var empty   = document.getElementById('empty');
 
   function selectIdx(i) {
+    if (!loaded.length) return;
     cur = i;
     strip.querySelectorAll('.car-btn').forEach(function(b, idx) {
       b.classList.toggle('active', idx === i);
     });
     bigImg.src = loaded[i].src;
-    lbl.textContent = 'Book ' + String(i + 1).padStart(2, '0') + ' of ' + loaded.length;
+    var label = 'Book ' + String(i + 1).padStart(2, '0') + ' of ' + loaded.length;
+    if (i === 0) label = 'جديد · ' + label;
+    lbl.textContent = label;
     viewer.style.display = 'block';
   }
 
@@ -252,31 +281,54 @@
     selectIdx((cur + dir + loaded.length) % loaded.length);
   };
 
-  FILES.forEach(function(name) {
+  FILES.forEach(function(name, idx) {
     var src = BASE + name;
-    var probe = new Image();
-    probe.onload = function() {
-      var idx = loaded.length;
-      loaded.push({ src: src });
+    loaded.push({ src: src, name: name });
 
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'car-btn';
-      btn.title = 'Book ' + (idx + 1);
-      btn.innerHTML = '<img src="' + src + '" alt="Book ' + (idx + 1) + '">';
-      btn.addEventListener('click', (function(i){ return function(){ selectIdx(i); }; })(idx));
-      strip.appendChild(btn);
-
-      if (idx === 0) selectIdx(0);
-    };
-    probe.src = src;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'car-btn' + (idx === 0 ? ' is-new' : '');
+    btn.title = idx === 0 ? 'جديد · أحدث موضوع' : ('Book ' + (idx + 1));
+    btn.innerHTML =
+      (idx === 0 ? '<span class="car-new-badge">جديد</span>' : '') +
+      '<img src="' + src + '" alt="Book ' + (idx + 1) + '" loading="' + (idx < 3 ? 'eager' : 'lazy') + '">';
+    btn.addEventListener('click', function(){ selectIdx(idx); });
+    strip.appendChild(btn);
   });
 
-  setTimeout(function() {
-    if (!loaded.length) {
-      empty.style.display = 'block';
-    }
-  }, 1400);
+  if (loaded.length) {
+    selectIdx(0);
+  } else {
+    empty.style.display = 'block';
+  }
+
+  // Share (same banner pill style)
+  var shareBtn = document.getElementById('shareBookBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function() {
+      var url = location.href.split('#')[0];
+      var title = 'A Cup of Book';
+      var text = 'A Cup of Book — أحدث موضوع في القائمة';
+      if (navigator.share) {
+        navigator.share({ title: title, text: text, url: url }).catch(function(){});
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+          var label = shareBtn.querySelector('span:last-child');
+          if (label) {
+            var prev = label.textContent;
+            label.textContent = 'تم النسخ';
+            setTimeout(function(){ label.textContent = prev; }, 1400);
+          }
+        }).catch(function() {
+          window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + url), '_blank');
+        });
+        return;
+      }
+      window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + url), '_blank');
+    });
+  }
 })();
 </script>
 </body>
