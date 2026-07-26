@@ -20,8 +20,8 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    .gate, .app { max-width: 560px; margin: 0 auto; padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)); }
-    .gate { text-align: center; padding-top: 18vh; }
+    .gate, .app { max-width: 720px; margin: 0 auto; padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)); }
+    .gate { text-align: center; padding-top: 18vh; max-width: 560px; }
     .gate h1 { font-size: 18px; margin: 0 0 8px; color: #94a3b8; font-weight: 700; }
     .gate p { margin: 0 0 16px; font-size: 13px; color: #64748b; }
     .gate input {
@@ -282,6 +282,97 @@
       border-color: #3b82f655;
       color: #dbeafe;
     }
+    .toolbar.mainTabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .toolbar.mainTabs .chip {
+      width: 100%;
+      justify-content: center;
+      min-height: 42px;
+      font-size: 13px;
+    }
+    .toolsIntro {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .toolsGrid {
+      display: grid;
+      gap: 10px;
+    }
+    .toolCard {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 12px;
+      align-items: center;
+      background: linear-gradient(165deg, #1e293b, #0f172aee);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s ease, transform .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toolCard:active { transform: scale(.99); }
+    .toolCard:hover { border-color: #60a5fa88; }
+    .toolTag {
+      display: inline-flex;
+      font-size: 10px;
+      font-weight: 800;
+      color: #93c5fd;
+      background: #1e3a8a66;
+      border: 1px solid #3b82f655;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-bottom: 6px;
+    }
+    .toolTitle {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .toolDesc {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+    .toolGo {
+      flex-shrink: 0;
+      min-width: 72px;
+      min-height: 38px;
+      border-radius: 12px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      pointer-events: none;
+    }
+    .sectionLabel {
+      margin: 18px 0 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    @media (max-width: 520px) {
+      .toolbar.mainTabs { grid-template-columns: 1fr; }
+      .toolCard { grid-template-columns: 1fr; }
+      .toolGo { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -301,17 +392,18 @@
   <div class="app" id="app" hidden>
     <div class="head">
       <div>
-        <h1>سجل الزوار</h1>
-        <p>موظفين حفظوا رقمهم + زوار بدون رقم (مرة واحدة في اليوم لكل جهاز/رقم).</p>
+        <h1>لوحة خاصة</h1>
+        <p>سجل الزيارات، أرقام الهواتف، وروابط الأدوات الخاصة حتى لا تُنسى.</p>
       </div>
       <div class="headActions">
         <a class="homeOut" id="homeOut" href="../index.html">🏠 الرئيسية</a>
         <button type="button" class="lockOut" id="lockOut">قفل</button>
       </div>
     </div>
-    <div class="toolbar" id="mainTabs">
+    <div class="toolbar mainTabs" id="mainTabs">
       <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
-      <button type="button" class="chip" data-view="phones" id="tabPhones">أرقام الهواتف</button>
+      <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
+      <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
     </div>
     <div id="visitsPanel">
       <div class="toolbar">
@@ -334,12 +426,19 @@
     <div id="phonesPanel" hidden>
       <div class="toolbar">
         <button type="button" class="chip" id="refreshPhonesBtn">تحديث</button>
+        <a class="chip" href="../tools/phone-match/" style="text-decoration:none;display:inline-flex;align-items:center">مطابقة أرقام</a>
       </div>
       <div class="stats">
         <div class="stat"><b id="statPhones">0</b><span>أرقام محفوظة</span></div>
         <div class="stat"><b id="statPhonesHint">—</b><span>آخر تحديث</span></div>
       </div>
       <div class="list" id="phonesList"></div>
+    </div>
+    <div id="toolsPanel" hidden>
+      <p class="toolsIntro">صفحات وأدوات خاصة للاستخدام عند الحاجة — مطابقة الأرقام، مراجعة المغادرين، وغيرها.</p>
+      <div class="toolsGrid" id="toolsGrid">
+        <div class="empty">جاري تحميل الأدوات...</div>
+      </div>
     </div>
   </div>
 
@@ -614,14 +713,75 @@
       }
 
       function setView(next) {
-        view = next === 'phones' ? 'phones' : 'visits';
+        view = (next === 'phones' || next === 'tools') ? next : 'visits';
         document.getElementById('visitsPanel').hidden = view !== 'visits';
         document.getElementById('phonesPanel').hidden = view !== 'phones';
+        document.getElementById('toolsPanel').hidden = view !== 'tools';
         document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-view') === view);
         });
         if (view === 'phones') loadPhones();
+        else if (view === 'tools') loadTools();
         else loadLog();
+      }
+
+      function toolHref(href) {
+        try {
+          if (!href) return '#';
+          if (/^https?:\/\//i.test(href)) return href;
+          const base = docsBase();
+          if (href.indexOf('../') === 0) {
+            // catalog paths are relative to desk-log/
+            return href;
+          }
+          return (base.replace(/\/?$/, '/') + href.replace(/^\//, ''));
+        } catch (e) {
+          return href || '#';
+        }
+      }
+
+      async function loadTools() {
+        const host = document.getElementById('toolsGrid');
+        if (!host) return;
+        const fallback = [
+          { id: 'phone-match', title: 'مطابقة أرقام الموظفين', desc: 'ربط أرقام جهات الاتصال بموظفي الروستر.', href: '../tools/phone-match/', tag: 'بيانات' },
+          { id: 'leavers', title: 'مراجعة المغادرين', desc: 'تأكيد من غادر عند الروستر الجديد.', href: '../tools/leavers/', tag: 'روستر' },
+          { id: 'alumni', title: 'زملاء سابقون', desc: 'صفحة التكريم والعرض العام.', href: '../alumni/', tag: 'عرض' },
+          { id: 'roster-diff', title: 'مقارنة الروستر', desc: 'فروقات بين إصدارات الروستر.', href: '../roster-diff/', tag: 'روستر' },
+          { id: 'training', title: 'التدريب', desc: 'جدول الدورات والحضور.', href: '../training/', tag: 'عرض' }
+        ];
+        let tools = fallback;
+        try {
+          const res = await fetch('../tools/catalog.json?ts=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (Array.isArray(json && json.tools) && json.tools.length) tools = json.tools;
+          }
+        } catch (e) {}
+
+        const byTag = Object.create(null);
+        tools.forEach((t) => {
+          const tag = (t && t.tag) || 'أخرى';
+          if (!byTag[tag]) byTag[tag] = [];
+          byTag[tag].push(t);
+        });
+        const order = ['روستر', 'بيانات', 'عرض', 'أخرى'];
+        const tags = order.filter((t) => byTag[t] && byTag[t].length)
+          .concat(Object.keys(byTag).filter((t) => order.indexOf(t) < 0));
+
+        host.innerHTML = tags.map((tag) => {
+          const cards = byTag[tag].map((t) => (
+            '<a class="toolCard" href="' + escapeHtml(toolHref(t.href)) + '">' +
+              '<div>' +
+                '<div class="toolTag">' + escapeHtml(tag) + '</div>' +
+                '<h3 class="toolTitle">' + escapeHtml(t.title || '') + '</h3>' +
+                '<p class="toolDesc">' + escapeHtml(t.desc || '') + '</p>' +
+              '</div>' +
+              '<span class="toolGo">فتح</span>' +
+            '</a>'
+          )).join('');
+          return '<div class="sectionLabel">' + escapeHtml(tag) + '</div><div class="toolsGrid">' + cards + '</div>';
+        }).join('');
       }
 
       function tryPin() {

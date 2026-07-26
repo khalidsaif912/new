@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow,noarchive"/>
+<title>مراجعة المغادرين</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f172a;--panel:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--blue:#3b82f6;--teal:#14b8a6;--ok:#22c55e;--warn:#f59e0b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic',Sora,Tahoma,sans-serif;padding:18px 14px 110px}
+.wrap{max-width:860px;margin:0 auto}
+.hero{background:linear-gradient(145deg,#0b1220,#1e3a5f);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:12px}
+.hero h1{margin:0;font:800 20px/1.3 Sora,sans-serif}
+.hero p{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{background:#0f172a88;border:1px solid #33415588;border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font:800 18px Sora,sans-serif;color:#93c5fd;margin-bottom:3px}
+.stat span{font-size:11px;color:var(--muted);font-weight:700}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.chip,.btn{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:12px;min-height:38px;padding:0 12px;font:800 12px inherit;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.chip.on{background:#1e3a8a;color:#dbeafe;border-color:#3b82f6}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.row.inAlumni{opacity:.55}
+.row.checked{border-color:#14b8a6;background:linear-gradient(180deg,#1e293b,#134e4a55)}
+.row input{width:20px;height:20px;accent-color:var(--teal)}
+.name{font:800 14px/1.3 Sora,sans-serif}
+.ar{font-size:13px;color:#5eead4;font-weight:700;margin-top:2px}
+.meta{font-size:11px;color:var(--muted);margin-top:4px;font-weight:700}
+.badge{font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.ok{color:#86efac;border-color:#166534;background:#14532d55}
+.badge.warn{color:#fde68a;border-color:#854d0e;background:#713f1255}
+.dock{position:fixed;left:0;right:0;bottom:0;background:rgba(15,23,42,.94);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));backdrop-filter:blur(10px)}
+.dockInner{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.msg{flex:1;min-width:140px;font-size:13px;font-weight:700;color:var(--muted)}
+.msg.ok{color:#86efac}.msg.err{color:#fca5a5}
+.btnSave{background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;min-width:130px;justify-content:center}
+.btnGhost{background:#334155;border:none;color:#e2e8f0;justify-content:center}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.empty{text-align:center;padding:28px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-weight:700}
+.gate{max-width:420px;margin:18vh auto 0;text-align:center;padding:0 16px}
+.gate input{width:min(220px,100%);border:1px solid var(--line);background:var(--panel);color:#fff;border-radius:12px;padding:12px;font-size:16px;text-align:center;letter-spacing:.2em}
+.gate button{margin-top:12px;width:min(220px,100%);background:#2563eb;border:0;color:#fff;border-radius:12px;min-height:42px;font:800 14px inherit;cursor:pointer}
+[hidden]{display:none!important}
+@media(max-width:640px){.stats{grid-template-columns:1fr 1fr 1fr}.row{grid-template-columns:auto 1fr}}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <h1 style="font-size:18px;color:#94a3b8">مراجعة المغادرين</h1>
+  <p style="color:#64748b;font-size:13px">أدخل رمز الصفحة السرية</p>
+  <input id="pin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" autofocus/>
+  <div><button type="button" id="pinBtn">دخول</button></div>
+  <div id="gateErr" style="color:#f87171;margin-top:10px;font-weight:700;min-height:20px"></div>
+  <p style="margin-top:16px"><a class="chip" href="../desk-log/" style="display:inline-flex">← السجل السري</a></p>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="hero">
+    <h1>مراجعة المغادرين</h1>
+    <p id="sub">من ليس لهم شهر حالي في الروستر — أكّد من غادر فعلاً لإضافتهم إلى زملاء سابقون.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+  <div class="toolbar">
+    <button type="button" class="chip on" data-f="pending">بانتظار التأكيد</button>
+    <button type="button" class="chip" data-f="alumni">مسجّلون سابقاً</button>
+    <button type="button" class="chip" data-f="all">الكل</button>
+    <a class="chip" href="../desk-log/">السجل السري</a>
+    <a class="chip" href="../alumni/">زملاء سابقون</a>
+  </div>
+  <div class="list" id="list"><div class="empty">جاري التحميل...</div></div>
+</div>
+
+<div class="dock" id="dock" hidden>
+  <div class="dockInner">
+    <div class="msg" id="msg">لم يتم تحديد أحد</div>
+    <button type="button" class="btn btnGhost" id="exportBtn">تنزيل JSON</button>
+    <button type="button" class="btn btnSave" id="saveBtn" disabled>حفظ التأكيد</button>
+  </div>
+</div>
+
+<script>
+const PIN='912';
+const AUTH_KEY='rosterVisitDeskAuth';
+const ALUMNI_URL='https://mantledb.sh/v2/roster-site-visits/alumni-confirmed';
+const MANTLE_KEY='8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+let DATA=null;
+let filter='pending';
+const selected=new Set();
+
+const gate=document.getElementById('gate');
+const app=document.getElementById('app');
+const dock=document.getElementById('dock');
+
+function unlocked(){ try{ return sessionStorage.getItem(AUTH_KEY)==='1'; }catch(e){ return false; } }
+function unlock(){ try{ sessionStorage.setItem(AUTH_KEY,'1'); }catch(e){} gate.hidden=true; app.hidden=false; dock.hidden=false; load(); }
+function tryPin(){
+  if((document.getElementById('pin').value||'').trim()!==PIN){
+    document.getElementById('gateErr').textContent='رمز غير صحيح';
+    return;
+  }
+  unlock();
+}
+document.getElementById('pinBtn').onclick=tryPin;
+document.getElementById('pin').addEventListener('keydown',e=>{ if(e.key==='Enter') tryPin(); });
+if(unlocked()) unlock();
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function updateDock(){
+  const n=selected.size;
+  const msg=document.getElementById('msg');
+  const btn=document.getElementById('saveBtn');
+  msg.className='msg';
+  if(!n){ msg.textContent='لم يتم تحديد أحد'; btn.disabled=true; }
+  else { msg.textContent=`جاهز للحفظ: ${n} موظف`; btn.disabled=false; }
+}
+
+function rows(){
+  if(!DATA) return [];
+  return (DATA.candidates||[]).filter(c=>{
+    if(filter==='pending') return !c.inAlumni;
+    if(filter==='alumni') return !!c.inAlumni;
+    return true;
+  });
+}
+
+function render(){
+  const s=DATA.summary||{};
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><b>${esc(DATA.currentMonth)}</b><span>الشهر الحالي</span></div>
+    <div class="stat"><b>${s.candidatesNotInAlumni||0}</b><span>بانتظار التأكيد</span></div>
+    <div class="stat"><b>${s.alreadyAlumni||0}</b><span>في الزملاء السابقين</span></div>`;
+  document.getElementById('sub').textContent=
+    `من ليس لهم بيانات في ${DATA.currentMonth}. أكّد المغادرين فقط (ليس المنتقلين مؤقتاً).`;
+
+  const list=document.getElementById('list');
+  const rs=rows();
+  if(!rs.length){
+    list.innerHTML='<div class="empty">لا يوجد موظفون في هذا الفلتر.</div>';
+    return;
+  }
+  list.innerHTML=rs.map(c=>{
+    const checked=selected.has(c.id)?' checked':'';
+    const cls=['row', c.inAlumni?'inAlumni':'', selected.has(c.id)?'checked':''].filter(Boolean).join(' ');
+    const badge=c.inAlumni
+      ? '<span class="badge ok">مسجّل في السابقين</span>'
+      : `<span class="badge warn">آخر شهر: ${esc(c.lastMonth)}</span>`;
+    return `<label class="${cls}">
+      <input type="checkbox" data-id="${esc(c.id)}"${checked}${c.inAlumni?' disabled':''}/>
+      <div>
+        <div class="name">${esc(c.en)}</div>
+        <div class="ar">${esc(c.ar||'—')}</div>
+        <div class="meta">#${esc(c.id)} · ${esc(c.dept)} · أشهر: ${(c.months||[]).join(', ')}</div>
+      </div>
+      ${badge}
+    </label>`;
+  }).join('');
+
+  list.querySelectorAll('input[type=checkbox]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      const id=inp.getAttribute('data-id');
+      if(inp.checked) selected.add(id); else selected.delete(id);
+      render();
+      updateDock();
+    });
+  });
+  updateDock();
+}
+
+document.querySelectorAll('.chip[data-f]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.chip[data-f]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    filter=btn.getAttribute('data-f');
+    render();
+  });
+});
+
+function selectedPeople(){
+  return (DATA.candidates||[]).filter(c=>selected.has(c.id)).map(c=>({
+    id:c.id, name:c.en, nameAr:c.ar, department:c.dept, kind:c.kind||'export',
+    lastMonth:c.lastMonth, note:'', noteAr:'', confirmedAt:Date.now(), source:'leavers-review'
+  }));
+}
+
+document.getElementById('exportBtn').onclick=()=>{
+  const people=selectedPeople();
+  if(!people.length){ document.getElementById('msg').textContent='حدّد موظفين أولاً'; return; }
+  const blob=new Blob([JSON.stringify({people},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='leavers-confirmed.json'; a.click();
+};
+
+document.getElementById('saveBtn').onclick=async()=>{
+  const people=selectedPeople();
+  if(!people.length) return;
+  const msg=document.getElementById('msg');
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; msg.className='msg'; msg.textContent='جاري الحفظ...';
+  try{
+    let cur={people:[]};
+    const r=await fetch(ALUMNI_URL+'?ts='+Date.now(),{headers:{Accept:'application/json','X-Mantle-Key':MANTLE_KEY},cache:'no-store'});
+    if(r.ok) cur=await r.json().catch(()=>({people:[]}));
+    else if(r.status!==404) throw new Error('read');
+    const map=Object.create(null);
+    (cur.people||[]).forEach(p=>{ if(p&&p.id) map[String(p.id)]=p; });
+    people.forEach(p=>{ map[String(p.id)]=p; });
+    const kept=Object.values(map);
+    const w=await fetch(ALUMNI_URL,{
+      method:'POST',
+      headers:{Accept:'application/json','Content-Type':'application/json','X-Mantle-Key':MANTLE_KEY},
+      body:JSON.stringify({people:kept, updatedAt:Date.now()})
+    });
+    if(!w.ok) throw new Error('write');
+    // mark local
+    people.forEach(p=>{
+      const c=DATA.candidates.find(x=>x.id===p.id);
+      if(c) c.inAlumni=true;
+      selected.delete(p.id);
+    });
+    DATA.summary.alreadyAlumni=(DATA.summary.alreadyAlumni||0)+people.length;
+    DATA.summary.candidatesNotInAlumni=Math.max(0,(DATA.summary.candidatesNotInAlumni||0)-people.length);
+    msg.className='msg ok';
+    msg.textContent=`تم تأكيد ${people.length}. سيظهرون مع زملاء سابقون بعد دمج القائمة.`;
+    render();
+  }catch(e){
+    console.warn(e);
+    msg.className='msg err';
+    msg.textContent='فشل الحفظ — يمكنك تنزيل JSON كبديل';
+  }finally{ btn.disabled=false; updateDock(); }
+};
+
+function load(){
+  fetch('./data.json?ts='+Date.now())
+    .then(r=>{ if(!r.ok) throw new Error('data'); return r.json(); })
+    .then(j=>{ DATA=j; render(); })
+    .catch(()=>{ document.getElementById('list').innerHTML='<div class="empty">تعذر تحميل البيانات</div>'; });
+}
+</script>
+</body>
+</html>

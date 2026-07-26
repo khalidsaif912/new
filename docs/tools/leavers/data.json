@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-07-26T22:23:18",
+  "currentMonth": "2026-07",
+  "allMonths": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07"
+  ],
+  "summary": {
+    "active": 76,
+    "candidates": 5,
+    "candidatesNotInAlumni": 2,
+    "alreadyAlumni": 3
+  },
+  "candidates": [
+    {
+      "id": "82545",
+      "en": "Marhoon Al Kiyumi",
+      "ar": "مرهون الكيومي",
+      "dept": "Export Checker",
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03"
+      ],
+      "lastMonth": "2026-03",
+      "inAlumni": true,
+      "kind": "export"
+    },
+    {
+      "id": "8611",
+      "en": "Waleed Al Siyabi",
+      "ar": "وليد السيابي",
+      "dept": "Export Checker",
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03"
+      ],
+      "lastMonth": "2026-03",
+      "inAlumni": true,
+      "kind": "export"
+    },
+    {
+      "id": "8646",
+      "en": "Yousuf Al Jaradi",
+      "ar": "يوسف الجرادي",
+      "dept": "Export Checker",
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03"
+      ],
+      "lastMonth": "2026-03",
+      "inAlumni": true,
+      "kind": "export"
+    },
+    {
+      "id": "82598",
+      "en": "Khalil Al Mazruie",
+      "ar": "",
+      "dept": "Export Checker",
+      "months": [
+        "2026-04"
+      ],
+      "lastMonth": "2026-04",
+      "inAlumni": false,
+      "kind": "export"
+    },
+    {
+      "id": "82592",
+      "en": "Mohamed Al Subhi",
+      "ar": "",
+      "dept": "Export Checker",
+      "months": [
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "lastMonth": "2026-06",
+      "inAlumni": false,
+      "kind": "export"
+    }
+  ],
+  "alumniIds": [
+    "80481",
+    "82049",
+    "82427",
+    "82428",
+    "82431",
+    "82545",
+    "82559",
+    "82615",
+    "82642",
+    "82653",
+    "82664",
+    "8336",
+    "8542",
+    "8608",
+    "8611",
+    "8646",
+    "8647",
+    "8714",
+    "8722",
+    "alumni-delivery-mubarak-hashimi",
+    "alumni-delivery-rashid-kharusi",
+    "alumni-delivery-salam-shukeili"
+  ]
+}

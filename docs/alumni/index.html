@@ -1070,6 +1070,9 @@
       return currentLang === 'ar' ? (p.nameAr || p.name || '') : (p.name || p.nameAr || '');
     }
 
+    const CONFIRMED_ALUMNI_URL = 'https://mantledb.sh/v2/roster-site-visits/alumni-confirmed';
+    const CONFIRMED_ALUMNI_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+
     async function loadAlumniData() {
       const roots = [];
       const primary = getSiteRootPath();
@@ -1077,16 +1080,51 @@
       if (location.hostname && location.hostname.endsWith('github.io')) roots.push('/new/docs');
       roots.push('..');
       const seen = new Set();
+      let base = null;
       for (const root of roots) {
         if (!root || seen.has(root)) continue;
         seen.add(root);
         try {
           const res = await fetch(root + '/alumni.json?ts=' + Date.now());
           if (!res.ok) continue;
-          return await res.json();
+          base = await res.json();
+          break;
         } catch (e) { /* try next root */ }
       }
-      throw new Error('fail');
+      if (!base) throw new Error('fail');
+
+      // Merge live confirmations from leavers review tool
+      try {
+        const res = await fetch(CONFIRMED_ALUMNI_URL + '?ts=' + Date.now(), {
+          headers: { Accept: 'application/json', 'X-Mantle-Key': CONFIRMED_ALUMNI_KEY },
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const extra = await res.json();
+          const more = Array.isArray(extra && extra.people) ? extra.people : [];
+          const map = Object.create(null);
+          (base.people || []).forEach((p) => {
+            if (p && p.id) map[String(p.id)] = p;
+          });
+          more.forEach((p) => {
+            if (!p || !p.id) return;
+            const id = String(p.id);
+            if (map[id]) return;
+            map[id] = {
+              id,
+              name: p.name || '',
+              nameAr: p.nameAr || '',
+              department: p.department || '',
+              kind: p.kind === 'import' ? 'import' : 'export',
+              note: p.note || '',
+              noteAr: p.noteAr || ''
+            };
+          });
+          base.people = Object.values(map);
+        }
+      } catch (e) { /* keep static list */ }
+
+      return base;
     }
 
     async function loadTributes() {
