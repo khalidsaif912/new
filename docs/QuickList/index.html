@@ -1407,11 +1407,12 @@ const updateDateTime = () => {
 
 const parseInputToItems = (input) => {
   const lines = input
-    .split(/[\n\r]+/)             // تقسيم على الأسطر
+    .split(/[\n\r]+/)
     .map(line => line.trim())
     .filter(line => line);
 
-  const items = new Set();
+  const items = [];
+  const seen = new Set();
 
   lines.forEach(line => {
     let cleanLine = line;
@@ -1419,24 +1420,29 @@ const parseInputToItems = (input) => {
     // إزالة تنسيقات الواتساب
     cleanLine = cleanLine.replace(/^\[.+?\]\s*/, "");     // التوقيت
     cleanLine = cleanLine.replace(/^[^:]+:\s*/, "");      // أسماء المرسلين
-    cleanLine = cleanLine.replace(/^[\d\-•\*\+\s]*/, ""); // أرقام أو رموز في البداية
+    cleanLine = cleanLine.replace(/^[\d\-•\*\+.\)]+\s*/, ""); // أرقام أو رموز في البداية
 
     // إزالة الإيموجي والرموز
     cleanLine = cleanLine.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, "");
-    cleanLine = cleanLine.trim();
+    cleanLine = cleanLine.trim().replace(/\s+/g, " ");
 
-    if (cleanLine) {
-      const subItems = cleanLine
-        .split(/\s+و\s+|[,،\-|/]+/)        // أولاً يفصل عند كلمة "و" أو الفواصل
-        .flatMap(item => item.trim().split(/\s+/)) // ثم يفصل عند المسافات
-        .map(item => item.trim())
-        .filter(item => item);
+    if (!cleanLine) return;
 
-      subItems.forEach(item => items.add(item));
-    }
+    // افصل فقط عند فواصل واضحة (فاصلة / و / شرطة محاطة بمسافات)
+    // لا تفصل على المسافات حتى تبقى أسماء مثل "فلفل كبار" و"فلفل أخضر" كاملة
+    const subItems = cleanLine
+      .split(/\s+و\s+|[,،|]+|(?:\s+[-–—]\s+)/)
+      .map(item => item.trim().replace(/\s+/g, " "))
+      .filter(item => item);
+
+    subItems.forEach(item => {
+      if (seen.has(item)) return;
+      seen.add(item);
+      items.push(item);
+    });
   });
 
-  return Array.from(items);
+  return items;
 };
 
 
