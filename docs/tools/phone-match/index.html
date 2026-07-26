@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>مطابقة أرقام الموظفين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f1f5f9; --panel:#fff; --text:#0f172a; --muted:#64748b;
+  --line:#e2e8f0; --blue:#1d4ed8; --teal:#0f766e; --ok:#15803d; --warn:#b45309;
+  --shadow:0 8px 28px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:'IBM Plex Sans Arabic','Sora',Tahoma,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 420px at 100% 0%, rgba(29,78,216,.08), transparent 55%),
+    linear-gradient(180deg,#eef2ff,#f8fafc 40%,#f1f5f9);
+  padding:18px 14px 120px;
+}
+.wrap{max-width:980px;margin:0 auto}
+.hero{
+  background:linear-gradient(145deg,#0f172a,#1e3a5f);
+  color:#fff;border-radius:22px;padding:20px 18px 18px;
+  box-shadow:var(--shadow);margin-bottom:14px;
+}
+.hero h1{margin:0;font:800 22px/1.25 Sora,sans-serif}
+.hero p{margin:8px 0 0;opacity:.85;font-size:13px;line-height:1.55}
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;
+}
+.stat{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);
+  border-radius:14px;padding:10px 8px;text-align:center;
+}
+.stat b{display:block;font:800 18px/1 Sora,sans-serif;margin-bottom:4px}
+.stat span{font-size:11px;opacity:.85}
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:10px;margin-bottom:12px;box-shadow:0 2px 10px rgba(15,23,42,.04);
+  position:sticky;top:8px;z-index:20;
+}
+.toolbar input[type=search]{
+  flex:1;min-width:160px;border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;font:600 13px inherit;outline:none;background:#f8fafc;
+}
+.toolbar input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.chip{
+  border:1px solid var(--line);background:#f8fafc;border-radius:999px;
+  padding:8px 12px;font:700 12px inherit;cursor:pointer;color:var(--muted);
+}
+.chip.on{background:#dbeafe;border-color:#93c5fd;color:#1e40af}
+.list{display:flex;flex-direction:column;gap:10px}
+.row{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:12px;box-shadow:0 2px 10px rgba(15,23,42,.04);
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);
+  gap:10px 14px;align-items:start;
+}
+.row.filled{border-color:#99f6e4;background:linear-gradient(180deg,#fff,#f0fdfa)}
+.row.has-current{border-color:#bfdbfe}
+.row.hidden{display:none}
+.empName{font:800 15px/1.3 Sora,sans-serif}
+.empAr{font-size:13px;font-weight:700;color:#0f766e;margin-top:2px}
+.empMeta{font-size:11px;color:var(--muted);margin-top:4px}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;margin-top:6px;
+  font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;
+  background:#f1f5f9;color:var(--muted);
+}
+.badge.ok{background:#dcfce7;color:var(--ok)}
+.badge.warn{background:#ffedd5;color:var(--warn)}
+.fields{display:flex;flex-direction:column;gap:8px;min-width:0}
+label{font-size:11px;font-weight:700;color:var(--muted)}
+select, .manual{
+  width:100%;border:1px solid var(--line);border-radius:12px;
+  padding:10px 11px;font:600 12.5px/1.3 inherit;background:#fff;outline:none;
+  color:var(--text);
+}
+select:focus,.manual:focus{border-color:#5eead4;box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+.pickPreview{
+  font-size:12px;color:var(--teal);font-weight:700;min-height:16px;
+  font-family:ui-monospace,Consolas,monospace;direction:ltr;text-align:right;
+}
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 30px rgba(15,23,42,.08);
+}
+.dockInner{
+  max-width:980px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.dockMsg{flex:1;min-width:140px;font-size:13px;font-weight:700;color:var(--muted)}
+.dockMsg.ok{color:var(--ok)}
+.dockMsg.err{color:#dc2626}
+.btn{
+  border:none;border-radius:14px;padding:12px 16px;font:800 13px inherit;cursor:pointer;
+}
+.btnSave{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;min-width:140px}
+.btnGhost{background:#e2e8f0;color:#334155}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.loading{padding:40px;text-align:center;color:var(--muted);font-weight:700}
+@media(max-width:720px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .row{grid-template-columns:1fr}
+  .hero h1{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>مطابقة أرقام الموظفين</h1>
+    <p>
+      لكل موظف اختر الاسم/الرقم المناسب من القائمة المنسدلة (من شيت جهات الاتصال).
+      يمكنك أيضاً كتابة الرقم يدوياً. ثم اضغط حفظ بالأسفل لحفظ النتائج في موقع الروستر.
+    </p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="بحث بالاسم أو رقم الموظف..." autocomplete="off"/>
+    <button type="button" class="chip on" data-filter="all">الكل</button>
+    <button type="button" class="chip" data-filter="todo">بدون اختيار</button>
+    <button type="button" class="chip" data-filter="picked">تم الاختيار</button>
+    <button type="button" class="chip" data-filter="empty">بدون مرشحين</button>
+  </div>
+
+  <div class="list" id="list"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<div class="dock">
+  <div class="dockInner">
+    <div class="dockMsg" id="dockMsg">لم يتم اختيار أرقام بعد</div>
+    <button type="button" class="btn btnGhost" id="exportBtn">تصدير CSV</button>
+    <button type="button" class="btn btnSave" id="saveBtn" disabled>حفظ في الموقع</button>
+  </div>
+</div>
+
+<script>
+const PHONE_LOG_URL = 'https://mantledb.sh/v2/roster-site-visits/phones';
+const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+const ADMIN_ID = '8715';
+
+let DATA = null;
+const picks = Object.create(null); // id -> {phone, contactName, source}
+let filter = 'all';
+
+function esc(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+function normPhone(raw){
+  let p = digits(raw);
+  if(p.startsWith('00')) p = p.slice(2);
+  if(p.length === 8 && /^[79]/.test(p)) p = '968'+p;
+  if(/^968[79]\d{7}$/.test(p)) return p;
+  return '';
+}
+
+function updateDock(){
+  const n = Object.keys(picks).filter(id => picks[id] && picks[id].phone).length;
+  const msg = document.getElementById('dockMsg');
+  const btn = document.getElementById('saveBtn');
+  msg.className = 'dockMsg';
+  if(!n){ msg.textContent = 'لم يتم اختيار أرقام بعد'; btn.disabled = true; }
+  else { msg.textContent = `جاهز للحفظ: ${n} رقم`; btn.disabled = false; }
+}
+
+function applyPick(id, phone, contactName, source){
+  const p = normPhone(phone);
+  const row = document.querySelector(`.row[data-id="${id}"]`);
+  if(!p){
+    delete picks[id];
+    if(row){
+      row.classList.remove('filled');
+      row.querySelector('.pickPreview').textContent = '';
+    }
+  } else {
+    picks[id] = { phone:p, contactName: contactName||'', source: source||'select' };
+    if(row){
+      row.classList.add('filled');
+      row.querySelector('.pickPreview').textContent = p;
+    }
+  }
+  updateDock();
+  applyFilter();
+}
+
+function rowMatchesFilter(emp, el){
+  const q = (document.getElementById('q').value||'').trim().toLowerCase();
+  const hay = `${emp.id} ${emp.en} ${emp.ar} ${emp.dept}`.toLowerCase();
+  if(q && !hay.includes(q)) return false;
+  const picked = !!(picks[emp.id] && picks[emp.id].phone);
+  if(filter === 'picked') return picked;
+  if(filter === 'todo') return !picked;
+  if(filter === 'empty') return !(emp.candidates && emp.candidates.length);
+  return true;
+}
+
+function applyFilter(){
+  if(!DATA) return;
+  DATA.employees.forEach(emp => {
+    const el = document.querySelector(`.row[data-id="${emp.id}"]`);
+    if(!el) return;
+    el.classList.toggle('hidden', !rowMatchesFilter(emp, el));
+  });
+}
+
+function render(){
+  const s = DATA.summary;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><b>${s.employees}</b><span>موظف</span></div>
+    <div class="stat"><b>${s.namedContacts}</b><span>اسم في الشيت</span></div>
+    <div class="stat"><b>${s.withSuggestion}</b><span>اقتراح قوي</span></div>
+    <div class="stat"><b>${s.alreadyHavePhone||0}</b><span>رقم محفوظ مسبقاً</span></div>`;
+
+  const list = document.getElementById('list');
+  list.innerHTML = DATA.employees.map(emp => {
+    const opts = (emp.candidates||[]).map(c => {
+      return `<option value="${esc(c.phone)}" data-name="${esc(c.name)}">${esc(c.label)}${c.score>=0.9?' ★':''}</option>`;
+    }).join('');
+    const cur = emp.currentPhone ? `<span class="badge ok">محفوظ: ${esc(emp.currentPhone)}</span>` : '';
+    const sug = emp.suggested ? `<span class="badge warn">اقتراح: ${(emp.candidates.find(c=>c.phone===emp.suggested)||{}).name||''}</span>` : (emp.candidates||[]).length ? `<span class="badge">${emp.candidates.length} مرشح</span>` : `<span class="badge">لا مرشحين</span>`;
+    const quick = emp.suggested ? `<button type="button" class="chip acceptSug" data-id="${esc(emp.id)}" data-phone="${esc(emp.suggested)}" data-name="${esc((emp.candidates.find(c=>c.phone===emp.suggested)||{}).name||'')}" style="margin-top:6px">قبول الاقتراح</button>` : '';
+    return `<article class="row${emp.currentPhone?' has-current':''}" data-id="${esc(emp.id)}">
+      <div>
+        <div class="empName">${esc(emp.en)}</div>
+        <div class="empAr">${esc(emp.ar||'—')}</div>
+        <div class="empMeta">#${esc(emp.id)} · ${esc(emp.dept||'')}</div>
+        ${cur}${sug}
+        ${quick}
+      </div>
+      <div class="fields">
+        <div>
+          <label>اختر من جهات الاتصال</label>
+          <select class="cand" data-id="${esc(emp.id)}">
+            <option value="">— بدون اختيار —</option>
+            ${opts}
+          </select>
+        </div>
+        <div>
+          <label>أو ابحث في كل الأسماء / أدخل رقماً يدوياً</label>
+          <input class="manual" list="allContactsList" data-id="${esc(emp.id)}" placeholder="اسم أو رقم مثل 9689xxxxxxx" autocomplete="off"/>
+        </div>
+        <div class="pickPreview"></div>
+      </div>
+    </article>`;
+  }).join('');
+
+  // datalist once
+  let dl = document.getElementById('allContactsList');
+  if(!dl){
+    dl = document.createElement('datalist');
+    dl.id = 'allContactsList';
+    document.body.appendChild(dl);
+  }
+  dl.innerHTML = (DATA.allContacts||[]).map(c =>
+    `<option value="${esc(c.label)}"></option>`
+  ).join('');
+
+  list.querySelectorAll('select.cand').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const id = sel.getAttribute('data-id');
+      const opt = sel.selectedOptions[0];
+      const name = opt ? (opt.getAttribute('data-name')||opt.textContent) : '';
+      const man = list.querySelector(`.manual[data-id="${id}"]`);
+      if(man) man.value = '';
+      applyPick(id, sel.value, name, 'select');
+    });
+  });
+
+  list.querySelectorAll('.acceptSug').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const phone = btn.getAttribute('data-phone');
+      const name = btn.getAttribute('data-name')||'';
+      const sel = list.querySelector(`select.cand[data-id="${id}"]`);
+      if(sel) sel.value = phone;
+      applyPick(id, phone, name, 'suggest');
+    });
+  });
+
+  list.querySelectorAll('input.manual').forEach(inp => {
+    inp.addEventListener('change', () => onManual(inp));
+    inp.addEventListener('blur', () => onManual(inp));
+  });
+
+  applyFilter();
+  updateDock();
+}
+
+function onManual(inp){
+  const id = inp.getAttribute('data-id');
+  let v = (inp.value||'').trim();
+  if(!v){
+    // don't clear select pick
+    return;
+  }
+  // parse "name — phone" from datalist
+  let phone = '', name = '';
+  const m = v.match(/—\s*(968\d{8}|\d{8,11})\s*$/);
+  if(m){
+    phone = m[1];
+    name = v.replace(/—\s*(968\d{8}|\d{8,11})\s*$/,'').trim();
+  } else {
+    phone = v;
+  }
+  const p = normPhone(phone);
+  if(!p){
+    document.getElementById('dockMsg').className = 'dockMsg err';
+    document.getElementById('dockMsg').textContent = 'رقم غير صالح: استخدم 9689xxxxxxx';
+    return;
+  }
+  // sync select if matching option exists
+  const sel = document.querySelector(`select.cand[data-id="${id}"]`);
+  if(sel){
+    const hit = [...sel.options].find(o => o.value === p);
+    sel.value = hit ? p : '';
+  }
+  applyPick(id, p, name, 'manual');
+}
+
+async function saveAll(){
+  const btn = document.getElementById('saveBtn');
+  const msg = document.getElementById('dockMsg');
+  const entries = Object.entries(picks).filter(([,v]) => v && v.phone);
+  if(!entries.length) return;
+  btn.disabled = true;
+  msg.className = 'dockMsg';
+  msg.textContent = 'جاري الحفظ...';
+  try{
+    const res = await fetch(PHONE_LOG_URL + '?ts=' + Date.now(), {
+      headers: { Accept:'application/json', 'X-Mantle-Key': MANTLE_KEY },
+      cache:'no-store'
+    });
+    let cur = {};
+    if(res.status !== 404){
+      if(!res.ok) throw new Error('read');
+      cur = await res.json().catch(()=>({}));
+    }
+    let list = Array.isArray(cur.phones) ? cur.phones.slice() : [];
+    const byId = Object.create(null);
+    list.forEach(item => { if(item && item.id) byId[String(item.id)] = item; });
+
+    const now = Date.now();
+    entries.forEach(([id, pick]) => {
+      const emp = DATA.employees.find(e => e.id === id);
+      byId[id] = {
+        id,
+        name: emp ? emp.en : id,
+        phone: pick.phone,
+        at: now,
+        by: ADMIN_ID,
+        contactName: pick.contactName || '',
+        source: 'phone-match'
+      };
+    });
+    const kept = Object.values(byId);
+    kept.sort((a,b) => (b.at||0) - (a.at||0));
+    if(kept.length > 800) kept.length = 800;
+
+    const w = await fetch(PHONE_LOG_URL, {
+      method:'POST',
+      headers:{
+        Accept:'application/json',
+        'Content-Type':'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      },
+      body: JSON.stringify({ phones: kept })
+    });
+    if(!w.ok) throw new Error('write '+w.status);
+    msg.className = 'dockMsg ok';
+    msg.textContent = `تم حفظ ${entries.length} رقماً في موقع الروستر`;
+  }catch(e){
+    msg.className = 'dockMsg err';
+    msg.textContent = 'فشل الحفظ — تأكد من الاتصال وحاول مرة أخرى';
+    console.warn(e);
+  }finally{
+    btn.disabled = false;
+    updateDock();
+  }
+}
+
+function exportCsv(){
+  const lines = [['Employee ID','Name EN','Name AR','Phone','Contact Name','Source'].join(',')];
+  Object.entries(picks).forEach(([id, pick]) => {
+    if(!pick || !pick.phone) return;
+    const emp = DATA.employees.find(e => e.id === id) || {};
+    const cells = [id, emp.en||'', emp.ar||'', pick.phone, pick.contactName||'', pick.source||'']
+      .map(v => '"'+String(v).replace(/"/g,'""')+'"');
+    lines.push(cells.join(','));
+  });
+  const blob = new Blob(['\ufeff'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'roster-phones-matched.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('q').addEventListener('input', applyFilter);
+document.querySelectorAll('.chip[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chip[data-filter]').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    filter = btn.getAttribute('data-filter');
+    applyFilter();
+  });
+});
+document.getElementById('saveBtn').addEventListener('click', saveAll);
+document.getElementById('exportBtn').addEventListener('click', exportCsv);
+
+fetch('./data.json?ts='+Date.now())
+  .then(r => { if(!r.ok) throw new Error('data'); return r.json(); })
+  .then(json => { DATA = json; render(); })
+  .catch(() => {
+    document.getElementById('list').innerHTML = '<div class="loading">تعذر تحميل البيانات. افتح الصفحة عبر السيرفر وليس كملف محلي.</div>';
+  });
+</script>
+</body>
+</html>
