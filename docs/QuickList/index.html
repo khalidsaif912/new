@@ -722,17 +722,44 @@ main.container {
     }
 
     .total-row-table td {
-      padding: 0.7rem 0.5rem;
+      padding: 0.65rem 0.35rem;
       font-weight: 800;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       background: #E4F5EB !important;
       color: #2F9E5B;
       border-bottom: none;
+      border-top: 1px solid #C8EBD6;
+      vertical-align: middle;
     }
 
-    .total-row-table td.over {
+    .total-row-table td.over,
+    .total-row-table.over td {
       background: var(--danger-bg-color) !important;
       color: var(--danger-color);
+    }
+
+    .total-row-table .totals-label {
+      text-align: start;
+      padding-inline: 0.45rem;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+    }
+
+    .total-row-table .sum-cell {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .total-row-table .sum-qty {
+      color: var(--steel);
+    }
+
+    .total-row-table .sum-price {
+      color: #1B6B3A;
+      font-size: 0.95rem;
     }
 
     .total-actions {
@@ -1535,15 +1562,30 @@ const parseInputToItems = (input) => {
                 }
 
                 const sortedItems = [...purchase.items].sort((a, b) => Number(a.checked) - Number(b.checked));
-                const total = purchase.items.reduce((sum, it) => sum + (parseFloat(it.price) || 0) * (parseInt(it.quantity) || 1), 0);
+                const qtySum = purchase.items.reduce((sum, it) => sum + (parseInt(it.quantity, 10) || 0), 0);
+                const priceSum = purchase.items.reduce((sum, it) => sum + (parseFloat(it.price) || 0), 0);
+                const moneyTotal = purchase.items.reduce((sum, it) => {
+                    const q = parseInt(it.quantity, 10) || 0;
+                    const p = parseFloat(it.price) || 0;
+                    return sum + (p * q);
+                }, 0);
                 const budgetVal = parseFloat(purchase.budget) || 0;
-                const isOver = budgetVal > 0 && total > budgetVal;
+                const isOver = budgetVal > 0 && moneyTotal > budgetVal;
+
+                const formatPlainSum = (n) => {
+                    if (!n) return '—';
+                    return String(n);
+                };
+                const formatPriceSum = (n) => {
+                    if (!n) return '—';
+                    return Number(n).toFixed(3).replace(/\.?0+$/, '');
+                };
                 
                 const listDiv = document.createElement('div');
                 listDiv.className = `purchase-list ${isOver ? 'over' : ''} ${purchase.open ? '' : 'closed'}`;
                 listDiv.dataset.listIndex = listIndex;
 
-                const displayTotal = purchase.manualTotal ?? total.toFixed(2);
+                const displayTotal = purchase.manualTotal ?? formatPriceSum(moneyTotal);
 
                 listDiv.innerHTML = `
                     <div class="purchase-header ${isOver ? 'over' : ''}">
@@ -1553,7 +1595,7 @@ const parseInputToItems = (input) => {
                                 <span class="ph-budget-label">الميزانية : ريال</span>
                                 <input class="budget-input" type="number" min="0" step="0.1" value="${purchase.budget}" placeholder="ـــــ" inputmode="decimal"/>
                              </span>` :
-                            `<span class="ph-total">المجموع: ${displayTotal} ر.ع.</span>`
+                            `<span class="ph-total">المجموع: ${displayTotal === '—' ? '—' : displayTotal + ' ر.ع.'}</span>`
                         }
                     </div>
                     <div class="purchase-content ${purchase.open ? 'open' : ''}">
@@ -1571,26 +1613,32 @@ const parseInputToItems = (input) => {
                             <tbody>
                                 ${sortedItems.map(item => {
                                     const itemIndex = purchase.items.findIndex(i => i === item);
+                                    const qtyVal = (item.quantity !== undefined && item.quantity !== null && String(item.quantity).trim() !== '')
+                                        ? item.quantity
+                                        : '';
+                                    const priceRaw = item.price;
+                                    const priceNum = parseFloat(priceRaw);
+                                    const priceVal = (priceRaw !== undefined && priceRaw !== null && String(priceRaw).trim() !== '' && !isNaN(priceNum) && priceNum !== 0)
+                                        ? priceRaw
+                                        : '';
                                     return `
                                     <tr class="${item.checked ? 'checked' : ''}" data-item-index="${itemIndex}">
                                         <td><input type="checkbox" ${item.checked ? 'checked' : ''}/></td>
                                         <td class="col-item">${item.item}</td>
-                                        <td><input class="quantity-input" type="number" min="1" value="${item.quantity || ''}" placeholder="1"/></td>
-                                        <td><input class="price-input" type="number" min="0" step="0.1" value="${item.price || ''}" placeholder="0.00"/></td>
+                                        <td><input class="quantity-input" type="number" min="1" value="${qtyVal}" placeholder="" inputmode="numeric"/></td>
+                                        <td><input class="price-input" type="number" min="0" step="any" value="${priceVal}" placeholder="" inputmode="decimal"/></td>
                                         <td><span class="delete-btn">×</span></td>
                                     </tr>
                                     `;
                                 }).join('')}
                             </tbody>
                             <tfoot>
-                                <tr class="total-row-table">
-                                    <td colspan="5" class="${isOver ? 'over' : ''}">
-                                        <div class="total-actions">
-                                            <span>المجموع:</span>
-                                            <input class="total-input ${purchase.manualTotal ? 'edited' : ''}" type="number" step="0.1" min="0" value="${displayTotal}" placeholder="ـــــ" inputmode="decimal" />
-                                            <span class="total-edited-mark" style="display:${purchase.manualTotal ? 'inline' : 'none'};">تم التعديل</span>
-                                        </div>
-                                    </td>
+                                <tr class="total-row-table ${isOver ? 'over' : ''}">
+                                    <td></td>
+                                    <td class="col-item totals-label">المجموع</td>
+                                    <td class="sum-cell sum-qty">${formatPlainSum(qtySum)}</td>
+                                    <td class="sum-cell sum-price">${formatPriceSum(priceSum)}</td>
+                                    <td></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1683,17 +1731,24 @@ const today = `${year}/${month}/${day}`;
             if (!listDiv) return;
             const listIndex = parseInt(listDiv.dataset.listIndex);
             const purchase = state.tabs[state.currentTab].lists[listIndex];
-            const originalTotal = purchase.items.reduce((sum, it) => sum + (parseFloat(it.price) || 0) * (parseInt(it.quantity) || 1), 0);
+            const originalTotal = purchase.items.reduce((sum, it) => {
+                const q = parseInt(it.quantity, 10) || 0;
+                const p = parseFloat(it.price) || 0;
+                return sum + (p * q);
+            }, 0);
 
-            // Update budget, quantity, price, or manual total
+            // Update budget, quantity, or price
             if (e.target.classList.contains('budget-input')) {
                 purchase.budget = e.target.value;
             } else if (e.target.classList.contains('quantity-input')) {
                 const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
                 purchase.items[itemIndex].quantity = e.target.value;
+                delete purchase.manualTotal;
             } else if (e.target.classList.contains('price-input')) {
                 const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
-                purchase.items[itemIndex].price = e.target.value;
+                const raw = e.target.value;
+                purchase.items[itemIndex].price = (raw === '' || Number(raw) === 0) ? '' : raw;
+                delete purchase.manualTotal;
             } else if (e.target.classList.contains('total-input')) {
                 if (parseFloat(e.target.value).toFixed(2) !== originalTotal.toFixed(2)) {
                     purchase.manualTotal = e.target.value;
