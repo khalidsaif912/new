@@ -284,7 +284,7 @@
     }
     .toolbar.mainTabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 16px;
     }
@@ -292,7 +292,7 @@
       width: 100%;
       justify-content: center;
       min-height: 42px;
-      font-size: 13px;
+      font-size: 12px;
     }
     .toolsIntro {
       margin: 0 0 12px;
@@ -368,8 +368,38 @@
       text-transform: uppercase;
       letter-spacing: .06em;
     }
+    .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
+    .stats.stats4 { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 560px) {
+      .stats.stats4 { grid-template-columns: repeat(4, 1fr); }
+    }
+    .gapNote {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #78350f33;
+      border: 1px solid #f59e0b44;
+      color: #fcd34d;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .gapBadge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      background: #0f172a88;
+    }
+    .gapBadge.phone { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
+    .gapBadge.visit { color: #fde68a; border-color: #854d0e; background: #713f1255; }
+    .gapBadge.both { color: #fda4af; border-color: #9f1239; background: #4c051955; }
     @media (max-width: 520px) {
-      .toolbar.mainTabs { grid-template-columns: 1fr; }
+      .toolbar.mainTabs { grid-template-columns: 1fr 1fr; }
       .toolCard { grid-template-columns: 1fr; }
       .toolGo { width: 100%; }
     }
@@ -403,6 +433,7 @@
     <div class="toolbar mainTabs" id="mainTabs">
       <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
       <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
+      <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
       <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
     </div>
     <div id="visitsPanel">
@@ -434,6 +465,24 @@
       </div>
       <div class="list" id="phonesList"></div>
     </div>
+    <div id="gapsPanel" hidden>
+      <p class="toolsIntro">مقارنة موظفي الروستر الحالي مع سجل الزيارات وأرقام الهواتف المحفوظة.</p>
+      <div class="toolbar" id="gapsFilters">
+        <button type="button" class="chip active" data-gap="noPhone">بدون هاتف</button>
+        <button type="button" class="chip" data-gap="noVisit">لم يزوروا</button>
+        <button type="button" class="chip" data-gap="noId">بدون رقم وظيفة*</button>
+        <button type="button" class="chip" data-gap="both">بدون زيارة وهاتف</button>
+        <button type="button" class="chip" id="refreshGapsBtn">تحديث</button>
+      </div>
+      <div class="stats stats4">
+        <div class="stat"><b id="gapStatStaff">0</b><span>موظف حالي</span></div>
+        <div class="stat"><b id="gapStatNoPhone">0</b><span>بدون هاتف</span></div>
+        <div class="stat"><b id="gapStatNoVisit">0</b><span>لم يزوروا بهويتهم</span></div>
+        <div class="stat"><b id="gapStatGuests">0</b><span>زيارات ضيف (بدون رقم وظيفة)</span></div>
+      </div>
+      <p class="gapNote" id="gapNote">* «بدون رقم وظيفة» = زيارات كضيف دون حفظ رقم الموظف. لا يمكن معرفة أسمائهم، لذلك يُعرض العدد فقط مع قائمة الموظفين الذين لم يظهروا بهويتهم.</p>
+      <div class="list" id="gapsList"></div>
+    </div>
     <div id="toolsPanel" hidden>
       <p class="toolsIntro">صفحات وأدوات خاصة للاستخدام عند الحاجة — مطابقة الأرقام، مراجعة المغادرين، وغيرها.</p>
       <div class="toolsGrid" id="toolsGrid">
@@ -451,8 +500,10 @@
       const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
       let filter = 'today';
       let view = 'visits';
+      let gapFilter = 'noPhone';
       let log = [];
       let phones = [];
+      let staffList = [];
       let nameById = Object.create(null);
 
       const gate = document.getElementById('gate');
@@ -713,15 +764,18 @@
       }
 
       function setView(next) {
-        view = (next === 'phones' || next === 'tools') ? next : 'visits';
+        const allowed = { visits: 1, phones: 1, gaps: 1, tools: 1 };
+        view = allowed[next] ? next : 'visits';
         document.getElementById('visitsPanel').hidden = view !== 'visits';
         document.getElementById('phonesPanel').hidden = view !== 'phones';
+        document.getElementById('gapsPanel').hidden = view !== 'gaps';
         document.getElementById('toolsPanel').hidden = view !== 'tools';
         document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-view') === view);
         });
         if (view === 'phones') loadPhones();
         else if (view === 'tools') loadTools();
+        else if (view === 'gaps') loadGaps();
         else loadLog();
       }
 
@@ -848,6 +902,201 @@
         }
       }
 
+      async function ensurePhonesLoaded(force) {
+        if (!force && phones && phones.__loaded) return;
+        try {
+          const res = await fetch(PHONES_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (res.status === 404) { phones = []; phones.__loaded = true; return; }
+          if (!res.ok) throw new Error('phones');
+          const json = await res.json().catch(() => ({}));
+          phones = Array.isArray(json.phones) ? json.phones.slice() : [];
+          phones.__loaded = true;
+          phones.forEach((r) => rememberName(r && r.id, r && r.name));
+        } catch (e) {
+          phones = phones || [];
+          phones.__loaded = true;
+        }
+      }
+
+      async function ensureLogLoaded(force) {
+        if (!force && log && log.__loaded) return;
+        try {
+          const res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('log');
+          const json = await res.json();
+          log = Array.isArray(json.log) ? json.log.slice() : [];
+          log.__loaded = true;
+        } catch (e) {
+          log = log || [];
+          log.__loaded = true;
+        }
+      }
+
+      async function loadStaffDirectory() {
+        const base = docsBase();
+        const res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('staff');
+        const json = await res.json();
+        const list = Array.isArray(json && json.employees) ? json.employees : [];
+        let currentMonth = '';
+        list.forEach((emp) => {
+          (emp.months || []).forEach((m) => {
+            if (!currentMonth || String(m) > currentMonth) currentMonth = String(m);
+          });
+        });
+        staffList = list
+          .filter((emp) => {
+            const months = emp.months || [];
+            return !currentMonth || months.indexOf(currentMonth) >= 0;
+          })
+          .map((emp) => {
+            const id = String(emp.id || '').trim();
+            rememberName(id, emp.name);
+            return {
+              id,
+              name: cleanName(emp.name) || nameById[id] || ('#' + id),
+              dept: emp.department || '',
+              months: emp.months || [],
+              currentMonth
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+        return currentMonth;
+      }
+
+      function phoneIdsSet() {
+        const set = Object.create(null);
+        (phones || []).forEach((r) => {
+          const id = String((r && r.id) || '').trim();
+          const phone = digitsOnly(r && r.phone);
+          if (id && /^\d+$/.test(id) && phone) set[id] = phone;
+        });
+        return set;
+      }
+
+      function visitedIdsSet() {
+        const set = Object.create(null);
+        (log || []).forEach((r) => {
+          if (isGuestRow(r)) return;
+          const id = String((r && r.id) || '').trim();
+          if (id && /^\d+$/.test(id)) {
+            const at = Number(r.at) || 0;
+            if (!set[id] || at > set[id]) set[id] = at;
+          }
+        });
+        return set;
+      }
+
+      function guestVisitCount() {
+        return (log || []).filter((r) => isGuestRow(r)).length;
+      }
+
+      function uniqueGuestDevices() {
+        const set = Object.create(null);
+        (log || []).forEach((r) => {
+          if (!isGuestRow(r)) return;
+          const id = String((r && r.id) || '').trim() || String(r.at || '');
+          set[id] = 1;
+        });
+        return Object.keys(set).length;
+      }
+
+      async function loadGaps() {
+        const list = document.getElementById('gapsList');
+        list.innerHTML = '<div class="empty">جاري التحليل…</div>';
+        try {
+          await Promise.all([ensurePhonesLoaded(true), ensureLogLoaded(true), loadStaffDirectory()]);
+          await loadNameDirectory();
+          renderGaps();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحليل النواقص</div>';
+        }
+      }
+
+      function gapRows() {
+        const phoneMap = phoneIdsSet();
+        const visitMap = visitedIdsSet();
+        return (staffList || []).map((emp) => {
+          const hasPhone = !!phoneMap[emp.id];
+          const hasVisit = !!visitMap[emp.id];
+          return {
+            ...emp,
+            hasPhone,
+            hasVisit,
+            phone: phoneMap[emp.id] || '',
+            lastVisit: visitMap[emp.id] || 0
+          };
+        }).filter((emp) => {
+          if (gapFilter === 'noPhone') return !emp.hasPhone;
+          if (gapFilter === 'noVisit') return !emp.hasVisit;
+          if (gapFilter === 'both') return !emp.hasPhone && !emp.hasVisit;
+          if (gapFilter === 'noId') return !emp.hasVisit; // employees never identified themselves
+          return true;
+        });
+      }
+
+      function renderGaps() {
+        const phoneMap = phoneIdsSet();
+        const visitMap = visitedIdsSet();
+        const noPhoneN = staffList.filter((e) => !phoneMap[e.id]).length;
+        const noVisitN = staffList.filter((e) => !visitMap[e.id]).length;
+        document.getElementById('gapStatStaff').textContent = String(staffList.length);
+        document.getElementById('gapStatNoPhone').textContent = String(noPhoneN);
+        document.getElementById('gapStatNoVisit').textContent = String(noVisitN);
+        document.getElementById('gapStatGuests').textContent = String(uniqueGuestDevices());
+
+        document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-gap') === gapFilter);
+        });
+
+        const note = document.getElementById('gapNote');
+        if (gapFilter === 'noId') {
+          note.hidden = false;
+          note.textContent = 'زيارات الضيف (بدون رقم وظيفة): ' + guestVisitCount() +
+            ' سجل · ' + uniqueGuestDevices() +
+            ' جهاز/هوية تقريبية. القائمة أدناه = موظفون حاليون لم يزوروا الموقع برقم وظيفتهم.';
+        } else {
+          note.hidden = false;
+          note.textContent = 'التغطية على موظفي الشهر الحالي فقط. الضيف = زار بدون حفظ رقم الوظيفة (' +
+            uniqueGuestDevices() + ' جهاز تقريبي).';
+        }
+
+        const list = document.getElementById('gapsList');
+        const rows = gapRows();
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">لا يوجد أحد في هذا الفلتر — التغطية جيدة.</div>';
+          return;
+        }
+        list.innerHTML = rows.map((emp) => {
+          let badge = '';
+          if (!emp.hasPhone && !emp.hasVisit) {
+            badge = '<span class="gapBadge both">بدون زيارة وهاتف</span>';
+          } else if (!emp.hasPhone) {
+            badge = '<span class="gapBadge phone">بدون هاتف</span>';
+          } else if (!emp.hasVisit) {
+            badge = '<span class="gapBadge visit">لم يزر بهويته</span>';
+          }
+          const meta = [
+            '#' + emp.id,
+            emp.dept || '',
+            emp.hasVisit ? ('آخر زيارة ' + formatTime(emp.lastVisit)) : 'لا زيارة بالهوية',
+            emp.hasPhone ? ('هاتف ' + formatPhone(emp.phone)) : 'لا هاتف'
+          ].filter(Boolean).join(' · ');
+          return (
+            '<article class="row">' +
+              '<p class="rowName"><span class="rowNameText">' + escapeHtml(emp.name) + '</span> ' + badge + '</p>' +
+              '<p class="rowMeta">' + escapeHtml(meta) + '</p>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
       async function loadPhones() {
         const list = document.getElementById('phonesList');
         list.innerHTML = '<div class="empty">جاري التحميل…</div>';
@@ -864,6 +1113,7 @@
           if (!res.ok) throw new Error('fail');
           const json = await res.json().catch(() => ({}));
           phones = Array.isArray(json.phones) ? json.phones.slice() : [];
+          phones.__loaded = true;
           phones.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
           phones.forEach((r) => rememberName(r && r.id, r && r.name));
           renderPhones();
@@ -924,6 +1174,7 @@
           if (!res.ok) throw new Error('fail');
           const json = await res.json();
           log = Array.isArray(json.log) ? json.log.slice() : [];
+          log.__loaded = true;
           log.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
           await loadNameDirectory();
           render();
@@ -1005,6 +1256,13 @@
       document.getElementById('lockOut').addEventListener('click', lock);
       document.getElementById('refreshBtn').addEventListener('click', loadLog);
       document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
+      document.getElementById('refreshGapsBtn').addEventListener('click', loadGaps);
+      document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
+        c.addEventListener('click', () => {
+          gapFilter = c.getAttribute('data-gap') || 'noPhone';
+          renderGaps();
+        });
+      });
       document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
         c.addEventListener('click', () => {
           setView(c.getAttribute('data-view') || 'visits');
