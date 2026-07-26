@@ -1,11 +1,13 @@
 {
-  "name": "سجل مشتريات المنزل",
+  "name": "قوائم المشتريات",
   "short_name": "مشترياتي",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2196F3",
+  "background_color": "#12181F",
+  "theme_color": "#12181F",
   "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
   "icons": [
     {
       "src": "icon-192.png",
