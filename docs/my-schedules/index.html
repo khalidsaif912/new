@@ -991,6 +991,160 @@
       margin-bottom:12px;
     }
 
+    /* ── Day notes tour ── */
+    .tip-replay{
+      margin-top:10px;
+      height:34px;
+      padding:0 12px;
+      border-radius:8px;
+      border:1px solid rgba(245,166,35,.35);
+      background:rgba(245,166,35,.1);
+      color:var(--ink);
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .tip-replay:hover{background:rgba(245,166,35,.18)}
+    .notes-tour-modal .modal-sheet{max-width:420px;border-radius:20px}
+    .tour-steps{
+      display:flex;gap:6px;justify-content:center;margin:4px 0 14px;
+    }
+    .tour-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--dim);opacity:.55;
+      transition:all .2s;
+    }
+    .tour-dot.on{background:#f5a623;opacity:1;width:18px;border-radius:999px}
+    .tour-demo{
+      position:relative;
+      height:168px;
+      border-radius:16px;
+      border:1px solid var(--border2);
+      background:
+        radial-gradient(ellipse at 30% 20%,rgba(88,166,255,.12),transparent 55%),
+        radial-gradient(ellipse at 80% 80%,rgba(245,166,35,.1),transparent 50%),
+        rgba(255,255,255,.02);
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+    body.light .tour-demo{background:
+      radial-gradient(ellipse at 30% 20%,rgba(88,166,255,.1),transparent 55%),
+      radial-gradient(ellipse at 80% 80%,rgba(245,166,35,.08),transparent 50%),
+      #f6f8fb}
+    .tour-demo-day{
+      position:absolute;
+      top:22px;left:50%;
+      width:78px;height:88px;
+      margin-left:-39px;
+      border-radius:12px;
+      border:1px solid var(--border2);
+      background:#110d1f;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    body.light .tour-demo-day{background:#f3efff;box-shadow:0 8px 20px rgba(15,23,42,.12)}
+    .tour-demo-day .tdn{
+      position:absolute;top:8px;left:0;right:0;text-align:center;
+      font:900 28px/1 'DM Mono',monospace;color:var(--ink);opacity:.28;
+    }
+    .tour-demo-day .tcode{
+      position:absolute;bottom:10px;left:0;right:0;text-align:center;
+      font:900 15px/1 'DM Mono',monospace;color:#bc8cff;
+    }
+    .tour-demo-day .temoji{
+      position:absolute;top:52%;left:50%;
+      transform:translate(-50%,-50%) scale(.4);
+      font-size:28px;opacity:0;
+      pointer-events:none;
+    }
+    .tour-demo-day .tfinger{
+      position:absolute;right:-6px;bottom:-4px;
+      font-size:22px;
+      opacity:0;
+      transform:translate(8px,8px) scale(.85);
+      filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));
+    }
+    .tour-demo-sheet{
+      position:absolute;
+      left:50%;bottom:14px;
+      width:210px;margin-left:-105px;
+      border-radius:14px;
+      border:1px solid var(--border2);
+      background:var(--surface);
+      padding:10px 12px;
+      opacity:0;
+      transform:translateY(16px) scale(.96);
+      box-shadow:0 12px 32px rgba(0,0,0,.4);
+    }
+    .tour-demo-emos{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
+    .tour-demo-emos span{
+      width:30px;height:30px;border-radius:8px;
+      display:grid;place-items:center;font-size:15px;
+      border:1px solid var(--border2);
+      background:rgba(255,255,255,.04);
+    }
+    .tour-demo-emos span.pick{
+      border-color:rgba(245,166,35,.55);
+      background:rgba(245,166,35,.14);
+      box-shadow:0 0 0 2px rgba(245,166,35,.15);
+    }
+    .tour-demo-line{
+      height:8px;border-radius:999px;
+      background:rgba(255,255,255,.08);
+      width:78%;
+    }
+    body.light .tour-demo-line{background:rgba(15,23,42,.08)}
+    .tour-demo-badge{
+      position:absolute;top:14px;inset-inline-end:12px;
+      display:inline-flex;align-items:center;gap:5px;
+      padding:5px 9px;border-radius:999px;
+      font-size:11px;font-weight:700;color:var(--muted);
+      border:1px solid var(--border2);
+      background:rgba(255,255,255,.05);
+      opacity:0;transform:translateY(-6px);
+    }
+    .tour-demo.play .tfinger{animation:tourFinger 5.5s ease-in-out infinite}
+    .tour-demo.play .tour-demo-sheet{animation:tourSheet 5.5s ease-in-out infinite}
+    .tour-demo.play .temoji{animation:tourEmoji 5.5s ease-in-out infinite}
+    .tour-demo.play .tour-demo-emos span.pick{animation:tourPick 5.5s ease-in-out infinite}
+    .tour-demo.play .tour-demo-badge{animation:tourBadge 5.5s ease-in-out infinite}
+    .tour-demo.play .tour-demo-day{animation:tourPulse 5.5s ease-in-out infinite}
+    @keyframes tourFinger{
+      0%,8%{opacity:0;transform:translate(10px,10px) scale(.8)}
+      18%,28%{opacity:1;transform:translate(0,0) scale(1)}
+      34%,100%{opacity:0;transform:translate(0,0) scale(.9)}
+    }
+    @keyframes tourSheet{
+      0%,30%{opacity:0;transform:translateY(16px) scale(.96)}
+      38%,62%{opacity:1;transform:translateY(0) scale(1)}
+      70%,100%{opacity:0;transform:translateY(10px) scale(.98)}
+    }
+    @keyframes tourPick{
+      0%,42%{transform:scale(1)}
+      48%,58%{transform:scale(1.12)}
+      64%,100%{transform:scale(1)}
+    }
+    @keyframes tourEmoji{
+      0%,58%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+      68%,88%{opacity:.4;transform:translate(-50%,-50%) scale(1)}
+      100%{opacity:.4;transform:translate(-50%,-50%) scale(1)}
+    }
+    @keyframes tourBadge{
+      0%,72%{opacity:0;transform:translateY(-6px)}
+      80%,92%{opacity:1;transform:translateY(0)}
+      100%{opacity:0;transform:translateY(-4px)}
+    }
+    @keyframes tourPulse{
+      0%,16%{box-shadow:0 10px 28px rgba(0,0,0,.35)}
+      20%,28%{box-shadow:0 0 0 2px rgba(245,166,35,.45),0 10px 28px rgba(0,0,0,.35)}
+      34%,100%{box-shadow:0 10px 28px rgba(0,0,0,.35)}
+    }
+    .tour-foot{
+      display:flex;gap:10px;justify-content:space-between;align-items:center;
+      padding:0 22px 22px;flex-wrap:wrap;
+    }
+    .tour-foot .ok-btn{min-width:110px}
+
     /* ── PRINT ── */
     @media print{
       .topbar,.search-section,.toast-container,.modal,.actions-card,.legend-card{display:none!important}
@@ -1407,6 +1561,32 @@
     }
     .brand-sq:hover{filter:brightness(1.12)}
     .brand-sq:active{transform:scale(.97)}
+    .brand-swap.has-feature-new::after{
+      content:attr(data-new-label);
+      position:absolute;
+      top:-7px;
+      inset-inline-end:-8px;
+      z-index:5;
+      min-width:18px;
+      height:18px;
+      padding:0 5px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#f59e0b,#ef4444);
+      color:#fff;
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.2px;
+      box-shadow:0 3px 8px rgba(239,68,68,.4);
+      pointer-events:none;
+      animation:featureTipPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes featureTipPulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.08)}
+    }
     .brand-mini{
       width:38px;height:38px;border-radius:10px;
       background:linear-gradient(135deg,#1f6feb,#58a6ff);
@@ -1554,9 +1734,9 @@
         <button class="ghost-btn" onclick="toggleLang()" id="langBtn">English</button>
         <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
         <div class="brand-mark">
-          <div class="brand-swap" aria-label="Help" title="Help">
-            <button class="brand-sq brand-cal show" id="brandCal" type="button" onclick="openTips()" aria-label="Help">📅</button>
-            <button class="brand-sq brand-q" id="brandQ" type="button" onclick="openTips()" aria-label="Help">❔</button>
+          <div class="brand-swap" id="brandSwap" aria-label="Help" title="Help" data-new-label="جديد">
+            <button class="brand-sq brand-cal show" id="brandCal" type="button" onclick="openTipsOrFeatureTour()" aria-label="Help">📅</button>
+            <button class="brand-sq brand-q" id="brandQ" type="button" onclick="openTipsOrFeatureTour()" aria-label="Help">❔</button>
           </div>
           <div class="brand-mini" id="brandMini" style="display:none"></div>
         </div>
@@ -1715,9 +1895,56 @@
           <div class="tip-ico">📆</div>
           <div class="tip-text" id="tip3">Use ICS export to add shifts to Apple/Google/Outlook calendars.</div>
         </div>
+        <div class="tip">
+          <div class="tip-ico">📌</div>
+          <div class="tip-text">
+            <div id="tip4">New: tap any day to add a personal emoji note — it also appears in PDF/image export.</div>
+            <button type="button" class="tip-replay" id="tip4Replay" onclick="closeTips();openDayNotesTour(true)">Watch example</button>
+          </div>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="ok-btn" onclick="closeTips()" id="tipsOk">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY NOTES TOUR -->
+  <div class="modal notes-tour-modal" id="dayNotesTourModal" role="dialog" aria-modal="true" style="align-items:center;padding:20px">
+    <div class="modal-backdrop" onclick="closeDayNotesTour(true)"></div>
+    <div class="modal-sheet">
+      <div class="modal-head" style="border-bottom:none;padding-bottom:4px">
+        <div>
+          <div class="modal-title" id="tourTitle">New: Day notes</div>
+          <div class="modal-sub" id="tourSub">A quick look at how it works</div>
+        </div>
+        <button class="modal-close" type="button" onclick="closeDayNotesTour(true)">✕</button>
+      </div>
+      <div class="modal-body" style="padding-top:0">
+        <div class="tour-steps" id="tourDots" aria-hidden="true"></div>
+        <div class="tour-demo play" id="tourDemo" aria-hidden="true">
+          <div class="tour-demo-badge" id="tourBadge">🖼️ PDF</div>
+          <div class="tour-demo-day">
+            <span class="tdn">14</span>
+            <span class="temoji">✈️</span>
+            <span class="tcode">NE22</span>
+            <span class="tfinger">👆</span>
+          </div>
+          <div class="tour-demo-sheet">
+            <div class="tour-demo-emos">
+              <span>📌</span><span>⭐</span><span class="pick">✈️</span><span>☕</span>
+            </div>
+            <div class="tour-demo-line"></div>
+          </div>
+        </div>
+        <div class="modal-intro" style="margin-bottom:0">
+          <div class="modal-intro-title" id="tourStepTitle">Tap any day</div>
+          <div class="modal-intro-desc" id="tourStepDesc">Open a personal note on any calendar day — even off days.</div>
+        </div>
+      </div>
+      <div class="tour-foot">
+        <button type="button" class="tbtn" id="tourSkipBtn" onclick="closeDayNotesTour(true)" style="flex:0 0 auto;min-width:90px;height:40px">Skip</button>
+        <button type="button" class="ok-btn" id="tourNextBtn" onclick="nextDayNotesTourStep()">Next</button>
       </div>
     </div>
   </div>
@@ -1837,7 +2064,19 @@
         noteDelete:'Delete',
         noteSaved:'Note saved',
         noteDeleted:'Note deleted',
-        noteNeedEmoji:'Choose an emoji first'
+        noteNeedEmoji:'Choose an emoji first',
+        tip4:'New: tap any day to add a personal emoji note — it also appears in PDF/image export.',
+        tip4Replay:'Watch example',
+        tourTitle:'New: Day notes',
+        tourSub:'A quick look at how it works',
+        tourSkip:'Skip',
+        tourNext:'Next',
+        tourDone:'Got it',
+        tourSteps:[
+          {title:'Tap any day',desc:'Open a personal note on any calendar day — even off days.'},
+          {title:'Pick an emoji',desc:'Choose an emoji and optionally write a short note. Saved on this device only.'},
+          {title:'Shows in export',desc:'The emoji appears on the calendar and in PDF / image export.'}
+        ]
       },
       ar:{
         title:'جدولي',sub:'أدخل رقمك الوظيفي',
@@ -1875,7 +2114,19 @@
         noteDelete:'حذف',
         noteSaved:'تم حفظ الملاحظة',
         noteDeleted:'تم حذف الملاحظة',
-        noteNeedEmoji:'اختر إيموجي أولاً'
+        noteNeedEmoji:'اختر إيموجي أولاً',
+        tip4:'جديد: اضغط أي يوم لإضافة ملاحظة بإيموجي — وتظهر أيضاً في تصدير PDF/الصورة.',
+        tip4Replay:'شاهد المثال',
+        tourTitle:'جديد: ملاحظات اليوم',
+        tourSub:'شرح سريع لطريقة الاستخدام',
+        tourSkip:'تخطي',
+        tourNext:'التالي',
+        tourDone:'حسناً',
+        tourSteps:[
+          {title:'اضغط أي يوم',desc:'افتح ملاحظة شخصية على أي يوم في التقويم — حتى أيام الإجازة.'},
+          {title:'اختر إيموجي',desc:'اختر إيموجي ويمكنك كتابة ملاحظة قصيرة. الحفظ على هذا الجهاز فقط.'},
+          {title:'تظهر في التصدير',desc:'الإيموجي يظهر على التقويم وفي تصدير PDF / الصورة.'}
+        ]
       }
     };
 
@@ -1907,6 +2158,14 @@
       document.getElementById('tip2').textContent=(lang==='ar'?'حفظ الصورة ينتج بطاقة مرتبة (رأس + تقويم + إحصائيات).':'Image export produces a clean card with header, calendar, and stats.');
       document.getElementById('tip3').textContent=(lang==='ar'?'استخدم تصدير ICS لإضافة المناوبات إلى تقويم Apple/Google/Outlook.':'Use ICS export to add shifts to Apple/Google/Outlook calendars.');
       document.getElementById('tipsOk').textContent='OK';
+      const tip4=document.getElementById('tip4');
+      if(tip4) tip4.textContent=t('tip4');
+      const tip4Replay=document.getElementById('tip4Replay');
+      if(tip4Replay) tip4Replay.textContent=t('tip4Replay');
+      updateTipsNewBadge();
+      if(document.getElementById('dayNotesTourModal') && document.getElementById('dayNotesTourModal').classList.contains('open')){
+        renderDayNotesTourStep();
+      }
       const fc=document.getElementById('footerCredit');
       if(fc) fc.textContent=lang==='ar'?'تصميم: خالد الرقادي':'Design: KHALID ALRAQADI';
       const fs=document.getElementById('footerSource');
@@ -1961,7 +2220,98 @@
 
     function openTips(){ document.getElementById('tipsModal').classList.add('open'); }
     function closeTips(){ document.getElementById('tipsModal').classList.remove('open'); }
-    
+    function openTipsOrFeatureTour(){
+      if(!hasSeenDayNotesTour()){
+        openDayNotesTour(false);
+        return;
+      }
+      openTips();
+    }
+
+    const DAY_NOTES_TOUR_KEY='seenDayNotesTour_v1';
+    let _tourStep=0;
+    let _tourTimer=null;
+
+    function markDayNotesTourSeen(){
+      try{ localStorage.setItem(DAY_NOTES_TOUR_KEY,'1'); }catch(e){}
+      updateTipsNewBadge();
+    }
+    function hasSeenDayNotesTour(){
+      try{ return localStorage.getItem(DAY_NOTES_TOUR_KEY)==='1'; }catch(e){ return false; }
+    }
+    function updateTipsNewBadge(){
+      const swap=document.getElementById('brandSwap');
+      if(!swap) return;
+      swap.dataset.newLabel=lang==='ar'?'جديد':'NEW';
+      swap.classList.toggle('has-feature-new', !hasSeenDayNotesTour());
+    }
+    function renderDayNotesTourStep(){
+      const steps=t('tourSteps')||[];
+      const step=steps[_tourStep]||steps[0]||{title:'',desc:''};
+      const titleEl=document.getElementById('tourTitle');
+      const subEl=document.getElementById('tourSub');
+      const stepTitle=document.getElementById('tourStepTitle');
+      const stepDesc=document.getElementById('tourStepDesc');
+      const skipBtn=document.getElementById('tourSkipBtn');
+      const nextBtn=document.getElementById('tourNextBtn');
+      const dots=document.getElementById('tourDots');
+      if(titleEl) titleEl.textContent=t('tourTitle');
+      if(subEl) subEl.textContent=t('tourSub');
+      if(stepTitle) stepTitle.textContent=step.title||'';
+      if(stepDesc) stepDesc.textContent=step.desc||'';
+      if(skipBtn) skipBtn.textContent=t('tourSkip');
+      if(nextBtn) nextBtn.textContent=(_tourStep>=steps.length-1)?t('tourDone'):t('tourNext');
+      if(dots){
+        dots.innerHTML=steps.map((_,i)=>`<span class="tour-dot${i===_tourStep?' on':''}"></span>`).join('');
+      }
+    }
+    function openDayNotesTour(fromTips){
+      _tourStep=0;
+      const m=document.getElementById('dayNotesTourModal');
+      if(!m) return;
+      renderDayNotesTourStep();
+      const demo=document.getElementById('tourDemo');
+      if(demo){
+        demo.classList.remove('play');
+        void demo.offsetWidth;
+        demo.classList.add('play');
+      }
+      m.classList.add('open');
+      if(fromTips) markDayNotesTourSeen();
+    }
+    function closeDayNotesTour(markSeen){
+      const m=document.getElementById('dayNotesTourModal');
+      if(m) m.classList.remove('open');
+      if(markSeen!==false) markDayNotesTourSeen();
+      if(_tourTimer){ clearTimeout(_tourTimer); _tourTimer=null; }
+    }
+    function nextDayNotesTourStep(){
+      const steps=t('tourSteps')||[];
+      if(_tourStep>=steps.length-1){
+        closeDayNotesTour(true);
+        return;
+      }
+      _tourStep++;
+      renderDayNotesTourStep();
+    }
+    function maybeShowDayNotesTour(force){
+      if(!force && hasSeenDayNotesTour()) return;
+      if(_tourTimer) clearTimeout(_tourTimer);
+      _tourTimer=setTimeout(function tryShow(attempt){
+        _tourTimer=null;
+        if(!force && hasSeenDayNotesTour()) return;
+        const toast=document.getElementById('toastMount');
+        const toastBusy=toast && toast.style.display==='flex' && toast.innerHTML.trim();
+        const otherModal=!!document.querySelector('.modal.open:not(#dayNotesTourModal)');
+        if((toastBusy||otherModal) && attempt<10){
+          _tourTimer=setTimeout(function(){ tryShow(attempt+1); },1200);
+          return;
+        }
+        if(toastBusy||otherModal||!data) return;
+        openDayNotesTour(false);
+      },900,0);
+    }
+
     document.getElementById('searchForm').addEventListener('submit',async(e)=>{
       e.preventDefault();
       const id=document.getElementById('empId').value.trim();
@@ -1992,6 +2342,8 @@
         const cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
         month=months.includes(cur)?cur:months[months.length-1];
         renderSchedule();
+        const forceTour=new URLSearchParams(location.search).get('tour')==='1';
+        maybeShowDayNotesTour(forceTour);
       }catch(err){
         const wrap=document.getElementById('searchAvatarWrap');
         if(wrap) wrap.style.display='none';
@@ -2218,7 +2570,7 @@
       const el=document.getElementById('statsModalOverlay');
       if(el){el.style.display='none';}
     }
-    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){closeTips();closeStatsModal();closeMonthPicker();} });
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){closeTips();closeStatsModal();closeMonthPicker();closeDayNoteModal();closeDayNotesTour(true);} });
 
     function chMonth(dir){ const ci=months.indexOf(month),ni=ci+dir; if(ni>=0&&ni<months.length){month=months[ni];renderSchedule();} }
     function jumpMonth(val){ if(months.includes(val)){month=val;renderSchedule();} }
@@ -2671,6 +3023,7 @@
 
     /* Init */
     applyLangUI();
+    updateTipsNewBadge();
     const p=new URLSearchParams(location.search).get('emp');
     if(p){
       // Deep-link (?emp=): show that employee's schedule only. Do not overwrite

@@ -443,6 +443,10 @@
         70% { transform: scale(0.98) translateY(0); }
       }
 
+      html.has-float-dock .wrap {
+        padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
       #${HOME_CARD_ID} {
         position: fixed;
         left: 50%;
@@ -1207,8 +1211,23 @@ function boot() {
   }
 }
 
+  function loadFeatureUpdateBadge() {
+    try {
+      if (!onHomePage()) return;
+      document.documentElement.classList.add('has-float-dock');
+      if (document.querySelector('script[data-feature-update-badge="1"]')) return;
+      var s = document.createElement('script');
+      s.src = getBase() + 'feature-update-badge.js?v=20260726d';
+      s.defer = true;
+      s.setAttribute('data-feature-update-badge', '1');
+      s.setAttribute('data-local-src', s.src);
+      document.body.appendChild(s);
+    } catch (err) {}
+  }
+
   function start() {
     boot();
+    loadFeatureUpdateBadge();
     // One delayed retry in case another script sets the saved employee id shortly after load.
     setTimeout(boot, 1800);
   }
