@@ -164,7 +164,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .dockCard{
   min-width:72px;
   width:auto;
-  padding:9px 11px 8px;
+  padding:10px 12px;
   border-radius:14px;
   min-height:unset;
   background:#fff;
@@ -177,8 +177,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  box-sizing:border-box;
+  justify-content:flex-start;
 }
 .dockCard:hover{
   transform:translateY(-3px);
@@ -692,114 +691,45 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 .staffBtnGhost{background:#eff6ff;color:var(--blue);font-weight:700}
 @media(max-width:720px){
   .wrap{padding:14px 12px 36px}
-  .mainPanel{padding:18px 12px 20px;border-radius:24px}
-  .mainPanel::before{border-radius:24px 24px 0 0}
-  .header{padding:16px 12px 14px;border-radius:20px}
-  .header::after{font-size:48px;left:4%;bottom:8%;opacity:.07}
-  .header h1{font-size:clamp(20px,5vw,28px)}
-  .header p{margin-top:6px;font-size:12px}
-  .dateTag{margin-top:12px;padding:8px 34px 8px 12px;font-size:12px}
-  .topDock{
-    gap:6px;
-    margin-top:10px;
-    flex-wrap:nowrap;
-    justify-content:center;
-    align-items:stretch;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    padding-bottom:2px;
-  }
-  .topDock::-webkit-scrollbar{display:none}
-  .dockCard{
-    flex:0 0 auto;
-    width:auto;
-    min-width:58px;
-    max-width:78px;
-    padding:8px 7px 7px;
-    border-radius:13px;
-    justify-content:center;
-  }
-  .statChip{min-width:60px;max-width:82px}
-  .statsTicker{height:40px;min-width:46px}
-  .statsFace .dockLabel{margin-top:3px}
+  .mainPanel{padding:22px 14px 24px;border-radius:26px}
+  .mainPanel::before{border-radius:26px 26px 0 0}
+  .header{padding:24px 18px 22px;border-radius:28px}
+  .header::after{font-size:56px;left:4%;bottom:8%}
+  .topDock{gap:6px;margin-top:14px}
+  .dockCard{padding:8px 8px;min-width:60px;border-radius:14px}
+  .statsTicker{height:38px}
   .dockValue{font-size:18px;height:24px}
-  .dockLabel,.rosterLabel,.savedName{
-    margin-top:3px;
-    font-size:9px;
-    letter-spacing:.2px;
-    line-height:1.15;
-  }
-  .otherPageLabel{
-    font-size:8.5px;line-height:1.15;max-width:100%;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
-  #otherPageBtn{min-width:58px;max-width:78px;padding:8px 6px 7px}
-  .otherPageInner{gap:4px;min-height:0}
-  .otherIconBadge{width:28px;height:28px;border-radius:9px;padding:2px}
-  .otherIconBadge img,.cupDockImg{width:20px;height:20px;object-fit:contain}
-  .rosterInner,.savedChip{min-height:0;gap:0}
-  .savedChip{padding:8px 7px 7px}
-  .savedIcon{height:24px;font-size:16px}
-  .dockSvg{width:20px;height:20px}
-  .rosterIconWrap svg,.savedIcon svg,.dockValue.searchGlyph svg{width:20px;height:20px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
+  .otherPageLabel{font-size:8px}
+  #otherPageBtn{min-width:68px;padding:8px 8px 7px}
+  .otherIconBadge{width:30px;height:30px;border-radius:10px}
   .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
-  .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px;padding:9px 10px}
+  .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
   .myTrainingTime{grid-column:2}
-  .cards{gap:12px;margin-top:14px}
-  .courseCard{border-radius:20px}
-  .courseHead{grid-template-columns:40px minmax(0,1fr) auto;gap:10px;padding:12px 12px 11px;border-inline-start-width:4px}
-  .courseIcon{width:40px;height:40px;font-size:20px;border-radius:14px;margin-top:0}
-  .courseIcon.hasImg{padding:5px}
-  .courseTitle{font-size:14.5px;line-height:1.25}
-  .courseTitleAr{font-size:12px;margin-top:3px}
-  .courseTitleWrap{padding-top:0}
-  .courseSubRow{margin-top:6px;gap:6px;font-size:11.5px}
-  .courseBadges{gap:5px!important;padding-top:0}
-  .badge{padding:6px 9px;font-size:9.5px}
-  .metaTicker{width:44px;height:44px;border-radius:14px}
-  .courseBody{padding:12px 12px 14px}
-  .filters{padding:12px;border-radius:16px}
-  .searchRow{gap:8px}
-  .searchRow input{padding:11px 12px;font-size:13px;border-radius:14px}
-  .searchBtn,.clearBtn{padding:11px 12px;border-radius:14px;font-size:11.5px}
-  .empRow{grid-template-columns:24px minmax(64px,84px) 1fr;gap:8px;padding:9px 10px}
+  .courseHead{grid-template-columns:42px minmax(0,1fr) auto;gap:10px;padding:14px 14px}
+  .courseIcon{width:42px;height:42px;font-size:19px;border-radius:16px}
+  .courseTitle{font-size:15px}
+  .courseBody{padding:14px 14px 16px}
+  .filters{padding:14px;border-radius:18px}
+  .searchRow input{padding:12px 14px;font-size:13px}
+  .empRow{grid-template-columns:26px minmax(68px,88px) 1fr;gap:10px;padding:10px 12px}
 }
 @media(max-width:420px){
-  .wrap{padding:12px 8px 30px}
-  .header{padding:14px 10px 12px;border-radius:18px}
-  .header h1{font-size:18px}
-  .header p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .dateTag{margin-top:10px;padding:7px 30px 7px 10px;font-size:11px}
-  .topDock{gap:5px;margin-top:8px}
-  .dockCard{
-    min-width:54px;max-width:72px;
-    padding:7px 5px 6px;border-radius:12px;
-  }
-  .statChip{min-width:56px;max-width:74px}
-  .statsTicker{height:36px;min-width:42px}
-  .dockValue{font-size:16px;height:22px}
-  .dockLabel,.rosterLabel,.savedName{font-size:8.5px;letter-spacing:.15px}
-  .otherPageLabel{font-size:8px}
-  #otherPageBtn{min-width:54px;max-width:72px;padding:7px 5px 6px}
-  .otherIconBadge{width:26px;height:26px;border-radius:8px}
-  .otherIconBadge img,.cupDockImg{width:18px;height:18px}
-  .dockSvg{width:19px;height:19px}
-  .rosterIconWrap svg,.savedIcon svg,.dockValue.searchGlyph svg{width:19px;height:19px}
-  .savedIcon{height:22px}
-  .myTrainingCourse{font-size:12.5px}
+  .wrap{padding:12px 10px 30px}
+  .header{padding:22px 14px 18px;border-radius:24px}
+  .topDock{gap:6px}
+  .dockCard{padding:8px 6px;min-width:56px}
+  .statsValue{font-size:18px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8px}
+  .otherPageLabel{font-size:7.5px}
+  .myTrainingCourse{font-size:12px}
   .miniMeta{font-size:11px}
-  .courseHead{grid-template-columns:36px minmax(0,1fr) auto;gap:8px;padding:10px 10px}
-  .courseIcon{width:36px;height:36px;font-size:18px;border-radius:12px}
-  .courseTitle{font-size:13.5px}
-  .courseTitleAr{font-size:11.5px}
-  .badge{padding:5px 8px;font-size:9px}
-  .metaTicker{width:40px;height:40px;border-radius:13px}
-  .chipPrimary{font-size:12px}
+  .badge{padding:6px 10px;font-size:9px}
+  .metaTicker{width:46px;height:46px;border-radius:15px}
+  .chipPrimary{font-size:13px}
   .chipSecondary{font-size:8px}
-  .metaFace[data-face="people"]{font-size:11px}
-  .metaFace[data-face="info"]{font-size:16px}
-  .courseBody{padding:10px 10px 12px}
+  .metaFace[data-face="people"]{font-size:12px}
+  .metaFace[data-face="info"]{font-size:18px}
 }
 @media(min-width:900px){
   .wrap{padding-left:24px;padding-right:24px}
