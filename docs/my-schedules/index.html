@@ -330,9 +330,9 @@
       background:var(--surface2);
       border:1px solid var(--border2);
       color:var(--ink);
-      border-radius:10px;
-      padding:0 12px;
-      height:38px;
+      border-radius:12px;
+      padding:0 14px;
+      height:42px;
       font-size:13px;font-weight:700;
       font-family:'DM Mono',monospace;
       cursor:pointer;
@@ -399,23 +399,29 @@
 
     /* ── EMPLOYEE BANNER ── */
     .emp-banner{
-      align-items:flex-start;
-      background:var(--surface);
+      align-items:center;
+      background:
+        radial-gradient(120% 140% at 100% 0%, rgba(56,139,253,.14), transparent 55%),
+        var(--surface);
       border:1px solid var(--border);
-      border-radius:var(--r-lg);
-      padding:16px 20px;
-      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      border-radius:20px;
+      padding:20px 22px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      min-height:92px;
+      box-shadow:0 10px 28px rgba(0,0,0,.12);
     }
     .emp-left{display:flex;align-items:center;gap:14px;min-width:0}
     .emp-avatar{
-      width:48px;height:48px;border-radius:14px;
+      width:56px;height:56px;border-radius:16px;
       background:linear-gradient(135deg,#1f6feb,#58a6ff);
       display:grid;place-items:center;
-      color:#fff;font-weight:800;font-size:17px;
+      color:#fff;font-weight:800;font-size:18px;
       flex:0 0 auto;
-      box-shadow:0 4px 16px rgba(31,111,235,.4);
+      box-shadow:0 6px 18px rgba(31,111,235,.4);
     }
-    .emp-name{font-size:16px;font-weight:700;color:var(--ink);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .emp-name{font-size:18px;font-weight:800;color:var(--ink);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     
     .emp-name-row{
@@ -451,10 +457,10 @@
     body.light .emp-idpill{ background:rgba(0,0,0,.04); }
 
     .emp-dept{
-      margin-top:6px;
-      font-size:12px;
+      margin-top:8px;
+      font-size:13px;
       color:var(--muted);
-      font-weight:600;
+      font-weight:650;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -1155,20 +1161,20 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
+      gap:16px;
     }
 
     .emp-left{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
       min-width:0;
     }
 
     .emp-info{
       display:flex;
       flex-direction:column;
-      gap:4px;
+      gap:5px;
     }
 
 
@@ -1666,10 +1672,15 @@
       .brand-swap{ width:32px !important; height:32px !important; }
       .brand-sq{ width:32px !important; height:32px !important; }
       .search-section{ padding:10px 14px 12px; }
-      .search-form{ flex-wrap:wrap; width:100%; row-gap:8px; }
-      .search-id-row{
-        flex:1 1 100%;
+      .search-form{
+        flex-wrap:nowrap;
         width:100%;
+        gap:6px;
+        align-items:center;
+      }
+      .search-id-row{
+        flex:1 1 auto;
+        width:auto;
         min-width:0;
       }
       .search-avatar-wrap{ flex:0 0 auto; }
@@ -1691,11 +1702,14 @@
       }
       .id-prefix{ min-height:44px; }
       .search-avatar,
-      .search-change-btn{ width:44px; height:44px; min-height:44px; }
+      .search-change-btn{ width:40px; height:40px; min-height:40px; }
       .search-btn{
-        flex:1 1 100%;
-        width:100%;
+        flex:0 0 auto;
+        width:auto;
+        min-width:72px;
         min-height:44px;
+        padding:0 12px;
+        font-size:12px;
       }
     }
 
