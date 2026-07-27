@@ -720,10 +720,11 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
         rows_html = ""
         for i, e in enumerate(emps):
             alt = " empRowAlt" if i % 2 == 1 else ""
-            name_attr = html_escape(e["name"], quote=True)
-            ar_name_attr = html_escape(name_i18n.arabic_display(e["name"]), quote=True)
+            display_name = name_i18n.format_name_id(e["name"])
+            name_attr = html_escape(display_name, quote=True)
+            ar_name_attr = html_escape(name_i18n.arabic_display(display_name), quote=True)
             rows_html += f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
-      <span class="empName" data-name-ar="{ar_name_attr}">{e['name']}</span>
+      <span class="empName" data-name-ar="{ar_name_attr}">{display_name}</span>
        <span class="empStatus" style="color:{colors['status_color']};">{e['shift']}</span>
      </div>"""
 

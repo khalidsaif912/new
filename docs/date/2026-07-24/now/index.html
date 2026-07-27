@@ -1625,8 +1625,8 @@
      </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Amri - 81224" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد العامري - 81224">Mohamed Al Amri - 81224</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Hadi 82654" role="button" tabindex="0">
-      <span class="empName" data-name-ar="أحمد ال هادي 82654">Ahmed Al Hadi 82654</span>
+     </div><div class="empRow" data-emp-name="Ahmed Al Hadi - 82654" role="button" tabindex="0">
+      <span class="empName" data-name-ar="أحمد الهادي - 82654">Ahmed Al Hadi - 82654</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div><div class="empRow empRowAlt" data-emp-name="Ghassan Al Tarsi - 82588" role="button" tabindex="0">
       <span class="empName" data-name-ar="غسان الطارشي - 82588">Ghassan Al Tarsi - 82588</span>
@@ -2396,13 +2396,14 @@ async function captureRosterElement(target, fileNamePrefix, opts) {
 }
 
 function goToEmployeeSchedule(empName) {
-  var match = empName.match(/-\s*(\d{3,})/);
+  var raw = String(empName || '');
+  var match = raw.match(/-\s*(\d{3,})\s*(?:\(|$)/) || raw.match(/(\d{3,})\s*(?:\(|$)/);
   var base = getSiteRootUrl() + '/my-schedules/index.html';
 
   if (match) {
     location.href = base + '?emp=' + encodeURIComponent(match[1]);
   } else {
-    location.href = base + '?name=' + encodeURIComponent(empName);
+    location.href = base + '?name=' + encodeURIComponent(raw);
   }
 }
 

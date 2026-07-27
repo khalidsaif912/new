@@ -282,18 +282,31 @@ _SINGLE = {
     "Z": "ز",
 }
 
-_ID_RE = re.compile(r"\s*-\s*(\d{3,})\s*$")
+_ID_RE = re.compile(r"(?:\s*[-–—]\s*|\s+)(\d{3,})\s*(?:\([^)]*\))?\s*$")
 
 
 def split_name_id(full_name: str) -> tuple[str, Optional[str]]:
-    """Split ``"AHMED KHALID - 12345"`` into ``("AHMED KHALID", "12345")``."""
+    """Split ``"AHMED KHALID - 12345"`` (or ``"AHMED KHALID 12345"``) into base + id."""
     if not full_name:
         return "", None
     m = _ID_RE.search(full_name)
     if not m:
         return full_name.strip(), None
-    base = full_name[: m.start()].strip()
+    base = full_name[: m.start()].strip(" -\t")
     return base, m.group(1)
+
+
+def format_name_id(full_name: str) -> str:
+    """Normalize to ``Name - ID`` (keeps optional trailing parenthetical)."""
+    base, emp_id = split_name_id(full_name)
+    if not emp_id:
+        return (full_name or "").strip()
+    # preserve inventory / support tags after the id if present
+    rest = ""
+    m = re.search(r"(\d{3,})\s*(\([^)]*\))\s*$", full_name or "")
+    if m:
+        rest = " " + m.group(2)
+    return f"{base} - {emp_id}{rest}"
 
 
 def _key_for(base_name: str) -> str:
