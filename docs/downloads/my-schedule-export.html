@@ -209,7 +209,7 @@
     .ghost-btn:hover{background:rgba(56,139,253,.15);color:#e6edf3;border-color:rgba(56,139,253,.35)}
     body.light .ghost-btn:hover{background:rgba(0,0,0,.07);border-color:rgba(0,0,0,.18)}
     .ghost-btn:active{transform:scale(.97)}
-    .theme-btn{width:48px;padding:0;font-size:20px;border-radius:14px;}
+    .theme-btn{width:36px;padding:0;font-size:16px;border-radius:10px;}
 
     /* Lang — same square chrome as home/theme */
     #langBtn{
@@ -1517,10 +1517,8 @@
     }
 
 
-    /* ── TOPBAR: home / lang / theme نفس المقاس والتصميم ── */
-    .topbar-inner .home-btn,
-    .topbar-inner .ghost-btn.theme-btn,
-    .topbar-inner #langBtn{
+    /* ── TOPBAR: home كبير، وباقي الأزرار أصغر بنفس التصميم ── */
+    .topbar-inner .home-btn{
       width:48px !important;
       height:48px !important;
       min-width:48px !important;
@@ -1534,6 +1532,21 @@
       border:1px solid rgba(255,255,255,.12) !important;
       box-shadow:none !important;
     }
+    .topbar-inner .ghost-btn.theme-btn,
+    .topbar-inner #langBtn{
+      width:36px !important;
+      height:36px !important;
+      min-width:36px !important;
+      max-width:36px !important;
+      padding:0 !important;
+      border-radius:10px !important;
+      display:grid !important;
+      place-items:center !important;
+      flex:0 0 36px !important;
+      background:rgba(255,255,255,.06) !important;
+      border:1px solid rgba(255,255,255,.12) !important;
+      box-shadow:none !important;
+    }
     body.light .topbar-inner .home-btn,
     body.light .topbar-inner .ghost-btn.theme-btn,
     body.light .topbar-inner #langBtn{
@@ -1542,10 +1555,10 @@
     }
     .topbar-inner #langBtn{
       color:#58a6ff !important;
-      font-size:14px !important;
+      font-size:12px !important;
       font-weight:800 !important;
     }
-    .topbar-inner .ghost-btn.theme-btn{ font-size:20px !important; }
+    .topbar-inner .ghost-btn.theme-btn{ font-size:16px !important; }
     .topbar-inner .home-btn:hover,
     .topbar-inner .ghost-btn.theme-btn:hover,
     .topbar-inner #langBtn:hover{
@@ -1555,15 +1568,15 @@
     }
     .topbar-inner .brand-swap,
     .topbar-inner .brand-sq{
-      width:48px !important;
-      height:48px !important;
-      min-width:48px !important;
-      border-radius:14px !important;
+      width:36px !important;
+      height:36px !important;
+      min-width:36px !important;
+      border-radius:10px !important;
       display:grid !important;
       place-items:center !important;
-      flex:0 0 48px !important;
+      flex:0 0 36px !important;
     }
-    .topbar-inner .brand-sq{ font-size:20px !important; }
+    .topbar-inner .brand-sq{ font-size:16px !important; }
 
 
     .brand-mark{
@@ -1575,20 +1588,20 @@
     }
     .brand-swap{
       position:relative;
-      width:48px;
-      height:48px;
+      width:36px;
+      height:36px;
       flex:0 0 auto;
     }
     .brand-sq{
       position:absolute;
       inset:0;
-      width:48px;
-      height:48px;
-      border-radius:14px;
+      width:36px;
+      height:36px;
+      border-radius:10px;
       background:linear-gradient(135deg,#1f6feb,#388bfd);
       display:grid;
       place-items:center;
-      font-size:20px;
+      font-size:16px;
       border:none;
       color:#fff;
       box-shadow:0 0 0 1px rgba(56,139,253,.28),0 4px 12px rgba(31,111,235,.28);
@@ -1675,7 +1688,7 @@
       background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.75));
     }
 
-    /* iPhone: keep large unified topbar controls (no shrink) */
+    /* iPhone: home stays large; other topbar buttons stay compact */
     @media (max-width: 520px) {
       .topbar-inner{ padding:14px 12px; gap:8px; align-items:center; }
       .topbar-center{
@@ -1687,12 +1700,8 @@
       .brand-info{ overflow:hidden; max-width:100%; gap:3px; }
       .brand-name{ font-size:15px; line-height:1.2; }
       .brand-sub{ display:block; font-size:12px; opacity:.78; }
-      .topbar-right{ gap:6px; flex-shrink:0; }
-      .topbar-inner .home-btn,
-      .topbar-inner .ghost-btn.theme-btn,
-      .topbar-inner #langBtn,
-      .topbar-inner .brand-swap,
-      .topbar-inner .brand-sq{
+      .topbar-right{ gap:5px; flex-shrink:0; }
+      .topbar-inner .home-btn{
         width:48px !important;
         height:48px !important;
         min-width:48px !important;
@@ -1701,12 +1710,24 @@
         border-radius:14px !important;
         padding:0 !important;
       }
-      .topbar-inner #langBtn{ font-size:14px !important; }
       .topbar-inner .ghost-btn.theme-btn,
-      .topbar-inner .brand-sq{ font-size:20px !important; }
+      .topbar-inner #langBtn,
+      .topbar-inner .brand-swap,
+      .topbar-inner .brand-sq{
+        width:34px !important;
+        height:34px !important;
+        min-width:34px !important;
+        max-width:34px !important;
+        flex:0 0 34px !important;
+        border-radius:9px !important;
+        padding:0 !important;
+      }
+      .topbar-inner #langBtn{ font-size:11px !important; }
+      .topbar-inner .ghost-btn.theme-btn,
+      .topbar-inner .brand-sq{ font-size:15px !important; }
       .home-btn svg{ width:20px; height:20px; }
-      .brand-swap{ width:48px !important; height:48px !important; }
-      .brand-sq{ width:48px !important; height:48px !important; }
+      .brand-swap{ width:34px !important; height:34px !important; }
+      .brand-sq{ width:34px !important; height:34px !important; }
       .search-section{ padding:10px 14px 12px; }
       .search-form{
         flex-wrap:nowrap;
