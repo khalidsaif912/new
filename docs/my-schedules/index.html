@@ -401,27 +401,27 @@
     .emp-banner{
       align-items:center;
       background:
-        radial-gradient(120% 140% at 100% 0%, rgba(56,139,253,.14), transparent 55%),
+        radial-gradient(120% 140% at 100% 0%, rgba(56,139,253,.16), transparent 55%),
         var(--surface);
       border:1px solid var(--border);
-      border-radius:20px;
-      padding:20px 22px;
+      border-radius:24px;
+      padding:24px 24px;
       display:flex;
       justify-content:space-between;
-      gap:16px;
-      min-height:92px;
-      box-shadow:0 10px 28px rgba(0,0,0,.12);
+      gap:18px;
+      min-height:118px;
+      box-shadow:0 12px 32px rgba(0,0,0,.14);
     }
-    .emp-left{display:flex;align-items:center;gap:14px;min-width:0}
+    .emp-left{display:flex;align-items:center;gap:16px;min-width:0}
     .emp-avatar{
-      width:56px;height:56px;border-radius:16px;
+      width:64px;height:64px;border-radius:18px;
       background:linear-gradient(135deg,#1f6feb,#58a6ff);
       display:grid;place-items:center;
-      color:#fff;font-weight:800;font-size:18px;
+      color:#fff;font-weight:800;font-size:22px;
       flex:0 0 auto;
-      box-shadow:0 6px 18px rgba(31,111,235,.4);
+      box-shadow:0 8px 22px rgba(31,111,235,.42);
     }
-    .emp-name{font-size:18px;font-weight:800;color:var(--ink);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .emp-name{font-size:22px;font-weight:800;color:var(--ink);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     
     .emp-name-row{
@@ -1434,11 +1434,22 @@
 
     /* Name typography polish */
     .emp-name{
-      font-size:16px;
+      font-size:22px;
       font-weight:800;
-      letter-spacing:-.3px;
+      letter-spacing:-.35px;
+      line-height:1.2;
     }
-    body.light .emp-name{letter-spacing:-.2px;}
+    body.light .emp-name{letter-spacing:-.25px;}
+    .emp-dept{
+      margin-top:10px;
+      font-size:14px;
+      font-weight:650;
+    }
+    .emp-idpill{
+      padding:5px 10px;
+      font-size:12px;
+      border-radius:8px;
+    }
 
 
     /* ── ID prefix inside input ── */
@@ -1483,13 +1494,15 @@
     }
 
 
-    /* Month button sizing (compact, not same as name) */
+    /* Month button sizing */
     .month-picker-btn{
-      font-size:12px !important;
-      height:32px !important;
-      padding:0 10px !important;
-      border-radius:10px !important;
+      font-size:14px !important;
+      height:46px !important;
+      padding:0 16px !important;
+      border-radius:14px !important;
+      font-weight:800 !important;
     }
+    .month-picker-btn .mpb-arrow{font-size:12px;opacity:.7}
 
 
     /* ── Topbar squares: identical size & perfectly stacked ── */
@@ -1710,6 +1723,21 @@
         min-height:44px;
         padding:0 12px;
         font-size:12px;
+      }
+      .emp-banner{
+        padding:22px 16px;
+        min-height:108px;
+        border-radius:20px;
+        gap:14px;
+      }
+      .emp-avatar{width:58px;height:58px;border-radius:16px;font-size:20px}
+      .emp-name{font-size:20px !important}
+      .emp-dept{font-size:13.5px;margin-top:8px}
+      .month-picker-btn{
+        height:44px !important;
+        padding:0 14px !important;
+        font-size:13px !important;
+        border-radius:13px !important;
       }
     }
 
