@@ -2199,13 +2199,14 @@ async function captureRosterElement(target, fileNamePrefix, opts) {{
 }}
 
 function goToEmployeeSchedule(empName) {{
-  var match = empName.match(/-\s*(\d{{3,}})/);
+  var raw = String(empName || '');
+  var match = raw.match(/-\s*(\d{{3,}})\s*(?:\(|$)/) || raw.match(/(\d{{3,}})\s*(?:\(|$)/);
   var base = getSiteRootUrl() + '/my-schedules/index.html';
 
   if (match) {{
     location.href = base + '?emp=' + encodeURIComponent(match[1]);
   }} else {{
-    location.href = base + '?name=' + encodeURIComponent(empName);
+    location.href = base + '?name=' + encodeURIComponent(raw);
   }}
 }}
 

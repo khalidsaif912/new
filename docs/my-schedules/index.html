@@ -2326,7 +2326,10 @@
           <div class="state-desc">${lang==='ar'?'انتظر لحظات…':'Please wait a moment…'}</div>
         </div>`;
       try{
-        const res=await fetch(`../schedules/${id}.json?ts=${Date.now()}`, { cache:'no-store' });
+        let res=await fetch(`../schedules/${id}.json?ts=${Date.now()}`, { cache:'no-store' });
+        if(!res.ok){
+          res=await fetch(`../import/schedules/${id}.json?ts=${Date.now()}`, { cache:'no-store' });
+        }
         if(!res.ok) throw new Error('not found');
         data=await res.json();
         months=Object.keys(data.schedules||{})
