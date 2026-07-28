@@ -95,6 +95,13 @@ SVG_APP_CART = (
 SVG_APP_GAME = (
     '<img class="siteAppsFlatImg" src="https://khalidsaif912.github.io/new/docs/assets/icons/app-games.png" width="30" height="30" alt="" decoding="async">'
 )
+SVG_APP_WA = (
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/>'
+    '<path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/>'
+    '<path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+    '</svg>'
+)
 SVG_APP_STORE = (
     '<svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
     '<path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/>'
@@ -677,6 +684,7 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
     .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
     .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
     .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
       animation: siteAppsStorePulse 2.4s ease-in-out infinite;
       transform-origin: center;
@@ -775,6 +783,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-text">
           <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
           <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        </span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
+        <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
         </span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">

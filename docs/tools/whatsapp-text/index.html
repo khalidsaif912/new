@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>تنسيق واتساب</title>
+  <style>
+    :root{
+      --bg:#f4f8ff;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:#dbe5f4;
+      --blue:#2563eb;
+      --blue-2:#60a5fa;
+      --green:#16a34a;
+      --amber:#f59e0b;
+      --purple:#7c3aed;
+      --shadow:0 24px 60px rgba(15,23,42,.10);
+      --r:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(96,165,250,.18), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color:var(--ink);
+      min-height:100dvh;
+    }
+    a{color:inherit}
+    .wrap{
+      width:min(1100px,100%);
+      margin:0 auto;
+      padding:18px 14px 28px;
+    }
+    .hero{
+      background:linear-gradient(135deg,#0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+      color:#fff;
+      border-radius:28px;
+      padding:18px 18px 20px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto -60px -80px auto;
+      width:180px;height:180px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+      filter:blur(2px);
+    }
+    .hero-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .home-btn{
+      width:42px;height:42px;
+      border-radius:12px;
+      display:grid;place-items:center;
+      text-decoration:none;
+      color:#fff;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.22);
+      backdrop-filter:blur(10px);
+    }
+    .home-btn svg{display:block}
+    .lang-btn{
+      min-width:42px;height:42px;padding:0 12px;
+      border:none;border-radius:12px;
+      background:rgba(255,255,255,.12);
+      color:#fff;font-weight:800;cursor:pointer;
+      border:1px solid rgba(255,255,255,.22);
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:12px;font-weight:700;
+      margin-bottom:10px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:28px;
+      line-height:1.15;
+    }
+    .hero p{
+      margin:0;
+      max-width:760px;
+      color:rgba(255,255,255,.92);
+      line-height:1.8;
+      font-size:14px;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:16px;
+      margin-top:16px;
+      align-items:start;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid rgba(148,163,184,.18);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+    }
+    .editor{
+      padding:16px;
+    }
+    .card-head{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-bottom:12px;
+    }
+    .card-title{font-size:18px;font-weight:900}
+    .card-sub{font-size:12px;color:var(--muted);line-height:1.6}
+    .toolbar{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+      margin:14px 0 12px;
+    }
+    .tool-btn{
+      min-height:52px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#f8fbff;
+      color:var(--ink);
+      padding:10px 8px;
+      cursor:pointer;
+      font:inherit;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      text-align:center;
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .tool-btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(37,99,235,.08);border-color:#bfdbfe}
+    .tool-btn strong{font-size:12px}
+    .tool-btn span{font-size:11px;color:var(--muted)}
+    .tool-btn--blue{background:#eff6ff}
+    .tool-btn--green{background:#f0fdf4}
+    .tool-btn--amber{background:#fffbeb}
+    .tool-btn--purple{background:#faf5ff}
+    textarea{
+      width:100%;
+      min-height:220px;
+      border-radius:18px;
+      border:1.5px solid var(--line);
+      background:#fff;
+      padding:16px;
+      resize:vertical;
+      font:inherit;
+      line-height:1.8;
+      color:var(--ink);
+      outline:none;
+    }
+    textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(96,165,250,.14)}
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:12px;
+    }
+    .primary,.secondary{
+      border:none;
+      min-height:46px;
+      border-radius:14px;
+      padding:0 16px;
+      font:inherit;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff}
+    .secondary{background:#eef4ff;color:#1d4ed8}
+    .result{
+      padding:16px;
+      position:sticky;
+      top:12px;
+    }
+    .preview{
+      background:#f8fbff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-height:220px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      line-height:1.9;
+      font-size:15px;
+    }
+    .hint-list{
+      margin:14px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+    .hint-list li{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:16px;
+      padding:12px 13px;
+      font-size:12px;
+      line-height:1.7;
+      color:var(--muted);
+    }
+    .hint-list strong{display:block;color:var(--ink);margin-bottom:4px}
+    .toast{
+      position:fixed;
+      inset:auto 14px 14px 14px;
+      margin:auto;
+      width:min(420px,calc(100% - 28px));
+      background:#0f172a;
+      color:#fff;
+      border-radius:14px;
+      padding:12px 14px;
+      text-align:center;
+      font-size:13px;
+      font-weight:700;
+      box-shadow:0 20px 40px rgba(15,23,42,.3);
+      opacity:0;
+      transform:translateY(14px);
+      pointer-events:none;
+      transition:.2s ease;
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media (max-width: 860px){
+      .layout{grid-template-columns:1fr}
+      .result{position:static}
+    }
+    @media (max-width: 560px){
+      .wrap{padding:12px 10px 24px}
+      .hero{padding:14px 14px 18px;border-radius:24px}
+      h1{font-size:24px}
+      .toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .tool-btn{min-height:50px}
+      textarea,.preview{min-height:190px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <a class="home-btn" href="https://khalidsaif912.github.io/new/" aria-label="Home" title="Home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>
+          </svg>
+        </a>
+        <button class="lang-btn" id="langBtn" type="button">EN</button>
+      </div>
+      <div class="hero-badge" id="badge">WA TEXT STYLER</div>
+      <h1 id="heroTitle">تنسيق نص واتساب</h1>
+      <p id="heroDesc">اكتب النص مرة واحدة ثم حوّله بسرعة إلى تنسيقات مناسبة لواتساب مثل التعريض، المائل، الشطب، الكود، الاقتباس، القوائم، وحتى بدائل مرئية مثل التسطير.</p>
+    </section>
+
+    <div class="layout">
+      <section class="card editor">
+        <div class="card-head">
+          <div>
+            <div class="card-title" id="inputTitle">النص الأصلي</div>
+            <div class="card-sub" id="inputSub">يمكنك كتابة فقرة أو عدة أسطر. بعض الخيارات تطبق على كل سطر تلقائياً.</div>
+          </div>
+        </div>
+        <textarea id="sourceText" placeholder="اكتب هنا النص الذي تريد تنسيقه..."></textarea>
+
+        <div class="toolbar">
+          <button class="tool-btn tool-btn--blue" type="button" data-format="bold"><strong id="boldLbl">تعريض</strong><span>*text*</span></button>
+          <button class="tool-btn tool-btn--blue" type="button" data-format="italic"><strong id="italicLbl">مائل</strong><span>_text_</span></button>
+          <button class="tool-btn tool-btn--blue" type="button" data-format="strike"><strong id="strikeLbl">مشطوب</strong><span>~text~</span></button>
+          <button class="tool-btn tool-btn--green" type="button" data-format="mono"><strong id="monoLbl">كود</strong><span>```text```</span></button>
+          <button class="tool-btn tool-btn--green" type="button" data-format="quote"><strong id="quoteLbl">اقتباس</strong><span>&gt; line</span></button>
+          <button class="tool-btn tool-btn--green" type="button" data-format="inline"><strong id="inlineLbl">كود قصير</strong><span>`text`</span></button>
+          <button class="tool-btn tool-btn--amber" type="button" data-format="bullets"><strong id="bulletsLbl">قائمة نقطية</strong><span>• item</span></button>
+          <button class="tool-btn tool-btn--amber" type="button" data-format="numbers"><strong id="numbersLbl">قائمة رقمية</strong><span>1. item</span></button>
+          <button class="tool-btn tool-btn--purple" type="button" data-format="underline"><strong id="underlineLbl">تسطير مرئي</strong><span>u̲n̲d̲e̲r̲</span></button>
+          <button class="tool-btn tool-btn--purple" type="button" data-format="box"><strong id="boxLbl">تضليل بديل</strong><span>code block</span></button>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="copyBtn" type="button">نسخ النتيجة</button>
+          <button class="secondary" id="swapBtn" type="button">استخدم النتيجة كنص جديد</button>
+          <button class="secondary" id="clearBtn" type="button">مسح</button>
+        </div>
+      </section>
+
+      <aside class="card result">
+        <div class="card-head">
+          <div>
+            <div class="card-title" id="resultTitle">النتيجة الجاهزة</div>
+            <div class="card-sub" id="resultSub">اضغط أحد الأزرار اليسار ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.</div>
+          </div>
+        </div>
+        <div class="preview" id="preview"></div>
+        <ul class="hint-list">
+          <li><strong id="tip1Title">التسطير</strong><span id="tip1Body">واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.</span></li>
+          <li><strong id="tip2Title">التضليل</strong><span id="tip2Body">واتساب لا يملك لون تظليل حقيقي للنص. أقرب بديل عملي هو تنسيق الكود أو بلوك الاقتباس.</span></li>
+          <li><strong id="tip3Title">القوائم</strong><span id="tip3Body">إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var T = {
+        ar: {
+          badge: 'WA TEXT STYLER',
+          heroTitle: 'تنسيق نص واتساب',
+          heroDesc: 'اكتب النص مرة واحدة ثم حوّله بسرعة إلى تنسيقات مناسبة لواتساب مثل التعريض، المائل، الشطب، الكود، الاقتباس، القوائم، وحتى بدائل مرئية مثل التسطير.',
+          inputTitle: 'النص الأصلي',
+          inputSub: 'يمكنك كتابة فقرة أو عدة أسطر. بعض الخيارات تطبق على كل سطر تلقائياً.',
+          resultTitle: 'النتيجة الجاهزة',
+          resultSub: 'اضغط أحد الأزرار اليسار ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.',
+          copy: 'نسخ النتيجة',
+          swap: 'استخدم النتيجة كنص جديد',
+          clear: 'مسح',
+          placeholder: 'اكتب هنا النص الذي تريد تنسيقه...',
+          bold: 'تعريض',
+          italic: 'مائل',
+          strike: 'مشطوب',
+          mono: 'كود',
+          quote: 'اقتباس',
+          inline: 'كود قصير',
+          bullets: 'قائمة نقطية',
+          numbers: 'قائمة رقمية',
+          underline: 'تسطير مرئي',
+          box: 'تضليل بديل',
+          tip1Title: 'التسطير',
+          tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
+          tip2Title: 'التضليل',
+          tip2Body: 'واتساب لا يملك لون تظليل حقيقي للنص. أقرب بديل عملي هو تنسيق الكود أو بلوك الاقتباس.',
+          tip3Title: 'القوائم',
+          tip3Body: 'إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.',
+          copied: 'تم نسخ النص',
+          empty: 'اكتب النص أولاً',
+          previewEmpty: 'سيظهر النص المنسق هنا',
+          langBtn: 'EN'
+        },
+        en: {
+          badge: 'WA TEXT STYLER',
+          heroTitle: 'WhatsApp Text Styler',
+          heroDesc: 'Type your text once, then turn it into ready WhatsApp styles like bold, italic, strike, code, quotes, lists, and visual alternatives such as underline.',
+          inputTitle: 'Source Text',
+          inputSub: 'You can type one paragraph or multiple lines. Some options apply line by line automatically.',
+          resultTitle: 'Ready Output',
+          resultSub: 'Tap any style button on the left, then copy the final result directly into WhatsApp.',
+          copy: 'Copy Result',
+          swap: 'Use Output as New Text',
+          clear: 'Clear',
+          placeholder: 'Type the text you want to style here...',
+          bold: 'Bold',
+          italic: 'Italic',
+          strike: 'Strike',
+          mono: 'Code Block',
+          quote: 'Quote',
+          inline: 'Inline Code',
+          bullets: 'Bulleted List',
+          numbers: 'Numbered List',
+          underline: 'Visual Underline',
+          box: 'Shade Alternative',
+          tip1Title: 'Underline',
+          tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
+          tip2Title: 'Shading',
+          tip2Body: 'WhatsApp has no real text highlight color. The closest practical alternative is code formatting or quote blocks.',
+          tip3Title: 'Lists',
+          tip3Body: 'If your text contains multiple lines, numbering or bullets will be applied to each line automatically.',
+          copied: 'Text copied',
+          empty: 'Type some text first',
+          previewEmpty: 'Formatted text will appear here',
+          langBtn: 'ع'
+        }
+      };
+
+      var lang = (localStorage.getItem('waTextLang') || 'ar') === 'en' ? 'en' : 'ar';
+      var source = document.getElementById('sourceText');
+      var preview = document.getElementById('preview');
+      var toast = document.getElementById('toast');
+      var latest = '';
+
+      function t(key) {
+        return (T[lang] && T[lang][key]) || T.ar[key] || key;
+      }
+
+      function lines(text) {
+        return text.split(/\r?\n/).map(function (line) { return line.trimEnd(); });
+      }
+
+      function nonEmptyLines(text) {
+        return lines(text).filter(function (line) { return line.trim() !== ''; });
+      }
+
+      function underlineVisual(text) {
+        return text.split('').map(function (ch) {
+          if (ch === '\n') return '\n';
+          if (ch === ' ') return ' ';
+          return ch + '\u0332';
+        }).join('');
+      }
+
+      function formatText(kind, text) {
+        switch (kind) {
+          case 'bold': return '*' + text + '*';
+          case 'italic': return '_' + text + '_';
+          case 'strike': return '~' + text + '~';
+          case 'inline': return '`' + text + '`';
+          case 'mono': return '```\\n' + text + '\\n```';
+          case 'quote':
+            return lines(text).map(function (line) { return line.trim() ? '> ' + line : '>'; }).join('\n');
+          case 'bullets':
+            return nonEmptyLines(text).map(function (line) { return '• ' + line; }).join('\n');
+          case 'numbers':
+            return nonEmptyLines(text).map(function (line, i) { return (i + 1) + '. ' + line; }).join('\n');
+          case 'underline':
+            return underlineVisual(text);
+          case 'box':
+            return '```\\n' + text + '\\n```';
+          default:
+            return text;
+        }
+      }
+
+      function setPreview(text) {
+        latest = text || '';
+        preview.textContent = latest || t('previewEmpty');
+      }
+
+      function flash(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(flash._timer);
+        flash._timer = setTimeout(function () {
+          toast.classList.remove('show');
+        }, 1600);
+      }
+
+      function applyLang() {
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        document.getElementById('badge').textContent = t('badge');
+        document.getElementById('heroTitle').textContent = t('heroTitle');
+        document.getElementById('heroDesc').textContent = t('heroDesc');
+        document.getElementById('inputTitle').textContent = t('inputTitle');
+        document.getElementById('inputSub').textContent = t('inputSub');
+        document.getElementById('resultTitle').textContent = t('resultTitle');
+        document.getElementById('resultSub').textContent = t('resultSub');
+        document.getElementById('copyBtn').textContent = t('copy');
+        document.getElementById('swapBtn').textContent = t('swap');
+        document.getElementById('clearBtn').textContent = t('clear');
+        document.getElementById('boldLbl').textContent = t('bold');
+        document.getElementById('italicLbl').textContent = t('italic');
+        document.getElementById('strikeLbl').textContent = t('strike');
+        document.getElementById('monoLbl').textContent = t('mono');
+        document.getElementById('quoteLbl').textContent = t('quote');
+        document.getElementById('inlineLbl').textContent = t('inline');
+        document.getElementById('bulletsLbl').textContent = t('bullets');
+        document.getElementById('numbersLbl').textContent = t('numbers');
+        document.getElementById('underlineLbl').textContent = t('underline');
+        document.getElementById('boxLbl').textContent = t('box');
+        document.getElementById('tip1Title').textContent = t('tip1Title');
+        document.getElementById('tip1Body').textContent = t('tip1Body');
+        document.getElementById('tip2Title').textContent = t('tip2Title');
+        document.getElementById('tip2Body').textContent = t('tip2Body');
+        document.getElementById('tip3Title').textContent = t('tip3Title');
+        document.getElementById('tip3Body').textContent = t('tip3Body');
+        document.getElementById('langBtn').textContent = t('langBtn');
+        source.placeholder = t('placeholder');
+        if (!latest) setPreview('');
+      }
+
+      document.querySelectorAll('[data-format]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = source.value.trim();
+          if (!text) {
+            flash(t('empty'));
+            return;
+          }
+          setPreview(formatText(btn.getAttribute('data-format'), source.value));
+        });
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', async function () {
+        if (!latest) {
+          flash(t('empty'));
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(latest);
+          flash(t('copied'));
+        } catch (err) {
+          flash('Copy failed');
+        }
+      });
+
+      document.getElementById('swapBtn').addEventListener('click', function () {
+        if (!latest) {
+          flash(t('empty'));
+          return;
+        }
+        source.value = latest;
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function () {
+        source.value = '';
+        setPreview('');
+      });
+
+      document.getElementById('langBtn').addEventListener('click', function () {
+        lang = lang === 'ar' ? 'en' : 'ar';
+        localStorage.setItem('waTextLang', lang);
+        applyLang();
+      });
+
+      setPreview('');
+      applyLang();
+    })();
+  </script>
+</body>
+</html>
