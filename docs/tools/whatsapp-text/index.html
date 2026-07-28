@@ -524,6 +524,10 @@
         return lines(text).filter(function (line) { return line.trim() !== ''; });
       }
 
+      function normalizeInput(text) {
+        return String(text || '').replace(/\\n/g, '\n');
+      }
+
       function underlineVisual(text) {
         return text.split('').map(function (ch) {
           if (ch === '\n') return '\n';
@@ -571,13 +575,14 @@
       }
 
       function formatText(kind, text) {
+        text = normalizeInput(text);
         switch (kind) {
           case 'bold': return '*' + text + '*';
           case 'italic': return '_' + text + '_';
           case 'strike': return '~' + text + '~';
           case 'boldItalic': return '*_' + text + '_*';
           case 'inline': return '`' + text + '`';
-          case 'mono': return '```\\n' + text + '\\n```';
+          case 'mono': return '```\n' + text + '\n```';
           case 'headline': return asHeading(text);
           case 'announce': return asAnnouncement(text);
           case 'admin': return asAdmin(text);
@@ -592,7 +597,7 @@
           case 'underline':
             return underlineVisual(text);
           case 'box':
-            return '```\\n' + text + '\\n```';
+            return '```\n' + text + '\n```';
           default:
             return text;
         }
@@ -665,7 +670,7 @@
 
       document.querySelectorAll('[data-format]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          var text = source.value.trim();
+          var text = normalizeInput(source.value).trim();
           if (!text) {
             flash(t('empty'));
             return;
@@ -678,7 +683,7 @@
         btn.addEventListener('click', function () {
           var key = btn.getAttribute('data-template');
           var map = templates();
-          source.value = map[key] || '';
+          source.value = normalizeInput(map[key] || '');
           setPreview(source.value);
         });
       });
@@ -701,12 +706,17 @@
           flash(t('empty'));
           return;
         }
-        source.value = latest;
+        source.value = normalizeInput(latest);
       });
 
       document.getElementById('clearBtn').addEventListener('click', function () {
         source.value = '';
         setPreview('');
+      });
+
+      source.addEventListener('blur', function () {
+        var normalized = normalizeInput(source.value);
+        if (normalized !== source.value) source.value = normalized;
       });
 
       document.getElementById('langBtn').addEventListener('click', function () {
