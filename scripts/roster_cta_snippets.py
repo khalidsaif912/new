@@ -324,37 +324,42 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       padding-top:10px;
       padding-bottom:8px;
     }
-    a.summaryChip.trainingChip .trainingNewBadge,
-    .trainingNewBadge{
-      position:static !important;
-      top:auto !important;
-      left:auto !important;
-      right:auto !important;
-      margin:2px 0 0 !important;
-      z-index:5 !important;
+    a.summaryChip.trainingChip .chipLabel{
       display:inline-flex !important;
       align-items:center;
       justify-content:center;
-      padding:3px 8px !important;
-      border-radius:999px;
-      background:linear-gradient(135deg,#fb923c,#f97316) !important;
-      color:#fff !important;
-      font-size:10px !important;
-      font-weight:900 !important;
-      letter-spacing:.03em;
-      line-height:1.1;
-      box-shadow:0 2px 8px rgba(249,115,22,.4);
-      pointer-events:none;
+      gap:5px;
+      max-width:none;
       white-space:nowrap;
-      visibility:visible !important;
-      opacity:1;
+    }
+    a.summaryChip.trainingChip .chipLabel::after{
+      content:attr(data-new);
+      display:inline-flex !important;
+      align-items:center;
+      justify-content:center;
+      padding:3px 7px;
+      border-radius:999px;
+      background:#f97316 !important;
+      background-color:#f97316 !important;
+      color:#fff !important;
+      font-size:9px !important;
+      font-weight:900 !important;
+      letter-spacing:.02em;
+      line-height:1;
+      text-transform:none !important;
+      box-shadow:0 2px 8px rgba(249,115,22,.45);
       animation:trainingNewBlink 1.2s ease-in-out infinite;
+    }
+    a.summaryChip.trainingChip.is-new-off .chipLabel::after{
+      content:none !important;
+      display:none !important;
+      animation:none !important;
     }
     @keyframes trainingNewBlink{
       0%,100%{opacity:1; transform:scale(1)}
-      50%{opacity:.5; transform:scale(.97)}
+      50%{opacity:.45; transform:scale(.97)}
     }
-    .trainingNewBadge[hidden]{display:none!important; animation:none!important}
+    .trainingNewBadge{display:none!important}
 """
 
 CTA_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
@@ -1176,8 +1181,7 @@ def import_summary_bar_html(total_emp: int) -> str:
     </a>
     <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
       {CHIP_TRAINING_HTML}
-      <div class="chipLabel" data-key="trainingPage">Training</div>
-      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">جديد</span>
+      <div class="chipLabel" data-key="trainingPage" data-new="جديد">Training</div>
     </a>
     <a href="{{{{BASE}}}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}
