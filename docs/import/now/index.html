@@ -315,8 +315,7 @@
       position:absolute;
       top:4px;
       left:50%;
-      transform:translateX(-50%);
-      inset-inline-end:auto;
+      margin-left:-18px;
       z-index:2;
       display:inline-flex;
       align-items:center;
@@ -332,7 +331,11 @@
       box-shadow:0 2px 8px rgba(249,115,22,.35);
       pointer-events:none;
       white-space:nowrap;
-      max-width:calc(100% - 8px);
+      animation:trainingNewBlink 1.4s ease-in-out infinite;
+    }
+    @keyframes trainingNewBlink{
+      0%,100%{opacity:1}
+      50%{opacity:.18}
     }
     .trainingNewBadge[hidden]{display:none!important}
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
@@ -3194,7 +3197,7 @@ function setLocalCtaLinks() {
 function goToTraining(e) {
   if (e) e.preventDefault();
   var root = getSiteRootPath();
-  location.href = root + '/training/?v=20260728d';
+  location.href = root + '/training/?v=20260728e';
 }
 setLocalCtaLinks();
 applyLang(LANG);
@@ -3849,7 +3852,7 @@ function setSummaryChipHrefs() {
     }
     exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
   }
-  if (trn) trn.href = root + '/training/?v=20260728d';
+  if (trn) trn.href = root + '/training/?v=20260728e';
   if (diff) diff.href = root + '/roster-diff/index.html';
   if (welcome) {
     var wid = localStorage.getItem('importSavedEmpId');
@@ -3860,11 +3863,15 @@ setSummaryChipHrefs();
 (function syncTrainingNewBadge() {
   var badge = document.getElementById('trainingNewBadge');
   if (!badge) return;
-  var lastJuly = new Date(2026, 6, 30);
+  var hideFrom = new Date(2026, 7, 1); /* 1 Aug 2026 */
   var today = new Date();
   today.setHours(0, 0, 0, 0);
-  lastJuly.setHours(0, 0, 0, 0);
-  if (today > lastJuly) badge.hidden = true;
+  hideFrom.setHours(0, 0, 0, 0);
+  if (today >= hideFrom) {
+    badge.hidden = true;
+  } else {
+    badge.hidden = false;
+  }
 })();
 
 
@@ -3888,7 +3895,7 @@ setSummaryChipHrefs();
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260728d');
+    addScript(root + '/feature-update-badge.js?v=20260728e');
     addScript(root + '/banner-changer.js?v=' + ver);
   }
   if (window.requestIdleCallback) {

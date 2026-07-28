@@ -137,8 +137,12 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   margin:10px 0 0;font-size:13px;color:rgba(255,255,255,.88);
   font-weight:600;letter-spacing:.02em;
 }
+.dateTagRow{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:22px;flex-wrap:wrap;position:relative;z-index:2;
+}
 .dateTag{
-  position:relative;z-index:2;display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+  position:relative;z-index:2;display:inline-flex;align-items:center;gap:8px;margin-top:0;
   padding:11px 40px 11px 16px;border-radius:999px;
   background:rgba(0,0,0,.14);
   border:1px solid rgba(255,255,255,.26);
@@ -147,14 +151,15 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
 }
 .dateTagNew{
   display:inline-flex;align-items:center;justify-content:center;
-  margin-inline-start:2px;
-  padding:4px 9px;border-radius:999px;
+  padding:5px 10px;border-radius:999px;
   background:linear-gradient(135deg,#fb923c 0%,#f97316 100%);
-  border:1px solid rgba(255,255,255,.35);
+  border:1px solid rgba(255,255,255,.4);
   color:#fff;font-size:10px;font-weight:900;letter-spacing:.04em;
-  box-shadow:0 4px 12px rgba(249,115,22,.28);
+  box-shadow:0 6px 16px rgba(249,115,22,.32);
   white-space:nowrap;line-height:1;flex-shrink:0;
+  animation:dateTagNewBlink 1.5s ease-in-out infinite;
 }
+@keyframes dateTagNewBlink{0%,100%{opacity:1}50%{opacity:.22}}
 .dateTag::after{
   content:'▾';position:absolute;left:15px;top:50%;transform:translateY(-50%);
   color:rgba(255,255,255,.86);font-size:12px;font-weight:900;pointer-events:none;
@@ -784,11 +789,13 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
     <div class="headerText">
       <h1 id="pageTitle" class="titleWithIcon"><span class="titleIcon"><svg class="titleIconSvg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="pageTitleText">Training Courses</span></h1>
       <p id="pageSubtitle">Visual schedule</p>
+      <div class="dateTagRow">
       <div class="dateTag">
         During 05 – 30 July
-        <span class="dateTagNew" id="dateTagNewBadge">New</span>
         <select id="monthPicker" class="dateTagSelect" aria-label="Choose month"><option value="2026-04.html">April 2026</option><option value="2026-05.html">May 2026</option><option value="2026-06.html">June 2026</option><option value="2026-07.html" selected>July 2026</option><option value="2026-08.html">August 2026</option></select>
       </div>
+      <span class="dateTagNew" id="dateTagNewBadge">New</span>
+    </div>
     </div>
   </div>
 

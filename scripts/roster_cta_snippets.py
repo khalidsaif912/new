@@ -326,8 +326,7 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       position:absolute;
       top:4px;
       left:50%;
-      transform:translateX(-50%);
-      inset-inline-end:auto;
+      margin-left:-18px;
       z-index:2;
       display:inline-flex;
       align-items:center;
@@ -343,7 +342,11 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       box-shadow:0 2px 8px rgba(249,115,22,.35);
       pointer-events:none;
       white-space:nowrap;
-      max-width:calc(100% - 8px);
+      animation:trainingNewBlink 1.4s ease-in-out infinite;
+    }
+    @keyframes trainingNewBlink{
+      0%,100%{opacity:1}
+      50%{opacity:.18}
     }
     .trainingNewBadge[hidden]{display:none!important}
 """
