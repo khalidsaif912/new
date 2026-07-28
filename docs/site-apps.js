@@ -248,6 +248,7 @@
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
+    ensureWhatsAppAppLink();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
@@ -263,6 +264,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureWhatsAppAppLink();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -500,6 +502,37 @@
     patchBookLink();
   }
 
+  function ensureWhatsAppAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var href = 'https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/';
+    var existing = grid.querySelector('a.siteAppsLink[data-app-id="wa"]');
+    if (!existing) {
+      var card = document.createElement('a');
+      card.className = 'siteAppsLink siteAppsLink--wa';
+      card.href = href;
+      card.setAttribute('data-app-id', 'wa');
+      card.setAttribute('data-open-same', '1');
+      card.setAttribute('data-badge', t('waBadge'));
+      card.innerHTML =
+        '<span class="siteAppsLink-icon">' + iconForApp('wa') + '</span>' +
+        '<span class="siteAppsLink-text">' +
+        '<span class="siteAppsLink-title" data-i18n="wa"></span>' +
+        '<span class="siteAppsLink-sub" data-i18n-sub="wa"></span>' +
+        '</span>';
+      grid.insertBefore(card, grid.firstElementChild);
+      existing = card;
+    }
+    existing.href = href;
+    existing.setAttribute('data-badge', t('waBadge'));
+    var title = existing.querySelector('[data-i18n="wa"]');
+    var sub = existing.querySelector('[data-i18n-sub="wa"]');
+    if (title) title.textContent = t('wa');
+    if (sub) sub.textContent = t('waSub');
+    var icon = existing.querySelector('.siteAppsLink-icon');
+    if (icon && !icon.innerHTML.trim()) icon.innerHTML = iconForApp('wa');
+  }
+
   function openCalcFromPwa(e) {
     var link = e.target.closest('a.siteAppsLink--calc');
     if (!link) return;
@@ -532,6 +565,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureWhatsAppAppLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
@@ -605,6 +639,11 @@
       '.spotlightPreviewTitle{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.25;}',
       '.spotlightPreviewSub{font-size:10.5px;font-weight:600;color:#64748b;line-height:1.35;margin-top:2px;}',
       '.spotlightPreviewGo{flex-shrink:0;font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:999px;padding:5px 8px;white-space:nowrap;}',
+      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:72px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;position:relative!important;overflow:hidden!important;}',
+      '.siteAppsLink--wa .siteAppsLink-icon{background:#dcfce7!important;border-color:#86efac!important;flex-shrink:0!important;}',
+      '.siteAppsLink--wa .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
+      '.siteAppsLink--wa .siteAppsLink-title,.siteAppsLink--wa .siteAppsLink-sub{text-align:start!important;}',
+      '.siteAppsLink--wa::after{content:attr(data-badge)!important;position:absolute!important;top:10px!important;inset-inline-end:12px!important;padding:4px 8px!important;border-radius:999px!important;background:#16a34a!important;color:#fff!important;font-size:10px!important;font-weight:900!important;box-shadow:0 4px 10px rgba(22,163,74,.25)!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
       '#spotlightEmojiBtn img{width:22px;height:22px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
@@ -939,6 +978,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureWhatsAppAppLink();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {
       if (!sessionStorage.getItem('spotlightShown')) {
