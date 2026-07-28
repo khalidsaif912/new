@@ -283,6 +283,70 @@
   .preset-btn strong{display:flex;align-items:center;gap:6px;font-size:12.5px;font-family:'Cairo',sans-serif;font-weight:800;color:var(--ink);margin-bottom:3px}
   .preset-btn span{display:block;font-size:10.5px;line-height:1.6;color:var(--muted)}
 
+  .phrase-grid{
+    width:min(600px,92%);
+    align-self:center;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .phrase-btn{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.88);
+    border-radius:12px;
+    padding:11px 12px;
+    text-align:start;
+    cursor:pointer;
+    font:inherit;
+    color:var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .phrase-btn:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(7,26,22,.08)}
+  .phrase-btn strong{
+    display:block;
+    font-size:12.5px;
+    font-family:'Cairo',sans-serif;
+    font-weight:800;
+    margin-bottom:3px;
+  }
+  .phrase-btn span{
+    display:block;
+    font-size:10.5px;
+    line-height:1.7;
+    color:var(--muted);
+  }
+  .history-list{
+    width:min(600px,92%);
+    align-self:center;
+    display:grid;
+    gap:8px;
+  }
+  .history-item{
+    border:1px solid rgba(18,140,126,.18);
+    background:rgba(255,255,255,.88);
+    border-radius:12px;
+    padding:10px 12px;
+    cursor:pointer;
+    text-align:start;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .history-item:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(7,26,22,.08)}
+  .history-item strong{
+    display:block;
+    font-size:11px;
+    color:var(--wa-header-2);
+    margin-bottom:4px;
+    font-family:'Cairo',sans-serif;
+  }
+  .history-item span{
+    display:block;
+    font-size:11.5px;
+    line-height:1.75;
+    color:var(--ink);
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
   .hint-list{
     width:min(600px,92%);
     align-self:center;
@@ -345,6 +409,8 @@
     .toolbar{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:10px 4px;padding:12px 6px}
     .toolbar--pro{grid-template-columns:repeat(2,minmax(0,1fr))}
     .preset-grid{grid-template-columns:1fr;width:100%}
+    .phrase-grid{grid-template-columns:1fr;width:100%}
+    .history-list{width:100%}
     .hint-list{width:100%}
     .bubble{max-width:94%}
     .tool-ico{width:42px;height:42px;font-size:14px}
@@ -461,6 +527,12 @@
         </button>
       </div>
 
+      <div class="sys-pill-row"><span class="sys-pill" id="commonSectionLbl">عبارات شائعة</span></div>
+      <div class="phrase-grid" id="commonPhrases"></div>
+
+      <div class="sys-pill-row"><span class="sys-pill" id="historySectionLbl">آخر ما نسخته</span></div>
+      <div class="history-list" id="historyList"></div>
+
       <div class="bubble bubble--out">
         <div class="bubble-meta">✅ <span id="resultTitle">النتيجة الجاهزة</span></div>
         <p class="bubble-sub" id="resultSub">اضغط أحد الأزرار أعلاه ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.</p>
@@ -527,6 +599,11 @@
           presetAnnouncement: 'قالب إعلان', presetAnnouncementSub: 'مقدمة + تفاصيل + إجراء مطلوب',
           presetAdmin: 'قالب إداري', presetAdminSub: 'جهة + موضوع + نقاط + ختام',
           presetHandover: 'قالب تسليم', presetHandoverSub: 'تم الإنجاز + المتبقي + ملاحظات',
+          commonSection: 'عبارات شائعة',
+          historySection: 'آخر ما نسخته',
+          historyEmpty: 'لا يوجد سجل محلي بعد. أي عبارة تنسخها ستظهر هنا.',
+          copiedAuto: 'تم التنسيق والنسخ',
+          copiedFromLibrary: 'تم نسخ العبارة',
           tip1Title: 'التسطير', tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
           tip2Title: 'التضليل', tip2Body: 'واتساب لا يملك لون تظليل حقيقي للنص. أقرب بديل عملي هو تنسيق الكود أو بلوك الاقتباس.',
           tip3Title: 'القوائم', tip3Body: 'إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.',
@@ -568,6 +645,11 @@
           presetAnnouncement: 'Announcement template', presetAnnouncementSub: 'Opening + details + required action',
           presetAdmin: 'Administrative template', presetAdminSub: 'From + subject + points + closing',
           presetHandover: 'Handover template', presetHandoverSub: 'Completed + pending + notes',
+          commonSection: 'Common phrases',
+          historySection: 'Recently copied',
+          historyEmpty: 'No local history yet. Anything you copy will appear here.',
+          copiedAuto: 'Styled and copied',
+          copiedFromLibrary: 'Phrase copied',
           tip1Title: 'Underline', tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
           tip2Title: 'Shading', tip2Body: 'WhatsApp has no real text highlight color. The closest practical alternative is code formatting or quote blocks.',
           tip3Title: 'Lists', tip3Body: 'If your text contains multiple lines, numbering or bullets will be applied to each line automatically.',
@@ -591,6 +673,7 @@
       var toast = document.getElementById('toast');
       var ticks = document.getElementById('ticks');
       var latest = '';
+      var HISTORY_KEY = 'waTextHistoryV1';
 
       function t(key) { return (T[lang] && T[lang][key]) || T.ar[key] || key; }
 
@@ -630,6 +713,104 @@
             ? '*تسليم المناوبة*\n\nتم الإنجاز:\n- \n- \n\nالمتبقي:\n- \n- \n\nملاحظات:'
             : '*Shift Handover*\n\nCompleted:\n- \n- \n\nPending:\n- \n- \n\nNotes:'
         };
+      }
+
+      function commonPhrases() {
+        if (lang === 'ar') {
+          return [
+            'السلام عليكم ورحمة الله وبركاته',
+            'صباح الخير جميعاً',
+            'مساء الخير جميعاً',
+            'يرجى التأكيد',
+            'تم الاستلام، شكراً لكم',
+            'جزاكم الله خيراً'
+          ];
+        }
+        return [
+          'Peace be upon you ورحمة الله وبركاته',
+          'Good morning everyone',
+          'Good evening everyone',
+          'Please confirm',
+          'Received, thank you',
+          'Much appreciated'
+        ];
+      }
+
+      function getHistory() {
+        try {
+          var raw = localStorage.getItem(HISTORY_KEY);
+          var parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          return [];
+        }
+      }
+
+      function saveHistory(text) {
+        var clean = normalizeInput(text).trim();
+        if (!clean) return;
+        var items = getHistory().filter(function (item) { return item !== clean; });
+        items.unshift(clean);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 20)));
+      }
+
+      function renderCommonPhrases() {
+        var wrap = document.getElementById('commonPhrases');
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        commonPhrases().forEach(function (phrase, idx) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'phrase-btn';
+          btn.innerHTML = '<strong>' + (lang === 'ar' ? 'عبارة ' + (idx + 1) : 'Phrase ' + (idx + 1)) + '</strong><span>' + phrase + '</span>';
+          btn.addEventListener('click', function () {
+            source.value = phrase;
+            setPreview(phrase);
+            copyText(phrase, t('copiedFromLibrary'));
+          });
+          wrap.appendChild(btn);
+        });
+      }
+
+      function renderHistory() {
+        var wrap = document.getElementById('historyList');
+        if (!wrap) return;
+        var items = getHistory();
+        wrap.innerHTML = '';
+        if (!items.length) {
+          var empty = document.createElement('div');
+          empty.className = 'history-item';
+          empty.innerHTML = '<strong>LOCAL</strong><span>' + t('historyEmpty') + '</span>';
+          wrap.appendChild(empty);
+          return;
+        }
+        items.forEach(function (phrase, idx) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'history-item';
+          btn.innerHTML = '<strong>' + (lang === 'ar' ? 'نسخة ' + (idx + 1) : 'Copy ' + (idx + 1)) + '</strong><span>' + phrase + '</span>';
+          btn.addEventListener('click', function () {
+            source.value = phrase;
+            setPreview(phrase);
+            copyText(phrase, t('copiedFromLibrary'));
+          });
+          wrap.appendChild(btn);
+        });
+      }
+
+      async function copyText(text, message) {
+        try {
+          await navigator.clipboard.writeText(text);
+          latest = text;
+          ticks.classList.add('read');
+          saveHistory(text);
+          renderHistory();
+          flash(message || t('copied'));
+          return true;
+        } catch (err) {
+          flash('Copy failed');
+          return false;
+        }
       }
 
       function formatText(kind, text) {
@@ -684,6 +865,7 @@
           presetAnnouncementLbl:'presetAnnouncement', presetAnnouncementSub:'presetAnnouncementSub',
           presetAdminLbl:'presetAdmin', presetAdminSub:'presetAdminSub',
           presetHandoverLbl:'presetHandover', presetHandoverSub:'presetHandoverSub',
+          commonSectionLbl:'commonSection', historySectionLbl:'historySection',
           tip1Title:'tip1Title', tip1Body:'tip1Body', tip2Title:'tip2Title', tip2Body:'tip2Body',
           tip3Title:'tip3Title', tip3Body:'tip3Body', langBtn:'langBtn', installTitle:'installTitle',
           installCloseBtn:'installClose'
@@ -697,14 +879,18 @@
           stepsEl.innerHTML = '<li>' + t('installStep1') + '</li><li>' + t('installStep2') + '</li><li>' + t('installStep3') + '</li>';
         }
         source.placeholder = t('placeholder');
+        renderCommonPhrases();
+        renderHistory();
         if (!latest) setPreview('');
       }
 
       document.querySelectorAll('[data-format]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', async function () {
           var text = normalizeInput(source.value).trim();
           if (!text) { flash(t('empty')); return; }
-          setPreview(formatText(btn.getAttribute('data-format'), source.value));
+          var output = formatText(btn.getAttribute('data-format'), source.value);
+          setPreview(output);
+          await copyText(output, t('copiedAuto'));
         });
       });
 
@@ -719,13 +905,7 @@
 
       document.getElementById('copyBtn').addEventListener('click', async function () {
         if (!latest) { flash(t('empty')); return; }
-        try {
-          await navigator.clipboard.writeText(latest);
-          flash(t('copied'));
-          ticks.classList.add('read');
-        } catch (err) {
-          flash('Copy failed');
-        }
+        await copyText(latest, t('copied'));
       });
 
       document.getElementById('swapBtn').addEventListener('click', function () {
