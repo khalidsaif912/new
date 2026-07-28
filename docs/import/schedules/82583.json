@@ -704,13 +704,13 @@
       },
       {
         "day": 17,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 18,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 19,
@@ -865,12 +865,12 @@
     {
       "day": 17,
       "weekday": "Fri",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 18,
       "weekday": "Sat",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 19,

@@ -21,6 +21,7 @@
     "AHMED AL BALUSHI": "أحمد البلوشي",
     "AHMED AL FARSI": "أحمد الفارسي",
     "AHMED AL HADI": "أحمد الهادي",
+    "AHMED AL HADI - 82654": "أحمد الهادي - 82654",
     "AHMED AL HADI 82654": "أحمد الهادي - 82654",
     "AHMED AL HASHMI": "أحمد الهاشمي",
     "AHMED AL HUSAINI": "أحمد الحسيني",
@@ -29,6 +30,7 @@
     "AHMED AL MUQAINI": "أحمد المقيني",
     "AHMED AL ORAIMI": "أحمد العريمي",
     "AHMED AL SABII": "أحمد السابعي",
+    "AHMED ALBALUSHI": "أحمد البالوشي",
     "AHMED ALRUJAIBI": "أحمد الرجيبي",
     "AHMED SHAFI HUMAID AL HASHEMI": "أحمد Shafi حميد الهاشمي",
     "AL MUTHANA AL SHAMFARI": "المثنى الشنفري",
@@ -333,8 +335,7 @@
     "YOUSUF AL BALUSHI": "يوسف البلوشي",
     "YOUSUF AL JARADI": "يوسف الجرادي",
     "YOUSUF AL WAHEEDI": "يوسف الوحيدي",
-    "ZAKARIYA AL BALUSHI": "زكريا البلوشي",
-    "AHMED AL HADI - 82654": "أحمد الهادي - 82654"
+    "ZAKARIYA AL BALUSHI": "زكريا البلوشي"
   },
   "auto_generated": [
     "*AHMED AL SABII",
@@ -363,6 +364,7 @@
     "AHMED AL MUQAINI",
     "AHMED AL ORAIMI",
     "AHMED AL SABII",
+    "AHMED ALBALUSHI",
     "AHMED ALRUJAIBI",
     "AHMED SHAFI HUMAID AL HASHEMI",
     "AL MUTHANA AL SHAMFARI",

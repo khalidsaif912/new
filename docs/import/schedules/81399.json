@@ -674,8 +674,8 @@
       },
       {
         "day": 11,
-        "shift_code": "NE22",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 12,
@@ -724,13 +724,13 @@
       },
       {
         "day": 21,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 22,
-        "shift_code": "AE14",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 23,
@@ -835,7 +835,7 @@
     {
       "day": 11,
       "weekday": "Sat",
-      "code": "NE22"
+      "code": "LV"
     },
     {
       "day": 12,
@@ -885,12 +885,12 @@
     {
       "day": 21,
       "weekday": "Tue",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 22,
       "weekday": "Wed",
-      "code": "AE14"
+      "code": "LV"
     },
     {
       "day": 23,

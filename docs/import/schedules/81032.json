@@ -714,28 +714,28 @@
       },
       {
         "day": 19,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 20,
-        "shift_code": "AN13",
-        "shift_group": "Afternoon"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 21,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 22,
-        "shift_code": "MN06",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 23,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 24,
@@ -875,27 +875,27 @@
     {
       "day": 19,
       "weekday": "Sun",
-      "code": "AN13"
+      "code": "LV"
     },
     {
       "day": 20,
       "weekday": "Mon",
-      "code": "AN13"
+      "code": "LV"
     },
     {
       "day": 21,
       "weekday": "Tue",
-      "code": "MN06"
+      "code": "LV"
     },
     {
       "day": 22,
       "weekday": "Wed",
-      "code": "MN06"
+      "code": "LV"
     },
     {
       "day": 23,
       "weekday": "Thu",
-      "code": "NN21"
+      "code": "LV"
     },
     {
       "day": 24,
