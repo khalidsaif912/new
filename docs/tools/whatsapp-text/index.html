@@ -988,7 +988,7 @@
       /* ---- Service worker for offline + installability ---- */
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js').catch(function () { /* ignore if unavailable */ });
+          navigator.serviceWorker.register('sw.js?v=20260728b').catch(function () { /* ignore if unavailable */ });
         });
       }
 
