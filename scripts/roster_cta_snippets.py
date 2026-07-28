@@ -320,28 +320,30 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     }
     a.summaryChip.trainingChip{
       overflow:visible;
-      padding-top:14px;
+      padding-top:16px;
     }
     .trainingNewBadge{
       position:absolute;
-      top:5px;
-      inset-inline-end:6px;
+      top:4px;
+      left:50%;
+      transform:translateX(-50%);
+      inset-inline-end:auto;
       z-index:2;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:2px 6px;
+      padding:3px 8px;
       border-radius:999px;
       background:linear-gradient(135deg,#fb923c,#f97316);
       color:#fff;
-      font-size:8px;
+      font-size:9px;
       font-weight:900;
       letter-spacing:.03em;
       line-height:1.1;
-      box-shadow:0 2px 6px rgba(249,115,22,.28);
+      box-shadow:0 2px 8px rgba(249,115,22,.35);
       pointer-events:none;
       white-space:nowrap;
-      max-width:calc(100% - 10px);
+      max-width:calc(100% - 8px);
     }
     .trainingNewBadge[hidden]{display:none!important}
 """

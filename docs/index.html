@@ -293,28 +293,30 @@
     a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
     a.summaryChip.trainingChip{
       overflow:visible;
-      padding-top:14px;
+      padding-top:16px;
     }
     .trainingNewBadge{
       position:absolute;
-      top:5px;
-      inset-inline-end:6px;
+      top:4px;
+      left:50%;
+      transform:translateX(-50%);
+      inset-inline-end:auto;
       z-index:2;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:2px 6px;
+      padding:3px 8px;
       border-radius:999px;
       background:linear-gradient(135deg,#fb923c,#f97316);
       color:#fff;
-      font-size:8px;
+      font-size:9px;
       font-weight:900;
       letter-spacing:.03em;
       line-height:1.1;
-      box-shadow:0 2px 6px rgba(249,115,22,.28);
+      box-shadow:0 2px 8px rgba(249,115,22,.35);
       pointer-events:none;
       white-space:nowrap;
-      max-width:calc(100% - 10px);
+      max-width:calc(100% - 8px);
     }
     .trainingNewBadge[hidden]{display:none!important}
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
@@ -2953,7 +2955,7 @@ function setSummaryChipHrefs() {
   var welcome = document.getElementById('welcomeChip');
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
-  if (trn) trn.href = base + '/training/';
+  if (trn) trn.href = base + '/training/?v=20260728d';
   if (diff) diff.href = base + '/roster-diff/index.html';
   if (welcome) {
     var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
@@ -3286,12 +3288,12 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260728c');
+    addScript(root + '/site-apps.js?v=20260728d');
   addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260728c');
+    addScript(root + '/feature-update-badge.js?v=20260728d');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
