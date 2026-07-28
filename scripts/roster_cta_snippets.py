@@ -319,36 +319,42 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       margin: 0;
     }
     a.summaryChip.trainingChip{
-      overflow:visible;
-      padding-top:16px;
+      overflow:visible !important;
+      gap:3px;
+      padding-top:10px;
+      padding-bottom:8px;
     }
+    a.summaryChip.trainingChip .trainingNewBadge,
     .trainingNewBadge{
-      position:absolute;
-      top:4px;
-      left:50%;
-      margin-left:-18px;
-      z-index:2;
-      display:inline-flex;
+      position:static !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      margin:2px 0 0 !important;
+      z-index:5 !important;
+      display:inline-flex !important;
       align-items:center;
       justify-content:center;
-      padding:3px 8px;
+      padding:3px 8px !important;
       border-radius:999px;
-      background:linear-gradient(135deg,#fb923c,#f97316);
-      color:#fff;
-      font-size:9px;
-      font-weight:900;
+      background:linear-gradient(135deg,#fb923c,#f97316) !important;
+      color:#fff !important;
+      font-size:10px !important;
+      font-weight:900 !important;
       letter-spacing:.03em;
       line-height:1.1;
-      box-shadow:0 2px 8px rgba(249,115,22,.35);
+      box-shadow:0 2px 8px rgba(249,115,22,.4);
       pointer-events:none;
       white-space:nowrap;
-      animation:trainingNewBlink 1.4s ease-in-out infinite;
+      visibility:visible !important;
+      opacity:1;
+      animation:trainingNewBlink 1.2s ease-in-out infinite;
     }
     @keyframes trainingNewBlink{
-      0%,100%{opacity:1}
-      50%{opacity:.18}
+      0%,100%{opacity:1; transform:scale(1)}
+      50%{opacity:.5; transform:scale(.97)}
     }
-    .trainingNewBadge[hidden]{display:none!important}
+    .trainingNewBadge[hidden]{display:none!important; animation:none!important}
 """
 
 CTA_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
@@ -1169,9 +1175,9 @@ def import_summary_bar_html(total_emp: int) -> str:
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
-      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">New</span>
       {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">Training</div>
+      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">جديد</span>
     </a>
     <a href="{{{{BASE}}}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}

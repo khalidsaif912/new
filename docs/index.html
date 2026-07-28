@@ -292,36 +292,42 @@
     a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
     a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
     a.summaryChip.trainingChip{
-      overflow:visible;
-      padding-top:16px;
+      overflow:visible !important;
+      gap:3px;
+      padding-top:10px;
+      padding-bottom:8px;
     }
+    a.summaryChip.trainingChip .trainingNewBadge,
     .trainingNewBadge{
-      position:absolute;
-      top:4px;
-      left:50%;
-      margin-left:-18px;
-      z-index:2;
-      display:inline-flex;
+      position:static !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      margin:2px 0 0 !important;
+      z-index:5 !important;
+      display:inline-flex !important;
       align-items:center;
       justify-content:center;
-      padding:3px 8px;
+      padding:3px 8px !important;
       border-radius:999px;
-      background:linear-gradient(135deg,#fb923c,#f97316);
-      color:#fff;
-      font-size:9px;
-      font-weight:900;
+      background:linear-gradient(135deg,#fb923c,#f97316) !important;
+      color:#fff !important;
+      font-size:10px !important;
+      font-weight:900 !important;
       letter-spacing:.03em;
       line-height:1.1;
-      box-shadow:0 2px 8px rgba(249,115,22,.35);
+      box-shadow:0 2px 8px rgba(249,115,22,.4);
       pointer-events:none;
       white-space:nowrap;
-      animation:trainingNewBlink 1.4s ease-in-out infinite;
+      visibility:visible !important;
+      opacity:1;
+      animation:trainingNewBlink 1.2s ease-in-out infinite;
     }
     @keyframes trainingNewBlink{
-      0%,100%{opacity:1}
-      50%{opacity:.18}
+      0%,100%{opacity:1; transform:scale(1)}
+      50%{opacity:.5; transform:scale(.97)}
     }
-    .trainingNewBadge[hidden]{display:none!important}
+    .trainingNewBadge[hidden]{display:none!important; animation:none!important}
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     .summaryChip {
@@ -1079,9 +1085,9 @@
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
-      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">New</span>
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">Training</div>
+      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">جديد</span>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
@@ -2871,8 +2877,8 @@ function applyLang(lang) {
     else if(k==='diffPage') el.textContent=t.diffPage;
   });
   var trainingNewBadge=document.getElementById('trainingNewBadge');
-  if(trainingNewBadge){
-    trainingNewBadge.textContent=lang==='ar'?(trainingNewBadge.getAttribute('data-ar')||'جديد'):(trainingNewBadge.getAttribute('data-en')||'New');
+  if(trainingNewBadge && !trainingNewBadge.hidden){
+    trainingNewBadge.textContent=lang==='ar'?'جديد':'New';
   }
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -2958,7 +2964,7 @@ function setSummaryChipHrefs() {
   var welcome = document.getElementById('welcomeChip');
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
-  if (trn) trn.href = base + '/training/?v=20260728e';
+  if (trn) trn.href = base + '/training/?v=20260728f';
   if (diff) diff.href = base + '/roster-diff/index.html';
   if (welcome) {
     var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
@@ -2969,22 +2975,35 @@ function setSummaryChipHrefs() {
 function goToTraining(e) {
   if (e) e.preventDefault();
   var root = getSiteRootPath();
-  location.href = root + '/training/?v=20260728e';
+  location.href = root + '/training/?v=20260728f';
 }
 setLocalCtaLinks();
 setSummaryChipHrefs();
-(function syncTrainingNewBadge() {
+(function ensureTrainingNewBadge() {
+  var chip = document.getElementById('trainingBtn');
+  if (!chip) return;
+  var now = new Date();
+  var stamp = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
   var badge = document.getElementById('trainingNewBadge');
-  if (!badge) return;
-  var hideFrom = new Date(2026, 7, 1); /* 1 Aug 2026 */
-  var today = new Date();
-  today.setHours(0, 0, 0, 0);
-  hideFrom.setHours(0, 0, 0, 0);
-  if (today >= hideFrom) {
-    badge.hidden = true;
-  } else {
-    badge.hidden = false;
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.id = 'trainingNewBadge';
+    badge.className = 'trainingNewBadge';
+    chip.appendChild(badge);
   }
+  if (stamp >= 20260801) {
+    badge.hidden = true;
+    badge.style.display = 'none';
+    return;
+  }
+  badge.hidden = false;
+  badge.removeAttribute('hidden');
+  badge.style.display = 'inline-flex';
+  badge.style.visibility = 'visible';
+  var ar = false;
+  try { ar = (localStorage.getItem('rosterLang') || '') === 'ar'; } catch (e) {}
+  if (!ar) ar = (document.documentElement.lang || '') === 'ar';
+  badge.textContent = ar ? 'جديد' : 'New';
 })();
 applyLang(LANG);
 startSummarySwitchLoop();
@@ -3295,12 +3314,12 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260728e');
+    addScript(root + '/site-apps.js?v=20260728f');
   addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260728e');
+    addScript(root + '/feature-update-badge.js?v=20260728f');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
