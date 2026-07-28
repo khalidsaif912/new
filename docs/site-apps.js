@@ -22,6 +22,7 @@
       bookSub: 'Reading topics',
       wa: 'WhatsApp Styler',
       waSub: 'Format text fast',
+      waBadge: 'NEW',
       games: 'Memory Games',
       gamesSub: 'Roster games hub',
       gamePairs: 'Picture Pairs',
@@ -67,6 +68,7 @@
       bookSub: 'مواضيع القراءة',
       wa: 'تنسيق واتساب',
       waSub: 'تنسيق النص بسرعة',
+      waBadge: 'جديد',
       games: 'ألعاب الذاكرة',
       gamesSub: 'مركز ألعاب الروستر',
       gamePairs: 'قرائن الصور',
@@ -152,6 +154,12 @@
       '<path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>' +
       '<path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>' +
       '</svg>',
+    wa:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/>' +
+      '<path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/>' +
+      '<path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>',
     store:
       '<svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
       '<path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/>' +
@@ -233,6 +241,11 @@
       var val = t(subKey);
       if (val && val !== subKey) el.textContent = val;
     });
+    sheet.querySelectorAll('[data-badge]').forEach(function (el) {
+      if (el.getAttribute('data-app-id') === 'wa') {
+        el.setAttribute('data-badge', t('waBadge'));
+      }
+    });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
     var spotlight = document.getElementById('spotlightSheet');
@@ -299,6 +312,15 @@
 
   function spotlightItems() {
     return [
+      {
+        id: 'wa',
+        title: t('wa'),
+        sub: t('waSub'),
+        href: 'https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/',
+        external: false,
+        classes: 'roster-cta-btn--apps',
+        icon: iconForApp('wa')
+      },
       {
         id: 'flights',
         title: t('flights'),
@@ -775,7 +797,9 @@
           return x.id === bar.dataset.itemId;
         }) || null;
       }
-      if (!item) item = randomSpotlight();
+      if (!item) {
+        item = spotlightItems().find(function (x) { return x.id === 'wa'; }) || randomSpotlight();
+      }
       bar.dataset.itemId = item.id;
       var btn = document.getElementById('spotlightBtn');
       if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + item.classes;
