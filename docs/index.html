@@ -291,6 +291,32 @@
     a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
     a.summaryChip.trainingChip .chipVal { color:#7c3aed; }
     a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
+    a.summaryChip.trainingChip{
+      overflow:visible;
+      padding-top:14px;
+    }
+    .trainingNewBadge{
+      position:absolute;
+      top:5px;
+      inset-inline-end:6px;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 6px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#fb923c,#f97316);
+      color:#fff;
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.03em;
+      line-height:1.1;
+      box-shadow:0 2px 6px rgba(249,115,22,.28);
+      pointer-events:none;
+      white-space:nowrap;
+      max-width:calc(100% - 10px);
+    }
+    .trainingNewBadge[hidden]{display:none!important}
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     .summaryChip {
@@ -1048,6 +1074,7 @@
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">New</span>
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
@@ -2838,6 +2865,10 @@ function applyLang(lang) {
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
   });
+  var trainingNewBadge=document.getElementById('trainingNewBadge');
+  if(trainingNewBadge){
+    trainingNewBadge.textContent=lang==='ar'?(trainingNewBadge.getAttribute('data-ar')||'جديد'):(trainingNewBadge.getAttribute('data-en')||'New');
+  }
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
@@ -2937,6 +2968,15 @@ function goToTraining(e) {
 }
 setLocalCtaLinks();
 setSummaryChipHrefs();
+(function syncTrainingNewBadge() {
+  var badge = document.getElementById('trainingNewBadge');
+  if (!badge) return;
+  var lastJuly = new Date(2026, 6, 30);
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  lastJuly.setHours(0, 0, 0, 0);
+  if (today > lastJuly) badge.hidden = true;
+})();
 applyLang(LANG);
 startSummarySwitchLoop();
 
@@ -3230,7 +3270,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260726c';
+  var ver = '20260728c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3246,12 +3286,12 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260726e');
-    addScript(root + '/shift-copy.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260728c');
+  addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260726d');
+    addScript(root + '/feature-update-badge.js?v=20260728c');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }

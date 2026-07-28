@@ -318,6 +318,32 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     .summaryChip .chipVal .waveHand .chip-icon {
       margin: 0;
     }
+    a.summaryChip.trainingChip{
+      overflow:visible;
+      padding-top:14px;
+    }
+    .trainingNewBadge{
+      position:absolute;
+      top:5px;
+      inset-inline-end:6px;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 6px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#fb923c,#f97316);
+      color:#fff;
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.03em;
+      line-height:1.1;
+      box-shadow:0 2px 6px rgba(249,115,22,.28);
+      pointer-events:none;
+      white-space:nowrap;
+      max-width:calc(100% - 10px);
+    }
+    .trainingNewBadge[hidden]{display:none!important}
 """
 
 CTA_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
@@ -1138,6 +1164,7 @@ def import_summary_bar_html(total_emp: int) -> str:
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      <span class="trainingNewBadge" id="trainingNewBadge" data-en="New" data-ar="جديد">New</span>
       {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
@@ -1229,7 +1256,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§Ã˜Âª'"
 
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
-IOS_PERF_VER = "20260726c"
+IOS_PERF_VER = "20260728c"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1255,7 +1282,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260726d');
+    addScript(root + '/feature-update-badge.js?v=20260728c');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
@@ -1287,7 +1314,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260726d');
+    addScript(root + '/feature-update-badge.js?v=20260728c');
     addScript(root + '/banner-changer.js?v=' + ver);
   }
   if (window.requestIdleCallback) {

@@ -3,7 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script defer src="../ios-tap-fix.js?v=20260525c"></script>
+  <script>
+    (function () {
+      /* Stay on the current month while it still has courses. July 2026 ends 30 Jul. */
+      var lastCurrentEnd = new Date(2026, 6, 30);
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      lastCurrentEnd.setHours(0, 0, 0, 0);
+      if (today <= lastCurrentEnd) {
+        window.location.replace('./archive/2026-07.html');
+      }
+    })();
+  </script>
+  <script defer src="../ios-tap-fix.js?v=20260728c"></script>
   <title>دورات التدريب - August 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,6 +156,16 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
   border:1px solid rgba(255,255,255,.26);
   color:rgba(255,255,255,.96);font-size:13px;font-weight:700;
   backdrop-filter:blur(12px);
+}
+.dateTagNew{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-inline-start:2px;
+  padding:4px 9px;border-radius:999px;
+  background:linear-gradient(135deg,#fb923c 0%,#f97316 100%);
+  border:1px solid rgba(255,255,255,.35);
+  color:#fff;font-size:10px;font-weight:900;letter-spacing:.04em;
+  box-shadow:0 4px 12px rgba(249,115,22,.28);
+  white-space:nowrap;line-height:1;flex-shrink:0;
 }
 .dateTag::after{
   content:'▾';position:absolute;left:15px;top:50%;transform:translateY(-50%);
@@ -776,6 +798,7 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
       <p id="pageSubtitle">Visual schedule</p>
       <div class="dateTag">
         During 05 – 25 August
+        <span class="dateTagNew" id="dateTagNewBadge">New</span>
         <select id="monthPicker" class="dateTagSelect" aria-label="Choose month"><option value="archive/2026-04.html">April 2026</option><option value="archive/2026-05.html">May 2026</option><option value="archive/2026-06.html">June 2026</option><option value="archive/2026-07.html">July 2026</option><option value="archive/2026-08.html" selected>August 2026</option></select>
       </div>
     </div>
@@ -1733,6 +1756,10 @@ html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
           node.textContent = ' ' + t.during + ' ' + range + ' ';
         }
       });
+    }
+    const dateTagNewBadge = document.getElementById('dateTagNewBadge');
+    if(dateTagNewBadge){
+      dateTagNewBadge.textContent = isAr ? 'جديد' : 'New';
     }
 
     const langBtn = document.getElementById('langToggle');
