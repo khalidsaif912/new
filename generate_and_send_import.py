@@ -995,7 +995,7 @@ def build_duty_html(
   {''.join(cards)}
 
   <div class="importBottom">
-    {import_cta_html(cta_href="{{BASE}}/now/", subscribe_href="{{BASE}}/subscribe/")}
+    {import_cta_html(cta_href="{{BASE}}/now/")}
     {footer}
   </div>
 
