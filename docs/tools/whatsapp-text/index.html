@@ -151,6 +151,21 @@
     .tool-btn--green{background:#f0fdf4}
     .tool-btn--amber{background:#fffbeb}
     .tool-btn--purple{background:#faf5ff}
+    .section-label{
+      margin:16px 0 10px;
+      font-size:13px;
+      font-weight:900;
+      color:#1e3a8a;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .section-label::before{
+      content:"";
+      width:8px;height:8px;border-radius:999px;
+      background:linear-gradient(135deg,var(--blue),var(--blue-2));
+      flex:0 0 auto;
+    }
     textarea{
       width:100%;
       min-height:220px;
@@ -182,6 +197,35 @@
     }
     .primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff}
     .secondary{background:#eef4ff;color:#1d4ed8}
+    .preset-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .preset-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:16px;
+      padding:12px;
+      text-align:start;
+      cursor:pointer;
+      font:inherit;
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .preset-btn:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(15,23,42,.07);border-color:#bfdbfe}
+    .preset-btn strong{
+      display:block;
+      font-size:13px;
+      color:var(--ink);
+      margin-bottom:4px;
+    }
+    .preset-btn span{
+      display:block;
+      font-size:11px;
+      line-height:1.6;
+      color:var(--muted);
+    }
     .result{
       padding:16px;
       position:sticky;
@@ -243,6 +287,7 @@
       .hero{padding:14px 14px 18px;border-radius:24px}
       h1{font-size:24px}
       .toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .preset-grid{grid-template-columns:1fr}
       .tool-btn{min-height:50px}
       textarea,.preview{min-height:190px}
     }
@@ -274,6 +319,7 @@
         </div>
         <textarea id="sourceText" placeholder="اكتب هنا النص الذي تريد تنسيقه..."></textarea>
 
+        <div class="section-label" id="basicSectionLbl">تنسيقات أساسية</div>
         <div class="toolbar">
           <button class="tool-btn tool-btn--blue" type="button" data-format="bold"><strong id="boldLbl">تعريض</strong><span>*text*</span></button>
           <button class="tool-btn tool-btn--blue" type="button" data-format="italic"><strong id="italicLbl">مائل</strong><span>_text_</span></button>
@@ -285,6 +331,36 @@
           <button class="tool-btn tool-btn--amber" type="button" data-format="numbers"><strong id="numbersLbl">قائمة رقمية</strong><span>1. item</span></button>
           <button class="tool-btn tool-btn--purple" type="button" data-format="underline"><strong id="underlineLbl">تسطير مرئي</strong><span>u̲n̲d̲e̲r̲</span></button>
           <button class="tool-btn tool-btn--purple" type="button" data-format="box"><strong id="boxLbl">تضليل بديل</strong><span>code block</span></button>
+        </div>
+
+        <div class="section-label" id="proSectionLbl">تنسيقات احترافية جاهزة</div>
+        <div class="toolbar">
+          <button class="tool-btn tool-btn--blue" type="button" data-format="boldItalic"><strong id="boldItalicLbl">عريض + مائل</strong><span>*_text_*</span></button>
+          <button class="tool-btn tool-btn--green" type="button" data-format="headline"><strong id="headlineLbl">عنوان رسمي</strong><span>*العنوان*</span></button>
+          <button class="tool-btn tool-btn--amber" type="button" data-format="announce"><strong id="announceLbl">إعلان جاهز</strong><span>structured</span></button>
+          <button class="tool-btn tool-btn--amber" type="button" data-format="admin"><strong id="adminLbl">رسالة إدارية</strong><span>formal</span></button>
+          <button class="tool-btn tool-btn--purple" type="button" data-format="warning"><strong id="warningLbl">تنبيه مهم</strong><span>alert</span></button>
+          <button class="tool-btn tool-btn--green" type="button" data-format="meeting"><strong id="meetingLbl">موعد / اجتماع</strong><span>time + place</span></button>
+        </div>
+
+        <div class="section-label" id="presetSectionLbl">قوالب سريعة</div>
+        <div class="preset-grid">
+          <button class="preset-btn" type="button" data-template="schedule">
+            <strong id="presetScheduleLbl">قالب جدول دوام</strong>
+            <span id="presetScheduleSub">عنوان + تاريخ + فريق + ملاحظات</span>
+          </button>
+          <button class="preset-btn" type="button" data-template="announcement">
+            <strong id="presetAnnouncementLbl">قالب إعلان</strong>
+            <span id="presetAnnouncementSub">مقدمة + تفاصيل + إجراء مطلوب</span>
+          </button>
+          <button class="preset-btn" type="button" data-template="admin">
+            <strong id="presetAdminLbl">قالب إداري</strong>
+            <span id="presetAdminSub">جهة + موضوع + نقاط + ختام</span>
+          </button>
+          <button class="preset-btn" type="button" data-template="handover">
+            <strong id="presetHandoverLbl">قالب تسليم</strong>
+            <span id="presetHandoverSub">تم الإنجاز + المتبقي + ملاحظات</span>
+          </button>
         </div>
 
         <div class="actions">
@@ -322,6 +398,9 @@
           heroDesc: 'اكتب النص مرة واحدة ثم حوّله بسرعة إلى تنسيقات مناسبة لواتساب مثل التعريض، المائل، الشطب، الكود، الاقتباس، القوائم، وحتى بدائل مرئية مثل التسطير.',
           inputTitle: 'النص الأصلي',
           inputSub: 'يمكنك كتابة فقرة أو عدة أسطر. بعض الخيارات تطبق على كل سطر تلقائياً.',
+          basicSection: 'تنسيقات أساسية',
+          proSection: 'تنسيقات احترافية جاهزة',
+          presetSection: 'قوالب سريعة',
           resultTitle: 'النتيجة الجاهزة',
           resultSub: 'اضغط أحد الأزرار اليسار ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.',
           copy: 'نسخ النتيجة',
@@ -338,6 +417,26 @@
           numbers: 'قائمة رقمية',
           underline: 'تسطير مرئي',
           box: 'تضليل بديل',
+          boldItalic: 'عريض + مائل',
+          headline: 'عنوان رسمي',
+          announce: 'إعلان جاهز',
+          admin: 'رسالة إدارية',
+          warning: 'تنبيه مهم',
+          meeting: 'موعد / اجتماع',
+          announceBodyEnd: 'يرجى الاطلاع والتقيد بالمذكور.',
+          adminBodyEnd: 'شاكرين تعاونكم.',
+          warningBodyEnd: 'يرجى الانتباه.',
+          meetingTime: 'الزمان:',
+          meetingPlace: 'المكان:',
+          meetingNeed: 'المطلوب:',
+          presetSchedule: 'قالب جدول دوام',
+          presetScheduleSub: 'عنوان + تاريخ + فريق + ملاحظات',
+          presetAnnouncement: 'قالب إعلان',
+          presetAnnouncementSub: 'مقدمة + تفاصيل + إجراء مطلوب',
+          presetAdmin: 'قالب إداري',
+          presetAdminSub: 'جهة + موضوع + نقاط + ختام',
+          presetHandover: 'قالب تسليم',
+          presetHandoverSub: 'تم الإنجاز + المتبقي + ملاحظات',
           tip1Title: 'التسطير',
           tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
           tip2Title: 'التضليل',
@@ -355,6 +454,9 @@
           heroDesc: 'Type your text once, then turn it into ready WhatsApp styles like bold, italic, strike, code, quotes, lists, and visual alternatives such as underline.',
           inputTitle: 'Source Text',
           inputSub: 'You can type one paragraph or multiple lines. Some options apply line by line automatically.',
+          basicSection: 'Basic styles',
+          proSection: 'Professional ready styles',
+          presetSection: 'Quick templates',
           resultTitle: 'Ready Output',
           resultSub: 'Tap any style button on the left, then copy the final result directly into WhatsApp.',
           copy: 'Copy Result',
@@ -371,6 +473,26 @@
           numbers: 'Numbered List',
           underline: 'Visual Underline',
           box: 'Shade Alternative',
+          boldItalic: 'Bold + Italic',
+          headline: 'Formal Heading',
+          announce: 'Announcement',
+          admin: 'Administrative',
+          warning: 'Important Alert',
+          meeting: 'Meeting / Time',
+          announceBodyEnd: 'Please review and follow the above.',
+          adminBodyEnd: 'Thank you for your cooperation.',
+          warningBodyEnd: 'Please take note.',
+          meetingTime: 'Time:',
+          meetingPlace: 'Place:',
+          meetingNeed: 'Required:',
+          presetSchedule: 'Duty schedule template',
+          presetScheduleSub: 'Title + date + team + notes',
+          presetAnnouncement: 'Announcement template',
+          presetAnnouncementSub: 'Opening + details + required action',
+          presetAdmin: 'Administrative template',
+          presetAdminSub: 'From + subject + points + closing',
+          presetHandover: 'Handover template',
+          presetHandoverSub: 'Completed + pending + notes',
           tip1Title: 'Underline',
           tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
           tip2Title: 'Shading',
@@ -410,13 +532,57 @@
         }).join('');
       }
 
+      function asHeading(text) {
+        var trimmed = text.trim();
+        return '*' + trimmed + '*\n' + '—'.repeat(Math.max(8, Math.min(24, trimmed.length)));
+      }
+
+      function asAnnouncement(text) {
+        return '*' + t('announce') + '*\n\n' + text + '\n\n' + t('announceBodyEnd');
+      }
+
+      function asAdmin(text) {
+        return '*' + t('admin') + '*\n\n' + text + '\n\n' + t('adminBodyEnd');
+      }
+
+      function asWarning(text) {
+        return '⚠️ *' + t('warning') + '*\n\n' + text + '\n\n' + '*' + t('warningBodyEnd') + '*';
+      }
+
+      function asMeeting(text) {
+        return '*' + t('meeting') + '*\n\n' + text + '\n\n' + t('meetingTime') + '\n' + t('meetingPlace') + '\n' + t('meetingNeed');
+      }
+
+      function templates() {
+        return {
+          schedule: lang === 'ar'
+            ? '*جدول الدوام*\n\nالتاريخ:\nالفترة:\nالفريق:\n\n1.\n2.\n3.\n\nملاحظات:'
+            : '*Duty Schedule*\n\nDate:\nShift:\nTeam:\n\n1.\n2.\n3.\n\nNotes:',
+          announcement: lang === 'ar'
+            ? '*إعلان*\n\nالموضوع:\n\nالتفاصيل:\n- \n- \n- \n\nالإجراء المطلوب:'
+            : '*Announcement*\n\nSubject:\n\nDetails:\n- \n- \n- \n\nRequired Action:',
+          admin: lang === 'ar'
+            ? '*رسالة إدارية*\n\nمن:\nإلى:\nالموضوع:\n\n1.\n2.\n3.\n\nشاكرين تعاونكم.'
+            : '*Administrative Message*\n\nFrom:\nTo:\nSubject:\n\n1.\n2.\n3.\n\nThank you for your cooperation.',
+          handover: lang === 'ar'
+            ? '*تسليم المناوبة*\n\nتم الإنجاز:\n- \n- \n\nالمتبقي:\n- \n- \n\nملاحظات:'
+            : '*Shift Handover*\n\nCompleted:\n- \n- \n\nPending:\n- \n- \n\nNotes:'
+        };
+      }
+
       function formatText(kind, text) {
         switch (kind) {
           case 'bold': return '*' + text + '*';
           case 'italic': return '_' + text + '_';
           case 'strike': return '~' + text + '~';
+          case 'boldItalic': return '*_' + text + '_*';
           case 'inline': return '`' + text + '`';
           case 'mono': return '```\\n' + text + '\\n```';
+          case 'headline': return asHeading(text);
+          case 'announce': return asAnnouncement(text);
+          case 'admin': return asAdmin(text);
+          case 'warning': return asWarning(text);
+          case 'meeting': return asMeeting(text);
           case 'quote':
             return lines(text).map(function (line) { return line.trim() ? '> ' + line : '>'; }).join('\n');
           case 'bullets':
@@ -454,6 +620,9 @@
         document.getElementById('heroDesc').textContent = t('heroDesc');
         document.getElementById('inputTitle').textContent = t('inputTitle');
         document.getElementById('inputSub').textContent = t('inputSub');
+        document.getElementById('basicSectionLbl').textContent = t('basicSection');
+        document.getElementById('proSectionLbl').textContent = t('proSection');
+        document.getElementById('presetSectionLbl').textContent = t('presetSection');
         document.getElementById('resultTitle').textContent = t('resultTitle');
         document.getElementById('resultSub').textContent = t('resultSub');
         document.getElementById('copyBtn').textContent = t('copy');
@@ -469,6 +638,20 @@
         document.getElementById('numbersLbl').textContent = t('numbers');
         document.getElementById('underlineLbl').textContent = t('underline');
         document.getElementById('boxLbl').textContent = t('box');
+        document.getElementById('boldItalicLbl').textContent = t('boldItalic');
+        document.getElementById('headlineLbl').textContent = t('headline');
+        document.getElementById('announceLbl').textContent = t('announce');
+        document.getElementById('adminLbl').textContent = t('admin');
+        document.getElementById('warningLbl').textContent = t('warning');
+        document.getElementById('meetingLbl').textContent = t('meeting');
+        document.getElementById('presetScheduleLbl').textContent = t('presetSchedule');
+        document.getElementById('presetScheduleSub').textContent = t('presetScheduleSub');
+        document.getElementById('presetAnnouncementLbl').textContent = t('presetAnnouncement');
+        document.getElementById('presetAnnouncementSub').textContent = t('presetAnnouncementSub');
+        document.getElementById('presetAdminLbl').textContent = t('presetAdmin');
+        document.getElementById('presetAdminSub').textContent = t('presetAdminSub');
+        document.getElementById('presetHandoverLbl').textContent = t('presetHandover');
+        document.getElementById('presetHandoverSub').textContent = t('presetHandoverSub');
         document.getElementById('tip1Title').textContent = t('tip1Title');
         document.getElementById('tip1Body').textContent = t('tip1Body');
         document.getElementById('tip2Title').textContent = t('tip2Title');
@@ -488,6 +671,15 @@
             return;
           }
           setPreview(formatText(btn.getAttribute('data-format'), source.value));
+        });
+      });
+
+      document.querySelectorAll('[data-template]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-template');
+          var map = templates();
+          source.value = map[key] || '';
+          setPreview(source.value);
         });
       });
 
