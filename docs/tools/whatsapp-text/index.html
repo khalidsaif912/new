@@ -340,7 +340,7 @@
           <button class="tool-row" type="button" data-format="bullets"><span class="tool-ico-sm">•</span><span class="info"><strong id="bulletsLbl">قائمة نقطية</strong><span class="ex">• item</span></span></button>
           <button class="tool-row" type="button" data-format="numbers"><span class="tool-ico-sm">1.</span><span class="info"><strong id="numbersLbl">قائمة رقمية</strong><span class="ex">1. item</span></span></button>
           <button class="tool-row" type="button" data-format="underline"><span class="tool-ico-sm">U̲</span><span class="info"><strong id="underlineLbl">تسطير مرئي</strong><span class="ex">u̲n̲d̲e̲r̲</span></span></button>
-          <button class="tool-row" type="button" data-format="box"><span class="tool-ico-sm">🟨</span><span class="info"><strong id="boxLbl">تضليل بديل</strong><span class="ex">🟨 text 🟨</span></span></button>
+          <button class="tool-row" type="button" data-format="box"><span class="tool-ico-sm">`</span><span class="info"><strong id="boxLbl">تضليل</strong><span class="ex">`text`</span></span></button>
         </div>
       </div>
 
@@ -374,7 +374,7 @@
         <summary id="notesTitle">نصائح مفيدة</summary>
         <ul>
           <li><strong id="tip1Title">التسطير:</strong> <span id="tip1Body">واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.</span></li>
-          <li><strong id="tip2Title">التضليل:</strong> <span id="tip2Body">واتساب لا يملك لون تظليل حقيقي للنص، لذلك يضيف هذا الخيار رمز 🟨 حول كل سطر كبديل مرئي يشبه القلم الفسفوري.</span></li>
+          <li><strong id="tip2Title">التضليل:</strong> <span id="tip2Body">يغلّف النص بعلامات ` ليظهر بتنسيق monospace في واتساب، مثل: `السَّلاَمُ عَلَيْكُمْ`.</span></li>
           <li><strong id="tip3Title">القوائم:</strong> <span id="tip3Body">إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.</span></li>
         </ul>
       </details>
@@ -443,7 +443,7 @@
           resultTitle: 'النتيجة الجاهزة',
           swap: 'استخدم كمدخل', clear: 'مسح', clearPhrases: 'مسح المحفوظات', copyAgain: 'نسخ مرة أخرى',
           bold: 'تعريض', italic: 'مائل', strike: 'مشطوب', mono: 'كود', quote: 'اقتباس', inline: 'كود قصير',
-          bullets: 'قائمة نقطية', numbers: 'قائمة رقمية', underline: 'تسطير مرئي', box: 'تضليل بديل',
+          bullets: 'قائمة نقطية', numbers: 'قائمة رقمية', underline: 'تسطير مرئي', box: 'تضليل',
           boldItalic: 'عريض + مائل', headline: 'عنوان رسمي', announce: 'إعلان جاهز', admin: 'رسالة إدارية',
           warning: 'تنبيه مهم', meeting: 'موعد / اجتماع',
           announceBodyEnd: 'يرجى الاطلاع والتقيد بالمذكور.',
@@ -464,7 +464,7 @@
           resetAllConfirm: 'تأكيد الحذف', resetAllCancel: 'إلغاء', resetAllDone: 'تمت إعادة الضبط',
           notesTitle: 'نصائح مفيدة',
           tip1Title: 'التسطير:', tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
-          tip2Title: 'التضليل:', tip2Body: 'واتساب لا يملك لون تظليل حقيقي للنص، لذلك يضيف هذا الخيار رمز 🟨 حول كل سطر كبديل مرئي يشبه القلم الفسفوري.',
+          tip2Title: 'التضليل:', tip2Body: 'يغلّف النص بعلامات ` ليظهر بتنسيق monospace في واتساب، مثل: `السَّلاَمُ عَلَيْكُمْ`.',
           tip3Title: 'القوائم:', tip3Body: 'إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.',
           copied: 'تم نسخ النص', empty: 'اكتب النص أولاً', previewEmpty: 'سيظهر النص المنسق هنا', langBtn: 'EN',
           shareTitle: 'منسّق نص واتساب', shareText: 'أداة سريعة لتنسيق النصوص بشكل جاهز للنسخ في واتساب',
@@ -483,7 +483,7 @@
           resultTitle: 'Ready Output',
           swap: 'Use as input', clear: 'Clear', clearPhrases: 'Clear history', copyAgain: 'Copy again',
           bold: 'Bold', italic: 'Italic', strike: 'Strike', mono: 'Code Block', quote: 'Quote', inline: 'Inline Code',
-          bullets: 'Bulleted List', numbers: 'Numbered List', underline: 'Visual Underline', box: 'Shade Alternative',
+          bullets: 'Bulleted List', numbers: 'Numbered List', underline: 'Visual Underline', box: 'Highlight',
           boldItalic: 'Bold + Italic', headline: 'Formal Heading', announce: 'Announcement', admin: 'Administrative',
           warning: 'Important Alert', meeting: 'Meeting / Time',
           announceBodyEnd: 'Please review and follow the above.',
@@ -504,7 +504,7 @@
           resetAllConfirm: 'Confirm delete', resetAllCancel: 'Cancel', resetAllDone: 'Settings reset',
           notesTitle: 'Useful tips',
           tip1Title: 'Underline:', tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
-          tip2Title: 'Shading:', tip2Body: 'WhatsApp has no real text highlight color, so this option wraps each line with 🟨 as a visual highlighter-pen alternative.',
+          tip2Title: 'Highlight:', tip2Body: 'Wraps text in backticks so WhatsApp shows it as monospace highlight, e.g. `Hello`.',
           tip3Title: 'Lists:', tip3Body: 'If your text contains multiple lines, numbering or bullets will be applied to each line automatically.',
           copied: 'Text copied', empty: 'Type some text first', previewEmpty: 'Formatted text will appear here', langBtn: 'ع',
           shareTitle: 'WhatsApp Text Styler', shareText: 'A quick tool to style text ready to paste into WhatsApp',
@@ -540,7 +540,7 @@
       }
 
       function asHighlight(text) {
-        return nonEmptyLines(text).map(function (line) { return '🟨 ' + line + ' 🟨'; }).join('\n') || text;
+        return nonEmptyLines(text).map(function (line) { return '`' + line + '`'; }).join('\n') || ('`' + text + '`');
       }
 
       /* ---- Pro tab: editable, saved patterns + titles ---- */
@@ -1071,7 +1071,7 @@
 
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js?v=20260729a').catch(function () {});
+          navigator.serviceWorker.register('sw.js?v=20260729b').catch(function () {});
         });
       }
 
