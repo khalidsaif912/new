@@ -24,7 +24,7 @@ from training_page_icons import (  # noqa: E402
 
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 MONTH_SHORT_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-IOS_TOUCH_VER = "20260525c"
+IOS_TOUCH_VER = "20260729c"
 
 # Meaningful course emoji + Arabic title + short description.
 COURSE_META: dict[str, dict[str, str]] = {
@@ -1827,6 +1827,17 @@ def latest_month_id(data: dict) -> str:
     return max(item["month_id"] for item in data["months"])
 
 
+def active_month_id(data: dict) -> str:
+    """Prefer the earliest month that still has courses ending today or later."""
+    today = date.today().isoformat()
+    months = sorted(data["months"], key=lambda x: x["month_id"])
+    for month in months:
+        for course in month.get("courses", []):
+            end = course.get("date_end") or course.get("date") or ""
+            if end >= today:
+                return month["month_id"]
+    return latest_month_id(data)
+
 def count_types(courses: list[dict]) -> int:
     return len({c["title"].strip().lower() for c in courses})
 
@@ -2109,6 +2120,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
 </div>
 <script>{PAGE_JS}</script>
 <script defer src="{share_script_src(in_archive)}"></script>
+<script defer src="{'../../training-new-badge.js?v=20260729c' if in_archive else '../training-new-badge.js?v=20260729c'}"></script>
 </body>
 </html>
 '''
@@ -2395,14 +2407,16 @@ def build_site(data: dict, out_dir: Path) -> None:
     archive = out_dir / "archive"
     archive.mkdir(parents=True, exist_ok=True)
     latest = latest_month_id(data)
-    (out_dir / "index.html").write_text(render_month_page(data, latest, in_archive=False), encoding="utf-8")
+    active = active_month_id(data)
+    (out_dir / "index.html").write_text(render_month_page(data, active, in_archive=False), encoding="utf-8")
     (archive / "index.html").write_text(render_archive_index(data), encoding="utf-8")
     for month in sorted(data["months"], key=lambda x: x["month_id"]):
         (archive / f'{month["month_id"]}.html').write_text(render_month_page(data, month["month_id"], in_archive=True), encoding="utf-8")
     cup_dir = out_dir / "a-cup-of-book"
     cup_dir.mkdir(parents=True, exist_ok=True)
     (cup_dir / "index.html").write_text(render_cup_of_book_page(), encoding="utf-8")
-
+    # silence unused if needed
+    _ = latest
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate archive pages site")
