@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wa-text-styler-v5';
+const CACHE_NAME = 'wa-text-styler-v6';
 const ASSETS = [
   './index.html',
   './manifest.webmanifest',
