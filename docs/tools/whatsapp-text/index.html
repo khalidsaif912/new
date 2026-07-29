@@ -140,12 +140,12 @@
   .tab-btn .ic{font-size:15px}
   .tab-btn.active{background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));color:#fff;box-shadow:0 3px 8px rgba(18,140,126,.3)}
 
-  .tab-panel{background:#fff;border-radius:var(--r);box-shadow:0 1px 2px rgba(0,0,0,.08);padding:10px}
+  .tab-panel{background:#fff;border-radius:var(--r);box-shadow:0 1px 2px rgba(0,0,0,.08);padding:10px;overflow:hidden}
   .tab-panel[hidden]{display:none}
 
-  .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .tool-row{
-    position:relative;
+    position:relative;min-width:0;max-width:100%;overflow:hidden;
     display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;
     border:1px solid var(--line);background:#fff;cursor:pointer;text-align:start;font:inherit;
   }
@@ -167,6 +167,9 @@
   .tool-grid .tool-row:nth-child(6n+4) .tool-ico-sm{background:linear-gradient(135deg,#25D366,#4FE08A)}
   .tool-grid .tool-row:nth-child(6n+5) .tool-ico-sm{background:linear-gradient(135deg,#FF9F1C,#FFBB5C)}
   .tool-grid .tool-row:nth-child(6n+6) .tool-ico-sm{background:linear-gradient(135deg,#00A884,#39C9A6)}
+  @media (min-width:560px){
+    .tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
 
   .tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   .tpl-card{
@@ -267,7 +270,7 @@
     .tool-row .ex{display:none}
     .tab-btn{font-size:10.5px}
     .phrase-text{max-width:130px}
-    .tpl-grid{gap:4px}
+    .tpl-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
     .tpl-card{padding:8px 3px 6px;min-height:60px}
     .tpl-card .tpl-title{font-size:9px}
     .tpl-card .tpl-emoji{font-size:15px}
@@ -1071,7 +1074,7 @@
 
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js?v=20260729b').catch(function () {});
+          navigator.serviceWorker.register('sw.js?v=20260729c').catch(function () {});
         });
       }
 
