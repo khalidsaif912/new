@@ -1,12 +1,13 @@
 /**
  * Force-visible "New" badge on homepage Training chip until 1 Aug 2026.
- * Uses inline styles so other CSS cannot hide it.
+ * Placed BELOW the training button so it is never covered by the chip.
  */
 (function () {
   'use strict';
 
   var HIDE_FROM = 20260801;
   var PILL_ID = 'trainingNewPillForce';
+  var SLOT_ID = 'trainingChipSlot';
   var STYLE_ID = 'trainingNewPillForceCss';
 
   function stampNow() {
@@ -28,28 +29,48 @@
     var s = document.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
-      '#trainingBtn.summaryChip{position:relative!important;overflow:visible!important;padding-top:20px!important;}',
-      '.summaryBar{overflow:visible!important;padding-top:4px!important;}',
+      '.summaryBar{overflow:visible!important;}',
+      '#' + SLOT_ID + '{',
+      'display:flex!important;flex-direction:column!important;align-items:center!important;',
+      'justify-content:flex-start!important;gap:4px!important;position:relative!important;',
+      'z-index:5!important;align-self:stretch!important;',
+      '}',
+      '#' + SLOT_ID + ' > #trainingBtn{',
+      'position:relative!important;overflow:visible!important;padding-top:10px!important;',
+      'margin:0!important;width:100%!important;min-width:72px!important;',
+      '}',
       '#' + PILL_ID + '{',
-      'position:absolute!important;top:3px!important;left:50%!important;transform:translateX(-50%)!important;',
-      'z-index:40!important;display:inline-block!important;visibility:visible!important;opacity:1!important;',
+      'position:static!important;display:inline-block!important;visibility:visible!important;',
+      'opacity:1!important;z-index:6!important;order:2!important;',
       'padding:3px 8px!important;border-radius:999px!important;',
-      'background:#ea580c!important;background-color:#ea580c!important;color:#fff!important;',
+      'background:#ea580c!important;color:#fff!important;',
       'font-size:10px!important;font-weight:900!important;line-height:1.15!important;',
       'letter-spacing:.02em!important;white-space:nowrap!important;text-transform:none!important;',
       'box-shadow:0 2px 8px rgba(234,88,12,.45)!important;pointer-events:none!important;',
-      'animation:thnForceBlink 1.2s ease-in-out infinite!important;',
+      'animation:thnForceBlink 1.4s ease-in-out infinite!important;',
       '}',
-      '@keyframes thnForceBlink{0%,100%{opacity:1}50%{opacity:.42}}',
+      '@keyframes thnForceBlink{0%,100%{opacity:1}50%{opacity:.55}}',
       '#trainingBtn .trainingNewPill{display:none!important}',
       '.dateTagRow{display:inline-flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;}',
       '.dateTagNewForce{',
       'display:inline-block!important;padding:5px 10px!important;border-radius:999px!important;',
       'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;',
-      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.2s ease-in-out infinite!important;',
+      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.4s ease-in-out infinite!important;',
       '}'
     ].join('');
     document.head.appendChild(s);
+  }
+
+  function ensureSlot(btn) {
+    var slot = document.getElementById(SLOT_ID);
+    if (slot && slot.contains(btn)) return slot;
+    slot = document.createElement('div');
+    slot.id = SLOT_ID;
+    if (btn.parentNode) {
+      btn.parentNode.insertBefore(slot, btn);
+      slot.appendChild(btn);
+    }
+    return slot;
   }
 
   function paintHomeBadge() {
@@ -63,20 +84,25 @@
     }
     injectCss();
     btn.classList.remove('is-new-off');
+    var slot = ensureSlot(btn);
     var pill = document.getElementById(PILL_ID);
     if (!pill) {
       pill = document.createElement('span');
       pill.id = PILL_ID;
-      btn.appendChild(pill);
+      // Place AFTER the button = visually below the training chip.
+      slot.appendChild(pill);
+    } else if (pill.parentNode !== slot) {
+      slot.appendChild(pill);
+    } else if (pill.previousElementSibling !== btn) {
+      slot.appendChild(pill);
     }
     pill.textContent = isAr() ? 'جديد' : 'New';
-    // Inline styles beat almost every stylesheet conflict.
     pill.setAttribute(
       'style',
-      'position:absolute!important;top:3px!important;left:50%!important;transform:translateX(-50%)!important;' +
-        'z-index:40!important;display:inline-block!important;visibility:visible!important;opacity:1!important;' +
-        'padding:3px 8px!important;border-radius:999px!important;background:#ea580c!important;color:#fff!important;' +
-        'font-size:10px!important;font-weight:900!important;line-height:1.15!important;white-space:nowrap!important;' +
+      'position:static!important;display:inline-block!important;visibility:visible!important;opacity:1!important;' +
+        'z-index:6!important;padding:3px 8px!important;border-radius:999px!important;' +
+        'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;' +
+        'line-height:1.15!important;white-space:nowrap!important;margin-top:2px!important;' +
         'box-shadow:0 2px 8px rgba(234,88,12,.45)!important;pointer-events:none!important;'
     );
   }
@@ -90,9 +116,6 @@
       return;
     }
     injectCss();
-    var path = (location.pathname || '') + (location.href || '');
-    var isAug = /2026-08|August|أغسطس/i.test(path) || /August/i.test(dateTag.textContent || '');
-    // Show near date on training pages (July promo for August, or August itself).
     var onTraining = /\/training(\/|$)/i.test(location.pathname || '');
     if (!onTraining) return;
 
@@ -101,7 +124,6 @@
       badge = document.createElement('span');
       badge.id = 'dateTagNewForce';
       badge.className = 'dateTagNewForce';
-      // Place outside the date pill when possible.
       var row = dateTag.parentElement;
       if (row && row.classList && row.classList.contains('dateTagRow')) {
         row.appendChild(badge);

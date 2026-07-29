@@ -1304,7 +1304,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/feature-update-badge.js?v=20260729c');
-    addScript(root + '/training-new-badge.js?v=20260729c');
+    addScript(root + '/training-new-badge.js?v=20260729d');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
@@ -1337,7 +1337,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/feature-update-badge.js?v=20260729c');
-    addScript(root + '/training-new-badge.js?v=20260729c');
+    addScript(root + '/training-new-badge.js?v=20260729d');
     addScript(root + '/banner-changer.js?v=' + ver);
   }
   if (window.requestIdleCallback) {
