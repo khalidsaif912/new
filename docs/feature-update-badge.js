@@ -191,8 +191,9 @@
 
   function refresh() {
     injectStyles();
+    // Keep chip "NEW" badges off employee/schedule chips; training has its own badge.
+    removeChipBadges();
     if (isFabDismissed()) {
-      removeChipBadges();
       var fab = document.getElementById(FAB_ID);
       if (fab) {
         fab.hidden = true;
@@ -200,8 +201,6 @@
       }
       return;
     }
-    ensureChipBadge(document.getElementById('myScheduleBtn'));
-    ensureChipBadge(document.getElementById('welcomeChip'));
     ensureFab();
   }
 

@@ -332,7 +332,11 @@
       0%,100%{opacity:1; transform:scale(1)}
       50%{opacity:.45; transform:scale(.97)}
     }
-    .trainingNewBadge{display:none!important}
+    .welcomeChip .feature-new-badge,
+    #welcomeChip .feature-new-badge,
+    #myScheduleBtn .feature-new-badge{
+      display:none !important;
+    }
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     .summaryChip {
@@ -3309,7 +3313,7 @@ function goToRosterDiff(event) {
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260728g');
+    addScript(root + '/feature-update-badge.js?v=20260729a');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
