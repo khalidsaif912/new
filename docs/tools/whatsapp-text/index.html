@@ -20,7 +20,6 @@
     --wa-header-2:#128C7E;
     --wa-green:#25D366;
     --wa-out:#d9fdd3;
-    --wa-out-line:#bdeeb2;
     --wa-in:#ffffff;
     --wa-wallpaper:#e7dfd3;
     --wa-wallpaper-2:#ded3c2;
@@ -30,7 +29,7 @@
     --tick:#8696a0;
     --tick-read:#53bdeb;
     --shadow:0 18px 40px rgba(7,26,22,.14);
-    --r:16px;
+    --r:14px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
@@ -46,21 +45,18 @@
     min-height:-webkit-fill-available;
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
     background:
       radial-gradient(circle at 8% 12%, rgba(255,255,255,.35) 0 2px, transparent 3px),
       radial-gradient(circle at 32% 68%, rgba(255,255,255,.35) 0 2px, transparent 3px),
       radial-gradient(circle at 58% 22%, rgba(255,255,255,.3) 0 2px, transparent 3px),
       radial-gradient(circle at 82% 78%, rgba(255,255,255,.3) 0 2px, transparent 3px),
-      radial-gradient(circle at 74% 40%, rgba(0,0,0,.03) 0 2px, transparent 3px),
-      radial-gradient(circle at 18% 88%, rgba(0,0,0,.03) 0 2px, transparent 3px),
       linear-gradient(180deg, var(--wa-wallpaper) 0%, var(--wa-wallpaper-2) 100%);
-    background-size:140px 140px, 160px 160px, 120px 120px, 150px 150px, 130px 130px, 145px 145px, 100% 100%;
+    background-size:140px 140px, 160px 160px, 120px 120px, 150px 150px, 100% 100%;
   }
   a{color:inherit}
   button{font-family:inherit}
   .app-shell{
-    width:min(880px,100%);
+    width:min(720px,100%);
     margin:0 auto;
     min-height:100dvh;
     min-height:-webkit-fill-available;
@@ -68,374 +64,213 @@
     flex-direction:column;
     box-shadow:var(--shadow);
   }
+  @supports (-webkit-touch-callout: none){ .app-shell{min-height:-webkit-fill-available} }
 
   /* ---- top bar ---- */
   .wa-topbar{
     background:linear-gradient(135deg,var(--wa-header) 0%, var(--wa-header-2) 100%);
     color:#fff;
-    padding:12px 14px;
-    padding-top:max(12px, env(safe-area-inset-top));
-    padding-inline-start:max(14px, env(safe-area-inset-left));
-    padding-inline-end:max(14px, env(safe-area-inset-right));
-    display:flex;
-    align-items:center;
-    gap:12px;
-    position:sticky;
-    top:0;
-    z-index:5;
+    padding:10px 12px;
+    padding-top:max(10px, env(safe-area-inset-top));
+    padding-inline-start:max(12px, env(safe-area-inset-left));
+    padding-inline-end:max(12px, env(safe-area-inset-right));
+    display:flex; align-items:center; gap:10px;
+    position:sticky; top:0; z-index:5;
   }
   .home-btn{
-    width:38px;height:38px;flex:0 0 auto;
-    border-radius:50%;
-    display:grid;place-items:center;
-    text-decoration:none;color:#fff;
-    background:rgba(255,255,255,.14);
-    border:1px solid rgba(255,255,255,.2);
+    width:34px;height:34px;flex:0 0 auto;border-radius:50%;
+    display:grid;place-items:center;text-decoration:none;color:#fff;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);
   }
   .avatar{
-    width:40px;height:40px;border-radius:50%;flex:0 0 auto;
-    display:grid;place-items:center;
-    font-family:'Cairo',sans-serif;font-weight:800;font-size:15px;
-    background:linear-gradient(135deg,#fff,#cdebe1);
-    color:var(--wa-header);
+    width:36px;height:36px;border-radius:50%;flex:0 0 auto;
+    display:grid;place-items:center;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;
+    background:linear-gradient(135deg,#fff,#cdebe1);color:var(--wa-header);
   }
   .contact-info{flex:1;min-width:0}
-  .contact-name{font-family:'Cairo',sans-serif;font-weight:800;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .contact-status{font-size:11.5px;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:5px}
-  .dot{width:7px;height:7px;border-radius:50%;background:#7CFFB2;box-shadow:0 0 0 0 rgba(124,255,178,.6);animation:pulse 2s infinite}
-  @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(124,255,178,.55)}
-    70%{box-shadow:0 0 0 6px rgba(124,255,178,0)}
-    100%{box-shadow:0 0 0 0 rgba(124,255,178,0)}
+  .contact-name{font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .contact-status{font-size:10.5px;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:5px}
+  .dot{width:6px;height:6px;border-radius:50%;background:#7CFFB2;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,255,178,.55)}70%{box-shadow:0 0 0 6px rgba(124,255,178,0)}100%{box-shadow:0 0 0 0 rgba(124,255,178,0)}}
+  .header-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .circle-btn{
+    width:32px;height:32px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+    color:#fff;cursor:pointer;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:0;
   }
   .lang-btn{
-    min-width:38px;height:34px;padding:0 12px;
-    border:1px solid rgba(255,255,255,.28);border-radius:999px;
-    background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer;font-size:13px;
-  }
-  .circle-btn{
-    width:36px;height:36px;flex:0 0 auto;
-    border-radius:50%;
-    display:grid;place-items:center;
-    color:#fff;cursor:pointer;
-    background:rgba(255,255,255,.14);
-    border:1px solid rgba(255,255,255,.2);
-    padding:0;
-  }
-  .header-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-
-  .install-sheet{
-    position:fixed;inset:0;
-    background:rgba(7,26,22,.45);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:50;
-    padding:12px;
-  }
-  .install-sheet.show{display:flex}
-  .install-card{
-    width:min(420px,100%);
-    background:#fff;
-    border-radius:18px;
-    padding:18px 18px calc(18px + env(safe-area-inset-bottom));
-    box-shadow:0 -10px 40px rgba(0,0,0,.25);
-  }
-  .install-card h3{margin:0 0 10px;font-family:'Cairo',sans-serif;font-size:16px;display:flex;align-items:center;gap:8px}
-  .install-card ol{margin:0 0 14px;padding-inline-start:20px;font-size:13px;line-height:2;color:var(--ink)}
-  .install-card ol b{color:var(--wa-header)}
-  .install-close{
-    width:100%;height:44px;border:none;border-radius:12px;
-    background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));
-    color:#fff;font-weight:800;font-size:14px;cursor:pointer;
+    min-width:32px;height:32px;padding:0 10px;border:1px solid rgba(255,255,255,.28);border-radius:999px;
+    background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer;font-size:12px;
   }
 
-  /* ---- chat area ---- */
-  .chat-area{
-    flex:1;
-    padding:16px 12px 10px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .sys-pill-row{display:flex;justify-content:center;margin:4px 0}
-  .sys-pill{
-    background:rgba(255,255,255,.85);
-    border:1px solid rgba(0,0,0,.06);
-    color:var(--muted);
-    font-size:11.5px;font-weight:700;
-    padding:6px 14px;
-    border-radius:999px;
-    box-shadow:0 1px 2px rgba(0,0,0,.06);
-  }
-  .intro-banner{
-    align-self:center;
-    max-width:520px;
-    text-align:center;
-    background:#fff8dc;
-    border:1px solid #f1e6ad;
-    color:#7a6a1f;
-    border-radius:10px;
-    padding:12px 16px;
-    font-size:12.5px;
-    line-height:1.9;
-  }
-  .intro-banner strong{
-    display:block;font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;color:#5c4e12;margin-bottom:4px;
-  }
+  /* ---- main ---- */
+  .main{flex:1;display:flex;flex-direction:column;gap:10px;padding:10px 10px max(14px, env(safe-area-inset-bottom))}
 
-  .bubble{
-    max-width:min(600px,92%);
-    border-radius:var(--r);
-    padding:12px 13px 8px;
-    position:relative;
-    box-shadow:0 1px 1px rgba(0,0,0,.08);
+  .card{
+    width:100%;background:#fff;border-radius:var(--r);
+    box-shadow:0 1px 2px rgba(0,0,0,.08);padding:10px 12px;
   }
-  .bubble--in{background:var(--wa-in);align-self:flex-start;border-inline-start:3px solid var(--wa-header-2)}
-  .bubble--out{background:var(--wa-out);align-self:flex-end;border-inline-end:3px solid var(--wa-green);margin-inline-start:auto}
-  .bubble-meta{display:flex;align-items:center;gap:7px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;margin-bottom:2px}
-  .bubble-sub{margin:0 0 10px;font-size:11.5px;color:var(--muted);line-height:1.7}
-  .bubble-time{
-    display:flex;justify-content:flex-end;align-items:center;gap:5px;
-    font-size:10.5px;color:var(--muted);margin-top:4px;
+  .card-label{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    font-family:'Cairo',sans-serif;font-weight:800;font-size:12.5px;margin-bottom:6px;color:var(--wa-header);
   }
-  .ticks{color:var(--tick);letter-spacing:-2px;transition:color .35s ease}
-  .ticks.read{color:var(--tick-read)}
-
+  .mini-icon-btn{
+    display:flex;align-items:center;gap:4px;border:none;background:none;cursor:pointer;
+    color:var(--muted);font:inherit;font-size:10.5px;font-weight:700;padding:3px 6px;border-radius:7px;
+  }
+  .mini-icon-btn:hover{background:#fde2e1;color:#c0392b}
   textarea{
-    width:100%;min-height:170px;
-    border-radius:10px;
-    border:1px solid var(--line);
-    background:#fbfdfe;
-    padding:12px;resize:vertical;
-    font:inherit;line-height:1.8;color:var(--ink);outline:none;font-size:16px;
-    -webkit-appearance:none; appearance:none;
+    width:100%;min-height:88px;border-radius:9px;border:1px solid var(--line);
+    background:#fbfdfe;padding:9px 10px;resize:vertical;
+    font:inherit;line-height:1.7;color:var(--ink);outline:none;font-size:16px;
+    -webkit-appearance:none;appearance:none;
   }
   textarea:focus{border-color:var(--wa-header-2);box-shadow:0 0 0 3px rgba(18,140,126,.12)}
 
-  .preview{
-    background:transparent;
-    min-height:150px;
-    white-space:pre-wrap;word-break:break-word;
-    line-height:1.85;font-size:14.5px;
-    padding:2px 0 4px;
+  /* ---- tabs ---- */
+  .tabs{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
+    background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);
+    border-radius:12px;padding:5px;
   }
+  .tab-btn{
+    border:none;background:transparent;border-radius:9px;cursor:pointer;
+    padding:7px 4px;font:inherit;font-size:11.5px;font-weight:700;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2;
+  }
+  .tab-btn .ic{font-size:15px}
+  .tab-btn.active{background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));color:#fff;box-shadow:0 3px 8px rgba(18,140,126,.3)}
 
-  /* ---- toolbar (attach-menu style) ---- */
-  .toolbar{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:12px 8px;
-    width:min(600px,92%);
-    align-self:center;
-    background:rgba(255,255,255,.55);
-    border:1px solid rgba(255,255,255,.7);
-    border-radius:18px;
-    padding:14px 10px;
-  }
-  .toolbar--pro{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .tool-btn{
-    border:none;background:none;cursor:pointer;font:inherit;
-    display:flex;flex-direction:column;align-items:center;gap:6px;
-    padding:4px 2px;
-    color:var(--ink);
-    transition:transform .15s ease;
-  }
-  .tool-btn:hover{transform:translateY(-2px)}
-  .tool-ico{
-    width:46px;height:46px;border-radius:50%;
-    display:grid;place-items:center;
-    color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;
-    box-shadow:0 3px 8px rgba(0,0,0,.16);
-  }
-  .tool-btn strong{font-size:11.5px;font-weight:700;text-align:center;line-height:1.3}
-  .tool-btn span{font-size:9.5px;color:var(--muted);font-family:monospace}
-  .toolbar .tool-btn:nth-child(6n+1) .tool-ico{background:linear-gradient(135deg,#5B57D1,#8A6EE8)}
-  .toolbar .tool-btn:nth-child(6n+2) .tool-ico{background:linear-gradient(135deg,#EA4C89,#F17DAA)}
-  .toolbar .tool-btn:nth-child(6n+3) .tool-ico{background:linear-gradient(135deg,#0B84FF,#57ABFF)}
-  .toolbar .tool-btn:nth-child(6n+4) .tool-ico{background:linear-gradient(135deg,#25D366,#4FE08A)}
-  .toolbar .tool-btn:nth-child(6n+5) .tool-ico{background:linear-gradient(135deg,#FF9F1C,#FFBB5C)}
-  .toolbar .tool-btn:nth-child(6n+6) .tool-ico{background:linear-gradient(135deg,#00A884,#39C9A6)}
+  .tab-panel{background:#fff;border-radius:var(--r);box-shadow:0 1px 2px rgba(0,0,0,.08);padding:10px}
+  .tab-panel[hidden]{display:none}
 
-  .preset-grid{
-    width:min(600px,92%);
-    align-self:center;
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-  }
-  .preset-btn{
-    border:1px solid var(--line);
-    background:#fff;
-    border-radius:12px;
-    padding:11px 12px;
-    text-align:start;cursor:pointer;font:inherit;
+  .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .tool-row{
     position:relative;
-    transition:transform .15s ease, box-shadow .15s ease;
+    display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;
+    border:1px solid var(--line);background:#fff;cursor:pointer;text-align:start;font:inherit;
   }
-  .preset-btn::before{
-    content:"↪";
-    position:absolute; inset-block-start:8px; inset-inline-end:10px;
-    color:var(--muted); font-size:13px; transform:scaleX(-1);
+  .tool-row.has-edit{padding-inline-end:24px}
+  .tool-edit{
+    position:absolute;top:4px;inset-inline-end:4px;width:17px;height:17px;border-radius:50%;
+    display:grid;place-items:center;font-size:9.5px;color:var(--muted);background:rgba(0,0,0,.06);
   }
-  html[dir="ltr"] .preset-btn::before{transform:none}
-  .preset-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(7,26,22,.1)}
-  .preset-btn strong{display:flex;align-items:center;gap:6px;font-size:12.5px;font-family:'Cairo',sans-serif;font-weight:800;color:var(--ink);margin-bottom:3px}
-  .preset-btn span{display:block;font-size:10.5px;line-height:1.6;color:var(--muted)}
+  .tool-edit:hover{background:#e3e3e3}
+  .sheet-hint{font-size:11px;color:var(--muted);margin:-2px 0 8px;line-height:1.6}
+  .tool-row:hover{border-color:var(--wa-header-2);box-shadow:0 4px 10px rgba(7,26,22,.08)}
+  .tool-ico-sm{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:11.5px;flex:0 0 auto}
+  .tool-row .info{min-width:0;flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .tool-row strong{font-size:11.8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+  .tool-row .ex{font-size:9px;color:var(--muted);font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tool-grid .tool-row:nth-child(6n+1) .tool-ico-sm{background:linear-gradient(135deg,#5B57D1,#8A6EE8)}
+  .tool-grid .tool-row:nth-child(6n+2) .tool-ico-sm{background:linear-gradient(135deg,#EA4C89,#F17DAA)}
+  .tool-grid .tool-row:nth-child(6n+3) .tool-ico-sm{background:linear-gradient(135deg,#0B84FF,#57ABFF)}
+  .tool-grid .tool-row:nth-child(6n+4) .tool-ico-sm{background:linear-gradient(135deg,#25D366,#4FE08A)}
+  .tool-grid .tool-row:nth-child(6n+5) .tool-ico-sm{background:linear-gradient(135deg,#FF9F1C,#FFBB5C)}
+  .tool-grid .tool-row:nth-child(6n+6) .tool-ico-sm{background:linear-gradient(135deg,#00A884,#39C9A6)}
 
-  .phrase-grid{
-    width:min(600px,92%);
-    align-self:center;
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
+  .tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .tpl-card{
+    position:relative;border:1px solid var(--line);border-radius:11px;background:#fff;
+    padding:10px 5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;
+    gap:4px;min-height:66px;text-align:center;font:inherit;
   }
-  .phrase-btn{
-    border:1px solid var(--line);
-    background:rgba(255,255,255,.88);
-    border-radius:12px;
-    padding:11px 12px;
-    text-align:start;
-    cursor:pointer;
-    font:inherit;
-    color:var(--ink);
-    transition:transform .15s ease, box-shadow .15s ease;
+  .tpl-card:hover{border-color:var(--wa-header-2);box-shadow:0 4px 10px rgba(7,26,22,.08)}
+  .tpl-card .tpl-emoji{font-size:17px}
+  .tpl-card .tpl-title{
+    font-size:10px;font-weight:700;line-height:1.25;color:var(--ink);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
-  .phrase-btn:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(7,26,22,.08)}
-  .phrase-btn strong{
-    display:block;
-    font-size:12.5px;
-    font-family:'Cairo',sans-serif;
-    font-weight:800;
-    margin-bottom:3px;
+  .tpl-actions{position:absolute;top:3px;inset-inline-end:3px;display:flex;gap:3px}
+  .tpl-icon-btn{
+    width:17px;height:17px;border-radius:50%;border:none;display:grid;place-items:center;
+    font-size:9px;color:var(--muted);background:rgba(0,0,0,.06);cursor:pointer;padding:0;
   }
-  .phrase-btn span{
-    display:block;
-    font-size:10.5px;
-    line-height:1.7;
-    color:var(--muted);
+  .tpl-icon-btn:hover{background:#e3e3e3}
+  .tpl-icon-btn.tpl-del:hover{background:#fde2e1;color:#c0392b}
+  .tpl-add-card{
+    border-style:dashed;border-color:#b7c2c6;color:var(--wa-header-2);
+    align-items:center;justify-content:center;
   }
-  .history-list{
-    width:min(600px,92%);
-    align-self:center;
-    display:grid;
-    gap:8px;
-  }
-  .history-item{
-    border:1px solid rgba(18,140,126,.18);
-    background:rgba(255,255,255,.88);
-    border-radius:12px;
-    padding:10px 12px;
-    cursor:pointer;
-    text-align:start;
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .history-item:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(7,26,22,.08)}
-  .history-item strong{
-    display:block;
-    font-size:11px;
-    color:var(--wa-header-2);
-    margin-bottom:4px;
-    font-family:'Cairo',sans-serif;
-  }
-  .history-item span{
-    display:block;
-    font-size:11.5px;
-    line-height:1.75;
-    color:var(--ink);
-    white-space:pre-wrap;
-    word-break:break-word;
-  }
+  .tpl-add-card span{font-size:22px;font-weight:800;line-height:1}
 
-  .hint-list{
-    width:min(600px,92%);
-    align-self:center;
-    margin:6px 0 0;padding:0;list-style:none;
-    display:grid;gap:8px;
+  .sheet{position:fixed;inset:0;background:rgba(7,26,22,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+  .sheet.show{display:flex}
+  .sheet-card{width:min(420px,100%);background:#fff;border-radius:16px;padding:16px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+  .sheet-card h3{margin:0 0 10px;font-family:'Cairo',sans-serif;font-size:15px;display:flex;align-items:center;gap:8px}
+  .sheet-card input[type="text"], .sheet-card textarea{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;
+    font:inherit;font-size:15px;margin-bottom:8px;outline:none;color:var(--ink);
   }
-  .hint-list li{
-    background:rgba(255,255,255,.7);
-    border:1px dashed var(--line);
-    border-radius:10px;
-    padding:9px 12px;
-    font-size:11px;line-height:1.7;color:var(--muted);
-    display:flex;gap:8px;
+  .sheet-card textarea{min-height:110px;resize:vertical;line-height:1.6}
+  .sheet-card input[type="text"]:focus, .sheet-card textarea:focus{border-color:var(--wa-header-2);box-shadow:0 0 0 3px rgba(18,140,126,.12)}
+  .icon-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .icon-picker button{
+    width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    font-size:15px;cursor:pointer;display:grid;place-items:center;
   }
-  .hint-list li::before{content:"ℹ️";flex:0 0 auto}
-  .hint-list strong{display:block;color:var(--ink);margin-bottom:2px;font-family:'Cairo',sans-serif}
+  .icon-picker button.active{border-color:var(--wa-header-2);background:#e8f7f3}
+  .sheet-actions{display:flex;gap:8px}
+  .sheet-actions button{
+    flex:1;height:42px;border-radius:11px;font-weight:800;font-size:13px;cursor:pointer;
+  }
+  .sheet-btn-cancel{border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .sheet-btn-save{border:none;background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));color:#fff}
+  .sheet-btn-danger{border:none;background:#e0453c;color:#fff}
 
-  /* ---- compose bar ---- */
-  .compose-bar{
-    position:sticky;bottom:0;
-    background:#f0f2f5;
-    border-top:1px solid var(--line);
-    padding:10px 14px;
-    padding-bottom:max(10px, env(safe-area-inset-bottom));
-    padding-inline-start:max(14px, env(safe-area-inset-left));
-    padding-inline-end:max(14px, env(safe-area-inset-right));
-    display:flex;align-items:center;gap:10px;
-    justify-content:center;
-    flex-wrap:wrap;
+  .phrase-list{display:flex;flex-wrap:wrap;gap:7px;min-height:34px}
+  .phrase-list:empty::after{content:"لا توجد عبارات بعد";font-size:11.5px;color:var(--muted)}
+  .phrase-chip{
+    display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid var(--line);
+    background:#fff;border-radius:999px;padding:7px 9px 7px 12px;font:inherit;font-size:11.5px;
+    color:var(--ink);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;
   }
-  .compose-icon-btn{
-    height:44px;padding:0 16px;
-    border:1px solid var(--line);border-radius:999px;
-    background:#fff;color:var(--wa-header);font-weight:800;font-size:13px;cursor:pointer;
-    display:flex;align-items:center;gap:6px;
-  }
-  .compose-icon-btn:hover{background:#f7fafa}
-  .send-btn{
-    width:50px;height:50px;border-radius:50%;border:none;
-    background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));
-    color:#fff;font-size:19px;cursor:pointer;
-    display:grid;place-items:center;
-    box-shadow:0 6px 16px rgba(18,140,126,.35);
-    order:5;
-  }
-  .send-btn:active{transform:scale(.94)}
+  html[dir="ltr"] .phrase-chip{padding:7px 12px 7px 9px}
+  .phrase-chip:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(7,26,22,.08)}
+  .phrase-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+  .phrase-del{flex:0 0 auto;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:12px;background:rgba(0,0,0,.05)}
+  .phrase-del:hover{background:#fde2e1;color:#c0392b}
+  .phrase-clear{display:block;margin:8px auto 0;border:none;background:none;cursor:pointer;font:inherit;font-size:10.5px;color:var(--muted);padding:3px 6px}
+  .phrase-clear:hover{color:#c0392b}
+
+  .result-card{background:var(--wa-out);border:1px solid #bdeeb2}
+  .preview{min-height:56px;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-word;line-height:1.75;font-size:14px;color:var(--ink)}
+  .result-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--muted)}
+  .ticks{color:var(--tick);letter-spacing:-2px;transition:color .35s ease}
+  .ticks.read{color:var(--tick-read)}
+
+  details.notes{width:100%;font-size:11px;color:var(--muted)}
+  details.notes summary{cursor:pointer;font-weight:700;color:var(--wa-header);list-style:none;padding:4px 2px}
+  details.notes summary::-webkit-details-marker{display:none}
+  details.notes summary::before{content:"▸ ";display:inline-block;transition:transform .15s ease}
+  details.notes[open] summary::before{transform:rotate(90deg)}
+  details.notes ul{margin:4px 0 2px;padding-inline-start:16px;display:grid;gap:4px}
 
   .toast{
-    position:fixed;inset:auto 14px 84px 14px;margin:auto;
-    width:min(360px,calc(100% - 28px));
-    background:#0f172a;color:#fff;border-radius:12px;padding:11px 14px;
-    text-align:center;font-size:12.5px;font-weight:700;
-    box-shadow:0 20px 40px rgba(15,23,42,.3);
-    opacity:0;transform:translateY(14px);pointer-events:none;transition:.2s ease;
+    position:fixed;left:14px;right:14px;bottom:max(18px, env(safe-area-inset-bottom));margin:auto;width:min(360px,calc(100% - 28px));
+    background:#0f172a;color:#fff;border-radius:12px;padding:10px 14px;text-align:center;font-size:12px;font-weight:700;
+    box-shadow:0 20px 40px rgba(15,23,42,.3);opacity:0;transform:translateY(14px);pointer-events:none;transition:.2s ease;
   }
   .toast.show{opacity:1;transform:translateY(0)}
 
-  @media (max-width:560px){
-    .chat-area{padding:12px 8px 8px}
-    .toolbar{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:10px 4px;padding:12px 6px}
-    .toolbar--pro{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .preset-grid{grid-template-columns:1fr;width:100%}
-    .phrase-grid{grid-template-columns:1fr;width:100%}
-    .history-list{width:100%}
-    .hint-list{width:100%}
-    .bubble{max-width:94%}
-    .tool-ico{width:42px;height:42px;font-size:14px}
-    .contact-name{font-size:14px}
-    .intro-banner{max-width:94%;padding:10px 12px}
-    .compose-icon-btn{padding:0 12px;font-size:12px;height:42px}
-    .send-btn{width:46px;height:46px;font-size:17px}
-    .wa-topbar{gap:8px}
-    .circle-btn{width:32px;height:32px}
-    .lang-btn{min-width:32px;height:32px;padding:0 9px;font-size:12px}
-    .header-actions{gap:6px}
-  }
+  .install-sheet{position:fixed;inset:0;background:rgba(7,26,22,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+  .install-sheet.show{display:flex}
+  .install-card{width:min(420px,100%);background:#fff;border-radius:16px;padding:16px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+  .install-card h3{margin:0 0 8px;font-family:'Cairo',sans-serif;font-size:15px;display:flex;align-items:center;gap:8px}
+  .install-card ol{margin:0 0 12px;padding-inline-start:18px;font-size:12.5px;line-height:1.9}
+  .install-close{width:100%;height:42px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--wa-header-2),var(--wa-green));color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+
   @media (max-width:380px){
-    .toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .toolbar--pro{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .tool-btn strong{font-size:11px}
-    .contact-status{font-size:10.5px}
-    .compose-bar{gap:8px}
-    .compose-icon-btn span{display:none}
-    .compose-icon-btn{width:44px;padding:0;justify-content:center}
-    .avatar{width:34px;height:34px;font-size:13px}
-    .home-btn{width:34px;height:34px}
-  }
-  @supports (-webkit-touch-callout: none){
-    .app-shell{min-height:-webkit-fill-available}
+    .tool-grid{gap:4px}
+    .tool-row{padding:6px 5px;gap:5px}
+    .tool-ico-sm{width:22px;height:22px;font-size:10px}
+    .tool-row strong{font-size:10.5px}
+    .tool-row .ex{display:none}
+    .tab-btn{font-size:10.5px}
+    .phrase-text{max-width:130px}
+    .tpl-grid{gap:4px}
+    .tpl-card{padding:8px 3px 6px;min-height:60px}
+    .tpl-card .tpl-title{font-size:9px}
+    .tpl-card .tpl-emoji{font-size:15px}
   }
 </style>
 </head>
@@ -443,7 +278,7 @@
   <div class="app-shell">
     <header class="wa-topbar">
       <a class="home-btn" href="https://khalidsaif912.github.io/new/" aria-label="Home" title="Home">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>
         </svg>
       </a>
@@ -454,104 +289,96 @@
       </div>
       <div class="header-actions">
         <button class="circle-btn" id="shareBtn" type="button" aria-label="Share" title="مشاركة">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
             <path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5"/>
           </svg>
         </button>
         <button class="circle-btn" id="installBtn" type="button" aria-label="Install" title="تثبيت التطبيق" style="display:none">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+          </svg>
+        </button>
+        <button class="circle-btn" id="settingsBtn" type="button" aria-label="Settings" title="الإعدادات">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>
           </svg>
         </button>
         <button class="lang-btn" id="langBtn" type="button">EN</button>
       </div>
     </header>
 
-    <main class="chat-area">
-      <div class="sys-pill-row">
-        <div class="intro-banner">
-          <strong id="heroTitle">تنسيق نص واتساب</strong>
-          <span id="heroDesc">اكتب النص مرة واحدة ثم حوّله بسرعة إلى تنسيقات مناسبة لواتساب.</span>
+    <main class="main">
+      <div class="card">
+        <div class="card-label">
+          <span>✏️ <span id="inputTitle">النص الأصلي</span></span>
+          <button class="mini-icon-btn" id="clearBtn" type="button" aria-label="Clear" title="مسح">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/>
+            </svg>
+            <span id="clearLbl">مسح</span>
+          </button>
+        </div>
+        <textarea id="sourceText" placeholder="اكتب هنا النص الذي تريد تنسيقه..."></textarea>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" type="button" data-tab="basic"><span class="ic">✨</span><span id="tabBasicLbl">أساسية</span></button>
+        <button class="tab-btn" type="button" data-tab="pro"><span class="ic">⭐</span><span id="tabProLbl">احترافية</span></button>
+        <button class="tab-btn" type="button" data-tab="templates"><span class="ic">📋</span><span id="tabTemplatesLbl">قوالب</span></button>
+        <button class="tab-btn" type="button" data-tab="phrases"><span class="ic">💬</span><span id="tabPhrasesLbl">عباراتي</span></button>
+      </div>
+
+      <div class="tab-panel" data-panel="basic" id="panelBasic">
+        <div class="tool-grid">
+          <button class="tool-row" type="button" data-format="bold"><span class="tool-ico-sm">B</span><span class="info"><strong id="boldLbl">تعريض</strong><span class="ex">*text*</span></span></button>
+          <button class="tool-row" type="button" data-format="italic"><span class="tool-ico-sm">i</span><span class="info"><strong id="italicLbl">مائل</strong><span class="ex">_text_</span></span></button>
+          <button class="tool-row" type="button" data-format="strike"><span class="tool-ico-sm">S̶</span><span class="info"><strong id="strikeLbl">مشطوب</strong><span class="ex">~text~</span></span></button>
+          <button class="tool-row" type="button" data-format="mono"><span class="tool-ico-sm">⌨</span><span class="info"><strong id="monoLbl">كود</strong><span class="ex">```text```</span></span></button>
+          <button class="tool-row" type="button" data-format="quote"><span class="tool-ico-sm">❝</span><span class="info"><strong id="quoteLbl">اقتباس</strong><span class="ex">&gt; line</span></span></button>
+          <button class="tool-row" type="button" data-format="bullets"><span class="tool-ico-sm">•</span><span class="info"><strong id="bulletsLbl">قائمة نقطية</strong><span class="ex">• item</span></span></button>
+          <button class="tool-row" type="button" data-format="numbers"><span class="tool-ico-sm">1.</span><span class="info"><strong id="numbersLbl">قائمة رقمية</strong><span class="ex">1. item</span></span></button>
+          <button class="tool-row" type="button" data-format="underline"><span class="tool-ico-sm">U̲</span><span class="info"><strong id="underlineLbl">تسطير مرئي</strong><span class="ex">u̲n̲d̲e̲r̲</span></span></button>
+          <button class="tool-row" type="button" data-format="box"><span class="tool-ico-sm">🟨</span><span class="info"><strong id="boxLbl">تضليل بديل</strong><span class="ex">🟨 text 🟨</span></span></button>
         </div>
       </div>
 
-      <div class="bubble bubble--in">
-        <div class="bubble-meta">✏️ <span id="inputTitle">النص الأصلي</span></div>
-        <p class="bubble-sub" id="inputSub">يمكنك كتابة فقرة أو عدة أسطر. بعض الخيارات تطبق على كل سطر تلقائياً.</p>
-        <textarea id="sourceText" placeholder="اكتب هنا النص الذي تريد تنسيقه..."></textarea>
-        <div class="bubble-time">✍️ typing…</div>
+      <div class="tab-panel" data-panel="pro" id="panelPro" hidden>
+        <div class="tool-grid">
+          <button class="tool-row has-edit" type="button" data-format="boldItalic"><span class="tool-ico-sm">Bi</span><span class="info"><strong id="boldItalicLbl">عريض + مائل</strong><span class="ex">*_text_*</span></span><span class="tool-edit" data-edit-key="boldItalic" title="edit">✎</span></button>
+          <button class="tool-row has-edit" type="button" data-format="headline"><span class="tool-ico-sm">🏷</span><span class="info"><strong id="headlineLbl">عنوان رسمي</strong><span class="ex">*العنوان*</span></span><span class="tool-edit" data-edit-key="headline" title="edit">✎</span></button>
+          <button class="tool-row has-edit" type="button" data-format="announce"><span class="tool-ico-sm">📣</span><span class="info"><strong id="announceLbl">إعلان جاهز</strong><span class="ex">structured</span></span><span class="tool-edit" data-edit-key="announce" title="edit">✎</span></button>
+          <button class="tool-row has-edit" type="button" data-format="admin"><span class="tool-ico-sm">🏢</span><span class="info"><strong id="adminLbl">رسالة إدارية</strong><span class="ex">formal</span></span><span class="tool-edit" data-edit-key="admin" title="edit">✎</span></button>
+          <button class="tool-row has-edit" type="button" data-format="warning"><span class="tool-ico-sm">⚠</span><span class="info"><strong id="warningLbl">تنبيه مهم</strong><span class="ex">alert</span></span><span class="tool-edit" data-edit-key="warning" title="edit">✎</span></button>
+          <button class="tool-row has-edit" type="button" data-format="meeting"><span class="tool-ico-sm">📅</span><span class="info"><strong id="meetingLbl">موعد / اجتماع</strong><span class="ex">time + place</span></span><span class="tool-edit" data-edit-key="meeting" title="edit">✎</span></button>
+        </div>
       </div>
 
-      <div class="sys-pill-row"><span class="sys-pill" id="basicSectionLbl">تنسيقات أساسية</span></div>
-      <div class="toolbar">
-        <button class="tool-btn" type="button" data-format="bold"><span class="tool-ico">B</span><strong id="boldLbl">تعريض</strong><span>*text*</span></button>
-        <button class="tool-btn" type="button" data-format="italic"><span class="tool-ico">i</span><strong id="italicLbl">مائل</strong><span>_text_</span></button>
-        <button class="tool-btn" type="button" data-format="strike"><span class="tool-ico">S̶</span><strong id="strikeLbl">مشطوب</strong><span>~text~</span></button>
-        <button class="tool-btn" type="button" data-format="mono"><span class="tool-ico">⌨</span><strong id="monoLbl">كود</strong><span>```text```</span></button>
-        <button class="tool-btn" type="button" data-format="quote"><span class="tool-ico">❝</span><strong id="quoteLbl">اقتباس</strong><span>&gt; line</span></button>
-        <button class="tool-btn" type="button" data-format="inline"><span class="tool-ico">`&gt;</span><strong id="inlineLbl">كود قصير</strong><span>`text`</span></button>
-        <button class="tool-btn" type="button" data-format="bullets"><span class="tool-ico">•</span><strong id="bulletsLbl">قائمة نقطية</strong><span>• item</span></button>
-        <button class="tool-btn" type="button" data-format="numbers"><span class="tool-ico">1.</span><strong id="numbersLbl">قائمة رقمية</strong><span>1. item</span></button>
-        <button class="tool-btn" type="button" data-format="underline"><span class="tool-ico">U̲</span><strong id="underlineLbl">تسطير مرئي</strong><span>u̲n̲d̲e̲r̲</span></button>
-        <button class="tool-btn" type="button" data-format="box"><span class="tool-ico">▦</span><strong id="boxLbl">تضليل بديل</strong><span>code block</span></button>
+      <div class="tab-panel" data-panel="templates" id="panelTemplates" hidden>
+        <div class="tpl-grid" id="tplGrid"></div>
       </div>
 
-      <div class="sys-pill-row"><span class="sys-pill" id="proSectionLbl">تنسيقات احترافية جاهزة</span></div>
-      <div class="toolbar toolbar--pro">
-        <button class="tool-btn" type="button" data-format="boldItalic"><span class="tool-ico">Bi</span><strong id="boldItalicLbl">عريض + مائل</strong><span>*_text_*</span></button>
-        <button class="tool-btn" type="button" data-format="headline"><span class="tool-ico">🏷</span><strong id="headlineLbl">عنوان رسمي</strong><span>*العنوان*</span></button>
-        <button class="tool-btn" type="button" data-format="announce"><span class="tool-ico">📣</span><strong id="announceLbl">إعلان جاهز</strong><span>structured</span></button>
-        <button class="tool-btn" type="button" data-format="admin"><span class="tool-ico">🏢</span><strong id="adminLbl">رسالة إدارية</strong><span>formal</span></button>
-        <button class="tool-btn" type="button" data-format="warning"><span class="tool-ico">⚠</span><strong id="warningLbl">تنبيه مهم</strong><span>alert</span></button>
-        <button class="tool-btn" type="button" data-format="meeting"><span class="tool-ico">📅</span><strong id="meetingLbl">موعد / اجتماع</strong><span>time + place</span></button>
+      <div class="tab-panel" data-panel="phrases" id="panelPhrases" hidden>
+        <div class="phrase-list" id="phraseList"></div>
+        <button class="phrase-clear" id="clearPhrasesBtn" type="button">🗑️ <span id="clearPhrasesLbl">مسح المحفوظات</span></button>
       </div>
 
-      <div class="sys-pill-row"><span class="sys-pill" id="presetSectionLbl">قوالب سريعة</span></div>
-      <div class="preset-grid">
-        <button class="preset-btn" type="button" data-template="schedule">
-          <strong>🗓️ <span id="presetScheduleLbl">قالب جدول دوام</span></strong>
-          <span id="presetScheduleSub">عنوان + تاريخ + فريق + ملاحظات</span>
-        </button>
-        <button class="preset-btn" type="button" data-template="announcement">
-          <strong>📣 <span id="presetAnnouncementLbl">قالب إعلان</span></strong>
-          <span id="presetAnnouncementSub">مقدمة + تفاصيل + إجراء مطلوب</span>
-        </button>
-        <button class="preset-btn" type="button" data-template="admin">
-          <strong>🏢 <span id="presetAdminLbl">قالب إداري</span></strong>
-          <span id="presetAdminSub">جهة + موضوع + نقاط + ختام</span>
-        </button>
-        <button class="preset-btn" type="button" data-template="handover">
-          <strong>🔁 <span id="presetHandoverLbl">قالب تسليم</span></strong>
-          <span id="presetHandoverSub">تم الإنجاز + المتبقي + ملاحظات</span>
-        </button>
-      </div>
-
-      <div class="sys-pill-row"><span class="sys-pill" id="commonSectionLbl">عبارات شائعة</span></div>
-      <div class="phrase-grid" id="commonPhrases"></div>
-
-      <div class="sys-pill-row"><span class="sys-pill" id="historySectionLbl">آخر ما نسخته</span></div>
-      <div class="history-list" id="historyList"></div>
-
-      <div class="bubble bubble--out">
-        <div class="bubble-meta">✅ <span id="resultTitle">النتيجة الجاهزة</span></div>
-        <p class="bubble-sub" id="resultSub">اضغط أحد الأزرار أعلاه ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.</p>
+      <div class="card result-card">
+        <div class="card-label"><span>✅ <span id="resultTitle">النتيجة الجاهزة</span></span></div>
         <div class="preview" id="preview"></div>
-        <div class="bubble-time">now <span class="ticks" id="ticks">✓✓</span></div>
+        <div class="result-meta"><span></span><span>now <span class="ticks" id="ticks">✓✓</span></span></div>
       </div>
 
-      <ul class="hint-list">
-        <li><div><strong id="tip1Title">التسطير</strong><span id="tip1Body">واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.</span></div></li>
-        <li><div><strong id="tip2Title">التضليل</strong><span id="tip2Body">واتساب لا يملك لون تظليل حقيقي للنص. أقرب بديل عملي هو تنسيق الكود أو بلوك الاقتباس.</span></div></li>
-        <li><div><strong id="tip3Title">القوائم</strong><span id="tip3Body">إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.</span></div></li>
-      </ul>
+      <details class="notes">
+        <summary id="notesTitle">نصائح مفيدة</summary>
+        <ul>
+          <li><strong id="tip1Title">التسطير:</strong> <span id="tip1Body">واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.</span></li>
+          <li><strong id="tip2Title">التضليل:</strong> <span id="tip2Body">واتساب لا يملك لون تظليل حقيقي للنص، لذلك يضيف هذا الخيار رمز 🟨 حول كل سطر كبديل مرئي يشبه القلم الفسفوري.</span></li>
+          <li><strong id="tip3Title">القوائم:</strong> <span id="tip3Body">إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.</span></li>
+        </ul>
+      </details>
     </main>
-
-    <footer class="compose-bar">
-      <button class="compose-icon-btn" id="swapBtn" type="button">🔁 <span id="swapLbl">استخدم كنص جديد</span></button>
-      <button class="compose-icon-btn" id="clearBtn" type="button">🗑️ <span id="clearLbl">مسح</span></button>
-      <button class="send-btn" id="copyBtn" type="button" aria-label="copy" title="نسخ">➤</button>
-    </footer>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -568,25 +395,53 @@
     </div>
   </div>
 
+  <div class="sheet" id="tplEditorSheet">
+    <div class="sheet-card">
+      <h3>📝 <span id="tplEditorTitleLbl">قالب جديد</span></h3>
+      <div class="icon-picker" id="tplIconPicker"></div>
+      <input type="text" id="tplEditTitle" maxlength="30">
+      <textarea id="tplEditBody"></textarea>
+      <div class="sheet-actions">
+        <button class="sheet-btn-cancel" id="tplEditCancel" type="button">إلغاء</button>
+        <button class="sheet-btn-save" id="tplEditSave" type="button">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="proEditorSheet">
+    <div class="sheet-card">
+      <h3>⭐ <span id="proEditorTitleLbl">تعديل الزر الاحترافي</span></h3>
+      <input type="text" id="proEditTitle" maxlength="24">
+      <p class="sheet-hint" id="proEditorHint">استخدم {text} لتحديد مكان النص الذي تكتبه.</p>
+      <textarea id="proEditPattern" style="min-height:130px"></textarea>
+      <div class="sheet-actions">
+        <button class="sheet-btn-cancel" id="proEditCancel" type="button">إلغاء</button>
+        <button class="sheet-btn-save" id="proEditSave" type="button">حفظ</button>
+      </div>
+      <button class="phrase-clear" id="proEditReset" type="button">↺ <span id="proResetLbl">استعادة الافتراضي</span></button>
+    </div>
+  </div>
+
+  <div class="sheet" id="resetSheet">
+    <div class="sheet-card">
+      <h3>⚠️ <span id="resetAllTitle">إعادة ضبط جميع الإعدادات</span></h3>
+      <p class="sheet-hint" id="resetAllDesc">سيتم حذف عباراتك المحفوظة، القوالب المخصصة، وأي أنماط احترافية عدّلتها، والعودة للإعدادات الافتراضية. لا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="sheet-actions">
+        <button class="sheet-btn-cancel" id="resetCancelBtn" type="button">إلغاء</button>
+        <button class="sheet-btn-danger" id="resetConfirmBtn" type="button">تأكيد الحذف</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       var T = {
         ar: {
-          badge: 'WA TEXT STYLER',
-          online: 'متصل الآن',
-          heroTitle: 'تنسيق نص واتساب',
-          heroDesc: 'اكتب النص مرة واحدة ثم حوّله بسرعة إلى تنسيقات مناسبة لواتساب مثل التعريض، المائل، الشطب، الكود، الاقتباس، القوائم، وحتى بدائل مرئية مثل التسطير.',
-          inputTitle: 'النص الأصلي',
-          inputSub: 'يمكنك كتابة فقرة أو عدة أسطر. بعض الخيارات تطبق على كل سطر تلقائياً.',
-          basicSection: 'تنسيقات أساسية',
-          proSection: 'تنسيقات احترافية جاهزة',
-          presetSection: 'قوالب سريعة',
+          badge: 'WA TEXT STYLER', online: 'متصل الآن',
+          inputTitle: 'النص الأصلي', placeholder: 'اكتب هنا النص الذي تريد تنسيقه...',
+          tabBasic: 'أساسية', tabPro: 'احترافية', tabTemplates: 'قوالب', tabPhrases: 'عباراتي',
           resultTitle: 'النتيجة الجاهزة',
-          resultSub: 'اضغط أحد الأزرار أعلاه ليظهر النص النهائي هنا ثم انسخه مباشرة إلى واتساب.',
-          copy: 'نسخ النتيجة',
-          swap: 'استخدم كنص جديد',
-          clear: 'مسح',
-          placeholder: 'اكتب هنا النص الذي تريد تنسيقه...',
+          swap: 'استخدم كمدخل', clear: 'مسح', clearPhrases: 'مسح المحفوظات', copyAgain: 'نسخ مرة أخرى',
           bold: 'تعريض', italic: 'مائل', strike: 'مشطوب', mono: 'كود', quote: 'اقتباس', inline: 'كود قصير',
           bullets: 'قائمة نقطية', numbers: 'قائمة رقمية', underline: 'تسطير مرئي', box: 'تضليل بديل',
           boldItalic: 'عريض + مائل', headline: 'عنوان رسمي', announce: 'إعلان جاهز', admin: 'رسالة إدارية',
@@ -595,44 +450,38 @@
           adminBodyEnd: 'شاكرين تعاونكم.',
           warningBodyEnd: 'يرجى الانتباه.',
           meetingTime: 'الزمان:', meetingPlace: 'المكان:', meetingNeed: 'المطلوب:',
-          presetSchedule: 'قالب جدول دوام', presetScheduleSub: 'عنوان + تاريخ + فريق + ملاحظات',
-          presetAnnouncement: 'قالب إعلان', presetAnnouncementSub: 'مقدمة + تفاصيل + إجراء مطلوب',
-          presetAdmin: 'قالب إداري', presetAdminSub: 'جهة + موضوع + نقاط + ختام',
-          presetHandover: 'قالب تسليم', presetHandoverSub: 'تم الإنجاز + المتبقي + ملاحظات',
-          commonSection: 'عبارات شائعة',
-          historySection: 'آخر ما نسخته',
-          historyEmpty: 'لا يوجد سجل محلي بعد. أي عبارة تنسخها ستظهر هنا.',
-          copiedAuto: 'تم التنسيق والنسخ',
-          copiedFromLibrary: 'تم نسخ العبارة',
-          tip1Title: 'التسطير', tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
-          tip2Title: 'التضليل', tip2Body: 'واتساب لا يملك لون تظليل حقيقي للنص. أقرب بديل عملي هو تنسيق الكود أو بلوك الاقتباس.',
-          tip3Title: 'القوائم', tip3Body: 'إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.',
+          newTemplate: 'قالب جديد', editTemplate: 'تعديل القالب',
+          tplTitlePh: 'اسم القالب', tplBodyPh: 'نص القالب...',
+          save: 'حفظ', cancel: 'إلغاء',
+          maxTemplates: 'الحد الأقصى 8 قوالب — احذف واحداً أولاً',
+          fillBoth: 'الرجاء كتابة الاسم والنص',
+          templateSaved: 'تم حفظ القالب', templateDeleted: 'تم حذف القالب',
+          editPattern: 'تعديل نمط', editProButton: 'تعديل الزر الاحترافي', patternHint: 'استخدم {text} لتحديد مكان النص الذي تكتبه.',
+          patternSaved: 'تم حفظ النمط', patternReset: 'تمت الاستعادة للافتراضي', needPlaceholder: 'يجب أن يحتوي النمط على {text}',
+          resetDefault: 'استعادة الافتراضي',
+          resetAllTitle: 'إعادة ضبط جميع الإعدادات',
+          resetAllDesc: 'سيتم حذف عباراتك المحفوظة، القوالب المخصصة، وأي أنماط احترافية عدّلتها، والعودة للإعدادات الافتراضية. لا يمكن التراجع عن هذا الإجراء.',
+          resetAllConfirm: 'تأكيد الحذف', resetAllCancel: 'إلغاء', resetAllDone: 'تمت إعادة الضبط',
+          notesTitle: 'نصائح مفيدة',
+          tip1Title: 'التسطير:', tip1Body: 'واتساب لا يدعم خطًا سفليًا رسميًا، لذلك استخدمت حروف Unicode تعطي شكلاً قريبًا من التسطير.',
+          tip2Title: 'التضليل:', tip2Body: 'واتساب لا يملك لون تظليل حقيقي للنص، لذلك يضيف هذا الخيار رمز 🟨 حول كل سطر كبديل مرئي يشبه القلم الفسفوري.',
+          tip3Title: 'القوائم:', tip3Body: 'إذا كان النص من عدة أسطر فسيتم تطبيق الترقيم أو التعداد على كل سطر تلقائياً.',
           copied: 'تم نسخ النص', empty: 'اكتب النص أولاً', previewEmpty: 'سيظهر النص المنسق هنا', langBtn: 'EN',
-          shareTitle: 'منسّق نص واتساب',
-          shareText: 'أداة سريعة لتنسيق النصوص بشكل جاهز للنسخ في واتساب',
-          linkCopied: 'تم نسخ رابط الصفحة',
-          shareFailed: 'تعذّرت المشاركة',
+          shareTitle: 'منسّق نص واتساب', shareText: 'أداة سريعة لتنسيق النصوص بشكل جاهز للنسخ في واتساب',
+          linkCopied: 'تم نسخ رابط الصفحة', shareFailed: 'تعذّرت المشاركة',
           installTitle: 'تثبيت التطبيق على الشاشة الرئيسية',
           installStep1: 'اضغط زر <b>مشاركة</b> ⬆️ في متصفح سفاري.',
           installStep2: 'اختر <b>إضافة إلى الشاشة الرئيسية</b>.',
           installStep3: 'اضغط <b>إضافة</b> — وستظهر الأداة كتطبيق مستقل.',
-          installClose: 'حسناً',
-          installed: 'تم تثبيت التطبيق'
+          installClose: 'حسناً', installed: 'تم تثبيت التطبيق',
+          templateLoaded: 'تم تحميل القالب، عدّله ثم نسّقه'
         },
         en: {
-          badge: 'WA TEXT STYLER',
-          online: 'Online',
-          heroTitle: 'WhatsApp Text Styler',
-          heroDesc: 'Type your text once, then turn it into ready WhatsApp styles like bold, italic, strike, code, quotes, lists, and visual alternatives such as underline.',
-          inputTitle: 'Source Text',
-          inputSub: 'You can type one paragraph or multiple lines. Some options apply line by line automatically.',
-          basicSection: 'Basic styles',
-          proSection: 'Professional ready styles',
-          presetSection: 'Quick templates',
+          badge: 'WA TEXT STYLER', online: 'Online',
+          inputTitle: 'Source Text', placeholder: 'Type the text you want to style here...',
+          tabBasic: 'Basic', tabPro: 'Pro', tabTemplates: 'Templates', tabPhrases: 'My Phrases',
           resultTitle: 'Ready Output',
-          resultSub: 'Tap any style button above, then copy the final result directly into WhatsApp.',
-          copy: 'Copy Result', swap: 'Use as new text', clear: 'Clear',
-          placeholder: 'Type the text you want to style here...',
+          swap: 'Use as input', clear: 'Clear', clearPhrases: 'Clear history', copyAgain: 'Copy again',
           bold: 'Bold', italic: 'Italic', strike: 'Strike', mono: 'Code Block', quote: 'Quote', inline: 'Inline Code',
           bullets: 'Bulleted List', numbers: 'Numbered List', underline: 'Visual Underline', box: 'Shade Alternative',
           boldItalic: 'Bold + Italic', headline: 'Formal Heading', announce: 'Announcement', admin: 'Administrative',
@@ -641,29 +490,31 @@
           adminBodyEnd: 'Thank you for your cooperation.',
           warningBodyEnd: 'Please take note.',
           meetingTime: 'Time:', meetingPlace: 'Place:', meetingNeed: 'Required:',
-          presetSchedule: 'Duty schedule template', presetScheduleSub: 'Title + date + team + notes',
-          presetAnnouncement: 'Announcement template', presetAnnouncementSub: 'Opening + details + required action',
-          presetAdmin: 'Administrative template', presetAdminSub: 'From + subject + points + closing',
-          presetHandover: 'Handover template', presetHandoverSub: 'Completed + pending + notes',
-          commonSection: 'Common phrases',
-          historySection: 'Recently copied',
-          historyEmpty: 'No local history yet. Anything you copy will appear here.',
-          copiedAuto: 'Styled and copied',
-          copiedFromLibrary: 'Phrase copied',
-          tip1Title: 'Underline', tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
-          tip2Title: 'Shading', tip2Body: 'WhatsApp has no real text highlight color. The closest practical alternative is code formatting or quote blocks.',
-          tip3Title: 'Lists', tip3Body: 'If your text contains multiple lines, numbering or bullets will be applied to each line automatically.',
+          newTemplate: 'New Template', editTemplate: 'Edit Template',
+          tplTitlePh: 'Template name', tplBodyPh: 'Template text...',
+          save: 'Save', cancel: 'Cancel',
+          maxTemplates: 'Max 8 templates — delete one first',
+          fillBoth: 'Please fill in both name and text',
+          templateSaved: 'Template saved', templateDeleted: 'Template deleted',
+          editPattern: 'Edit pattern', editProButton: 'Edit Pro Button', patternHint: 'Use {text} to mark where your typed text will go.',
+          patternSaved: 'Pattern saved', patternReset: 'Reset to default', needPlaceholder: 'Pattern must include {text}',
+          resetDefault: 'Reset to default',
+          resetAllTitle: 'Reset all settings',
+          resetAllDesc: 'This will delete your saved phrases, custom templates, and any pro patterns you edited, and restore the defaults. This cannot be undone.',
+          resetAllConfirm: 'Confirm delete', resetAllCancel: 'Cancel', resetAllDone: 'Settings reset',
+          notesTitle: 'Useful tips',
+          tip1Title: 'Underline:', tip1Body: 'WhatsApp does not support a true underline format, so this tool uses Unicode characters that look underlined.',
+          tip2Title: 'Shading:', tip2Body: 'WhatsApp has no real text highlight color, so this option wraps each line with 🟨 as a visual highlighter-pen alternative.',
+          tip3Title: 'Lists:', tip3Body: 'If your text contains multiple lines, numbering or bullets will be applied to each line automatically.',
           copied: 'Text copied', empty: 'Type some text first', previewEmpty: 'Formatted text will appear here', langBtn: 'ع',
-          shareTitle: 'WhatsApp Text Styler',
-          shareText: 'A quick tool to style text ready to paste into WhatsApp',
-          linkCopied: 'Page link copied',
-          shareFailed: 'Could not share',
+          shareTitle: 'WhatsApp Text Styler', shareText: 'A quick tool to style text ready to paste into WhatsApp',
+          linkCopied: 'Page link copied', shareFailed: 'Could not share',
           installTitle: 'Add to your Home Screen',
           installStep1: 'Tap the <b>Share</b> ⬆️ button in Safari.',
           installStep2: 'Choose <b>Add to Home Screen</b>.',
           installStep3: 'Tap <b>Add</b> — the tool will open like a standalone app.',
-          installClose: 'Got it',
-          installed: 'App installed'
+          installClose: 'Got it', installed: 'App installed',
+          templateLoaded: 'Template loaded — edit then style it'
         }
       };
 
@@ -673,20 +524,12 @@
       var toast = document.getElementById('toast');
       var ticks = document.getElementById('ticks');
       var latest = '';
-      var HISTORY_KEY = 'waTextHistoryV1';
 
       function t(key) { return (T[lang] && T[lang][key]) || T.ar[key] || key; }
 
       function lines(text) { return text.split(/\r?\n/).map(function (line) { return line.trimEnd(); }); }
       function nonEmptyLines(text) { return lines(text).filter(function (line) { return line.trim() !== ''; }); }
       function normalizeInput(text) { return String(text || '').replace(/\\n/g, '\n'); }
-      function wrapLines(text, prefix, suffix) {
-        return lines(text).map(function (line) {
-          var trimmed = line.trim();
-          if (!trimmed) return '';
-          return prefix + trimmed + suffix;
-        }).join('\n');
-      }
 
       function underlineVisual(text) {
         return text.split('').map(function (ch) {
@@ -696,149 +539,251 @@
         }).join('');
       }
 
-      function asHeading(text) {
-        var trimmed = text.trim();
-        return '*' + trimmed + '*\n' + '—'.repeat(Math.max(8, Math.min(24, trimmed.length)));
-      }
-      function asAnnouncement(text) { return '*' + t('announce') + '*\n\n' + text + '\n\n' + t('announceBodyEnd'); }
-      function asAdmin(text) { return '*' + t('admin') + '*\n\n' + text + '\n\n' + t('adminBodyEnd'); }
-      function asWarning(text) { return '⚠️ *' + t('warning') + '*\n\n' + text + '\n\n' + '*' + t('warningBodyEnd') + '*'; }
-      function asMeeting(text) { return '*' + t('meeting') + '*\n\n' + text + '\n\n' + t('meetingTime') + '\n' + t('meetingPlace') + '\n' + t('meetingNeed'); }
-
-      function templates() {
-        return {
-          schedule: lang === 'ar'
-            ? '*جدول الدوام*\n\nالتاريخ:\nالفترة:\nالفريق:\n\n1.\n2.\n3.\n\nملاحظات:'
-            : '*Duty Schedule*\n\nDate:\nShift:\nTeam:\n\n1.\n2.\n3.\n\nNotes:',
-          announcement: lang === 'ar'
-            ? '*إعلان*\n\nالموضوع:\n\nالتفاصيل:\n- \n- \n- \n\nالإجراء المطلوب:'
-            : '*Announcement*\n\nSubject:\n\nDetails:\n- \n- \n- \n\nRequired Action:',
-          admin: lang === 'ar'
-            ? '*رسالة إدارية*\n\nمن:\nإلى:\nالموضوع:\n\n1.\n2.\n3.\n\nشاكرين تعاونكم.'
-            : '*Administrative Message*\n\nFrom:\nTo:\nSubject:\n\n1.\n2.\n3.\n\nThank you for your cooperation.',
-          handover: lang === 'ar'
-            ? '*تسليم المناوبة*\n\nتم الإنجاز:\n- \n- \n\nالمتبقي:\n- \n- \n\nملاحظات:'
-            : '*Shift Handover*\n\nCompleted:\n- \n- \n\nPending:\n- \n- \n\nNotes:'
-        };
+      function asHighlight(text) {
+        return nonEmptyLines(text).map(function (line) { return '🟨 ' + line + ' 🟨'; }).join('\n') || text;
       }
 
-      function commonPhrases() {
-        if (lang === 'ar') {
-          return [
-            'السلام عليكم ورحمة الله وبركاته',
-            'صباح الخير جميعاً',
-            'مساء الخير جميعاً',
-            'يرجى التأكيد',
-            'تم الاستلام، شكراً لكم',
-            'جزاكم الله خيراً'
-          ];
+      /* ---- Pro tab: editable, saved patterns + titles ---- */
+      var PRO_PATTERNS_KEY = 'waProPatterns_v1';
+      var PRO_KEYS = ['boldItalic', 'headline', 'announce', 'admin', 'warning', 'meeting'];
+      var defaultProPatterns = {
+        ar: {
+          boldItalic: { title: 'عريض + مائل', pattern: '*_{text}_*' },
+          headline: { title: 'عنوان رسمي', pattern: '*{text}*\n————————————' },
+          announce: { title: 'إعلان جاهز', pattern: '*إعلان*\n\n{text}\n\nيرجى الاطلاع والتقيد بالمذكور.' },
+          admin: { title: 'رسالة إدارية', pattern: '*رسالة إدارية*\n\n{text}\n\nشاكرين تعاونكم.' },
+          warning: { title: 'تنبيه مهم', pattern: '⚠️ *تنبيه مهم*\n\n{text}\n\n*يرجى الانتباه.*' },
+          meeting: { title: 'موعد / اجتماع', pattern: '*موعد / اجتماع*\n\n{text}\n\nالزمان:\nالمكان:\nالمطلوب:' }
+        },
+        en: {
+          boldItalic: { title: 'Bold + Italic', pattern: '*_{text}_*' },
+          headline: { title: 'Formal Heading', pattern: '*{text}*\n————————————' },
+          announce: { title: 'Announcement', pattern: '*Announcement*\n\n{text}\n\nPlease review and follow the above.' },
+          admin: { title: 'Administrative', pattern: '*Administrative Message*\n\n{text}\n\nThank you for your cooperation.' },
+          warning: { title: 'Important Alert', pattern: '⚠️ *Important Alert*\n\n{text}\n\n*Please take note.*' },
+          meeting: { title: 'Meeting / Time', pattern: '*Meeting / Time*\n\n{text}\n\nTime:\nPlace:\nRequired:' }
         }
-        return [
-          'Peace be upon you ورحمة الله وبركاته',
-          'Good morning everyone',
-          'Good evening everyone',
-          'Please confirm',
-          'Received, thank you',
-          'Much appreciated'
-        ];
-      }
-
-      function getHistory() {
+      };
+      function loadProPatterns() {
         try {
-          var raw = localStorage.getItem(HISTORY_KEY);
-          var parsed = raw ? JSON.parse(raw) : [];
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (err) {
-          return [];
-        }
+          var raw = localStorage.getItem(PRO_PATTERNS_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.ar && parsed.en) return parsed;
+          }
+        } catch (e) { /* storage unavailable - fall back to defaults in-memory */ }
+        return JSON.parse(JSON.stringify(defaultProPatterns));
       }
-
-      function saveHistory(text) {
-        var clean = normalizeInput(text).trim();
-        if (!clean) return;
-        var items = getHistory().filter(function (item) { return item !== clean; });
-        items.unshift(clean);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 20)));
+      var proPatterns = loadProPatterns();
+      function saveProPatterns() {
+        try { localStorage.setItem(PRO_PATTERNS_KEY, JSON.stringify(proPatterns)); } catch (e) { /* ignore */ }
       }
-
-      function renderCommonPhrases() {
-        var wrap = document.getElementById('commonPhrases');
-        if (!wrap) return;
-        wrap.innerHTML = '';
-        commonPhrases().forEach(function (phrase, idx) {
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'phrase-btn';
-          btn.innerHTML = '<strong>' + (lang === 'ar' ? 'عبارة ' + (idx + 1) : 'Phrase ' + (idx + 1)) + '</strong><span>' + phrase + '</span>';
-          btn.addEventListener('click', function () {
-            source.value = phrase;
-            setPreview(phrase);
-            copyText(phrase, t('copiedFromLibrary'));
-          });
-          wrap.appendChild(btn);
+      function getProEntry(kind) {
+        return (proPatterns[lang] && proPatterns[lang][kind]) || defaultProPatterns[lang][kind];
+      }
+      function getProLabel(kind) { return getProEntry(kind).title; }
+      function applyProPattern(kind, text) {
+        var pat = getProEntry(kind).pattern || '{text}';
+        return pat.split('{text}').join(text);
+      }
+      function renderProLabels() {
+        PRO_KEYS.forEach(function (key) {
+          var el = document.getElementById(key + 'Lbl');
+          if (el) el.textContent = getProLabel(key);
         });
       }
 
-      function renderHistory() {
-        var wrap = document.getElementById('historyList');
-        if (!wrap) return;
-        var items = getHistory();
-        wrap.innerHTML = '';
-        if (!items.length) {
-          var empty = document.createElement('div');
-          empty.className = 'history-item';
-          empty.innerHTML = '<strong>LOCAL</strong><span>' + t('historyEmpty') + '</span>';
-          wrap.appendChild(empty);
-          return;
-        }
-        items.forEach(function (phrase, idx) {
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'history-item';
-          btn.innerHTML = '<strong>' + (lang === 'ar' ? 'نسخة ' + (idx + 1) : 'Copy ' + (idx + 1)) + '</strong><span>' + phrase + '</span>';
-          btn.addEventListener('click', function () {
-            source.value = phrase;
-            setPreview(phrase);
-            copyText(phrase, t('copiedFromLibrary'));
+      var editingProKey = null;
+      var proEditorSheet = document.getElementById('proEditorSheet');
+      function openProEditor(key) {
+        editingProKey = key;
+        var entry = getProEntry(key);
+        document.getElementById('proEditorTitleLbl').textContent = t('editProButton');
+        document.getElementById('proEditorHint').textContent = t('patternHint');
+        document.getElementById('proEditTitle').placeholder = t('tplTitlePh');
+        document.getElementById('proEditTitle').value = entry.title;
+        document.getElementById('proEditPattern').value = entry.pattern;
+        proEditorSheet.classList.add('show');
+      }
+      function closeProEditor() { proEditorSheet.classList.remove('show'); }
+      function saveProEditor() {
+        var title = document.getElementById('proEditTitle').value.trim();
+        var val = document.getElementById('proEditPattern').value;
+        if (!title || !val.trim()) { flash(t('fillBoth')); return; }
+        if (val.indexOf('{text}') === -1) { flash(t('needPlaceholder')); return; }
+        proPatterns[lang] = proPatterns[lang] || {};
+        proPatterns[lang][editingProKey] = { title: title, pattern: val };
+        saveProPatterns();
+        renderProLabels();
+        closeProEditor();
+        flash(t('patternSaved'));
+      }
+      function resetProEditor() {
+        var def = defaultProPatterns[lang][editingProKey];
+        document.getElementById('proEditTitle').value = def.title;
+        document.getElementById('proEditPattern').value = def.pattern;
+        flash(t('patternReset'));
+      }
+
+      var seedTemplates = {
+        ar: [
+          { title: 'جدول دوام', icon: '🗓️', body: '*جدول الدوام*\n\nالتاريخ:\nالفترة:\nالفريق:\n\n1.\n2.\n3.\n\nملاحظات:' },
+          { title: 'إعلان', icon: '📣', body: '*إعلان*\n\nالموضوع:\n\nالتفاصيل:\n- \n- \n- \n\nالإجراء المطلوب:' },
+          { title: 'رسالة إدارية', icon: '🏢', body: '*رسالة إدارية*\n\nمن:\nإلى:\nالموضوع:\n\n1.\n2.\n3.\n\nشاكرين تعاونكم.' },
+          { title: 'تسليم مناوبة', icon: '🔁', body: '*تسليم المناوبة*\n\nتم الإنجاز:\n- \n- \n\nالمتبقي:\n- \n- \n\nملاحظات:' },
+          { title: 'ترحيب', icon: '👋', body: 'مرحباً بكم 🌹\n\nيسعدنا انضمامكم إلينا، ونتمنى لكم تجربة ممتازة.' },
+          { title: 'طلب إجازة', icon: '🌴', body: '*طلب إجازة*\n\nالاسم:\nنوع الإجازة:\nمن تاريخ:\nإلى تاريخ:\nالسبب:' },
+          { title: 'متابعة', icon: '📌', body: 'تحية طيبة،\n\nنتابع معكم بخصوص:\n\nونأمل إفادتنا في أقرب وقت ممكن.' },
+          { title: 'شكر وتقدير', icon: '🌟', body: 'نشكركم على جهودكم المتميزة 🌟\n\nنقدّر حرصكم والتزامكم بالعمل.' }
+        ],
+        en: [
+          { title: 'Duty schedule', icon: '🗓️', body: '*Duty Schedule*\n\nDate:\nShift:\nTeam:\n\n1.\n2.\n3.\n\nNotes:' },
+          { title: 'Announcement', icon: '📣', body: '*Announcement*\n\nSubject:\n\nDetails:\n- \n- \n- \n\nRequired Action:' },
+          { title: 'Administrative', icon: '🏢', body: '*Administrative Message*\n\nFrom:\nTo:\nSubject:\n\n1.\n2.\n3.\n\nThank you for your cooperation.' },
+          { title: 'Handover', icon: '🔁', body: '*Shift Handover*\n\nCompleted:\n- \n- \n\nPending:\n- \n- \n\nNotes:' },
+          { title: 'Welcome', icon: '👋', body: 'Welcome! 🌹\n\nWe are glad to have you with us, and we hope you have a great experience.' },
+          { title: 'Leave request', icon: '🌴', body: '*Leave Request*\n\nName:\nLeave type:\nFrom date:\nTo date:\nReason:' },
+          { title: 'Follow-up', icon: '📌', body: 'Hello,\n\nFollowing up regarding:\n\nLooking forward to your feedback soon.' },
+          { title: 'Thanks & appreciation', icon: '🌟', body: 'Thank you for your outstanding effort 🌟\n\nWe appreciate your dedication and commitment.' }
+        ]
+      };
+      var TPL_KEY = 'waTemplates_v1';
+      var MAX_TEMPLATES = 8;
+      var ICON_CHOICES = ['📝', '🗓️', '📣', '🏢', '🔁', '👋', '🌴', '📌', '🌟', '✅'];
+
+      function genId() { return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+      function loadTemplates() {
+        try {
+          var raw = localStorage.getItem(TPL_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.ar && parsed.en) return parsed;
+          }
+        } catch (e) { /* storage unavailable - fall back to in-memory seed */ }
+        function seed(list) { return list.map(function (item) { return { id: genId(), title: item.title, icon: item.icon, body: item.body }; }); }
+        return { ar: seed(seedTemplates.ar), en: seed(seedTemplates.en) };
+      }
+      var templatesLib = loadTemplates();
+      function saveTemplates() {
+        try { localStorage.setItem(TPL_KEY, JSON.stringify(templatesLib)); } catch (e) { /* ignore */ }
+      }
+
+      var editingTplId = null;
+      var editingTplIcon = '📝';
+      var tplEditorSheet = document.getElementById('tplEditorSheet');
+
+      function renderIconPicker() {
+        var picker = document.getElementById('tplIconPicker');
+        picker.innerHTML = '';
+        ICON_CHOICES.forEach(function (ic) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = ic;
+          if (ic === editingTplIcon) b.classList.add('active');
+          b.addEventListener('click', function () {
+            editingTplIcon = ic;
+            renderIconPicker();
           });
-          wrap.appendChild(btn);
+          picker.appendChild(b);
         });
       }
 
-      async function copyText(text, message) {
-        try {
-          await navigator.clipboard.writeText(text);
-          latest = text;
-          ticks.classList.add('read');
-          saveHistory(text);
-          renderHistory();
-          flash(message || t('copied'));
-          return true;
-        } catch (err) {
-          flash('Copy failed');
-          return false;
+      function openTplEditor(entry) {
+        var list = templatesLib[lang] || (templatesLib[lang] = []);
+        if (!entry && list.length >= MAX_TEMPLATES) { flash(t('maxTemplates')); return; }
+        editingTplId = entry ? entry.id : null;
+        editingTplIcon = entry ? (entry.icon || '📝') : '📝';
+        document.getElementById('tplEditorTitleLbl').textContent = entry ? t('editTemplate') : t('newTemplate');
+        document.getElementById('tplEditTitle').value = entry ? entry.title : '';
+        document.getElementById('tplEditBody').value = entry ? entry.body : '';
+        document.getElementById('tplEditTitle').placeholder = t('tplTitlePh');
+        document.getElementById('tplEditBody').placeholder = t('tplBodyPh');
+        renderIconPicker();
+        tplEditorSheet.classList.add('show');
+      }
+      function closeTplEditor() { tplEditorSheet.classList.remove('show'); }
+
+      function saveTplEditor() {
+        var title = document.getElementById('tplEditTitle').value.trim();
+        var body = document.getElementById('tplEditBody').value;
+        if (!title || !body.trim()) { flash(t('fillBoth')); return; }
+        var list = templatesLib[lang] || (templatesLib[lang] = []);
+        if (editingTplId) {
+          var found = null;
+          for (var i = 0; i < list.length; i++) { if (list[i].id === editingTplId) { found = list[i]; break; } }
+          if (found) { found.title = title; found.body = body; found.icon = editingTplIcon; }
+        } else {
+          if (list.length >= MAX_TEMPLATES) { flash(t('maxTemplates')); return; }
+          list.push({ id: genId(), title: title, body: body, icon: editingTplIcon });
+        }
+        saveTemplates();
+        renderTemplates();
+        closeTplEditor();
+        flash(t('templateSaved'));
+      }
+
+      function deleteTemplate(id) {
+        templatesLib[lang] = (templatesLib[lang] || []).filter(function (item) { return item.id !== id; });
+        saveTemplates();
+        renderTemplates();
+        flash(t('templateDeleted'));
+      }
+
+      function renderTemplates() {
+        var grid = document.getElementById('tplGrid');
+        if (!grid) return;
+        var list = templatesLib[lang] || [];
+        grid.innerHTML = '';
+        list.forEach(function (item) {
+          var card = document.createElement('div');
+          card.className = 'tpl-card';
+          card.innerHTML =
+            '<span class="tpl-actions">' +
+            '<button type="button" class="tpl-icon-btn tpl-edit" title="edit">✎</button>' +
+            '<button type="button" class="tpl-icon-btn tpl-del" title="delete">×</button>' +
+            '</span>' +
+            '<span class="tpl-emoji">' + (item.icon || '📝') + '</span>' +
+            '<span class="tpl-title">' + escapeHtml(item.title) + '</span>';
+          card.querySelector('.tpl-edit').addEventListener('click', function (e) { e.stopPropagation(); openTplEditor(item); });
+          card.querySelector('.tpl-del').addEventListener('click', function (e) { e.stopPropagation(); deleteTemplate(item.id); });
+          card.addEventListener('click', function () {
+            source.value = normalizeInput(item.body);
+            setPreview(source.value);
+            flash(t('templateLoaded'));
+            source.focus();
+          });
+          grid.appendChild(card);
+        });
+        if (list.length < MAX_TEMPLATES) {
+          var addCard = document.createElement('button');
+          addCard.type = 'button';
+          addCard.className = 'tpl-card tpl-add-card';
+          addCard.innerHTML = '<span>+</span>';
+          addCard.addEventListener('click', function () { openTplEditor(null); });
+          grid.appendChild(addCard);
         }
       }
 
       function formatText(kind, text) {
         text = normalizeInput(text);
         switch (kind) {
-          case 'bold': return wrapLines(text, '*', '*');
-          case 'italic': return wrapLines(text, '_', '_');
-          case 'strike': return wrapLines(text, '~', '~');
-          case 'boldItalic': return wrapLines(text, '*_', '_*');
-          case 'inline': return wrapLines(text, '`', '`');
+          case 'bold': return '*' + text + '*';
+          case 'italic': return '_' + text + '_';
+          case 'strike': return '~' + text + '~';
+          case 'boldItalic': return applyProPattern('boldItalic', text);
+          case 'inline': return '`' + text + '`';
           case 'mono': return '```\n' + text + '\n```';
-          case 'headline': return asHeading(text);
-          case 'announce': return asAnnouncement(text);
-          case 'admin': return asAdmin(text);
-          case 'warning': return asWarning(text);
-          case 'meeting': return asMeeting(text);
+          case 'headline': return applyProPattern('headline', text.trim());
+          case 'announce': return applyProPattern('announce', text);
+          case 'admin': return applyProPattern('admin', text);
+          case 'warning': return applyProPattern('warning', text);
+          case 'meeting': return applyProPattern('meeting', text);
           case 'quote': return lines(text).map(function (line) { return line.trim() ? '> ' + line : '>'; }).join('\n');
           case 'bullets': return nonEmptyLines(text).map(function (line) { return '• ' + line; }).join('\n');
           case 'numbers': return nonEmptyLines(text).map(function (line, i) { return (i + 1) + '. ' + line; }).join('\n');
           case 'underline': return underlineVisual(text);
-          case 'box': return '```\n' + text + '\n```';
+          case 'box': return asHighlight(text);
           default: return text;
         }
       }
@@ -850,32 +795,141 @@
       }
 
       function flash(message) {
+        if (!message) return;
         toast.textContent = message;
         toast.classList.add('show');
         clearTimeout(flash._timer);
         flash._timer = setTimeout(function () { toast.classList.remove('show'); }, 1600);
       }
 
+      /* ---- Common phrases library (persisted locally, frequency-sorted) ---- */
+      var PHRASE_LIB_KEY = 'waPhraseLib_v1';
+      var MAX_PHRASES = 60;
+      var seedPhrases = {
+        ar: [
+          'جزاكم الله خيراً', 'تم بحمد الله', 'بانتظار ردكم', 'يرجى التكرم بالإفادة',
+          'شاكرين لكم حسن تعاونكم', 'تم الاستلام، شكراً', 'نعتذر عن التأخير في الرد',
+          'يرجى تأكيد الاستلام', 'مع خالص التحية والتقدير', 'تم إنجاز المطلوب',
+          'الرجاء الاطلاع والتزويد بالملاحظات', 'بالتوفيق للجميع'
+        ],
+        en: [
+          'Thank you very much', 'Done, thank God', 'Awaiting your reply', 'Please advise',
+          'Thanks for your cooperation', 'Received, thank you', 'Sorry for the delayed reply',
+          'Please confirm receipt', 'Best regards', 'Task completed',
+          'Please review and share feedback', 'Good luck everyone'
+        ]
+      };
+
+      function loadPhraseLib() {
+        try {
+          var raw = localStorage.getItem(PHRASE_LIB_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.ar && parsed.en) return parsed;
+          }
+        } catch (e) { /* storage unavailable (e.g. sandboxed preview) - fall back to in-memory */ }
+        return {
+          ar: seedPhrases.ar.map(function (p) { return { text: p, count: 0, lastUsed: 0 }; }),
+          en: seedPhrases.en.map(function (p) { return { text: p, count: 0, lastUsed: 0 }; })
+        };
+      }
+      var phraseLib = loadPhraseLib();
+
+      function savePhraseLib() {
+        try { localStorage.setItem(PHRASE_LIB_KEY, JSON.stringify(phraseLib)); } catch (e) { /* ignore */ }
+      }
+
+      function recordPhrase(text) {
+        text = (text || '').trim();
+        if (!text) return;
+        var list = phraseLib[lang] || (phraseLib[lang] = []);
+        var found = null;
+        for (var i = 0; i < list.length; i++) { if (list[i].text === text) { found = list[i]; break; } }
+        if (found) { found.count += 1; found.lastUsed = Date.now(); }
+        else { list.push({ text: text, count: 1, lastUsed: Date.now() }); }
+        if (list.length > MAX_PHRASES) {
+          list.sort(function (a, b) { return (a.count - b.count) || (a.lastUsed - b.lastUsed); });
+          list.splice(0, list.length - MAX_PHRASES);
+        }
+        savePhraseLib();
+        renderPhrases();
+      }
+
+      function deletePhrase(text) {
+        phraseLib[lang] = (phraseLib[lang] || []).filter(function (item) { return item.text !== text; });
+        savePhraseLib();
+        renderPhrases();
+      }
+
+      function clearPhraseHistory() {
+        phraseLib[lang] = seedPhrases[lang].map(function (p) { return { text: p, count: 0, lastUsed: 0 }; });
+        savePhraseLib();
+        renderPhrases();
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, function (ch) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+        });
+      }
+      function truncate(str, n) {
+        str = str.replace(/\n+/g, ' ⏎ ');
+        return str.length > n ? str.slice(0, n).trim() + '…' : str;
+      }
+
+      function renderPhrases() {
+        var container = document.getElementById('phraseList');
+        if (!container) return;
+        var list = (phraseLib[lang] || []).slice().sort(function (a, b) { return b.count - a.count; });
+        container.innerHTML = '';
+        list.forEach(function (item) {
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'phrase-chip';
+          var hot = item.count >= 3 ? '🔥 ' : '';
+          chip.innerHTML = '<span class="phrase-text">' + hot + escapeHtml(truncate(item.text, 40)) + '</span>' +
+            '<span class="phrase-del" title="حذف">×</span>';
+          chip.addEventListener('click', function (e) {
+            if (e.target.classList.contains('phrase-del')) {
+              e.stopPropagation();
+              deletePhrase(item.text);
+              return;
+            }
+            source.value = item.text;
+            setPreview(item.text);
+            copyLatest(false).then(function (ok) { if (ok) flash(t('copied')); });
+          });
+          container.appendChild(chip);
+        });
+      }
+
+      async function copyLatest(showEmpty) {
+        if (!latest) { if (showEmpty) flash(t('empty')); return false; }
+        try {
+          await navigator.clipboard.writeText(latest);
+          ticks.classList.add('read');
+          recordPhrase(latest);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
       function applyLang() {
         document.documentElement.lang = lang;
         document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
         var map = {
-          badge:'badge', onlineLbl:'online', heroTitle:'heroTitle', heroDesc:'heroDesc',
-          inputTitle:'inputTitle', inputSub:'inputSub', basicSectionLbl:'basicSection', proSectionLbl:'proSection',
-          presetSectionLbl:'presetSection', resultTitle:'resultTitle', resultSub:'resultSub',
-          swapLbl:'swap', clearLbl:'clear',
-          boldLbl:'bold', italicLbl:'italic', strikeLbl:'strike', monoLbl:'mono', quoteLbl:'quote', inlineLbl:'inline',
-          bulletsLbl:'bullets', numbersLbl:'numbers', underlineLbl:'underline', boxLbl:'box',
-          boldItalicLbl:'boldItalic', headlineLbl:'headline', announceLbl:'announce', adminLbl:'admin',
-          warningLbl:'warning', meetingLbl:'meeting',
-          presetScheduleLbl:'presetSchedule', presetScheduleSub:'presetScheduleSub',
-          presetAnnouncementLbl:'presetAnnouncement', presetAnnouncementSub:'presetAnnouncementSub',
-          presetAdminLbl:'presetAdmin', presetAdminSub:'presetAdminSub',
-          presetHandoverLbl:'presetHandover', presetHandoverSub:'presetHandoverSub',
-          commonSectionLbl:'commonSection', historySectionLbl:'historySection',
-          tip1Title:'tip1Title', tip1Body:'tip1Body', tip2Title:'tip2Title', tip2Body:'tip2Body',
-          tip3Title:'tip3Title', tip3Body:'tip3Body', langBtn:'langBtn', installTitle:'installTitle',
-          installCloseBtn:'installClose'
+          badge: 'badge', onlineLbl: 'online', inputTitle: 'inputTitle',
+          tabBasicLbl: 'tabBasic', tabProLbl: 'tabPro', tabTemplatesLbl: 'tabTemplates', tabPhrasesLbl: 'tabPhrases',
+          resultTitle: 'resultTitle', clearLbl: 'clear', clearPhrasesLbl: 'clearPhrases',
+          boldLbl: 'bold', italicLbl: 'italic', strikeLbl: 'strike', monoLbl: 'mono', quoteLbl: 'quote', inlineLbl: 'inline',
+          bulletsLbl: 'bullets', numbersLbl: 'numbers', underlineLbl: 'underline', boxLbl: 'box',
+          notesTitle: 'notesTitle',
+          tip1Title: 'tip1Title', tip1Body: 'tip1Body', tip2Title: 'tip2Title', tip2Body: 'tip2Body',
+          tip3Title: 'tip3Title', tip3Body: 'tip3Body', langBtn: 'langBtn', installTitle: 'installTitle',
+          installCloseBtn: 'installClose', proResetLbl: 'resetDefault',
+          resetAllTitle: 'resetAllTitle', resetAllDesc: 'resetAllDesc',
+          resetCancelBtn: 'resetAllCancel', resetConfirmBtn: 'resetAllConfirm'
         };
         Object.keys(map).forEach(function (id) {
           var el = document.getElementById(id);
@@ -886,44 +940,77 @@
           stepsEl.innerHTML = '<li>' + t('installStep1') + '</li><li>' + t('installStep2') + '</li><li>' + t('installStep3') + '</li>';
         }
         source.placeholder = t('placeholder');
-        renderCommonPhrases();
-        renderHistory();
         if (!latest) setPreview('');
+        renderPhrases();
+        renderTemplates();
+        renderProLabels();
       }
 
+      /* ---- tabs ---- */
+      document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var target = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-panel').forEach(function (p) {
+            p.hidden = p.getAttribute('data-panel') !== target;
+          });
+        });
+      });
+
+      /* ---- format buttons: apply + auto-copy ---- */
       document.querySelectorAll('[data-format]').forEach(function (btn) {
-        btn.addEventListener('click', async function () {
+        btn.addEventListener('click', async function (e) {
+          if (e.target.classList.contains('tool-edit')) {
+            e.stopPropagation();
+            openProEditor(e.target.getAttribute('data-edit-key'));
+            return;
+          }
           var text = normalizeInput(source.value).trim();
           if (!text) { flash(t('empty')); return; }
-          var output = formatText(btn.getAttribute('data-format'), source.value);
-          setPreview(output);
-          await copyText(output, t('copiedAuto'));
+          setPreview(formatText(btn.getAttribute('data-format'), source.value));
+          var ok = await copyLatest(false);
+          if (ok) flash(t('copied'));
         });
       });
 
-      document.querySelectorAll('[data-template]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var key = btn.getAttribute('data-template');
-          var map = templates();
-          source.value = normalizeInput(map[key] || '');
-          setPreview(source.value);
-        });
+      /* ---- pro pattern editor sheet buttons ---- */
+      document.getElementById('proEditSave').addEventListener('click', saveProEditor);
+      document.getElementById('proEditCancel').addEventListener('click', closeProEditor);
+      document.getElementById('proEditReset').addEventListener('click', resetProEditor);
+      proEditorSheet.addEventListener('click', function (e) { if (e.target === proEditorSheet) closeProEditor(); });
+
+      /* ---- reset all settings ---- */
+      var resetSheet = document.getElementById('resetSheet');
+      document.getElementById('settingsBtn').addEventListener('click', function () {
+        resetSheet.classList.add('show');
+      });
+      document.getElementById('resetCancelBtn').addEventListener('click', function () {
+        resetSheet.classList.remove('show');
+      });
+      resetSheet.addEventListener('click', function (e) { if (e.target === resetSheet) resetSheet.classList.remove('show'); });
+      document.getElementById('resetConfirmBtn').addEventListener('click', function () {
+        try {
+          localStorage.removeItem(PHRASE_LIB_KEY);
+          localStorage.removeItem(TPL_KEY);
+          localStorage.removeItem(PRO_PATTERNS_KEY);
+        } catch (e) { /* ignore */ }
+        resetSheet.classList.remove('show');
+        flash(t('resetAllDone'));
+        setTimeout(function () { location.reload(); }, 700);
       });
 
-      document.getElementById('copyBtn').addEventListener('click', async function () {
-        if (!latest) { flash(t('empty')); return; }
-        await copyText(latest, t('copied'));
-      });
-
-      document.getElementById('swapBtn').addEventListener('click', function () {
-        if (!latest) { flash(t('empty')); return; }
-        source.value = normalizeInput(latest);
-      });
+      /* ---- template editor sheet buttons ---- */
+      document.getElementById('tplEditSave').addEventListener('click', saveTplEditor);
+      document.getElementById('tplEditCancel').addEventListener('click', closeTplEditor);
+      tplEditorSheet.addEventListener('click', function (e) { if (e.target === tplEditorSheet) closeTplEditor(); });
 
       document.getElementById('clearBtn').addEventListener('click', function () {
         source.value = '';
         setPreview('');
       });
+
+      document.getElementById('clearPhrasesBtn').addEventListener('click', clearPhraseHistory);
 
       source.addEventListener('blur', function () {
         var normalized = normalizeInput(source.value);
@@ -939,17 +1026,10 @@
       document.getElementById('shareBtn').addEventListener('click', async function () {
         var shareData = { title: t('shareTitle'), text: t('shareText'), url: location.href };
         try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else if (navigator.clipboard) {
-            await navigator.clipboard.writeText(location.href);
-            flash(t('linkCopied'));
-          } else {
-            flash(t('shareFailed'));
-          }
-        } catch (err) {
-          /* user cancelled share sheet - no message needed */
-        }
+          if (navigator.share) { await navigator.share(shareData); }
+          else if (navigator.clipboard) { await navigator.clipboard.writeText(location.href); flash(t('linkCopied')); }
+          else { flash(t('shareFailed')); }
+        } catch (err) { /* user cancelled - no message needed */ }
       });
 
       /* ---- Install as app ---- */
@@ -957,11 +1037,8 @@
       var installSheet = document.getElementById('installSheet');
       var deferredPrompt = null;
       var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-      if (!isStandalone) {
-        installBtn.style.display = 'grid';
-      }
+      if (!isStandalone) { installBtn.style.display = 'grid'; }
 
       window.addEventListener('beforeinstallprompt', function (e) {
         e.preventDefault();
@@ -992,10 +1069,9 @@
         flash(t('installed'));
       });
 
-      /* ---- Service worker for offline + installability ---- */
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js?v=20260728b').catch(function () { /* ignore if unavailable */ });
+          navigator.serviceWorker.register('sw.js?v=20260729a').catch(function () {});
         });
       }
 
