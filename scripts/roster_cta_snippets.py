@@ -320,40 +320,10 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     }
     a.summaryChip.trainingChip{
       overflow:visible !important;
-      gap:4px;
-      padding-top:8px;
-      padding-bottom:8px;
-      min-width:76px;
+      position:relative;
     }
-    a.summaryChip.trainingChip .trainingNewPill{
-      display:inline-block !important;
-      visibility:visible !important;
-      opacity:1 !important;
-      position:static !important;
-      margin:0 auto 2px !important;
-      padding:3px 8px !important;
-      border-radius:999px !important;
-      background:#f97316 !important;
-      background-color:#f97316 !important;
-      color:#ffffff !important;
-      font-size:10px !important;
-      font-weight:900 !important;
-      line-height:1.1 !important;
-      letter-spacing:.02em;
-      text-transform:none !important;
-      white-space:nowrap !important;
-      box-shadow:0 2px 8px rgba(249,115,22,.45);
-      pointer-events:none;
-      animation:trainingNewBlink 1.2s ease-in-out infinite;
-      z-index:5;
-    }
-    a.summaryChip.trainingChip.is-new-off .trainingNewPill{
-      display:none !important;
-      animation:none !important;
-    }
-    @keyframes trainingNewBlink{
-      0%,100%{opacity:1}
-      50%{opacity:.4}
+    a.summaryChip.trainingChip .trainingNewPill{display:none!important}
+    50%{opacity:.4}
     }
     a.summaryChip.trainingChip .chipLabel::after{
       content:none !important;
@@ -1185,7 +1155,6 @@ def import_summary_bar_html(total_emp: int) -> str:
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
-      <span class="trainingNewPill" id="trainingNewPill">جديد</span>
       {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>

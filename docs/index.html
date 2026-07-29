@@ -295,35 +295,8 @@
       overflow:visible !important;
       position:relative;
     }
-    a.summaryChip.trainingChip .trainingNewPill{
-      display:inline-block !important;
-      visibility:visible !important;
-      opacity:1 !important;
-      position:static !important;
-      margin:0 auto 2px !important;
-      padding:3px 8px !important;
-      border-radius:999px !important;
-      background:#f97316 !important;
-      background-color:#f97316 !important;
-      color:#ffffff !important;
-      font-size:10px !important;
-      font-weight:900 !important;
-      line-height:1.1 !important;
-      letter-spacing:.02em;
-      text-transform:none !important;
-      white-space:nowrap !important;
-      box-shadow:0 2px 8px rgba(249,115,22,.45);
-      pointer-events:none;
-      animation:trainingNewBlink 1.2s ease-in-out infinite;
-      z-index:5;
-    }
-    a.summaryChip.trainingChip.is-new-off .trainingNewPill{
-      display:none !important;
-      animation:none !important;
-    }
-    @keyframes trainingNewBlink{
-      0%,100%{opacity:1}
-      50%{opacity:.4}
+    a.summaryChip.trainingChip .trainingNewPill{display:none!important}
+    50%{opacity:.4}
     }
     a.summaryChip.trainingChip .chipLabel::after{
       content:none !important;
@@ -1091,7 +1064,6 @@
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
-      <span class="trainingNewPill" id="trainingNewPill">جديد</span>
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
@@ -2882,11 +2854,7 @@ function applyLang(lang) {
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
   });
-  var trainingNewPill=document.getElementById('trainingNewPill');
-  if(trainingNewPill && !((document.getElementById('trainingBtn')||{}).classList||{contains:function(){return false}}).contains('is-new-off')){
-    trainingNewPill.textContent=lang==='ar'?'جديد':'New';
-  }
-  document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
+document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
   document.querySelectorAll('.deptTitle').forEach(function(el) {
@@ -2985,30 +2953,6 @@ function goToTraining(e) {
 }
 setLocalCtaLinks();
 setSummaryChipHrefs();
-(function ensureTrainingNewBadge() {
-  var chip = document.getElementById('trainingBtn');
-  if (!chip) return;
-  var pill = document.getElementById('trainingNewPill');
-  if (!pill) {
-    pill = document.createElement('span');
-    pill.id = 'trainingNewPill';
-    pill.className = 'trainingNewPill';
-    chip.insertBefore(pill, chip.firstChild);
-  }
-  var now = new Date();
-  var stamp = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
-  var ar = false;
-  try { ar = (localStorage.getItem('rosterLang') || '') === 'ar'; } catch (e) {}
-  if (!ar) ar = (document.documentElement.lang || '') === 'ar';
-  pill.textContent = ar ? 'جديد' : 'New';
-  if (stamp >= 20260801) {
-    chip.classList.add('is-new-off');
-  } else {
-    chip.classList.remove('is-new-off');
-    pill.style.display = 'inline-block';
-    pill.style.visibility = 'visible';
-  }
-})();
 applyLang(LANG);
 startSummarySwitchLoop();
 
