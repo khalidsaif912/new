@@ -2120,7 +2120,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
 </div>
 <script>{PAGE_JS}</script>
 <script defer src="{share_script_src(in_archive)}"></script>
-<script defer src="{'../../training-new-badge.js?v=20260729d' if in_archive else '../training-new-badge.js?v=20260729d'}"></script>
+<script defer src="{'../../training-new-badge.js?v=20260729e' if in_archive else '../training-new-badge.js?v=20260729e'}"></script>
 </body>
 </html>
 '''

@@ -1,13 +1,12 @@
 /**
- * Force-visible "New" badge on homepage Training chip until 1 Aug 2026.
- * Placed BELOW the training button so it is never covered by the chip.
+ * Small "New" badge on homepage Training chip until 1 Aug 2026.
+ * Floats above the chip (slightly aside) without changing chip size/alignment.
  */
 (function () {
   'use strict';
 
   var HIDE_FROM = 20260801;
   var PILL_ID = 'trainingNewPillForce';
-  var SLOT_ID = 'trainingChipSlot';
   var STYLE_ID = 'trainingNewPillForceCss';
 
   function stampNow() {
@@ -24,58 +23,73 @@
       document.body.classList.contains('ar');
   }
 
+  function unwrapSlot() {
+    var slot = document.getElementById('trainingChipSlot');
+    if (!slot || !slot.parentNode) return;
+    var parent = slot.parentNode;
+    while (slot.firstChild) parent.insertBefore(slot.firstChild, slot);
+    slot.remove();
+  }
+
   function injectCss() {
-    if (document.getElementById(STYLE_ID)) return;
+    var existing = document.getElementById(STYLE_ID);
+    if (existing) existing.remove();
     var s = document.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
       '.summaryBar{overflow:visible!important;}',
-      '#' + SLOT_ID + '{',
-      'display:flex!important;flex-direction:column!important;align-items:center!important;',
-      'justify-content:flex-start!important;gap:4px!important;position:relative!important;',
-      'z-index:5!important;align-self:stretch!important;',
-      '}',
-      '#' + SLOT_ID + ' > #trainingBtn{',
-      'position:relative!important;overflow:visible!important;padding-top:10px!important;',
-      'margin:0!important;width:100%!important;min-width:72px!important;',
+      '#trainingBtn.summaryChip{',
+      'position:relative!important;overflow:visible!important;',
       '}',
       '#' + PILL_ID + '{',
-      'position:static!important;display:inline-block!important;visibility:visible!important;',
-      'opacity:1!important;z-index:6!important;order:2!important;',
-      'padding:3px 8px!important;border-radius:999px!important;',
-      'background:#ea580c!important;color:#fff!important;',
-      'font-size:10px!important;font-weight:900!important;line-height:1.15!important;',
-      'letter-spacing:.02em!important;white-space:nowrap!important;text-transform:none!important;',
-      'box-shadow:0 2px 8px rgba(234,88,12,.45)!important;pointer-events:none!important;',
-      'animation:thnForceBlink 1.4s ease-in-out infinite!important;',
+      'position:absolute!important;',
+      'top:-7px!important;',
+      'inset-inline-end:-6px!important;',
+      'left:auto!important;right:auto!important;',
+      'transform:none!important;',
+      'z-index:20!important;',
+      'display:inline-flex!important;',
+      'align-items:center!important;',
+      'justify-content:center!important;',
+      'visibility:visible!important;',
+      'opacity:1!important;',
+      'min-width:0!important;',
+      'height:auto!important;',
+      'padding:2px 6px!important;',
+      'border-radius:999px!important;',
+      'background:linear-gradient(135deg,#fb923c,#ea580c)!important;',
+      'color:#fff!important;',
+      'font-size:8px!important;',
+      'font-weight:900!important;',
+      'line-height:1.1!important;',
+      'letter-spacing:.02em!important;',
+      'white-space:nowrap!important;',
+      'text-transform:none!important;',
+      'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;',
+      'pointer-events:none!important;',
+      'animation:thnForceBlink 1.6s ease-in-out infinite!important;',
       '}',
-      '@keyframes thnForceBlink{0%,100%{opacity:1}50%{opacity:.55}}',
+      'html[dir="rtl"] #' + PILL_ID + ',body.ar #' + PILL_ID + '{',
+      'inset-inline-end:auto!important;',
+      'inset-inline-start:-6px!important;',
+      '}',
+      '@keyframes thnForceBlink{0%,100%{opacity:1}50%{opacity:.62}}',
       '#trainingBtn .trainingNewPill{display:none!important}',
+      '#trainingChipSlot{display:contents!important}',
       '.dateTagRow{display:inline-flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;}',
       '.dateTagNewForce{',
       'display:inline-block!important;padding:5px 10px!important;border-radius:999px!important;',
       'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;',
-      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.4s ease-in-out infinite!important;',
+      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.6s ease-in-out infinite!important;',
       '}'
     ].join('');
     document.head.appendChild(s);
   }
 
-  function ensureSlot(btn) {
-    var slot = document.getElementById(SLOT_ID);
-    if (slot && slot.contains(btn)) return slot;
-    slot = document.createElement('div');
-    slot.id = SLOT_ID;
-    if (btn.parentNode) {
-      btn.parentNode.insertBefore(slot, btn);
-      slot.appendChild(btn);
-    }
-    return slot;
-  }
-
   function paintHomeBadge() {
     var btn = document.getElementById('trainingBtn');
     if (!btn) return;
+    unwrapSlot();
     if (stampNow() >= HIDE_FROM) {
       var old = document.getElementById(PILL_ID);
       if (old) old.remove();
@@ -84,26 +98,25 @@
     }
     injectCss();
     btn.classList.remove('is-new-off');
-    var slot = ensureSlot(btn);
     var pill = document.getElementById(PILL_ID);
     if (!pill) {
       pill = document.createElement('span');
       pill.id = PILL_ID;
-      // Place AFTER the button = visually below the training chip.
-      slot.appendChild(pill);
-    } else if (pill.parentNode !== slot) {
-      slot.appendChild(pill);
-    } else if (pill.previousElementSibling !== btn) {
-      slot.appendChild(pill);
+      btn.appendChild(pill);
+    } else if (pill.parentNode !== btn) {
+      btn.appendChild(pill);
     }
     pill.textContent = isAr() ? 'جديد' : 'New';
+    var rtl = isAr() || (document.documentElement.dir || '') === 'rtl';
     pill.setAttribute(
       'style',
-      'position:static!important;display:inline-block!important;visibility:visible!important;opacity:1!important;' +
-        'z-index:6!important;padding:3px 8px!important;border-radius:999px!important;' +
-        'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;' +
-        'line-height:1.15!important;white-space:nowrap!important;margin-top:2px!important;' +
-        'box-shadow:0 2px 8px rgba(234,88,12,.45)!important;pointer-events:none!important;'
+      'position:absolute!important;top:-7px!important;z-index:20!important;' +
+        (rtl ? 'left:-6px!important;right:auto!important;' : 'right:-6px!important;left:auto!important;') +
+        'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
+        'visibility:visible!important;opacity:1!important;padding:2px 6px!important;border-radius:999px!important;' +
+        'background:linear-gradient(135deg,#fb923c,#ea580c)!important;color:#fff!important;' +
+        'font-size:8px!important;font-weight:900!important;line-height:1.1!important;white-space:nowrap!important;' +
+        'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;pointer-events:none!important;transform:none!important;'
     );
   }
 
