@@ -46,13 +46,11 @@
       'top:-7px!important;',
       'inset-inline-end:-6px!important;',
       'left:auto!important;right:auto!important;',
-      'transform:none!important;',
       'z-index:20!important;',
       'display:inline-flex!important;',
       'align-items:center!important;',
       'justify-content:center!important;',
       'visibility:visible!important;',
-      'opacity:1!important;',
       'min-width:0!important;',
       'height:auto!important;',
       'padding:2px 6px!important;',
@@ -67,20 +65,23 @@
       'text-transform:none!important;',
       'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;',
       'pointer-events:none!important;',
-      'animation:thnForceBlink 1.6s ease-in-out infinite!important;',
+      'animation:thnForceBlink 1.1s ease-in-out infinite!important;',
       '}',
       'html[dir="rtl"] #' + PILL_ID + ',body.ar #' + PILL_ID + '{',
       'inset-inline-end:auto!important;',
       'inset-inline-start:-6px!important;',
       '}',
-      '@keyframes thnForceBlink{0%,100%{opacity:1}50%{opacity:.62}}',
+      '@keyframes thnForceBlink{',
+      '0%,100%{opacity:1;transform:scale(1)}',
+      '50%{opacity:.28;transform:scale(.92)}',
+      '}',
       '#trainingBtn .trainingNewPill{display:none!important}',
       '#trainingChipSlot{display:contents!important}',
       '.dateTagRow{display:inline-flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;}',
       '.dateTagNewForce{',
       'display:inline-block!important;padding:5px 10px!important;border-radius:999px!important;',
       'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;',
-      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.6s ease-in-out infinite!important;',
+      'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;animation:thnForceBlink 1.1s ease-in-out infinite!important;',
       '}'
     ].join('');
     document.head.appendChild(s);
@@ -108,15 +109,17 @@
     }
     pill.textContent = isAr() ? 'جديد' : 'New';
     var rtl = isAr() || (document.documentElement.dir || '') === 'rtl';
+    // Do NOT force opacity/transform inline — that blocks the blink animation.
     pill.setAttribute(
       'style',
       'position:absolute!important;top:-7px!important;z-index:20!important;' +
         (rtl ? 'left:-6px!important;right:auto!important;' : 'right:-6px!important;left:auto!important;') +
         'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
-        'visibility:visible!important;opacity:1!important;padding:2px 6px!important;border-radius:999px!important;' +
+        'visibility:visible!important;padding:2px 6px!important;border-radius:999px!important;' +
         'background:linear-gradient(135deg,#fb923c,#ea580c)!important;color:#fff!important;' +
         'font-size:8px!important;font-weight:900!important;line-height:1.1!important;white-space:nowrap!important;' +
-        'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;pointer-events:none!important;transform:none!important;'
+        'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;pointer-events:none!important;' +
+        'animation:thnForceBlink 1.1s ease-in-out infinite!important;'
     );
   }
 
@@ -155,7 +158,8 @@
       'style',
       'display:inline-block!important;padding:5px 10px!important;border-radius:999px!important;' +
         'background:#ea580c!important;color:#fff!important;font-size:10px!important;font-weight:900!important;' +
-        'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;'
+        'box-shadow:0 4px 12px rgba(234,88,12,.35)!important;' +
+        'animation:thnForceBlink 1.1s ease-in-out infinite!important;'
     );
   }
 
