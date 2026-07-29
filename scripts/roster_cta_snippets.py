@@ -723,22 +723,6 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     .siteAppsLink--wa {
       background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
       border-color: #86efac;
-      position: relative;
-      overflow: hidden;
-    }
-    .siteAppsLink--wa::after {
-      content: attr(data-badge);
-      position: absolute;
-      top: 10px;
-      inset-inline-end: 12px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #16a34a;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .02em;
-      box-shadow: 0 4px 10px rgba(22,163,74,.25);
     }
     .siteAppsLink--store {
       background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
@@ -795,7 +779,7 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
-      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1" data-badge="NEW">
+      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
         <span class="siteAppsLink-text">
           <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>

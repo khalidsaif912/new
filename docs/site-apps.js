@@ -22,7 +22,6 @@
       bookSub: 'Reading topics',
       wa: 'WhatsApp Styler',
       waSub: 'Format text fast',
-      waBadge: 'NEW',
       games: 'Memory Games',
       gamesSub: 'Roster games hub',
       gamePairs: 'Picture Pairs',
@@ -68,7 +67,6 @@
       bookSub: 'مواضيع القراءة',
       wa: 'تنسيق واتساب',
       waSub: 'تنسيق النص بسرعة',
-      waBadge: 'جديد',
       games: 'ألعاب الذاكرة',
       gamesSub: 'مركز ألعاب الروستر',
       gamePairs: 'قرائن الصور',
@@ -240,11 +238,6 @@
       var subKey = id + 'Sub';
       var val = t(subKey);
       if (val && val !== subKey) el.textContent = val;
-    });
-    sheet.querySelectorAll('[data-badge]').forEach(function (el) {
-      if (el.getAttribute('data-app-id') === 'wa') {
-        el.setAttribute('data-badge', t('waBadge'));
-      }
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
@@ -513,7 +506,6 @@
       card.href = href;
       card.setAttribute('data-app-id', 'wa');
       card.setAttribute('data-open-same', '1');
-      card.setAttribute('data-badge', t('waBadge'));
       card.innerHTML =
         '<span class="siteAppsLink-icon">' + iconForApp('wa') + '</span>' +
         '<span class="siteAppsLink-text">' +
@@ -524,7 +516,7 @@
       existing = card;
     }
     existing.href = href;
-    existing.setAttribute('data-badge', t('waBadge'));
+    existing.removeAttribute('data-badge');
     var title = existing.querySelector('[data-i18n="wa"]');
     var sub = existing.querySelector('[data-i18n-sub="wa"]');
     if (title) title.textContent = t('wa');
@@ -619,10 +611,6 @@
       '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
       '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
       '.spotlightBar .spotlightBtn{width:min(100%,255px)!important;justify-content:center!important;text-align:center!important;min-height:44px!important;padding:8px 12px!important;gap:7px!important;margin-inline:auto!important;}',
-      '.spotlightBar .spotlightBtn--wa{position:relative!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border:1.5px solid #86efac!important;box-shadow:0 8px 18px rgba(22,163,74,.10)!important;overflow:hidden!important;transform:none!important;backface-visibility:hidden!important;-webkit-font-smoothing:antialiased!important;text-rendering:optimizeLegibility!important;}',
-      '.spotlightBar .spotlightBtn--wa::after{content:"' + t('waBadge') + '"!important;position:absolute!important;top:6px!important;inset-inline-end:8px!important;background:#f97316!important;color:#fff!important;font-size:8px!important;font-weight:900!important;padding:3px 6px!important;border-radius:999px!important;box-shadow:0 4px 10px rgba(249,115,22,.24)!important;}',
-      '.spotlightBar .spotlightBtn--wa::before{content:""!important;position:absolute!important;inset:-40% auto -40% -35%!important;width:44px!important;background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent)!important;transform:rotate(18deg)!important;animation:spotlightWaShine 3.8s ease-in-out infinite!important;pointer-events:none!important;}',
-      '@keyframes spotlightWaShine{0%{left:-35%;opacity:0}18%{opacity:.55}52%{left:118%;opacity:.18}100%{left:118%;opacity:0}}',
       '.spotlightBtnLabel{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;}',
       '.spotlightBtnTitle{font-size:12px!important;font-weight:800!important;color:inherit!important;}',
       '.spotlightBtnSub{font-size:9px!important;font-weight:600!important;color:#64748b!important;}',
@@ -643,11 +631,11 @@
       '.spotlightPreviewTitle{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.25;}',
       '.spotlightPreviewSub{font-size:10.5px;font-weight:600;color:#64748b;line-height:1.35;margin-top:2px;}',
       '.spotlightPreviewGo{flex-shrink:0;font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:999px;padding:5px 8px;white-space:nowrap;}',
-      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:72px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;position:relative!important;overflow:hidden!important;}',
+      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:72px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;}',
       '.siteAppsLink--wa .siteAppsLink-icon{background:#dcfce7!important;border-color:#86efac!important;flex-shrink:0!important;}',
       '.siteAppsLink--wa .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
       '.siteAppsLink--wa .siteAppsLink-title,.siteAppsLink--wa .siteAppsLink-sub{text-align:start!important;}',
-      '.siteAppsLink--wa::after{content:attr(data-badge)!important;position:absolute!important;top:10px!important;inset-inline-end:12px!important;padding:4px 8px!important;border-radius:999px!important;background:#16a34a!important;color:#fff!important;font-size:10px!important;font-weight:900!important;box-shadow:0 4px 10px rgba(22,163,74,.25)!important;}',
+      '.siteAppsLink--wa::after{content:none!important;display:none!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
       '#spotlightEmojiBtn img{width:22px;height:22px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
@@ -834,10 +822,15 @@
         footer.parentNode.insertBefore(bar, footer);
       }
       bar.style.display = '';
-      var item = spotlightItems().find(function (x) { return x.id === 'wa'; }) || null;
+      // Keep the same random pick across re-renders in one page load.
+      var item = null;
+      if (bar.dataset.itemId) {
+        item = spotlightItems().find(function (x) { return x.id === bar.dataset.itemId; }) || null;
+      }
+      if (!item) item = randomSpotlight();
       bar.dataset.itemId = item.id;
       var btn = document.getElementById('spotlightBtn');
-      if (btn) btn.className = 'roster-cta-btn spotlightBtn spotlightBtn--wa ' + item.classes;
+      if (btn) btn.className = 'roster-cta-btn spotlightBtn ' + (item.classes || '');
       var icon = document.getElementById('spotlightBtnIcon');
       if (icon) icon.innerHTML = item.icon;
       var title = document.getElementById('spotlightBtnTitle');
