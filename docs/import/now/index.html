@@ -309,44 +309,44 @@
     a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
     a.summaryChip.trainingChip{
       overflow:visible !important;
-      gap:3px;
-      padding-top:10px;
+      gap:4px;
+      padding-top:8px;
       padding-bottom:8px;
+      min-width:76px;
     }
-    a.summaryChip.trainingChip .chipLabel{
-      display:inline-flex !important;
-      align-items:center;
-      justify-content:center;
-      gap:5px;
-      max-width:none;
-      white-space:nowrap;
-    }
-    a.summaryChip.trainingChip .chipLabel::after{
-      content:attr(data-new);
-      display:inline-flex !important;
-      align-items:center;
-      justify-content:center;
-      padding:3px 7px;
-      border-radius:999px;
+    a.summaryChip.trainingChip .trainingNewPill{
+      display:inline-block !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      position:static !important;
+      margin:0 auto 2px !important;
+      padding:3px 8px !important;
+      border-radius:999px !important;
       background:#f97316 !important;
       background-color:#f97316 !important;
-      color:#fff !important;
-      font-size:9px !important;
+      color:#ffffff !important;
+      font-size:10px !important;
       font-weight:900 !important;
+      line-height:1.1 !important;
       letter-spacing:.02em;
-      line-height:1;
       text-transform:none !important;
+      white-space:nowrap !important;
       box-shadow:0 2px 8px rgba(249,115,22,.45);
+      pointer-events:none;
       animation:trainingNewBlink 1.2s ease-in-out infinite;
+      z-index:5;
     }
-    a.summaryChip.trainingChip.is-new-off .chipLabel::after{
-      content:none !important;
+    a.summaryChip.trainingChip.is-new-off .trainingNewPill{
       display:none !important;
       animation:none !important;
     }
     @keyframes trainingNewBlink{
-      0%,100%{opacity:1; transform:scale(1)}
-      50%{opacity:.45; transform:scale(.97)}
+      0%,100%{opacity:1}
+      50%{opacity:.4}
+    }
+    a.summaryChip.trainingChip .chipLabel::after{
+      content:none !important;
+      display:none !important;
     }
     .trainingNewBadge{display:none!important}
     .welcomeChip .feature-new-badge,
@@ -1211,8 +1211,9 @@
       <div class="chipLabel" id="welcomeName"></div>
     </a>
     <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+      <span class="trainingNewPill" id="trainingNewPill">جديد</span>
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-      <div class="chipLabel" data-key="trainingPage" data-new="جديد">Training</div>
+      <div class="chipLabel" data-key="trainingPage">Training</div>
     </a>
     <a href="{{BASE}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
@@ -3127,12 +3128,14 @@ function applyLang(lang) {
     else if(k==='allShifts') el.textContent=t.allShifts;
     else if(k==='mySchedule') el.textContent=t.mySchedule;
     else if(k==='importRoster') el.textContent=t.importRoster;
-    else if(k==='trainingPage'){
-      el.textContent=t.trainingPage;
-      el.setAttribute('data-new', lang==='ar'?'جديد':'New');
-    }
+    else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
   });
+  var trainingNewPill=document.getElementById('trainingNewPill');
+  var trainingBtnEl=document.getElementById('trainingBtn');
+  if(trainingNewPill && !(trainingBtnEl && trainingBtnEl.classList.contains('is-new-off'))){
+    trainingNewPill.textContent=lang==='ar'?'جديد':'New';
+  }
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
@@ -3866,7 +3869,7 @@ function setSummaryChipHrefs() {
     }
     exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
   }
-  if (trn) trn.href = root + '/training/?v=20260728g';
+  if (trn) trn.href = root + '/training/?v=20260729b';
   if (diff) diff.href = root + '/roster-diff/index.html';
   if (welcome) {
     var wid = localStorage.getItem('importSavedEmpId');
@@ -3877,15 +3880,26 @@ setSummaryChipHrefs();
 (function ensureTrainingNewBadge() {
   var chip = document.getElementById('trainingBtn');
   if (!chip) return;
-  var label = chip.querySelector('.chipLabel[data-key="trainingPage"]') || chip.querySelector('.chipLabel');
+  var pill = document.getElementById('trainingNewPill');
+  if (!pill) {
+    pill = document.createElement('span');
+    pill.id = 'trainingNewPill';
+    pill.className = 'trainingNewPill';
+    chip.insertBefore(pill, chip.firstChild);
+  }
   var now = new Date();
   var stamp = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
   var ar = false;
   try { ar = (localStorage.getItem('rosterLang') || '') === 'ar'; } catch (e) {}
   if (!ar) ar = (document.documentElement.lang || '') === 'ar';
-  if (label) label.setAttribute('data-new', ar ? 'جديد' : 'New');
-  if (stamp >= 20260801) chip.classList.add('is-new-off');
-  else chip.classList.remove('is-new-off');
+  pill.textContent = ar ? 'جديد' : 'New';
+  if (stamp >= 20260801) {
+    chip.classList.add('is-new-off');
+  } else {
+    chip.classList.remove('is-new-off');
+    pill.style.display = 'inline-block';
+    pill.style.visibility = 'visible';
+  }
 })();
 
 
@@ -3909,7 +3923,7 @@ setSummaryChipHrefs();
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260729a');
+    addScript(root + '/feature-update-badge.js?v=20260729b');
     addScript(root + '/banner-changer.js?v=' + ver);
   }
   if (window.requestIdleCallback) {
