@@ -3217,23 +3217,23 @@
       tryFetch(0);
     })();
 
-    // Local enhancement scripts (alerts/banners)
+    // Local enhancement scripts
     (function loadLocalEnhancements(){
       const origin = location.origin;
       const root = location.pathname.includes('/roster-site/')
         ? origin + '/roster-site'
-        : origin;
+        : (location.pathname.includes('/docs/')
+          ? origin + '/' + location.pathname.split('/').filter(Boolean)[0] + '/docs'
+          : origin);
       function addScript(src){
-        if(document.querySelector('script[data-local-src=\"' + src + '\"]')) return;
+        if(document.querySelector('script[data-local-src="' + src + '"]')) return;
         const s = document.createElement('script');
         s.src = src;
-        if (!sync) if (!sync) if (!sync) s.defer = true;
+        s.defer = true;
         s.setAttribute('data-local-src', src);
-        (sync ? document.head : document.body).appendChild(s);
+        document.body.appendChild(s);
       }
       addScript(root + '/change-alert.js');
-        addScript(root + '/bg-texture-shuffle.js?v=' + ver);
-  addScript(root + '/banner-changer.js');
     })();
   </script>
 </body>

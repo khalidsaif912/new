@@ -137,26 +137,29 @@ IMPORT_PWA_HEAD_SNIPPET = """
       }}
     }} catch (swIosErr) {{}}
     try {{
-      var bn = localStorage.getItem('roster_banner_choice');
-      if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {{
-        var bUrl = base + 'assets/banners/' + bn;
-        if (!document.getElementById('banner-early-style')) {{
-          var bes = document.createElement('style');
-          bes.id = 'banner-early-style';
-          bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
-            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
-          document.head.appendChild(bes);
+      var pathNow = location.pathname || '';
+      if (pathNow.indexOf('/my-schedules') === -1) {{
+        var bn = localStorage.getItem('roster_banner_choice');
+        if (bn && /^banner\\d+\\.jpg$/i.test(bn)) {{
+          var bUrl = base + 'assets/banners/' + bn;
+          if (!document.getElementById('banner-early-style')) {{
+            var bes = document.createElement('style');
+            bes.id = 'banner-early-style';
+            bes.textContent =
+              'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
+              'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
+            document.head.appendChild(bes);
+          }}
+          if (!document.querySelector('link[data-banner-preload="1"]')) {{
+            var bp = document.createElement('link');
+            bp.rel = 'preload';
+            bp.as = 'image';
+            bp.href = bUrl;
+            bp.setAttribute('data-banner-preload', '1');
+            document.head.appendChild(bp);
+          }}
+          document.documentElement.classList.add('roster-banner-early');
         }}
-        if (!document.querySelector('link[data-banner-preload="1"]')) {{
-          var bp = document.createElement('link');
-          bp.rel = 'preload';
-          bp.as = 'image';
-          bp.href = bUrl;
-          bp.setAttribute('data-banner-preload', '1');
-          document.head.appendChild(bp);
-        }}
-        document.documentElement.classList.add('roster-banner-early');
       }}
     }} catch (bannerEarlyErr) {{}}
   }})();

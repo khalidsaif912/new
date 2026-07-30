@@ -1,4 +1,7 @@
 (function () {
+  // My Schedule pages use their own chrome — never apply homepage photo banners there.
+  if ((location.pathname || '').indexOf('/my-schedules') !== -1) return;
+
   const BANNER_KEY = 'roster_banner_choice';
   const ACTIVE_CLASS = 'has-custom-banner';
   const EARLY_CLASS = 'roster-banner-early';
