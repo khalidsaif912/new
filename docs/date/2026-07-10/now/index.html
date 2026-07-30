@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260723a"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260728c"></script>
   <title>Duty Roster</title>
   <style>
     /* ═══════ RESET ═══════ */
@@ -323,6 +323,23 @@
     }
     .summaryChip .chipVal .waveHand .chip-icon {
       margin: 0;
+    }
+    a.summaryChip.trainingChip{
+      overflow:visible !important;
+      position:relative;
+    }
+    a.summaryChip.trainingChip .trainingNewPill{display:none!important}
+    50%{opacity:.4}
+    }
+    a.summaryChip.trainingChip .chipLabel::after{
+      content:none !important;
+      display:none !important;
+    }
+    .trainingNewBadge{display:none!important}
+    .welcomeChip .feature-new-badge,
+    #welcomeChip .feature-new-badge,
+    #myScheduleBtn .feature-new-badge{
+      display:none !important;
     }
 
     #summarySwitchChip .chipVal { transition:opacity .2s ease; }
@@ -801,7 +818,7 @@
     .siteAppsCloseWrap { margin-top:4px; }
     .siteAppsCloseWrap .roster-cta-btn { width:100%; }
 
-    /* ═══════ SHIFT COPY (bottom button + modal) ═══════ */
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -1016,14 +1033,14 @@
 
   <!-- ════ HEADER ════ -->
   <div class="header">
-    <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">ع</span></button>
+    <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">Ã˜Â¹</span></button>
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
       <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">10 July 2026</span></label>
-      <input id="datePicker" type="date" value="2026-07-10" min="2026-06-01" max="2026-08-31" aria-label="Select roster date" />
+      <input id="datePicker" type="date" value="2026-07-10" min="2026-07-01" max="2026-09-30" aria-label="Select roster date" />
     </div>
   </div>
 
@@ -1099,10 +1116,10 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
-        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftLabel" style="color:#92400e;">Rajaram - 8899</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1113,10 +1130,10 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftLabel" style="color:#9a3412;">Salim Al Masroori - 8926</span>
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1130,7 +1147,7 @@
     <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
-        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftLabel" style="color:#3730a3;">Adil Al Balushi - 81392</span>
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
@@ -1170,10 +1187,10 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
-        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftLabel" style="color:#92400e;">Saleh Al Rashdi - 82546</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1184,10 +1201,10 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftLabel" style="color:#9a3412;">Mohamed Al Kalbani - 82593</span>
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1201,7 +1218,7 @@
     <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
-        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Jay Macalino - 80250</span>
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1215,7 +1232,7 @@
     <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
-        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftLabel" style="color:#3730a3;">Said Al Amri - 990737</span>
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
@@ -1232,7 +1249,7 @@
     <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
-        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftLabel" style="color:#065f46;">Talal Al Balushi - 81300</span>
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1269,10 +1286,10 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
-        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftLabel" style="color:#92400e;">Assad Al Omairi - 81348</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
@@ -1289,10 +1306,10 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftLabel" style="color:#9a3412;">Mohamed Al Siyabi - 81402</span>
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
@@ -1312,7 +1329,7 @@
     <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
-        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Bushra Al Wahiebi - 82657</span>
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
@@ -1332,7 +1349,7 @@
     <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
-        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftLabel" style="color:#3730a3;">Ahmed Al Kharusi - 82575</span>
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
       </summary>
       <div class="shiftBody">
@@ -1355,7 +1372,7 @@
     <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
-        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftLabel" style="color:#065f46;">Omar Al Obaidi - 82551</span>
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
       </summary>
       <div class="shiftBody">
@@ -1395,10 +1412,10 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
-        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftLabel" style="color:#92400e;">Mohamed Al Subhi - 82592 (Inventory)</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">7</span>
       </summary>
       <div class="shiftBody">
@@ -1421,16 +1438,16 @@
       <span class="empName" data-name-ar="محمد المسكري - 82666">Mohamed Al Maskari - 82666</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="Mohamed Al Subhi - 82592 (Inventory)" role="button" tabindex="0">
-      <span class="empName" data-name-ar="محمد الصبحي - 82592 (INVENTORY)">Mohamed Al Subhi - 82592 (Inventory)</span>
+      <span class="empName" data-name-ar="محمد ال سوبهي - 82592">Mohamed Al Subhi - 82592 (Inventory)</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftLabel" style="color:#9a3412;">Ali Al Marjubi - 82577</span>
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">6</span>
       </summary>
       <div class="shiftBody">
@@ -1459,7 +1476,7 @@
     <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
-        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Riyahd Al Jabri - 82555</span>
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">6</span>
       </summary>
       <div class="shiftBody">
@@ -1488,7 +1505,7 @@
     <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
-        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftLabel" style="color:#3730a3;">Adil Al Zadjali - 8584</span>
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">9</span>
       </summary>
       <div class="shiftBody">
@@ -1526,7 +1543,7 @@
     <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
-        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftLabel" style="color:#065f46;">Mohamed Al Mamari - 82674</span>
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">4</span>
       </summary>
       <div class="shiftBody">
@@ -1572,10 +1589,10 @@
 
       <div class="shiftStack">
 
-    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7">
+    <details class="shiftCard" data-shift="Morning" style="border:1px solid #f59e0b44; background:#fef3c7" open>
       <summary class="shiftSummary" style="background:#fef3c7; border-bottom:1px solid #f59e0b33;">
         <span class="shiftIcon">☀️</span>
-        <span class="shiftLabel" style="color:#92400e;">Morning</span>
+        <span class="shiftLabel" style="color:#92400e;">Zakariya Al Balushi - 82429</span>
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
@@ -1592,10 +1609,10 @@
       </div>
     </details>
             
-    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5" open>
+    <details class="shiftCard" data-shift="Afternoon" style="border:1px solid #f9731644; background:#ffedd5">
       <summary class="shiftSummary" style="background:#ffedd5; border-bottom:1px solid #f9731633;">
         <span class="shiftIcon">🌤️</span>
-        <span class="shiftLabel" style="color:#9a3412;">Afternoon</span>
+        <span class="shiftLabel" style="color:#9a3412;">Khamis Al Hinai - 82467</span>
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
       </summary>
       <div class="shiftBody">
@@ -1612,7 +1629,7 @@
     <details class="shiftCard" data-shift="Night" style="border:1px solid #8b5cf644; background:#ede9fe">
       <summary class="shiftSummary" style="background:#ede9fe; border-bottom:1px solid #8b5cf633;">
         <span class="shiftIcon">🌙</span>
-        <span class="shiftLabel" style="color:#5b21b6;">Night</span>
+        <span class="shiftLabel" style="color:#5b21b6;">Badar Al Hamadani - 81307</span>
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">2</span>
       </summary>
       <div class="shiftBody">
@@ -1629,7 +1646,7 @@
     <details class="shiftCard" data-shift="Off Day" style="border:1px solid #6366f144; background:#e0e7ff">
       <summary class="shiftSummary" style="background:#e0e7ff; border-bottom:1px solid #6366f133;">
         <span class="shiftIcon">🛋️</span>
-        <span class="shiftLabel" style="color:#3730a3;">Off Day</span>
+        <span class="shiftLabel" style="color:#3730a3;">Said Al Fahkri - 8744</span>
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
       </summary>
       <div class="shiftBody">
@@ -1658,7 +1675,7 @@
     <details class="shiftCard" data-shift="Annual Leave" style="border:1px solid #10b98144; background:#d1fae5">
       <summary class="shiftSummary" style="background:#d1fae5; border-bottom:1px solid #10b98133;">
         <span class="shiftIcon">✈️</span>
-        <span class="shiftLabel" style="color:#065f46;">Annual Leave</span>
+        <span class="shiftLabel" style="color:#065f46;">Badar Al Fulaiti - 82468</span>
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
@@ -1705,7 +1722,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">23 July 2026 / 13:53</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 August 2026 / 10:06</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Operation Roster July2026 Version 5.1.xlsx</strong>
   </div>
 
@@ -1745,6 +1762,13 @@
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/><path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/><path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+        </span>
+      </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/><path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><circle cx="40" cy="34" r="2.2" fill="#fff"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
@@ -1765,10 +1789,15 @@
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
         <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
       </a>
+      <a class="siteAppsLink siteAppsLink--book" href="https://khalidsaif912.github.io/new/docs/a-cup-of-book/" data-app-id="book" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="book">A Cup of Book</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="book">Reading topics</span>
+      </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/><path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/><rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/></svg></span>
         <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store · متجر مُبهر</span>
+          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
           <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
         </span>
       </a>
@@ -2949,7 +2978,7 @@ startSummarySwitchLoop();
     if (document.getElementById('bgTextureShuffleBtn')) return;
     try {
       var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260723a';
+      var src = root + '/bg-texture-shuffle.js?v=20260728c';
       if (document.querySelector('script[data-local-src="' + src + '"]')) return;
       var s = document.createElement('script');
       s.src = src;
@@ -3228,7 +3257,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260726c';
+  var ver = '20260728c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3244,12 +3273,13 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260726e');
+    addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/feature-update-badge.js?v=20260726d');
+    addScript(root + '/feature-update-badge.js?v=20260729c');
+    addScript(root + '/training-new-badge.js?v=20260729h');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
@@ -3260,7 +3290,7 @@ function goToRosterDiff(event) {
   }
 })();
 
-// Employee row: tap → schedule
+// Employee row: tap → schedule; long-press → next 5 shifts preview
 (function initEmployeeNextShiftPreview() {
   var tooltip = document.createElement('div');
   tooltip.className = 'nextShiftTooltip';
@@ -3439,7 +3469,45 @@ function goToRosterDiff(event) {
     if (!rowEl || rowEl.dataset.nextShiftBound === '1') return;
     rowEl.dataset.nextShiftBound = '1';
 
+    rowEl.addEventListener('pointerdown', function(ev) {
+      if (ev.button !== 0 && ev.button !== undefined) return;
+      longPressRow = rowEl;
+      longPressMoved = false;
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(function() {
+        longPressTimer = null;
+        if (longPressRow !== rowEl || longPressMoved) return;
+        suppressClickFor = rowEl;
+        showPreviewForRow(rowEl, null);
+      }, LONG_PRESS_MS);
+    });
+    rowEl.addEventListener('pointermove', function(ev) {
+      if (longPressRow !== rowEl) return;
+      if (typeof ev.movementX === 'number' && (Math.abs(ev.movementX) > 8 || Math.abs(ev.movementY) > 8)) {
+        longPressMoved = true;
+      }
+    });
+    rowEl.addEventListener('pointerup', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('pointercancel', function() {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPressRow = null;
+    });
+    rowEl.addEventListener('contextmenu', function(ev) {
+      if (suppressClickFor === rowEl) ev.preventDefault();
+    });
+
     rowEl.addEventListener('click', function(ev) {
+      if (suppressClickFor === rowEl) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        suppressClickFor = null;
+        return;
+      }
       ev.preventDefault();
       goToEmployeeSchedule(empNameFromRow(rowEl));
     }, true);
