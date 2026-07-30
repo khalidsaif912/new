@@ -385,7 +385,7 @@
       .topbar-center{flex:1 1 0;min-width:0;overflow:hidden;padding-inline-end:4px}
       .brand-info{overflow:hidden;max-width:100%}
       .brand-name{font-size:14px;line-height:1.15}
-      .brand-sub{display:none}
+      .brand-sub{display:block;font-size:12px;opacity:.78}
       .topbar-right{gap:4px;flex-shrink:0}
       .topbar-inner .home-btn{width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important;border-radius:12px!important}
       .topbar-inner .ghost-btn.theme-btn,.topbar-inner #langBtn,.topbar-inner .brand-swap,.topbar-inner .brand-sq{width:32px!important;height:32px!important;min-width:32px!important;flex:0 0 32px!important;border-radius:8px!important}
@@ -395,7 +395,20 @@
       .brand-swap{width:32px!important;height:32px!important}
       .brand-sq{width:32px!important;height:32px!important}
       .search-section{padding:10px 14px 12px}
-      .search-form{flex-wrap:wrap;width:100%;row-gap:8px}.search-id-row{flex:1 1 100%;width:100%;min-width:0}.search-avatar-wrap{flex:0 0 auto}.search-avatar,.search-change-btn{width:44px;height:44px;min-height:44px}.id-input{flex:1 1 auto;width:auto;min-width:0;max-width:none}.id-input .search-input{flex:1 1 auto;width:auto;min-width:0;max-width:100%;font-size:16px;min-height:44px;-webkit-appearance:none;appearance:none}.id-prefix{min-height:44px}.search-btn{flex:1 1 100%;width:100%;min-height:44px}}
+      .search-form{flex-wrap:nowrap;width:100%;gap:6px;align-items:center}
+      .search-id-row{flex:1 1 auto;width:auto;min-width:0}
+      .search-avatar-wrap{flex:0 0 auto}
+      .search-avatar,.search-change-btn{width:40px;height:40px;min-height:40px}
+      .id-input{flex:1 1 auto;width:auto;min-width:0;max-width:none}
+      .id-input .search-input{flex:1 1 auto;width:auto;min-width:0;max-width:100%;font-size:16px;min-height:44px;-webkit-appearance:none;appearance:none}
+      .id-prefix{min-height:44px}
+      .search-btn{flex:0 0 auto;width:auto;min-width:72px;min-height:44px;padding:0 12px;font-size:12px}
+    }
+    @media (max-width:390px){
+      #diffBtn{display:none!important}
+      .brand-name{font-size:14px}
+      .brand-sub{font-size:11px}
+    }
     @media print{.topbar,.search-section,.toast-container,.modal,.actions-card{display:none!important}body{background:#fff;color:#000}}
   </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
@@ -403,10 +416,9 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <button class="home-btn" onclick="goBack()" aria-label="Home">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="color:#8b949e">
-        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>
-        <path d="M9 21V12h6v9"/>
+    <button class="home-btn" onclick="goBack()" id="backBtn" aria-label="Home" title="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>
       </svg>
     </button>
     <div class="topbar-center">
@@ -416,12 +428,13 @@
       </div>
     </div>
     <div class="topbar-right">
-      <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
-      <button class="ghost-btn" onclick="toggleLang()" id="langBtn">English</button>
+      <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
+      <button class="ghost-btn theme-btn" onclick="toggleLang()" id="langBtn">EN</button>
+      <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
       <div class="brand-mark">
-        <div class="brand-swap">
-          <button class="brand-sq show" id="brandCal" type="button" onclick="openTips()">📅</button>
-          <button class="brand-sq" id="brandQ" type="button" onclick="openTips()">❔</button>
+        <div class="brand-swap" id="brandSwap" aria-label="Help" title="Help">
+          <button class="brand-sq brand-cal show" id="brandCal" type="button" onclick="openTips()" aria-label="Help">📅</button>
+          <button class="brand-sq brand-q" id="brandQ" type="button" onclick="openTips()" aria-label="Help">❔</button>
         </div>
       </div>
     </div>
@@ -566,6 +579,7 @@
   function toggleTheme(){theme=theme==='dark'?'light':'dark';document.body.classList.toggle('light',theme==='light');document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';localStorage.setItem('importPrefTheme',theme);}
   function toggleLang(){lang=lang==='en'?'ar':'en';localStorage.setItem('importPrefLang',lang);applyLangUI();}
   function goBack(){var root=siteRootUrl();if(document.referrer&&document.referrer.includes(location.host))history.back();else location.href=root+'import/';}
+  function goToRosterDiff(){location.href=siteRootUrl()+'roster-diff/index.html';}
   function openTips(){document.getElementById('tipsModal').classList.add('open');}
   function closeTips(){document.getElementById('tipsModal').classList.remove('open');}
   document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();var id=document.getElementById('empId').value.trim();if(id)loadSchedule(id);});
