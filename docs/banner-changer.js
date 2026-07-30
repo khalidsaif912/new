@@ -48,7 +48,12 @@
     'banner28.jpg',
     'banner29.jpg',
     'banner30.jpg',
-    'banner31.jpg'
+    'banner31.jpg',
+    'banner32.jpg',
+    'banner33.jpg',
+    'banner34.jpg',
+    'banner35.jpg',
+    'banner36.jpg'
   ];
 
   /** Per-banner crop/scrim tuning (logo-left layouts, etc.). */
@@ -70,6 +75,37 @@
       positionMobile: '50% 45%',
       scrim:
         'linear-gradient(to right,rgba(20,8,12,.45) 0%,rgba(20,8,12,.2) 50%,rgba(20,8,12,.32) 100%)',
+    },
+    // Arabic calligraphy — keep text centered; light scrim for title readability
+    'banner32.jpg': {
+      position: '50% 50%',
+      positionMobile: '50% 50%',
+      scrim:
+        'linear-gradient(to right,rgba(0,0,0,.35) 0%,rgba(0,0,0,.12) 45%,rgba(0,0,0,.28) 100%)',
+    },
+    'banner33.jpg': {
+      position: '50% 50%',
+      positionMobile: '50% 50%',
+      scrim:
+        'linear-gradient(to right,rgba(0,0,0,.32) 0%,rgba(0,0,0,.1) 45%,rgba(0,0,0,.26) 100%)',
+    },
+    'banner34.jpg': {
+      position: '50% 50%',
+      positionMobile: '50% 50%',
+      scrim:
+        'linear-gradient(to right,rgba(12,18,10,.38) 0%,rgba(12,18,10,.12) 45%,rgba(12,18,10,.3) 100%)',
+    },
+    'banner35.jpg': {
+      position: '50% 50%',
+      positionMobile: '50% 50%',
+      scrim:
+        'linear-gradient(to right,rgba(255,255,255,.55) 0%,rgba(255,255,255,.2) 40%,rgba(8,16,40,.35) 100%)',
+    },
+    'banner36.jpg': {
+      position: '50% 50%',
+      positionMobile: '50% 50%',
+      scrim:
+        'linear-gradient(to right,rgba(255,255,255,.5) 0%,rgba(255,255,255,.18) 40%,rgba(8,16,40,.32) 100%)',
     },
   };
 
