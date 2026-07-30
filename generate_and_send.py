@@ -716,15 +716,16 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
         colors = SHIFT_COLORS.get(group_key, SHIFT_COLORS["Other"])
         count = len(emps)
         open_attr = ' open' if (group_key == open_group) else ''
+        shift_label = display_name
 
         rows_html = ""
         for i, e in enumerate(emps):
             alt = " empRowAlt" if i % 2 == 1 else ""
-            display_name = name_i18n.format_name_id(e["name"])
-            name_attr = html_escape(display_name, quote=True)
-            ar_name_attr = html_escape(name_i18n.arabic_display(display_name), quote=True)
+            emp_display = name_i18n.format_name_id(e["name"])
+            name_attr = html_escape(emp_display, quote=True)
+            ar_name_attr = html_escape(name_i18n.arabic_display(emp_display), quote=True)
             rows_html += f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
-      <span class="empName" data-name-ar="{ar_name_attr}">{display_name}</span>
+      <span class="empName" data-name-ar="{ar_name_attr}">{emp_display}</span>
        <span class="empStatus" style="color:{colors['status_color']};">{e['shift']}</span>
      </div>"""
 
@@ -732,7 +733,7 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
     <details class="shiftCard" data-shift="{group_key}" style="border:1px solid {colors['border']}; background:{colors['bg']}"{open_attr}>
       <summary class="shiftSummary" style="background:{colors['summary_bg']}; border-bottom:1px solid {colors['summary_border']};">
         <span class="shiftIcon">{colors['icon']}</span>
-        <span class="shiftLabel" style="color:{colors['label_color']};">{display_name}</span>
+        <span class="shiftLabel" style="color:{colors['label_color']};">{shift_label}</span>
         <span class="shiftCount" style="background:{colors['count_bg']}; color:{colors['count_color']};">{count}</span>
       </summary>
       <div class="shiftBody">
