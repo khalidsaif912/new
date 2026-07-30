@@ -170,19 +170,49 @@ def patch_flatten_future_shifts(html: str) -> str:
     return patch_flatten_future_shifts_js(html)
 
 
-def inject_modals(html: str, share_html: str, apps_html: str) -> str:
-    if 'id="siteShareSheet"' in html and 'id="siteAppsSheet"' in html:
+def inject_modals(html: str, share_html: str, apps_html: str, shift_copy_html: str = "") -> str:
+    if 'id="siteShareSheet"' not in html or 'id="siteAppsSheet"' not in html:
+        needle = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+        if needle in html:
+            insert = f"\n{share_html}\n{apps_html}\n"
+            html = html.replace(needle, insert + needle, 1)
+        elif 'id="captureBusy"' in html:
+            html = html.replace(
+                '<div id="captureBusy"',
+                f"{share_html}\n{apps_html}\n<div id=\"captureBusy\"",
+                1,
+            )
+    if shift_copy_html and 'id="shiftCopySheet"' not in html:
+        needle = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
+        if needle in html:
+            html = html.replace(needle, shift_copy_html + "\n" + needle, 1)
+        elif 'id="captureBusy"' in html:
+            html = html.replace(
+                '<div id="captureBusy"',
+                shift_copy_html + '\n<div id="captureBusy"',
+                1,
+            )
+        else:
+            html = html + "\n" + shift_copy_html + "\n"
+    return html
+
+
+def patch_secondary_bar(html: str, secondary_html: str) -> str:
+    """Insert Copy Shift + Former Colleagues bar before footer inside importBottom."""
+    if 'id="copyShiftBtn"' in html and "secondaryBar" in html:
         return html
-    needle = '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>'
-    if needle in html:
-        insert = f"\n{share_html}\n{apps_html}\n"
-        return html.replace(needle, insert + needle, 1)
-    if 'id="captureBusy"' in html:
-        return html.replace(
-            '<div id="captureBusy"',
-            f"{share_html}\n{apps_html}\n<div id=\"captureBusy\"",
-            1,
-        )
+    bar = (secondary_html or "").strip()
+    if not bar:
+        return html
+    m = re.search(
+        r'(</nav>\s*)(\n\s*<div class="footer">)',
+        html,
+    )
+    if m and 'class="importBottom"' in html[: m.start()]:
+        return html[: m.end(1)] + "\n    " + bar + "\n    " + html[m.start(2) :]
+    m2 = re.search(r'(\n\s*<div class="footer">)', html)
+    if m2 and 'class="importBottom"' in html:
+        return html[: m2.start()] + "\n    " + bar + "\n  " + html[m2.start() :]
     return html
 
 
@@ -474,6 +504,8 @@ def patch_file(
     load_block: str,
     share_html: str,
     apps_html: str,
+    secondary_html: str = "",
+    shift_copy_html: str = "",
 ) -> bool:
     text = path.read_text(encoding="utf-8")
     if ".deptCard" not in text:
@@ -487,8 +519,9 @@ def patch_file(
     updated = patch_summary_bar(updated, summary_bar_html)
     updated = patch_cta_placement(updated, cta_html)
     updated = patch_cta_bar(updated, cta_html)
+    updated = patch_secondary_bar(updated, secondary_html)
     updated = inject_capture_shell(updated)
-    updated = inject_modals(updated, share_html, apps_html)
+    updated = inject_modals(updated, share_html, apps_html, shift_copy_html)
     updated = patch_flatten_future_shifts(updated)
     updated = patch_reference_date(updated)
     updated = upgrade_emp_rows(updated)
@@ -514,6 +547,8 @@ def main() -> int:
         import_summary_bar_html,
         LANG_TOGGLE_HTML,
         LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+        SHIFT_COPY_BUTTON_HTML,
+        SHIFT_COPY_MODAL_HTML,
         SITE_APPS_MODAL_HTML,
         SITE_SHARE_MODAL_HTML,
     )
@@ -545,6 +580,8 @@ def main() -> int:
             load_block,
             SITE_SHARE_MODAL_HTML,
             SITE_APPS_MODAL_HTML,
+            SHIFT_COPY_BUTTON_HTML,
+            SHIFT_COPY_MODAL_HTML,
         ):
             updated += 1
     print(f"patched={updated}")

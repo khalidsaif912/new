@@ -1821,6 +1821,17 @@
 </nav>
 
     
+    <nav class="quickActions secondaryBar" aria-label="More actions">
+  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M11.5 13h5M11.5 16h3"/></svg></span>
+    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
+  </button>
+  <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="alumni/">
+    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span class="roster-cta-label">Former Colleagues</span>
+  </a>
+</nav>
+    
   <div class="footer">
     <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">28JUL2026 / 07:51</strong>
     <br>Total: <strong id="importTotalEmployees">68 employees</strong>
@@ -1832,6 +1843,75 @@
 </div>
 
 
+<div id="shiftCopySheet" class="shiftCopySheet" aria-hidden="true">
+  <div class="shiftCopyCard" role="dialog" aria-labelledby="shiftCopyTitle">
+    <h2 class="shiftCopyTitle" id="shiftCopyTitle">On-duty list</h2>
+    <p class="shiftCopyHint" id="shiftCopyHint">Copy or share a shift as WhatsApp text</p>
+    <div class="shiftCopyGrid">
+      <div class="shiftCopyOpt shiftCopyOpt--morning" data-shift="Morning">
+        <span class="shiftCopyOpt-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41"/><path d="M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
+        <span class="shiftCopyOpt-main">
+          <span class="shiftCopyOpt-label">Morning</span>
+          <span class="shiftCopyOpt-count" data-shift-count="Morning">0</span>
+        </span>
+        <span class="shiftCopyOpt-actions">
+          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="Morning" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="Morning" title="Share" aria-label="Share"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        </span>
+      </div>
+      <div class="shiftCopyOpt shiftCopyOpt--afternoon" data-shift="Afternoon">
+        <span class="shiftCopyOpt-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 18H8a5 5 0 1 1 2-9.5"/><circle cx="17" cy="8" r="3"/></svg></span>
+        <span class="shiftCopyOpt-main">
+          <span class="shiftCopyOpt-label">Afternoon</span>
+          <span class="shiftCopyOpt-count" data-shift-count="Afternoon">0</span>
+        </span>
+        <span class="shiftCopyOpt-actions">
+          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="Afternoon" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="Afternoon" title="Share" aria-label="Share"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        </span>
+      </div>
+      <div class="shiftCopyOpt shiftCopyOpt--night" data-shift="Night">
+        <span class="shiftCopyOpt-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span class="shiftCopyOpt-main">
+          <span class="shiftCopyOpt-label">Night</span>
+          <span class="shiftCopyOpt-count" data-shift-count="Night">0</span>
+        </span>
+        <span class="shiftCopyOpt-actions">
+          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="Night" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="Night" title="Share" aria-label="Share"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        </span>
+      </div>
+      <div class="shiftCopyOpt shiftCopyOpt--annual" data-shift="Annual Leave">
+        <span class="shiftCopyOpt-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M5.6 8.6 3.5 6.5M18.4 8.6l2.1-2.1"/><path d="M3 13a9 9 0 0 1 18 0z"/><path d="M12 13v8M9 21h6"/></svg></span>
+        <span class="shiftCopyOpt-main">
+          <span class="shiftCopyOpt-label">Annual Leave</span>
+          <span class="shiftCopyOpt-count" data-shift-count="Annual Leave">0</span>
+        </span>
+        <span class="shiftCopyOpt-actions">
+          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="Annual Leave" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="Annual Leave" title="Share" aria-label="Share"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        </span>
+      </div>
+      <div class="shiftCopyOpt shiftCopyOpt--training" data-shift="Training">
+        <span class="shiftCopyOpt-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span>
+        <span class="shiftCopyOpt-main">
+          <span class="shiftCopyOpt-label">Training</span>
+          <span class="shiftCopyOpt-count" data-shift-count="Training">0</span>
+        </span>
+        <span class="shiftCopyOpt-actions">
+          <button type="button" class="shiftCopyAct shiftCopyAct--copy" data-act="copy" data-shift="Training" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button type="button" class="shiftCopyAct shiftCopyAct--share" data-act="share" data-shift="Training" title="Share" aria-label="Share"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        </span>
+      </div>
+    </div>
+    <p class="shiftCopyStatus" id="shiftCopyStatus" aria-live="polite"></p>
+    <div class="shiftCopyCloseWrap">
+      <button type="button" class="roster-cta-btn roster-cta-btn--muted shiftCopyCloseBtn" id="shiftCopyCloseBtn">
+        <span class="roster-cta-label" id="shiftCopyCloseLabel">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
   <div class="captureSheetCard">
@@ -3832,10 +3912,13 @@ setSummaryChipHrefs();
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/feature-update-badge.js?v=20260729c');
     addScript(root + '/training-new-badge.js?v=20260729h');
+    addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
   if (window.requestIdleCallback) {

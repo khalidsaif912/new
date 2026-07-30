@@ -53,6 +53,8 @@ from roster_cta_snippets import (  # noqa: E402
     LANG_TOGGLE_HTML,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
     PERF_RENDER_CSS,
+    SHIFT_COPY_BUTTON_HTML,
+    SHIFT_COPY_MODAL_HTML,
     SHIFT_RANGE_CSS,
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
@@ -996,6 +998,7 @@ def build_duty_html(
 
   <div class="importBottom">
     {import_cta_html(cta_href="{{BASE}}/now/")}
+    {SHIFT_COPY_BUTTON_HTML}
     {footer}
   </div>
 
@@ -1004,6 +1007,7 @@ def build_duty_html(
 {CAPTURE_DOM_HTML}
 {SITE_SHARE_MODAL_HTML}
 {SITE_APPS_MODAL_HTML}
+{SHIFT_COPY_MODAL_HTML}
 <script>
 var __html2canvasLoading = null;
 function ensureHtml2Canvas() {{
