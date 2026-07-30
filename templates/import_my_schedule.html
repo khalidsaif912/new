@@ -25,11 +25,24 @@
     .topbar::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(56,139,253,.5) 30%,rgba(63,185,80,.4) 60%,rgba(188,140,255,.4) 80%,transparent 100%);background-size:200% 100%;animation:aurora 4s ease infinite;pointer-events:none;}
     body.light .topbar{background:rgba(225,232,245,.97);border-bottom-color:rgba(29,111,212,.18);box-shadow:0 6px 24px rgba(0,0,0,.18);}
     .topbar-inner{display:flex;align-items:center;padding:11px 20px;gap:10px;max-width:1080px;margin:0 auto;}
-    .home-btn{width:38px;height:38px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;display:grid;place-items:center;cursor:pointer;transition:all .18s;flex:0 0 auto;}
-    .home-btn svg{width:19px;height:19px;transition:transform .18s;}
-    .home-btn:hover{background:rgba(56,139,253,.18);border-color:rgba(56,139,253,.4);}
-    .home-btn:hover svg{transform:scale(1.12);}
-    .home-btn:active{transform:scale(.94);}
+    .home-btn{
+      width:48px;height:48px;padding:0;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      color:rgba(230,237,243,.95);
+      display:grid;place-items:center;
+      cursor:pointer;
+      transition:all .15s;
+      flex:0 0 auto;
+      font-size:0;
+      position:relative;
+    }
+    .home-btn svg{width:20px;height:20px;display:block;pointer-events:none;}
+    .home-btn:hover{background:rgba(56,139,253,.15);color:#e6edf3;border-color:rgba(56,139,253,.35);}
+    .home-btn:active{transform:scale(.97);}
+    body.light .home-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12);color:#1a1f2e;}
+    body.light .home-btn:hover{background:rgba(0,0,0,.07);border-color:rgba(0,0,0,.18);}
     .topbar-center{display:flex;align-items:center;flex:1;min-width:0;}
     .brand-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
     .topbar-right{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex:0 0 auto;}
@@ -374,7 +387,20 @@
     body.light .secret-msg{color:#b91c1c}
     .secret-foot{gap:10px;justify-content:space-between;padding:0 22px calc(18px + var(--safe-bot));border-top:none;background:transparent;backdrop-filter:none}
     .secret-foot .tbtn{flex:1;height:42px;border-radius:12px;font-size:13px}
-    .topbar-inner .home-btn{width:48px!important;height:48px!important;min-width:48px!important;border-radius:14px!important;flex:0 0 48px!important;display:grid!important;place-items:center!important;}
+    .topbar-inner .home-btn{
+      width:48px!important;height:48px!important;min-width:48px!important;max-width:48px!important;
+      padding:0!important;border-radius:14px!important;flex:0 0 48px!important;
+      display:grid!important;place-items:center!important;
+      background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.12)!important;
+      box-shadow:none!important;color:rgba(230,237,243,.95)!important;
+    }
+    .topbar-inner .home-btn svg{width:20px!important;height:20px!important;display:block!important;pointer-events:none!important;}
+    .topbar-inner .home-btn:hover{
+      background:rgba(56,139,253,.15)!important;border-color:rgba(56,139,253,.35)!important;transform:none!important;
+    }
+    body.light .topbar-inner .home-btn{
+      background:rgba(0,0,0,.05)!important;border-color:rgba(0,0,0,.12)!important;color:#1a1f2e!important;
+    }
     .topbar-inner .ghost-btn.theme-btn,.topbar-inner #langBtn,.topbar-inner .brand-swap,.topbar-inner .brand-sq{width:36px!important;height:36px!important;min-width:36px!important;border-radius:10px!important;display:grid!important;place-items:center!important;flex:0 0 36px!important;}
     .topbar-inner #langBtn{width:auto!important;min-width:36px!important;padding:0 10px!important;flex:0 0 auto!important;}
     .topbar-inner .ghost-btn.theme-btn,.topbar-inner .brand-sq{font-size:16px!important;}
@@ -387,11 +413,11 @@
       .brand-name{font-size:14px;line-height:1.15}
       .brand-sub{display:block;font-size:12px;opacity:.78}
       .topbar-right{gap:4px;flex-shrink:0}
-      .topbar-inner .home-btn{width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important;border-radius:12px!important}
+      .topbar-inner .home-btn{width:48px!important;height:48px!important;min-width:48px!important;flex:0 0 48px!important;border-radius:14px!important}
       .topbar-inner .ghost-btn.theme-btn,.topbar-inner #langBtn,.topbar-inner .brand-swap,.topbar-inner .brand-sq{width:32px!important;height:32px!important;min-width:32px!important;flex:0 0 32px!important;border-radius:8px!important}
       .topbar-inner #langBtn{min-width:30px!important;padding:0 6px!important;font-size:11px!important}
       .topbar-inner .ghost-btn.theme-btn,.topbar-inner .brand-sq{font-size:15px!important}
-      .home-btn svg{width:18px;height:18px}
+      .home-btn svg{width:20px;height:20px}
       .brand-swap{width:32px!important;height:32px!important}
       .brand-sq{width:32px!important;height:32px!important}
       .search-section{padding:10px 14px 12px}
