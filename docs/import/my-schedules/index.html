@@ -330,18 +330,6 @@
     .tbtn{flex:1;height:36px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--border2);background:rgba(255,255,255,.05);color:var(--muted);transition:all .12s;}
     .tbtn:hover{background:rgba(255,255,255,.1);color:var(--ink)}.tbtn.primary{background:linear-gradient(135deg,#1f6feb,#388bfd);border:none;color:#fff;}
     .tbtn.primary:hover{filter:brightness(1.1)}
-    .secret-sheet{border-radius:20px;max-width:400px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.55)}
-    .secret-head{display:flex;align-items:flex-start;gap:12px;min-width:0}
-    .secret-badge{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;font-size:20px;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.28)}
-    body.light .secret-badge{background:rgba(31,111,235,.08);border-color:rgba(31,111,235,.22)}
-    .secret-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 8px;letter-spacing:.02em}
-    .secret-input{width:100%;height:46px;border-radius:12px;border:1px solid var(--border2);padding:0 14px;font-size:16px;font-weight:600;letter-spacing:.08em;color:var(--ink);background:rgba(255,255,255,.04);outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
-    body.light .secret-input{background:rgba(15,23,42,.03)}
-    .secret-input:focus{border-color:rgba(56,139,253,.65);box-shadow:0 0 0 3px rgba(56,139,253,.18);background:rgba(88,166,255,.06)}
-    .secret-msg{margin-top:10px;font-size:13px;font-weight:600;color:#f85149;min-height:18px}
-    body.light .secret-msg{color:#b91c1c}
-    .secret-foot{gap:10px;justify-content:space-between;padding:0 22px calc(18px + var(--safe-bot));border-top:none;background:transparent;backdrop-filter:none}
-    .secret-foot .tbtn{flex:1;height:42px;border-radius:12px;font-size:13px}
     .toast-container{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:20px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);}
     .toast-card{pointer-events:auto;width:min(400px,100%);background:var(--surface);border:1px solid rgba(56,139,253,.25);border-radius:20px;padding:20px;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:slideUp .22s cubic-bezier(.22,1,.36,1);}
     .toast-row{display:flex;align-items:flex-start;gap:10px}
@@ -528,31 +516,6 @@
   </div>
 </div>
 
-<div class="modal" id="adminSecretModal" role="dialog" aria-modal="true" style="align-items:center;padding:20px">
-  <div class="modal-backdrop" onclick="closeAdminSecretModal()"></div>
-  <div class="modal-sheet secret-sheet">
-    <div class="modal-head" style="border-bottom:none;padding-bottom:8px">
-      <div class="secret-head">
-        <div class="secret-badge" aria-hidden="true">🔐</div>
-        <div>
-          <div class="modal-title" id="adminSecretTitle">Protected ID</div>
-          <div class="modal-sub" id="adminSecretSub">Enter the secret code</div>
-        </div>
-      </div>
-      <button class="modal-close" type="button" onclick="closeAdminSecretModal()">✕</button>
-    </div>
-    <div class="modal-body" style="padding-top:4px">
-      <label class="secret-label" for="adminSecretInput" id="adminSecretLabel">Secret code</label>
-      <input id="adminSecretInput" class="secret-input" type="password" autocomplete="off" dir="ltr" placeholder="Secret code"/>
-      <div id="adminSecretMsg" class="secret-msg"></div>
-    </div>
-    <div class="modal-foot secret-foot">
-      <button class="tbtn" type="button" onclick="closeAdminSecretModal()" id="adminSecretCancel">Cancel</button>
-      <button class="tbtn primary" type="button" onclick="confirmAdminSecret()" id="adminSecretOk">Confirm</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal" id="tipsModal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" onclick="closeTips()"></div>
   <div class="modal-sheet">
@@ -573,7 +536,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="../../emp-id-gate.js?v=20260730a"></script>
 <script>
   function deployBasePath(){
     if (location.protocol === 'file:') return '';
@@ -601,7 +563,7 @@
   function currentMonthKey(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
   function shiftHoursPerDay(ym){var key=ym||month||currentMonthKey();return key>=currentMonthKey()?SHIFT_HOURS_CURRENT:SHIFT_HOURS_LEGACY;}
   var STAT_MODAL=[{k:'workHours',icon:'⏱️',c:'c-blue',label_en:'Work hrs',label_ar:'ساعات عمل',hrsOnly:1},{k:'work',icon:'💼',c:'c-blue',label_en:'Work',label_ar:'عمل',hrsKey:'workHours'},{k:'off',icon:'🛌',c:'c-gray',label_en:'Off',label_ar:'راحة'},{k:'morning',icon:'☀️',c:'c-amber',label_en:'Morning',label_ar:'صباحي',hrsKey:'morningHours'},{k:'afternoon',icon:'🌤️',c:'c-orange',label_en:'Afternoon',label_ar:'مسائي',hrsKey:'afternoonHours'},{k:'night',icon:'🌙',c:'c-purple',label_en:'Night',label_ar:'ليلي',hrsKey:'nightHours'},{k:'annualLeave',icon:'✈️',c:'c-green',label_en:'Annual',label_ar:'سنوية'},{k:'sickLeave',icon:'🤒',c:'c-green',label_en:'Sick',label_ar:'مرضية'},{k:'training',icon:'🎓',c:'c-blue',label_en:'Training',label_ar:'تدريب'},{k:'standby',icon:'🧍',c:'c-pink',label_en:'Standby',label_ar:'احتياطي'},{k:'other',icon:'❓',c:'c-gray',label_en:'Other',label_ar:'أخرى'},{k:'unrecorded',icon:'📭',c:'c-gray',label_en:'Empty',label_ar:'فارغ'}];
-  var T={en:{title:'Import - My Schedule',sub:'Enter your Employee ID',heroTitle:'Your Import roster in one view',heroDesc:'Enter your Employee ID to view the month, export as PDF, Image, or add to your calendar.',tipsTitle:'Help & Tips',tipsSub:'Quick help for using the roster.',langBtn:'ع',ph:'e.g. 8715',sbtn:'📅 View',loading:'Loading…',notFound:'Employee not found',notFoundSub:'ID not in the system. Please check and try again.',e1:'Search your schedule',e2:'Enter your Employee ID above to view your monthly Import roster.',saveSub:'Open your schedule faster next time.',saveYes:'✅ Save',saveNo:'Not now',idActTitle:'Employee ID',idActChange:'Change saved ID?',idActChangeSub:'This will remove the saved ID from this device.',idActPin:'Set as My ID?',idActPinSub:'Save this ID on this device for faster access.',cancel:'Cancel',ok:'OK',secretTitle:'Protected ID',secretSub:'Enter the secret code to save this Employee ID on this device.',secretPh:'Secret code',secretBad:'Incorrect secret code',secretOk:'Confirm',days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],legendTitle:'Legend',legend:{Morning:'Morning',Afternoon:'Afternoon',Night:'Night','Off Day':'Day Off','Annual Leave':'Annual Leave','Sick Leave':'Sick Leave',Training:'Training',Standby:'Standby',Other:'Other'},months:['January','February','March','April','May','June','July','August','September','October','November','December']},ar:{title:'الوارد - جدولي',sub:'أدخل رقمك الوظيفي',heroTitle:'جدول الوارد في عرض واحد',heroDesc:'أدخل رقمك الوظيفي لعرض الشهر، ثم حمّل PDF/صورة أو أضفه للتقويم.',tipsTitle:'مساعدة ونصائح',tipsSub:'مساعدة سريعة لاستخدام الجدول.',langBtn:'EN',ph:'مثال: 8715',sbtn:'📅 عرض',loading:'جاري التحميل…',notFound:'لم يُعثر على موظف',notFoundSub:'الرقم غير موجود في النظام. تحقق وأعد المحاولة.',e1:'ابحث عن جدولك',e2:'أدخل رقمك الوظيفي أعلاه لعرض مناوبات الوارد.',saveSub:'لفتح الجدول بسرعة في المرات القادمة.',saveYes:'✅ احفظ',saveNo:'ليس الآن',idActTitle:'الرقم الوظيفي',idActChange:'هل تريد حذف الرقم الوظيفي؟',idActChangeSub:'سيتم حذف الرقم المحفوظ من هذا الجهاز نهائياً.',idActPin:'هل تريد حفظ الرقم الوظيفي؟',idActPinSub:'سيتم حفظ هذا الرقم على هذا الجهاز لفتح الجدول بسرعة.',cancel:'إلغاء',ok:'موافق',secretTitle:'رقم محمي',secretSub:'أدخل الرقم السري لحفظ هذا الرقم الوظيفي على هذا الجهاز.',secretPh:'الرقم السري',secretBad:'الرقم السري غير صحيح',secretOk:'تأكيد',days:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],legendTitle:'الدليل',legend:{Morning:'صباحي',Afternoon:'مسائي',Night:'ليلي','Off Day':'إجازة','Annual Leave':'سنوية','Sick Leave':'مرضية',Training:'تدريب',Standby:'احتياطي',Other:'أخرى'},months:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']}};
+  var T={en:{title:'Import - My Schedule',sub:'Enter your Employee ID',heroTitle:'Your Import roster in one view',heroDesc:'Enter your Employee ID to view the month, export as PDF, Image, or add to your calendar.',tipsTitle:'Help & Tips',tipsSub:'Quick help for using the roster.',langBtn:'ع',ph:'e.g. 8715',sbtn:'📅 View',loading:'Loading…',notFound:'Employee not found',notFoundSub:'ID not in the system. Please check and try again.',e1:'Search your schedule',e2:'Enter your Employee ID above to view your monthly Import roster.',saveSub:'Open your schedule faster next time.',saveYes:'✅ Save',saveNo:'Not now',idActTitle:'Employee ID',idActChange:'Change saved ID?',idActChangeSub:'This will remove the saved ID from this device.',idActPin:'Set as My ID?',idActPinSub:'Save this ID on this device for faster access.',cancel:'Cancel',ok:'OK',days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],legendTitle:'Legend',legend:{Morning:'Morning',Afternoon:'Afternoon',Night:'Night','Off Day':'Day Off','Annual Leave':'Annual Leave','Sick Leave':'Sick Leave',Training:'Training',Standby:'Standby',Other:'Other'},months:['January','February','March','April','May','June','July','August','September','October','November','December']},ar:{title:'الوارد - جدولي',sub:'أدخل رقمك الوظيفي',heroTitle:'جدول الوارد في عرض واحد',heroDesc:'أدخل رقمك الوظيفي لعرض الشهر، ثم حمّل PDF/صورة أو أضفه للتقويم.',tipsTitle:'مساعدة ونصائح',tipsSub:'مساعدة سريعة لاستخدام الجدول.',langBtn:'EN',ph:'مثال: 8715',sbtn:'📅 عرض',loading:'جاري التحميل…',notFound:'لم يُعثر على موظف',notFoundSub:'الرقم غير موجود في النظام. تحقق وأعد المحاولة.',e1:'ابحث عن جدولك',e2:'أدخل رقمك الوظيفي أعلاه لعرض مناوبات الوارد.',saveSub:'لفتح الجدول بسرعة في المرات القادمة.',saveYes:'✅ احفظ',saveNo:'ليس الآن',idActTitle:'الرقم الوظيفي',idActChange:'هل تريد حذف الرقم الوظيفي؟',idActChangeSub:'سيتم حذف الرقم المحفوظ من هذا الجهاز نهائياً.',idActPin:'هل تريد حفظ الرقم الوظيفي؟',idActPinSub:'سيتم حفظ هذا الرقم على هذا الجهاز لفتح الجدول بسرعة.',cancel:'إلغاء',ok:'موافق',days:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],legendTitle:'الدليل',legend:{Morning:'صباحي',Afternoon:'مسائي',Night:'ليلي','Off Day':'إجازة','Annual Leave':'سنوية','Sick Leave':'مرضية',Training:'تدريب',Standby:'احتياطي',Other:'أخرى'},months:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']}};
   function t(k){return T[lang][k];}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';
@@ -620,50 +582,13 @@
   function buildStatsModalHTML(stats,mLabel){return '<div class="stats-modal-grid">'+STAT_MODAL.map(function(m){var n=m.hrsOnly?fmtHours(stats.workHours):(stats[m.k]||0);var sub='';if(m.hrsKey&&stats[m.hrsKey]&&!m.hrsOnly)sub=fmtHours(stats[m.hrsKey]);var z=m.hrsOnly?!stats.workHours:!(stats[m.k]);return '<div class="stat-card stat-sq '+m.c+(z?' is-zero':'')+'"><span class="stat-ico">'+m.icon+'</span><div class="stat-val">'+n+'</div><div class="stat-lbl">'+(lang==='ar'?m.label_ar:m.label_en)+'</div>'+(sub?'<div class="stat-sub">'+sub+'</div>':'')+'</div>';}).join('')+'</div>';}
   async function loadSchedule(id){document.getElementById('area').innerHTML='<div class="state-view"><div class="spin"></div><div class="state-title">'+t('loading')+'</div></div>';try{var res=await fetch(schedulesUrl(id));if(!res.ok)throw new Error('not found');data=await res.json();if(!data.schedules&&data.days){var mk=data.month||(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'));data={id:data.id,name:data.name,department:data.department,schedules:{[mk]:data.days.map(function(d){return{day:d.day,shift_code:d.code,shift_group:codeToGroup(d.code)};})}};}var importMeta=null;try{var mr=await fetch(siteRootUrl()+'import/import_meta.json',{cache:'no-store'});if(mr.ok)importMeta=await mr.json();}catch(e){}months=Object.keys(data.schedules||{}).sort();if(importMeta&&Array.isArray(importMeta.available_months)&&importMeta.available_months.length){months=importMeta.available_months.slice().sort();var filtered={};months.forEach(function(m){filtered[m]=(data.schedules&&data.schedules[m])?data.schedules[m]:[];});data.schedules=filtered;}if(!months.length)throw new Error('empty');if(!localStorage.getItem('importSavedEmpId'))showSaveToast(id);var now=new Date(),cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');month=months.indexOf(cur)>=0?cur:months[months.length-1];renderSchedule();}catch(e){document.getElementById('searchAvatarWrap').style.display='none';document.getElementById('area').innerHTML='<div class="state-view"><span class="state-emoji">❌</span><div class="state-title">'+t('notFound')+'</div><div class="state-desc">'+t('notFoundSub')+'</div></div>';}}
   function showSaveToast(id){var m=document.getElementById('toastMount');m.style.display='flex';m.innerHTML='<div class="toast-card"><div class="toast-row"><div class="toast-ico">💾</div><div class="toast-text"><p><strong>'+(lang==='ar'?'هل تريد حفظ الرقم الوظيفي؟':'Save Employee ID?')+'</strong><br>'+t('saveSub')+'</p></div></div><div class="toast-btns"><button class="tbtn primary" onclick="confirmSave(\''+id+'\')">'+t('saveYes')+'</button><button class="tbtn" onclick="dismissToast()">'+t('saveNo')+'</button></div></div>';setTimeout(function(){dismissToast();},10000);}
-  function isProtectedEmpId(id){return window.rosterEmpIdGate&&window.rosterEmpIdGate.isProtectedEmpId?window.rosterEmpIdGate.isProtectedEmpId(id):String(id)==='81021'||String(id)==='8715';}
-  function applySaveEmpId(id){localStorage.setItem('importSavedEmpId',String(id));dismissToast();if(data)renderSchedule();}
-  function applyPinEmpId(){if(data&&data.id){localStorage.setItem('importSavedEmpId',String(data.id));}closeIdActionModal();if(data)renderSchedule();}
-  var _pendingSecretKind=null,_pendingSecretId=null;
-  function openAdminSecretModal(kind,id){
-    _pendingSecretKind=kind;_pendingSecretId=id!=null?String(id):null;
-    var m=document.getElementById('adminSecretModal');if(!m)return;
-    document.getElementById('adminSecretTitle').textContent=t('secretTitle');
-    document.getElementById('adminSecretSub').textContent=t('secretSub');
-    document.getElementById('adminSecretCancel').textContent=t('cancel');
-    document.getElementById('adminSecretOk').textContent=t('secretOk');
-    var lab=document.getElementById('adminSecretLabel');if(lab)lab.textContent=t('secretPh');
-    var inp=document.getElementById('adminSecretInput'),msg=document.getElementById('adminSecretMsg');
-    if(inp){inp.value='';inp.placeholder=t('secretPh');}
-    if(msg)msg.textContent='';
-    m.classList.add('open');
-    setTimeout(function(){if(inp)inp.focus();},40);
-    if(inp&&!inp._adminSecretBound){
-      inp._adminSecretBound=true;
-      inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();confirmAdminSecret();}});
-    }
-  }
-  function closeAdminSecretModal(){
-    var m=document.getElementById('adminSecretModal');if(m)m.classList.remove('open');
-    _pendingSecretKind=null;_pendingSecretId=null;
-    var inp=document.getElementById('adminSecretInput'),msg=document.getElementById('adminSecretMsg');
-    if(inp)inp.value='';if(msg)msg.textContent='';
-  }
-  function confirmAdminSecret(){
-    var inp=document.getElementById('adminSecretInput'),msg=document.getElementById('adminSecretMsg');
-    var ok=window.rosterEmpIdGate&&window.rosterEmpIdGate.checkEmpSecret?window.rosterEmpIdGate.checkEmpSecret(inp&&inp.value):String(inp&&inp.value||'')==='K8715s';
-    if(!ok){if(msg)msg.textContent=t('secretBad');if(inp){inp.focus();if(inp.select)inp.select();}return;}
-    var kind=_pendingSecretKind,sid=_pendingSecretId;
-    closeAdminSecretModal();
-    if(kind==='save')applySaveEmpId(sid);
-    else if(kind==='pin')applyPinEmpId();
-  }
-  function confirmSave(id){if(isProtectedEmpId(id)){dismissToast();openAdminSecretModal('save',id);return;}applySaveEmpId(id);}
+  function confirmSave(id){localStorage.setItem('importSavedEmpId',id);dismissToast();if(data)renderSchedule();}
   function dismissToast(){var m=document.getElementById('toastMount');m.innerHTML='';m.style.display='none';}
   function changeMyId(){openIdActionModal('change');}function setAsMyId(){openIdActionModal('pin');}
   var _pendingIdAction=null;
   function openIdActionModal(kind){_pendingIdAction=kind;var m=document.getElementById('idActionModal');if(!m)return;document.getElementById('idActionTitle').textContent=t('idActTitle');document.getElementById('idActionIntroTitle').textContent=kind==='change'?t('idActChange'):t('idActPin');document.getElementById('idActionIntroDesc').textContent=kind==='change'?t('idActChangeSub'):t('idActPinSub');document.getElementById('idActionCancel').textContent=t('cancel');document.getElementById('idActionOk').textContent=t('ok');m.classList.add('open');}
   function closeIdActionModal(){var m=document.getElementById('idActionModal');if(m)m.classList.remove('open');_pendingIdAction=null;}
-  function confirmIdAction(){if(_pendingIdAction==='change'){localStorage.removeItem('importSavedEmpId');closeIdActionModal();if(data)renderSchedule();}else if(_pendingIdAction==='pin'){if(data&&data.id&&isProtectedEmpId(data.id)){closeIdActionModal();openAdminSecretModal('pin',data.id);return;}applyPinEmpId();}else closeIdActionModal();}
+  function confirmIdAction(){if(_pendingIdAction==='change'){localStorage.removeItem('importSavedEmpId');closeIdActionModal();if(data)renderSchedule();}else if(_pendingIdAction==='pin'){if(data&&data.id)localStorage.setItem('importSavedEmpId',String(data.id));closeIdActionModal();if(data)renderSchedule();}else closeIdActionModal();}
   var COLORS={
     Morning:{dot:'#d29922'},Afternoon:{dot:'#db6d28'},Night:{dot:'#bc8cff'},
     'Off Day':{dot:'#8b949e'},'Annual Leave':{dot:'#3fb950'},'Sick Leave':{dot:'#3fb950'},
@@ -680,7 +605,7 @@
   function shiftClass(g){return{Morning:'s-morning',Afternoon:'s-afternoon',Night:'s-night','Off Day':'s-off','Annual Leave':'s-leave','Sick Leave':'s-leave',Training:'s-training',Standby:'s-standby',Other:'s-other'}[g]||'s-other';}
   function openStatsModal(){var el=document.getElementById('statsModalOverlay');if(el)el.style.display='flex';}
   function closeStatsModal(){var el=document.getElementById('statsModalOverlay');if(el)el.style.display='none';}
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeTips();closeStatsModal();closeMonthPicker();closeIdActionModal();closeAdminSecretModal();}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeTips();closeStatsModal();closeMonthPicker();}});
   function jumpMonth(val){if(months.indexOf(val)>=0){month=val;renderSchedule();}}
   function toggleMonthPicker(){var p=document.getElementById('monthPopup');if(!p)return;p.style.cssText='';p.classList.toggle('open');if(p.classList.contains('open')){requestAnimationFrame(function(){var rect=p.getBoundingClientRect(),vw=window.innerWidth,margin=10;if(rect.right>vw-margin)p.style.transform='translateX(-'+(rect.right-(vw-margin))+'px)';else if(rect.left<margin)p.style.transform='translateX('+(margin-rect.left)+'px)';if(rect.bottom>window.innerHeight-margin){p.style.top='auto';p.style.bottom='calc(100% + 8px)';}});}}
   function closeMonthPicker(){var p=document.getElementById('monthPopup');if(p)p.classList.remove('open');}
@@ -704,7 +629,7 @@
     if(mx){document.getElementById('empId').value=mx[1];loadSchedule(mx[1]);}
     else{document.getElementById('empId').value=dec;}
   }
-  else{try{if(window.rosterEmpIdGate&&window.rosterEmpIdGate.forceLogoutLocked)window.rosterEmpIdGate.forceLogoutLocked();}catch(e){}var saved=localStorage.getItem('importSavedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
+  else{var saved=localStorage.getItem('importSavedEmpId');if(saved){document.getElementById('empId').value=saved;loadSchedule(saved);}}
 </script>
 <script>
 (function(){
