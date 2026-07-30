@@ -896,6 +896,52 @@
     }
     .ok-btn:hover{filter:brightness(1.1)}
 
+    /* ── SECRET MODAL ── */
+    .secret-sheet{
+      border-radius:20px;max-width:400px;width:100%;
+      box-shadow:0 24px 64px rgba(0,0,0,.55);
+    }
+    .secret-head{display:flex;align-items:flex-start;gap:12px;min-width:0}
+    .secret-badge{
+      width:42px;height:42px;border-radius:12px;flex:0 0 auto;
+      display:grid;place-items:center;font-size:20px;
+      background:rgba(88,166,255,.12);
+      border:1px solid rgba(88,166,255,.28);
+    }
+    body.light .secret-badge{
+      background:rgba(31,111,235,.08);
+      border-color:rgba(31,111,235,.22);
+    }
+    .secret-label{
+      display:block;font-size:12px;font-weight:700;
+      color:var(--muted);margin:0 0 8px;letter-spacing:.02em;
+    }
+    .secret-input{
+      width:100%;height:46px;border-radius:12px;
+      border:1px solid var(--border2);
+      padding:0 14px;font-size:16px;font-weight:600;
+      letter-spacing:.08em;color:var(--ink);
+      background:rgba(255,255,255,.04);outline:none;
+      transition:border-color .15s,box-shadow .15s,background .15s;
+    }
+    body.light .secret-input{background:rgba(15,23,42,.03)}
+    .secret-input:focus{
+      border-color:rgba(56,139,253,.65);
+      box-shadow:0 0 0 3px rgba(56,139,253,.18);
+      background:rgba(88,166,255,.06);
+    }
+    .secret-msg{
+      margin-top:10px;font-size:13px;font-weight:600;
+      color:#f85149;min-height:18px;
+    }
+    body.light .secret-msg{color:#b91c1c}
+    .secret-foot{
+      gap:10px;justify-content:space-between;
+      padding:0 22px calc(18px + var(--safe-bot));
+      border-top:none;background:transparent;backdrop-filter:none;
+    }
+    .secret-foot .tbtn{flex:1;height:42px;border-radius:12px;font-size:13px}
+
     /* ── TOAST ── */
     .toast-container{
       position:fixed;
@@ -1928,26 +1974,29 @@
     </div>
   </div>
 
-  <!-- ADMIN SECRET MODAL (protect saving ID 8715) -->
+  <!-- ADMIN SECRET MODAL -->
   <div class="modal" id="adminSecretModal" role="dialog" aria-modal="true" style="align-items:center;padding:20px">
     <div class="modal-backdrop" onclick="closeAdminSecretModal()"></div>
-    <div class="modal-sheet" style="border-radius:20px;max-width:400px;width:100%">
+    <div class="modal-sheet secret-sheet">
       <div class="modal-head" style="border-bottom:none;padding-bottom:8px">
-        <div>
-          <div class="modal-title" id="adminSecretTitle">Protected ID</div>
-          <div class="modal-sub" id="adminSecretSub">Enter the secret code</div>
+        <div class="secret-head">
+          <div class="secret-badge" aria-hidden="true">🔐</div>
+          <div>
+            <div class="modal-title" id="adminSecretTitle">Protected ID</div>
+            <div class="modal-sub" id="adminSecretSub">Enter the secret code</div>
+          </div>
         </div>
-        <button class="modal-close" onclick="closeAdminSecretModal()">✕</button>
+        <button class="modal-close" onclick="closeAdminSecretModal()" type="button">✕</button>
       </div>
       <div class="modal-body" style="padding-top:4px">
-        <input id="adminSecretInput" type="password" autocomplete="off" dir="ltr"
-          style="width:100%;height:44px;border-radius:12px;border:1px solid rgba(148,163,184,.35);padding:0 14px;font-size:16px;background:rgba(15,23,42,.04);outline:none"
+        <label class="secret-label" for="adminSecretInput" id="adminSecretLabel">Secret code</label>
+        <input id="adminSecretInput" class="secret-input" type="password" autocomplete="off" dir="ltr"
           placeholder="Secret code"/>
-        <div id="adminSecretMsg" style="margin-top:10px;font-size:13px;color:#b91c1c;min-height:18px"></div>
+        <div id="adminSecretMsg" class="secret-msg"></div>
       </div>
-      <div class="modal-foot" style="gap:10px;justify-content:space-between;padding:0 22px 22px">
-        <button class="tbtn" style="flex:1;height:42px" onclick="closeAdminSecretModal()" id="adminSecretCancel">Cancel</button>
-        <button class="tbtn primary" style="flex:1;height:42px" onclick="confirmAdminSecret()" id="adminSecretOk">Confirm</button>
+      <div class="modal-foot secret-foot">
+        <button class="tbtn" type="button" onclick="closeAdminSecretModal()" id="adminSecretCancel">Cancel</button>
+        <button class="tbtn primary" type="button" onclick="confirmAdminSecret()" id="adminSecretOk">Confirm</button>
       </div>
     </div>
   </div>
@@ -2139,7 +2188,7 @@
         cancel:'Cancel',
         ok:'OK',
         secretTitle:'Protected ID',
-        secretSub:'Enter the secret code to save ID 8715 on this device.',
+        secretSub:'Enter the secret code to save this Employee ID on this device.',
         secretPh:'Secret code',
         secretBad:'Incorrect secret code',
         secretOk:'Confirm',
@@ -2189,7 +2238,7 @@
         cancel:'إلغاء',
         ok:'موافق',
         secretTitle:'رقم محمي',
-        secretSub:'أدخل الرقم السري لحفظ الرقم الوظيفي 8715 على هذا الجهاز.',
+        secretSub:'أدخل الرقم السري لحفظ هذا الرقم الوظيفي على هذا الجهاز.',
         secretPh:'الرقم السري',
         secretBad:'الرقم السري غير صحيح',
         secretOk:'تأكيد',
@@ -2499,6 +2548,8 @@
       document.getElementById('adminSecretSub').textContent=t('secretSub');
       document.getElementById('adminSecretCancel').textContent=t('cancel');
       document.getElementById('adminSecretOk').textContent=t('secretOk');
+      const lab=document.getElementById('adminSecretLabel');
+      if(lab) lab.textContent=t('secretPh');
       const inp=document.getElementById('adminSecretInput');
       const msg=document.getElementById('adminSecretMsg');
       if(inp){ inp.value=''; inp.placeholder=t('secretPh'); }

@@ -3898,7 +3898,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260720b';
+  var ver = '20260728c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3907,20 +3907,21 @@ setSummaryChipHrefs();
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
-  addScript(root + '/roster-icons.js?v=' + ver);
+  addScript(root + '/emp-contact.js?v=20260730b');
+  addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
-  addScript(root + '/emp-contact.js?v=20260724a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-function loadSecondary() {
+  function loadSecondary() {
+    addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260726e');
+    addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=' + ver);
-    addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/shift-swap.js?v=' + ver);
+    addScript(root + '/feature-update-badge.js?v=20260729c');
+    addScript(root + '/training-new-badge.js?v=20260729h');
     addScript(root + '/banner-changer.js?v=' + ver);
-}
+  }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
   } else {

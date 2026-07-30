@@ -480,6 +480,9 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
         elif "requestIdleCallback" not in text:
             text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
             notes.append("lazy-enhance")
+        elif "function goToExport" in text and "emp-contact.js" not in text:
+            text = LOAD_ENHANCE_BLOCK_RE.sub(lambda _m: replacement, text, count=1)
+            notes.append("import-emp-contact")
 
     if "loadLocalEnhancements" in text and "ios-tap-fix.js" in text:
         text = re.sub(

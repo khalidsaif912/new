@@ -658,8 +658,19 @@
     return location.origin;
   }
 
+  function isImportSection() {
+    try {
+      return String(location.pathname || '').indexOf('/import/') !== -1;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function getReferenceIsoDate() {
-    var pathMatch = (location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+    var path = location.pathname || '';
+    var pathMatch =
+      path.match(/\/(?:import\/date|import)\/(\d{4}-\d{2}-\d{2})\//) ||
+      path.match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
     if (pathMatch) return pathMatch[1];
     var picker = document.getElementById('datePicker');
     if (picker && picker.value) return picker.value;
@@ -676,7 +687,26 @@
 
   function flattenFutureShifts(data, fromIso) {
     var out = [];
-    if (!data || !data.schedules) return out;
+    if (!data) return out;
+    if (Array.isArray(data.days) && data.month) {
+      var mp = String(data.month).match(/^(\d{4})-(\d{2})$/);
+      if (mp) {
+        var y0 = mp[1];
+        var mo0 = mp[2];
+        data.days.forEach(function (d) {
+          if (!d || !d.day) return;
+          var iso0 = y0 + '-' + mo0 + '-' + String(d.day).padStart(2, '0');
+          if (iso0 >= fromIso) {
+            out.push({ date: iso0, shift_code: String(d.code || d.shift_code || '').trim() });
+          }
+        });
+        out.sort(function (a, b) {
+          return String(a.date).localeCompare(String(b.date));
+        });
+        return out.slice(0, 5);
+      }
+    }
+    if (!data.schedules) return out;
     Object.keys(data.schedules).forEach(function (monthKey) {
       var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
       if (!mk) return;
@@ -715,7 +745,8 @@
     if (scheduleCache[empId]) {
       return Promise.resolve(flattenFutureShifts(scheduleCache[empId], fromIso));
     }
-    var url = docsRootUrl() + '/schedules/' + encodeURIComponent(empId) + '.json';
+    var schedBase = isImportSection() ? '/import/schedules/' : '/schedules/';
+    var url = docsRootUrl() + schedBase + encodeURIComponent(empId) + '.json';
     return fetch(url)
       .then(function (res) {
         if (!res.ok) throw new Error('missing');
