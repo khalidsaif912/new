@@ -2913,6 +2913,19 @@ function setLocalCtaLinks() {
 }
 
 function setSummaryChipHrefs() {
+  try {
+    if (window.rosterEmpIdGate && window.rosterEmpIdGate.forceLogoutLocked) {
+      window.rosterEmpIdGate.forceLogoutLocked();
+    } else {
+      var _locked = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+      if (String(_locked) === '81021') {
+        localStorage.removeItem('exportSavedEmpId');
+        localStorage.removeItem('savedEmpId');
+        localStorage.removeItem('exportSavedEmpName');
+        localStorage.removeItem('savedEmpName');
+      }
+    }
+  } catch (e) {}
   var base = getSiteRootUrl();
   var my = document.getElementById('myScheduleBtn');
   var imp = document.getElementById('importBtn');
@@ -3242,8 +3255,10 @@ function goToRosterDiff(event) {
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
   addScript(root + '/emp-contact.js?v=20260724a');
+  addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
+    addScript(root + '/emp-id-gate.js?v=20260730a');
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
     addScript(root + '/shift-copy.js?v=' + ver);

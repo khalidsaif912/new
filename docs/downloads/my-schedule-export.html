@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <script defer src="../ios-tap-fix.js?v=20260625a"></script>
+  <script src="../emp-id-gate.js?v=20260730a"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>My Schedule</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2466,11 +2467,29 @@
         </div>`;
       setTimeout(()=>dismissToast(),10000);
     }
-    const ADMIN_ID='8715';
+    const PROTECTED_EMP_IDS={'81021':1,'8715':1};
     const ADMIN_SECRET='K8715s';
     let _pendingSecretKind=null; // 'save' | 'pin'
     let _pendingSecretId=null;
-    function isProtectedEmpId(id){ return String(id||'')===ADMIN_ID; }
+    function isProtectedEmpId(id){
+      if(window.rosterEmpIdGate&&window.rosterEmpIdGate.isProtectedEmpId){
+        return window.rosterEmpIdGate.isProtectedEmpId(id);
+      }
+      return !!PROTECTED_EMP_IDS[String(id||'').trim()];
+    }
+    try{
+      if(window.rosterEmpIdGate&&window.rosterEmpIdGate.forceLogoutLocked){
+        window.rosterEmpIdGate.forceLogoutLocked();
+      }else{
+        const sid=localStorage.getItem('exportSavedEmpId')||localStorage.getItem('savedEmpId')||'';
+        if(String(sid)==='81021'){
+          localStorage.removeItem('exportSavedEmpId');
+          localStorage.removeItem('savedEmpId');
+          localStorage.removeItem('exportSavedEmpName');
+          localStorage.removeItem('savedEmpName');
+        }
+      }
+    }catch(_){}
     function openAdminSecretModal(kind,id){
       _pendingSecretKind=kind;
       _pendingSecretId=id!=null?String(id):null;
@@ -2506,7 +2525,9 @@
     function confirmAdminSecret(){
       const inp=document.getElementById('adminSecretInput');
       const msg=document.getElementById('adminSecretMsg');
-      if(String(inp&&inp.value||'')!==ADMIN_SECRET){
+      if(window.rosterEmpIdGate&&window.rosterEmpIdGate.checkEmpSecret
+        ? !window.rosterEmpIdGate.checkEmpSecret(inp&&inp.value)
+        : String(inp&&inp.value||'')!==ADMIN_SECRET){
         if(msg) msg.textContent=t('secretBad');
         if(inp){ inp.focus(); inp.select&&inp.select(); }
         return;

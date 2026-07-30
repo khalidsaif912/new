@@ -1248,6 +1248,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
   addScript(root + '/emp-contact.js?v=20260724a');
+  addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
@@ -1280,6 +1281,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=' + ver);
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
