@@ -76,36 +76,26 @@
       scrim:
         'linear-gradient(to right,rgba(20,8,12,.45) 0%,rgba(20,8,12,.2) 50%,rgba(20,8,12,.32) 100%)',
     },
-    // Arabic calligraphy — keep text centered; light scrim for title readability
+    // Arabic calligraphy — centered; no scrim (avoids leftover ::before square on light banners)
     'banner32.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
-      scrim:
-        'linear-gradient(to right,rgba(0,0,0,.35) 0%,rgba(0,0,0,.12) 45%,rgba(0,0,0,.28) 100%)',
     },
     'banner33.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
-      scrim:
-        'linear-gradient(to right,rgba(0,0,0,.32) 0%,rgba(0,0,0,.1) 45%,rgba(0,0,0,.26) 100%)',
     },
     'banner34.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
-      scrim:
-        'linear-gradient(to right,rgba(12,18,10,.38) 0%,rgba(12,18,10,.12) 45%,rgba(12,18,10,.3) 100%)',
     },
     'banner35.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
-      scrim:
-        'linear-gradient(to right,rgba(255,255,255,.55) 0%,rgba(255,255,255,.2) 40%,rgba(8,16,40,.35) 100%)',
     },
     'banner36.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
-      scrim:
-        'linear-gradient(to right,rgba(255,255,255,.5) 0%,rgba(255,255,255,.18) 40%,rgba(8,16,40,.32) 100%)',
     },
   };
 
@@ -163,7 +153,9 @@
       'background-position:' + bannerPos + '!important;',
       '}',
       '.header.' + ACTIVE_CLASS + '::before,.header.' + ACTIVE_CLASS + '::after,',
-      '.topbar.' + ACTIVE_CLASS + '::before,.topbar.' + ACTIVE_CLASS + '::after{opacity:0!important;}',
+      '.topbar.' + ACTIVE_CLASS + '::before,.topbar.' + ACTIVE_CLASS + '::after{',
+      'content:none!important;opacity:0!important;display:none!important;',
+      '}',
       '.' + ACTIVE_CLASS + ' .bannerTitle,',
       '.' + ACTIVE_CLASS + ' .bannerTitleEyebrow,',
       '.' + ACTIVE_CLASS + ' .bannerTitleMain,',
@@ -252,7 +244,9 @@
       rules.push(
         '.header.' + ACTIVE_CLASS + '[data-banner="' + bannerName + '"]::before,',
         '.topbar.' + ACTIVE_CLASS + '[data-banner="' + bannerName + '"]::before{',
-        'content:""!important;position:absolute!important;inset:0!important;',
+        'content:""!important;display:block!important;position:absolute!important;',
+        'inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;',
+        'width:auto!important;height:auto!important;max-width:none!important;max-height:none!important;',
         'opacity:1!important;border-radius:inherit!important;pointer-events:none!important;',
         'background:' + bannerScrim + '!important;',
         '}'
@@ -403,7 +397,7 @@
       EARLY_CLASS +
       ' .header::after,html.' +
       EARLY_CLASS +
-      ' .topbar::after{opacity:0!important}' +
+      ' .topbar::after{content:none!important;opacity:0!important;display:none!important}' +
       '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit;opacity:0}' +
       '.roster-banner-ios-img.is-ready{opacity:1}' +
       '.header.has-custom-banner > :not(.roster-banner-ios-img),' +
