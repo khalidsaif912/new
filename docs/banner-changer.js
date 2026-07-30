@@ -346,23 +346,33 @@
       'z-index:0',
       'pointer-events:none',
       'border-radius:inherit',
+      'opacity:0',
       '-webkit-transform:translateZ(0)',
       'transform:translateZ(0)'
     ].join(';');
     if (img.getAttribute('data-src') !== url) {
       img.setAttribute('data-src', url);
+      img.style.opacity = '0';
       img.onerror = function () {
-        // One retry with a soft cache-buster if the first load fails.
-        if (img.dataset.retry === '1') return;
-        img.dataset.retry = '1';
-        img.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ios=' + Date.now();
+        // Retry once, then remove so a broken-image square never stays visible.
+        if (img.dataset.retry !== '1') {
+          img.dataset.retry = '1';
+          img.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ios=' + Date.now();
+          return;
+        }
+        removeIosBannerLayers(el);
       };
       img.onload = function () {
         img.dataset.retry = '0';
+        img.style.opacity = '1';
+        img.classList.add('is-ready');
       };
       img.src = url;
     } else if (!img.getAttribute('src')) {
       img.src = url;
+    } else if (img.complete && img.naturalWidth > 0) {
+      img.style.opacity = '1';
+      img.classList.add('is-ready');
     }
     return img;
   }
@@ -394,7 +404,8 @@
       ' .header::after,html.' +
       EARLY_CLASS +
       ' .topbar::after{opacity:0!important}' +
-      '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit}' +
+      '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit;opacity:0}' +
+      '.roster-banner-ios-img.is-ready{opacity:1}' +
       '.header.has-custom-banner > :not(.roster-banner-ios-img),' +
       '.topbar.has-custom-banner > :not(.roster-banner-ios-img){position:relative;z-index:1}';
     document.head.appendChild(early);
