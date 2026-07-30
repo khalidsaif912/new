@@ -786,8 +786,8 @@
       },
       {
         "day": 2,
-        "shift_code": "NN21",
-        "shift_group": "Night"
+        "shift_code": "O",
+        "shift_group": "Off Day"
       },
       {
         "day": 3,
@@ -801,8 +801,8 @@
       },
       {
         "day": 5,
-        "shift_code": "O",
-        "shift_group": "Off Day"
+        "shift_code": "LV",
+        "shift_group": "Annual Leave"
       },
       {
         "day": 6,
@@ -947,7 +947,7 @@
     {
       "day": 2,
       "weekday": "Sun",
-      "code": "NN21"
+      "code": "O"
     },
     {
       "day": 3,
@@ -962,7 +962,7 @@
     {
       "day": 5,
       "weekday": "Wed",
-      "code": "O"
+      "code": "LV"
     },
     {
       "day": 6,
