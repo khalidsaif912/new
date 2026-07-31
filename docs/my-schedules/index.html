@@ -2320,6 +2320,34 @@
       if(lang==='en'){ document.documentElement.lang='en'; document.documentElement.dir='ltr'; }
     })();
 
+    // ── Arabic translations for employee names & departments ──
+    let nameTrMap=null;
+    (function loadNameTranslations(){
+      fetch('../name_translations.json',{cache:'no-store'})
+        .then(r=>r.json())
+        .then(j=>{ nameTrMap=(j&&j.names)||{}; if(lang==='ar'&&data) renderSchedule(); })
+        .catch(()=>{ nameTrMap={}; });
+    })();
+    const DEPT_AR={
+      'Officers':'الضباط','Supervisors':'المشرفون','Load Control':'مراقبة الحمولة',
+      'Export Checker':'مدقق الصادرات','Export Operators':'مشغلو الصادرات',
+      'Flight Dispatch (Export)':'تجهيز الرحلات (الصادر)','Flight Dispatch (Import)':'تجهيز الرحلات (الوارد)',
+      'Import Checkers':'مدققو الواردات','Import Operators':'مشغلو الواردات',
+      'Release Control':'مراقبة الإفراج','Documentation':'المستندات','Unassigned':'غير مُعيَّن'
+    };
+    function dispName(n){
+      if(lang==='ar'&&nameTrMap){
+        const k=String(n||'').toUpperCase().trim();
+        if(nameTrMap[k]) return nameTrMap[k];
+      }
+      return n||'';
+    }
+    function dispDept(d){
+      const k=String(d||'').trim();
+      if(lang==='ar'&&DEPT_AR[k]) return DEPT_AR[k];
+      return d||'';
+    }
+
     const COLORS={
       Morning:       {icon:'☀️', dot:'#d29922'},
       Afternoon:     {icon:'🌤️', dot:'#db6d28'},
@@ -3172,9 +3200,9 @@
         <div class="emp-banner">
           <div class="emp-info" style="min-width:0;flex:1">
             <div class="emp-name-row">
-              <div class="emp-name">${esc(data.name)}</div>
+              <div class="emp-name">${esc(dispName(data.name))}</div>
             </div>
-            <div class="emp-dept">${esc(data.department)}</div>
+            <div class="emp-dept">${esc(dispDept(data.department))}</div>
           </div>
 
                     <div class="emp-right">

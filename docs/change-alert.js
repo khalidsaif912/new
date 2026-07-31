@@ -55,6 +55,14 @@
 
   function getLang() {
     var path = window.location.pathname || '';
+    // My Schedule pages have their own language preference keys
+    if (path.indexOf('/my-schedules') !== -1) {
+      var msLang = path.indexOf('/import/') !== -1
+        ? localStorage.getItem('importPrefLang')
+        : localStorage.getItem('prefLang');
+      // these pages default to Arabic when no preference is stored
+      return msLang || 'ar';
+    }
     if (path.indexOf('/import/') !== -1) {
       return localStorage.getItem('importPrefLang')
         || localStorage.getItem('rosterLang')
@@ -1023,7 +1031,7 @@ function hookRosterLangChange() {
     };
   }
   document.addEventListener('click', function (e) {
-    if (e.target && e.target.closest && e.target.closest('#langToggle')) {
+    if (e.target && e.target.closest && e.target.closest('#langToggle, #langBtn')) {
       setTimeout(onAppLangChange, 0);
     }
   });

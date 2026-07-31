@@ -1221,7 +1221,10 @@ def build_my_schedule_html(style: str, repo_base_path: str) -> str:
     if not tpl.is_file():
         tpl = Path(__file__).resolve().parent / "docs" / "import" / "my-schedules" / "index.html"
     html = tpl.read_text(encoding="utf-8")
-    return html.replace("{IMPORT_PWA_HEAD_SNIPPET}", IMPORT_PWA_HEAD_SNIPPET.strip())
+    # The snippet is written with doubled braces for str.format() call sites;
+    # this template is filled via .replace(), so collapse them back to real braces.
+    snippet = IMPORT_PWA_HEAD_SNIPPET.strip().replace("{{", "{").replace("}}", "}")
+    return html.replace("{IMPORT_PWA_HEAD_SNIPPET}", snippet)
 
 
 
