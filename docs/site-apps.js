@@ -994,7 +994,18 @@
 
   function applyWelcomeEmoji() {
     var cp = '';
-    try { cp = (localStorage.getItem('empEmojiChoice') || '').trim().toLowerCase(); } catch (e) {}
+    try {
+      var isImport = (window.location.pathname || '').indexOf('/import/') !== -1;
+      var empId = isImport
+        ? (localStorage.getItem('importSavedEmpId') || '').trim()
+        : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
+      var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+      // legacy single shared key -> counts as the export employee's choice
+      var legacy = (localStorage.getItem('empEmojiChoice') || '').trim();
+      if (legacy && !isImport && !map[empId || 'export']) cp = legacy;
+      else cp = map[empId || (isImport ? 'import' : 'export')] || '';
+      cp = String(cp).trim().toLowerCase();
+    } catch (e) {}
     if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
     var chip = document.getElementById('welcomeChip');
     if (!chip) return;

@@ -108,9 +108,37 @@
 <script>
 (function(){
   'use strict';
-  var KEY = 'empEmojiChoice';
+  var MAP_KEY = 'empEmojiChoiceMap';
+  var OLD_KEY = 'empEmojiChoice';
   var CDN = 'https://fonts.gstatic.com/s/e/notoemoji/latest/';
   var lang = 'ar', theme = 'dark';
+
+  // Which section/employee is this choice for?
+  var section = /[?&]src=import\b/.test(location.search) ? 'import' : 'export';
+  var empId = '';
+  try {
+    empId = section === 'import'
+      ? (localStorage.getItem('importSavedEmpId') || '').trim()
+      : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
+  } catch (e) {}
+  var slot = empId || section;
+
+  function readMap(){
+    try { return JSON.parse(localStorage.getItem(MAP_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function writeMap(m){
+    try { localStorage.setItem(MAP_KEY, JSON.stringify(m)); } catch (e) {}
+  }
+  // Migrate the old single shared key (belonged to the export flow) once
+  try {
+    var old = (localStorage.getItem(OLD_KEY) || '').trim();
+    if (old) {
+      var mm = readMap();
+      var expSlot = (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim() || 'export';
+      if (!mm[expSlot]) { mm[expSlot] = old; writeMap(mm); }
+      localStorage.removeItem(OLD_KEY);
+    }
+  } catch (e) {}
 
   var T = {
     ar: { saved: 'تم الحفظ ✓ سيظهر فوق اسمك في الصفحة الرئيسية',
@@ -131,7 +159,12 @@
   } catch (e) {}
 
   function url(cp){ return CDN + cp + '/512.webp'; }
-  function getChoice(){ try { return localStorage.getItem(KEY) || ''; } catch(e){ return ''; } }
+  function getChoice(){ return readMap()[slot] || ''; }
+  function setChoice(cp){
+    var m = readMap();
+    if (cp) m[slot] = cp; else delete m[slot];
+    writeMap(m);
+  }
 
   function applyTheme(){
     document.body.classList.toggle('light', theme === 'light');
@@ -150,7 +183,9 @@
   function renderCurrent(){
     var cp = getChoice();
     var prev = document.getElementById('curPreview');
-    document.getElementById('curTitle').textContent = T[lang].curTitle;
+    var secLabel = (lang === 'ar' ? (section === 'import' ? 'الوارد' : 'الصادر') : (section === 'import' ? 'Import' : 'Export'));
+    var who = secLabel + (empId ? ' — ' + empId : '');
+    document.getElementById('curTitle').textContent = T[lang].curTitle + ' (' + who + ')';
     if (cp) {
       prev.innerHTML = '<img alt="" src="' + url(cp) + '">';
       document.getElementById('curSub').textContent = T[lang].curSet;
@@ -189,7 +224,7 @@
       img.src = url(item.cp);
       tile.appendChild(img);
       tile.addEventListener('click', function(){
-        try { localStorage.setItem(KEY, item.cp); } catch(e){}
+        setChoice(item.cp);
         renderCurrent();
         toast(T[lang].saved);
       });
@@ -208,7 +243,7 @@
     applyLang();
   });
   document.getElementById('resetBtn').addEventListener('click', function(){
-    try { localStorage.removeItem(KEY); } catch(e){}
+    setChoice('');
     renderCurrent();
     toast(T[lang].resetDone);
   });

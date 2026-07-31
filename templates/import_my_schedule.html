@@ -456,7 +456,7 @@
     <div class="topbar-right">
       <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
       <button class="ghost-btn theme-btn" onclick="toggleLang()" id="langBtn">EN</button>
-      <button class="ghost-btn theme-btn" onclick="location.href='../../my-emoji/'" id="emojiPickBtn" aria-label="My Emoji" title="إيموجي الترحيب — My Emoji">😊</button>
+      <button class="ghost-btn theme-btn" onclick="location.href='../../my-emoji/?src=import'" id="emojiPickBtn" aria-label="My Emoji" title="إيموجي الترحيب — My Emoji">😊</button>
       <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
       <div class="brand-mark">
         <div class="brand-swap" id="brandSwap" aria-label="Help" title="Help">
@@ -744,7 +744,9 @@
 // Show the employee's chosen welcome emoji on the picker button
 (function(){
   try {
-    var cp = (localStorage.getItem('empEmojiChoice') || '').trim().toLowerCase();
+    var empId = (localStorage.getItem('importSavedEmpId') || '').trim();
+    var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+    var cp = String(map[empId || 'import'] || '').trim().toLowerCase();
     if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
     var btn = document.getElementById('emojiPickBtn');
     if (!btn) return;
