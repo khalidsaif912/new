@@ -83,7 +83,8 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <a class="icon-btn" id="backBtn" href="../my-schedules/index.html" aria-label="Back">➜</a>
+    <a class="icon-btn" id="backBtn" href="../my-schedules/index.html" aria-label="Back"
+       onclick="if(document.referrer&&document.referrer.includes(location.host)&&history.length>1){history.back();return false;}">➜</a>
     <h1><span data-en="My Emoji" data-ar="إيموجي الترحيب">إيموجي الترحيب</span>
       <small data-en="Pick the emoji shown above your name" data-ar="اختر الإيموجي الذي يظهر فوق اسمك">اختر الإيموجي الذي يظهر فوق اسمك</small>
     </h1>

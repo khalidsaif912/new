@@ -2347,7 +2347,7 @@
       const bm=document.getElementById('brandMini');
       if(bm) bm.style.display='none';
       const base=(function(){var p=location.pathname||'/';var s=p.split('/').filter(Boolean);if(p.includes('/roster-site/')) return '/roster-site/';if(location.hostname&&location.hostname.endsWith('github.io')) return (s.length>=2&&s[1]==='docs')?('/'+s[0]+'/docs/'): (s.length?('/'+s[0]+'/'):'/');return '/';})();
-      if(document.referrer&&document.referrer.includes(location.host)) history.back();
+      if(document.referrer&&document.referrer.includes(location.host)&&!document.referrer.includes('/my-emoji')) history.back();
       else location.href=base;
     }
     function goToRosterDiff(){
