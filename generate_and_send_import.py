@@ -816,6 +816,24 @@ def build_duty_html(
     depts = sorted(dept_map.items(), key=dept_sort_key)
     dept_count = len(depts)
 
+    # The reused Export script carries Export's hardcoded summary counts;
+    # replace them with this page's Import totals so the alternating chip is correct.
+    script = re.sub(
+        r"(__summaryCounts \|\| \{ employees: )\d+(, departments: )\d+",
+        rf"\g<1>{total_emp}\g<2>{dept_count}",
+        script,
+    )
+    script = re.sub(
+        r"(counts\.employees != null \? counts\.employees : )\d+",
+        rf"\g<1>{total_emp}",
+        script,
+    )
+    script = re.sub(
+        r"(counts\.departments != null \? counts\.departments : )\d+",
+        rf"\g<1>{dept_count}",
+        script,
+    )
+
     summary = import_summary_bar_html(total_emp)
 
     palette = ["#2563eb","#0891b2","#059669","#dc2626","#7c3aed","#f59e0b","#0ea5e9","#a855f7"]

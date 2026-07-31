@@ -3102,7 +3102,7 @@ function goToEmployeeSchedule(empName) {
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
-window.__summaryCounts = window.__summaryCounts || { employees: 72, departments: 5 };
+window.__summaryCounts = window.__summaryCounts || { employees: 69, departments: 6 };
 window.__summarySwitchMode = 'employees';
 var T = {
   en: {
@@ -3142,12 +3142,12 @@ function updateSummarySwitchChip() {
   var counts = window.__summaryCounts || {};
   if(mode === 'departments') {
     val.style.color = '#059669';
-    val.textContent = counts.departments != null ? counts.departments : 5;
+    val.textContent = counts.departments != null ? counts.departments : 6;
     lbl.textContent = t.departments;
     lbl.dataset.key = 'departments';
   } else {
     val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 72;
+    val.textContent = counts.employees != null ? counts.employees : 69;
     lbl.textContent = t.employees;
     lbl.dataset.key = 'employees';
   }
