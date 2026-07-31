@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     /* ── RESET ── */
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1839,6 +1840,195 @@
     }
 
 </style>
+<style id="monoThemeCss">
+  /* ══════════ THIRD THEME: "MONO" — flat charcoal, Inter/Tajawal, solid blue accent ══════════ */
+  body.mono{
+    --bg:#0b0c10; --surface:#15171c; --surface2:#1b1e24; --surface3:#20242b;
+    --border:rgba(255,255,255,.09); --border2:rgba(255,255,255,.17);
+    --ink:#f2f3f5; --muted:#8b8f98; --dim:#4d525c;
+    --accent:#2f5cff; --accent2:#4ec081;
+    --amber:#e0b24a; --orange:#e08a54; --purple:#a996e8; --pink:#e06478; --cyan:#4ec081;
+    --r:10px; --r-lg:14px;
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  body.mono.ar{font-family:'Tajawal',system-ui,sans-serif}
+  body.mono .dnum,body.mono .day-code,body.mono .stat-val{font-family:'JetBrains Mono',monospace}
+
+  /* Topbar: flat, no gradient/blur/shimmer/aurora */
+  body.mono .topbar{
+    background:var(--bg) !important;
+    backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+    border-bottom:1px solid var(--border) !important;
+    box-shadow:none !important;
+  }
+  body.mono .topbar::before{display:none !important}
+  body.mono .aurora-bar-inner{opacity:0 !important;animation:none !important}
+
+  /* Topbar buttons: transparent + hairline border */
+  body.mono .topbar-inner .home-btn,
+  body.mono .topbar-inner .ghost-btn.theme-btn,
+  body.mono .topbar-inner #langBtn{
+    background:transparent !important;
+    border:1px solid var(--border) !important;
+    color:var(--muted) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .topbar-inner .home-btn:hover,
+  body.mono .topbar-inner .ghost-btn.theme-btn:hover,
+  body.mono .topbar-inner #langBtn:hover{
+    background:transparent !important;
+    border-color:var(--accent) !important;
+    color:var(--accent) !important;
+  }
+  body.mono .topbar-inner #langBtn{font-family:'JetBrains Mono',monospace !important;color:var(--muted) !important}
+  body.mono .brand-icon,body.mono .brand-mini{
+    background:var(--accent) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .brand-sq{
+    background:transparent !important;
+    border:1px solid var(--border) !important;
+    color:var(--muted) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .brand-sq:hover{border-color:var(--accent) !important;color:var(--accent) !important}
+
+  /* Kill glow/gloss pseudo-elements */
+  body.mono .ghost-btn::after,
+  body.mono .tips-pill::after,
+  body.mono .month-picker-btn::after,
+  body.mono .search-btn::after,
+  body.mono .search-change-btn::after,
+  body.mono .change-btn::after,
+  body.mono .action-btn::after,
+  body.mono .search-input::after,
+  body.mono .emp-banner::after,
+  body.mono .cal-card::after,
+  body.mono .actions-card::after,
+  body.mono .legend-card::after{display:none !important}
+
+  /* Cards: flat surfaces, no glow shadows */
+  body.mono .emp-banner{
+    background:var(--surface) !important;
+    border:1px solid var(--border) !important;
+    border-inline-start:3px solid var(--accent) !important;
+    border-radius:var(--r-lg) !important;
+    box-shadow:none !important;
+  }
+  body.mono .emp-avatar{
+    background:var(--accent) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .cal-card,body.mono .legend-card,body.mono .actions-card{
+    border-radius:var(--r-lg) !important;
+    box-shadow:none !important;
+  }
+  body.mono .leg-item{background:var(--surface2) !important}
+
+  /* Search area */
+  body.mono .search-input{
+    background:var(--surface) !important;
+    border:1px solid var(--border) !important;
+    backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .search-input:focus{border-color:var(--accent) !important;box-shadow:none !important}
+  body.mono .search-btn{
+    background:var(--accent) !important;
+    border:none !important;
+    color:#fff !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .search-btn:hover{background:#2449d6 !important;box-shadow:none !important}
+  body.mono .search-avatar{background:var(--accent) !important;box-shadow:none !important;border-radius:var(--r) !important;font-family:inherit}
+  body.mono .search-change-btn,body.mono .change-btn{
+    background:var(--surface) !important;
+    border:1px solid var(--border) !important;
+    color:var(--muted) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .search-change-btn:hover,body.mono .change-btn:hover{border-color:var(--accent) !important;color:var(--accent) !important}
+  body.mono .month-picker-btn{
+    background:var(--surface2) !important;
+    border:1px solid var(--border) !important;
+    color:var(--ink) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+    font-family:'JetBrains Mono',monospace !important;
+  }
+  body.mono .month-picker-btn:hover{border-color:var(--accent) !important}
+  body.mono .mp-item.active{
+    background:var(--accent) !important;
+    border-color:var(--accent) !important;
+    color:#fff !important;
+  }
+
+  /* Action buttons: outline style */
+  body.mono .action-btn{
+    color:var(--ink) !important;
+    background:transparent !important;
+    border:1px solid var(--border) !important;
+    font-weight:600 !important;
+    border-radius:var(--r) !important;
+    box-shadow:none !important;
+  }
+  body.mono .action-btn:hover{
+    color:var(--accent) !important;
+    background:transparent !important;
+    border-color:var(--accent) !important;
+  }
+
+  /* Modals / primary buttons */
+  body.mono .ok-btn,body.mono .tbtn.primary{
+    background:var(--accent) !important;
+    box-shadow:none !important;
+    border-radius:var(--r) !important;
+  }
+  body.mono .ok-btn:hover,body.mono .tbtn.primary:hover{background:#2449d6 !important}
+  body.mono .modal-sheet,body.mono .stats-modal{box-shadow:0 12px 28px rgba(0,0,0,.4) !important}
+
+  /* Stat cards: flat top strips */
+  body.mono .stat-card.c-blue::after{background:#5b9ae6 !important}
+  body.mono .stat-card.c-gray::after{background:#8b8f98 !important}
+  body.mono .stat-card.c-amber::after{background:#e0b24a !important}
+  body.mono .stat-card.c-orange::after{background:#e08a54 !important}
+  body.mono .stat-card.c-purple::after{background:#a996e8 !important}
+  body.mono .stat-card.c-pink::after{background:#e06478 !important}
+  body.mono .stat-card.c-green::after{background:#4ec081 !important}
+
+  /* Calendar: today marker */
+  body.mono .day.today{
+    background:rgba(47,92,255,.10) !important;
+    box-shadow:inset 0 0 0 1.5px var(--accent) !important;
+  }
+  body.mono .day.today::before{display:none !important}
+  body.mono .day.empty{background:var(--surface2) !important}
+
+  /* Calendar: shift palette (muted, from mono design) */
+  body.mono .s-morning{background:#332a15}
+  body.mono .s-afternoon{background:#332015}
+  body.mono .s-night{background:#241f38}
+  body.mono .s-off{background:#1b1e24}
+  body.mono .s-leave{background:#14261c}
+  body.mono .s-training{background:#151f30}
+  body.mono .s-standby{background:#301a20}
+  body.mono .s-other{background:#1b1e24}
+  body.mono .s-morning .day-code,body.mono .s-morning .dnum{color:#e0b24a}
+  body.mono .s-afternoon .day-code,body.mono .s-afternoon .dnum{color:#e08a54}
+  body.mono .s-night .day-code,body.mono .s-night .dnum{color:#a996e8}
+  body.mono .s-off .day-code,body.mono .s-off .dnum{color:#8b8f98}
+  body.mono .s-leave .day-code,body.mono .s-leave .dnum{color:#4ec081}
+  body.mono .s-training .day-code,body.mono .s-training .dnum{color:#5b9ae6}
+  body.mono .s-standby .day-code,body.mono .s-standby .dnum{color:#e06478}
+  body.mono .s-other .day-code,body.mono .s-other .dnum{color:#8b8f98}
+</style>
 </head>
 <body>
 
@@ -2122,8 +2312,11 @@
       const sl=localStorage.getItem('prefLang');
       const st=localStorage.getItem('prefTheme');
       if(sl==='en'||sl==='ar') lang=sl;
-      if(st==='light'||st==='dark') theme=st;
+      if(st==='light'||st==='dark'||st==='mono') theme=st;
       if(theme==='light') document.body.classList.add('light');
+      if(theme==='mono') document.body.classList.add('mono');
+      var tb=document.getElementById('themeBtn');
+      if(tb) tb.textContent=(theme==='dark'?'🌙':(theme==='light'?'☀️':'🌑'));
       if(lang==='en'){ document.documentElement.lang='en'; document.documentElement.dir='ltr'; }
     })();
 
@@ -2330,10 +2523,16 @@
     }
 
     function toggleTheme(){
-      theme=(theme==='dark'?'light':'dark');
+      // cycle: dark -> light -> mono -> dark
+      theme=(theme==='dark'?'light':(theme==='light'?'mono':'dark'));
       document.body.classList.toggle('light', theme==='light');
-      document.getElementById('themeBtn').textContent=(theme==='dark'?'🌙':'☀️');
+      document.body.classList.toggle('mono', theme==='mono');
+      applyThemeBtnIcon();
       localStorage.setItem('prefTheme', theme);
+    }
+    function applyThemeBtnIcon(){
+      var b=document.getElementById('themeBtn');
+      if(b) b.textContent=(theme==='dark'?'🌙':(theme==='light'?'☀️':'🌑'));
     }
     function toggleLang(){
       lang=(lang==='en'?'ar':'en');
