@@ -772,35 +772,9 @@
   }
 
   function ensureSpotlightEmojiButton() {
-    var header = document.querySelector('.header, .topbar');
-    if (!header) return;
-    if (getComputedStyle(header).position === 'static') {
-      header.style.position = 'relative';
-    }
+    // Banner emoji spotlight button removed per product owner request.
     var btn = document.getElementById('spotlightEmojiBtn');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.id = 'spotlightEmojiBtn';
-      btn.type = 'button';
-      btn.innerHTML = '<img alt="" width="30" height="30" decoding="async">';
-      header.appendChild(btn);
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openSpotlightPopup(true);
-      });
-    }
-    var emoji = pickRandomEmoji();
-    var corner = pickRandomCorner();
-    btn.className = corner;
-    btn.title = t('spotlightBtn');
-    btn.setAttribute('aria-label', t('spotlightBtn'));
-    var img = btn.querySelector('img');
-    if (img) {
-      img.src = emojiAssetUrl(emoji);
-      img.alt = '';
-    }
-    btn.dataset.emoji = emoji;
+    if (btn) btn.remove();
   }
 
   function ensureSpotlightButton() {
