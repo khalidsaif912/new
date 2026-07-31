@@ -1374,7 +1374,16 @@ PAGE_JS = r"""
   searchInput?.addEventListener('input', applyFilters);
   searchInput?.addEventListener('keydown', e => { if(e.key === 'Enter') applyFilters(); });
   clearBtn?.addEventListener('click', () => { searchInput.value = ''; applyFilters(); });
-  savedChip?.addEventListener('click', openStaffModal);
+  function mySchedulePageUrl(){
+    const path = window.location.pathname || '';
+    if(path.includes('/training/archive/')) return '../../my-schedules/index.html';
+    return '../my-schedules/index.html';
+  }
+  savedChip?.addEventListener('click', () => {
+    // With a saved employee, jump straight to My Schedule; otherwise ask for the ID first.
+    if(savedChip.classList.contains('savedEmpty')){ openStaffModal(); return; }
+    window.location.href = mySchedulePageUrl();
+  });
   staffClose?.addEventListener('click', closeStaffModal);
   staffModal?.addEventListener('click', (e) => { if(e.target === staffModal) closeStaffModal(); });
   staffClear?.addEventListener('click', () => {
