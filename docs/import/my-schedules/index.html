@@ -532,6 +532,7 @@
     <div class="topbar-right">
       <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
       <button class="ghost-btn theme-btn" onclick="toggleLang()" id="langBtn">EN</button>
+      <button class="ghost-btn theme-btn" onclick="location.href='../../my-emoji/'" id="emojiPickBtn" aria-label="My Emoji" title="إيموجي الترحيب — My Emoji">😊</button>
       <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
       <div class="brand-mark">
         <div class="brand-swap" id="brandSwap" aria-label="Help" title="Help">
@@ -680,7 +681,7 @@
   function applyLangUI(){document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('ar',lang==='ar');document.getElementById('ttl').textContent=t('title');document.getElementById('sub').textContent=t('sub');document.getElementById('langBtn').textContent=t('langBtn');document.getElementById('empId').placeholder=t('ph');document.getElementById('sbtn').textContent=t('sbtn');var e1=document.getElementById('e1'),e2=document.getElementById('e2');if(e1)e1.textContent=t('e1');if(e2)e2.textContent=t('e2');document.getElementById('tipsTitleModal').textContent=t('tipsTitle');document.getElementById('tipsSub').textContent=t('tipsSub');document.getElementById('miTitle').textContent=t('heroTitle');document.getElementById('miDesc').textContent=t('heroDesc');document.getElementById('tip1').textContent=lang==='ar'?'احفظ رقمك مرة واحدة — وسيظهر تلقائياً في المرة القادمة.':'Save your Employee ID once — it will load automatically next time.';document.getElementById('tip2').textContent=lang==='ar'?'حفظ الصورة ينتج بطاقة مرتبة بالتقويم والإحصائيات.':'Image export produces a clean card with calendar and stats.';document.getElementById('tip3').textContent=lang==='ar'?'استخدم تصدير ICS لإضافة المناوبات إلى تقويم Apple/Google/Outlook.':'Use ICS export to add shifts to Apple/Google/Outlook calendars.';document.getElementById('tipsOk').textContent='OK';var fc=document.getElementById('footerCredit');if(fc)fc.textContent=lang==='ar'?'تصميم: خالد الرقادي':'Design: KHALID ALRAQADI';if(data)renderSchedule();}
   function toggleTheme(){theme=theme==='dark'?'light':'dark';document.body.classList.toggle('light',theme==='light');document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';localStorage.setItem('importPrefTheme',theme);}
   function toggleLang(){lang=lang==='en'?'ar':'en';localStorage.setItem('importPrefLang',lang);applyLangUI();}
-  function goBack(){var root=siteRootUrl();if(document.referrer&&document.referrer.includes(location.host))history.back();else location.href=root+'import/';}
+  function goBack(){var root=siteRootUrl();if(document.referrer&&document.referrer.includes(location.host)&&!document.referrer.includes('/my-emoji'))history.back();else location.href=root+'import/';}
   function goToRosterDiff(){location.href=siteRootUrl()+'roster-diff/index.html';}
   function openTips(){document.getElementById('tipsModal').classList.add('open');}
   function closeTips(){document.getElementById('tipsModal').classList.remove('open');}
@@ -807,6 +808,23 @@
   }
   addScript(base + 'change-alert.js?v=20260514b', 'data-chg-alert');
   addScript(base + 'install-pwa.js?v=11', 'data-install-pwa');
+})();
+</script>
+<script>
+// Show the employee's chosen welcome emoji on the picker button
+(function(){
+  try {
+    var cp = (localStorage.getItem('empEmojiChoice') || '').trim().toLowerCase();
+    if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
+    var btn = document.getElementById('emojiPickBtn');
+    if (!btn) return;
+    var img = document.createElement('img');
+    img.alt = '';
+    img.decoding = 'async';
+    img.style.cssText = 'display:block;width:22px;height:22px;object-fit:contain;pointer-events:none;';
+    img.onload = function(){ btn.textContent = ''; btn.appendChild(img); };
+    img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+  } catch (e) {}
 })();
 </script>
 </body>
