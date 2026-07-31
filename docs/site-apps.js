@@ -984,3 +984,40 @@
     loadTrainingNewBadge();
   }
 })();
+
+/**
+ * Custom welcome emoji — replaces the waving hand above the employee name
+ * with the animated emoji chosen in /my-emoji/ (stored in localStorage).
+ */
+(function () {
+  'use strict';
+
+  function applyWelcomeEmoji() {
+    var cp = '';
+    try { cp = (localStorage.getItem('empEmojiChoice') || '').trim().toLowerCase(); } catch (e) {}
+    if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
+    var chip = document.getElementById('welcomeChip');
+    if (!chip) return;
+    var slot = chip.querySelector('.waveHand') || chip.querySelector('.chipVal');
+    if (!slot || slot.getAttribute('data-custom-emoji') === cp) return;
+    var img = document.createElement('img');
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.decoding = 'async';
+    img.style.cssText = 'display:block;width:30px;height:30px;margin:-3px 0;object-fit:contain;pointer-events:none;';
+    img.onload = function () {
+      slot.innerHTML = '';
+      slot.appendChild(img);
+      // the webp animates itself — stop the hand-wave rotation
+      slot.style.animation = 'none';
+      slot.setAttribute('data-custom-emoji', cp);
+    };
+    img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyWelcomeEmoji);
+  } else {
+    applyWelcomeEmoji();
+  }
+})();

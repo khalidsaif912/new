@@ -1865,6 +1865,7 @@
       <div class="topbar-right">
         <button class="ghost-btn theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
         <button class="ghost-btn theme-btn" onclick="toggleLang()" id="langBtn">EN</button>
+        <button class="ghost-btn theme-btn" onclick="location.href='../my-emoji/'" id="emojiPickBtn" aria-label="My Emoji" title="إيموجي الترحيب — My Emoji">😊</button>
         <button class="ghost-btn theme-btn" onclick="goToRosterDiff()" id="diffBtn" aria-label="Roster Diff" title="Roster Diff">📊</button>
         <div class="brand-mark">
           <div class="brand-swap" id="brandSwap" aria-label="Help" title="Help" data-new-label="جديد">
@@ -3234,6 +3235,23 @@
         document.body.appendChild(s);
       }
       addScript(root + '/change-alert.js');
+    })();
+  </script>
+  <script>
+    // Show the employee's chosen welcome emoji on the picker button
+    (function(){
+      try {
+        var cp = (localStorage.getItem('empEmojiChoice') || '').trim().toLowerCase();
+        if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
+        var btn = document.getElementById('emojiPickBtn');
+        if (!btn) return;
+        var img = document.createElement('img');
+        img.alt = '';
+        img.decoding = 'async';
+        img.style.cssText = 'display:block;width:22px;height:22px;object-fit:contain;pointer-events:none;';
+        img.onload = function(){ btn.textContent = ''; btn.appendChild(img); };
+        img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+      } catch (e) {}
     })();
   </script>
 </body>
