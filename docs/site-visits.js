@@ -6,15 +6,16 @@
   'use strict';
 
   var NS = 'khalidsaif912.github.io';
+  var TOTAL_KEY = 'total-visits';
   var COUNTED_KEY = 'rosterVisitCountedDay';
   var CACHE_KEY = 'rosterVisitCountsV2';
-  var cached = { day: null, month: null, dayKey: '', monthKey: '' };
+  var cached = { day: null, month: null, total: null, dayKey: '', monthKey: '' };
   var booted = false;
   var loading = false;
 
   var I18N = {
-    en: { day: 'Visitors today:', month: 'This month:' },
-    ar: { day: 'زوار اليوم:', month: 'هذا الشهر:' }
+    en: { day: 'Visitors today:', month: 'This month:', total: 'Total:' },
+    ar: { day: 'زوار اليوم:', month: 'هذا الشهر:', total: 'الإجمالي:' }
   };
 
   function lang() {
@@ -62,6 +63,7 @@
       if (!data) return;
       if (data.dayKey === keys.day && data.day != null) cached.day = Number(data.day);
       if (data.monthKey === keys.month && data.month != null) cached.month = Number(data.month);
+      if (data.total != null) cached.total = Number(data.total);
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
     } catch (e) {}
@@ -75,7 +77,8 @@
           dayKey: keys.day,
           monthKey: keys.month,
           day: cached.day,
-          month: cached.month
+          month: cached.month,
+          total: cached.total
         })
       );
     } catch (e) {}
@@ -188,7 +191,10 @@
       '<strong style="color:#1e40af;" id="siteVisitsDay">--</strong>' +
       '<span aria-hidden="true"> · </span>' +
       '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>';
+      '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>' +
+      '<span aria-hidden="true"> · </span>' +
+      '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel"></strong> ' +
+      '<strong style="color:#1e40af;" id="siteVisitsTotal">--</strong>';
 
     placeHostInFooter(host, footer);
     return host;
@@ -198,8 +204,10 @@
     var pack = I18N[lang()] || I18N.en;
     var dayLbl = document.getElementById('siteVisitsDayLabel');
     var monthLbl = document.getElementById('siteVisitsMonthLabel');
+    var totalLbl = document.getElementById('siteVisitsTotalLabel');
     if (dayLbl) dayLbl.textContent = pack.day;
     if (monthLbl) monthLbl.textContent = pack.month;
+    if (totalLbl) totalLbl.textContent = pack.total;
     var host = document.getElementById('siteVisitsHost');
     if (host) host.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
   }
@@ -212,6 +220,10 @@
     }
     if (monthEl && cached.month != null && !isNaN(Number(cached.month))) {
       monthEl.textContent = formatCount(cached.month);
+    }
+    var totalEl = document.getElementById('siteVisitsTotal');
+    if (totalEl && cached.total != null && !isNaN(Number(cached.total))) {
+      totalEl.textContent = formatCount(cached.total);
     }
   }
 
@@ -256,6 +268,7 @@
     if (shouldUp) {
       cached.day = Number(cached.day || 0) + 1;
       cached.month = Number(cached.month || 0) + 1;
+      if (cached.total != null) cached.total = Number(cached.total) + 1;
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
       paint();
@@ -264,11 +277,13 @@
 
     return Promise.all([
       requestCount(dayKey, shouldUp),
-      requestCount(monthKey, shouldUp)
+      requestCount(monthKey, shouldUp),
+      requestCount(TOTAL_KEY, shouldUp)
     ])
       .then(function (vals) {
         if (vals[0] != null) cached.day = vals[0];
         if (vals[1] != null) cached.month = vals[1];
+        if (vals[2] != null) cached.total = vals[2];
         cached.dayKey = keys.day;
         cached.monthKey = keys.month;
         if (shouldUp) markCounted(keys.day);
@@ -279,10 +294,12 @@
         if (cached.day == null || cached.month == null) {
           return Promise.all([
             requestCount(dayKey, true),
-            requestCount(monthKey, true)
+            requestCount(monthKey, true),
+            requestCount(TOTAL_KEY, true)
           ]).then(function (vals2) {
             if (vals2[0] != null) cached.day = vals2[0];
             if (vals2[1] != null) cached.month = vals2[1];
+            if (vals2[2] != null) cached.total = vals2[2];
             markCounted(keys.day);
             persistCounts(keys);
             paint();
@@ -614,7 +631,12 @@
           return !(item && String(item.id) === String(row.id) && String(item.day) === String(row.day));
         });
         kept.unshift(row);
-        if (kept.length > 500) kept.length = 500;
+        if (kept.length > 400) kept.length = 400;
+        // mantledb free tier rejects payloads over 64KB (HTTP 413); drop the
+        // oldest rows until there is comfortable headroom, or nothing gets saved.
+        while (kept.length > 1 && JSON.stringify({ log: kept }).length > 50000) {
+          kept.pop();
+        }
         return fetch(VISIT_LOG_URL, {
           method: 'POST',
           headers: headers,

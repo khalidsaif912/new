@@ -86,6 +86,7 @@
       border-radius: 14px;
       padding: 12px;
     }
+    .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
     .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
     .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
     .deviceStats {
@@ -443,9 +444,10 @@
         <button type="button" class="chip" data-filter="all" id="fAll">الكل</button>
         <button type="button" class="chip" id="refreshBtn">تحديث</button>
       </div>
-      <div class="stats">
-        <div class="stat"><b id="statToday">0</b><span>اليوم</span></div>
+      <div class="stats stats3">
+        <div class="stat"><b id="statToday">0</b><span>زوار اليوم</span></div>
         <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
+        <div class="stat"><b id="statTotal">—</b><span>إجمالي الزوار</span></div>
       </div>
       <section class="deviceStats" id="deviceStats">
         <h2>إحصائية الأجهزة</h2>
@@ -1163,9 +1165,49 @@
         });
       }
 
+      // Official visitor counters (same source as the footer counter on the site).
+      // Read-only /get so opening this page never inflates the numbers.
+      const COUNTER_NS = 'khalidsaif912.github.io';
+      let counterVals = { day: null, month: null, total: null };
+
+      function paintCounters() {
+        const set = (id, v) => {
+          if (v == null) return;
+          const el = document.getElementById(id);
+          if (el) el.textContent = String(v);
+        };
+        set('statToday', counterVals.day);
+        set('statMonth', counterVals.month);
+        const totalEl = document.getElementById('statTotal');
+        if (totalEl) totalEl.textContent = counterVals.total != null ? String(counterVals.total) : '—';
+      }
+
+      async function loadCounters() {
+        const keys = muscatParts();
+        const get = async (key) => {
+          try {
+            const res = await fetch('https://abacus.jasoncameron.dev/get/' + COUNTER_NS + '/' + key + '?ts=' + Date.now(), { cache: 'no-store' });
+            if (!res.ok) return res.status === 404 ? 0 : null;
+            const json = await res.json();
+            const v = Number(json && json.value);
+            return isFinite(v) ? v : null;
+          } catch (e) {
+            return null;
+          }
+        };
+        const [d, m, t] = await Promise.all([
+          get('day-' + keys.day),
+          get('month-' + keys.month),
+          get('total-visits')
+        ]);
+        counterVals = { day: d, month: m, total: t };
+        paintCounters();
+      }
+
       async function loadLog() {
         const list = document.getElementById('list');
         list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        loadCounters();
         try {
           const res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
             headers: { 'X-Mantle-Key': MANTLE_KEY },
@@ -1194,8 +1236,10 @@
         const keys = muscatParts();
         const todayN = log.filter((r) => r && r.day === keys.day).length;
         const monthN = log.filter((r) => r && String(r.day || '').startsWith(keys.month)).length;
-        document.getElementById('statToday').textContent = String(todayN);
-        document.getElementById('statMonth').textContent = String(monthN);
+        // Log-derived numbers are a fallback; the official counters repaint on top.
+        if (counterVals.day == null) document.getElementById('statToday').textContent = String(todayN);
+        if (counterVals.month == null) document.getElementById('statMonth').textContent = String(monthN);
+        paintCounters();
         document.querySelectorAll('.chip[data-filter]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-filter') === filter);
         });

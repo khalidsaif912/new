@@ -33,3 +33,5 @@ EXP/
 # Local Excel drops in repo root (canonical copies live under rosters/ or import-rosters/)
 /Export Roster*.xlsx
 /JUN *IMPORT*.xlsx
+
+_local_abacus_admin_key.txt
