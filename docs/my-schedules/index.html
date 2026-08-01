@@ -3480,12 +3480,14 @@
         img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
       }
       function emojiHash(s){ var h=0; for (var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+      var EMOJI_DEFAULTS = { '82437': '1f349' };
       try {
         var empId = (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
         var slotKey = empId || 'export';
         var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
         var cp = map[slotKey] || (localStorage.getItem('empEmojiChoice') || '');
         if (cp) { apply(cp); return; }
+        if (EMOJI_DEFAULTS[slotKey]) { apply(EMOJI_DEFAULTS[slotKey]); return; }
         fetch('../my-emoji/emojis.json')
           .then(function(r){ return r.json(); })
           .then(function(list){ if (list && list.length) apply(list[emojiHash(slotKey) % list.length].cp); })

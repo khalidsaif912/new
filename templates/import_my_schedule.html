@@ -762,6 +762,8 @@
     var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
     var cp = map[slotKey] || '';
     if (cp) { apply(cp); return; }
+    var EMOJI_DEFAULTS = { '82437': '1f349' };
+    if (EMOJI_DEFAULTS[slotKey]) { apply(EMOJI_DEFAULTS[slotKey]); return; }
     fetch('../../my-emoji/emojis.json')
       .then(function(r){ return r.json(); })
       .then(function(list){ if (list && list.length) apply(list[emojiHash(slotKey) % list.length].cp); })

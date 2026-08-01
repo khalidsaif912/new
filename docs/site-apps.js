@@ -1000,6 +1000,9 @@
     return h;
   }
 
+  // Hand-picked default emojis for specific employees (still changeable in /my-emoji/).
+  var EMOJI_DEFAULTS = { '82437': '1f349' };
+
   function setChipEmoji(cp) {
     cp = String(cp || '').trim().toLowerCase();
     if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
@@ -1041,6 +1044,10 @@
       return;
     }
     if (!empId) return;
+    if (EMOJI_DEFAULTS[empId]) {
+      setChipEmoji(EMOJI_DEFAULTS[empId]);
+      return;
+    }
     // No explicit choice: assign a stable per-employee default
     try {
       var root = typeof getSiteRootUrl === 'function' ? getSiteRootUrl() : '';
