@@ -142,12 +142,12 @@
 
   var T = {
     ar: { saved: 'تم الحفظ ✓ سيظهر فوق اسمك في الصفحة الرئيسية',
-          resetDone: 'تمت الاستعادة — ستظهر اليد الملوّحة الافتراضية 👋',
-          curTitle: 'اختيارك الحالي', curNone: 'لم تختر بعد — تظهر اليد الملوّحة الافتراضية',
+          resetDone: 'تمت الاستعادة — سيظهر إيموجيك العشوائي الافتراضي',
+          curTitle: 'اختيارك الحالي', curNone: 'إيموجي عشوائي مُعيّن لك — اضغط أي إيموجي لتغييره',
           curSet: 'اضغط أي إيموجي آخر للتغيير' },
     en: { saved: 'Saved ✓ It will appear above your name on the home page',
-          resetDone: 'Reset — the default waving hand 👋 will be shown',
-          curTitle: 'Your current choice', curNone: 'Nothing picked yet — default waving hand is shown',
+          resetDone: 'Reset — your random default emoji will be shown',
+          curTitle: 'Your current choice', curNone: 'A random emoji is assigned to you — tap any emoji to change it',
           curSet: 'Tap any other emoji to change' }
   };
 
@@ -164,6 +164,16 @@
     var m = readMap();
     if (cp) m[slot] = cp; else delete m[slot];
     writeMap(m);
+  }
+  var emojiList = null;
+  function emojiHash(s){
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function getDefault(){
+    if (!emojiList || !emojiList.length) return '';
+    return emojiList[emojiHash(slot) % emojiList.length].cp;
   }
 
   function applyTheme(){
@@ -186,15 +196,16 @@
     var secLabel = (lang === 'ar' ? (section === 'import' ? 'الوارد' : 'الصادر') : (section === 'import' ? 'Import' : 'Export'));
     var who = secLabel + (empId ? ' — ' + empId : '');
     document.getElementById('curTitle').textContent = T[lang].curTitle + ' (' + who + ')';
-    if (cp) {
-      prev.innerHTML = '<img alt="" src="' + url(cp) + '">';
-      document.getElementById('curSub').textContent = T[lang].curSet;
+    var shown = cp || getDefault();
+    if (shown) {
+      prev.innerHTML = '<img alt="" src="' + url(shown) + '">';
+      document.getElementById('curSub').textContent = cp ? T[lang].curSet : T[lang].curNone;
     } else {
       prev.textContent = '👋';
       document.getElementById('curSub').textContent = T[lang].curNone;
     }
     document.querySelectorAll('.tile').forEach(function(t){
-      t.classList.toggle('selected', t.getAttribute('data-cp') === cp);
+      t.classList.toggle('selected', t.getAttribute('data-cp') === shown);
     });
   }
 
@@ -253,7 +264,7 @@
 
   fetch('emojis.json')
     .then(function(r){ return r.json(); })
-    .then(function(list){ buildGrid(list); renderCurrent(); })
+    .then(function(list){ emojiList = list; buildGrid(list); renderCurrent(); })
     .catch(function(){
       document.getElementById('grid').innerHTML =
         '<div class="loading">' + (lang === 'ar' ? 'تعذر التحميل — أعد المحاولة' : 'Failed to load — try again') + '</div>';

@@ -988,24 +988,20 @@
 /**
  * Custom welcome emoji — replaces the waving hand above the employee name
  * with the animated emoji chosen in /my-emoji/ (stored in localStorage).
+ * Employees without a choice get a stable "random" emoji derived from their
+ * employee ID, so everyone discovers the feature.
  */
 (function () {
   'use strict';
 
-  function applyWelcomeEmoji() {
-    var cp = '';
-    try {
-      var isImport = (window.location.pathname || '').indexOf('/import/') !== -1;
-      var empId = isImport
-        ? (localStorage.getItem('importSavedEmpId') || '').trim()
-        : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
-      var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
-      // legacy single shared key -> counts as the export employee's choice
-      var legacy = (localStorage.getItem('empEmojiChoice') || '').trim();
-      if (legacy && !isImport && !map[empId || 'export']) cp = legacy;
-      else cp = map[empId || (isImport ? 'import' : 'export')] || '';
-      cp = String(cp).trim().toLowerCase();
-    } catch (e) {}
+  function emojiHash(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+
+  function setChipEmoji(cp) {
+    cp = String(cp || '').trim().toLowerCase();
     if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
     var chip = document.getElementById('welcomeChip');
     if (!chip) return;
@@ -1024,6 +1020,38 @@
       slot.setAttribute('data-custom-emoji', cp);
     };
     img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+  }
+
+  function applyWelcomeEmoji() {
+    var cp = '';
+    var empId = '';
+    try {
+      var isImport = (window.location.pathname || '').indexOf('/import/') !== -1;
+      empId = isImport
+        ? (localStorage.getItem('importSavedEmpId') || '').trim()
+        : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
+      var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+      // legacy single shared key -> counts as the export employee's choice
+      var legacy = (localStorage.getItem('empEmojiChoice') || '').trim();
+      if (legacy && !isImport && !map[empId || 'export']) cp = legacy;
+      else cp = map[empId || (isImport ? 'import' : 'export')] || '';
+    } catch (e) {}
+    if (cp) {
+      setChipEmoji(cp);
+      return;
+    }
+    if (!empId) return;
+    // No explicit choice: assign a stable per-employee default
+    try {
+      var root = typeof getSiteRootUrl === 'function' ? getSiteRootUrl() : '';
+      fetch(root + '/my-emoji/emojis.json')
+        .then(function (r) { return r.json(); })
+        .then(function (list) {
+          if (!list || !list.length) return;
+          setChipEmoji(list[emojiHash(empId) % list.length].cp);
+        })
+        .catch(function () {});
+    } catch (e) {}
   }
 
   if (document.readyState === 'loading') {

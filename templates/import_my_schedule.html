@@ -741,12 +741,10 @@
 })();
 </script>
 <script>
-// Show the employee's chosen welcome emoji on the picker button
+// Show the employee's chosen (or default random) welcome emoji on the picker button
 (function(){
-  try {
-    var empId = (localStorage.getItem('importSavedEmpId') || '').trim();
-    var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
-    var cp = String(map[empId || 'import'] || '').trim().toLowerCase();
+  function apply(cp){
+    cp = String(cp || '').trim().toLowerCase();
     if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
     var btn = document.getElementById('emojiPickBtn');
     if (!btn) return;
@@ -756,6 +754,18 @@
     img.style.cssText = 'display:block;width:22px;height:22px;object-fit:contain;pointer-events:none;';
     img.onload = function(){ btn.textContent = ''; btn.appendChild(img); };
     img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+  }
+  function emojiHash(s){ var h=0; for (var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+  try {
+    var empId = (localStorage.getItem('importSavedEmpId') || '').trim();
+    var slotKey = empId || 'import';
+    var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+    var cp = map[slotKey] || '';
+    if (cp) { apply(cp); return; }
+    fetch('../../my-emoji/emojis.json')
+      .then(function(r){ return r.json(); })
+      .then(function(list){ if (list && list.length) apply(list[emojiHash(slotKey) % list.length].cp); })
+      .catch(function(){});
   } catch (e) {}
 })();
 </script>
