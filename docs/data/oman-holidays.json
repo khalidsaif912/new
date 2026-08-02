@@ -1,0 +1,298 @@
+{
+  "country": "OM",
+  "source": "Google Calendar — Holidays in Oman",
+  "source_url": "https://calendar.google.com/calendar/ical/en.om%23holiday%40group.v.calendar.google.com/public/basic.ics",
+  "note_ar": "التواريخ مستمدة من تقويم عطلات عُمان وقد تُعدَّل بإعلان وزارة العمل أو الرؤية الشرعية.",
+  "note_en": "Dates follow the Oman public holiday calendar and may shift with official announcements.",
+  "updated": "2026-08-02",
+  "holidays": [
+    {
+      "date": "2025-01-12",
+      "name_en": "Sultan’s Accession Day",
+      "name_ar": "يوم تولي السلطان مقاليد الحكم",
+      "type": "public"
+    },
+    {
+      "date": "2025-01-30",
+      "name_en": "Isra and Mi'raj Holiday",
+      "name_ar": "Isra and Mi'raj Holiday",
+      "type": "public"
+    },
+    {
+      "date": "2025-03-29",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2025-03-30",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2025-03-31",
+      "name_en": "Eid al-Fitr",
+      "name_ar": "عيد الفطر المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2025-04-01",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2025-04-02",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2025-04-03",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2025-06-06",
+      "name_en": "Eid al-Adha",
+      "name_ar": "عيد الأضحى المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2025-06-07",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2025-06-08",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2025-06-09",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2025-06-26",
+      "name_en": "Muharram Holiday",
+      "name_ar": "إجازة رأس السنة الهجرية",
+      "type": "public"
+    },
+    {
+      "date": "2025-09-05",
+      "name_en": "The Prophet's Birthday",
+      "name_ar": "المولد النبوي الشريف",
+      "type": "public"
+    },
+    {
+      "date": "2025-09-07",
+      "name_en": "The Prophet's Birthday Holiday",
+      "name_ar": "The Prophet's Birthday Holiday",
+      "type": "public"
+    },
+    {
+      "date": "2025-11-26",
+      "name_en": "National Day Holiday",
+      "name_ar": "إجازة اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2025-11-27",
+      "name_en": "National Day Holiday",
+      "name_ar": "إجازة اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2026-01-15",
+      "name_en": "Sultan’s Accession Day",
+      "name_ar": "يوم تولي السلطان مقاليد الحكم",
+      "type": "public"
+    },
+    {
+      "date": "2026-01-18",
+      "name_en": "Isra and Mi'raj",
+      "name_ar": "الإسراء والمعراج",
+      "type": "public"
+    },
+    {
+      "date": "2026-03-19",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2026-03-20",
+      "name_en": "Eid al-Fitr",
+      "name_ar": "عيد الفطر المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2026-03-21",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2026-03-22",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2026-03-23",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2026-05-26",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2026-05-27",
+      "name_en": "Eid al-Adha",
+      "name_ar": "عيد الأضحى المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2026-05-28",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2026-05-29",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2026-05-30",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2026-06-16",
+      "name_en": "Muharram",
+      "name_ar": "رأس السنة الهجرية",
+      "type": "public"
+    },
+    {
+      "date": "2026-06-18",
+      "name_en": "Muharram Holiday",
+      "name_ar": "إجازة رأس السنة الهجرية",
+      "type": "public"
+    },
+    {
+      "date": "2026-08-27",
+      "name_en": "The Prophet's Birthday Holiday",
+      "name_ar": "المولد النبوي الشريف",
+      "type": "public"
+    },
+    {
+      "date": "2026-11-25",
+      "name_en": "National Day",
+      "name_ar": "اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2026-11-26",
+      "name_en": "National Day Holiday",
+      "name_ar": "إجازة اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2027-01-06",
+      "name_en": "Isra and Mi'raj",
+      "name_ar": "الإسراء والمعراج",
+      "type": "public"
+    },
+    {
+      "date": "2027-03-10",
+      "name_en": "Eid al-Fitr",
+      "name_ar": "عيد الفطر المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2027-03-11",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2027-03-12",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2027-03-13",
+      "name_en": "Eid al-Fitr Holiday",
+      "name_ar": "إجازة عيد الفطر",
+      "type": "public"
+    },
+    {
+      "date": "2027-05-17",
+      "name_en": "Eid al-Adha",
+      "name_ar": "عيد الأضحى المبارك",
+      "type": "public"
+    },
+    {
+      "date": "2027-05-18",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2027-05-19",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2027-05-20",
+      "name_en": "Eid al-Adha Holiday",
+      "name_ar": "إجازة عيد الأضحى",
+      "type": "public"
+    },
+    {
+      "date": "2027-06-06",
+      "name_en": "Muharram",
+      "name_ar": "رأس السنة الهجرية",
+      "type": "public"
+    },
+    {
+      "date": "2027-08-15",
+      "name_en": "The Prophet's Birthday Holiday",
+      "name_ar": "المولد النبوي الشريف",
+      "type": "public"
+    },
+    {
+      "date": "2027-11-20",
+      "name_en": "National Day",
+      "name_ar": "اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2027-11-21",
+      "name_en": "National Day Holiday",
+      "name_ar": "إجازة اليوم الوطني",
+      "type": "public"
+    },
+    {
+      "date": "2027-12-26",
+      "name_en": "Isra and Mi'raj",
+      "name_ar": "الإسراء والمعراج",
+      "type": "public"
+    }
+  ]
+}
