@@ -170,19 +170,16 @@
       '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:inline-block;white-space:nowrap;padding-inline:8px;',
+      'display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
+      'padding-inline:8px;max-width:100%;',
       'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
-      'letter-spacing:0;animation:htScroll 28s linear infinite;',
+      'letter-spacing:0;animation:none;transform:none;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{color:#9a3412;font-weight:900}',
       '#' + TICKER_ID + ' .ht-from{color:#0369a1;font-weight:800}',
       '#' + TICKER_ID + ' .ht-sep{color:#c2410c;opacity:.55;margin:0 .35em}',
       '#' + TICKER_ID + ' .ht-hol{color:#b45309;font-weight:800}',
-      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
-      '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
-      '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
-      '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
       '#' + TICKER_ID + '.lifted{transition:bottom .18s ease}'
@@ -269,19 +266,13 @@
     var plain = parts.map(function (p) {
       return String(p).replace(/<[^>]+>/g, '');
     }).join('  •  ');
-    var strip =
-      joinedHtml +
-      '<span class="ht-sep">•</span>' +
-      joinedHtml +
-      '<span class="ht-sep">•</span>' +
-      joinedHtml;
     el.innerHTML =
       '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
       (ar ? 'اكتب رسالة للشريط' : 'Write a ticker message') +
       '" aria-label="' +
       (ar ? 'فتح صفحة كتابة رسالة الشريط' : 'Open ticker message page') +
       '">🎉</button>' +
-      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
+      '<div class="ht-track"><div class="ht-marquee">' + joinedHtml + '</div></div>';
     el.title = plain;
     el.hidden = false;
     el.classList.add('on');
