@@ -1,10 +1,13 @@
 /**
- * Official Oman holiday news ticker — shows beside the bottom alert bell
- * only during the Muscat week that contains an official public holiday.
+ * Official Oman holiday news ticker — beside the bottom alert bell.
+ * Preview mode shows upcoming holidays now so the marquee can be tried;
+ * later it can be limited to the Muscat week that contains a holiday.
  */
 (function () {
   'use strict';
 
+  // Trial: keep the ticker visible with upcoming official holidays.
+  var PREVIEW = true;
   var TICKER_ID = 'holidayTicker';
   var STYLE_ID = 'holidayTickerCss';
   var DATA_URL_CACHE = null;
@@ -91,21 +94,35 @@
     return muscatToday();
   }
 
-  function holidaysThisWeek(list, today) {
+  function holidaysForTicker(list, today) {
     var w = weekBounds(today);
     var inWeek = (list || []).filter(function (h) {
       return h && h.date >= w.start && h.date <= w.end;
     });
-    // Dev/demo: ?htDemo=1 shows the next upcoming holiday so the ticker can be previewed
+    if (inWeek.length) return inWeek;
+
+    // Preview / trial: scroll the next official holidays so the bar can be tested now.
+    if (PREVIEW) {
+      var out = [];
+      var seen = Object.create(null);
+      (list || []).forEach(function (h) {
+        if (!h || h.date < muscatToday()) return;
+        var key = String(h.name_ar || h.name_en || '');
+        if (!key || seen[key]) return;
+        seen[key] = 1;
+        out.push(h);
+      });
+      return out.slice(0, 4);
+    }
+
     try {
       if (/(?:\?|&)htDemo=1(?:&|$)/.test(location.search || '')) {
         try { sessionStorage.setItem('htDemo', '1'); } catch (e0) {}
       }
       var demo = false;
       try { demo = sessionStorage.getItem('htDemo') === '1'; } catch (e1) {}
-      if (!inWeek.length && demo) {
-        var upcoming = (list || []).filter(function (h) { return h && h.date >= muscatToday(); }).slice(0, 1);
-        return upcoming;
+      if (demo) {
+        return (list || []).filter(function (h) { return h && h.date >= muscatToday(); }).slice(0, 1);
       }
     } catch (e) {}
     return inWeek;
@@ -150,14 +167,14 @@
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:8px;',
       'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
-      'letter-spacing:0;animation:htScroll 18s linear infinite;',
+      'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{',
       'animation-name:htScrollRtl;',
       '}',
       '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
-      '@keyframes htScroll{0%{transform:translateX(30%)}100%{transform:translateX(-100%)}}',
-      '@keyframes htScrollRtl{0%{transform:translateX(-30%)}100%{transform:translateX(100%)}}',
+      '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
+      '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}'
     ].join('');
@@ -207,20 +224,25 @@
       return;
     }
     var ar = lang() === 'ar';
-    var prefix = ar ? 'إجازة رسمية هذا الأسبوع:' : 'Official holiday this week:';
+    var prefix = PREVIEW
+      ? (ar ? 'تجربة الشريط الإخباري · الإجازات الرسمية:' : 'News ticker trial · Official holidays:')
+      : (ar ? 'إجازة رسمية هذا الأسبوع:' : 'Official holiday this week:');
     var parts = items.map(function (h) {
       var name = ar ? (h.name_ar || h.name_en) : (h.name_en || h.name_ar);
       return name + ' · ' + formatDay(h.date, ar);
     });
-    var text = prefix + ' ' + parts.join('  •  ');
-    // Duplicate for smoother marquee loop
+    var joined = parts.join('  •  ');
+    var text = prefix + ' ' + joined;
+    // Triple the strip so the marquee feels continuous while scrolling
+    var strip =
+      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined) +
+      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
+      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined) +
+      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
+      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined);
     el.innerHTML =
       '<span class="ht-ico" aria-hidden="true">🎉</span>' +
-      '<div class="ht-track"><div class="ht-marquee">' +
-        '<span class="ht-label">' + prefix + '</span>' + escapeHtml(parts.join('  •  ')) +
-        '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
-        '<span class="ht-label">' + prefix + '</span>' + escapeHtml(parts.join('  •  ')) +
-      '</div></div>';
+      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
     el.title = text;
     el.hidden = false;
     el.classList.add('on');
@@ -237,7 +259,7 @@
   }
 
   function loadHolidays() {
-    var url = docsBase() + 'data/oman-holidays.json?v=20260802a';
+    var url = docsBase() + 'data/oman-holidays.json?v=20260802b';
     if (DATA_URL_CACHE) return DATA_URL_CACHE;
     DATA_URL_CACHE = fetch(url, { cache: 'no-store' })
       .then(function (r) {
@@ -255,7 +277,7 @@
 
   function refresh() {
     loadHolidays().then(function (list) {
-      paint(holidaysThisWeek(list, activeDate()));
+      paint(holidaysForTicker(list, activeDate()));
     });
   }
 
