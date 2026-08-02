@@ -134,15 +134,14 @@
       '#' + TICKER_ID + '{',
       'position:fixed;bottom:24px;left:72px;right:16px;',
       'z-index:100015;display:none;align-items:center;gap:8px;',
-      'min-height:48px;width:auto;max-width:none;',
+      'min-height:52px;width:auto;max-width:none;',
       'padding:0 14px 0 8px;border-radius:16px;',
-      'background:rgba(255,255,255,.94);',
-      'border:1px solid rgba(15,23,42,.1);',
-      'box-shadow:0 8px 24px rgba(15,23,42,.14);',
-      'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);',
-      'overflow:hidden;font-family:Tajawal,Sora,system-ui,sans-serif;',
+      'background:#ffffff;',
+      'border:1px solid rgba(15,23,42,.14);',
+      'box-shadow:0 8px 24px rgba(15,23,42,.16);',
+      'overflow:hidden;font-family:Tajawal,system-ui,sans-serif;',
+      '-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
-      /* let footer refresh/texture/secret buttons receive clicks through the bar */
       'pointer-events:none;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
@@ -152,8 +151,8 @@
       'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
       'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:34px;height:34px;border-radius:12px;border:0;',
-      'display:grid;place-items:center;font-size:17px;cursor:pointer;',
+      'flex:0 0 auto;width:36px;height:36px;border-radius:12px;border:0;',
+      'display:grid;place-items:center;font-size:18px;cursor:pointer;',
       'background:linear-gradient(135deg,#fff7ed,#ffedd5);',
       'box-shadow:0 2px 8px rgba(234,88,12,.18);',
       '-webkit-tap-highlight-color:transparent;',
@@ -162,30 +161,37 @@
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
       '}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
-      'mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
-      '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
+      'mask-image:linear-gradient(270deg,transparent 0,#000 12px,#000 100%);',
+      '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 12px,#000 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:8px;',
-      'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
+      'font-size:15px;font-weight:800;color:#1c1917;line-height:1.45;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
-      '#' + TICKER_ID + ' .ht-msg{color:#9a3412;font-weight:900}',
-      '#' + TICKER_ID + ' .ht-from{color:#0369a1;font-weight:800}',
-      '#' + TICKER_ID + ' .ht-sep{color:#c2410c;opacity:.55;margin:0 .35em}',
-      '#' + TICKER_ID + ' .ht-hol{color:#b45309;font-weight:800}',
+      '#' + TICKER_ID + ' .ht-msg{color:#111827;font-weight:900}',
+      '#' + TICKER_ID + ' .ht-from{color:#075985;font-weight:800}',
+      '#' + TICKER_ID + ' .ht-sep{color:#78716c;opacity:.9;margin:0 .4em}',
+      '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
-      '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
+      '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}'
     ].join('');
+    if (!document.getElementById('htTajawalFont')) {
+      var fontLink = document.createElement('link');
+      fontLink.id = 'htTajawalFont';
+      fontLink.rel = 'stylesheet';
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&display=swap';
+      document.head.appendChild(fontLink);
+    }
     document.documentElement.classList.add('has-float-dock');
   }
 
