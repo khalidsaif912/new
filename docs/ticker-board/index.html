@@ -175,7 +175,7 @@
       <span style="font-size:22px" aria-hidden="true">🎉</span>
     </div>
     <h1>اكتب للشريط الإخباري</h1>
-    <p class="sub">أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
+    <p class="sub" id="pageSub">أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
 
     <div class="card">
       <label for="empIdInput">الرقم الوظيفي <span style="color:#f59e0b">(مطلوب)</span></label>
@@ -192,7 +192,7 @@
     </div>
 
     <div class="card">
-      <p class="note">بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.</p>
+      <p class="note" id="pageNote">بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.</p>
     </div>
 
     <div class="card">
@@ -213,8 +213,11 @@
     var empIdInput = document.getElementById('empIdInput');
     var empHint = document.getElementById('empHint');
     var liveList = document.getElementById('liveList');
+    var pageSub = document.getElementById('pageSub');
+    var pageNote = document.getElementById('pageNote');
     var staffById = null;
     var resolved = { id: '', name: '' };
+    var requireApproval = true;
 
     function docsBase() {
       try {
@@ -411,7 +414,8 @@
         pending: Array.isArray(json.pending) ? json.pending : [],
         approved: Array.isArray(json.approved) ? json.approved : [],
         showMode: mode,
-        hidden: !!json.hidden
+        hidden: !!json.hidden,
+        requireApproval: json.requireApproval !== false
       };
     }
 
@@ -420,7 +424,8 @@
         pending: store.pending || [],
         approved: store.approved || [],
         showMode: store.showMode || 'both',
-        hidden: !!store.hidden
+        hidden: !!store.hidden,
+        requireApproval: store.requireApproval !== false
       };
       var res = await fetch(MANTLE_URL, {
         method: 'POST',
@@ -428,6 +433,19 @@
         body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('write');
+    }
+
+    function paintPolicy(needApproval) {
+      requireApproval = needApproval !== false;
+      if (requireApproval) {
+        pageSub.textContent = 'أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.';
+        pageNote.textContent = 'بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.';
+        sendBtn.textContent = 'إرسال للمراجعة';
+      } else {
+        pageSub.textContent = 'أدخل رقمك الوظيفي واكتب رسالة قصيرة. تظهر مباشرة في الشريط الإخباري.';
+        pageNote.textContent = 'النشر المباشر مفعّل حالياً — رسالتك تظهر على الشريط فوراً بعد الإرسال.';
+        sendBtn.textContent = 'نشر في الشريط';
+      }
     }
 
     function renderApproved(list) {

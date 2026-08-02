@@ -263,7 +263,17 @@
             <strong>إخفاء الشريط</strong>
             <span>عند التفعيل يختفي الشريط الإخباري عن جميع الزوار فوراً.</span>
           </div>
-          <button type="button" class="toggleBtn" id="hideToggle">إظهار</button>
+          <button type="button" class="toggleBtn" id="hideToggle">ظاهر</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toggleRow">
+          <div>
+            <strong>ضرورة الاعتماد</strong>
+            <span>إذا أوقفتها تظهر رسائل الموظفين في الشريط مباشرة دون انتظار موافقتك.</span>
+          </div>
+          <button type="button" class="toggleBtn" id="approvalToggle">مطلوب</button>
         </div>
       </div>
 
@@ -289,7 +299,7 @@
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
     var tab = 'messages';
     var filter = 'pending';
-    var store = { pending: [], approved: [], showMode: 'both', hidden: false };
+    var store = { pending: [], approved: [], showMode: 'both', hidden: false, requireApproval: true };
     var MODE_LABELS = {
       official: 'الرسائل الرسمية فقط',
       staff: 'رسائل الموظفين فقط',
@@ -302,6 +312,7 @@
     var gateErr = document.getElementById('gateErr');
     var settingsStatus = document.getElementById('settingsStatus');
     var hideToggle = document.getElementById('hideToggle');
+    var approvalToggle = document.getElementById('approvalToggle');
     var visibilityBadge = document.getElementById('visibilityBadge');
 
     function docsBase() {
@@ -320,6 +331,11 @@
       return 'both';
     }
 
+    function normalizeRequireApproval(v) {
+      // default true when missing
+      return v !== false;
+    }
+
     function headers() {
       return { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY };
     }
@@ -332,7 +348,8 @@
         pending: Array.isArray(json.pending) ? json.pending.slice() : [],
         approved: Array.isArray(json.approved) ? json.approved.slice() : [],
         showMode: normalizeMode(json.showMode),
-        hidden: !!json.hidden
+        hidden: !!json.hidden,
+        requireApproval: normalizeRequireApproval(json.requireApproval)
       };
     }
 
@@ -341,6 +358,7 @@
       next.approved = (next.approved || []).slice(0, 40);
       next.showMode = normalizeMode(next.showMode);
       next.hidden = !!next.hidden;
+      next.requireApproval = normalizeRequireApproval(next.requireApproval);
       while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
       while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
       var res = await fetch(MANTLE_URL, {
@@ -358,10 +376,13 @@
 
     function paintSettings() {
       var hidden = !!store.hidden;
+      var needApproval = normalizeRequireApproval(store.requireApproval);
       hideToggle.classList.toggle('on', hidden);
       hideToggle.textContent = hidden ? 'مخفي' : 'ظاهر';
       visibilityBadge.classList.toggle('off', hidden);
       visibilityBadge.textContent = hidden ? 'الشريط مخفي عن الزوار' : 'الشريط ظاهر للزوار';
+      approvalToggle.classList.toggle('on', !needApproval);
+      approvalToggle.textContent = needApproval ? 'مطلوب' : 'غير مطلوب';
       var mode = normalizeMode(store.showMode);
       document.querySelectorAll('.modeOpt').forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
@@ -586,6 +607,15 @@
       savePatch(
         { hidden: next },
         next ? 'تم إخفاء الشريط عن الزوار' : 'تم إظهار الشريط للزوار'
+      );
+    });
+    approvalToggle.addEventListener('click', function () {
+      var next = !normalizeRequireApproval(store.requireApproval);
+      savePatch(
+        { requireApproval: next },
+        next
+          ? 'تم تفعيل ضرورة الاعتماد قبل النشر'
+          : 'الرسائل تظهر مباشرة بدون اعتماد'
       );
     });
 
