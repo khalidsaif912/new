@@ -183,8 +183,9 @@
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
-      'html.has-float-dock .wrap{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-float-dock .footer{position:relative;z-index:100016}'
+      'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
+      '#' + TICKER_ID + '.lifted{transition:bottom .18s ease}'
     ].join('');
     document.documentElement.classList.add('has-float-dock');
   }
@@ -202,12 +203,38 @@
     return !!(chgOn || absOn);
   }
 
+  function baseBottomPx(fabOn) {
+    return fabOn ? 84 : 24;
+  }
+
   function layoutTicker(el) {
     if (!el) return;
     var fabOn = fabVisible();
     var alertOn = alertIconVisible();
     el.classList.toggle('above-dock', fabOn);
     el.classList.toggle('solo', !fabOn && !alertOn);
+
+    // Keep the bar outside the footer card (update/source/visitors/buttons).
+    var footer = document.querySelector('.footer');
+    var base = baseBottomPx(fabOn);
+    var bottom = base;
+    var lifted = false;
+    if (footer) {
+      var fr = footer.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+      var tickerH = Math.max(el.offsetHeight || 48, 48);
+      var gap = 10;
+      // Footer is in the lower viewport and would collide with the fixed bar.
+      if (fr.top < vh - base && fr.bottom > 0) {
+        var need = Math.ceil(vh - fr.top + gap);
+        if (need > base) {
+          bottom = Math.min(need, Math.ceil(vh - tickerH - 8));
+          lifted = need > base;
+        }
+      }
+    }
+    el.style.bottom = bottom + 'px';
+    el.classList.toggle('lifted', lifted);
   }
 
   function ensureTicker() {
@@ -361,10 +388,13 @@
 
   function boot() {
     refresh();
-    setInterval(function () {
+    function relayout() {
       var el = document.getElementById(TICKER_ID);
       if (el && el.classList.contains('on')) layoutTicker(el);
-    }, 1500);
+    }
+    setInterval(relayout, 1500);
+    window.addEventListener('scroll', relayout, { passive: true });
+    window.addEventListener('resize', relayout);
     // Refresh approved messages periodically
     setInterval(function () {
       messagesCache = null;
