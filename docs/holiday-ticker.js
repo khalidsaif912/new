@@ -170,19 +170,21 @@
       '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
-      'padding-inline:8px;max-width:100%;',
+      'display:inline-block;white-space:nowrap;padding-inline:8px;',
       'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
-      'letter-spacing:0;animation:none;transform:none;',
+      'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{color:#9a3412;font-weight:900}',
       '#' + TICKER_ID + ' .ht-from{color:#0369a1;font-weight:800}',
       '#' + TICKER_ID + ' .ht-sep{color:#c2410c;opacity:.55;margin:0 .35em}',
       '#' + TICKER_ID + ' .ht-hol{color:#b45309;font-weight:800}',
+      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
+      '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
+      '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
+      '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
-      '#' + TICKER_ID + '.lifted{transition:bottom .18s ease}'
+      'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}'
     ].join('');
     document.documentElement.classList.add('has-float-dock');
   }
@@ -200,38 +202,15 @@
     return !!(chgOn || absOn);
   }
 
-  function baseBottomPx(fabOn) {
-    return fabOn ? 84 : 24;
-  }
-
   function layoutTicker(el) {
     if (!el) return;
     var fabOn = fabVisible();
     var alertOn = alertIconVisible();
     el.classList.toggle('above-dock', fabOn);
     el.classList.toggle('solo', !fabOn && !alertOn);
-
-    // Keep the bar outside the footer card (update/source/visitors/buttons).
-    var footer = document.querySelector('.footer');
-    var base = baseBottomPx(fabOn);
-    var bottom = base;
-    var lifted = false;
-    if (footer) {
-      var fr = footer.getBoundingClientRect();
-      var vh = window.innerHeight || document.documentElement.clientHeight || 0;
-      var tickerH = Math.max(el.offsetHeight || 48, 48);
-      var gap = 10;
-      // Footer is in the lower viewport and would collide with the fixed bar.
-      if (fr.top < vh - base && fr.bottom > 0) {
-        var need = Math.ceil(vh - fr.top + gap);
-        if (need > base) {
-          bottom = Math.min(need, Math.ceil(vh - tickerH - 8));
-          lifted = need > base;
-        }
-      }
-    }
-    el.style.bottom = bottom + 'px';
-    el.classList.toggle('lifted', lifted);
+    // Keep bar pinned — never lift on scroll.
+    el.style.bottom = '';
+    el.classList.remove('lifted');
   }
 
   function ensureTicker() {
@@ -266,13 +245,19 @@
     var plain = parts.map(function (p) {
       return String(p).replace(/<[^>]+>/g, '');
     }).join('  •  ');
+    var strip =
+      joinedHtml +
+      '<span class="ht-sep">•</span>' +
+      joinedHtml +
+      '<span class="ht-sep">•</span>' +
+      joinedHtml;
     el.innerHTML =
       '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
       (ar ? 'اكتب رسالة للشريط' : 'Write a ticker message') +
       '" aria-label="' +
       (ar ? 'فتح صفحة كتابة رسالة الشريط' : 'Open ticker message page') +
       '">🎉</button>' +
-      '<div class="ht-track"><div class="ht-marquee">' + joinedHtml + '</div></div>';
+      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
     el.title = plain;
     el.hidden = false;
     el.classList.add('on');
@@ -379,13 +364,10 @@
 
   function boot() {
     refresh();
-    function relayout() {
+    setInterval(function () {
       var el = document.getElementById(TICKER_ID);
       if (el && el.classList.contains('on')) layoutTicker(el);
-    }
-    setInterval(relayout, 1500);
-    window.addEventListener('scroll', relayout, { passive: true });
-    window.addEventListener('resize', relayout);
+    }, 1500);
     // Refresh approved messages periodically
     setInterval(function () {
       messagesCache = null;
