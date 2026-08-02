@@ -10,6 +10,9 @@
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
+      --line: #334155;
+      --card: #1e293b;
+      --muted: #94a3b8;
     }
     * { box-sizing: border-box; }
     body {
@@ -26,12 +29,12 @@
       padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bot));
     }
     .gate { text-align: center; padding-top: 16vh; }
-    .gate h1 { font-size: 18px; color: #94a3b8; margin: 0 0 8px; }
+    .gate h1 { font-size: 18px; color: var(--muted); margin: 0 0 8px; }
     .gate p { color: #64748b; font-size: 13px; margin: 0 0 14px; }
     .gate input {
       width: min(220px, 100%);
-      border: 1px solid #334155;
-      background: #1e293b;
+      border: 1px solid var(--line);
+      background: var(--card);
       color: #fff;
       border-radius: 12px;
       padding: 12px;
@@ -40,7 +43,7 @@
       text-align: center;
       letter-spacing: .2em;
     }
-    .gate button, .chip, .act {
+    .gate button, .chip, .act, .modeOpt, .toggleBtn {
       border: 0;
       border-radius: 12px;
       min-height: 42px;
@@ -52,21 +55,57 @@
     .gate button { margin-top: 12px; width: min(220px, 100%); background: #2563eb; color: #fff; }
     .gateErr { color: #f87171; min-height: 20px; margin-top: 10px; font-weight: 700; }
     [hidden] { display: none !important; }
-    .head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
     .head h1 { margin: 0; font-size: 20px; }
-    .head p { margin: 6px 0 0; color: #94a3b8; font-size: 12px; line-height: 1.45; }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .chip { background: #1e293b; color: #94a3b8; border: 1px solid #334155; font-size: 12px; }
+    .head p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .headActions { display: grid; gap: 8px; flex-shrink: 0; }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .chip {
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+    .tabs .chip { width: 100%; min-height: 44px; }
     .chip.active { background: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .subTabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
     .stat {
-      background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
     }
     .stat b { display: block; font-size: 22px; color: #fbbf24; margin-bottom: 4px; }
-    .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .stat span { font-size: 11px; color: var(--muted); font-weight: 700; }
     .row {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 14px;
       padding: 12px;
       margin-bottom: 10px;
@@ -78,28 +117,27 @@
     .act.ok { background: #15803d; color: #fff; }
     .act.no { background: #7f1d1d; color: #fecaca; }
     .act.dim { background: #334155; color: #e2e8f0; }
-    .empty, .error { color: #94a3b8; font-weight: 700; padding: 18px 8px; text-align: center; }
+    .empty, .error { color: var(--muted); font-weight: 700; padding: 18px 8px; text-align: center; }
     .error { color: #f87171; }
     a.linkish { color: #93c5fd; text-decoration: none; font-weight: 800; font-size: 12px; }
-    .modeBox {
-      background: #1e293b;
-      border: 1px solid #334155;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    .modeBox h2 {
+    .card h2 {
       margin: 0 0 6px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 900;
-      color: #e2e8f0;
     }
-    .modeBox p {
-      margin: 0 0 10px;
-      font-size: 11px;
-      color: #94a3b8;
+    .card p {
+      margin: 0 0 12px;
+      font-size: 12px;
+      color: var(--muted);
       font-weight: 650;
-      line-height: 1.45;
+      line-height: 1.5;
     }
     .modeOpts {
       display: grid;
@@ -110,16 +148,12 @@
       .modeOpts { grid-template-columns: repeat(3, 1fr); }
     }
     .modeOpt {
-      border: 1px solid #334155;
+      border: 1px solid var(--line);
       background: #0f172a;
-      color: #94a3b8;
-      border-radius: 12px;
-      min-height: 48px;
+      color: var(--muted);
+      min-height: 52px;
       padding: 10px 12px;
-      font: inherit;
-      font-weight: 800;
       font-size: 12px;
-      cursor: pointer;
       text-align: center;
       line-height: 1.35;
     }
@@ -128,14 +162,53 @@
       border-color: #f59e0b88;
       color: #fde68a;
     }
-    .modeStatus {
-      margin: 8px 0 0;
+    .toggleRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .toggleRow strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .toggleRow span { display: block; font-size: 11px; color: var(--muted); font-weight: 700; line-height: 1.4; }
+    .toggleBtn {
+      flex-shrink: 0;
+      min-width: 96px;
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid var(--line);
+      font-size: 12px;
+    }
+    .toggleBtn.on {
+      background: #7f1d1d;
+      border-color: #ef444488;
+      color: #fecaca;
+    }
+    .statusLine {
+      margin: 10px 0 0;
       min-height: 18px;
       font-size: 11px;
       font-weight: 800;
       color: #86efac;
     }
-    .modeStatus.err { color: #fca5a5; }
+    .statusLine.err { color: #fca5a5; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #14532d55;
+      color: #86efac;
+      border: 1px solid #22c55e55;
+      margin-bottom: 12px;
+    }
+    .badge.off {
+      background: #7f1d1d55;
+      color: #fecaca;
+      border-color: #ef444455;
+    }
   </style>
 </head>
 <body>
@@ -151,34 +224,58 @@
   <div class="app" id="app" hidden>
     <div class="head">
       <div>
-        <h1>رسائل الشريط</h1>
-        <p>اعتمد أو ارفض. الرسائل المعتمدة فقط تظهر في الشريط الإخباري.</p>
+        <h1>إدارة الشريط</h1>
+        <p>اعتماد الرسائل وضبط ظهور الشريط للزوار.</p>
       </div>
-      <div style="display:grid;gap:8px">
-        <a class="chip" id="toBoard" href="./" style="text-decoration:none;display:inline-flex;align-items:center">صفحة الكتابة</a>
+      <div class="headActions">
+        <a class="chip" href="./">صفحة الكتابة</a>
         <button type="button" class="chip" id="lockBtn">قفل</button>
       </div>
     </div>
-    <div class="toolbar">
-      <button type="button" class="chip active" data-filter="pending" id="fPending">بانتظار الاعتماد</button>
-      <button type="button" class="chip" data-filter="approved" id="fApproved">المعتمد</button>
-      <button type="button" class="chip" id="refreshBtn">تحديث</button>
+
+    <div class="tabs" id="mainTabs" role="tablist">
+      <button type="button" class="chip active" data-tab="messages" role="tab" aria-selected="true">الرسائل</button>
+      <button type="button" class="chip" data-tab="settings" role="tab" aria-selected="false">الإعدادات</button>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="statPending">0</b><span>بانتظار الاعتماد</span></div>
-      <div class="stat"><b id="statApproved">0</b><span>معتمد على الشريط</span></div>
-    </div>
-    <section class="modeBox" aria-label="محتوى الشريط">
-      <h2>ماذا يظهر في الشريط؟</h2>
-      <p>اختر محتوى الشريط الإخباري لجميع الزوار. يُحفظ فوراً.</p>
-      <div class="modeOpts" id="modeOpts">
-        <button type="button" class="modeOpt" data-mode="official">الرسائل الرسمية فقط<br><span style="opacity:.75;font-weight:700;font-size:10px">إجازات رسمية</span></button>
-        <button type="button" class="modeOpt" data-mode="staff">رسائل الموظفين فقط</button>
-        <button type="button" class="modeOpt active" data-mode="both">الاثنان معاً</button>
+
+    <section id="panelMessages" role="tabpanel">
+      <div class="stats">
+        <div class="stat"><b id="statPending">0</b><span>بانتظار الاعتماد</span></div>
+        <div class="stat"><b id="statApproved">0</b><span>معتمد على الشريط</span></div>
       </div>
-      <div class="modeStatus" id="modeStatus" aria-live="polite"></div>
+      <div class="subTabs">
+        <button type="button" class="chip active" data-filter="pending">بانتظار الاعتماد</button>
+        <button type="button" class="chip" data-filter="approved">المعتمد</button>
+        <button type="button" class="chip" id="refreshBtn">تحديث</button>
+      </div>
+      <div id="list"><div class="empty">جاري التحميل…</div></div>
     </section>
-    <div id="list"><div class="empty">جاري التحميل…</div></div>
+
+    <section id="panelSettings" role="tabpanel" hidden>
+      <div class="badge" id="visibilityBadge">الشريط ظاهر للزوار</div>
+
+      <div class="card">
+        <div class="toggleRow">
+          <div>
+            <strong>إخفاء الشريط</strong>
+            <span>عند التفعيل يختفي الشريط الإخباري عن جميع الزوار فوراً.</span>
+          </div>
+          <button type="button" class="toggleBtn" id="hideToggle">إظهار</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>محتوى الشريط</h2>
+        <p>يُطبَّق فقط عندما يكون الشريط ظاهراً.</p>
+        <div class="modeOpts" id="modeOpts">
+          <button type="button" class="modeOpt" data-mode="official">الرسائل الرسمية فقط<br><span style="opacity:.75;font-weight:700;font-size:10px">إجازات رسمية</span></button>
+          <button type="button" class="modeOpt" data-mode="staff">رسائل الموظفين فقط</button>
+          <button type="button" class="modeOpt active" data-mode="both">الاثنان معاً</button>
+        </div>
+      </div>
+
+      <div class="statusLine" id="settingsStatus" aria-live="polite"></div>
+    </section>
   </div>
 
   <script>
@@ -187,8 +284,9 @@
     var AUTH_KEY = 'rosterTickerModAuth';
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var tab = 'messages';
     var filter = 'pending';
-    var store = { pending: [], approved: [], showMode: 'both' };
+    var store = { pending: [], approved: [], showMode: 'both', hidden: false };
     var MODE_LABELS = {
       official: 'الرسائل الرسمية فقط',
       staff: 'رسائل الموظفين فقط',
@@ -199,7 +297,9 @@
     var app = document.getElementById('app');
     var pinInput = document.getElementById('pinInput');
     var gateErr = document.getElementById('gateErr');
-    var modeStatus = document.getElementById('modeStatus');
+    var settingsStatus = document.getElementById('settingsStatus');
+    var hideToggle = document.getElementById('hideToggle');
+    var visibilityBadge = document.getElementById('visibilityBadge');
 
     function docsBase() {
       try {
@@ -228,15 +328,16 @@
       return {
         pending: Array.isArray(json.pending) ? json.pending.slice() : [],
         approved: Array.isArray(json.approved) ? json.approved.slice() : [],
-        showMode: normalizeMode(json.showMode)
+        showMode: normalizeMode(json.showMode),
+        hidden: !!json.hidden
       };
     }
 
     async function writeStore(next) {
-      // trim to stay under free Mantle limit
       next.pending = (next.pending || []).slice(0, 80);
       next.approved = (next.approved || []).slice(0, 40);
       next.showMode = normalizeMode(next.showMode);
+      next.hidden = !!next.hidden;
       while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
       while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
       var res = await fetch(MANTLE_URL, {
@@ -247,27 +348,47 @@
       if (!res.ok) throw new Error('write');
     }
 
-    function paintMode() {
+    function setStatus(text, isErr) {
+      settingsStatus.className = 'statusLine' + (isErr ? ' err' : '');
+      settingsStatus.textContent = text || '';
+    }
+
+    function paintSettings() {
+      var hidden = !!store.hidden;
+      hideToggle.classList.toggle('on', hidden);
+      hideToggle.textContent = hidden ? 'مخفي' : 'ظاهر';
+      visibilityBadge.classList.toggle('off', hidden);
+      visibilityBadge.textContent = hidden ? 'الشريط مخفي عن الزوار' : 'الشريط ظاهر للزوار';
       var mode = normalizeMode(store.showMode);
       document.querySelectorAll('.modeOpt').forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+        btn.disabled = hidden;
+        btn.style.opacity = hidden ? '0.55' : '1';
       });
     }
 
-    async function setShowMode(mode) {
-      mode = normalizeMode(mode);
-      modeStatus.className = 'modeStatus';
-      modeStatus.textContent = 'جاري الحفظ…';
+    function paintTabs() {
+      document.querySelectorAll('#mainTabs .chip').forEach(function (c) {
+        var on = c.getAttribute('data-tab') === tab;
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.getElementById('panelMessages').hidden = tab !== 'messages';
+      document.getElementById('panelSettings').hidden = tab !== 'settings';
+    }
+
+    async function savePatch(patch, okMsg) {
+      setStatus('جاري الحفظ…');
       try {
         store = await readStore();
-        store.showMode = mode;
+        Object.keys(patch).forEach(function (k) { store[k] = patch[k]; });
         await writeStore(store);
         store = await readStore();
-        paintMode();
-        modeStatus.textContent = 'تم الحفظ: ' + (MODE_LABELS[store.showMode] || store.showMode);
+        paintSettings();
+        paintList();
+        setStatus(okMsg || 'تم الحفظ');
       } catch (e) {
-        modeStatus.className = 'modeStatus err';
-        modeStatus.textContent = 'تعذر حفظ الخيار';
+        setStatus('تعذر حفظ الخيار', true);
       }
     }
 
@@ -300,11 +421,10 @@
       setTimeout(function () { pinInput.focus(); }, 30);
     }
 
-    function render() {
+    function paintList() {
       document.getElementById('statPending').textContent = String(store.pending.length);
       document.getElementById('statApproved').textContent = String(store.approved.length);
-      paintMode();
-      document.querySelectorAll('.chip[data-filter]').forEach(function (c) {
+      document.querySelectorAll('.subTabs [data-filter]').forEach(function (c) {
         c.classList.toggle('active', c.getAttribute('data-filter') === filter);
       });
       var list = document.getElementById('list');
@@ -366,6 +486,12 @@
       });
     }
 
+    function render() {
+      paintTabs();
+      paintSettings();
+      paintList();
+    }
+
     async function load() {
       var list = document.getElementById('list');
       list.innerHTML = '<div class="empty">جاري التحميل…</div>';
@@ -422,16 +548,35 @@
     });
     document.getElementById('lockBtn').addEventListener('click', lock);
     document.getElementById('refreshBtn').addEventListener('click', load);
-    document.querySelectorAll('.chip[data-filter]').forEach(function (c) {
+
+    document.querySelectorAll('#mainTabs .chip').forEach(function (c) {
+      c.addEventListener('click', function () {
+        tab = c.getAttribute('data-tab') || 'messages';
+        paintTabs();
+      });
+    });
+    document.querySelectorAll('.subTabs [data-filter]').forEach(function (c) {
       c.addEventListener('click', function () {
         filter = c.getAttribute('data-filter') || 'pending';
-        render();
+        paintList();
       });
     });
     document.querySelectorAll('.modeOpt').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        setShowMode(btn.getAttribute('data-mode') || 'both');
+        if (store.hidden) {
+          setStatus('أظهر الشريط أولاً لتغيير المحتوى', true);
+          return;
+        }
+        var mode = btn.getAttribute('data-mode') || 'both';
+        savePatch({ showMode: mode }, 'تم الحفظ: ' + (MODE_LABELS[mode] || mode));
       });
+    });
+    hideToggle.addEventListener('click', function () {
+      var next = !store.hidden;
+      savePatch(
+        { hidden: next },
+        next ? 'تم إخفاء الشريط عن الزوار' : 'تم إظهار الشريط للزوار'
+      );
     });
 
     if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();

@@ -340,12 +340,13 @@
         showModeCache = normalizeMode(json && json.showMode);
         return {
           approved: Array.isArray(json && json.approved) ? json.approved : [],
-          showMode: showModeCache
+          showMode: showModeCache,
+          hidden: !!(json && json.hidden)
         };
       })
       .catch(function () {
         showModeCache = 'both';
-        return { approved: [], showMode: 'both' };
+        return { approved: [], showMode: 'both', hidden: false };
       });
     return messagesCache;
   }
@@ -353,7 +354,11 @@
   function refresh() {
     messagesCache = null; // always re-check approved list + mode
     Promise.all([loadTickerStore(), loadHolidays()]).then(function (pair) {
-      var store = pair[0] || { approved: [], showMode: 'both' };
+      var store = pair[0] || { approved: [], showMode: 'both', hidden: false };
+      if (store.hidden) {
+        paintParts([], lang() === 'ar');
+        return;
+      }
       var mode = normalizeMode(store.showMode);
       var approved = mode === 'official' ? [] : (store.approved || []);
       var holidays =

@@ -361,7 +361,8 @@
       return {
         pending: Array.isArray(json.pending) ? json.pending : [],
         approved: Array.isArray(json.approved) ? json.approved : [],
-        showMode: mode
+        showMode: mode,
+        hidden: !!json.hidden
       };
     }
 
@@ -369,7 +370,8 @@
       var payload = {
         pending: store.pending || [],
         approved: store.approved || [],
-        showMode: store.showMode || 'both'
+        showMode: store.showMode || 'both',
+        hidden: !!store.hidden
       };
       var res = await fetch(MANTLE_URL, {
         method: 'POST',
