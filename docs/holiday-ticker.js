@@ -174,7 +174,8 @@
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{color:#111827;font-weight:900}',
-      '#' + TICKER_ID + ' .ht-from{color:#075985;font-weight:800}',
+      '#' + TICKER_ID + ' .ht-from{color:#075985;font-weight:800;display:inline-flex;align-items:center;gap:4px;vertical-align:middle}',
+      '#' + TICKER_ID + ' .ht-emoji{width:18px;height:18px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-3px}',
       '#' + TICKER_ID + ' .ht-sep{color:#78716c;opacity:.9;margin:0 .4em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
@@ -279,6 +280,21 @@
     }
   }
 
+  function validEmojiCp(cp) {
+    return /^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/i.test(String(cp || '').trim());
+  }
+
+  function emojiImgHtml(cp) {
+    cp = String(cp || '').trim().toLowerCase();
+    if (!validEmojiCp(cp)) return '';
+    return (
+      '<img class="ht-emoji" alt="" aria-hidden="true" decoding="async" ' +
+      'src="https://fonts.gstatic.com/s/e/notoemoji/latest/' +
+      escapeHtml(cp) +
+      '/512.webp">'
+    );
+  }
+
   function buildParts(approved, holidays) {
     var ar = lang() === 'ar';
     var parts = [];
@@ -288,6 +304,7 @@
       if (m.name) {
         bit +=
           '<span class="ht-sep">—</span><span class="ht-from">' +
+          emojiImgHtml(m.emoji) +
           escapeHtml(String(m.name)) +
           '</span>';
       }

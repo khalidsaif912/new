@@ -155,6 +155,15 @@
       font-size: 11px;
       color: #38bdf8;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .liveMeta img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      flex: 0 0 auto;
     }
     .empty { color: #64748b; font-size: 13px; font-weight: 700; }
   </style>
@@ -251,6 +260,46 @@
 
     function digitsOnly(v) {
       return String(v || '').replace(/\D+/g, '').slice(0, 12);
+    }
+
+    var EMOJI_DEFAULTS = { '82437': '1f349' };
+    var emojiListCache = null;
+
+    function validEmojiCp(cp) {
+      return /^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/i.test(String(cp || '').trim());
+    }
+
+    function emojiHash(s) {
+      var h = 0;
+      for (var i = 0; i < String(s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+      return h;
+    }
+
+    function readLocalEmoji(empId) {
+      try {
+        var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+        var cp = String(map[empId] || map.export || '').trim();
+        if (!cp) cp = String(localStorage.getItem('empEmojiChoice') || '').trim();
+        if (validEmojiCp(cp)) return cp.toLowerCase();
+      } catch (e) {}
+      if (EMOJI_DEFAULTS[empId]) return EMOJI_DEFAULTS[empId];
+      return '';
+    }
+
+    async function resolveEmoji(empId) {
+      var local = readLocalEmoji(empId);
+      if (local) return local;
+      try {
+        if (!emojiListCache) {
+          var res = await fetch(base + 'my-emoji/emojis.json', { cache: 'force-cache' });
+          emojiListCache = res.ok ? await res.json() : [];
+        }
+        if (emojiListCache && emojiListCache.length) {
+          var item = emojiListCache[emojiHash(empId) % emojiListCache.length];
+          if (item && validEmojiCp(item.cp)) return String(item.cp).toLowerCase();
+        }
+      } catch (e) {}
+      return '';
     }
 
     function paintWho() {
@@ -399,10 +448,21 @@
       Array.from(liveList.children).forEach(function (el, i) {
         var m = list[i];
         el.querySelector('.liveMsg').textContent = m.text || '';
+        var metaEl = el.querySelector('.liveMeta');
+        metaEl.textContent = '';
+        var cp = String(m.emoji || '').trim().toLowerCase();
+        if (/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) {
+          var img = document.createElement('img');
+          img.alt = '';
+          img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+          metaEl.appendChild(img);
+        }
         var meta = [];
         if (m.name) meta.push(m.name);
         if (m.empId) meta.push('#' + m.empId);
-        el.querySelector('.liveMeta').textContent = meta.join(' · ') || 'معتمد';
+        var span = document.createElement('span');
+        span.textContent = meta.join(' · ') || 'معتمد';
+        metaEl.appendChild(span);
       });
     }
 
@@ -438,11 +498,13 @@
       status.textContent = 'جاري الإرسال…';
       try {
         var store = await readStore();
+        var emoji = await resolveEmoji(emp.id);
         var row = {
           id: uid(),
           text: text,
           name: emp.name || resolved.name || '',
           empId: emp.id,
+          emoji: emoji || '',
           at: Date.now(),
           status: 'pending'
         };
