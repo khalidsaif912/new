@@ -60,6 +60,23 @@
       padding-top:var(--topbar-h); /* synced to fixed topbar height (iPhone safe area) */
     }
     body.ar{direction:rtl}
+    /* letter-spacing / uppercase break Arabic glyph joining (on-screen + html2canvas) */
+    body.ar .emp-name,
+    body.ar .emp-name-row .emp-name,
+    body.ar .emp-dept,
+    body.ar .cal-head div,
+    body.ar .month-picker-btn,
+    body.ar .brand-name,
+    body.ar .action-btn{
+      letter-spacing:0 !important;
+      text-transform:none !important;
+    }
+    body.ar .emp-name,
+    body.ar .emp-dept,
+    body.ar .cal-head div,
+    body.ar .month-picker-btn{
+      font-family:'Tajawal','Sora',system-ui,sans-serif !important;
+    }
     a{color:var(--accent);text-decoration:none}
     button,input,select{font-family:inherit;font-size:inherit}
     button{cursor:pointer}
@@ -2303,6 +2320,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="../vendor/html-to-image.min.js"></script>
 
   <script>
     let data=null, month=null, months=[], lang='ar', theme='dark';
@@ -3263,35 +3281,76 @@
       const source = document.getElementById('exportArea') || document.querySelector('.main');
       if(!source) throw new Error('export area not found');
 
-      // Clone to an offscreen container sized like a mobile portrait card
-      const clone = source.cloneNode(true);
-
-      const wrap = document.createElement('div');
-      wrap.style.position = 'absolute';
-      wrap.style.left = '-9999px';
-      wrap.style.top = '0';
-      wrap.style.width = '420px';           // portrait mobile-friendly width
-      wrap.style.padding = '16px';
-      wrap.style.boxSizing = 'border-box';
-
-      // Match current page background (keeps glass + shadows consistent)
       const bg = getComputedStyle(document.body).backgroundColor || '#0d1117';
-      wrap.style.background = bg;
+      const isAr = (lang==='ar' || document.body.classList.contains('ar'));
 
+      // Prefer capturing the live on-screen node (best Arabic shaping).
+      // Fall back to an on-screen (opacity:0) clone if needed.
+      async function renderNode(node){
+        try{ if(document.fonts && document.fonts.ready) await document.fonts.ready; }catch(e){}
+        await new Promise(requestAnimationFrame);
+        if(window.htmlToImage && typeof htmlToImage.toCanvas === 'function'){
+          return await htmlToImage.toCanvas(node, {
+            pixelRatio: 3,
+            backgroundColor: bg,
+            cacheBust: true,
+            skipFonts: false
+          });
+        }
+        return await html2canvas(node, {
+          scale: 3,
+          backgroundColor: bg,
+          useCORS: true
+        });
+      }
+
+      // Soften Arabic CSS killers on the live node during capture
+      const prev = source.getAttribute('style') || '';
+      if(isAr){
+        source.style.fontFamily = "'Tajawal','Sora',system-ui,sans-serif";
+      }
+      try{
+        const live = await renderNode(source);
+        // Reject blank/near-blank captures (html-to-image can fail with zero content)
+        if(live && live.width > 10 && live.height > 10){
+          const ctx = live.getContext('2d');
+          const sample = ctx.getImageData(Math.floor(live.width/2), Math.floor(live.height/2), 1, 1).data;
+          const corner = ctx.getImageData(2, 2, 1, 1).data;
+          const blankish = (sample[3] < 5 && corner[3] < 5);
+          if(!blankish) return live;
+        }
+      }catch(e){
+        console.warn('live capture failed, trying clone', e);
+      }finally{
+        source.setAttribute('style', prev);
+      }
+
+      const clone = source.cloneNode(true);
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:fixed;left:0;top:0;width:420px;padding:16px;box-sizing:border-box;z-index:2147483000;opacity:0;pointer-events:none;';
+      wrap.style.background = bg;
+      if(document.body.classList.contains('light')) wrap.classList.add('light');
+      if(document.body.classList.contains('mono')) wrap.classList.add('mono');
+      if(isAr){
+        wrap.classList.add('ar');
+        wrap.setAttribute('lang','ar');
+        wrap.setAttribute('dir','rtl');
+        wrap.style.fontFamily = "'Tajawal','Sora',system-ui,sans-serif";
+        const style = document.createElement('style');
+        style.textContent = [
+          '.ar, .ar *{letter-spacing:0!important;text-transform:none!important;}',
+          ".ar .emp-name,.ar .emp-dept,.ar .cal-head div,.ar .month-picker-btn{",
+          "font-family:'Tajawal','Sora',system-ui,sans-serif!important;}"
+        ].join('');
+        wrap.appendChild(style);
+      }
       wrap.appendChild(clone);
       document.body.appendChild(wrap);
-
-      // Wait for layout
-      await new Promise(requestAnimationFrame);
-
-      const canvas = await html2canvas(wrap, {
-        scale: 3,
-        backgroundColor: null,
-        useCORS: true
-      });
-
-      document.body.removeChild(wrap);
-      return canvas;
+      try{
+        return await renderNode(wrap);
+      }finally{
+        document.body.removeChild(wrap);
+      }
     }
 
     async function dlIMG(){
