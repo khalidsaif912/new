@@ -547,7 +547,13 @@
         }
       };
 
-      var lang = 'ar';
+      var lang = (function () {
+        try {
+          var l = localStorage.getItem('rosterLang') || localStorage.getItem('prefLang');
+          if (l === 'en' || l === 'ar') return l;
+        } catch (e) {}
+        return 'ar';
+      })();
       var source = document.getElementById('sourceText');
       var preview = document.getElementById('preview');
       var toast = document.getElementById('toast');
@@ -1048,6 +1054,12 @@
 
       document.getElementById('langBtn').addEventListener('click', function () {
         lang = lang === 'ar' ? 'en' : 'ar';
+        try {
+          localStorage.setItem('rosterLang', lang);
+          localStorage.setItem('prefLang', lang);
+          localStorage.setItem('importPrefLang', lang);
+          localStorage.setItem('appLang', lang);
+        } catch (e) {}
         applyLang();
       });
 

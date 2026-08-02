@@ -2309,7 +2309,7 @@
 
     // ── Restore saved preferences ──
     (function(){
-      const sl=localStorage.getItem('prefLang');
+      const sl=localStorage.getItem('rosterLang')||localStorage.getItem('prefLang');
       const st=localStorage.getItem('prefTheme');
       if(sl==='en'||sl==='ar') lang=sl;
       if(st==='light'||st==='dark'||st==='mono') theme=st;
@@ -2564,7 +2564,12 @@
     }
     function toggleLang(){
       lang=(lang==='en'?'ar':'en');
-      localStorage.setItem('prefLang', lang);
+      try{
+        localStorage.setItem('prefLang', lang);
+        localStorage.setItem('rosterLang', lang);
+        localStorage.setItem('importPrefLang', lang);
+        localStorage.setItem('appLang', lang);
+      }catch(e){}
       applyLangUI();
     }
 

@@ -53,24 +53,33 @@
     } catch (_) {}
   }
 
+  function syncSiteLang(lang) {
+    if (lang !== 'ar' && lang !== 'en') return;
+    try {
+      localStorage.setItem('rosterLang', lang);
+      localStorage.setItem('prefLang', lang);
+      localStorage.setItem('importPrefLang', lang);
+      localStorage.setItem('appLang', lang);
+    } catch (e) {}
+  }
+
   function getLang() {
+    // rosterLang is the site-wide source of truth (home page toggle).
+    var primary = localStorage.getItem('rosterLang');
+    if (primary === 'ar' || primary === 'en') return primary;
     var path = window.location.pathname || '';
-    // My Schedule pages have their own language preference keys
     if (path.indexOf('/my-schedules') !== -1) {
       var msLang = path.indexOf('/import/') !== -1
         ? localStorage.getItem('importPrefLang')
         : localStorage.getItem('prefLang');
-      // these pages default to Arabic when no preference is stored
       return msLang || 'ar';
     }
     if (path.indexOf('/import/') !== -1) {
       return localStorage.getItem('importPrefLang')
-        || localStorage.getItem('rosterLang')
         || localStorage.getItem('appLang')
         || 'en';
     }
-    return localStorage.getItem('rosterLang')
-      || localStorage.getItem('importPrefLang')
+    return localStorage.getItem('importPrefLang')
       || localStorage.getItem('appLang')
       || 'en';
   }
@@ -1023,20 +1032,37 @@ function onAppLangChange() {
 function hookRosterLangChange() {
   if (window.__chgLangHooked) return;
   window.__chgLangHooked = true;
+  // Keep legacy page keys aligned with the home-page language.
+  try {
+    var bootLang = localStorage.getItem('rosterLang');
+    if (bootLang === 'ar' || bootLang === 'en') syncSiteLang(bootLang);
+  } catch (e) {}
   var orig = window.applyLang;
   if (typeof orig === 'function') {
     window.applyLang = function (lang) {
       orig(lang);
+      syncSiteLang(lang === 'ar' ? 'ar' : 'en');
       onAppLangChange();
     };
   }
   document.addEventListener('click', function (e) {
     if (e.target && e.target.closest && e.target.closest('#langToggle, #langBtn')) {
-      setTimeout(onAppLangChange, 0);
+      setTimeout(function () {
+        try {
+          var l = localStorage.getItem('rosterLang')
+            || localStorage.getItem('prefLang')
+            || localStorage.getItem('importPrefLang');
+          if (l === 'ar' || l === 'en') syncSiteLang(l);
+        } catch (err) {}
+        onAppLangChange();
+      }, 0);
     }
   });
   window.addEventListener('storage', function (e) {
-    if (e.key === 'rosterLang' || e.key === 'appLang') onAppLangChange();
+    if (e.key === 'rosterLang' || e.key === 'appLang' || e.key === 'prefLang' || e.key === 'importPrefLang') {
+      if (e.newValue === 'ar' || e.newValue === 'en') syncSiteLang(e.newValue);
+      onAppLangChange();
+    }
   });
 }
 

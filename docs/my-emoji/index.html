@@ -152,7 +152,7 @@
   };
 
   try {
-    var sl = localStorage.getItem('prefLang');
+    var sl = localStorage.getItem('rosterLang') || localStorage.getItem('prefLang');
     var st = localStorage.getItem('prefTheme');
     if (sl === 'en' || sl === 'ar') lang = sl;
     if (st === 'light' || st === 'dark') theme = st;
@@ -252,7 +252,12 @@
   });
   document.getElementById('langBtn').addEventListener('click', function(){
     lang = (lang === 'ar' ? 'en' : 'ar');
-    try { localStorage.setItem('prefLang', lang); } catch(e){}
+    try {
+      localStorage.setItem('prefLang', lang);
+      localStorage.setItem('rosterLang', lang);
+      localStorage.setItem('importPrefLang', lang);
+      localStorage.setItem('appLang', lang);
+    } catch(e){}
     applyLang();
   });
   document.getElementById('resetBtn').addEventListener('click', function(){
