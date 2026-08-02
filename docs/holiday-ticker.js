@@ -331,41 +331,77 @@
       'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
       '#' + MODAL_ID + '{',
-      'position:fixed;inset:0;z-index:100120;display:none;align-items:flex-end;justify-content:center;',
-      'padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));',
-      'background:rgba(15,23,42,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);',
+      'position:fixed;inset:0;z-index:100120;display:none;',
       'font-family:Tajawal,system-ui,sans-serif;letter-spacing:0;',
       '}',
-      '#' + MODAL_ID + '.on{display:flex}',
+      '#' + MODAL_ID + '.on{display:block}',
       '#' + MODAL_ID + ' .htc-sheet{',
-      'width:min(440px,100%);background:#fff;border-radius:20px;padding:16px;',
-      'box-shadow:0 20px 50px rgba(15,23,42,.28);color:#0f172a;',
+      'position:absolute;inset:0;display:flex;flex-direction:column;',
+      'background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);color:#0f172a;',
       '}',
-      '#' + MODAL_ID + ' .htc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}',
+      '#' + MODAL_ID + ' .htc-top{',
+      'flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;',
+      'padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px;',
+      'background:#0f172a;color:#f8fafc;border-bottom:1px solid #1e293b;',
+      '}',
       '#' + MODAL_ID + ' .htc-top h2{margin:0;font-size:17px;font-weight:900}',
+      '#' + MODAL_ID + ' .htc-top .htc-subline{margin:3px 0 0;font-size:11px;font-weight:700;color:#94a3b8}',
       '#' + MODAL_ID + ' .htc-close{',
-      'width:36px;height:36px;border:0;border-radius:12px;background:#f1f5f9;color:#334155;',
-      'font-size:18px;font-weight:900;cursor:pointer;',
+      'width:40px;height:40px;border:0;border-radius:12px;background:#1e293b;color:#e2e8f0;',
+      'font-size:20px;font-weight:900;cursor:pointer;flex-shrink:0;',
       '}',
-      '#' + MODAL_ID + ' .htc-sub{margin:0 0 12px;font-size:12px;font-weight:700;color:#64748b;line-height:1.45}',
-      '#' + MODAL_ID + ' label{display:block;font-size:12px;font-weight:800;color:#475569;margin:0 0 6px}',
+      '#' + MODAL_ID + ' .htc-feed{',
+      'flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;',
+      'padding:14px 12px 10px;display:flex;flex-direction:column;gap:10px;',
+      '}',
+      '#' + MODAL_ID + ' .htc-empty{',
+      'margin:auto;text-align:center;color:#64748b;font-size:13px;font-weight:800;padding:24px 12px;line-height:1.5',
+      '}',
+      '#' + MODAL_ID + ' .htc-bubble{',
+      'max-width:min(92%,420px);align-self:flex-start;background:#fff;',
+      'border:1px solid #e2e8f0;border-radius:16px 16px 16px 6px;padding:10px 12px;',
+      'box-shadow:0 4px 14px rgba(15,23,42,.06);',
+      '}',
+      '#' + MODAL_ID + ' .htc-bubble.mine{',
+      'align-self:flex-end;background:#fff7ed;border-color:#fed7aa;border-radius:16px 16px 6px 16px;',
+      '}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-meta{',
+      'display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px;font-weight:800;color:#0369a1;',
+      '}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-meta img{width:18px;height:18px;object-fit:contain;flex:0 0 auto}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-text{font-size:14px;font-weight:800;color:#111827;line-height:1.45;word-break:break-word}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-time{margin-top:5px;font-size:10px;font-weight:700;color:#94a3b8}',
+      '#' + MODAL_ID + ' .htc-composer{',
+      'flex:0 0 auto;background:#fff;border-top:1px solid #e2e8f0;',
+      'padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));',
+      '}',
+      '#' + MODAL_ID + ' .htc-idrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}',
+      '#' + MODAL_ID + ' .htc-idrow.hidden{display:none}',
+      '#' + MODAL_ID + ' .htc-whochip{',
+      'display:flex;align-items:center;justify-content:space-between;gap:8px;',
+      'margin-bottom:8px;padding:8px 10px;border-radius:12px;background:#f1f5f9;',
+      'font-size:12px;font-weight:800;color:#0f172a;',
+      '}',
+      '#' + MODAL_ID + ' .htc-whochip button{',
+      'border:0;background:transparent;color:#0369a1;font:inherit;font-weight:900;font-size:11px;cursor:pointer;padding:0;',
+      '}',
+      '#' + MODAL_ID + ' label{display:block;font-size:11px;font-weight:800;color:#64748b;margin:0 0 4px}',
       '#' + MODAL_ID + ' input,#' + MODAL_ID + ' textarea{',
       'width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;',
-      'padding:11px 12px;font:inherit;font-size:15px;font-weight:700;color:#0f172a;outline:none;',
+      'padding:11px 12px;font:inherit;font-size:15px;font-weight:700;color:#0f172a;outline:none;background:#fff;',
       '}',
-      '#' + MODAL_ID + ' textarea{min-height:96px;resize:vertical;line-height:1.45}',
+      '#' + MODAL_ID + ' textarea{min-height:44px;max-height:110px;resize:none;line-height:1.4}',
       '#' + MODAL_ID + ' input:focus,#' + MODAL_ID + ' textarea:focus{border-color:#f59e0b}',
-      '#' + MODAL_ID + ' .htc-hint{margin:6px 0 0;font-size:11px;font-weight:700;color:#94a3b8}',
-      '#' + MODAL_ID + ' .htc-who{margin:10px 0 0;font-size:12px;font-weight:800;color:#0369a1}',
-      '#' + MODAL_ID + ' .htc-field{margin-bottom:12px}',
+      '#' + MODAL_ID + ' .htc-sendrow{display:flex;gap:8px;align-items:flex-end;margin-top:8px}',
+      '#' + MODAL_ID + ' .htc-sendrow .htc-grow{flex:1 1 auto;min-width:0}',
       '#' + MODAL_ID + ' .htc-send{',
-      'width:100%;margin-top:4px;border:0;border-radius:12px;min-height:46px;',
+      'flex:0 0 auto;border:0;border-radius:12px;min-height:44px;min-width:84px;padding:0 14px;',
       'background:linear-gradient(135deg,#f59e0b,#ea580c);color:#111;font:inherit;font-weight:900;cursor:pointer;',
       '}',
       '#' + MODAL_ID + ' .htc-send:disabled{opacity:.55;cursor:wait}',
-      '#' + MODAL_ID + ' .htc-status{min-height:20px;margin-top:8px;font-size:12px;font-weight:800;color:#15803d}',
+      '#' + MODAL_ID + ' .htc-status{min-height:16px;margin-top:6px;font-size:11px;font-weight:800;color:#15803d}',
       '#' + MODAL_ID + ' .htc-status.err{color:#b91c1c}',
-      '@media (min-width:640px){#' + MODAL_ID + '{align-items:center}}'
+      '#' + MODAL_ID + ' .htc-hint{margin:4px 0 0;font-size:10px;font-weight:700;color:#94a3b8}'
     ].join('');
     if (!document.getElementById('htTajawalFont')) {
       var fontLink = document.createElement('link');
@@ -420,12 +456,66 @@
       .replace(/"/g, '&quot;');
   }
 
+  function formatChatTime(at) {
+    try {
+      return new Date(Number(at) || Date.now()).toLocaleString('ar-OM', {
+        timeZone: 'Asia/Muscat',
+        hour: '2-digit',
+        minute: '2-digit',
+        day: 'numeric',
+        month: 'short'
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
   function closeCompose() {
     var modal = document.getElementById(MODAL_ID);
     if (!modal) return;
     modal.classList.remove('on');
     modal.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
+  }
+
+  function renderChatFeed(approved, myId) {
+    var feed = document.getElementById('htcFeed');
+    if (!feed) return;
+    var list = (approved || []).slice().reverse(); // oldest first for chat
+    if (!list.length) {
+      feed.innerHTML = '<div class="htc-empty">لا رسائل بعد.<br>كن أول من يكتب في الشريط الإخباري.</div>';
+      return;
+    }
+    feed.innerHTML = list
+      .map(function (m) {
+        var mine = myId && String(m.empId || '') === String(myId);
+        var cp = String(m.emoji || '').trim().toLowerCase();
+        var emoji = validEmojiCp(cp)
+          ? '<img alt="" src="https://fonts.gstatic.com/s/e/notoemoji/latest/' +
+            escapeHtml(cp) +
+            '/512.webp">'
+          : '';
+        return (
+          '<article class="htc-bubble' +
+          (mine ? ' mine' : '') +
+          '">' +
+          '<div class="htc-meta">' +
+          emoji +
+          '<span></span>' +
+          '</div>' +
+          '<div class="htc-text"></div>' +
+          '<div class="htc-time"></div>' +
+          '</article>'
+        );
+      })
+      .join('');
+    Array.from(feed.children).forEach(function (el, i) {
+      var m = list[i];
+      el.querySelector('.htc-meta span').textContent = m.name || 'موظف';
+      el.querySelector('.htc-text').textContent = m.text || '';
+      el.querySelector('.htc-time').textContent = formatChatTime(m.approvedAt || m.at);
+    });
+    feed.scrollTop = feed.scrollHeight;
   }
 
   function ensureCompose() {
@@ -438,47 +528,63 @@
     modal.innerHTML =
       '<div class="htc-sheet" role="dialog" aria-modal="true" aria-labelledby="htcTitle">' +
         '<div class="htc-top">' +
-          '<h2 id="htcTitle">رسالة للشريط</h2>' +
+          '<div>' +
+            '<h2 id="htcTitle">🎉 دردشة الشريط</h2>' +
+            '<p class="htc-subline" id="htcSub">رسائل الموظفين المعتمدة</p>' +
+          '</div>' +
           '<button type="button" class="htc-close" id="htcClose" aria-label="إغلاق">×</button>' +
         '</div>' +
-        '<p class="htc-sub" id="htcSub">اكتب رسالة قصيرة. قد تحتاج اعتماد المشرف قبل الظهور.</p>' +
-        '<div class="htc-field">' +
-          '<label for="htcEmpId">الرقم الوظيفي</label>' +
-          '<input id="htcEmpId" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="مثال: 8715">' +
-          '<p class="htc-who" id="htcWho"></p>' +
+        '<div class="htc-feed" id="htcFeed"><div class="htc-empty">جاري التحميل…</div></div>' +
+        '<div class="htc-composer">' +
+          '<div class="htc-whochip" id="htcWhoChip" hidden>' +
+            '<span id="htcWhoText"></span>' +
+            '<button type="button" id="htcChangeId">تغيير الرقم</button>' +
+          '</div>' +
+          '<div class="htc-idrow" id="htcIdRow">' +
+            '<div class="htc-grow" style="flex:1">' +
+              '<label for="htcEmpId">الرقم الوظيفي</label>' +
+              '<input id="htcEmpId" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="مثال: 8715">' +
+            '</div>' +
+          '</div>' +
+          '<div class="htc-sendrow">' +
+            '<div class="htc-grow">' +
+              '<textarea id="htcMsg" maxlength="120" rows="1" placeholder="اكتب رسالة للزملاء…"></textarea>' +
+              '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
+            '</div>' +
+            '<button type="button" class="htc-send" id="htcSend">إرسال</button>' +
+          '</div>' +
+          '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
         '</div>' +
-        '<div class="htc-field">' +
-          '<label for="htcMsg">رسالتك</label>' +
-          '<textarea id="htcMsg" maxlength="120" placeholder="مثال: كل عام وأنتم بخير…"></textarea>' +
-          '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
-        '</div>' +
-        '<button type="button" class="htc-send" id="htcSend">إرسال</button>' +
-        '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
       '</div>';
     document.body.appendChild(modal);
 
     if (!composeBound) {
       composeBound = true;
-      modal.addEventListener('click', function (e) {
-        if (e.target === modal) closeCompose();
-      });
       document.getElementById('htcClose').addEventListener('click', closeCompose);
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.classList.contains('on')) closeCompose();
       });
       var empInput = document.getElementById('htcEmpId');
       var msgInput = document.getElementById('htcMsg');
-      var whoEl = document.getElementById('htcWho');
       var countEl = document.getElementById('htcCount');
       var statusEl = document.getElementById('htcStatus');
       var sendBtn = document.getElementById('htcSend');
       var subEl = document.getElementById('htcSub');
+      var whoChip = document.getElementById('htcWhoChip');
+      var whoText = document.getElementById('htcWhoText');
+      var idRow = document.getElementById('htcIdRow');
+      var changeIdBtn = document.getElementById('htcChangeId');
+      var resolvedEmp = { id: '', name: '' };
 
-      function paintWho(r) {
-        if (r && r.ok && r.id) {
-          whoEl.textContent = 'المرسل: ' + (r.name || 'موظف') + ' · #' + r.id;
+      function paintIdentity(r) {
+        resolvedEmp = r && r.ok ? { id: r.id, name: r.name || '' } : { id: '', name: '' };
+        if (resolvedEmp.id) {
+          whoText.textContent = (resolvedEmp.name || 'موظف') + ' · #' + resolvedEmp.id;
+          whoChip.hidden = false;
+          idRow.classList.add('hidden');
         } else {
-          whoEl.textContent = 'أدخل رقمك الوظيفي أولاً';
+          whoChip.hidden = true;
+          idRow.classList.remove('hidden');
         }
       }
 
@@ -488,19 +594,43 @@
           saveIdentity(r.id, r.name);
           if (empInput.value !== r.id) empInput.value = r.id;
         }
-        paintWho(r);
+        paintIdentity(r);
         return r;
       }
 
+      async function refreshFeed() {
+        try {
+          var store = await readFullStore();
+          var need = store.requireApproval !== false;
+          subEl.textContent = need
+            ? 'رسائل الموظفين · تظهر بعد الاعتماد'
+            : 'رسائل الموظفين · نشر مباشر';
+          sendBtn.textContent = need ? 'إرسال' : 'نشر';
+          renderChatFeed(store.approved || [], resolvedEmp.id || readSavedIdentity().id);
+        } catch (e) {
+          var feed = document.getElementById('htcFeed');
+          if (feed) feed.innerHTML = '<div class="htc-empty">تعذر تحميل الرسائل.</div>';
+        }
+      }
+      modal._htcRefreshFeed = refreshFeed;
+      modal._htcSyncEmp = syncEmp;
+
+      changeIdBtn.addEventListener('click', function () {
+        whoChip.hidden = true;
+        idRow.classList.remove('hidden');
+        empInput.focus();
+      });
       empInput.addEventListener('input', function () {
         var d = digitsOnly(empInput.value);
         if (empInput.value !== d) empInput.value = d;
         clearTimeout(empInput._t);
-        empInput._t = setTimeout(function () { syncEmp(); }, 280);
+        empInput._t = setTimeout(function () { syncEmp().then(refreshFeed); }, 280);
       });
-      empInput.addEventListener('blur', function () { syncEmp(); });
+      empInput.addEventListener('blur', function () { syncEmp().then(refreshFeed); });
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
+        msgInput.style.height = 'auto';
+        msgInput.style.height = Math.min(110, Math.max(44, msgInput.scrollHeight)) + 'px';
       });
 
       sendBtn.addEventListener('click', async function () {
@@ -514,6 +644,8 @@
             emp.reason === 'unknown'
               ? 'الرقم الوظيفي غير موجود في الروستر.'
               : 'أدخل رقمك الوظيفي قبل الإرسال.';
+          idRow.classList.remove('hidden');
+          whoChip.hidden = true;
           empInput.focus();
           return;
         }
@@ -528,10 +660,6 @@
         try {
           var store = await readFullStore();
           var needApproval = store.requireApproval !== false;
-          subEl.textContent = needApproval
-            ? 'اكتب رسالة قصيرة. تظهر بعد اعتماد المشرف.'
-            : 'اكتب رسالة قصيرة. تظهر مباشرة في الشريط.';
-          sendBtn.textContent = needApproval ? 'إرسال للمراجعة' : 'نشر في الشريط';
           var emoji = await resolveEmoji(emp.id);
           var row = {
             id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
@@ -551,12 +679,13 @@
           await writeFullStore(store);
           msgInput.value = '';
           countEl.textContent = '0';
+          msgInput.style.height = '44px';
           statusEl.textContent = needApproval
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
-            : 'تم النشر في الشريط.';
+            : 'تم النشر.';
           messagesCache = null;
           refresh();
-          setTimeout(closeCompose, needApproval ? 900 : 700);
+          await refreshFeed();
         } catch (e) {
           statusEl.className = 'htc-status err';
           statusEl.textContent = 'تعذر الإرسال. حاول مرة أخرى.';
@@ -575,42 +704,26 @@
     var empInput = document.getElementById('htcEmpId');
     var msgInput = document.getElementById('htcMsg');
     var statusEl = document.getElementById('htcStatus');
-    var whoEl = document.getElementById('htcWho');
-    var sendBtn = document.getElementById('htcSend');
-    var subEl = document.getElementById('htcSub');
     statusEl.className = 'htc-status';
     statusEl.textContent = '';
     var saved = readSavedIdentity();
-    if (saved.id && !empInput.value) empInput.value = saved.id;
-    whoEl.textContent = saved.id
-      ? 'المرسل: ' + (saved.name || 'موظف') + ' · #' + saved.id
-      : 'أدخل رقمك الوظيفي أولاً';
-    resolveEmp(empInput.value || saved.id).then(function (r) {
-      if (r.ok) {
-        saveIdentity(r.id, r.name || saved.name);
-        empInput.value = r.id;
-        whoEl.textContent = 'المرسل: ' + (r.name || saved.name || 'موظف') + ' · #' + r.id;
-      }
-    });
-    readFullStore()
-      .then(function (store) {
-        var need = store.requireApproval !== false;
-        subEl.textContent = need
-          ? (ar ? 'اكتب رسالة قصيرة. تظهر بعد اعتماد المشرف.' : 'Short message. Shown after admin approval.')
-          : (ar ? 'اكتب رسالة قصيرة. تظهر مباشرة في الشريط.' : 'Short message. Publishes immediately.');
-        sendBtn.textContent = need
-          ? (ar ? 'إرسال للمراجعة' : 'Send for review')
-          : (ar ? 'نشر في الشريط' : 'Publish');
-      })
-      .catch(function () {});
+    if (saved.id) empInput.value = saved.id;
     modal.classList.add('on');
     modal.setAttribute('aria-hidden', 'false');
     document.documentElement.style.overflow = 'hidden';
-    setTimeout(function () {
-      (msgInput.value || !empInput.value ? msgInput : empInput).focus();
-      if (!empInput.value) empInput.focus();
-      else msgInput.focus();
-    }, 40);
+    Promise.resolve()
+      .then(function () {
+        return modal._htcSyncEmp ? modal._htcSyncEmp() : null;
+      })
+      .then(function () {
+        return modal._htcRefreshFeed ? modal._htcRefreshFeed() : null;
+      })
+      .finally(function () {
+        setTimeout(function () {
+          if (!empInput.value) empInput.focus();
+          else msgInput.focus();
+        }, 40);
+      });
   }
 
   function paintParts(parts, ar) {
