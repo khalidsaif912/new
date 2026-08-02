@@ -135,6 +135,8 @@
       'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);',
       'overflow:hidden;font-family:Tajawal,Sora,system-ui,sans-serif;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
+      /* let footer refresh/texture/secret buttons receive clicks through the bar */
+      'pointer-events:none;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
       '#' + TICKER_ID + '.solo{left:16px;right:16px}',
@@ -148,6 +150,7 @@
       'background:linear-gradient(135deg,#fff7ed,#ffedd5);',
       'box-shadow:0 2px 8px rgba(234,88,12,.18);',
       '-webkit-tap-highlight-color:transparent;',
+      'pointer-events:auto;',
       '}',
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
@@ -169,7 +172,8 @@
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
-      'html.has-float-dock .wrap{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}'
+      'html.has-float-dock .wrap{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .footer{position:relative;z-index:100016}'
     ].join('');
     document.documentElement.classList.add('has-float-dock');
   }
