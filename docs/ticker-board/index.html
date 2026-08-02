@@ -165,13 +165,16 @@
       <span style="font-size:22px" aria-hidden="true">🎉</span>
     </div>
     <h1>اكتب للشريط الإخباري</h1>
-    <p class="sub">اكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
+    <p class="sub">أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
 
     <div class="card">
-      <label for="msg">رسالتك</label>
+      <label for="empIdInput">الرقم الوظيفي <span style="color:#f59e0b">(مطلوب)</span></label>
+      <input id="empIdInput" type="text" inputmode="numeric" autocomplete="off" placeholder="مثال: 8715" maxlength="12">
+      <p class="hint" id="empHint">يُحفظ على جهازك ويُرفق مع الرسالة للمشرف.</p>
+      <label for="msg" style="margin-top:14px">رسالتك</label>
       <textarea id="msg" maxlength="120" placeholder="مثال: كل عام وأنتم بخير… أو تهنئة لزميل"></textarea>
       <p class="hint"><span id="count">0</span>/120 · رسائل مهذبة فقط</p>
-      <p class="who" id="who">زائر</p>
+      <p class="who" id="who">أدخل رقمك الوظيفي أولاً</p>
       <div class="actions">
         <button type="button" class="send" id="sendBtn">إرسال للمراجعة</button>
       </div>
@@ -197,7 +200,11 @@
     var status = document.getElementById('status');
     var sendBtn = document.getElementById('sendBtn');
     var who = document.getElementById('who');
+    var empIdInput = document.getElementById('empIdInput');
+    var empHint = document.getElementById('empHint');
     var liveList = document.getElementById('liveList');
+    var staffById = null;
+    var resolved = { id: '', name: '' };
 
     function docsBase() {
       try {
@@ -207,34 +214,117 @@
         return '../';
       }
     }
-    document.getElementById('backBtn').href = docsBase().replace(/\/?$/, '/') + 'index.html';
+    var base = docsBase().replace(/\/?$/, '/');
+    document.getElementById('backBtn').href = base + 'index.html';
 
-    function identity() {
+    function readSavedIdentity() {
       try {
-        var path = location.pathname || '';
-        var isImport = path.indexOf('/import/') !== -1;
         var id = (
-          isImport
-            ? localStorage.getItem('importSavedEmpId')
-            : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId'))
-        ) || '';
+          localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          ''
+        );
         var name = (
-          isImport
-            ? localStorage.getItem('importSavedEmpName')
-            : (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName'))
-        ) || '';
-        id = String(id || '').trim();
-        name = String(name || '').trim();
-        return { id: id, name: name };
+          localStorage.getItem('exportSavedEmpName') ||
+          localStorage.getItem('importSavedEmpName') ||
+          localStorage.getItem('savedEmpName') ||
+          ''
+        );
+        return { id: String(id || '').trim(), name: String(name || '').trim() };
       } catch (e) {
         return { id: '', name: '' };
       }
     }
 
-    var ident = identity();
-    who.textContent = ident.id
-      ? ('المرسل: ' + (ident.name || 'موظف') + ' · #' + ident.id)
-      : 'المرسل: زائر (بدون رقم موظف محفوظ)';
+    function saveIdentity(id, name) {
+      try {
+        localStorage.setItem('exportSavedEmpId', id);
+        localStorage.setItem('savedEmpId', id);
+        if (name) {
+          localStorage.setItem('exportSavedEmpName', name);
+          localStorage.setItem('savedEmpName', name);
+        }
+      } catch (e) {}
+    }
+
+    function digitsOnly(v) {
+      return String(v || '').replace(/\D+/g, '').slice(0, 12);
+    }
+
+    function paintWho() {
+      if (resolved.id) {
+        who.textContent = 'المرسل: ' + (resolved.name || 'موظف') + ' · #' + resolved.id;
+        empHint.textContent = 'رقمك محفوظ على هذا الجهاز.';
+      } else {
+        who.textContent = 'أدخل رقمك الوظيفي أولاً — مطلوب قبل الإرسال';
+        empHint.textContent = 'يُحفظ على جهازك ويُرفق مع الرسالة للمشرف.';
+      }
+    }
+
+    async function loadStaff() {
+      if (staffById) return staffById;
+      staffById = Object.create(null);
+      try {
+        var res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('staff');
+        var json = await res.json();
+        (json.employees || []).forEach(function (e) {
+          if (!e || !e.id) return;
+          staffById[String(e.id)] = String(e.name || '').trim();
+        });
+      } catch (e) {}
+      return staffById;
+    }
+
+    async function resolveEmp(rawId) {
+      var id = digitsOnly(rawId);
+      if (!id) return { id: '', name: '', ok: false, reason: 'empty' };
+      var map = await loadStaff();
+      if (map[id]) return { id: id, name: map[id], ok: true };
+      // allow if index failed to load but id looks valid
+      if (!Object.keys(map).length && id.length >= 4) {
+        return { id: id, name: '', ok: true, unverified: true };
+      }
+      return { id: id, name: '', ok: false, reason: 'unknown' };
+    }
+
+    async function syncFromInput() {
+      var r = await resolveEmp(empIdInput.value);
+      if (r.ok) {
+        resolved = { id: r.id, name: r.name };
+        saveIdentity(r.id, r.name);
+        if (r.name && empIdInput.value.trim() !== r.id) empIdInput.value = r.id;
+      } else {
+        resolved = { id: '', name: '' };
+      }
+      paintWho();
+      return r;
+    }
+
+    var saved = readSavedIdentity();
+    if (saved.id) {
+      empIdInput.value = saved.id;
+      resolved = { id: saved.id, name: saved.name };
+      paintWho();
+      resolveEmp(saved.id).then(function (r) {
+        if (r.ok) {
+          resolved = { id: r.id, name: r.name || saved.name };
+          saveIdentity(resolved.id, resolved.name);
+          paintWho();
+        }
+      });
+    } else {
+      paintWho();
+    }
+
+    empIdInput.addEventListener('input', function () {
+      var d = digitsOnly(empIdInput.value);
+      if (empIdInput.value !== d) empIdInput.value = d;
+      clearTimeout(empIdInput._t);
+      empIdInput._t = setTimeout(function () { syncFromInput(); }, 280);
+    });
+    empIdInput.addEventListener('blur', function () { syncFromInput(); });
 
     msg.addEventListener('input', function () {
       count.textContent = String(msg.value.length);
@@ -287,7 +377,7 @@
         return;
       }
       liveList.className = '';
-      liveList.innerHTML = list.slice(0, 12).map(function (m) {
+      liveList.innerHTML = list.slice(0, 12).map(function () {
         return (
           '<div class="liveItem">' +
             '<div></div>' +
@@ -319,6 +409,15 @@
       var text = cleanText(msg.value);
       status.className = 'status';
       status.textContent = '';
+      var emp = await syncFromInput();
+      if (!emp.ok || !emp.id) {
+        status.className = 'status err';
+        status.textContent = emp.reason === 'unknown'
+          ? 'الرقم الوظيفي غير موجود في الروستر.'
+          : 'أدخل رقمك الوظيفي واحفظه قبل الإرسال.';
+        empIdInput.focus();
+        return;
+      }
       if (text.length < 3) {
         status.className = 'status err';
         status.textContent = 'اكتب رسالة أوضح (٣ أحرف على الأقل).';
@@ -331,14 +430,13 @@
         var row = {
           id: uid(),
           text: text,
-          name: ident.name || '',
-          empId: ident.id || '',
+          name: emp.name || resolved.name || '',
+          empId: emp.id,
           at: Date.now(),
           status: 'pending'
         };
         store.pending = [row].concat(store.pending || []).slice(0, 80);
         if ((store.approved || []).length > 40) store.approved = store.approved.slice(0, 40);
-        // keep payload small
         while (JSON.stringify(store).length > 50000 && store.pending.length > 1) store.pending.pop();
         await writeStore(store);
         msg.value = '';
