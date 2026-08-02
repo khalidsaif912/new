@@ -71,8 +71,9 @@
       padding: 12px;
       margin-bottom: 10px;
     }
-    .rowText { font-size: 14px; font-weight: 800; line-height: 1.45; margin: 0 0 8px; }
-    .rowMeta { font-size: 11px; color: #94a3b8; font-weight: 700; margin: 0 0 10px; }
+    .rowText { font-size: 14px; font-weight: 800; line-height: 1.45; margin: 0 0 8px; color: #fde68a; }
+    .rowMeta { font-size: 11px; color: #38bdf8; font-weight: 700; margin: 0 0 10px; }
+    .rowMeta .metaTime { color: #64748b; }
     .rowActs { display: flex; gap: 8px; flex-wrap: wrap; }
     .act.ok { background: #15803d; color: #fff; }
     .act.no { background: #7f1d1d; color: #fecaca; }
@@ -220,12 +221,22 @@
       Array.from(list.children).forEach(function (el, i) {
         var m = rows[i];
         el.querySelector('.rowText').textContent = m.text || '';
-        var meta = [];
-        if (m.name) meta.push(m.name);
-        if (m.empId) meta.push('#' + m.empId);
-        meta.push(formatTime(m.at));
-        if (m.approvedAt) meta.push('اعتمد: ' + formatTime(m.approvedAt));
-        el.querySelector('.rowMeta').textContent = meta.join(' · ');
+        var who = [];
+        if (m.name) who.push(m.name);
+        if (m.empId) who.push('#' + m.empId);
+        var metaEl = el.querySelector('.rowMeta');
+        metaEl.textContent = '';
+        if (who.length) {
+          var whoSpan = document.createElement('span');
+          whoSpan.textContent = who.join(' · ');
+          metaEl.appendChild(whoSpan);
+        }
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'metaTime';
+        var times = [formatTime(m.at)];
+        if (m.approvedAt) times.push('اعتمد: ' + formatTime(m.approvedAt));
+        timeSpan.textContent = (who.length ? ' · ' : '') + times.join(' · ');
+        metaEl.appendChild(timeSpan);
         var acts = el.querySelector('.rowActs');
         if (filter === 'pending') {
           var ok = document.createElement('button');

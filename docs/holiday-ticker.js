@@ -167,6 +167,10 @@
       'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
+      '#' + TICKER_ID + ' .ht-msg{color:#9a3412;font-weight:900}',
+      '#' + TICKER_ID + ' .ht-from{color:#0369a1;font-weight:800}',
+      '#' + TICKER_ID + ' .ht-sep{color:#c2410c;opacity:.55;margin:0 .35em}',
+      '#' + TICKER_ID + ' .ht-hol{color:#b45309;font-weight:800}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
@@ -227,13 +231,16 @@
       el.innerHTML = '';
       return;
     }
-    var joined = parts.join('  •  ');
+    var joinedHtml = parts.join('<span class="ht-sep">•</span>');
+    var plain = parts.map(function (p) {
+      return String(p).replace(/<[^>]+>/g, '');
+    }).join('  •  ');
     var strip =
-      escapeHtml(joined) +
-      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
-      escapeHtml(joined) +
-      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
-      escapeHtml(joined);
+      joinedHtml +
+      '<span class="ht-sep">•</span>' +
+      joinedHtml +
+      '<span class="ht-sep">•</span>' +
+      joinedHtml;
     el.innerHTML =
       '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
       (ar ? 'اكتب رسالة للشريط' : 'Write a ticker message') +
@@ -241,7 +248,7 @@
       (ar ? 'فتح صفحة كتابة رسالة الشريط' : 'Open ticker message page') +
       '">🎉</button>' +
       '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
-    el.title = joined;
+    el.title = plain;
     el.hidden = false;
     el.classList.add('on');
     layoutTicker(el);
@@ -261,19 +268,35 @@
     var parts = [];
     (approved || []).forEach(function (m) {
       if (!m || !m.text) return;
-      var bit = String(m.text);
-      if (m.name) bit += ar ? (' — ' + m.name) : (' — ' + m.name);
+      var bit = '<span class="ht-msg">' + escapeHtml(m.text) + '</span>';
+      var who = [];
+      if (m.name) who.push(String(m.name));
+      if (m.empId) who.push('#' + String(m.empId));
+      if (who.length) {
+        bit +=
+          '<span class="ht-sep">—</span><span class="ht-from">' +
+          escapeHtml(who.join(' · ')) +
+          '</span>';
+      }
       parts.push(bit);
     });
     (holidays || []).forEach(function (h) {
       var name = ar ? (h.name_ar || h.name_en) : (h.name_en || h.name_ar);
-      parts.push((ar ? 'إجازة رسمية: ' : 'Holiday: ') + name + ' · ' + formatDay(h.date, ar));
+      parts.push(
+        '<span class="ht-hol">' +
+          escapeHtml((ar ? 'إجازة رسمية: ' : 'Holiday: ') + name + ' · ' + formatDay(h.date, ar)) +
+          '</span>'
+      );
     });
     if (!parts.length) {
       parts.push(
-        ar
-          ? 'اضغط 🎉 لكتابة رسالة للشريط الإخباري — تظهر بعد اعتماد المشرف'
-          : 'Tap 🎉 to write a ticker message — shown after admin approval'
+        '<span class="ht-msg">' +
+          escapeHtml(
+            ar
+              ? 'اضغط 🎉 لكتابة رسالة للشريط الإخباري — تظهر بعد اعتماد المشرف'
+              : 'Tap 🎉 to write a ticker message — shown after admin approval'
+          ) +
+          '</span>'
       );
     }
     return parts;

@@ -149,10 +149,11 @@
       font-weight: 700;
       line-height: 1.45;
     }
+    .liveItem .liveMsg { color: #fde68a; font-weight: 800; }
     .liveMeta {
       margin-top: 4px;
       font-size: 11px;
-      color: #64748b;
+      color: #38bdf8;
       font-weight: 700;
     }
     .empty { color: #64748b; font-size: 13px; font-weight: 700; }
@@ -380,14 +381,14 @@
       liveList.innerHTML = list.slice(0, 12).map(function () {
         return (
           '<div class="liveItem">' +
-            '<div></div>' +
+            '<div class="liveMsg"></div>' +
             '<div class="liveMeta"></div>' +
           '</div>'
         );
       }).join('');
       Array.from(liveList.children).forEach(function (el, i) {
         var m = list[i];
-        el.querySelector('div').textContent = m.text || '';
+        el.querySelector('.liveMsg').textContent = m.text || '';
         var meta = [];
         if (m.name) meta.push(m.name);
         if (m.empId) meta.push('#' + m.empId);
