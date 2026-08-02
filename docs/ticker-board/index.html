@@ -356,17 +356,25 @@
       });
       if (!res.ok) throw new Error('read');
       var json = await res.json();
+      var mode = String(json.showMode || '').trim();
+      if (mode !== 'official' && mode !== 'staff' && mode !== 'both') mode = 'both';
       return {
         pending: Array.isArray(json.pending) ? json.pending : [],
-        approved: Array.isArray(json.approved) ? json.approved : []
+        approved: Array.isArray(json.approved) ? json.approved : [],
+        showMode: mode
       };
     }
 
     async function writeStore(store) {
+      var payload = {
+        pending: store.pending || [],
+        approved: store.approved || [],
+        showMode: store.showMode || 'both'
+      };
       var res = await fetch(MANTLE_URL, {
         method: 'POST',
         headers: headers(),
-        body: JSON.stringify(store)
+        body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('write');
     }

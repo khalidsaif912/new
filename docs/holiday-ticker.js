@@ -12,6 +12,13 @@
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var holidaysCache = null;
   var messagesCache = null;
+  var showModeCache = 'both';
+
+  function normalizeMode(m) {
+    m = String(m || '').trim();
+    if (m === 'official' || m === 'staff' || m === 'both') return m;
+    return 'both';
+  }
 
   function lang() {
     try {
@@ -319,7 +326,7 @@
     return holidaysCache;
   }
 
-  function loadApprovedMessages() {
+  function loadTickerStore() {
     if (messagesCache) return messagesCache;
     messagesCache = fetch(MANTLE_URL + '?ts=' + Date.now(), {
       headers: { 'X-Mantle-Key': MANTLE_KEY },
@@ -330,20 +337,27 @@
         return r.json();
       })
       .then(function (json) {
-        return Array.isArray(json && json.approved) ? json.approved : [];
+        showModeCache = normalizeMode(json && json.showMode);
+        return {
+          approved: Array.isArray(json && json.approved) ? json.approved : [],
+          showMode: showModeCache
+        };
       })
       .catch(function () {
-        return [];
+        showModeCache = 'both';
+        return { approved: [], showMode: 'both' };
       });
     return messagesCache;
   }
 
   function refresh() {
-    messagesCache = null; // always re-check approved list
-    Promise.all([loadApprovedMessages(), loadHolidays()]).then(function (pair) {
-      var approved = pair[0] || [];
-      var holidays = holidaysForTicker(pair[1] || [], activeDate());
-      // If there are approved staff messages, prefer them; still append week holidays.
+    messagesCache = null; // always re-check approved list + mode
+    Promise.all([loadTickerStore(), loadHolidays()]).then(function (pair) {
+      var store = pair[0] || { approved: [], showMode: 'both' };
+      var mode = normalizeMode(store.showMode);
+      var approved = mode === 'official' ? [] : (store.approved || []);
+      var holidays =
+        mode === 'staff' ? [] : holidaysForTicker(pair[1] || [], activeDate());
       paintParts(buildParts(approved, holidays), lang() === 'ar');
     });
   }

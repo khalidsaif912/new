@@ -81,6 +81,61 @@
     .empty, .error { color: #94a3b8; font-weight: 700; padding: 18px 8px; text-align: center; }
     .error { color: #f87171; }
     a.linkish { color: #93c5fd; text-decoration: none; font-weight: 800; font-size: 12px; }
+    .modeBox {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .modeBox h2 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #e2e8f0;
+    }
+    .modeBox p {
+      margin: 0 0 10px;
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    .modeOpts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 520px) {
+      .modeOpts { grid-template-columns: repeat(3, 1fr); }
+    }
+    .modeOpt {
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #94a3b8;
+      border-radius: 12px;
+      min-height: 48px;
+      padding: 10px 12px;
+      font: inherit;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .modeOpt.active {
+      background: #78350f55;
+      border-color: #f59e0b88;
+      color: #fde68a;
+    }
+    .modeStatus {
+      margin: 8px 0 0;
+      min-height: 18px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #86efac;
+    }
+    .modeStatus.err { color: #fca5a5; }
   </style>
 </head>
 <body>
@@ -113,6 +168,16 @@
       <div class="stat"><b id="statPending">0</b><span>بانتظار الاعتماد</span></div>
       <div class="stat"><b id="statApproved">0</b><span>معتمد على الشريط</span></div>
     </div>
+    <section class="modeBox" aria-label="محتوى الشريط">
+      <h2>ماذا يظهر في الشريط؟</h2>
+      <p>اختر محتوى الشريط الإخباري لجميع الزوار. يُحفظ فوراً.</p>
+      <div class="modeOpts" id="modeOpts">
+        <button type="button" class="modeOpt" data-mode="official">الرسائل الرسمية فقط<br><span style="opacity:.75;font-weight:700;font-size:10px">إجازات رسمية</span></button>
+        <button type="button" class="modeOpt" data-mode="staff">رسائل الموظفين فقط</button>
+        <button type="button" class="modeOpt active" data-mode="both">الاثنان معاً</button>
+      </div>
+      <div class="modeStatus" id="modeStatus" aria-live="polite"></div>
+    </section>
     <div id="list"><div class="empty">جاري التحميل…</div></div>
   </div>
 
@@ -123,12 +188,18 @@
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
     var filter = 'pending';
-    var store = { pending: [], approved: [] };
+    var store = { pending: [], approved: [], showMode: 'both' };
+    var MODE_LABELS = {
+      official: 'الرسائل الرسمية فقط',
+      staff: 'رسائل الموظفين فقط',
+      both: 'الاثنان معاً'
+    };
 
     var gate = document.getElementById('gate');
     var app = document.getElementById('app');
     var pinInput = document.getElementById('pinInput');
     var gateErr = document.getElementById('gateErr');
+    var modeStatus = document.getElementById('modeStatus');
 
     function docsBase() {
       try {
@@ -140,6 +211,12 @@
     }
     document.getElementById('homeOut').href = docsBase().replace(/\/?$/, '/') + 'index.html';
 
+    function normalizeMode(m) {
+      m = String(m || '').trim();
+      if (m === 'official' || m === 'staff' || m === 'both') return m;
+      return 'both';
+    }
+
     function headers() {
       return { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY };
     }
@@ -150,7 +227,8 @@
       var json = await res.json();
       return {
         pending: Array.isArray(json.pending) ? json.pending.slice() : [],
-        approved: Array.isArray(json.approved) ? json.approved.slice() : []
+        approved: Array.isArray(json.approved) ? json.approved.slice() : [],
+        showMode: normalizeMode(json.showMode)
       };
     }
 
@@ -158,6 +236,7 @@
       // trim to stay under free Mantle limit
       next.pending = (next.pending || []).slice(0, 80);
       next.approved = (next.approved || []).slice(0, 40);
+      next.showMode = normalizeMode(next.showMode);
       while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
       while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
       var res = await fetch(MANTLE_URL, {
@@ -166,6 +245,30 @@
         body: JSON.stringify(next)
       });
       if (!res.ok) throw new Error('write');
+    }
+
+    function paintMode() {
+      var mode = normalizeMode(store.showMode);
+      document.querySelectorAll('.modeOpt').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+      });
+    }
+
+    async function setShowMode(mode) {
+      mode = normalizeMode(mode);
+      modeStatus.className = 'modeStatus';
+      modeStatus.textContent = 'جاري الحفظ…';
+      try {
+        store = await readStore();
+        store.showMode = mode;
+        await writeStore(store);
+        store = await readStore();
+        paintMode();
+        modeStatus.textContent = 'تم الحفظ: ' + (MODE_LABELS[store.showMode] || store.showMode);
+      } catch (e) {
+        modeStatus.className = 'modeStatus err';
+        modeStatus.textContent = 'تعذر حفظ الخيار';
+      }
     }
 
     function formatTime(at) {
@@ -200,6 +303,7 @@
     function render() {
       document.getElementById('statPending').textContent = String(store.pending.length);
       document.getElementById('statApproved').textContent = String(store.approved.length);
+      paintMode();
       document.querySelectorAll('.chip[data-filter]').forEach(function (c) {
         c.classList.toggle('active', c.getAttribute('data-filter') === filter);
       });
@@ -322,6 +426,11 @@
       c.addEventListener('click', function () {
         filter = c.getAttribute('data-filter') || 'pending';
         render();
+      });
+    });
+    document.querySelectorAll('.modeOpt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setShowMode(btn.getAttribute('data-mode') || 'both');
       });
     });
 
