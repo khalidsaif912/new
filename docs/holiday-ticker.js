@@ -129,40 +129,50 @@
   }
 
   function injectStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    var style = document.createElement('style');
-    style.id = STYLE_ID;
+    var style = document.getElementById(STYLE_ID);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = STYLE_ID;
+      document.head.appendChild(style);
+    }
     style.textContent = [
       '#' + TICKER_ID + '{',
       'position:fixed;bottom:24px;left:72px;right:16px;',
       'z-index:100015;display:none;align-items:center;gap:8px;',
-      'min-height:48px;max-width:min(520px, calc(100vw - 96px));',
-      'padding:0 12px 0 10px;border-radius:16px;',
+      'min-height:48px;width:auto;max-width:none;',
+      'padding:0 14px 0 10px;border-radius:16px;',
       'background:rgba(255,255,255,.94);',
       'border:1px solid rgba(15,23,42,.1);',
       'box-shadow:0 8px 24px rgba(15,23,42,.14);',
       'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);',
       'overflow:hidden;font-family:Tajawal,Sora,system-ui,sans-serif;',
       'letter-spacing:0;text-transform:none;',
+      'box-sizing:border-box;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      '#' + TICKER_ID + '.solo{left:16px;max-width:min(560px, calc(100vw - 32px))}',
-      '#' + TICKER_ID + '.above-dock{',
-      'bottom:84px;left:16px;right:16px;max-width:none;',
-      '}',
+      /* bell (#chg-dot) is always fixed to the left, even in Arabic */
+      '#' + TICKER_ID + '.solo{left:16px;right:16px}',
+      '#' + TICKER_ID + '.above-dock{bottom:84px;left:16px;right:16px}',
       'html[dir="rtl"] #' + TICKER_ID + ',body.ar #' + TICKER_ID + '{',
-      'left:16px;right:72px;padding:0 10px 0 12px;flex-direction:row-reverse;',
+      'left:72px;right:16px;padding:0 14px 0 10px;',
       '}',
-      'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo{right:16px}',
-      'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
+      'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
+      'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{',
+      'left:16px;right:16px;',
+      '}',
       '#' + TICKER_ID + ' .ht-ico{',
       'flex:0 0 auto;width:28px;height:28px;border-radius:10px;',
       'display:grid;place-items:center;font-size:15px;',
       'background:linear-gradient(135deg,#fff7ed,#ffedd5);',
       '}',
       '#' + TICKER_ID + ' .ht-track{',
-      'flex:1;min-width:0;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);',
+      'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 100%);',
+      '}',
+      'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
+      'mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
+      '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 14px,#000 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:8px;',
@@ -178,7 +188,6 @@
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}'
     ].join('');
-    document.head.appendChild(style);
     document.documentElement.classList.add('has-float-dock');
   }
 
