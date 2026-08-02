@@ -5,220 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>الشريط الإخباري</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --ink: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #f59e0b;
-      --line: #334155;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
-    }
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100dvh;
-      background: radial-gradient(1200px 600px at 80% -10%, #1e293b, var(--bg));
-      color: var(--ink);
+      display: grid;
+      place-items: center;
+      background: #0f172a;
+      color: #e2e8f0;
       font-family: Tajawal, system-ui, sans-serif;
       letter-spacing: 0;
+      padding: 24px;
+      text-align: center;
     }
-    .wrap {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bot));
-    }
-    .top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-    .back {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #0b1220;
-      color: var(--ink);
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 13px;
-    }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 22px;
-      font-weight: 900;
-    }
-    .sub {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-      font-weight: 600;
-    }
-    .card {
-      background: linear-gradient(165deg, #1e293b, #0f172aee);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    textarea, input {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #0b1220;
-      color: var(--ink);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      outline: none;
-      letter-spacing: 0;
-    }
-    textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
-    textarea:focus, input:focus { border-color: #f59e0b88; }
-    .hint {
-      margin: 8px 0 0;
-      font-size: 11px;
-      color: #64748b;
-      font-weight: 700;
-    }
-    .who {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #cbd5e1;
-      font-weight: 700;
-    }
-    .actions { display: grid; gap: 8px; margin-top: 14px; }
-    button {
+    p { margin: 0 0 14px; color: #94a3b8; font-weight: 700; line-height: 1.5; }
+    button, a {
       border: 0;
       border-radius: 12px;
-      min-height: 46px;
+      min-height: 44px;
+      padding: 0 16px;
       font: inherit;
       font-weight: 900;
       cursor: pointer;
-    }
-    .send {
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      color: #111;
-    }
-    .send:disabled { opacity: .55; cursor: wait; }
-    .status {
-      min-height: 22px;
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #86efac;
-    }
-    .status.err { color: #fca5a5; }
-    .note {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.55;
-      font-weight: 650;
-    }
-    .liveTitle {
-      margin: 0 0 10px;
-      font-size: 14px;
-      font-weight: 900;
-    }
-    .liveItem {
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #0b122088;
-      border: 1px solid #33415555;
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-    .liveItem .liveMsg { color: #fde68a; font-weight: 800; }
-    .liveMeta {
-      margin-top: 4px;
-      font-size: 11px;
-      color: #38bdf8;
-      font-weight: 700;
-      display: flex;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
     }
-    .liveMeta img {
-      width: 16px;
-      height: 16px;
-      object-fit: contain;
-      flex: 0 0 auto;
-    }
-    .empty { color: #64748b; font-size: 13px; font-weight: 700; }
+    button { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #111; }
+    a { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; margin-inline-start: 8px; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <a class="back" id="backBtn" href="../">رجوع</a>
-      <span style="font-size:22px" aria-hidden="true">🎉</span>
-    </div>
-    <h1>اكتب للشريط الإخباري</h1>
-    <p class="sub" id="pageSub">أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
-
-    <div class="card">
-      <label for="empIdInput">الرقم الوظيفي <span style="color:#f59e0b">(مطلوب)</span></label>
-      <input id="empIdInput" type="text" inputmode="numeric" autocomplete="off" placeholder="مثال: 8715" maxlength="12">
-      <p class="hint" id="empHint">يُحفظ على جهازك ويُرفق مع الرسالة للمشرف.</p>
-      <label for="msg" style="margin-top:14px">رسالتك</label>
-      <textarea id="msg" maxlength="120" placeholder="مثال: كل عام وأنتم بخير… أو تهنئة لزميل"></textarea>
-      <p class="hint"><span id="count">0</span>/120 · رسائل مهذبة فقط</p>
-      <p class="who" id="who">أدخل رقمك الوظيفي أولاً</p>
-      <div class="actions">
-        <button type="button" class="send" id="sendBtn">إرسال للمراجعة</button>
-      </div>
-      <div class="status" id="status" aria-live="polite"></div>
-    </div>
-
-    <div class="card">
-      <p class="note" id="pageNote">بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.</p>
-    </div>
-
-    <div class="card">
-      <h2 class="liveTitle">المعتمد حالياً على الشريط</h2>
-      <div id="liveList" class="empty">جاري التحميل…</div>
-    </div>
+  <div>
+    <p id="hint">جاري فتح نافذة الكتابة…</p>
+    <button type="button" id="openBtn">اكتب رسالة 🎉</button>
+    <a id="homeBtn" href="../index.html">رجوع</a>
   </div>
-
+  <script src="../holiday-ticker.js?v=20260802q"></script>
   <script>
   (function () {
-    var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
-    var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
-    var msg = document.getElementById('msg');
-    var count = document.getElementById('count');
-    var status = document.getElementById('status');
-    var sendBtn = document.getElementById('sendBtn');
-    var who = document.getElementById('who');
-    var empIdInput = document.getElementById('empIdInput');
-    var empHint = document.getElementById('empHint');
-    var liveList = document.getElementById('liveList');
-    var pageSub = document.getElementById('pageSub');
-    var pageNote = document.getElementById('pageNote');
-    var staffById = null;
-    var resolved = { id: '', name: '' };
-    var requireApproval = true;
-
     function docsBase() {
       try {
         var m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
@@ -227,322 +54,17 @@
         return '../';
       }
     }
-    var base = docsBase().replace(/\/?$/, '/');
-    document.getElementById('backBtn').href = base + 'index.html';
-
-    function readSavedIdentity() {
-      try {
-        var id = (
-          localStorage.getItem('exportSavedEmpId') ||
-          localStorage.getItem('importSavedEmpId') ||
-          localStorage.getItem('savedEmpId') ||
-          ''
-        );
-        var name = (
-          localStorage.getItem('exportSavedEmpName') ||
-          localStorage.getItem('importSavedEmpName') ||
-          localStorage.getItem('savedEmpName') ||
-          ''
-        );
-        return { id: String(id || '').trim(), name: String(name || '').trim() };
-      } catch (e) {
-        return { id: '', name: '' };
-      }
-    }
-
-    function saveIdentity(id, name) {
-      try {
-        localStorage.setItem('exportSavedEmpId', id);
-        localStorage.setItem('savedEmpId', id);
-        if (name) {
-          localStorage.setItem('exportSavedEmpName', name);
-          localStorage.setItem('savedEmpName', name);
-        }
-      } catch (e) {}
-    }
-
-    function digitsOnly(v) {
-      return String(v || '').replace(/\D+/g, '').slice(0, 12);
-    }
-
-    var EMOJI_DEFAULTS = { '82437': '1f349' };
-    var emojiListCache = null;
-
-    function validEmojiCp(cp) {
-      return /^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/i.test(String(cp || '').trim());
-    }
-
-    function emojiHash(s) {
-      var h = 0;
-      for (var i = 0; i < String(s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-      return h;
-    }
-
-    function readLocalEmoji(empId) {
-      try {
-        var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
-        var cp = String(map[empId] || map.export || '').trim();
-        if (!cp) cp = String(localStorage.getItem('empEmojiChoice') || '').trim();
-        if (validEmojiCp(cp)) return cp.toLowerCase();
-      } catch (e) {}
-      if (EMOJI_DEFAULTS[empId]) return EMOJI_DEFAULTS[empId];
-      return '';
-    }
-
-    async function resolveEmoji(empId) {
-      var local = readLocalEmoji(empId);
-      if (local) return local;
-      try {
-        if (!emojiListCache) {
-          var res = await fetch(base + 'my-emoji/emojis.json', { cache: 'force-cache' });
-          emojiListCache = res.ok ? await res.json() : [];
-        }
-        if (emojiListCache && emojiListCache.length) {
-          var item = emojiListCache[emojiHash(empId) % emojiListCache.length];
-          if (item && validEmojiCp(item.cp)) return String(item.cp).toLowerCase();
-        }
-      } catch (e) {}
-      return '';
-    }
-
-    function paintWho() {
-      if (resolved.id) {
-        who.textContent = 'المرسل: ' + (resolved.name || 'موظف') + ' · #' + resolved.id;
-        empHint.textContent = 'رقمك محفوظ على هذا الجهاز.';
+    document.getElementById('homeBtn').href = docsBase().replace(/\/?$/, '/') + 'index.html';
+    function open() {
+      if (window.rosterHolidayTicker && window.rosterHolidayTicker.openCompose) {
+        window.rosterHolidayTicker.openCompose();
+        document.getElementById('hint').textContent = 'اكتب رسالتك في النافذة، أو اضغط الزر مرة أخرى.';
       } else {
-        who.textContent = 'أدخل رقمك الوظيفي أولاً — مطلوب قبل الإرسال';
-        empHint.textContent = 'يُحفظ على جهازك ويُرفق مع الرسالة للمشرف.';
+        document.getElementById('hint').textContent = 'تعذر فتح النافذة. ارجع للرئيسية واضغط 🎉 في الشريط.';
       }
     }
-
-    async function loadStaff() {
-      if (staffById) return staffById;
-      staffById = Object.create(null);
-      try {
-        var res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error('staff');
-        var json = await res.json();
-        (json.employees || []).forEach(function (e) {
-          if (!e || !e.id) return;
-          staffById[String(e.id)] = String(e.name || '').trim();
-        });
-      } catch (e) {}
-      return staffById;
-    }
-
-    async function resolveEmp(rawId) {
-      var id = digitsOnly(rawId);
-      if (!id) return { id: '', name: '', ok: false, reason: 'empty' };
-      var map = await loadStaff();
-      if (map[id]) return { id: id, name: map[id], ok: true };
-      // allow if index failed to load but id looks valid
-      if (!Object.keys(map).length && id.length >= 4) {
-        return { id: id, name: '', ok: true, unverified: true };
-      }
-      return { id: id, name: '', ok: false, reason: 'unknown' };
-    }
-
-    async function syncFromInput() {
-      var r = await resolveEmp(empIdInput.value);
-      if (r.ok) {
-        resolved = { id: r.id, name: r.name };
-        saveIdentity(r.id, r.name);
-        if (r.name && empIdInput.value.trim() !== r.id) empIdInput.value = r.id;
-      } else {
-        resolved = { id: '', name: '' };
-      }
-      paintWho();
-      return r;
-    }
-
-    var saved = readSavedIdentity();
-    if (saved.id) {
-      empIdInput.value = saved.id;
-      resolved = { id: saved.id, name: saved.name };
-      paintWho();
-      resolveEmp(saved.id).then(function (r) {
-        if (r.ok) {
-          resolved = { id: r.id, name: r.name || saved.name };
-          saveIdentity(resolved.id, resolved.name);
-          paintWho();
-        }
-      });
-    } else {
-      paintWho();
-    }
-
-    empIdInput.addEventListener('input', function () {
-      var d = digitsOnly(empIdInput.value);
-      if (empIdInput.value !== d) empIdInput.value = d;
-      clearTimeout(empIdInput._t);
-      empIdInput._t = setTimeout(function () { syncFromInput(); }, 280);
-    });
-    empIdInput.addEventListener('blur', function () { syncFromInput(); });
-
-    msg.addEventListener('input', function () {
-      count.textContent = String(msg.value.length);
-    });
-
-    function headers() {
-      return {
-        'Content-Type': 'application/json',
-        'X-Mantle-Key': MANTLE_KEY
-      };
-    }
-
-    function cleanText(t) {
-      return String(t || '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 120);
-    }
-
-    function uid() {
-      return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    }
-
-    async function readStore() {
-      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
-        headers: headers(),
-        cache: 'no-store'
-      });
-      if (!res.ok) throw new Error('read');
-      var json = await res.json();
-      var mode = String(json.showMode || '').trim();
-      if (mode !== 'official' && mode !== 'staff' && mode !== 'both') mode = 'both';
-      return {
-        pending: Array.isArray(json.pending) ? json.pending : [],
-        approved: Array.isArray(json.approved) ? json.approved : [],
-        showMode: mode,
-        hidden: !!json.hidden,
-        requireApproval: json.requireApproval !== false
-      };
-    }
-
-    async function writeStore(store) {
-      var payload = {
-        pending: store.pending || [],
-        approved: store.approved || [],
-        showMode: store.showMode || 'both',
-        hidden: !!store.hidden,
-        requireApproval: store.requireApproval !== false
-      };
-      var res = await fetch(MANTLE_URL, {
-        method: 'POST',
-        headers: headers(),
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('write');
-    }
-
-    function paintPolicy(needApproval) {
-      requireApproval = needApproval !== false;
-      if (requireApproval) {
-        pageSub.textContent = 'أدخل رقمك الوظيفي واكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.';
-        pageNote.textContent = 'بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.';
-        sendBtn.textContent = 'إرسال للمراجعة';
-      } else {
-        pageSub.textContent = 'أدخل رقمك الوظيفي واكتب رسالة قصيرة. تظهر مباشرة في الشريط الإخباري.';
-        pageNote.textContent = 'النشر المباشر مفعّل حالياً — رسالتك تظهر على الشريط فوراً بعد الإرسال.';
-        sendBtn.textContent = 'نشر في الشريط';
-      }
-    }
-
-    function renderApproved(list) {
-      if (!list || !list.length) {
-        liveList.className = 'empty';
-        liveList.textContent = 'لا توجد رسائل معتمدة على الشريط حالياً.';
-        return;
-      }
-      liveList.className = '';
-      liveList.innerHTML = list.slice(0, 12).map(function () {
-        return (
-          '<div class="liveItem">' +
-            '<div class="liveMsg"></div>' +
-            '<div class="liveMeta"></div>' +
-          '</div>'
-        );
-      }).join('');
-      Array.from(liveList.children).forEach(function (el, i) {
-        var m = list[i];
-        el.querySelector('.liveMsg').textContent = m.text || '';
-        var metaEl = el.querySelector('.liveMeta');
-        metaEl.textContent = '';
-        var cp = String(m.emoji || '').trim().toLowerCase();
-        if (/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) {
-          var img = document.createElement('img');
-          img.alt = '';
-          img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
-          metaEl.appendChild(img);
-        }
-        var meta = [];
-        if (m.name) meta.push(m.name);
-        if (m.empId) meta.push('#' + m.empId);
-        var span = document.createElement('span');
-        span.textContent = meta.join(' · ') || 'معتمد';
-        metaEl.appendChild(span);
-      });
-    }
-
-    async function refreshLive() {
-      try {
-        var store = await readStore();
-        renderApproved(store.approved);
-      } catch (e) {
-        liveList.className = 'empty';
-        liveList.textContent = 'تعذر تحميل الرسائل المعتمدة.';
-      }
-    }
-
-    sendBtn.addEventListener('click', async function () {
-      var text = cleanText(msg.value);
-      status.className = 'status';
-      status.textContent = '';
-      var emp = await syncFromInput();
-      if (!emp.ok || !emp.id) {
-        status.className = 'status err';
-        status.textContent = emp.reason === 'unknown'
-          ? 'الرقم الوظيفي غير موجود في الروستر.'
-          : 'أدخل رقمك الوظيفي واحفظه قبل الإرسال.';
-        empIdInput.focus();
-        return;
-      }
-      if (text.length < 3) {
-        status.className = 'status err';
-        status.textContent = 'اكتب رسالة أوضح (٣ أحرف على الأقل).';
-        return;
-      }
-      sendBtn.disabled = true;
-      status.textContent = 'جاري الإرسال…';
-      try {
-        var store = await readStore();
-        var emoji = await resolveEmoji(emp.id);
-        var row = {
-          id: uid(),
-          text: text,
-          name: emp.name || resolved.name || '',
-          empId: emp.id,
-          emoji: emoji || '',
-          at: Date.now(),
-          status: 'pending'
-        };
-        store.pending = [row].concat(store.pending || []).slice(0, 80);
-        if ((store.approved || []).length > 40) store.approved = store.approved.slice(0, 40);
-        while (JSON.stringify(store).length > 50000 && store.pending.length > 1) store.pending.pop();
-        await writeStore(store);
-        msg.value = '';
-        count.textContent = '0';
-        status.textContent = 'تم الإرسال. بانتظار اعتماد المشرف.';
-        refreshLive();
-      } catch (e) {
-        status.className = 'status err';
-        status.textContent = 'تعذر الإرسال. حاول مرة أخرى.';
-      } finally {
-        sendBtn.disabled = false;
-      }
-    });
-
-    refreshLive();
+    document.getElementById('openBtn').addEventListener('click', open);
+    setTimeout(open, 250);
   })();
   </script>
 </body>
