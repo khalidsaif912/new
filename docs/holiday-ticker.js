@@ -276,13 +276,10 @@
     (approved || []).forEach(function (m) {
       if (!m || !m.text) return;
       var bit = '<span class="ht-msg">' + escapeHtml(m.text) + '</span>';
-      var who = [];
-      if (m.name) who.push(String(m.name));
-      if (m.empId) who.push('#' + String(m.empId));
-      if (who.length) {
+      if (m.name) {
         bit +=
           '<span class="ht-sep">—</span><span class="ht-from">' +
-          escapeHtml(who.join(' · ')) +
+          escapeHtml(String(m.name)) +
           '</span>';
       }
       parts.push(bit);
