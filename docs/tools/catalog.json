@@ -1,8 +1,15 @@
 {
   "title": "أدوات خاصة",
   "titleEn": "Private tools",
-  "updated": "2026-07-26",
+  "updated": "2026-08-02",
   "tools": [
+    {
+      "id": "ticker-mod",
+      "title": "اعتماد رسائل الشريط",
+      "desc": "مراجعة واعتماد رسائل الموظفين قبل ظهورها في الشريط الإخباري.",
+      "href": "../ticker-board/moderate.html",
+      "tag": "بيانات"
+    },
     {
       "id": "phone-match",
       "title": "مطابقة أرقام الموظفين",

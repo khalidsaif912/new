@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>اعتماد الشريط</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: Tajawal, system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    .gate, .app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bot));
+    }
+    .gate { text-align: center; padding-top: 16vh; }
+    .gate h1 { font-size: 18px; color: #94a3b8; margin: 0 0 8px; }
+    .gate p { color: #64748b; font-size: 13px; margin: 0 0 14px; }
+    .gate input {
+      width: min(220px, 100%);
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      font: inherit;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: .2em;
+    }
+    .gate button, .chip, .act {
+      border: 0;
+      border-radius: 12px;
+      min-height: 42px;
+      padding: 0 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .gate button { margin-top: 12px; width: min(220px, 100%); background: #2563eb; color: #fff; }
+    .gateErr { color: #f87171; min-height: 20px; margin-top: 10px; font-weight: 700; }
+    [hidden] { display: none !important; }
+    .head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .head h1 { margin: 0; font-size: 20px; }
+    .head p { margin: 6px 0 0; color: #94a3b8; font-size: 12px; line-height: 1.45; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .chip { background: #1e293b; color: #94a3b8; border: 1px solid #334155; font-size: 12px; }
+    .chip.active { background: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat {
+      background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 12px;
+    }
+    .stat b { display: block; font-size: 22px; color: #fbbf24; margin-bottom: 4px; }
+    .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .row {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .rowText { font-size: 14px; font-weight: 800; line-height: 1.45; margin: 0 0 8px; }
+    .rowMeta { font-size: 11px; color: #94a3b8; font-weight: 700; margin: 0 0 10px; }
+    .rowActs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .act.ok { background: #15803d; color: #fff; }
+    .act.no { background: #7f1d1d; color: #fecaca; }
+    .act.dim { background: #334155; color: #e2e8f0; }
+    .empty, .error { color: #94a3b8; font-weight: 700; padding: 18px 8px; text-align: center; }
+    .error { color: #f87171; }
+    a.linkish { color: #93c5fd; text-decoration: none; font-weight: 800; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="gate" id="gate">
+    <h1>اعتماد رسائل الشريط</h1>
+    <p>أدخل رمز الدخول الخاص</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="•••">
+    <button type="button" id="pinBtn">دخول</button>
+    <div class="gateErr" id="gateErr"></div>
+    <p style="margin-top:18px"><a class="linkish" id="homeOut" href="../">العودة للموقع</a></p>
+  </div>
+
+  <div class="app" id="app" hidden>
+    <div class="head">
+      <div>
+        <h1>رسائل الشريط</h1>
+        <p>اعتمد أو ارفض. الرسائل المعتمدة فقط تظهر في الشريط الإخباري.</p>
+      </div>
+      <div style="display:grid;gap:8px">
+        <a class="chip" id="toBoard" href="./" style="text-decoration:none;display:inline-flex;align-items:center">صفحة الكتابة</a>
+        <button type="button" class="chip" id="lockBtn">قفل</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="chip active" data-filter="pending" id="fPending">بانتظار الاعتماد</button>
+      <button type="button" class="chip" data-filter="approved" id="fApproved">المعتمد</button>
+      <button type="button" class="chip" id="refreshBtn">تحديث</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="statPending">0</b><span>بانتظار الاعتماد</span></div>
+      <div class="stat"><b id="statApproved">0</b><span>معتمد على الشريط</span></div>
+    </div>
+    <div id="list"><div class="empty">جاري التحميل…</div></div>
+  </div>
+
+  <script>
+  (function () {
+    var PIN = '912';
+    var AUTH_KEY = 'rosterTickerModAuth';
+    var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
+    var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var filter = 'pending';
+    var store = { pending: [], approved: [] };
+
+    var gate = document.getElementById('gate');
+    var app = document.getElementById('app');
+    var pinInput = document.getElementById('pinInput');
+    var gateErr = document.getElementById('gateErr');
+
+    function docsBase() {
+      try {
+        var m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
+        return m ? m[1] : '../';
+      } catch (e) {
+        return '../';
+      }
+    }
+    document.getElementById('homeOut').href = docsBase().replace(/\/?$/, '/') + 'index.html';
+
+    function headers() {
+      return { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY };
+    }
+
+    async function readStore() {
+      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), { headers: headers(), cache: 'no-store' });
+      if (!res.ok) throw new Error('read');
+      var json = await res.json();
+      return {
+        pending: Array.isArray(json.pending) ? json.pending.slice() : [],
+        approved: Array.isArray(json.approved) ? json.approved.slice() : []
+      };
+    }
+
+    async function writeStore(next) {
+      // trim to stay under free Mantle limit
+      next.pending = (next.pending || []).slice(0, 80);
+      next.approved = (next.approved || []).slice(0, 40);
+      while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
+      while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
+      var res = await fetch(MANTLE_URL, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify(next)
+      });
+      if (!res.ok) throw new Error('write');
+    }
+
+    function formatTime(at) {
+      try {
+        return new Date(Number(at) || Date.now()).toLocaleString('ar-OM', {
+          timeZone: 'Asia/Muscat',
+          hour: '2-digit',
+          minute: '2-digit',
+          day: 'numeric',
+          month: 'short'
+        });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function unlock() {
+      sessionStorage.setItem(AUTH_KEY, '1');
+      gate.hidden = true;
+      app.hidden = false;
+      load();
+    }
+    function lock() {
+      sessionStorage.removeItem(AUTH_KEY);
+      app.hidden = true;
+      gate.hidden = false;
+      pinInput.value = '';
+      gateErr.textContent = '';
+      setTimeout(function () { pinInput.focus(); }, 30);
+    }
+
+    function render() {
+      document.getElementById('statPending').textContent = String(store.pending.length);
+      document.getElementById('statApproved').textContent = String(store.approved.length);
+      document.querySelectorAll('.chip[data-filter]').forEach(function (c) {
+        c.classList.toggle('active', c.getAttribute('data-filter') === filter);
+      });
+      var list = document.getElementById('list');
+      var rows = filter === 'approved' ? store.approved : store.pending;
+      if (!rows.length) {
+        list.innerHTML = '<div class="empty">' + (filter === 'approved' ? 'لا رسائل معتمدة.' : 'لا رسائل بانتظار الاعتماد.') + '</div>';
+        return;
+      }
+      list.innerHTML = rows.map(function () {
+        return (
+          '<article class="row">' +
+            '<p class="rowText"></p>' +
+            '<p class="rowMeta"></p>' +
+            '<div class="rowActs"></div>' +
+          '</article>'
+        );
+      }).join('');
+      Array.from(list.children).forEach(function (el, i) {
+        var m = rows[i];
+        el.querySelector('.rowText').textContent = m.text || '';
+        var meta = [];
+        if (m.name) meta.push(m.name);
+        if (m.empId) meta.push('#' + m.empId);
+        meta.push(formatTime(m.at));
+        if (m.approvedAt) meta.push('اعتمد: ' + formatTime(m.approvedAt));
+        el.querySelector('.rowMeta').textContent = meta.join(' · ');
+        var acts = el.querySelector('.rowActs');
+        if (filter === 'pending') {
+          var ok = document.createElement('button');
+          ok.type = 'button';
+          ok.className = 'act ok';
+          ok.textContent = 'اعتماد ونشر';
+          ok.addEventListener('click', function () { approve(m.id); });
+          var no = document.createElement('button');
+          no.type = 'button';
+          no.className = 'act no';
+          no.textContent = 'رفض';
+          no.addEventListener('click', function () { reject(m.id); });
+          acts.appendChild(ok);
+          acts.appendChild(no);
+        } else {
+          var rem = document.createElement('button');
+          rem.type = 'button';
+          rem.className = 'act dim';
+          rem.textContent = 'إزالة من الشريط';
+          rem.addEventListener('click', function () { unpublish(m.id); });
+          acts.appendChild(rem);
+        }
+      });
+    }
+
+    async function load() {
+      var list = document.getElementById('list');
+      list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+      try {
+        store = await readStore();
+        render();
+      } catch (e) {
+        list.innerHTML = '<div class="error">تعذر تحميل الرسائل</div>';
+      }
+    }
+
+    async function mutate(fn) {
+      try {
+        store = await readStore();
+        fn(store);
+        await writeStore(store);
+        store = await readStore();
+        render();
+      } catch (e) {
+        alert('تعذر حفظ التعديل');
+      }
+    }
+
+    function approve(id) {
+      mutate(function (s) {
+        var idx = s.pending.findIndex(function (x) { return x && x.id === id; });
+        if (idx < 0) return;
+        var row = s.pending.splice(idx, 1)[0];
+        row.approvedAt = Date.now();
+        row.status = 'approved';
+        s.approved = [row].concat(s.approved || []);
+      });
+    }
+    function reject(id) {
+      mutate(function (s) {
+        s.pending = (s.pending || []).filter(function (x) { return !(x && x.id === id); });
+      });
+    }
+    function unpublish(id) {
+      mutate(function (s) {
+        s.approved = (s.approved || []).filter(function (x) { return !(x && x.id === id); });
+      });
+    }
+
+    document.getElementById('pinBtn').addEventListener('click', function () {
+      if (String(pinInput.value || '').trim() !== PIN) {
+        gateErr.textContent = 'رمز غير صحيح';
+        return;
+      }
+      unlock();
+    });
+    pinInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('pinBtn').click();
+    });
+    document.getElementById('lockBtn').addEventListener('click', lock);
+    document.getElementById('refreshBtn').addEventListener('click', load);
+    document.querySelectorAll('.chip[data-filter]').forEach(function (c) {
+      c.addEventListener('click', function () {
+        filter = c.getAttribute('data-filter') || 'pending';
+        render();
+      });
+    });
+
+    if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();
+    else setTimeout(function () { pinInput.focus(); }, 50);
+  })();
+  </script>
+</body>
+</html>

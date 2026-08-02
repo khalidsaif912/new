@@ -1,16 +1,17 @@
 /**
- * Official Oman holiday news ticker — beside the bottom alert bell.
- * Preview mode shows upcoming holidays now so the marquee can be tried;
- * later it can be limited to the Muscat week that contains a holiday.
+ * News ticker — shows admin-approved employee messages (+ optional holidays).
+ * The emoji opens /ticker-board/ where staff can submit messages for approval.
  */
 (function () {
   'use strict';
 
-  // Trial: keep the ticker visible with upcoming official holidays.
-  var PREVIEW = true;
+  var PREVIEW_HOLIDAYS = true; // also scroll upcoming holidays while empty/previewing
   var TICKER_ID = 'holidayTicker';
   var STYLE_ID = 'holidayTickerCss';
-  var DATA_URL_CACHE = null;
+  var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
+  var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  var holidaysCache = null;
+  var messagesCache = null;
 
   function lang() {
     try {
@@ -30,10 +31,14 @@
     } catch (e) {}
     try {
       var m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
-      return m ? m[1] : '/docs/';
-    } catch (e2) {
-      return '/docs/';
-    }
+      if (m) return m[1];
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return '/';
+    } catch (e2) {}
+    return '/docs/';
+  }
+
+  function boardUrl() {
+    return docsBase() + 'ticker-board/';
   }
 
   function muscatToday() {
@@ -55,12 +60,10 @@
     }
   }
 
-  /** Sunday–Saturday week bounds for a YYYY-MM-DD (Muscat civil date). */
   function weekBounds(ymd) {
     var p = ymd.split('-').map(Number);
-    // noon UTC avoids DST edge cases; Oman has no DST
     var dt = new Date(Date.UTC(p[0], p[1] - 1, p[2], 8, 0, 0));
-    var dow = dt.getUTCDay(); // 0=Sun
+    var dow = dt.getUTCDay();
     var start = new Date(dt);
     start.setUTCDate(start.getUTCDate() - dow);
     var end = new Date(start);
@@ -100,32 +103,17 @@
       return h && h.date >= w.start && h.date <= w.end;
     });
     if (inWeek.length) return inWeek;
-
-    // Preview / trial: scroll the next official holidays so the bar can be tested now.
-    if (PREVIEW) {
-      var out = [];
-      var seen = Object.create(null);
-      (list || []).forEach(function (h) {
-        if (!h || h.date < muscatToday()) return;
-        var key = String(h.name_ar || h.name_en || '');
-        if (!key || seen[key]) return;
-        seen[key] = 1;
-        out.push(h);
-      });
-      return out.slice(0, 4);
-    }
-
-    try {
-      if (/(?:\?|&)htDemo=1(?:&|$)/.test(location.search || '')) {
-        try { sessionStorage.setItem('htDemo', '1'); } catch (e0) {}
-      }
-      var demo = false;
-      try { demo = sessionStorage.getItem('htDemo') === '1'; } catch (e1) {}
-      if (demo) {
-        return (list || []).filter(function (h) { return h && h.date >= muscatToday(); }).slice(0, 1);
-      }
-    } catch (e) {}
-    return inWeek;
+    if (!PREVIEW_HOLIDAYS) return [];
+    var out = [];
+    var seen = Object.create(null);
+    (list || []).forEach(function (h) {
+      if (!h || h.date < muscatToday()) return;
+      var key = String(h.name_ar || h.name_en || '');
+      if (!key || seen[key]) return;
+      seen[key] = 1;
+      out.push(h);
+    });
+    return out.slice(0, 3);
   }
 
   function injectStyles() {
@@ -140,31 +128,28 @@
       'position:fixed;bottom:24px;left:72px;right:16px;',
       'z-index:100015;display:none;align-items:center;gap:8px;',
       'min-height:48px;width:auto;max-width:none;',
-      'padding:0 14px 0 10px;border-radius:16px;',
+      'padding:0 14px 0 8px;border-radius:16px;',
       'background:rgba(255,255,255,.94);',
       'border:1px solid rgba(15,23,42,.1);',
       'box-shadow:0 8px 24px rgba(15,23,42,.14);',
       'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);',
       'overflow:hidden;font-family:Tajawal,Sora,system-ui,sans-serif;',
-      'letter-spacing:0;text-transform:none;',
-      'box-sizing:border-box;',
+      'letter-spacing:0;text-transform:none;box-sizing:border-box;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      /* bell (#chg-dot) is always fixed to the left, even in Arabic */
       '#' + TICKER_ID + '.solo{left:16px;right:16px}',
       '#' + TICKER_ID + '.above-dock{bottom:84px;left:16px;right:16px}',
-      'html[dir="rtl"] #' + TICKER_ID + ',body.ar #' + TICKER_ID + '{',
-      'left:72px;right:16px;padding:0 14px 0 10px;',
-      '}',
+      'html[dir="rtl"] #' + TICKER_ID + ',body.ar #' + TICKER_ID + '{left:72px;right:16px}',
       'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
-      'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{',
-      'left:16px;right:16px;',
-      '}',
+      'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:28px;height:28px;border-radius:10px;',
-      'display:grid;place-items:center;font-size:15px;',
+      'flex:0 0 auto;width:34px;height:34px;border-radius:12px;border:0;',
+      'display:grid;place-items:center;font-size:17px;cursor:pointer;',
       'background:linear-gradient(135deg,#fff7ed,#ffedd5);',
+      'box-shadow:0 2px 8px rgba(234,88,12,.18);',
+      '-webkit-tap-highlight-color:transparent;',
       '}',
+      '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;',
       'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 100%);',
@@ -179,9 +164,7 @@
       'font-size:12.5px;font-weight:800;color:#9a3412;line-height:1.35;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
-      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{',
-      'animation-name:htScrollRtl;',
-      '}',
+      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#c2410c;font-weight:900;margin-inline-end:6px}',
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
@@ -223,42 +206,6 @@
     return el;
   }
 
-  function paint(items) {
-    injectStyles();
-    var el = ensureTicker();
-    if (!items || !items.length) {
-      el.classList.remove('on');
-      el.hidden = true;
-      el.innerHTML = '';
-      return;
-    }
-    var ar = lang() === 'ar';
-    var prefix = PREVIEW
-      ? (ar ? 'تجربة الشريط الإخباري · الإجازات الرسمية:' : 'News ticker trial · Official holidays:')
-      : (ar ? 'إجازة رسمية هذا الأسبوع:' : 'Official holiday this week:');
-    var parts = items.map(function (h) {
-      var name = ar ? (h.name_ar || h.name_en) : (h.name_en || h.name_ar);
-      return name + ' · ' + formatDay(h.date, ar);
-    });
-    var joined = parts.join('  •  ');
-    var text = prefix + ' ' + joined;
-    // Triple the strip so the marquee feels continuous while scrolling
-    var strip =
-      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined) +
-      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
-      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined) +
-      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
-      '<span class="ht-label">' + prefix + '</span> ' + escapeHtml(joined);
-    el.innerHTML =
-      '<span class="ht-ico" aria-hidden="true">🎉</span>' +
-      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
-    el.title = text;
-    el.hidden = false;
-    el.classList.add('on');
-    layoutTicker(el);
-    el.setAttribute('dir', ar ? 'rtl' : 'ltr');
-  }
-
   function escapeHtml(s) {
     return String(s || '')
       .replace(/&/g, '&amp;')
@@ -267,10 +214,71 @@
       .replace(/"/g, '&quot;');
   }
 
+  function paintParts(parts, ar) {
+    injectStyles();
+    var el = ensureTicker();
+    if (!parts || !parts.length) {
+      el.classList.remove('on');
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
+    var joined = parts.join('  •  ');
+    var strip =
+      escapeHtml(joined) +
+      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
+      escapeHtml(joined) +
+      '&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;' +
+      escapeHtml(joined);
+    el.innerHTML =
+      '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
+      (ar ? 'اكتب رسالة للشريط' : 'Write a ticker message') +
+      '" aria-label="' +
+      (ar ? 'فتح صفحة كتابة رسالة الشريط' : 'Open ticker message page') +
+      '">🎉</button>' +
+      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
+    el.title = joined;
+    el.hidden = false;
+    el.classList.add('on');
+    layoutTicker(el);
+    el.setAttribute('dir', ar ? 'rtl' : 'ltr');
+    var btn = document.getElementById('htOpenBoard');
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        location.href = boardUrl();
+      });
+    }
+  }
+
+  function buildParts(approved, holidays) {
+    var ar = lang() === 'ar';
+    var parts = [];
+    (approved || []).forEach(function (m) {
+      if (!m || !m.text) return;
+      var bit = String(m.text);
+      if (m.name) bit += ar ? (' — ' + m.name) : (' — ' + m.name);
+      parts.push(bit);
+    });
+    (holidays || []).forEach(function (h) {
+      var name = ar ? (h.name_ar || h.name_en) : (h.name_en || h.name_ar);
+      parts.push((ar ? 'إجازة رسمية: ' : 'Holiday: ') + name + ' · ' + formatDay(h.date, ar));
+    });
+    if (!parts.length) {
+      parts.push(
+        ar
+          ? 'اضغط 🎉 لكتابة رسالة للشريط الإخباري — تظهر بعد اعتماد المشرف'
+          : 'Tap 🎉 to write a ticker message — shown after admin approval'
+      );
+    }
+    return parts;
+  }
+
   function loadHolidays() {
+    if (holidaysCache) return holidaysCache;
     var url = docsBase() + 'data/oman-holidays.json?v=20260802b';
-    if (DATA_URL_CACHE) return DATA_URL_CACHE;
-    DATA_URL_CACHE = fetch(url, { cache: 'no-store' })
+    holidaysCache = fetch(url, { cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('holidays');
         return r.json();
@@ -281,22 +289,49 @@
       .catch(function () {
         return [];
       });
-    return DATA_URL_CACHE;
+    return holidaysCache;
+  }
+
+  function loadApprovedMessages() {
+    if (messagesCache) return messagesCache;
+    messagesCache = fetch(MANTLE_URL + '?ts=' + Date.now(), {
+      headers: { 'X-Mantle-Key': MANTLE_KEY },
+      cache: 'no-store'
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('msgs');
+        return r.json();
+      })
+      .then(function (json) {
+        return Array.isArray(json && json.approved) ? json.approved : [];
+      })
+      .catch(function () {
+        return [];
+      });
+    return messagesCache;
   }
 
   function refresh() {
-    loadHolidays().then(function (list) {
-      paint(holidaysForTicker(list, activeDate()));
+    messagesCache = null; // always re-check approved list
+    Promise.all([loadApprovedMessages(), loadHolidays()]).then(function (pair) {
+      var approved = pair[0] || [];
+      var holidays = holidaysForTicker(pair[1] || [], activeDate());
+      // If there are approved staff messages, prefer them; still append week holidays.
+      paintParts(buildParts(approved, holidays), lang() === 'ar');
     });
   }
 
   function boot() {
     refresh();
-    // Re-position when alert icons appear/disappear
     setInterval(function () {
       var el = document.getElementById(TICKER_ID);
       if (el && el.classList.contains('on')) layoutTicker(el);
     }, 1500);
+    // Refresh approved messages periodically
+    setInterval(function () {
+      messagesCache = null;
+      refresh();
+    }, 60000);
     document.addEventListener('click', function (e) {
       if (e.target && e.target.closest && e.target.closest('#langToggle, #langBtn')) {
         setTimeout(refresh, 50);

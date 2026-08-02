@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>الشريط الإخباري</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #f59e0b;
+      --line: #334155;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: radial-gradient(1200px 600px at 80% -10%, #1e293b, var(--bg));
+      color: var(--ink);
+      font-family: Tajawal, system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bot));
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0b1220;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+    .card {
+      background: linear-gradient(165deg, #1e293b, #0f172aee);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    textarea, input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #0b1220;
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      outline: none;
+      letter-spacing: 0;
+    }
+    textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+    textarea:focus, input:focus { border-color: #f59e0b88; }
+    .hint {
+      margin: 8px 0 0;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .who {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+    .actions { display: grid; gap: 8px; margin-top: 14px; }
+    button {
+      border: 0;
+      border-radius: 12px;
+      min-height: 46px;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .send {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #111;
+    }
+    .send:disabled { opacity: .55; cursor: wait; }
+    .status {
+      min-height: 22px;
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #86efac;
+    }
+    .status.err { color: #fca5a5; }
+    .note {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.55;
+      font-weight: 650;
+    }
+    .liveTitle {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .liveItem {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #0b122088;
+      border: 1px solid #33415555;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .liveMeta {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .empty { color: #64748b; font-size: 13px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a class="back" id="backBtn" href="../">رجوع</a>
+      <span style="font-size:22px" aria-hidden="true">🎉</span>
+    </div>
+    <h1>اكتب للشريط الإخباري</h1>
+    <p class="sub">اكتب رسالة قصيرة. لن تظهر على الشريط إلا بعد اعتماد المشرف.</p>
+
+    <div class="card">
+      <label for="msg">رسالتك</label>
+      <textarea id="msg" maxlength="120" placeholder="مثال: كل عام وأنتم بخير… أو تهنئة لزميل"></textarea>
+      <p class="hint"><span id="count">0</span>/120 · رسائل مهذبة فقط</p>
+      <p class="who" id="who">زائر</p>
+      <div class="actions">
+        <button type="button" class="send" id="sendBtn">إرسال للمراجعة</button>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+
+    <div class="card">
+      <p class="note">بعد الإرسال تذهب الرسالة إلى قائمة الانتظار. تظهر في الشريط فقط إذا اعتمدها المشرف من لوحة الاعتماد.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="liveTitle">المعتمد حالياً على الشريط</h2>
+      <div id="liveList" class="empty">جاري التحميل…</div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
+    var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var msg = document.getElementById('msg');
+    var count = document.getElementById('count');
+    var status = document.getElementById('status');
+    var sendBtn = document.getElementById('sendBtn');
+    var who = document.getElementById('who');
+    var liveList = document.getElementById('liveList');
+
+    function docsBase() {
+      try {
+        var m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
+        return m ? m[1] : '../';
+      } catch (e) {
+        return '../';
+      }
+    }
+    document.getElementById('backBtn').href = docsBase().replace(/\/?$/, '/') + 'index.html';
+
+    function identity() {
+      try {
+        var path = location.pathname || '';
+        var isImport = path.indexOf('/import/') !== -1;
+        var id = (
+          isImport
+            ? localStorage.getItem('importSavedEmpId')
+            : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId'))
+        ) || '';
+        var name = (
+          isImport
+            ? localStorage.getItem('importSavedEmpName')
+            : (localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName'))
+        ) || '';
+        id = String(id || '').trim();
+        name = String(name || '').trim();
+        return { id: id, name: name };
+      } catch (e) {
+        return { id: '', name: '' };
+      }
+    }
+
+    var ident = identity();
+    who.textContent = ident.id
+      ? ('المرسل: ' + (ident.name || 'موظف') + ' · #' + ident.id)
+      : 'المرسل: زائر (بدون رقم موظف محفوظ)';
+
+    msg.addEventListener('input', function () {
+      count.textContent = String(msg.value.length);
+    });
+
+    function headers() {
+      return {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+    }
+
+    function cleanText(t) {
+      return String(t || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 120);
+    }
+
+    function uid() {
+      return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    async function readStore() {
+      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+        headers: headers(),
+        cache: 'no-store'
+      });
+      if (!res.ok) throw new Error('read');
+      var json = await res.json();
+      return {
+        pending: Array.isArray(json.pending) ? json.pending : [],
+        approved: Array.isArray(json.approved) ? json.approved : []
+      };
+    }
+
+    async function writeStore(store) {
+      var res = await fetch(MANTLE_URL, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify(store)
+      });
+      if (!res.ok) throw new Error('write');
+    }
+
+    function renderApproved(list) {
+      if (!list || !list.length) {
+        liveList.className = 'empty';
+        liveList.textContent = 'لا توجد رسائل معتمدة على الشريط حالياً.';
+        return;
+      }
+      liveList.className = '';
+      liveList.innerHTML = list.slice(0, 12).map(function (m) {
+        return (
+          '<div class="liveItem">' +
+            '<div></div>' +
+            '<div class="liveMeta"></div>' +
+          '</div>'
+        );
+      }).join('');
+      Array.from(liveList.children).forEach(function (el, i) {
+        var m = list[i];
+        el.querySelector('div').textContent = m.text || '';
+        var meta = [];
+        if (m.name) meta.push(m.name);
+        if (m.empId) meta.push('#' + m.empId);
+        el.querySelector('.liveMeta').textContent = meta.join(' · ') || 'معتمد';
+      });
+    }
+
+    async function refreshLive() {
+      try {
+        var store = await readStore();
+        renderApproved(store.approved);
+      } catch (e) {
+        liveList.className = 'empty';
+        liveList.textContent = 'تعذر تحميل الرسائل المعتمدة.';
+      }
+    }
+
+    sendBtn.addEventListener('click', async function () {
+      var text = cleanText(msg.value);
+      status.className = 'status';
+      status.textContent = '';
+      if (text.length < 3) {
+        status.className = 'status err';
+        status.textContent = 'اكتب رسالة أوضح (٣ أحرف على الأقل).';
+        return;
+      }
+      sendBtn.disabled = true;
+      status.textContent = 'جاري الإرسال…';
+      try {
+        var store = await readStore();
+        var row = {
+          id: uid(),
+          text: text,
+          name: ident.name || '',
+          empId: ident.id || '',
+          at: Date.now(),
+          status: 'pending'
+        };
+        store.pending = [row].concat(store.pending || []).slice(0, 80);
+        if ((store.approved || []).length > 40) store.approved = store.approved.slice(0, 40);
+        // keep payload small
+        while (JSON.stringify(store).length > 50000 && store.pending.length > 1) store.pending.pop();
+        await writeStore(store);
+        msg.value = '';
+        count.textContent = '0';
+        status.textContent = 'تم الإرسال. بانتظار اعتماد المشرف.';
+        refreshLive();
+      } catch (e) {
+        status.className = 'status err';
+        status.textContent = 'تعذر الإرسال. حاول مرة أخرى.';
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    refreshLive();
+  })();
+  </script>
+</body>
+</html>
