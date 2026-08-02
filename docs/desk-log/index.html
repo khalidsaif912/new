@@ -260,7 +260,7 @@
       align-items: stretch;
       flex-shrink: 0;
     }
-    .lockOut, .homeOut {
+    .lockOut, .homeOut, .tickerModOut {
       background: transparent;
       border: 1px solid #475569;
       color: #cbd5e1;
@@ -282,6 +282,11 @@
       background: #1e3a8a55;
       border-color: #3b82f655;
       color: #dbeafe;
+    }
+    .tickerModOut {
+      background: #9a341255;
+      border-color: #f59e0b66;
+      color: #fdba74;
     }
     .toolbar.mainTabs {
       display: grid;
@@ -428,6 +433,7 @@
       </div>
       <div class="headActions">
         <a class="homeOut" id="homeOut" href="../index.html">🏠 الرئيسية</a>
+        <a class="tickerModOut" href="../ticker-board/moderate.html">🎉 اعتماد الشريط</a>
         <button type="button" class="lockOut" id="lockOut">قفل</button>
       </div>
     </div>
