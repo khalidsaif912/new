@@ -85,12 +85,47 @@
     }
   }
 
-  function saveIdentity(id, name) {
+  function listSavedEmpIds() {
+    var out = [];
     try {
+      ['exportSavedEmpId', 'importSavedEmpId', 'savedEmpId'].forEach(function (key) {
+        var id = digitsOnly(localStorage.getItem(key));
+        if (id && out.indexOf(id) === -1) out.push(id);
+      });
+    } catch (e) {}
+    return out;
+  }
+
+  function nameForSavedId(id) {
+    id = digitsOnly(id);
+    if (!id) return '';
+    try {
+      var pairs = [
+        ['exportSavedEmpId', 'exportSavedEmpName'],
+        ['importSavedEmpId', 'importSavedEmpName'],
+        ['savedEmpId', 'savedEmpName']
+      ];
+      for (var i = 0; i < pairs.length; i++) {
+        if (digitsOnly(localStorage.getItem(pairs[i][0])) === id) {
+          var n = String(localStorage.getItem(pairs[i][1]) || '').trim();
+          if (n) return n;
+        }
+      }
+    } catch (e) {}
+    return String(readSavedIdentity().name || '').trim();
+  }
+
+  function saveIdentity(id, name) {
+    id = digitsOnly(id);
+    if (!id) return;
+    try {
+      // Keep both export (جدولي) and import (الوارد) in sync for chat identity.
       localStorage.setItem('exportSavedEmpId', id);
+      localStorage.setItem('importSavedEmpId', id);
       localStorage.setItem('savedEmpId', id);
       if (name) {
         localStorage.setItem('exportSavedEmpName', name);
+        localStorage.setItem('importSavedEmpName', name);
         localStorage.setItem('savedEmpName', name);
       }
     } catch (e) {}
@@ -109,7 +144,7 @@
   function readLocalEmoji(empId) {
     try {
       var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
-      var cp = String(map[empId] || map.export || '').trim();
+      var cp = String(map[empId] || map.export || map.import || '').trim();
       if (!cp) cp = String(localStorage.getItem('empEmojiChoice') || '').trim();
       if (validEmojiCp(cp)) return cp.toLowerCase();
     } catch (e) {}
@@ -148,11 +183,45 @@
     return staffById;
   }
 
+  async function lookupScheduleName(path, id) {
+    try {
+      var res = await fetch(docsBase() + path + encodeURIComponent(id) + '.json?ts=' + Date.now(), {
+        cache: 'no-store'
+      });
+      if (!res.ok) return null;
+      var json = await res.json();
+      if (!json) return null;
+      var name = String(json.name || '').trim();
+      var foundId = digitsOnly(json.id || id);
+      if (!foundId) foundId = id;
+      return { id: foundId, name: name };
+    } catch (e) {
+      return null;
+    }
+  }
+
   async function resolveEmp(rawId) {
     var id = digitsOnly(rawId);
     if (!id) return { id: '', name: '', ok: false, reason: 'empty' };
     var map = await loadStaff();
-    if (map[id]) return { id: id, name: map[id], ok: true };
+    if (map[id]) return { id: id, name: map[id], ok: true, source: 'export' };
+
+    // Employees from «الوارد» live under import/schedules/{id}.json
+    var imp = await lookupScheduleName('import/schedules/', id);
+    if (imp) {
+      staffById[imp.id] = imp.name;
+      return { id: imp.id, name: imp.name, ok: true, source: 'import' };
+    }
+
+    // Individual export schedule file (if index missed them)
+    var exp = await lookupScheduleName('schedules/', id);
+    if (exp) {
+      staffById[exp.id] = exp.name;
+      return { id: exp.id, name: exp.name, ok: true, source: 'export' };
+    }
+
+    var savedName = nameForSavedId(id);
+    if (savedName) return { id: id, name: savedName, ok: true, source: 'saved', unverified: true };
     if (!Object.keys(map).length && id.length >= 4) {
       return { id: id, name: '', ok: true, unverified: true };
     }
@@ -379,13 +448,27 @@
       'box-shadow:0 -6px 20px rgba(15,23,42,.06);',
       '}',
       '#' + MODAL_ID + ' .htc-whochip{',
-      'display:flex;align-items:center;gap:8px;',
+      'display:flex;flex-wrap:wrap;align-items:center;gap:8px;',
       'margin:0 0 10px;padding:8px 12px;border-radius:14px;',
       'background:#f1f5f9;border:1px solid #e2e8f0;',
       'font-size:12px;font-weight:800;color:#0f172a;line-height:1.3;',
       '}',
       '#' + MODAL_ID + ' .htc-whochip::before{',
       'content:"";width:8px;height:8px;border-radius:50%;background:#22c55e;flex:0 0 auto;',
+      '}',
+      '#' + MODAL_ID + ' .htc-idrow{',
+      'display:none;width:100%;flex:1 1 100%;align-items:center;gap:6px;margin-top:2px;',
+      '}',
+      '#' + MODAL_ID + ' .htc-idrow.on{display:flex}',
+      '#' + MODAL_ID + ' .htc-idrow input{',
+      'flex:1 1 auto;min-width:0;height:34px;box-sizing:border-box;',
+      'border:1px solid #cbd5e1;border-radius:10px;padding:0 10px;',
+      'font:inherit;font-size:13px;font-weight:800;color:#0f172a;background:#fff;',
+      'text-align:right;direction:ltr;',
+      '}',
+      '#' + MODAL_ID + ' .htc-idrow button{',
+      'flex:0 0 auto;height:34px;padding:0 12px;border:0;border-radius:10px;',
+      'background:#0f172a;color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer;',
       '}',
       '#' + MODAL_ID + ' .htc-composebox{',
       'display:flex;align-items:center;gap:8px;',
@@ -602,6 +685,10 @@
         '<div class="htc-composer">' +
           '<div class="htc-whochip" id="htcWhoChip">' +
             '<span id="htcWhoText">جاري التعرّف…</span>' +
+            '<div class="htc-idrow" id="htcIdRow">' +
+              '<input type="text" id="htcEmpId" inputmode="numeric" autocomplete="username" maxlength="12" placeholder="رقم الوظيفة" dir="ltr" />' +
+              '<button type="button" id="htcEmpSave">حفظ</button>' +
+            '</div>' +
           '</div>' +
           '<div class="htc-composebox">' +
             '<input type="text" id="htcMsg" maxlength="120" enterkeyhint="send" autocomplete="off" inputmode="text" dir="rtl" placeholder="اكتب رسالة للزملاء…" />' +
@@ -659,32 +746,72 @@
       var sendBtn = document.getElementById('htcSend');
       var subEl = document.getElementById('htcSub');
       var whoText = document.getElementById('htcWhoText');
+      var idRow = document.getElementById('htcIdRow');
+      var empIdInput = document.getElementById('htcEmpId');
+      var empIdSave = document.getElementById('htcEmpSave');
       var resolvedEmp = { id: '', name: '' };
 
       function paintIdentity(r) {
         resolvedEmp = r && r.ok ? { id: r.id, name: r.name || '' } : { id: '', name: '' };
         if (resolvedEmp.id) {
-          whoText.textContent = resolvedEmp.name || ('#' + resolvedEmp.id);
+          whoText.textContent = resolvedEmp.name
+            ? resolvedEmp.name + ' · #' + resolvedEmp.id
+            : '#' + resolvedEmp.id;
+          if (idRow) idRow.classList.remove('on');
         } else {
-          whoText.textContent = 'افتح «جدولي» أولاً لحفظ اسمك';
+          whoText.textContent = 'أدخل رقم وظيفتك (جدولي أو الوارد)';
+          if (idRow) idRow.classList.add('on');
         }
       }
 
-      async function syncEmp() {
-        var saved = readSavedIdentity();
-        if (!saved.id) {
+      async function resolveFromCandidates(extraId) {
+        var ids = listSavedEmpIds();
+        var extra = digitsOnly(extraId);
+        if (extra && ids.indexOf(extra) === -1) ids.unshift(extra);
+        for (var i = 0; i < ids.length; i++) {
+          var r = await resolveEmp(ids[i]);
+          if (r && r.ok && r.id) {
+            saveIdentity(r.id, r.name || nameForSavedId(r.id));
+            paintIdentity(r);
+            return r;
+          }
+        }
+        if (!ids.length) {
           paintIdentity({ ok: false, id: '', name: '' });
           return { ok: false, id: '', name: '', reason: 'empty' };
         }
-        var r = await resolveEmp(saved.id);
-        if (r.ok) {
-          saveIdentity(r.id, r.name || saved.name);
-          paintIdentity(r);
-          return r;
-        }
-        // Keep saved name even if roster lookup fails briefly
-        paintIdentity({ ok: true, id: saved.id, name: saved.name });
-        return { ok: true, id: saved.id, name: saved.name };
+        // Saved id(s) but not found in either roster
+        paintIdentity({ ok: false, id: '', name: '' });
+        return { ok: false, id: ids[0] || '', name: '', reason: 'unknown' };
+      }
+
+      async function syncEmp() {
+        var typed = empIdInput && idRow && idRow.classList.contains('on') ? empIdInput.value : '';
+        return resolveFromCandidates(typed);
+      }
+
+      if (empIdSave) {
+        empIdSave.addEventListener('click', async function () {
+          statusEl.className = 'htc-status';
+          statusEl.textContent = 'جاري التحقق…';
+          var r = await resolveFromCandidates(empIdInput ? empIdInput.value : '');
+          if (r.ok) {
+            statusEl.textContent = r.name ? 'مرحباً ' + r.name : 'تم حفظ الرقم.';
+          } else {
+            statusEl.className = 'htc-status err';
+            statusEl.textContent = r.reason === 'empty'
+              ? 'أدخل رقم الوظيفة.'
+              : 'الرقم غير موجود في جدولي أو الوارد.';
+          }
+        });
+      }
+      if (empIdInput) {
+        empIdInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (empIdSave) empIdSave.click();
+          }
+        });
       }
 
       async function refreshFeed() {
@@ -744,7 +871,11 @@
         var text = String(msgInput.value || '').replace(/\s+/g, ' ').trim().slice(0, 120);
         if (!emp.ok || !emp.id) {
           statusEl.className = 'htc-status err';
-          statusEl.textContent = 'احفظ رقمك الوظيفي من «جدولي» ثم عد للدردشة.';
+          statusEl.textContent = emp.reason === 'unknown'
+            ? 'الرقم غير موجود في جدولي أو الوارد.'
+            : 'أدخل رقم وظيفتك (من جدولي أو الوارد) ثم أرسل.';
+          if (idRow) idRow.classList.add('on');
+          if (empIdInput) empIdInput.focus();
           return;
         }
         if (text.length < 3) {
