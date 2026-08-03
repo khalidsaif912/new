@@ -387,33 +387,31 @@
       'content:"";width:8px;height:8px;border-radius:50%;background:#22c55e;flex:0 0 auto;',
       '}',
       '#' + MODAL_ID + ' .htc-composebox{',
-      'display:flex;align-items:flex-end;gap:8px;',
-      'padding:8px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;',
-      '}',
-      '#' + MODAL_ID + ' .htc-composebox:focus-within{',
-      'border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.16);background:#fff;',
-      '}',
-      '#' + MODAL_ID + ' .htc-composebox .htc-grow{',
-      'flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px;',
+      'display:flex;align-items:center;gap:8px;',
+      'padding:0;background:transparent;border:0;',
       '}',
       '#' + MODAL_ID + ' textarea#htcMsg{',
-      'width:100%;box-sizing:border-box;border:0;border-radius:10px;',
-      'padding:10px 12px;margin:0;min-height:40px;max-height:110px;height:40px;',
-      'resize:none;overflow:hidden;line-height:1.45;',
+      'flex:1 1 auto;min-width:0;width:auto;box-sizing:border-box;',
+      'border:1px solid #e2e8f0;border-radius:12px;',
+      'padding:0 12px;margin:0;height:42px;min-height:42px;max-height:42px;',
+      'resize:none;overflow:hidden;line-height:42px;',
       'font:inherit;font-size:14px;font-weight:700;color:#0f172a;outline:none;',
-      'background:transparent;-webkit-appearance:none;appearance:none;',
+      'background:#f8fafc;-webkit-appearance:none;appearance:none;',
+      '}',
+      '#' + MODAL_ID + ' textarea#htcMsg:focus{',
+      'border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.16);background:#fff;',
       '}',
       '#' + MODAL_ID + ' textarea#htcMsg::placeholder{color:#94a3b8;font-weight:700}',
       '#' + MODAL_ID + ' .htc-hint{',
-      'margin:0;padding:0 4px;font-size:11px;font-weight:700;color:#94a3b8;text-align:start;',
+      'margin:6px 0 0;padding:0 2px;font-size:11px;font-weight:700;color:#94a3b8;text-align:start;',
       '}',
       '#' + MODAL_ID + ' .htc-send{',
-      'flex:0 0 auto;border:0;border-radius:12px;',
-      'height:40px;min-height:40px;min-width:70px;padding:0 14px;margin-bottom:18px;',
+      'flex:0 0 auto;align-self:center;border:0;border-radius:12px;',
+      'height:42px;min-height:42px;min-width:72px;padding:0 16px;margin:0;',
       'background:linear-gradient(135deg,#f59e0b,#ea580c);color:#111;',
       'font:inherit;font-size:13px;font-weight:900;cursor:pointer;',
       'display:inline-flex;align-items:center;justify-content:center;',
-      'line-height:1;',
+      'line-height:1;box-sizing:border-box;',
       '}',
       '#' + MODAL_ID + ' .htc-send:disabled{opacity:.55;cursor:wait}',
       '#' + MODAL_ID + ' .htc-status{',
@@ -593,12 +591,10 @@
             '<span id="htcWhoText">جاري التعرّف…</span>' +
           '</div>' +
           '<div class="htc-composebox">' +
-            '<div class="htc-grow">' +
-              '<textarea id="htcMsg" maxlength="120" rows="1" enterkeyhint="send" autocomplete="off" placeholder="اكتب رسالة للزملاء…"></textarea>' +
-              '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
-            '</div>' +
+            '<textarea id="htcMsg" maxlength="120" rows="1" enterkeyhint="send" autocomplete="off" placeholder="اكتب رسالة للزملاء…"></textarea>' +
             '<button type="button" class="htc-send" id="htcSend">نشر</button>' +
           '</div>' +
+          '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
           '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
         '</div>' +
       '</div>';
@@ -663,11 +659,6 @@
 
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
-        msgInput.style.height = '40px';
-        msgInput.style.overflow = 'hidden';
-        var h = Math.min(110, Math.max(40, msgInput.scrollHeight));
-        msgInput.style.height = h + 'px';
-        if (msgInput.scrollHeight > 110) msgInput.style.overflow = 'auto';
       });
 
       sendBtn.addEventListener('click', async function () {
