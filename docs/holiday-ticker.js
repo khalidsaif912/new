@@ -536,15 +536,8 @@
         '</div>' +
         '<div class="htc-feed" id="htcFeed"><div class="htc-empty">جاري التحميل…</div></div>' +
         '<div class="htc-composer">' +
-          '<div class="htc-whochip" id="htcWhoChip" hidden>' +
-            '<span id="htcWhoText"></span>' +
-            '<button type="button" id="htcChangeId">تغيير الرقم</button>' +
-          '</div>' +
-          '<div class="htc-idrow" id="htcIdRow">' +
-            '<div class="htc-grow" style="flex:1">' +
-              '<label for="htcEmpId">الرقم الوظيفي</label>' +
-              '<input id="htcEmpId" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="مثال: 8715">' +
-            '</div>' +
+          '<div class="htc-whochip" id="htcWhoChip">' +
+            '<span id="htcWhoText">جاري التعرّف…</span>' +
           '</div>' +
           '<div class="htc-sendrow">' +
             '<div class="htc-grow">' +
@@ -564,38 +557,38 @@
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.classList.contains('on')) closeCompose();
       });
-      var empInput = document.getElementById('htcEmpId');
       var msgInput = document.getElementById('htcMsg');
       var countEl = document.getElementById('htcCount');
       var statusEl = document.getElementById('htcStatus');
       var sendBtn = document.getElementById('htcSend');
       var subEl = document.getElementById('htcSub');
-      var whoChip = document.getElementById('htcWhoChip');
       var whoText = document.getElementById('htcWhoText');
-      var idRow = document.getElementById('htcIdRow');
-      var changeIdBtn = document.getElementById('htcChangeId');
       var resolvedEmp = { id: '', name: '' };
 
       function paintIdentity(r) {
         resolvedEmp = r && r.ok ? { id: r.id, name: r.name || '' } : { id: '', name: '' };
         if (resolvedEmp.id) {
           whoText.textContent = (resolvedEmp.name || 'موظف') + ' · #' + resolvedEmp.id;
-          whoChip.hidden = false;
-          idRow.classList.add('hidden');
         } else {
-          whoChip.hidden = true;
-          idRow.classList.remove('hidden');
+          whoText.textContent = 'افتح «جدولي» أولاً لحفظ رقمك الوظيفي';
         }
       }
 
       async function syncEmp() {
-        var r = await resolveEmp(empInput.value);
-        if (r.ok) {
-          saveIdentity(r.id, r.name);
-          if (empInput.value !== r.id) empInput.value = r.id;
+        var saved = readSavedIdentity();
+        if (!saved.id) {
+          paintIdentity({ ok: false, id: '', name: '' });
+          return { ok: false, id: '', name: '', reason: 'empty' };
         }
-        paintIdentity(r);
-        return r;
+        var r = await resolveEmp(saved.id);
+        if (r.ok) {
+          saveIdentity(r.id, r.name || saved.name);
+          paintIdentity(r);
+          return r;
+        }
+        // Keep saved name even if roster lookup fails briefly
+        paintIdentity({ ok: true, id: saved.id, name: saved.name });
+        return { ok: true, id: saved.id, name: saved.name };
       }
 
       async function refreshFeed() {
@@ -615,18 +608,6 @@
       modal._htcRefreshFeed = refreshFeed;
       modal._htcSyncEmp = syncEmp;
 
-      changeIdBtn.addEventListener('click', function () {
-        whoChip.hidden = true;
-        idRow.classList.remove('hidden');
-        empInput.focus();
-      });
-      empInput.addEventListener('input', function () {
-        var d = digitsOnly(empInput.value);
-        if (empInput.value !== d) empInput.value = d;
-        clearTimeout(empInput._t);
-        empInput._t = setTimeout(function () { syncEmp().then(refreshFeed); }, 280);
-      });
-      empInput.addEventListener('blur', function () { syncEmp().then(refreshFeed); });
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
         msgInput.style.height = 'auto';
@@ -640,13 +621,7 @@
         var text = String(msgInput.value || '').replace(/\s+/g, ' ').trim().slice(0, 120);
         if (!emp.ok || !emp.id) {
           statusEl.className = 'htc-status err';
-          statusEl.textContent =
-            emp.reason === 'unknown'
-              ? 'الرقم الوظيفي غير موجود في الروستر.'
-              : 'أدخل رقمك الوظيفي قبل الإرسال.';
-          idRow.classList.remove('hidden');
-          whoChip.hidden = true;
-          empInput.focus();
+          statusEl.textContent = 'احفظ رقمك الوظيفي من «جدولي» ثم عد للدردشة.';
           return;
         }
         if (text.length < 3) {
@@ -701,13 +676,10 @@
     var ar = lang() === 'ar';
     var modal = ensureCompose();
     modal.setAttribute('dir', ar ? 'rtl' : 'ltr');
-    var empInput = document.getElementById('htcEmpId');
     var msgInput = document.getElementById('htcMsg');
     var statusEl = document.getElementById('htcStatus');
     statusEl.className = 'htc-status';
     statusEl.textContent = '';
-    var saved = readSavedIdentity();
-    if (saved.id) empInput.value = saved.id;
     modal.classList.add('on');
     modal.setAttribute('aria-hidden', 'false');
     document.documentElement.style.overflow = 'hidden';
@@ -719,10 +691,7 @@
         return modal._htcRefreshFeed ? modal._htcRefreshFeed() : null;
       })
       .finally(function () {
-        setTimeout(function () {
-          if (!empInput.value) empInput.focus();
-          else msgInput.focus();
-        }, 40);
+        setTimeout(function () { msgInput.focus(); }, 40);
       });
   }
 
