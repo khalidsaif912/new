@@ -373,36 +373,52 @@
       '#' + MODAL_ID + ' .htc-bubble .htc-text{font-size:13px;font-weight:800;color:#1e293b;line-height:1.4;word-break:break-word}',
       '#' + MODAL_ID + ' .htc-bubble .htc-time{margin-top:4px;font-size:10px;font-weight:700;color:#94a3b8}',
       '#' + MODAL_ID + ' .htc-composer{',
-      'flex:0 0 auto;background:#fff;border-top:1px solid #e2e8f0;',
-      'padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));',
+      'flex:0 0 auto;background:#ffffff;border-top:1px solid #e2e8f0;',
+      'padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));',
+      'box-shadow:0 -6px 20px rgba(15,23,42,.06);',
       '}',
-      '#' + MODAL_ID + ' .htc-idrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}',
-      '#' + MODAL_ID + ' .htc-idrow.hidden{display:none}',
       '#' + MODAL_ID + ' .htc-whochip{',
-      'display:flex;align-items:center;justify-content:space-between;gap:8px;',
-      'margin-bottom:8px;padding:8px 10px;border-radius:12px;background:#f1f5f9;',
-      'font-size:12px;font-weight:800;color:#0f172a;',
+      'display:flex;align-items:center;gap:8px;',
+      'margin:0 0 10px;padding:8px 12px;border-radius:14px;',
+      'background:#f1f5f9;border:1px solid #e2e8f0;',
+      'font-size:12px;font-weight:800;color:#0f172a;line-height:1.3;',
       '}',
-      '#' + MODAL_ID + ' .htc-whochip button{',
-      'border:0;background:transparent;color:#0369a1;font:inherit;font-weight:900;font-size:11px;cursor:pointer;padding:0;',
+      '#' + MODAL_ID + ' .htc-whochip::before{',
+      'content:"";width:8px;height:8px;border-radius:50%;background:#22c55e;flex:0 0 auto;',
       '}',
-      '#' + MODAL_ID + ' label{display:block;font-size:11px;font-weight:800;color:#64748b;margin:0 0 4px}',
-      '#' + MODAL_ID + ' input,#' + MODAL_ID + ' textarea{',
-      'width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:12px;',
-      'padding:11px 12px;font:inherit;font-size:15px;font-weight:700;color:#0f172a;outline:none;background:#fff;',
+      '#' + MODAL_ID + ' .htc-composebox{',
+      'display:flex;align-items:stretch;gap:8px;',
+      'padding:8px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;',
       '}',
-      '#' + MODAL_ID + ' textarea{min-height:44px;max-height:110px;resize:none;line-height:1.4}',
-      '#' + MODAL_ID + ' input:focus,#' + MODAL_ID + ' textarea:focus{border-color:#f59e0b}',
-      '#' + MODAL_ID + ' .htc-sendrow{display:flex;gap:8px;align-items:flex-end;margin-top:8px}',
-      '#' + MODAL_ID + ' .htc-sendrow .htc-grow{flex:1 1 auto;min-width:0}',
+      '#' + MODAL_ID + ' .htc-composebox:focus-within{',
+      'border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.16);background:#fff;',
+      '}',
+      '#' + MODAL_ID + ' .htc-composebox .htc-grow{',
+      'flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px;',
+      '}',
+      '#' + MODAL_ID + ' textarea#htcMsg{',
+      'width:100%;box-sizing:border-box;border:0;border-radius:10px;',
+      'padding:10px 12px;margin:0;min-height:48px;max-height:110px;height:48px;',
+      'resize:none;overflow:hidden;line-height:1.45;',
+      'font:inherit;font-size:14px;font-weight:700;color:#0f172a;outline:none;',
+      'background:transparent;-webkit-appearance:none;appearance:none;',
+      '}',
+      '#' + MODAL_ID + ' textarea#htcMsg::placeholder{color:#94a3b8;font-weight:700}',
+      '#' + MODAL_ID + ' .htc-hint{',
+      'margin:0;padding:0 4px;font-size:11px;font-weight:700;color:#94a3b8;text-align:start;',
+      '}',
       '#' + MODAL_ID + ' .htc-send{',
-      'flex:0 0 auto;border:0;border-radius:12px;min-height:44px;min-width:84px;padding:0 14px;',
-      'background:linear-gradient(135deg,#f59e0b,#ea580c);color:#111;font:inherit;font-weight:900;cursor:pointer;',
+      'flex:0 0 auto;align-self:stretch;border:0;border-radius:12px;',
+      'min-width:78px;padding:0 16px;',
+      'background:linear-gradient(135deg,#f59e0b,#ea580c);color:#111;',
+      'font:inherit;font-size:14px;font-weight:900;cursor:pointer;',
+      'display:inline-flex;align-items:center;justify-content:center;',
       '}',
       '#' + MODAL_ID + ' .htc-send:disabled{opacity:.55;cursor:wait}',
-      '#' + MODAL_ID + ' .htc-status{min-height:16px;margin-top:6px;font-size:11px;font-weight:800;color:#15803d}',
-      '#' + MODAL_ID + ' .htc-status.err{color:#b91c1c}',
-      '#' + MODAL_ID + ' .htc-hint{margin:4px 0 0;font-size:10px;font-weight:700;color:#94a3b8}'
+      '#' + MODAL_ID + ' .htc-status{',
+      'min-height:16px;margin-top:8px;font-size:11px;font-weight:800;color:#15803d;text-align:center;',
+      '}',
+      '#' + MODAL_ID + ' .htc-status.err{color:#b91c1c}'
     ].join('');
     if (!document.getElementById('htTajawalFont')) {
       var fontLink = document.createElement('link');
@@ -575,12 +591,12 @@
           '<div class="htc-whochip" id="htcWhoChip">' +
             '<span id="htcWhoText">جاري التعرّف…</span>' +
           '</div>' +
-          '<div class="htc-sendrow">' +
+          '<div class="htc-composebox">' +
             '<div class="htc-grow">' +
-              '<textarea id="htcMsg" maxlength="120" rows="1" placeholder="اكتب رسالة للزملاء…"></textarea>' +
+              '<textarea id="htcMsg" maxlength="120" rows="1" enterkeyhint="send" autocomplete="off" placeholder="اكتب رسالة للزملاء…"></textarea>' +
               '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
             '</div>' +
-            '<button type="button" class="htc-send" id="htcSend">إرسال</button>' +
+            '<button type="button" class="htc-send" id="htcSend">نشر</button>' +
           '</div>' +
           '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
         '</div>' +
@@ -604,9 +620,9 @@
       function paintIdentity(r) {
         resolvedEmp = r && r.ok ? { id: r.id, name: r.name || '' } : { id: '', name: '' };
         if (resolvedEmp.id) {
-          whoText.textContent = (resolvedEmp.name || 'موظف') + ' · #' + resolvedEmp.id;
+          whoText.textContent = resolvedEmp.name || ('#' + resolvedEmp.id);
         } else {
-          whoText.textContent = 'افتح «جدولي» أولاً لحفظ رقمك الوظيفي';
+          whoText.textContent = 'افتح «جدولي» أولاً لحفظ اسمك';
         }
       }
 
@@ -646,8 +662,11 @@
 
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
-        msgInput.style.height = 'auto';
-        msgInput.style.height = Math.min(110, Math.max(44, msgInput.scrollHeight)) + 'px';
+        msgInput.style.height = '48px';
+        msgInput.style.overflow = 'hidden';
+        var h = Math.min(110, Math.max(48, msgInput.scrollHeight));
+        msgInput.style.height = h + 'px';
+        if (msgInput.scrollHeight > 110) msgInput.style.overflow = 'auto';
       });
 
       sendBtn.addEventListener('click', async function () {
@@ -690,7 +709,8 @@
           await writeFullStore(store);
           msgInput.value = '';
           countEl.textContent = '0';
-          msgInput.style.height = '44px';
+          msgInput.style.height = '48px';
+          msgInput.style.overflow = 'hidden';
           statusEl.textContent = needApproval
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
             : 'تم النشر.';
