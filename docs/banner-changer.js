@@ -497,7 +497,7 @@
       'position:absolute',
       'top:12px',
       'left:12px',
-      'z-index:30',
+      'z-index:80',
       'background:transparent',
       'border:none',
       'border-radius:0',
@@ -513,6 +513,7 @@
       'align-items:center',
       'justify-content:center',
       'box-shadow:none',
+      'pointer-events:auto',
       'transition:transform .2s ease, opacity .2s ease'
     ].join(';');
 
@@ -750,6 +751,7 @@
       'html.header-chrome-dim #dateTag,',
       'html.header-chrome-dim .header .dateTag{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
+      'pointer-events:auto!important;',
       '}'
     );
     if (mode === 'all') {

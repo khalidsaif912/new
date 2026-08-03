@@ -347,7 +347,7 @@
     style.textContent = [
       '#' + TICKER_ID + '{',
       'position:fixed;bottom:10px;left:12px;right:12px;',
-      'z-index:100015;display:none;align-items:center;gap:6px;',
+      'z-index:100010;display:none;align-items:center;gap:6px;',
       'min-height:36px;height:36px;width:auto;max-width:none;',
       'padding:0 10px 0 5px;border-radius:12px;',
       'background:#ffffff;',
@@ -363,6 +363,19 @@
       'html.has-news-ticker #chg-dot{bottom:54px!important}',
       'html.has-news-ticker #abs-dot{bottom:56px!important}',
       'html.has-news-ticker #featureNotesFab{bottom:54px!important}',
+      /* Footer controls must stay above the ticker hit layer */
+      'html.has-news-ticker .footer,html.has-float-dock .footer{',
+      'position:relative;z-index:100040;isolation:isolate;',
+      'padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;',
+      '}',
+      'html.has-news-ticker .bgTextureShuffleWrap,html.has-float-dock .bgTextureShuffleWrap,',
+      '.bgTextureShuffleWrap{',
+      'position:relative;z-index:100055!important;pointer-events:auto!important;',
+      'isolation:isolate;',
+      '}',
+      'html.has-news-ticker .bgTextureShuffleWrap button,html.has-float-dock .bgTextureShuffleWrap button,',
+      '.bgTextureShuffleWrap button{pointer-events:auto!important;position:relative;z-index:1}',
+      'html.has-news-ticker #siteVisitsHost{position:relative;z-index:100050}',
       '#' + TICKER_ID + ' .ht-ico{',
       'flex:0 0 auto;width:28px;height:28px;border-radius:9px;border:1px solid #dbeafe;padding:0;',
       'display:grid;place-items:center;cursor:pointer;',
@@ -397,10 +410,10 @@
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
-      'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-news-ticker .wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-news-ticker .footer{margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .wrap{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .footer{margin-bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-news-ticker .wrap{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-news-ticker .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
       '#' + MODAL_ID + '{',
       'position:fixed;inset:0;z-index:100120;display:none;',
       'font-family:Tajawal,system-ui,sans-serif;letter-spacing:0;',
@@ -614,6 +627,7 @@
     modal.classList.remove('on');
     modal.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
   }
 
   function renderChatFeed(approved, myId) {
@@ -936,6 +950,7 @@
     modal.classList.add('on');
     modal.setAttribute('aria-hidden', 'false');
     document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
     Promise.resolve()
       .then(function () {
         return modal._htcSyncEmp ? modal._htcSyncEmp() : null;
