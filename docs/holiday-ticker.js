@@ -387,7 +387,7 @@
       'content:"";width:8px;height:8px;border-radius:50%;background:#22c55e;flex:0 0 auto;',
       '}',
       '#' + MODAL_ID + ' .htc-composebox{',
-      'display:flex;align-items:stretch;gap:8px;',
+      'display:flex;align-items:flex-end;gap:8px;',
       'padding:8px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;',
       '}',
       '#' + MODAL_ID + ' .htc-composebox:focus-within{',
@@ -398,7 +398,7 @@
       '}',
       '#' + MODAL_ID + ' textarea#htcMsg{',
       'width:100%;box-sizing:border-box;border:0;border-radius:10px;',
-      'padding:10px 12px;margin:0;min-height:48px;max-height:110px;height:48px;',
+      'padding:10px 12px;margin:0;min-height:40px;max-height:110px;height:40px;',
       'resize:none;overflow:hidden;line-height:1.45;',
       'font:inherit;font-size:14px;font-weight:700;color:#0f172a;outline:none;',
       'background:transparent;-webkit-appearance:none;appearance:none;',
@@ -408,11 +408,12 @@
       'margin:0;padding:0 4px;font-size:11px;font-weight:700;color:#94a3b8;text-align:start;',
       '}',
       '#' + MODAL_ID + ' .htc-send{',
-      'flex:0 0 auto;align-self:stretch;border:0;border-radius:12px;',
-      'min-width:78px;padding:0 16px;',
+      'flex:0 0 auto;border:0;border-radius:12px;',
+      'height:40px;min-height:40px;min-width:70px;padding:0 14px;margin-bottom:18px;',
       'background:linear-gradient(135deg,#f59e0b,#ea580c);color:#111;',
-      'font:inherit;font-size:14px;font-weight:900;cursor:pointer;',
+      'font:inherit;font-size:13px;font-weight:900;cursor:pointer;',
       'display:inline-flex;align-items:center;justify-content:center;',
+      'line-height:1;',
       '}',
       '#' + MODAL_ID + ' .htc-send:disabled{opacity:.55;cursor:wait}',
       '#' + MODAL_ID + ' .htc-status{',
@@ -662,9 +663,9 @@
 
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
-        msgInput.style.height = '48px';
+        msgInput.style.height = '40px';
         msgInput.style.overflow = 'hidden';
-        var h = Math.min(110, Math.max(48, msgInput.scrollHeight));
+        var h = Math.min(110, Math.max(40, msgInput.scrollHeight));
         msgInput.style.height = h + 'px';
         if (msgInput.scrollHeight > 110) msgInput.style.overflow = 'auto';
       });
@@ -709,7 +710,7 @@
           await writeFullStore(store);
           msgInput.value = '';
           countEl.textContent = '0';
-          msgInput.style.height = '48px';
+          msgInput.style.height = '40px';
           msgInput.style.overflow = 'hidden';
           statusEl.textContent = needApproval
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
