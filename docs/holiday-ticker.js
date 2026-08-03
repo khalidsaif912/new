@@ -815,10 +815,20 @@
     );
   }
 
+  function sortMessagesNewestFirst(list) {
+    return (list || [])
+      .slice()
+      .sort(function (a, b) {
+        var ta = Number((a && (a.approvedAt || a.at)) || 0);
+        var tb = Number((b && (b.approvedAt || b.at)) || 0);
+        return tb - ta;
+      });
+  }
+
   function buildParts(approved, holidays) {
     var ar = lang() === 'ar';
     var parts = [];
-    (approved || []).forEach(function (m) {
+    sortMessagesNewestFirst(approved).forEach(function (m) {
       if (!m || !m.text) return;
       var c = authorColors(authorKey(m));
       var bit =
