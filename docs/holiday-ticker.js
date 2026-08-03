@@ -408,8 +408,26 @@
       '#' + MODAL_ID + ' input#htcMsg::-webkit-input-placeholder{',
       'color:#94a3b8;font-weight:700;text-align:right;line-height:normal;',
       '}',
+      '#' + MODAL_ID + ' .htc-toolrow{',
+      'display:flex;align-items:center;justify-content:space-between;gap:8px;',
+      'margin-top:8px;',
+      '}',
+      '#' + MODAL_ID + ' .htc-emojis{',
+      'display:flex;flex-wrap:nowrap;align-items:center;gap:4px;',
+      'overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;',
+      'flex:1 1 auto;min-width:0;padding:2px 0;',
+      '}',
+      '#' + MODAL_ID + ' .htc-emojis::-webkit-scrollbar{display:none}',
+      '#' + MODAL_ID + ' .htc-emojis button{',
+      'flex:0 0 auto;width:34px;height:34px;padding:0;margin:0;',
+      'border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;',
+      'font-size:18px;line-height:1;cursor:pointer;',
+      'display:inline-flex;align-items:center;justify-content:center;',
+      '}',
+      '#' + MODAL_ID + ' .htc-emojis button:active{transform:scale(.94);background:#fff7ed;border-color:#fdba74}',
       '#' + MODAL_ID + ' .htc-hint{',
-      'margin:6px 0 0;padding:0 2px;font-size:11px;font-weight:700;color:#94a3b8;text-align:right;',
+      'margin:0;padding:0 2px;font-size:11px;font-weight:700;color:#94a3b8;',
+      'text-align:right;flex:0 0 auto;white-space:nowrap;',
       '}',
       '#' + MODAL_ID + ' .htc-send{',
       'flex:0 0 auto;align-self:center;border:0;border-radius:12px;',
@@ -600,7 +618,41 @@
             '<input type="text" id="htcMsg" maxlength="120" enterkeyhint="send" autocomplete="off" inputmode="text" dir="rtl" placeholder="اكتب رسالة للزملاء…" />' +
             '<button type="button" class="htc-send" id="htcSend">نشر</button>' +
           '</div>' +
-          '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
+          '<div class="htc-toolrow">' +
+            '<div class="htc-emojis" id="htcEmojis" role="group" aria-label="إيموجي">' +
+              [
+                '😀',
+                '😂',
+                '😍',
+                '🔥',
+                '👍',
+                '👏',
+                '🙏',
+                '💪',
+                '🎉',
+                '✨',
+                '❤️',
+                '☀️',
+                '☕',
+                '🤝',
+                '⭐',
+                '🥳'
+              ]
+                .map(function (e) {
+                  return (
+                    '<button type="button" data-emoji="' +
+                    e +
+                    '" aria-label="إيموجي ' +
+                    e +
+                    '">' +
+                    e +
+                    '</button>'
+                  );
+                })
+                .join('') +
+            '</div>' +
+            '<p class="htc-hint"><span id="htcCount">0</span>/120</p>' +
+          '</div>' +
           '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
         '</div>' +
       '</div>';
@@ -666,6 +718,35 @@
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
       });
+
+      var emojiBar = document.getElementById('htcEmojis');
+      if (emojiBar) {
+        emojiBar.addEventListener('click', function (ev) {
+          var btn = ev.target && ev.target.closest ? ev.target.closest('button[data-emoji]') : null;
+          if (!btn) return;
+          var emo = btn.getAttribute('data-emoji') || '';
+          if (!emo) return;
+          var max = 120;
+          var start = typeof msgInput.selectionStart === 'number' ? msgInput.selectionStart : msgInput.value.length;
+          var end = typeof msgInput.selectionEnd === 'number' ? msgInput.selectionEnd : start;
+          var val = msgInput.value || '';
+          var room = max - (val.length - (end - start));
+          if (room <= 0) {
+            msgInput.focus();
+            return;
+          }
+          var piece = emo.slice(0, room);
+          var next = val.slice(0, start) + piece + val.slice(end);
+          if (next.length > max) next = next.slice(0, max);
+          msgInput.value = next;
+          var pos = Math.min(start + piece.length, next.length);
+          try {
+            msgInput.setSelectionRange(pos, pos);
+          } catch (e) {}
+          countEl.textContent = String(msgInput.value.length);
+          msgInput.focus();
+        });
+      }
 
       sendBtn.addEventListener('click', async function () {
         statusEl.className = 'htc-status';
