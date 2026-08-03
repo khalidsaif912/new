@@ -346,9 +346,9 @@
     }
     style.textContent = [
       '#' + TICKER_ID + '{',
-      'position:fixed;bottom:10px;left:12px;right:12px;',
-      'z-index:100010;display:none;align-items:center;gap:6px;',
-      'min-height:36px;height:36px;width:auto;max-width:none;',
+      'position:fixed;bottom:12px;left:72px;right:12px;',
+      'z-index:100020;display:none;align-items:center;gap:6px;',
+      'min-height:40px;height:40px;width:auto;max-width:none;',
       'padding:0 10px 0 5px;border-radius:12px;',
       'background:#ffffff;',
       'border:1px solid rgba(15,23,42,.14);',
@@ -359,30 +359,32 @@
       'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      /* Lift alert/fab icons above ticker; keep above page footer stacking */
-      'html.has-news-ticker #chg-dot,html.has-float-dock #chg-dot{',
-      'bottom:58px!important;left:16px!important;z-index:100080!important;',
+      '#' + TICKER_ID + '.solo{left:12px}',
+      /* Icons share bottom strip left of ticker — never lift into footer content */
+      '#chg-dot,#abs-dot,#featureNotesFab{',
+      'position:fixed!important;left:16px!important;bottom:12px!important;',
+      'z-index:100030!important;pointer-events:auto!important;',
       '}',
-      'html.has-news-ticker #abs-dot,html.has-float-dock #abs-dot{',
-      'bottom:60px!important;left:16px!important;z-index:100080!important;',
-      '}',
+      'html.has-news-ticker #chg-dot,html.has-float-dock #chg-dot,',
+      'html.has-news-ticker #abs-dot,html.has-float-dock #abs-dot,',
       'html.has-news-ticker #featureNotesFab,html.has-float-dock #featureNotesFab{',
-      'bottom:58px!important;left:16px!important;z-index:100080!important;',
+      'bottom:12px!important;left:16px!important;',
       '}',
-      /* Only the action buttons need to sit above the ticker (not the whole footer frame) */
+      'html.has-news-ticker #featureNotesFab.beside-alert,',
+      'html.has-float-dock #featureNotesFab.beside-alert{left:72px!important;bottom:12px!important}',
+      /* Footer never paints over fixed docks */
       'html.has-news-ticker .footer,html.has-float-dock .footer{',
-      'position:relative;z-index:auto;isolation:auto;',
-      'padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;',
+      'position:relative;z-index:1!important;isolation:auto;',
+      'margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important;',
+      'padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;',
       '}',
       'html.has-news-ticker .bgTextureShuffleWrap,html.has-float-dock .bgTextureShuffleWrap,',
       '.bgTextureShuffleWrap{',
-      'position:relative;z-index:100055!important;pointer-events:auto!important;',
-      'isolation:isolate;',
+      'position:relative;z-index:100025!important;pointer-events:auto!important;',
       '}',
       'html.has-news-ticker .bgTextureShuffleWrap button,html.has-float-dock .bgTextureShuffleWrap button,',
       '.bgTextureShuffleWrap button{pointer-events:auto!important;position:relative;z-index:1}',
       'html.has-news-ticker #siteVisitsHost{position:relative;z-index:1}',
-      '#chg-dot,#abs-dot,#featureNotesFab{z-index:100080!important;pointer-events:auto!important}',
       '#' + TICKER_ID + ' .ht-ico{',
       'flex:0 0 auto;width:28px;height:28px;border-radius:9px;border:1px solid #dbeafe;padding:0;',
       'display:grid;place-items:center;cursor:pointer;',
@@ -417,10 +419,10 @@
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
-      'html.has-float-dock .wrap{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-float-dock .footer{margin-bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-news-ticker .wrap{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}',
-      'html.has-news-ticker .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .wrap,html.has-news-ticker .wrap{',
+      'padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-float-dock .footer,html.has-news-ticker .footer{',
+      'margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}',
       '#' + MODAL_ID + '{',
       'position:fixed;inset:0;z-index:100120;display:none;',
       'font-family:Tajawal,system-ui,sans-serif;letter-spacing:0;',
@@ -557,15 +559,25 @@
     document.documentElement.classList.add('has-float-dock');
   }
 
+  function alertIconEl() {
+    var chg = document.getElementById('chg-dot');
+    if (chg && !chg.hidden && getComputedStyle(chg).display !== 'none') return chg;
+    var abs = document.getElementById('abs-dot');
+    if (abs && abs.classList.contains('abs-on') && getComputedStyle(abs).display !== 'none') return abs;
+    return null;
+  }
+
   function layoutTicker(el) {
     if (!el) return;
-    // Full-width compact bar stays pinned at the bottom; icons lift above via CSS.
+    var hasAlert = !!alertIconEl();
+    // Beside notification icon when present; full width otherwise.
+    el.classList.toggle('solo', !hasAlert);
+    el.classList.remove('lifted', 'above-dock');
     el.style.left = '';
     el.style.right = '';
     el.style.width = '';
     el.style.maxWidth = '';
     el.style.bottom = '';
-    el.classList.remove('lifted', 'solo', 'above-dock');
     document.documentElement.classList.toggle('has-news-ticker', el.classList.contains('on') && !el.hidden);
   }
 

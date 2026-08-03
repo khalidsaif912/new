@@ -423,7 +423,7 @@
       #${HOME_ICON_ID} {
         position: fixed;
         left: 16px;
-        bottom: 24px;
+        bottom: 12px;
         width: 48px;
         height: 48px;
         display: flex;
@@ -433,7 +433,7 @@
         border: 1px solid rgba(15,23,42,.1);
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(15,23,42,.14);
-        z-index: 100080;
+        z-index: 100030;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         padding: 0;

@@ -226,9 +226,9 @@
 
       #abs-dot {
         position: fixed;
-        bottom: 26px;
+        bottom: 12px;
         left: 16px;
-        z-index: 999998;
+        z-index: 100030;
         display: none;
         flex-direction: column;
         align-items: center;

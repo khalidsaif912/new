@@ -94,7 +94,7 @@
       (isIOSDevice()
         ? ''
         : 'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);') +
-      'border-top-color:rgba(148,163,184,.28)!important;position:relative;z-index:auto;}' +
+      'border-top-color:rgba(148,163,184,.28)!important;position:relative;z-index:1;}' +
       'body.roster-bg-textured [data-bg-texture-mount]{background:transparent!important;' +
       'backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;}';
     document.head.appendChild(st);

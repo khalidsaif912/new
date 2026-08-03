@@ -85,7 +85,7 @@
       '50%{transform:scale(1.08)}',
       '}',
       '#' + FAB_ID + '{',
-      'position:fixed;z-index:100080;left:16px;bottom:24px;',
+      'position:fixed;z-index:100030;left:16px;bottom:12px;',
       'display:inline-flex;align-items:center;gap:8px;',
       'height:48px;padding:0 12px 0 10px;border:1px solid rgba(15,23,42,.1);',
       'border-radius:16px;background:rgba(255,255,255,.94);',
