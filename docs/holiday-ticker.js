@@ -287,7 +287,7 @@
       'overflow:hidden;font-family:Tajawal,system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
-      'pointer-events:none;',
+      'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
       '#' + TICKER_ID + '.solo{left:16px;right:16px}',
@@ -296,16 +296,16 @@
       'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
       'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:36px;height:36px;border-radius:12px;border:0;',
-      'display:grid;place-items:center;font-size:18px;cursor:pointer;',
-      'background:linear-gradient(135deg,#fff7ed,#ffedd5);',
-      'box-shadow:0 2px 8px rgba(234,88,12,.18);',
+      'flex:0 0 auto;width:36px;height:36px;border-radius:12px;border:0;padding:0;',
+      'display:grid;place-items:center;cursor:pointer;',
+      'background:#0b1220;box-shadow:0 2px 8px rgba(15,23,42,.18);',
       '-webkit-tap-highlight-color:transparent;',
       'pointer-events:auto;',
       '}',
+      '#' + TICKER_ID + ' .ht-ico img{width:22px;height:22px;object-fit:contain;display:block;pointer-events:none}',
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
-      'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;',
+      'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
       'mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
       '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
       '}',
@@ -745,26 +745,37 @@
       joinedHtml +
       '<span class="ht-sep">•</span>' +
       joinedHtml;
+    var iconSrc = docsBase() + 'assets/live-chat.png';
+    var openLabel = ar ? 'فتح دردشة الشريط' : 'Open ticker chat';
     el.innerHTML =
       '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
-      (ar ? 'اكتب رسالة للشريط' : 'Write a ticker message') +
+      openLabel +
       '" aria-label="' +
-      (ar ? 'كتابة رسالة للشريط' : 'Write a ticker message') +
-      '">🎉</button>' +
-      '<div class="ht-track"><div class="ht-marquee">' + strip + '</div></div>';
-    el.title = plain;
+      openLabel +
+      '"><img src="' +
+      escapeHtml(iconSrc) +
+      '" alt=""></button>' +
+      '<div class="ht-track" id="htOpenTrack"><div class="ht-marquee">' +
+      strip +
+      '</div></div>';
+    el.title = plain + (ar ? ' — اضغط للكتابة' : ' — Tap to write');
     el.hidden = false;
     el.classList.add('on');
     layoutTicker(el);
     el.setAttribute('dir', ar ? 'rtl' : 'ltr');
-    var btn = document.getElementById('htOpenBoard');
-    if (btn) {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openCompose();
-      });
+    function onOpen(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openCompose();
     }
+    var btn = document.getElementById('htOpenBoard');
+    if (btn) btn.addEventListener('click', onOpen);
+    var track = document.getElementById('htOpenTrack');
+    if (track) track.addEventListener('click', onOpen);
+    el.onclick = function (e) {
+      if (e.target && e.target.closest && e.target.closest('#' + MODAL_ID)) return;
+      onOpen(e);
+    };
   }
 
   function emojiImgHtml(cp) {
@@ -806,8 +817,8 @@
         '<span class="ht-msg">' +
           escapeHtml(
             ar
-              ? 'اضغط 🎉 لكتابة رسالة للشريط الإخباري — تظهر بعد اعتماد المشرف'
-              : 'Tap 🎉 to write a ticker message — shown after admin approval'
+              ? 'اضغط على الشريط أو أيقونة الدردشة لكتابة رسالة — تظهر بعد اعتماد المشرف'
+              : 'Tap the ticker or chat icon to write a message — shown after admin approval'
           ) +
           '</span>'
       );
