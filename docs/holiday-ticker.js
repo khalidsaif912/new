@@ -277,33 +277,32 @@
     }
     style.textContent = [
       '#' + TICKER_ID + '{',
-      'position:fixed;bottom:24px;left:72px;right:auto;',
+      'position:fixed;bottom:10px;left:12px;right:12px;',
       'z-index:100015;display:none;align-items:center;gap:6px;',
-      'min-height:48px;height:48px;',
-      'width:min(240px,calc(100vw - 96px));max-width:min(240px,calc(100vw - 96px));',
-      'padding:0 10px 0 6px;border-radius:14px;',
+      'min-height:36px;height:36px;width:auto;max-width:none;',
+      'padding:0 10px 0 5px;border-radius:12px;',
       'background:#ffffff;',
       'border:1px solid rgba(15,23,42,.14);',
-      'box-shadow:0 8px 24px rgba(15,23,42,.16);',
+      'box-shadow:0 6px 18px rgba(15,23,42,.14);',
       'overflow:hidden;font-family:Tajawal,system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
       'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      '#' + TICKER_ID + '.solo{',
-      'left:16px;width:min(240px,calc(100vw - 32px));max-width:min(240px,calc(100vw - 32px));',
-      '}',
-      '#' + TICKER_ID + '.above-dock{bottom:84px}',
+      /* Lift alert/fab icons above the compact full-width ticker */
+      'html.has-news-ticker #chg-dot{bottom:54px!important}',
+      'html.has-news-ticker #abs-dot{bottom:56px!important}',
+      'html.has-news-ticker #featureNotesFab{bottom:54px!important}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid #dbeafe;padding:0;',
+      'flex:0 0 auto;width:28px;height:28px;border-radius:9px;border:1px solid #dbeafe;padding:0;',
       'display:grid;place-items:center;cursor:pointer;',
       'background:linear-gradient(160deg,#ffffff,#eff6ff);',
-      'box-shadow:0 2px 8px rgba(37,99,235,.16);',
+      'box-shadow:0 2px 6px rgba(37,99,235,.14);',
       '-webkit-tap-highlight-color:transparent;',
       'pointer-events:auto;',
       '}',
-      '#' + TICKER_ID + ' .ht-ico img{width:22px;height:22px;object-fit:contain;display:block;pointer-events:none}',
+      '#' + TICKER_ID + ' .ht-ico img{width:18px;height:18px;object-fit:contain;display:block;pointer-events:none}',
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
@@ -316,7 +315,7 @@
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:6px;',
-      'font-size:12px;font-weight:800;color:#1c1917;line-height:1.35;',
+      'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
@@ -331,6 +330,8 @@
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer{margin-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-news-ticker .wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}',
+      'html.has-news-ticker .footer{margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}',
       '#' + MODAL_ID + '{',
       'position:fixed;inset:0;z-index:100120;display:none;',
       'font-family:Tajawal,system-ui,sans-serif;letter-spacing:0;',
@@ -453,49 +454,16 @@
     document.documentElement.classList.add('has-float-dock');
   }
 
-  function fabVisible() {
-    var fab = document.getElementById('featureNotesFab');
-    return !!(fab && !fab.hidden && getComputedStyle(fab).display !== 'none');
-  }
-
-  function alertIconEl() {
-    var chg = document.getElementById('chg-dot');
-    if (chg && !chg.hidden && getComputedStyle(chg).display !== 'none') return chg;
-    var abs = document.getElementById('abs-dot');
-    if (abs && abs.classList.contains('abs-on') && getComputedStyle(abs).display !== 'none') return abs;
-    return null;
-  }
-
-  function alertIconVisible() {
-    return !!alertIconEl();
-  }
-
   function layoutTicker(el) {
     if (!el) return;
-    var fabOn = fabVisible();
-    var icon = alertIconEl();
-    var alertOn = !!icon;
-    el.classList.toggle('above-dock', fabOn);
-    el.classList.toggle('solo', !alertOn);
-    // Keep bar pinned — never lift on scroll.
+    // Full-width compact bar stays pinned at the bottom; icons lift above via CSS.
+    el.style.left = '';
+    el.style.right = '';
+    el.style.width = '';
+    el.style.maxWidth = '';
     el.style.bottom = '';
-    el.style.right = 'auto';
-    el.classList.remove('lifted');
-    // Sit tightly next to the notification icon when present.
-    if (icon) {
-      var r = icon.getBoundingClientRect();
-      var gap = 8;
-      var left = Math.max(8, Math.round(r.right + gap));
-      el.style.left = left + 'px';
-      var room = Math.max(140, Math.floor(window.innerWidth - left - 16));
-      var w = Math.min(240, room);
-      el.style.width = w + 'px';
-      el.style.maxWidth = w + 'px';
-    } else {
-      el.style.left = '';
-      el.style.width = '';
-      el.style.maxWidth = '';
-    }
+    el.classList.remove('lifted', 'solo', 'above-dock');
+    document.documentElement.classList.toggle('has-news-ticker', el.classList.contains('on') && !el.hidden);
   }
 
   function ensureTicker() {
@@ -856,6 +824,7 @@
       el.classList.remove('on');
       el.hidden = true;
       el.innerHTML = '';
+      document.documentElement.classList.remove('has-news-ticker');
       return;
     }
     var joinedHtml = parts.join('<span class="ht-sep">•</span>');
