@@ -277,10 +277,11 @@
     }
     style.textContent = [
       '#' + TICKER_ID + '{',
-      'position:fixed;bottom:24px;left:72px;right:16px;',
-      'z-index:100015;display:none;align-items:center;gap:8px;',
-      'min-height:52px;width:auto;max-width:none;',
-      'padding:0 14px 0 8px;border-radius:16px;',
+      'position:fixed;bottom:24px;left:72px;right:auto;',
+      'z-index:100015;display:none;align-items:center;gap:6px;',
+      'min-height:48px;height:48px;',
+      'width:min(240px,calc(100vw - 96px));max-width:min(240px,calc(100vw - 96px));',
+      'padding:0 10px 0 6px;border-radius:14px;',
       'background:#ffffff;',
       'border:1px solid rgba(15,23,42,.14);',
       'box-shadow:0 8px 24px rgba(15,23,42,.16);',
@@ -290,39 +291,38 @@
       'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      '#' + TICKER_ID + '.solo{left:16px;right:16px}',
-      '#' + TICKER_ID + '.above-dock{bottom:84px;left:16px;right:16px}',
-      'html[dir="rtl"] #' + TICKER_ID + ',body.ar #' + TICKER_ID + '{left:72px;right:16px}',
-      'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
-      'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
+      '#' + TICKER_ID + '.solo{',
+      'left:16px;width:min(240px,calc(100vw - 32px));max-width:min(240px,calc(100vw - 32px));',
+      '}',
+      '#' + TICKER_ID + '.above-dock{bottom:84px}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:38px;height:38px;border-radius:12px;border:1px solid #dbeafe;padding:0;',
+      'flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid #dbeafe;padding:0;',
       'display:grid;place-items:center;cursor:pointer;',
       'background:linear-gradient(160deg,#ffffff,#eff6ff);',
       'box-shadow:0 2px 8px rgba(37,99,235,.16);',
       '-webkit-tap-highlight-color:transparent;',
       'pointer-events:auto;',
       '}',
-      '#' + TICKER_ID + ' .ht-ico img{width:24px;height:24px;object-fit:contain;display:block;pointer-events:none}',
+      '#' + TICKER_ID + ' .ht-ico img{width:22px;height:22px;object-fit:contain;display:block;pointer-events:none}',
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
       '}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
-      'mask-image:linear-gradient(270deg,transparent 0,#000 12px,#000 100%);',
-      '-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 12px,#000 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:inline-block;white-space:nowrap;padding-inline:8px;',
-      'font-size:13px;font-weight:800;color:#1c1917;line-height:1.4;',
+      'display:inline-block;white-space:nowrap;padding-inline:6px;',
+      'font-size:12px;font-weight:800;color:#1c1917;line-height:1.35;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
       '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle}',
-      '#' + TICKER_ID + ' .ht-emoji{width:16px;height:16px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-2px}',
-      '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .35em}',
+      '#' + TICKER_ID + ' .ht-emoji{width:14px;height:14px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-2px}',
+      '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .3em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
@@ -458,23 +458,44 @@
     return !!(fab && !fab.hidden && getComputedStyle(fab).display !== 'none');
   }
 
-  function alertIconVisible() {
+  function alertIconEl() {
     var chg = document.getElementById('chg-dot');
+    if (chg && !chg.hidden && getComputedStyle(chg).display !== 'none') return chg;
     var abs = document.getElementById('abs-dot');
-    var chgOn = chg && !chg.hidden && getComputedStyle(chg).display !== 'none';
-    var absOn = abs && abs.classList.contains('abs-on') && getComputedStyle(abs).display !== 'none';
-    return !!(chgOn || absOn);
+    if (abs && abs.classList.contains('abs-on') && getComputedStyle(abs).display !== 'none') return abs;
+    return null;
+  }
+
+  function alertIconVisible() {
+    return !!alertIconEl();
   }
 
   function layoutTicker(el) {
     if (!el) return;
     var fabOn = fabVisible();
-    var alertOn = alertIconVisible();
+    var icon = alertIconEl();
+    var alertOn = !!icon;
     el.classList.toggle('above-dock', fabOn);
-    el.classList.toggle('solo', !fabOn && !alertOn);
+    el.classList.toggle('solo', !alertOn);
     // Keep bar pinned — never lift on scroll.
     el.style.bottom = '';
+    el.style.right = 'auto';
     el.classList.remove('lifted');
+    // Sit tightly next to the notification icon when present.
+    if (icon) {
+      var r = icon.getBoundingClientRect();
+      var gap = 8;
+      var left = Math.max(8, Math.round(r.right + gap));
+      el.style.left = left + 'px';
+      var room = Math.max(140, Math.floor(window.innerWidth - left - 16));
+      var w = Math.min(240, room);
+      el.style.width = w + 'px';
+      el.style.maxWidth = w + 'px';
+    } else {
+      el.style.left = '';
+      el.style.width = '';
+      el.style.maxWidth = '';
+    }
   }
 
   function ensureTicker() {
