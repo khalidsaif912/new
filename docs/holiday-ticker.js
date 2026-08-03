@@ -316,13 +316,13 @@
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:8px;',
-      'font-size:15px;font-weight:800;color:#1c1917;line-height:1.45;',
+      'font-size:13px;font-weight:800;color:#1c1917;line-height:1.4;',
       'letter-spacing:0;animation:htScroll 28s linear infinite;',
       '}',
-      '#' + TICKER_ID + ' .ht-msg{color:#111827;font-weight:900}',
-      '#' + TICKER_ID + ' .ht-from{color:#075985;font-weight:800;display:inline-flex;align-items:center;gap:4px;vertical-align:middle}',
-      '#' + TICKER_ID + ' .ht-emoji{width:18px;height:18px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-3px}',
-      '#' + TICKER_ID + ' .ht-sep{color:#78716c;opacity:.9;margin:0 .4em}',
+      '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
+      '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle}',
+      '#' + TICKER_ID + ' .ht-emoji{width:16px;height:16px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-2px}',
+      '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .35em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
@@ -360,18 +360,18 @@
       '}',
       '#' + MODAL_ID + ' .htc-bubble{',
       'max-width:min(92%,420px);align-self:flex-start;background:#fff;',
-      'border:1px solid #e2e8f0;border-radius:16px 16px 16px 6px;padding:10px 12px;',
-      'box-shadow:0 4px 14px rgba(15,23,42,.06);',
+      'border:1px solid #e2e8f0;border-radius:16px 16px 16px 6px;padding:9px 11px;',
+      'box-shadow:0 4px 14px rgba(15,23,42,.06);border-inline-start:3px solid #94a3b8;',
       '}',
       '#' + MODAL_ID + ' .htc-bubble.mine{',
-      'align-self:flex-end;background:#fff7ed;border-color:#fed7aa;border-radius:16px 16px 6px 16px;',
+      'align-self:flex-end;border-radius:16px 16px 6px 16px;',
       '}',
       '#' + MODAL_ID + ' .htc-bubble .htc-meta{',
-      'display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px;font-weight:800;color:#0369a1;',
+      'display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:11px;font-weight:800;',
       '}',
-      '#' + MODAL_ID + ' .htc-bubble .htc-meta img{width:18px;height:18px;object-fit:contain;flex:0 0 auto}',
-      '#' + MODAL_ID + ' .htc-bubble .htc-text{font-size:14px;font-weight:800;color:#111827;line-height:1.45;word-break:break-word}',
-      '#' + MODAL_ID + ' .htc-bubble .htc-time{margin-top:5px;font-size:10px;font-weight:700;color:#94a3b8}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-meta img{width:16px;height:16px;object-fit:contain;flex:0 0 auto}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-text{font-size:13px;font-weight:800;color:#1e293b;line-height:1.4;word-break:break-word}',
+      '#' + MODAL_ID + ' .htc-bubble .htc-time{margin-top:4px;font-size:10px;font-weight:700;color:#94a3b8}',
       '#' + MODAL_ID + ' .htc-composer{',
       'flex:0 0 auto;background:#fff;border-top:1px solid #e2e8f0;',
       'padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));',
@@ -471,6 +471,32 @@
     }
   }
 
+  function authorKey(m) {
+    return String((m && (m.empId || m.name)) || 'guest').trim().toLowerCase();
+  }
+
+  function authorColors(key) {
+    // Distinct readable palette (ink + soft bg + border)
+    var palette = [
+      { ink: '#1d4ed8', bg: '#eff6ff', border: '#93c5fd' },
+      { ink: '#b45309', bg: '#fffbeb', border: '#fcd34d' },
+      { ink: '#047857', bg: '#ecfdf5', border: '#6ee7b7' },
+      { ink: '#be185d', bg: '#fdf2f8', border: '#f9a8d4' },
+      { ink: '#7c3aed', bg: '#f5f3ff', border: '#c4b5fd' },
+      { ink: '#0e7490', bg: '#ecfeff', border: '#67e8f9' },
+      { ink: '#c2410c', bg: '#fff7ed', border: '#fdba74' },
+      { ink: '#4f46e5', bg: '#eef2ff', border: '#a5b4fc' },
+      { ink: '#15803d', bg: '#f0fdf4', border: '#86efac' },
+      { ink: '#a16207', bg: '#fefce8', border: '#fde047' },
+      { ink: '#0369a1', bg: '#f0f9ff', border: '#7dd3fc' },
+      { ink: '#9f1239', bg: '#fff1f2', border: '#fda4af' }
+    ];
+    var s = String(key || 'guest');
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) >>> 0;
+    return palette[h % palette.length];
+  }
+
   function closeCompose() {
     var modal = document.getElementById(MODAL_ID);
     if (!modal) return;
@@ -490,6 +516,7 @@
     feed.innerHTML = list
       .map(function (m) {
         var mine = myId && String(m.empId || '') === String(myId);
+        var c = authorColors(authorKey(m));
         var cp = String(m.emoji || '').trim().toLowerCase();
         var emoji = validEmojiCp(cp)
           ? '<img alt="" src="https://fonts.gstatic.com/s/e/notoemoji/latest/' +
@@ -499,8 +526,16 @@
         return (
           '<article class="htc-bubble' +
           (mine ? ' mine' : '') +
+          '" style="background:' +
+          c.bg +
+          ';border-color:' +
+          c.border +
+          ';border-inline-start-color:' +
+          c.ink +
           '">' +
-          '<div class="htc-meta">' +
+          '<div class="htc-meta" style="color:' +
+          c.ink +
+          '">' +
           emoji +
           '<span></span>' +
           '</div>' +
@@ -764,10 +799,18 @@
     var parts = [];
     (approved || []).forEach(function (m) {
       if (!m || !m.text) return;
-      var bit = '<span class="ht-msg">' + escapeHtml(m.text) + '</span>';
+      var c = authorColors(authorKey(m));
+      var bit =
+        '<span class="ht-msg" style="color:' +
+        c.ink +
+        '">' +
+        escapeHtml(m.text) +
+        '</span>';
       if (m.name) {
         bit +=
-          '<span class="ht-sep">—</span><span class="ht-from">' +
+          '<span class="ht-sep">—</span><span class="ht-from" style="color:' +
+          c.ink +
+          '">' +
           emojiImgHtml(m.emoji) +
           escapeHtml(String(m.name)) +
           '</span>';
@@ -784,7 +827,7 @@
     });
     if (!parts.length) {
       parts.push(
-        '<span class="ht-msg">' +
+        '<span class="ht-msg" style="color:#334155">' +
           escapeHtml(
             ar
               ? 'اضغط على الشريط أو أيقونة الدردشة لكتابة رسالة — تظهر بعد اعتماد المشرف'
