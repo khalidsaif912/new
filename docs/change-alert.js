@@ -433,7 +433,7 @@
         border: 1px solid rgba(15,23,42,.1);
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(15,23,42,.14);
-        z-index: 100020;
+        z-index: 100080;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         padding: 0;
