@@ -296,13 +296,14 @@
       'html[dir="rtl"] #' + TICKER_ID + '.solo,body.ar #' + TICKER_ID + '.solo,',
       'html[dir="rtl"] #' + TICKER_ID + '.above-dock,body.ar #' + TICKER_ID + '.above-dock{left:16px;right:16px}',
       '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:36px;height:36px;border-radius:12px;border:0;padding:0;',
+      'flex:0 0 auto;width:38px;height:38px;border-radius:12px;border:1px solid #dbeafe;padding:0;',
       'display:grid;place-items:center;cursor:pointer;',
-      'background:#0b1220;box-shadow:0 2px 8px rgba(15,23,42,.18);',
+      'background:linear-gradient(160deg,#ffffff,#eff6ff);',
+      'box-shadow:0 2px 8px rgba(37,99,235,.16);',
       '-webkit-tap-highlight-color:transparent;',
       'pointer-events:auto;',
       '}',
-      '#' + TICKER_ID + ' .ht-ico img{width:22px;height:22px;object-fit:contain;display:block;pointer-events:none}',
+      '#' + TICKER_ID + ' .ht-ico img{width:24px;height:24px;object-fit:contain;display:block;pointer-events:none}',
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
@@ -714,7 +715,7 @@
       joinedHtml +
       '<span class="ht-sep">•</span>' +
       joinedHtml;
-    var iconSrc = docsBase() + 'assets/live-chat.png';
+    var iconSrc = docsBase() + 'assets/live-chat.png?v=2';
     var openLabel = ar ? 'فتح دردشة الشريط' : 'Open ticker chat';
     el.innerHTML =
       '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
