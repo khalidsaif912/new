@@ -532,7 +532,7 @@
     var style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-      '.siteShareSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);z-index:10001;padding:16px;pointer-events:none;visibility:hidden}',
+      '.siteShareSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);z-index:100130;padding:16px;pointer-events:none;visibility:hidden}',
       '.siteShareSheet.open{display:flex;pointer-events:auto;visibility:visible}',
       '.siteShareCard{width:min(420px,100%);background:#fff;border-radius:20px;padding:18px 16px 14px;box-shadow:0 20px 50px rgba(15,23,42,.28);border:1px solid #e2e8f0}',
       '.siteShareTitle{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px}',

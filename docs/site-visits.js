@@ -725,7 +725,7 @@
     var style = document.createElement('style');
     style.id = 'rosterPhonePromptCss';
     style.textContent = [
-      '.rosterPhoneSheet{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}',
+      '.rosterPhoneSheet{position:fixed;inset:0;z-index:100130;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}',
       '.rosterPhoneSheet.open{display:flex;}',
       '.rosterPhoneCard{width:min(100%,400px);background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid rgba(148,163,184,.28);border-radius:20px;padding:18px 16px 14px;box-shadow:0 24px 60px rgba(15,23,42,.28);text-align:center;}',
       '.rosterPhoneCard h2{margin:0 0 8px;font-size:17px;font-weight:900;color:#0f172a;}',
