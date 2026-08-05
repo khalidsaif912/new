@@ -346,36 +346,45 @@
     }
     style.textContent = [
       '#' + TICKER_ID + '{',
-      'position:fixed;bottom:12px;left:72px;right:12px;',
+      'position:fixed;bottom:0;left:0;right:0;',
       'z-index:100020;display:none;align-items:center;gap:6px;',
       'min-height:40px;height:40px;width:auto;max-width:none;',
-      'padding:0 10px 0 5px;border-radius:12px;',
+      'padding:0 12px 0 8px;border-radius:0;',
+      'padding-bottom:env(safe-area-inset-bottom,0px);',
+      'min-height:calc(40px + env(safe-area-inset-bottom,0px));',
+      'height:calc(40px + env(safe-area-inset-bottom,0px));',
       'background:#ffffff;',
-      'border:1px solid rgba(15,23,42,.14);',
-      'box-shadow:0 6px 18px rgba(15,23,42,.14);',
+      'border:0;border-top:1px solid rgba(15,23,42,.14);',
+      'box-shadow:0 -4px 18px rgba(15,23,42,.12);',
       'overflow:hidden;font-family:Tajawal,system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
       'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
-      '#' + TICKER_ID + '.solo{left:12px}',
-      /* Icons share bottom strip left of ticker — never lift into footer content */
+      /* Icons sit above full-bleed ticker */
       '#chg-dot,#abs-dot,#featureNotesFab{',
-      'position:fixed!important;left:16px!important;bottom:12px!important;',
+      'position:fixed!important;left:16px!important;bottom:16px!important;',
       'z-index:100030!important;pointer-events:auto!important;',
       '}',
       'html.has-news-ticker #chg-dot,html.has-float-dock #chg-dot,',
-      'html.has-news-ticker #abs-dot,html.has-float-dock #abs-dot,',
+      'html.has-news-ticker #abs-dot,html.has-float-dock #abs-dot{',
+      'bottom:calc(48px + env(safe-area-inset-bottom,0px))!important;',
+      'left:16px!important;',
+      '}',
       'html.has-news-ticker #featureNotesFab,html.has-float-dock #featureNotesFab{',
-      'bottom:12px!important;left:16px!important;',
+      'bottom:calc(48px + env(safe-area-inset-bottom,0px))!important;',
+      'left:16px!important;',
       '}',
       'html.has-news-ticker #featureNotesFab.beside-alert,',
-      'html.has-float-dock #featureNotesFab.beside-alert{left:72px!important;bottom:12px!important}',
-      /* Footer never paints over fixed docks */
+      'html.has-float-dock #featureNotesFab.beside-alert{',
+      'left:72px!important;',
+      'bottom:calc(48px + env(safe-area-inset-bottom,0px))!important;',
+      '}',
+      /* Footer stays above dock + ticker clear zone */
       'html.has-news-ticker .footer,html.has-float-dock .footer{',
       'position:relative;z-index:1!important;isolation:auto;',
-      'margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important;',
+      'margin-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important;',
       'padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;',
       '}',
       'html.has-news-ticker .bgTextureShuffleWrap,html.has-float-dock .bgTextureShuffleWrap,',
@@ -397,17 +406,17 @@
       '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
       '}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 10px),transparent 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:inline-block;white-space:nowrap;padding-inline:6px;',
+      'display:inline-block;white-space:nowrap;padding-inline:8px;',
       'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
-      'letter-spacing:0;animation:htScroll 28s linear infinite;',
+      'letter-spacing:0;animation:htScroll 40s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
       '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle}',
@@ -420,9 +429,9 @@
       '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap,html.has-news-ticker .wrap{',
-      'padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}',
+      'padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer,html.has-news-ticker .footer{',
-      'margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}',
+      'margin-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}',
       '#' + MODAL_ID + '{',
       'position:fixed;inset:0;z-index:100120;display:none;',
       'font-family:Tajawal,system-ui,sans-serif;letter-spacing:0;',
@@ -569,10 +578,8 @@
 
   function layoutTicker(el) {
     if (!el) return;
-    var hasAlert = !!alertIconEl();
-    // Beside notification icon when present; full width otherwise.
-    el.classList.toggle('solo', !hasAlert);
-    el.classList.remove('lifted', 'above-dock');
+    // Edge-to-edge bar; alert icons float above it via CSS.
+    el.classList.remove('lifted', 'solo', 'above-dock');
     el.style.left = '';
     el.style.right = '';
     el.style.width = '';
