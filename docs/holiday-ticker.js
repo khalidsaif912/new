@@ -347,9 +347,9 @@
     style.textContent = [
       '#' + TICKER_ID + '{',
       'position:fixed;bottom:0;left:0;right:0;',
-      'z-index:100020;display:none;align-items:center;gap:6px;',
+      'z-index:100020;display:none;align-items:center;gap:0;',
       'min-height:40px;height:40px;width:auto;max-width:none;',
-      'padding:0 12px 0 8px;border-radius:0;',
+      'padding:0;border-radius:0;',
       'padding-bottom:env(safe-area-inset-bottom,0px);',
       'min-height:calc(40px + env(safe-area-inset-bottom,0px));',
       'height:calc(40px + env(safe-area-inset-bottom,0px));',
@@ -362,6 +362,21 @@
       'pointer-events:auto;cursor:pointer;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
+      /* Soft glow fade on left + right edges */
+      '#' + TICKER_ID + '::before,#' + TICKER_ID + '::after{',
+      'content:"";position:absolute;top:0;bottom:0;width:42px;',
+      'pointer-events:none;z-index:4;',
+      '}',
+      '#' + TICKER_ID + '::before{',
+      'left:0;',
+      'background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.95) 28%,rgba(255,255,255,.55) 58%,rgba(255,255,255,0) 100%);',
+      'box-shadow:10px 0 18px rgba(255,255,255,.55);',
+      '}',
+      '#' + TICKER_ID + '::after{',
+      'right:0;',
+      'background:linear-gradient(270deg,#fff 0%,rgba(255,255,255,.95) 28%,rgba(255,255,255,.55) 58%,rgba(255,255,255,0) 100%);',
+      'box-shadow:-10px 0 18px rgba(255,255,255,.55);',
+      '}',
       /* Icons sit above full-bleed ticker */
       '#chg-dot,#abs-dot,#featureNotesFab{',
       'position:fixed!important;left:16px!important;bottom:16px!important;',
@@ -394,27 +409,18 @@
       'html.has-news-ticker .bgTextureShuffleWrap button,html.has-float-dock .bgTextureShuffleWrap button,',
       '.bgTextureShuffleWrap button{pointer-events:auto!important;position:relative;z-index:1}',
       'html.has-news-ticker #siteVisitsHost{position:relative;z-index:1}',
-      '#' + TICKER_ID + ' .ht-ico{',
-      'flex:0 0 auto;width:28px;height:28px;border-radius:9px;border:1px solid #dbeafe;padding:0;',
-      'display:grid;place-items:center;cursor:pointer;',
-      'background:linear-gradient(160deg,#ffffff,#eff6ff);',
-      'box-shadow:0 2px 6px rgba(37,99,235,.14);',
-      '-webkit-tap-highlight-color:transparent;',
-      'pointer-events:auto;',
-      '}',
-      '#' + TICKER_ID + ' .ht-ico img{width:18px;height:18px;object-fit:contain;display:block;pointer-events:none}',
-      '#' + TICKER_ID + ' .ht-ico:active{transform:scale(.96)}',
+      '#' + TICKER_ID + ' .ht-ico{display:none!important}',
       '#' + TICKER_ID + ' .ht-track{',
       'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
       '}',
       'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);',
+      'mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:inline-block;white-space:nowrap;padding-inline:8px;',
+      'display:inline-block;white-space:nowrap;padding-inline:28px;',
       'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
       'letter-spacing:0;animation:htScroll 40s linear infinite;',
       '}',
@@ -1009,20 +1015,13 @@
       joinedHtml +
       '<span class="ht-sep">•</span>' +
       joinedHtml;
-    var iconSrc = docsBase() + 'assets/live-chat.png?v=2';
-    var openLabel = ar ? 'فتح دردشة الشريط' : 'Open ticker chat';
     el.innerHTML =
-      '<button type="button" class="ht-ico" id="htOpenBoard" title="' +
-      openLabel +
-      '" aria-label="' +
-      openLabel +
-      '"><img src="' +
-      escapeHtml(iconSrc) +
-      '" alt=""></button>' +
       '<div class="ht-track" id="htOpenTrack"><div class="ht-marquee">' +
       strip +
       '</div></div>';
     el.title = plain + (ar ? ' — اضغط للكتابة' : ' — Tap to write');
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', ar ? 'فتح كتابة رسالة للشريط' : 'Open ticker message compose');
     el.hidden = false;
     el.classList.add('on');
     layoutTicker(el);
@@ -1032,8 +1031,6 @@
       e.stopPropagation();
       openCompose();
     }
-    var btn = document.getElementById('htOpenBoard');
-    if (btn) btn.addEventListener('click', onOpen);
     var track = document.getElementById('htOpenTrack');
     if (track) track.addEventListener('click', onOpen);
     el.onclick = function (e) {
