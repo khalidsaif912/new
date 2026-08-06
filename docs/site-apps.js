@@ -49,6 +49,8 @@
       pickBookSub: 'Open the reading page',
       pickAlumni: 'Former Colleagues',
       pickAlumniSub: 'Tribute to colleagues who served with us',
+      pickIdeas: 'Ideas & suggestions',
+      pickIdeasSub: 'Share ideas and rate the site',
     },
     ar: {
       btn: 'تطبيقات',
@@ -94,6 +96,8 @@
       pickBookSub: 'نافذة قراءة عشوائية',
       pickAlumni: 'زملاء سابقون',
       pickAlumniSub: 'تكريم زملاء خدموا معنا',
+      pickIdeas: 'اقتراحات وأفكار',
+      pickIdeasSub: 'شارك فكرتك وقيّم الموقع',
     },
   };
 
@@ -305,6 +309,11 @@
     return 'https://khalidsaif912.github.io/new/docs/alumni/';
   }
 
+  function ideasPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/ideas/';
+    return 'https://khalidsaif912.github.io/new/docs/ideas/';
+  }
+
   function spotlightItems() {
     return [
       {
@@ -423,6 +432,15 @@
         external: false,
         classes: 'roster-cta-btn--alumni',
         icon: '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><circle cx="24" cy="22" r="10" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><circle cx="42" cy="24" r="8" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M8 54c2-10 10-16 16-16s14 6 16 16" fill="#ccfbf1" stroke="#0f172a" stroke-width="2.2"/><path d="M34 54c1-8 7-12 12-12s9 4 10 12" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/></svg>'
+      },
+      {
+        id: 'ideas',
+        title: t('pickIdeas'),
+        sub: t('pickIdeasSub'),
+        href: ideasPageUrl(),
+        external: false,
+        classes: 'roster-cta-btn--share',
+        icon: '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><path d="M32 8a16 16 0 0 0-9 29v7h18v-7A16 16 0 0 0 32 8z" fill="#fde68a" stroke="#0f172a" stroke-width="2.2"/><path d="M26 48h12M28 54h8" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><path d="M28 22h8M30 28h4" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/></svg>'
       }
     ];
   }
