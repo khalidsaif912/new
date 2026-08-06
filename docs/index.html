@@ -293,6 +293,8 @@
     a.summaryChip.trainingChip:hover { box-shadow:0 8px 20px rgba(124,58,237,.18); }
     a.summaryChip.diffChip .chipVal { color:#ef4444; }
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
+    a.summaryChip.ideasChip .chipVal { color:#d97706; }
+    a.summaryChip.ideasChip:hover { box-shadow:0 8px 20px rgba(217,119,6,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -1071,6 +1073,10 @@
     <a href="https://khalidsaif912.github.io/roster-site/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
       <div class="chipLabel" data-key="diffPage">Diff</div>
+    </a>
+    <a href="ideas/" id="ideasChipBtn" class="summaryChip ideasChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></div>
+      <div class="chipLabel" data-key="ideasPage">Ideas</div>
     </a>
     
   </div>
@@ -2778,7 +2784,7 @@ var T = {
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', ideasPage:'Ideas',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
@@ -2791,7 +2797,7 @@ var T = {
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', ideasPage:'أفكار',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
 };
@@ -2847,6 +2853,7 @@ function applyLang(lang) {
     else if(k==='importRoster') el.textContent=t.importRoster;
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
+    else if(k==='ideasPage') el.textContent=t.ideasPage;
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -3263,6 +3270,7 @@ function goToRosterDiff(event) {
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);
     addScript(root + '/holiday-ticker.js?v=20260803k');
+    addScript(root + '/ideas-prompt.js?v=20260806a');
     addScript(root + '/feature-update-badge.js?v=20260729c');
     addScript(root + '/training-new-badge.js?v=20260729h');
     addScript(root + '/shift-swap.js?v=' + ver);

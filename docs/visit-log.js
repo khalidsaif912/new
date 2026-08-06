@@ -378,7 +378,9 @@
       var section = 'home';
       var detail = '';
 
-      if (/\/desk-log(\/|$)/.test(p)) {
+      } else if (/\/ideas(\/|$)/.test(p)) {
+        section = 'ideas';
+      } else if (/\/desk-log(\/|$)/.test(p)) {
         section = 'desk-log';
       } else if (/\/a-cup-of-book(\/|$)/.test(p)) {
         section = 'a-cup-of-book';
