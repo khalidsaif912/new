@@ -89,42 +89,105 @@
     .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
     .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
     .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
-    .deviceStats {
+    .visitsSubTabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 5px;
+      margin-bottom: 14px;
+      background: #0b1220;
+      border: 1px solid #334155;
+      border-radius: 14px;
+    }
+    .visitsSubTabs .chip {
+      width: 100%;
+      min-height: 40px;
+      margin: 0;
+      border-radius: 10px;
+      font-size: 13px;
+      background: transparent;
+      border-color: transparent;
+      color: #94a3b8;
+    }
+    .visitsSubTabs .chip.active {
+      background: #1e3a8a;
+      color: #dbeafe;
+      border-color: #3b82f6;
+      box-shadow: 0 1px 0 #1d4ed8 inset;
+    }
+    .statsPanel {
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 14px;
       padding: 12px 14px;
       margin-bottom: 14px;
     }
-    .deviceStats h2 {
-      margin: 0 0 10px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #e2e8f0;
+    .statsPanelHead {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    .deviceStatsNote {
-      margin: 0 0 10px;
+    .statsPanelHead h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #f1f5f9;
+    }
+    .statsPanelHead .countPill {
+      font-size: 12px;
+      font-weight: 800;
+      color: #93c5fd;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+    .statsPanelNote {
+      margin: -2px 0 12px;
       font-size: 11px;
       color: #64748b;
       font-weight: 600;
-      line-height: 1.4;
+      line-height: 1.45;
     }
-    .deviceTypeList { display: grid; gap: 8px; }
-    .deviceTypeRow {
+    .deviceTypeList,
+    .pageTypeList { display: grid; gap: 8px; }
+    .deviceTypeRow,
+    .pageTypeRow {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
       align-items: start;
-      padding: 8px 10px;
+      padding: 10px 12px;
       border-radius: 12px;
       background: #0f172a88;
       border: 1px solid #33415555;
     }
-    .deviceTypeName { font-size: 13px; font-weight: 800; color: #f1f5f9; }
-    .deviceTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
+    .deviceTypeName,
+    .pageTypeName { font-size: 13px; font-weight: 800; color: #f1f5f9; }
+    .pageTypeName { color: #e0f2fe; font-size: 12px; }
+    .deviceTypeCount,
+    .pageTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
+    .barTrack {
+      grid-column: 1 / -1;
+      height: 5px;
+      border-radius: 999px;
+      background: #0f172a;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .barFill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
+      min-width: 2px;
+    }
     .deviceModelList {
       grid-column: 1 / -1;
-      margin: 2px 0 0;
+      margin: 4px 0 0;
       padding: 0;
       list-style: none;
       display: grid;
@@ -139,12 +202,35 @@
       color: #94a3b8;
     }
     .deviceModelList li b { color: #cbd5e1; font-weight: 800; }
-    .deviceStatsEmpty {
+    .deviceStatsEmpty,
+    .pageStatsEmpty {
       font-size: 12px;
       font-weight: 700;
       color: #64748b;
       text-align: center;
-      padding: 8px 0 2px;
+      padding: 18px 8px;
+    }
+    .listHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0 10px;
+    }
+    .listHead h2 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+    .listHead .countPill {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 3px 9px;
     }
     .list { display: grid; gap: 8px; }
     .row {
@@ -182,44 +268,6 @@
       color: #7dd3fc;
       line-height: 1.5;
       word-break: break-word;
-    }
-    .pageStats {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-    .pageStats h2 {
-      margin: 0 0 10px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #e2e8f0;
-    }
-    .pageStatsNote {
-      margin: -4px 0 10px;
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1.4;
-    }
-    .pageTypeList { display: grid; gap: 8px; }
-    .pageTypeRow {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #0f172a88;
-      border: 1px solid #33415555;
-    }
-    .pageTypeName { font-size: 12px; font-weight: 800; color: #e0f2fe; }
-    .pageTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
-    .pageStatsEmpty {
-      font-size: 12px;
-      color: #64748b;
-      text-align: center;
-      padding: 6px 0;
     }
     .phoneRow {
       display: flex;
@@ -506,17 +554,34 @@
         <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
         <div class="stat"><b id="statTotal">—</b><span>إجمالي الزوار</span></div>
       </div>
-      <section class="deviceStats" id="deviceStats">
-        <h2>إحصائية الأجهزة</h2>
-        <p class="deviceStatsNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+      <div class="visitsSubTabs" id="visitsSubTabs" role="tablist" aria-label="أقسام الزيارات">
+        <button type="button" class="chip active" data-vtab="list" id="vTabList" role="tab" aria-selected="true">السجل</button>
+        <button type="button" class="chip" data-vtab="devices" id="vTabDevices" role="tab" aria-selected="false">الأجهزة</button>
+        <button type="button" class="chip" data-vtab="pages" id="vTabPages" role="tab" aria-selected="false">الصفحات</button>
+      </div>
+      <div id="visitsListPanel" role="tabpanel">
+        <div class="listHead">
+          <h2>سجل الزيارات</h2>
+          <span class="countPill" id="listCountPill">0</span>
+        </div>
+        <div class="list" id="list"></div>
+      </div>
+      <section class="statsPanel" id="deviceStats" role="tabpanel" hidden>
+        <div class="statsPanelHead">
+          <h2>إحصائية الأجهزة</h2>
+          <span class="countPill" id="deviceCountPill">0</span>
+        </div>
+        <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
         <div class="deviceTypeList" id="deviceTypeList"></div>
       </section>
-      <section class="pageStats" id="pageStats">
-        <h2>إحصائية الصفحات</h2>
-        <p class="pageStatsNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
+      <section class="statsPanel" id="pageStats" role="tabpanel" hidden>
+        <div class="statsPanelHead">
+          <h2>إحصائية الصفحات</h2>
+          <span class="countPill" id="pageCountPill">0</span>
+        </div>
+        <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
         <div class="pageTypeList" id="pageTypeList"></div>
       </section>
-      <div class="list" id="list"></div>
     </div>
     <div id="phonesPanel" hidden>
       <div class="toolbar">
@@ -564,6 +629,7 @@
       const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
       let filter = 'today';
       let view = 'visits';
+      let visitsTab = 'list';
       let gapFilter = 'noPhone';
       let log = [];
       let phones = [];
@@ -836,12 +902,16 @@
 
       function renderDeviceStats(rows) {
         const host = document.getElementById('deviceTypeList');
+        const pill = document.getElementById('deviceCountPill');
         if (!host) return;
         const stats = buildDeviceStats(rows);
+        const total = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) pill.textContent = total ? (total + ' زيارة') : '0';
         if (!stats.length) {
           host.innerHTML = '<div class="deviceStatsEmpty">لا بيانات أجهزة في هذا النطاق بعد.</div>';
           return;
         }
+        const max = Math.max.apply(null, stats.map((s) => s.count || 0)) || 1;
         host.innerHTML = stats.map((s) => {
           const showModels = s.models.length > 1 || (s.models[0] && s.models[0].model !== s.type);
           const modelsHtml = showModels
@@ -851,10 +921,12 @@
               ).join('') +
               '</ul>'
             : '';
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
           return (
             '<div class="deviceTypeRow">' +
               '<div class="deviceTypeName">' + escapeHtml(deviceLabel(s.type) || s.type) + '</div>' +
               '<div class="deviceTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
               modelsHtml +
             '</div>'
           );
@@ -875,18 +947,31 @@
 
       function renderPageStats(rows) {
         const host = document.getElementById('pageTypeList');
+        const pill = document.getElementById('pageCountPill');
         if (!host) return;
         const stats = buildPageStats(rows);
+        const shown = stats.slice(0, 40);
+        const totalHits = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) {
+          pill.textContent = stats.length
+            ? (stats.length + ' صفحة · ' + totalHits + ' زيارة')
+            : '0';
+        }
         if (!stats.length) {
           host.innerHTML = '<div class="pageStatsEmpty">لا بيانات صفحات في هذا النطاق بعد.</div>';
           return;
         }
-        host.innerHTML = stats.slice(0, 24).map((s) => (
-          '<div class="pageTypeRow">' +
-            '<div class="pageTypeName">' + escapeHtml(pageLabel(s.page)) + '</div>' +
-            '<div class="pageTypeCount">' + s.count + '</div>' +
-          '</div>'
-        )).join('');
+        const max = Math.max.apply(null, shown.map((s) => s.count || 0)) || 1;
+        host.innerHTML = shown.map((s) => {
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
+          return (
+            '<div class="pageTypeRow">' +
+              '<div class="pageTypeName">' + escapeHtml(pageLabel(s.page)) + '</div>' +
+              '<div class="pageTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
+            '</div>'
+          );
+        }).join('');
       }
 
       function escapeHtml(s) {
@@ -911,6 +996,22 @@
         pinInput.value = '';
         gateErr.textContent = '';
         setTimeout(() => pinInput.focus(), 30);
+      }
+
+      function setVisitsTab(next) {
+        const allowed = { list: 1, devices: 1, pages: 1 };
+        visitsTab = allowed[next] ? next : 'list';
+        const listPanel = document.getElementById('visitsListPanel');
+        const devicePanel = document.getElementById('deviceStats');
+        const pagePanel = document.getElementById('pageStats');
+        if (listPanel) listPanel.hidden = visitsTab !== 'list';
+        if (devicePanel) devicePanel.hidden = visitsTab !== 'devices';
+        if (pagePanel) pagePanel.hidden = visitsTab !== 'pages';
+        document.querySelectorAll('#visitsSubTabs .chip[data-vtab]').forEach((c) => {
+          const on = c.getAttribute('data-vtab') === visitsTab;
+          c.classList.toggle('active', on);
+          c.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
       }
 
       function setView(next) {
@@ -1392,7 +1493,10 @@
         document.querySelectorAll('.chip[data-filter]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-filter') === filter);
         });
+        setVisitsTab(visitsTab);
         const rows = filtered();
+        const listPill = document.getElementById('listCountPill');
+        if (listPill) listPill.textContent = rows.length + ' سجل';
         renderDeviceStats(rows);
         renderPageStats(rows);
         const list = document.getElementById('list');
@@ -1488,6 +1592,11 @@
         c.addEventListener('click', () => {
           filter = c.getAttribute('data-filter') || 'today';
           render();
+        });
+      });
+      document.querySelectorAll('#visitsSubTabs .chip[data-vtab]').forEach((c) => {
+        c.addEventListener('click', () => {
+          setVisitsTab(c.getAttribute('data-vtab') || 'list');
         });
       });
 
