@@ -831,13 +831,13 @@ def collect_gallery_images(images_dir: Path) -> list[str]:
 
 
 def visits_script_src_for(out_dir: Path) -> str:
-    """Relative path from out_dir to docs/site-visits.js."""
+    """Relative path from out_dir to docs/visit-log.js (dedicated tracker)."""
     try:
         docs_root = Path("docs").resolve()
         depth = len(out_dir.resolve().relative_to(docs_root).parts)
     except Exception:
         depth = 2
-    return ("../" * max(depth, 1)) + "site-visits.js?v=20260806c"
+    return ("../" * max(depth, 1)) + "visit-log.js?v=1"
 
 
 def render_local_gallery_page(title: str, image_names: list[str], visits_src: str | None = None) -> str:
