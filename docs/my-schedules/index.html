@@ -2732,6 +2732,11 @@
         const cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
         month=months.includes(cur)?cur:months[months.length-1];
         renderSchedule();
+        try {
+          if (window.rosterSiteVisits && typeof window.rosterSiteVisits.logScheduleView === 'function') {
+            window.rosterSiteVisits.logScheduleView(id);
+          }
+        } catch (eLog) {}
         const forceTour=new URLSearchParams(location.search).get('tour')==='1';
         maybeShowDayNotesTour(forceTour);
       }catch(err){
@@ -3559,6 +3564,6 @@
       } catch (e) {}
     })();
   </script>
-<script defer src="../site-visits.js?v=20260806d"></script>
+<script defer src="../site-visits.js?v=20260806sched"></script>
 </body>
 </html>

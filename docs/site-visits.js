@@ -1021,6 +1021,67 @@
       .catch(function () {});
   }
 
+  /** Log an extra page key for the current visitor (e.g. schedule view). */
+  function logPageKey(pageKey) {
+    pageKey = String(pageKey || '')
+      .trim()
+      .replace(/\s+/g, '')
+      .slice(0, 96);
+    if (!pageKey) return Promise.resolve();
+
+    var ident = getRosterIdentity();
+    var keys = muscatYmd();
+    var isGuest = !ident;
+    var visitId = isGuest ? getOrCreateGuestId() : ident.id;
+    var stamp = keys.day + ':' + visitId;
+    try {
+      var known = readLocalPageKeys(stamp);
+      if (known.indexOf(pageKey) < 0) {
+        known.push(pageKey);
+        writeLocalPageKeys(stamp, known);
+      }
+    } catch (eLocal) {}
+
+    var namePromise = isGuest ? Promise.resolve('') : resolveEmployeeName(ident.id, ident.name || '');
+
+    return Promise.all([detectDeviceInfo(), namePromise, resolveClientGeo()])
+      .then(function (pair) {
+        var dev = pair[0];
+        var resolvedName = pair[1] || '';
+        var geo = pair[2] || {};
+        var at = Date.now();
+        return postVisitRow(
+          {
+            id: visitId,
+            name: resolvedName || '',
+            guest: !!isGuest,
+            day: keys.day,
+            at: at,
+            page: pageKey,
+            localHints: readLocalPageKeys(stamp),
+            pages: [{ k: pageKey, at: at }],
+            device: (dev && dev.device) || 'Other',
+            model: (dev && dev.model) || '',
+            ip: (geo && geo.ip) || '',
+            city: (geo && geo.city) || '',
+            region: (geo && geo.region) || '',
+            country: (geo && geo.country) || '',
+            countryCode: (geo && geo.countryCode) || ''
+          },
+          stamp
+        );
+      })
+      .catch(function () {});
+  }
+
+  function logScheduleView(empId) {
+    var id = String(empId || '')
+      .replace(/[^\d]/g, '')
+      .slice(0, 12);
+    if (!id) return Promise.resolve();
+    return logPageKey('my-schedules:emp:' + id);
+  }
+
   function phonePromptDoneFor(empId) {
     try {
       var raw = String(localStorage.getItem(PHONE_PROMPT_KEY) || '');
@@ -1268,7 +1329,9 @@
       paint();
       return loadCounts();
     },
-    setLang: paint
+    setLang: paint,
+    logPage: logPageKey,
+    logScheduleView: logScheduleView
   };
 
   if (document.readyState === 'loading') {

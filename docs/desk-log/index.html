@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="desk-log-build" content="20260806fold">
+  <meta name="desk-log-build" content="20260806sched">
   <title>·</title>
   <style>
     :root {
@@ -584,6 +584,17 @@
             <div class="pageTypeList" id="pageTypeList"></div>
           </div>
         </details>
+        <details class="fold" id="scheduleViewsFold">
+          <summary>
+            <span class="foldTitle">أرقام شوهدت في جدولي</span>
+            <span class="countPill" id="scheduleViewPill">0</span>
+            <span class="foldChevron" aria-hidden="true">▼</span>
+          </summary>
+          <div class="foldBody">
+            <p class="statsPanelNote">أرقام الوظيفة التي فتح أحد الزوار جدولها من صفحة «جدولي» (حسب الفلتر).</p>
+            <div class="pageTypeList" id="scheduleViewList"></div>
+          </div>
+        </details>
       </div>
       <div class="listHead">
         <h2>سجل الزيارات</h2>
@@ -809,10 +820,68 @@
         if (detail === 'now') return base + ' · الآن';
         if (detail === 'import') return base + ' · وارد';
         if (detail === 'a-cup-of-book') return 'كوب في فنجان';
+        const empView = detail.match(/^emp:(\d+)$/);
+        if (empView) {
+          const eid = empView[1];
+          const ename = cleanName(nameById[eid] || '');
+          return base + ' · #' + eid + (ename ? ' · ' + ename : '');
+        }
         if (/^\d{4}-\d{2}-\d{2}(\/now)?$/.test(detail)) {
           return base + ' · ' + detail.replace('/now', ' · الآن');
         }
         return base + ' · ' + detail;
+      }
+
+      function parseScheduleEmpId(pageKey) {
+        const m = String(pageKey || '').match(/^my-schedules:emp:(\d+)$/i);
+        return m ? m[1] : '';
+      }
+
+      function buildScheduleViewStats(rows) {
+        const byEmp = new Map();
+        rows.forEach((r) => {
+          pagesOf(r).forEach((k) => {
+            const eid = parseScheduleEmpId(k);
+            if (!eid) return;
+            byEmp.set(eid, (byEmp.get(eid) || 0) + 1);
+          });
+        });
+        return Array.from(byEmp.entries())
+          .map(([id, count]) => ({
+            id,
+            count,
+            name: cleanName(nameById[id] || '')
+          }))
+          .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
+      }
+
+      function renderScheduleViewStats(rows) {
+        const host = document.getElementById('scheduleViewList');
+        const pill = document.getElementById('scheduleViewPill');
+        if (!host) return;
+        const stats = buildScheduleViewStats(rows);
+        const total = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) {
+          pill.textContent = stats.length
+            ? (stats.length + ' رقم · ' + total + ' مشاهدة')
+            : '0';
+        }
+        if (!stats.length) {
+          host.innerHTML = '<div class="pageStatsEmpty">لا مشاهدات جداول مسجّلة في هذا النطاق بعد. تظهر بعد فتح «جدولي» وكتابة رقم وظيفة.</div>';
+          return;
+        }
+        const max = Math.max.apply(null, stats.map((s) => s.count || 0)) || 1;
+        host.innerHTML = stats.slice(0, 50).map((s) => {
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
+          const label = '#' + s.id + (s.name ? ' · ' + s.name : '');
+          return (
+            '<div class="pageTypeRow">' +
+              '<div class="pageTypeName">' + escapeHtml(label) + '</div>' +
+              '<div class="pageTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
+            '</div>'
+          );
+        }).join('');
       }
 
       function pagesOf(r) {
@@ -1489,6 +1558,7 @@
         if (listPill) listPill.textContent = rows.length + ' سجل';
         renderDeviceStats(rows);
         renderPageStats(rows);
+        renderScheduleViewStats(rows);
         const list = document.getElementById('list');
         if (!rows.length) {
           list.innerHTML = '<div class="empty">لا توجد زيارات مسجّلة في هذا النطاق بعد.</div>';
