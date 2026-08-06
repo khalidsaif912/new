@@ -665,7 +665,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
   </div>
 </div>
 <script>{PAGE_JS}</script>
-<script defer src="../site-visits.js?v=20260806c"></script>
+<script defer src="../visit-log.js?v=1"></script>
 </body>
 </html>
 '''
@@ -808,7 +808,7 @@ def render_cup_of_book_page() -> str:
     window.location.href = target;
   });
 </script>
-<script defer src="../site-visits.js?v=20260806c"></script>
+<script defer src="../visit-log.js?v=1"></script>
 </body>
 </html>'''.replace("https://omanair-my.sharepoint.com/:u:/p/8715_hq/IQCtTYRlRXrAT4iThomS-xbtAZoXbZtGbVaak_14uDpqev8?e=X8mLMK", source_url)
 
@@ -844,7 +844,7 @@ def render_local_gallery_page(title: str, image_names: list[str], visits_src: st
     names_js = json.dumps(image_names, ensure_ascii=False)
     safe_title = title.strip() or "A Cup of Book"
     if not visits_src:
-        visits_src = "../../site-visits.js?v=20260806c"
+        visits_src = "../../visit-log.js?v=1"
     return """<!doctype html>
 <html lang="en">
 <head>
