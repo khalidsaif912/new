@@ -1127,6 +1127,8 @@
   }
 
   function boot() {
+    if (window.__rosterSiteVisitsBooted) return;
+    window.__rosterSiteVisitsBooted = true;
     if (booted) return;
     booted = true;
     // Skip counter UI mounting on pages without a footer, but always log visits.
