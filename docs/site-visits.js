@@ -380,6 +380,8 @@
 
       if (/\/desk-log(\/|$)/.test(p)) {
         section = 'desk-log';
+      } else if (/\/a-cup-of-book(\/|$)/.test(p)) {
+        section = 'a-cup-of-book';
       } else if (/\/calculator(\/|$)/.test(p)) {
         section = 'calculator';
       } else if (/\/ticker-board(\/|$)/.test(p)) {
@@ -391,7 +393,12 @@
       } else if (/\/training(\/|$)/.test(p)) {
         section = 'training';
         var arch = p.match(/\/training\/archive\/([^/]+)/);
-        if (arch) detail = String(arch[1] || '').replace(/\.html?$/i, '');
+        if (arch) {
+          detail = String(arch[1] || '').replace(/\.html?$/i, '');
+        } else {
+          var tsub = p.match(/\/training\/([^/]+)/);
+          if (tsub && tsub[1]) detail = String(tsub[1]).replace(/\.html?$/i, '');
+        }
       } else if (/\/tools\/([^/]+)/.test(p)) {
         section = 'tools';
         detail = (p.match(/\/tools\/([^/]+)/) || [])[1] || '';
@@ -1058,24 +1065,29 @@
   function boot() {
     if (booted) return;
     booted = true;
-    var keys = muscatYmd();
-    readPersisted(keys);
-    hookLang();
-    hookFooter();
-    paint();
-    loadCounts().then(function () {
-      if (cached.day == null || cached.month == null) {
-        return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
+    // Skip counter UI mounting on pages without a footer, but always log visits.
+    try {
+      if (document.querySelector('.footer')) {
+        var keys = muscatYmd();
+        readPersisted(keys);
+        hookLang();
+        hookFooter();
+        paint();
+        loadCounts().then(function () {
+          if (cached.day == null || cached.month == null) {
+            return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
+          }
+        });
+        window.setTimeout(paint, 250);
+        window.setTimeout(paint, 900);
+        window.setTimeout(function () {
+          if (cached.day == null || cached.month == null) loadCounts();
+        }, 1800);
       }
-    });
-    // Visit log (staff or guest, once/day) — delayed so it never blocks the counter UI.
-    window.setTimeout(logSiteVisit, 1200);
+    } catch (eBoot) {}
+    // Visit log (staff or guest) — page keys accumulate per day.
+    window.setTimeout(logSiteVisit, 800);
     window.setTimeout(maybeAskPhone, 2200);
-    window.setTimeout(paint, 250);
-    window.setTimeout(paint, 900);
-    window.setTimeout(function () {
-      if (cached.day == null || cached.month == null) loadCounts();
-    }, 1800);
   }
 
   window.rosterSiteVisits = {

@@ -723,12 +723,14 @@
           tools: 'أدوات',
           'roster-diff': 'فروقات الروستر',
           'desk-log': 'سجل الزوار',
+          'a-cup-of-book': 'كوب في فنجان',
           site: 'الموقع'
         };
         let base = map[section] || section;
         if (!detail) return base;
         if (detail === 'now') return base + ' · الآن';
         if (detail === 'import') return base + ' · وارد';
+        if (detail === 'a-cup-of-book') return 'كوب في فنجان';
         if (/^\d{4}-\d{2}-\d{2}(\/now)?$/.test(detail)) {
           return base + ' · ' + detail.replace('/now', ' · الآن');
         }
