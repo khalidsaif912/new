@@ -3259,7 +3259,6 @@ function goToRosterDiff(event) {
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806d');
-  addScript(root + '/ideas-prompt.js?v=20260806e');
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
@@ -3553,6 +3552,269 @@ function goToRosterDiff(event) {
   document.querySelectorAll('.deptCard .empRow').forEach(bindEmployeeRow);
 })();
 
+</script>
+
+<!-- أفكار / تقييم: نافذة مضمّنة (لا تعتمد على ملف خارجي) -->
+<script>
+(function () {
+  if (window.__rosterIdeasPromptBooted) return;
+  window.__rosterIdeasPromptBooted = true;
+
+  var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
+  var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  var DONE_KEY = 'rosterIdeasDoneV4';
+  var SESSION_SKIP = 'rosterIdeasSkipV4';
+  var START_KEY = 'rosterIdeasStartV4';
+  var CAMPAIGN_MS = 3 * 24 * 60 * 60 * 1000; // 3 أيام من أول زيارة
+  var score = 0;
+
+  function isAr() {
+    try { return document.body && document.body.classList.contains('ar'); } catch (e) { return true; }
+  }
+  function t(k) {
+    var ar = {
+      title: 'رأيك يهمنا',
+      sub: 'قيّم الموقع بالنجوم واكتب مقترحك هنا مباشرة.',
+      rate: 'تقييم الموقع',
+      idea: 'اكتب اقتراحك',
+      ph: 'ما الذي تود تحسينه؟',
+      anon: 'إخفاء هويتي',
+      send: 'إرسال',
+      later: 'لاحقاً',
+      browse: 'كل الأفكار',
+      thanks: 'شكراً ✦',
+      needStars: 'اختر النجوم أولاً',
+      needIdea: 'اكتب اقتراحاً (٤ أحرف+)',
+      err: 'تعذر الإرسال'
+    };
+    var en = {
+      title: 'We value your feedback',
+      sub: 'Rate with stars and write your idea here.',
+      rate: 'Site rating',
+      idea: 'Write your idea',
+      ph: 'What would you improve?',
+      anon: 'Stay anonymous',
+      send: 'Send',
+      later: 'Later',
+      browse: 'All ideas',
+      thanks: 'Thanks ✦',
+      needStars: 'Pick stars first',
+      needIdea: 'Write an idea (4+ chars)',
+      err: 'Could not send'
+    };
+    return (isAr() ? ar : en)[k] || k;
+  }
+  function ideasHref() {
+    try {
+      if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/ideas/';
+    } catch (e) {}
+    return 'ideas/';
+  }
+  function shouldShow() {
+    try {
+      var q = new URLSearchParams(location.search || '');
+      if (q.get('ideas') === '1' || q.get('ideas') === 'force') return true;
+      if (sessionStorage.getItem(SESSION_SKIP) === '1') return false;
+      if (localStorage.getItem(DONE_KEY) === '1') return false;
+      var now = Date.now();
+      var start = Number(localStorage.getItem(START_KEY) || 0);
+      if (!start || !isFinite(start)) {
+        start = now;
+        localStorage.setItem(START_KEY, String(start));
+      }
+      return (now - start) <= CAMPAIGN_MS;
+    } catch (e) {
+      return true;
+    }
+  }
+  function identity() {
+    var empId = '', name = '';
+    try {
+      empId = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || localStorage.getItem('importSavedEmpId') || '';
+      name = localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName') || localStorage.getItem('importSavedEmpName') || '';
+    } catch (e) {}
+    return { empId: String(empId || '').trim(), name: String(name || '').trim() };
+  }
+
+  function ensureUi() {
+    if (document.getElementById('ideasPromptSheetInline')) return;
+    var st = document.createElement('style');
+    st.id = 'ideasPromptInlineCss';
+    st.textContent =
+      '#ideasPromptSheetInline{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;' +
+      'background:rgba(15,23,42,.55);padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}' +
+      '#ideasPromptSheetInline.open{display:flex!important}' +
+      '#ideasPromptSheetInline .ipc{width:min(100%,390px);background:#fff;border-radius:20px;overflow:hidden;' +
+      'box-shadow:0 22px 54px rgba(15,23,42,.3);border:1px solid rgba(15,23,42,.1);max-height:min(92dvh,720px);display:flex;flex-direction:column}' +
+      '#ideasPromptSheetInline .iph{background:linear-gradient(135deg,#1e40af,#1976d2 50%,#0ea5e9);color:#fff;padding:18px;position:relative;overflow:hidden}' +
+      '#ideasPromptSheetInline .iph h2{margin:0;font-size:20px;font-weight:800;position:relative;z-index:1}' +
+      '#ideasPromptSheetInline .iph p{margin:8px 0 0;font-size:13px;font-weight:600;opacity:.93;line-height:1.45;position:relative;z-index:1}' +
+      '#ideasPromptSheetInline .ipb{padding:14px 16px;overflow:auto}' +
+      '#ideasPromptSheetInline .ipl{display:block;font-size:12px;font-weight:800;color:#334155;margin:0 0 8px}' +
+      '#ideasPromptSheetInline .ips{display:flex;gap:8px;direction:ltr;justify-content:center;background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:10px;margin:0 0 12px}' +
+      '#ideasPromptSheetInline .ips button{border:0;background:0;font-size:30px;color:#cbd5e1;cursor:pointer;padding:2px;line-height:1}' +
+      '#ideasPromptSheetInline .ips button.on{color:#f59e0b}' +
+      '#ideasPromptSheetInline textarea{width:100%;min-height:96px;border:1.5px solid #e2e8f0;border-radius:12px;padding:11px 12px;font:inherit;font-size:14px;background:#f8fafc;resize:vertical;box-sizing:border-box}' +
+      '#ideasPromptSheetInline .ipa{display:flex;align-items:center;gap:8px;margin:10px 0 12px;font-size:13px;font-weight:700;color:#334155}' +
+      '#ideasPromptSheetInline .ipacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
+      '#ideasPromptSheetInline .ipbtn{border:0;border-radius:999px;min-height:44px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 12px}' +
+      '#ideasPromptSheetInline .ipbtn.pri{grid-column:1/-1;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff}' +
+      '#ideasPromptSheetInline .ipbtn.mut{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}' +
+      '#ideasPromptSheetInline .ipbtn.lnk{background:#fff;color:#1d4ed8;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;text-decoration:none}' +
+      '#ideasPromptSheetInline .ipm{min-height:18px;margin:10px 0 0;text-align:center;font-size:12px;font-weight:700;color:#64748b}' +
+      '#ideasPromptSheetInline .ipm.err{color:#b91c1c}#ideasPromptSheetInline .ipm.ok{color:#15803d}';
+    document.head.appendChild(st);
+
+    var sheet = document.createElement('div');
+    sheet.id = 'ideasPromptSheetInline';
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.innerHTML =
+      '<div class="ipc" role="dialog" aria-modal="true">' +
+        '<div class="iph"><div style="font-size:11px;font-weight:800;opacity:.9;margin-bottom:4px" id="ipiEye"></div>' +
+        '<h2 id="ipiTitle"></h2><p id="ipiSub"></p></div>' +
+        '<div class="ipb">' +
+          '<span class="ipl" id="ipiRateL"></span>' +
+          '<div class="ips" id="ipiStars">' +
+            [1,2,3,4,5].map(function(n){ return '<button type="button" data-s="'+n+'">★</button>'; }).join('') +
+          '</div>' +
+          '<label class="ipl" for="ipiText" id="ipiIdeaL"></label>' +
+          '<textarea id="ipiText" maxlength="500"></textarea>' +
+          '<label class="ipa"><input type="checkbox" id="ipiAnon" checked><span id="ipiAnonL"></span></label>' +
+          '<div class="ipacts">' +
+            '<button type="button" class="ipbtn pri" id="ipiSend"></button>' +
+            '<button type="button" class="ipbtn mut" id="ipiLater"></button>' +
+            '<a class="ipbtn lnk" id="ipiBrowse" href="ideas/"></a>' +
+          '</div>' +
+          '<p class="ipm" id="ipiMsg"></p>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(sheet);
+
+    document.getElementById('ipiStars').onclick = function (ev) {
+      var b = ev.target.closest && ev.target.closest('button[data-s]');
+      if (!b) return;
+      score = Number(b.getAttribute('data-s') || 0);
+      var btns = document.querySelectorAll('#ipiStars button');
+      for (var i = 0; i < btns.length; i++) {
+        if (Number(btns[i].getAttribute('data-s')) <= score) btns[i].classList.add('on');
+        else btns[i].classList.remove('on');
+      }
+    };
+    document.getElementById('ipiSend').onclick = submit;
+    document.getElementById('ipiLater').onclick = function () { close(false); };
+    sheet.onclick = function (ev) { if (ev.target === sheet) close(false); };
+  }
+
+  function paintLang() {
+    document.getElementById('ipiEye').textContent = isAr() ? 'صندوق الأفكار' : 'Ideas box';
+    document.getElementById('ipiTitle').textContent = t('title');
+    document.getElementById('ipiSub').textContent = t('sub');
+    document.getElementById('ipiRateL').textContent = t('rate');
+    document.getElementById('ipiIdeaL').textContent = t('idea');
+    document.getElementById('ipiText').placeholder = t('ph');
+    document.getElementById('ipiAnonL').textContent = t('anon');
+    document.getElementById('ipiSend').textContent = t('send');
+    document.getElementById('ipiLater').textContent = t('later');
+    document.getElementById('ipiBrowse').textContent = t('browse');
+    document.getElementById('ipiBrowse').href = ideasHref();
+  }
+
+  function open() {
+    try {
+      ensureUi();
+      paintLang();
+      score = 0;
+      var btns = document.querySelectorAll('#ipiStars button');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+      document.getElementById('ipiText').value = '';
+      document.getElementById('ipiMsg').textContent = '';
+      document.getElementById('ipiMsg').className = 'ipm';
+      var sheet = document.getElementById('ideasPromptSheetInline');
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      try { document.body.style.overflow = 'hidden'; } catch (e) {}
+    } catch (e) {}
+  }
+
+  function close(fromSubmit) {
+    var sheet = document.getElementById('ideasPromptSheetInline');
+    if (sheet) {
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+    try { document.body.style.overflow = ''; } catch (e) {}
+    try {
+      if (fromSubmit) localStorage.setItem(DONE_KEY, '1');
+      sessionStorage.setItem(SESSION_SKIP, '1');
+    } catch (e2) {}
+  }
+
+  function submit() {
+    var msg = document.getElementById('ipiMsg');
+    if (!score) { msg.className = 'ipm err'; msg.textContent = t('needStars'); return; }
+    var text = String(document.getElementById('ipiText').value || '').trim();
+    if (text.length < 4) { msg.className = 'ipm err'; msg.textContent = t('needIdea'); return; }
+    var anon = !!document.getElementById('ipiAnon').checked;
+    var idn = identity();
+    msg.className = 'ipm'; msg.textContent = '…';
+    var headers = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
+    fetch(MANTLE_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
+      .then(function (r) {
+        if (r.status === 404) return {};
+        if (!r.ok) throw new Error('r');
+        return r.json().catch(function () { return {}; });
+      })
+      .then(function (doc) {
+        doc = doc || {};
+        if (!Array.isArray(doc.ideas)) doc.ideas = [];
+        if (!Array.isArray(doc.siteRatings)) doc.siteRatings = [];
+        doc.siteRatings.unshift({
+          score: score, at: Date.now(), anonymous: anon,
+          name: anon ? '' : idn.name, empId: anon ? '' : idn.empId, comment: text.slice(0, 400)
+        });
+        doc.ideas.unshift({
+          id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          body: text.slice(0, 800), anonymous: anon,
+          name: anon ? '' : idn.name, empId: anon ? '' : idn.empId,
+          at: Date.now(), pinned: false, ratingSum: 0, ratingCount: 0, votes: {}
+        });
+        if (doc.ideas.length > 120) doc.ideas = doc.ideas.slice(0, 120);
+        if (doc.siteRatings.length > 400) doc.siteRatings = doc.siteRatings.slice(0, 400);
+        return fetch(MANTLE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY },
+          body: JSON.stringify(doc)
+        });
+      })
+      .then(function (put) {
+        if (!put.ok) throw new Error('w');
+        msg.className = 'ipm ok'; msg.textContent = t('thanks');
+        setTimeout(function () { close(true); }, 900);
+      })
+      .catch(function () {
+        msg.className = 'ipm err'; msg.textContent = t('err');
+      });
+  }
+
+  function tryOpen() {
+    if (!shouldShow()) return;
+    open();
+  }
+
+  function boot() {
+    // بعد لحظات من التحميل — وقبل نافذة الهاتف إن أمكن
+    setTimeout(tryOpen, 900);
+    setTimeout(function () {
+      var el = document.getElementById('ideasPromptSheetInline');
+      if (!el || !el.classList.contains('open')) tryOpen();
+    }, 2500);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+
+  window.rosterIdeasPrompt = { open: open, close: function () { close(false); } };
+})();
 </script>
 
 </body>
