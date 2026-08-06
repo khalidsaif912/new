@@ -1711,8 +1711,18 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong><br>
-    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Operation Roster August 2026 Version 2.xlsx</strong>
+    <strong style="color:#475569;font-size:13px;" id="footerLastUpdatedLabel">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong><br>
+    <strong style="color:#475569;font-size:13px;" id="footerSourceLabel">Source:</strong> <strong id="footerSourceValue">Operation Roster August 2026 Version 2.xlsx</strong>
+    <div id="siteVisitsHost" class="siteVisitsHost" dir="ltr" style="margin:2px 0 8px;padding:0;text-align:center;font-size:12px;line-height:1.7;color:#94a3b8;font-family:inherit">
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">Visitors today:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsDay">--</strong>
+      <span aria-hidden="true"> · </span>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">This month:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>
+      <span aria-hidden="true"> · </span>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">Total:</strong>
+      <strong style="color:#1e40af;" id="siteVisitsTotal">--</strong>
+    </div>
   </div>
 
 </div>
@@ -1919,12 +1929,21 @@ function ensureHtml2Canvas() {
 function getSiteRootPath() {
   if (location.protocol === 'file:') return '';
   var path = location.pathname || '/';
+  // jsDelivr / rawcdn style: /gh/user/repo@version/docs/...
+  var cdn = path.match(/^(?:\/gh)?\/[^/]+\/[^/]+(?:@[^/]+)?(\/docs)(?:\/|$)/);
+  if (cdn && (location.hostname || '').indexOf('jsdelivr') !== -1) {
+    return path.substring(0, path.indexOf('/docs') + 5);
+  }
   if (path.includes('/roster-site/')) return '/roster-site';
   if (location.hostname && location.hostname.endsWith('github.io')) {
     var segs = path.split('/').filter(Boolean);
     if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
     return segs.length ? '/' + segs[0] : '';
   }
+  // Generic: keep trailing /docs segment if present
+  var docsAt = path.indexOf('/docs/');
+  if (docsAt >= 0) return path.substring(0, docsAt + 5);
+  if (path.endsWith('/docs')) return path;
   return '';
 }
 
@@ -2896,26 +2915,12 @@ function applyLang(lang) {
   if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   if(window.rosterSiteShiftCopy && window.rosterSiteShiftCopy.setLang) window.rosterSiteShiftCopy.setLang();
   if(window.rosterSiteVisits && window.rosterSiteVisits.setLang) window.rosterSiteVisits.setLang();
-  var footer=document.querySelector('.footer');
-  if(footer) {
-    var dayEl=document.getElementById('siteVisitsDay');
-    var monthEl=document.getElementById('siteVisitsMonth');
-    var dayN=dayEl?dayEl.textContent:'—';
-    var monthN=monthEl?monthEl.textContent:'—';
-    var h=footer.innerHTML;
-    if(isAr) {
-      h=h.replace('Last Updated','آخر تحديث'); h=h.replace('Source:','المصدر:');
-      h=h.replace('Visitors today:','زوار اليوم:'); h=h.replace('This month:','هذا الشهر:');
-    } else {
-      h=h.replace('آخر تحديث','Last Updated'); h=h.replace('المصدر:','Source:');
-      h=h.replace('زوار اليوم:','Visitors today:'); h=h.replace('هذا الشهر:','This month:');
-    }
-    footer.innerHTML=h;
-    dayEl=document.getElementById('siteVisitsDay');
-    monthEl=document.getElementById('siteVisitsMonth');
-    if(dayEl) dayEl.textContent=dayN;
-    if(monthEl) monthEl.textContent=monthN;
-  }
+  // Update footer labels by element id — do NOT rewrite footer.innerHTML
+  // (that used to wipe #siteVisitsHost / texture buttons).
+  var lu=document.getElementById('footerLastUpdatedLabel');
+  var src=document.getElementById('footerSourceLabel');
+  if(lu) lu.textContent = isAr ? 'آخر تحديث:' : 'Last Updated:';
+  if(src) src.textContent = isAr ? 'المصدر:' : 'Source:';
   localStorage.setItem('rosterLang',lang);
   LANG=lang;
   updateSummarySwitchChip();
@@ -3258,7 +3263,7 @@ function goToRosterDiff(event) {
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260806d');
+  addScript(root + '/site-visits.js?v=20260806f');
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);

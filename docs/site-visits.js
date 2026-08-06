@@ -177,6 +177,9 @@
         var buttons = footer.querySelector('.bgTextureShuffleWrap');
         if (buttons && host.nextSibling !== buttons) footer.insertBefore(host, buttons);
       }
+      // Always visible (never left display:none after lang swaps / sheets)
+      host.style.display = '';
+      host.hidden = false;
       return host;
     }
 

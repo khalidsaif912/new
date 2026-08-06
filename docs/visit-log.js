@@ -177,6 +177,8 @@
         var buttons = footer.querySelector('.bgTextureShuffleWrap');
         if (buttons && host.nextSibling !== buttons) footer.insertBefore(host, buttons);
       }
+      host.style.display = '';
+      host.hidden = false;
       return host;
     }
 
