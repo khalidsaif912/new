@@ -665,6 +665,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
   </div>
 </div>
 <script>{PAGE_JS}</script>
+<script defer src="../site-visits.js?v=20260806b"></script>
 </body>
 </html>
 '''
