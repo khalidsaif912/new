@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="desk-log-build" content="20260806e">
   <title>·</title>
   <style>
     :root {
@@ -89,32 +90,6 @@
     .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
     .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
     .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
-    .visitsSubTabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      padding: 5px;
-      margin-bottom: 14px;
-      background: #0b1220;
-      border: 1px solid #334155;
-      border-radius: 14px;
-    }
-    .visitsSubTabs .chip {
-      width: 100%;
-      min-height: 40px;
-      margin: 0;
-      border-radius: 10px;
-      font-size: 13px;
-      background: transparent;
-      border-color: transparent;
-      color: #94a3b8;
-    }
-    .visitsSubTabs .chip.active {
-      background: #1e3a8a;
-      color: #dbeafe;
-      border-color: #3b82f6;
-      box-shadow: 0 1px 0 #1d4ed8 inset;
-    }
     .statsPanel {
       background: #1e293b;
       border: 1px solid #334155;
@@ -389,7 +364,7 @@
     }
     .toolbar.mainTabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 16px;
     }
@@ -398,6 +373,12 @@
       justify-content: center;
       min-height: 42px;
       font-size: 12px;
+      padding: 0 8px;
+    }
+    @media (min-width: 640px) {
+      .toolbar.mainTabs {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
     }
     .toolsIntro {
       margin: 0 0 12px;
@@ -504,7 +485,7 @@
     .gapBadge.visit { color: #fde68a; border-color: #854d0e; background: #713f1255; }
     .gapBadge.both { color: #fda4af; border-color: #9f1239; background: #4c051955; }
     @media (max-width: 520px) {
-      .toolbar.mainTabs { grid-template-columns: 1fr 1fr; }
+      .toolbar.mainTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .toolCard { grid-template-columns: 1fr; }
       .toolGo { width: 100%; }
     }
@@ -538,11 +519,13 @@
     </div>
     <div class="toolbar mainTabs" id="mainTabs">
       <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
+      <button type="button" class="chip" data-view="devices" id="tabDevices">الأجهزة</button>
+      <button type="button" class="chip" data-view="pages" id="tabPages">الصفحات</button>
       <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
       <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
       <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
     </div>
-    <div id="visitsPanel">
+    <div id="visitsChrome">
       <div class="toolbar">
         <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
         <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
@@ -554,35 +537,30 @@
         <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
         <div class="stat"><b id="statTotal">—</b><span>إجمالي الزوار</span></div>
       </div>
-      <div class="visitsSubTabs" id="visitsSubTabs" role="tablist" aria-label="أقسام الزيارات">
-        <button type="button" class="chip active" data-vtab="list" id="vTabList" role="tab" aria-selected="true">السجل</button>
-        <button type="button" class="chip" data-vtab="devices" id="vTabDevices" role="tab" aria-selected="false">الأجهزة</button>
-        <button type="button" class="chip" data-vtab="pages" id="vTabPages" role="tab" aria-selected="false">الصفحات</button>
-      </div>
-      <div id="visitsListPanel" role="tabpanel">
-        <div class="listHead">
-          <h2>سجل الزيارات</h2>
-          <span class="countPill" id="listCountPill">0</span>
-        </div>
-        <div class="list" id="list"></div>
-      </div>
-      <section class="statsPanel" id="deviceStats" role="tabpanel" hidden>
-        <div class="statsPanelHead">
-          <h2>إحصائية الأجهزة</h2>
-          <span class="countPill" id="deviceCountPill">0</span>
-        </div>
-        <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
-        <div class="deviceTypeList" id="deviceTypeList"></div>
-      </section>
-      <section class="statsPanel" id="pageStats" role="tabpanel" hidden>
-        <div class="statsPanelHead">
-          <h2>إحصائية الصفحات</h2>
-          <span class="countPill" id="pageCountPill">0</span>
-        </div>
-        <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
-        <div class="pageTypeList" id="pageTypeList"></div>
-      </section>
     </div>
+    <div id="visitsPanel">
+      <div class="listHead">
+        <h2>سجل الزيارات</h2>
+        <span class="countPill" id="listCountPill">0</span>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+    <section class="statsPanel" id="devicesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الأجهزة</h2>
+        <span class="countPill" id="deviceCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+      <div class="deviceTypeList" id="deviceTypeList"></div>
+    </section>
+    <section class="statsPanel" id="pagesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الصفحات</h2>
+        <span class="countPill" id="pageCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
+      <div class="pageTypeList" id="pageTypeList"></div>
+    </section>
     <div id="phonesPanel" hidden>
       <div class="toolbar">
         <button type="button" class="chip" id="refreshPhonesBtn">تحديث</button>
@@ -629,7 +607,6 @@
       const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
       let filter = 'today';
       let view = 'visits';
-      let visitsTab = 'list';
       let gapFilter = 'noPhone';
       let log = [];
       let phones = [];
@@ -998,26 +975,15 @@
         setTimeout(() => pinInput.focus(), 30);
       }
 
-      function setVisitsTab(next) {
-        const allowed = { list: 1, devices: 1, pages: 1 };
-        visitsTab = allowed[next] ? next : 'list';
-        const listPanel = document.getElementById('visitsListPanel');
-        const devicePanel = document.getElementById('deviceStats');
-        const pagePanel = document.getElementById('pageStats');
-        if (listPanel) listPanel.hidden = visitsTab !== 'list';
-        if (devicePanel) devicePanel.hidden = visitsTab !== 'devices';
-        if (pagePanel) pagePanel.hidden = visitsTab !== 'pages';
-        document.querySelectorAll('#visitsSubTabs .chip[data-vtab]').forEach((c) => {
-          const on = c.getAttribute('data-vtab') === visitsTab;
-          c.classList.toggle('active', on);
-          c.setAttribute('aria-selected', on ? 'true' : 'false');
-        });
-      }
-
       function setView(next) {
-        const allowed = { visits: 1, phones: 1, gaps: 1, tools: 1 };
+        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1 };
         view = allowed[next] ? next : 'visits';
+        const visitRelated = view === 'visits' || view === 'devices' || view === 'pages';
+        const chrome = document.getElementById('visitsChrome');
+        if (chrome) chrome.hidden = !visitRelated;
         document.getElementById('visitsPanel').hidden = view !== 'visits';
+        document.getElementById('devicesPanel').hidden = view !== 'devices';
+        document.getElementById('pagesPanel').hidden = view !== 'pages';
         document.getElementById('phonesPanel').hidden = view !== 'phones';
         document.getElementById('gapsPanel').hidden = view !== 'gaps';
         document.getElementById('toolsPanel').hidden = view !== 'tools';
@@ -1493,7 +1459,6 @@
         document.querySelectorAll('.chip[data-filter]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-filter') === filter);
         });
-        setVisitsTab(visitsTab);
         const rows = filtered();
         const listPill = document.getElementById('listCountPill');
         if (listPill) listPill.textContent = rows.length + ' سجل';
@@ -1592,11 +1557,6 @@
         c.addEventListener('click', () => {
           filter = c.getAttribute('data-filter') || 'today';
           render();
-        });
-      });
-      document.querySelectorAll('#visitsSubTabs .chip[data-vtab]').forEach((c) => {
-        c.addEventListener('click', () => {
-          setVisitsTab(c.getAttribute('data-vtab') || 'list');
         });
       });
 
