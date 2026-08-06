@@ -428,8 +428,100 @@
     }
   }
 
-  function pagePathLabel() {
-    return pageVisitInfo().key;
+  function resolveClientGeo() {
+    var CACHE = 'rosterVisitGeoV1';
+    try {
+      var cached = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
+      if (cached && (cached.ip || cached.city || cached.country) && Date.now() - Number(cached.at || 0) < 6 * 3600 * 1000) {
+        return Promise.resolve(cached);
+      }
+    } catch (e0) {}
+
+    function pack(partial) {
+      var out = {
+        ip: String((partial && partial.ip) || '').slice(0, 64),
+        city: String((partial && partial.city) || '').slice(0, 48),
+        region: String((partial && partial.region) || '').slice(0, 48),
+        country: String((partial && partial.country) || '').slice(0, 48),
+        countryCode: String((partial && partial.countryCode) || '').slice(0, 8),
+        at: Date.now()
+      };
+      try {
+        sessionStorage.setItem(CACHE, JSON.stringify(out));
+      } catch (e1) {}
+      return out;
+    }
+
+    // HTTPS free lookups (works from GitHub Pages without mixed-content issues).
+    return fetch('https://ipwho.is/', { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('geo');
+        return r.json();
+      })
+      .then(function (j) {
+        if (!j || j.success === false) throw new Error('geo');
+        return pack({
+          ip: j.ip,
+          city: j.city,
+          region: j.region,
+          country: j.country,
+          countryCode: j.country_code
+        });
+      })
+      .catch(function () {
+        return fetch('https://get.geojs.io/v1/ip/geo.json', { cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error('geo2');
+            return r.json();
+          })
+          .then(function (j) {
+            return pack({
+              ip: j && j.ip,
+              city: j && j.city,
+              region: j && j.region,
+              country: j && j.country,
+              countryCode: j && j.country_code
+            });
+          });
+      })
+      .catch(function () {
+        return pack({});
+      });
+  }
+
+  // Optional: mirror visits to VPS (needs open CORS; HTTPS recommended later).
+  var ROSTER_VISIT_SERVER = 'http://158.220.106.38:3000/api/roster-visits';
+  var ROSTER_VISIT_KEY = 'rv_roster_geo_2026';
+
+  function pingVisitServer(row) {
+    try {
+      if (!ROSTER_VISIT_SERVER || !row) return;
+      fetch(ROSTER_VISIT_SERVER, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Roster-Visit-Key': ROSTER_VISIT_KEY
+        },
+        body: JSON.stringify({
+          id: row.id,
+          name: row.name || '',
+          guest: !!row.guest,
+          day: row.day,
+          at: row.at || Date.now(),
+          page: row.page || '',
+          pages: row.pages || [],
+          device: row.device || '',
+          model: row.model || '',
+          ip: row.ip || '',
+          city: row.city || '',
+          region: row.region || '',
+          country: row.country || '',
+          countryCode: row.countryCode || '',
+          key: ROSTER_VISIT_KEY
+        })
+      }).catch(function () {});
+    } catch (e) {}
   }
 
   function screenKey() {
@@ -829,6 +921,11 @@
           pages: pages,
           device: (row.device || (prev && prev.device) || 'Other') || 'Other',
           model: (row.model || (prev && prev.model) || '') || '',
+          ip: (row.ip || (prev && prev.ip) || '') || '',
+          city: (row.city || (prev && prev.city) || '') || '',
+          region: (row.region || (prev && prev.region) || '') || '',
+          country: (row.country || (prev && prev.country) || '') || '',
+          countryCode: (row.countryCode || (prev && prev.countryCode) || '') || '',
           v: 5
         };
         kept.unshift(merged);
@@ -850,6 +947,9 @@
               })
             );
           } catch (e2) {}
+          try {
+            pingVisitServer(merged);
+          } catch (e3) {}
         });
       })
       .catch(function (err) {
@@ -883,10 +983,11 @@
       ? Promise.resolve('')
       : resolveEmployeeName(ident.id, ident.name);
 
-    Promise.all([detectDeviceInfo(), namePromise])
+    Promise.all([detectDeviceInfo(), namePromise, resolveClientGeo()])
       .then(function (pair) {
         var dev = pair[0];
         var resolvedName = pair[1] || '';
+        var geo = pair[2] || {};
         if (!isGuest && resolvedName) {
           try {
             if (!localStorage.getItem('exportSavedEmpName') && !localStorage.getItem('savedEmpName') && !localStorage.getItem('importSavedEmpName')) {
@@ -907,7 +1008,12 @@
             localHints: readLocalPageKeys(stamp),
             pages: [{ k: pageKey, at: at }],
             device: (dev && dev.device) || 'Other',
-            model: (dev && dev.model) || ''
+            model: (dev && dev.model) || '',
+            ip: (geo && geo.ip) || '',
+            city: (geo && geo.city) || '',
+            region: (geo && geo.region) || '',
+            country: (geo && geo.country) || '',
+            countryCode: (geo && geo.countryCode) || ''
           },
           stamp
         );

@@ -169,6 +169,11 @@
       background: #78350f55;
       border-color: #f59e0b55;
     }
+    .rowDevice.place {
+      color: #a7f3d0;
+      background: #064e3b55;
+      border-color: #10b98155;
+    }
     .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
     .rowPages {
       margin: 6px 0 0;
@@ -754,6 +759,24 @@
         }
         if (r.page) return [String(r.page)];
         return [];
+      }
+
+      function placeText(r) {
+        if (!r) return '';
+        const city = String(r.city || '').trim();
+        const region = String(r.region || '').trim();
+        const country = String(r.country || '').trim();
+        if (city && country) return city + ' · ' + country;
+        if (city) return city;
+        if (region && country) return region + ' · ' + country;
+        return country || String(r.place || '').trim() || '';
+      }
+
+      function ipHint(r) {
+        const ip = String((r && r.ip) || '').trim();
+        if (!ip) return '';
+        // Hide full last octet optionally? show full for admin desk-log
+        return ip;
       }
 
       function deviceLabel(device) {
@@ -1406,6 +1429,14 @@
             guestBadge.textContent = 'ضيف';
             nameEl.appendChild(guestBadge);
           }
+          const place = placeText(r);
+          if (place) {
+            const placeBadge = document.createElement('span');
+            placeBadge.className = 'rowDevice place';
+            placeBadge.textContent = place;
+            placeBadge.title = ipHint(r) || place;
+            nameEl.appendChild(placeBadge);
+          }
           const metaParts = [];
           if (guest) {
             metaParts.push('ضيف');
@@ -1424,6 +1455,7 @@
           } else {
             metaParts.push(pageLabel(r.page));
           }
+          if (ipHint(r)) metaParts.push(ipHint(r));
           el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
           const pagesEl = el.querySelector('.rowPages');
           if (pagesEl && pages.length > 1) {
