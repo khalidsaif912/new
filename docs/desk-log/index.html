@@ -170,6 +170,52 @@
       border-color: #f59e0b55;
     }
     .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
+    .rowPages {
+      margin: 6px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #7dd3fc;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .pageStats {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .pageStats h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #e2e8f0;
+    }
+    .pageStatsNote {
+      margin: -4px 0 10px;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .pageTypeList { display: grid; gap: 8px; }
+    .pageTypeRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #0f172a88;
+      border: 1px solid #33415555;
+    }
+    .pageTypeName { font-size: 12px; font-weight: 800; color: #e0f2fe; }
+    .pageTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
+    .pageStatsEmpty {
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      padding: 6px 0;
+    }
     .phoneRow {
       display: flex;
       align-items: center;
@@ -460,6 +506,11 @@
         <p class="deviceStatsNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
         <div class="deviceTypeList" id="deviceTypeList"></div>
       </section>
+      <section class="pageStats" id="pageStats">
+        <h2>إحصائية الصفحات</h2>
+        <p class="pageStatsNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
+        <div class="pageTypeList" id="pageTypeList"></div>
+      </section>
       <div class="list" id="list"></div>
     </div>
     <div id="phonesPanel" hidden>
@@ -654,15 +705,53 @@
       }
 
       function pageLabel(page) {
+        const raw = String(page || '').trim();
+        if (!raw) return '—';
+        const colon = raw.indexOf(':');
+        const section = colon >= 0 ? raw.slice(0, colon) : raw;
+        const detail = colon >= 0 ? raw.slice(colon + 1) : '';
         const map = {
           home: 'الرئيسية',
           roster: 'الروستر',
           alumni: 'زملاء سابقون',
           training: 'التدريب',
           'my-schedules': 'جدولي',
-          import: 'الوارد'
+          import: 'الوارد',
+          calculator: 'الحاسبة',
+          'ticker-board': 'لوحة الشريط',
+          'my-emoji': 'إيموجي',
+          tools: 'أدوات',
+          'roster-diff': 'فروقات الروستر',
+          'desk-log': 'سجل الزوار',
+          site: 'الموقع'
         };
-        return map[page] || page || '—';
+        let base = map[section] || section;
+        if (!detail) return base;
+        if (detail === 'now') return base + ' · الآن';
+        if (detail === 'import') return base + ' · وارد';
+        if (/^\d{4}-\d{2}-\d{2}(\/now)?$/.test(detail)) {
+          return base + ' · ' + detail.replace('/now', ' · الآن');
+        }
+        return base + ' · ' + detail;
+      }
+
+      function pagesOf(r) {
+        if (!r) return [];
+        if (Array.isArray(r.pages) && r.pages.length) {
+          const out = [];
+          const seen = {};
+          r.pages.forEach((item) => {
+            let k = '';
+            if (typeof item === 'string') k = item.trim();
+            else if (item && typeof item === 'object') k = String(item.k || item.page || item.key || '').trim();
+            if (!k || seen[k]) return;
+            seen[k] = 1;
+            out.push(k);
+          });
+          return out;
+        }
+        if (r.page) return [String(r.page)];
+        return [];
       }
 
       function deviceLabel(device) {
@@ -745,6 +834,34 @@
             '</div>'
           );
         }).join('');
+      }
+
+      function buildPageStats(rows) {
+        const byPage = new Map();
+        rows.forEach((r) => {
+          pagesOf(r).forEach((k) => {
+            byPage.set(k, (byPage.get(k) || 0) + 1);
+          });
+        });
+        return Array.from(byPage.entries())
+          .map(([page, count]) => ({ page, count }))
+          .sort((a, b) => b.count - a.count || a.page.localeCompare(b.page));
+      }
+
+      function renderPageStats(rows) {
+        const host = document.getElementById('pageTypeList');
+        if (!host) return;
+        const stats = buildPageStats(rows);
+        if (!stats.length) {
+          host.innerHTML = '<div class="pageStatsEmpty">لا بيانات صفحات في هذا النطاق بعد.</div>';
+          return;
+        }
+        host.innerHTML = stats.slice(0, 24).map((s) => (
+          '<div class="pageTypeRow">' +
+            '<div class="pageTypeName">' + escapeHtml(pageLabel(s.page)) + '</div>' +
+            '<div class="pageTypeCount">' + s.count + '</div>' +
+          '</div>'
+        )).join('');
       }
 
       function escapeHtml(s) {
@@ -1252,6 +1369,7 @@
         });
         const rows = filtered();
         renderDeviceStats(rows);
+        renderPageStats(rows);
         const list = document.getElementById('list');
         if (!rows.length) {
           list.innerHTML = '<div class="empty">لا توجد زيارات مسجّلة في هذا النطاق بعد.</div>';
@@ -1262,6 +1380,7 @@
             '<article class="row">' +
               '<p class="rowName"><span class="rowNameText"></span></p>' +
               '<p class="rowMeta"></p>' +
+              '<p class="rowPages" hidden></p>' +
             '</article>'
           );
         }).join('');
@@ -1295,8 +1414,20 @@
             if (name) metaParts.push(name);
           }
           metaParts.push(formatTime(r.at));
-          metaParts.push(pageLabel(r.page));
+          const pages = pagesOf(r);
+          if (pages.length === 1) {
+            metaParts.push(pageLabel(pages[0]));
+          } else if (pages.length > 1) {
+            metaParts.push(pages.length + ' صفحات');
+          } else {
+            metaParts.push(pageLabel(r.page));
+          }
           el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
+          const pagesEl = el.querySelector('.rowPages');
+          if (pagesEl && pages.length > 1) {
+            pagesEl.hidden = false;
+            pagesEl.textContent = pages.map(pageLabel).join('  ←  ');
+          }
         });
       }
 

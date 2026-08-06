@@ -364,18 +364,65 @@
     }
   }
 
-  function pagePathLabel() {
+  /** Coarse section + optional detail (path), e.g. roster:2026-08-05, tools:whatsapp-text */
+  function pageVisitInfo() {
     try {
-      var p = location.pathname || '/';
-      if (/\/alumni(\/|$)/.test(p)) return 'alumni';
-      if (/\/training(\/|$)/.test(p)) return 'training';
-      if (/\/my-schedules(\/|$)/.test(p)) return 'my-schedules';
-      if (/\/import(\/|$)/.test(p)) return 'import';
-      if (/\/date\//.test(p)) return 'roster';
-      return 'home';
+      var p = String(location.pathname || '/');
+      var rel = p;
+      var docs = p.match(/\/docs\/(.*)$/);
+      if (docs) rel = '/' + docs[1];
+      rel = rel.replace(/\/index\.html?$/i, '/').replace(/\/{2,}/g, '/');
+      if (rel.length > 1) rel = rel.replace(/\/$/, '');
+      if (!rel) rel = '/';
+
+      var section = 'home';
+      var detail = '';
+
+      if (/\/desk-log(\/|$)/.test(p)) {
+        section = 'desk-log';
+      } else if (/\/calculator(\/|$)/.test(p)) {
+        section = 'calculator';
+      } else if (/\/ticker-board(\/|$)/.test(p)) {
+        section = 'ticker-board';
+      } else if (/\/my-emoji(\/|$)/.test(p)) {
+        section = 'my-emoji';
+      } else if (/\/alumni(\/|$)/.test(p)) {
+        section = 'alumni';
+      } else if (/\/training(\/|$)/.test(p)) {
+        section = 'training';
+        var arch = p.match(/\/training\/archive\/([^/]+)/);
+        if (arch) detail = String(arch[1] || '').replace(/\.html?$/i, '');
+      } else if (/\/tools\/([^/]+)/.test(p)) {
+        section = 'tools';
+        detail = (p.match(/\/tools\/([^/]+)/) || [])[1] || '';
+      } else if (/\/import\/my-schedules(\/|$)/.test(p) || /\/my-schedules(\/|$)/.test(p)) {
+        section = 'my-schedules';
+        if (/\/import\//.test(p)) detail = 'import';
+      } else if (/\/import(\/|$)/.test(p)) {
+        section = 'import';
+        var idate = p.match(/\/import\/date\/(\d{4}-\d{2}-\d{2})/);
+        if (idate) detail = idate[1];
+        else if (/\/import\/now(\/|$)/.test(p)) detail = 'now';
+      } else if (/\/date\/(\d{4}-\d{2}-\d{2})/.test(p)) {
+        section = 'roster';
+        detail = (p.match(/\/date\/(\d{4}-\d{2}-\d{2})/) || [])[1] || '';
+        if (/\/now(\/|$)/.test(p)) detail += detail ? '/now' : 'now';
+      } else if (/\/now(\/|$)/.test(p)) {
+        section = 'roster';
+        detail = 'now';
+      } else if (/\/roster-diff(\/|$)/.test(p)) {
+        section = 'roster-diff';
+      }
+
+      var key = section + (detail ? ':' + detail : '');
+      return { section: section, detail: detail, key: key, path: rel.slice(0, 100) };
     } catch (e) {
-      return 'site';
+      return { section: 'site', detail: '', key: 'site', path: '/' };
     }
+  }
+
+  function pagePathLabel() {
+    return pageVisitInfo().key;
   }
 
   function screenKey() {
@@ -553,9 +600,12 @@
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
   var PHONE_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/phones';
   // v4: also log guests without saved employee id (once/day per device).
+  // v5: still one row per visitor/day, but merge every distinct page visited that day.
   var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV4';
+  var VISIT_PAGES_KEY = 'rosterVisitPagesV5';
   var GUEST_ID_KEY = 'rosterVisitGuestId';
   var PHONE_PROMPT_KEY = 'rosterPhonePromptDone';
+  var MAX_PAGES_PER_VISIT = 30;
 
   function docsBasePath() {
     try {
@@ -618,8 +668,86 @@
     };
   }
 
+  function readLocalPageKeys(stamp) {
+    try {
+      var raw = localStorage.getItem(VISIT_PAGES_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      if (!data || data.stamp !== stamp) return [];
+      return Array.isArray(data.keys) ? data.keys.map(String) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeLocalPageKeys(stamp, pageKeys) {
+    try {
+      localStorage.setItem(
+        VISIT_PAGES_KEY,
+        JSON.stringify({ stamp: stamp, keys: (pageKeys || []).slice(0, MAX_PAGES_PER_VISIT) })
+      );
+    } catch (e) {}
+  }
+
+  function normalizePageEntry(item) {
+    if (!item) return null;
+    if (typeof item === 'string') {
+      var k0 = String(item).trim();
+      return k0 ? { k: k0, at: 0 } : null;
+    }
+    var k = String(item.k || item.page || item.key || '').trim();
+    if (!k) return null;
+    return { k: k, at: Number(item.at) || 0 };
+  }
+
+  function mergeVisitPages(existingPages, pageKey, at) {
+    var list = [];
+    var seen = {};
+    (Array.isArray(existingPages) ? existingPages : []).forEach(function (raw) {
+      var e = normalizePageEntry(raw);
+      if (!e || seen[e.k]) return;
+      seen[e.k] = 1;
+      list.push(e);
+    });
+    if (!seen[pageKey]) {
+      list.push({ k: pageKey, at: at || Date.now() });
+    } else {
+      list.forEach(function (e) {
+        if (e.k === pageKey && at) e.at = at;
+      });
+    }
+    if (list.length > MAX_PAGES_PER_VISIT) list = list.slice(list.length - MAX_PAGES_PER_VISIT);
+    return list;
+  }
+
+  function shrinkLogPayload(kept) {
+    if (kept.length > 400) kept.length = 400;
+    // mantledb free tier rejects payloads over 64KB (HTTP 413).
+    while (kept.length > 1 && JSON.stringify({ log: kept }).length > 50000) {
+      kept.pop();
+    }
+    // If still oversized (many pages per row), trim page histories on oldest rows first.
+    var i = kept.length - 1;
+    while (i >= 0 && JSON.stringify({ log: kept }).length > 50000) {
+      var row = kept[i];
+      if (row && Array.isArray(row.pages) && row.pages.length > 4) {
+        row.pages = row.pages.slice(-Math.max(4, Math.floor(row.pages.length / 2)));
+      } else if (kept.length > 1) {
+        kept.pop();
+        i = kept.length - 1;
+        continue;
+      } else {
+        break;
+      }
+      i -= 1;
+    }
+    return kept;
+  }
+
   function postVisitRow(row, stamp) {
     var headers = visitHeaders();
+    var pageKey = String((row && row.page) || '').trim() || 'site';
+    var at = Number(row && row.at) || Date.now();
     return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('read');
@@ -627,23 +755,47 @@
       })
       .then(function (cur) {
         var list = Array.isArray(cur && cur.log) ? cur.log.slice() : [];
-        var kept = list.filter(function (item) {
-          return !(item && String(item.id) === String(row.id) && String(item.day) === String(row.day));
+        var prev = null;
+        var kept = [];
+        list.forEach(function (item) {
+          if (item && String(item.id) === String(row.id) && String(item.day) === String(row.day)) {
+            prev = item;
+          } else {
+            kept.push(item);
+          }
         });
-        kept.unshift(row);
-        if (kept.length > 400) kept.length = 400;
-        // mantledb free tier rejects payloads over 64KB (HTTP 413); drop the
-        // oldest rows until there is comfortable headroom, or nothing gets saved.
-        while (kept.length > 1 && JSON.stringify({ log: kept }).length > 50000) {
-          kept.pop();
+
+        var basePages = prev && Array.isArray(prev.pages) ? prev.pages.slice() : [];
+        if (!basePages.length && prev && prev.page) {
+          basePages = [{ k: String(prev.page), at: Number(prev.at) || 0 }];
         }
+        var pages = mergeVisitPages(basePages, pageKey, at);
+
+        var merged = {
+          id: row.id,
+          name: (row.name || (prev && prev.name) || '') || '',
+          guest: !!(row.guest || (prev && prev.guest)),
+          day: row.day,
+          at: at,
+          page: pageKey,
+          pages: pages,
+          device: (row.device || (prev && prev.device) || 'Other') || 'Other',
+          model: (row.model || (prev && prev.model) || '') || ''
+        };
+        kept.unshift(merged);
+        kept = shrinkLogPayload(kept);
+
         return fetch(VISIT_LOG_URL, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({ log: kept })
         }).then(function (r) {
           if (!r.ok) throw new Error('write');
-          try { localStorage.setItem(VISIT_LOGGED_KEY, stamp); } catch (e2) {}
+          try {
+            localStorage.setItem(VISIT_LOGGED_KEY, stamp);
+            var keys = pages.map(function (p) { return p.k; });
+            writeLocalPageKeys(stamp, keys);
+          } catch (e2) {}
         });
       });
   }
@@ -654,9 +806,11 @@
     var isGuest = !ident;
     var visitId = isGuest ? getOrCreateGuestId() : ident.id;
     var stamp = keys.day + ':' + visitId;
-    try {
-      if (localStorage.getItem(VISIT_LOGGED_KEY) === stamp) return;
-    } catch (e) {}
+    var info = pageVisitInfo();
+    var pageKey = info.key || pagePathLabel() || 'site';
+    var localPages = readLocalPageKeys(stamp);
+    // Already logged this exact page today → skip network.
+    if (localPages.indexOf(pageKey) >= 0) return;
 
     var namePromise = isGuest
       ? Promise.resolve('')
@@ -674,13 +828,15 @@
             }
           } catch (e3) {}
         }
+        var at = Date.now();
         return postVisitRow({
           id: visitId,
           name: resolvedName || '',
           guest: !!isGuest,
           day: keys.day,
-          at: Date.now(),
-          page: pagePathLabel(),
+          at: at,
+          page: pageKey,
+          pages: [{ k: pageKey, at: at }],
           device: (dev && dev.device) || 'Other',
           model: (dev && dev.model) || ''
         }, stamp);
