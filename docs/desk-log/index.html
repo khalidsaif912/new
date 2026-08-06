@@ -1,0 +1,1637 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="desk-log-build" content="20260806tabs2">
+  <title>·</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .gate, .app { max-width: 720px; margin: 0 auto; padding: calc(20px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)); }
+    .gate { text-align: center; padding-top: 18vh; max-width: 560px; }
+    .gate h1 { font-size: 18px; margin: 0 0 8px; color: #94a3b8; font-weight: 700; }
+    .gate p { margin: 0 0 16px; font-size: 13px; color: #64748b; }
+    .gate input {
+      width: min(220px, 100%);
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: .2em;
+      outline: none;
+    }
+    .gate input:focus { border-color: #60a5fa; }
+    .gate button, .toolbar button, .chip {
+      border: 0;
+      border-radius: 12px;
+      min-height: 42px;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .gate button {
+      margin-top: 12px;
+      background: #2563eb;
+      color: #fff;
+      width: min(220px, 100%);
+    }
+    .gateErr { min-height: 20px; margin-top: 10px; color: #f87171; font-size: 13px; font-weight: 700; }
+    .app[hidden], .gate[hidden], [hidden] { display: none !important; }
+    .head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .head h1 { margin: 0; font-size: 20px; font-weight: 800; color: #f8fafc; }
+    .head p { margin: 6px 0 0; font-size: 12px; color: #94a3b8; line-height: 1.45; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .chip {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      min-height: 36px;
+      font-size: 12px;
+    }
+    .chip.active { background: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
+    .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
+    .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .visitsChrome { margin-bottom: 0; }
+    .statsPanel {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .statsPanelHead {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .statsPanelHead h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #f1f5f9;
+    }
+    .statsPanelHead .countPill {
+      font-size: 12px;
+      font-weight: 800;
+      color: #93c5fd;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+    .statsPanelNote {
+      margin: 0 0 12px;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    .deviceTypeList,
+    .pageTypeList { display: grid; gap: 8px; }
+    .deviceTypeRow,
+    .pageTypeRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #0f172a88;
+      border: 1px solid #33415555;
+    }
+    .deviceTypeName,
+    .pageTypeName { font-size: 13px; font-weight: 800; color: #f1f5f9; }
+    .pageTypeName { color: #e0f2fe; font-size: 12px; }
+    .deviceTypeCount,
+    .pageTypeCount { font-size: 14px; font-weight: 800; color: #93c5fd; }
+    .barTrack {
+      grid-column: 1 / -1;
+      height: 5px;
+      border-radius: 999px;
+      background: #0f172a;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .barFill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
+      min-width: 2px;
+    }
+    .deviceModelList {
+      grid-column: 1 / -1;
+      margin: 4px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 4px;
+    }
+    .deviceModelList li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .deviceModelList li b { color: #cbd5e1; font-weight: 800; }
+    .deviceStatsEmpty,
+    .pageStatsEmpty {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      text-align: center;
+      padding: 18px 8px;
+    }
+    .listHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0 10px;
+    }
+    .listHead h2 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+    .listHead .countPill {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+    .list { display: grid; gap: 8px; }
+    .row {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .rowName { font-size: 14px; font-weight: 800; color: #f1f5f9; margin: 0 0 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .rowDevice {
+      font-size: 11px;
+      font-weight: 700;
+      color: #93c5fd;
+      background: #1e3a8a55;
+      border: 1px solid #3b82f655;
+      border-radius: 999px;
+      padding: 2px 8px;
+      line-height: 1.4;
+    }
+    .rowDevice.guest {
+      color: #fcd34d;
+      background: #78350f55;
+      border-color: #f59e0b55;
+    }
+    .rowDevice.place {
+      color: #a7f3d0;
+      background: #064e3b55;
+      border-color: #10b98155;
+    }
+    .rowMeta { font-size: 12px; color: #94a3b8; font-weight: 600; line-height: 1.45; }
+    .rowPages {
+      margin: 6px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #7dd3fc;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .phoneRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .phoneRowMain { min-width: 0; flex: 1; }
+    .phoneRow .rowName { margin-bottom: 6px; }
+    .phoneDigits {
+      display: inline-flex;
+      align-items: center;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      color: #e0f2fe;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin: 0 0 6px;
+    }
+    .phoneActions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .phoneAct {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,.22);
+      transition: transform .12s ease, filter .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .phoneAct:active { transform: scale(.96); }
+    .phoneAct svg { width: 20px; height: 20px; display: block; }
+    .phoneAct--call {
+      background: linear-gradient(145deg, #22c55e, #15803d);
+    }
+    .phoneAct--copy {
+      background: linear-gradient(145deg, #38bdf8, #0284c7);
+    }
+    .phoneToast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(12px);
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 20;
+    }
+    .phoneToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .empty, .error {
+      text-align: center;
+      padding: 28px 14px;
+      border-radius: 14px;
+      border: 1px dashed #334155;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .error { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
+    .headActions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      flex-shrink: 0;
+    }
+    .lockOut, .homeOut, .tickerModOut {
+      background: transparent;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      font-size: 12px;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .homeOut {
+      background: #1e3a8a55;
+      border-color: #3b82f655;
+      color: #dbeafe;
+    }
+    .tickerModOut {
+      background: #9a341255;
+      border-color: #f59e0b66;
+      color: #fdba74;
+    }
+    .toolbar.mainTabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .toolbar.mainTabs .chip {
+      width: 100%;
+      justify-content: center;
+      min-height: 44px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 0 6px;
+    }
+    @media (min-width: 640px) {
+      .toolbar.mainTabs {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+    .toolsIntro {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .toolsGrid {
+      display: grid;
+      gap: 10px;
+    }
+    .toolCard {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 12px;
+      align-items: center;
+      background: linear-gradient(165deg, #1e293b, #0f172aee);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s ease, transform .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toolCard:active { transform: scale(.99); }
+    .toolCard:hover { border-color: #60a5fa88; }
+    .toolTag {
+      display: inline-flex;
+      font-size: 10px;
+      font-weight: 800;
+      color: #93c5fd;
+      background: #1e3a8a66;
+      border: 1px solid #3b82f655;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-bottom: 6px;
+    }
+    .toolTitle {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .toolDesc {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+    .toolGo {
+      flex-shrink: 0;
+      min-width: 72px;
+      min-height: 38px;
+      border-radius: 12px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      pointer-events: none;
+    }
+    .sectionLabel {
+      margin: 18px 0 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
+    .stats.stats4 { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 560px) {
+      .stats.stats4 { grid-template-columns: repeat(4, 1fr); }
+    }
+    .gapNote {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #78350f33;
+      border: 1px solid #f59e0b44;
+      color: #fcd34d;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .gapBadge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      background: #0f172a88;
+    }
+    .gapBadge.phone { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
+    .gapBadge.visit { color: #fde68a; border-color: #854d0e; background: #713f1255; }
+    .gapBadge.both { color: #fda4af; border-color: #9f1239; background: #4c051955; }
+    @media (max-width: 520px) {
+      .toolbar.mainTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolCard { grid-template-columns: 1fr; }
+      .toolGo { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gate" id="gate">
+    <h1>دخول خاص</h1>
+    <p>أدخل الرمز للمتابعة</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="12" autocomplete="off" autofocus>
+    <div>
+      <button type="button" id="pinBtn">دخول</button>
+    </div>
+    <div class="gateErr" id="gateErr"></div>
+    <div style="margin-top:18px">
+      <a class="homeOut" id="gateHomeOut" href="../index.html" style="display:inline-flex;min-width:160px">🏠 الرئيسية</a>
+    </div>
+  </div>
+
+  <div class="app" id="app" hidden>
+    <div class="head">
+      <div>
+        <h1>لوحة خاصة</h1>
+        <p>سجل الزيارات، أرقام الهواتف، وروابط الأدوات الخاصة حتى لا تُنسى.</p>
+      </div>
+      <div class="headActions">
+        <a class="homeOut" id="homeOut" href="../index.html">🏠 الرئيسية</a>
+        <a class="tickerModOut" href="../ticker-board/moderate.html">🎉 اعتماد الشريط</a>
+        <button type="button" class="lockOut" id="lockOut">قفل</button>
+      </div>
+    </div>
+    <div class="toolbar mainTabs" id="mainTabs">
+      <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
+      <button type="button" class="chip" data-view="devices" id="tabDevices">الأجهزة</button>
+      <button type="button" class="chip" data-view="pages" id="tabPages">الصفحات</button>
+      <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
+      <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
+      <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
+    </div>
+    <div id="visitsChrome">
+      <div class="toolbar">
+        <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
+        <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
+        <button type="button" class="chip" data-filter="all" id="fAll">الكل</button>
+        <button type="button" class="chip" id="refreshBtn">تحديث</button>
+      </div>
+      <div class="stats stats3">
+        <div class="stat"><b id="statToday">0</b><span>زوار اليوم</span></div>
+        <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
+        <div class="stat"><b id="statTotal">—</b><span>إجمالي الزوار</span></div>
+      </div>
+    </div>
+    <div id="visitsPanel">
+      <div class="listHead">
+        <h2>سجل الزيارات</h2>
+        <span class="countPill" id="listCountPill">0</span>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+    <section class="statsPanel" id="devicesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الأجهزة</h2>
+        <span class="countPill" id="deviceCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+      <div class="deviceTypeList" id="deviceTypeList"></div>
+    </section>
+    <section class="statsPanel" id="pagesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الصفحات</h2>
+        <span class="countPill" id="pageCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
+      <div class="pageTypeList" id="pageTypeList"></div>
+      <div class="statsPanelHead" style="margin-top:18px">
+        <h2>أرقام شوهدت في جدولي</h2>
+        <span class="countPill" id="scheduleViewPill">0</span>
+      </div>
+      <p class="statsPanelNote">أرقام الوظيفة التي فتح أحد الزوار جدولها من صفحة «جدولي» (حسب الفلتر).</p>
+      <div class="pageTypeList" id="scheduleViewList"></div>
+    </section>
+    <div id="phonesPanel" hidden>
+      <div class="toolbar">
+        <button type="button" class="chip" id="refreshPhonesBtn">تحديث</button>
+        <a class="chip" href="../tools/phone-match/" style="text-decoration:none;display:inline-flex;align-items:center">مطابقة أرقام</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statPhones">0</b><span>أرقام محفوظة</span></div>
+        <div class="stat"><b id="statPhonesHint">—</b><span>آخر تحديث</span></div>
+      </div>
+      <div class="list" id="phonesList"></div>
+    </div>
+    <div id="gapsPanel" hidden>
+      <p class="toolsIntro">مقارنة موظفي الروستر الحالي مع سجل الزيارات وأرقام الهواتف المحفوظة.</p>
+      <div class="toolbar" id="gapsFilters">
+        <button type="button" class="chip active" data-gap="noPhone">بدون هاتف</button>
+        <button type="button" class="chip" data-gap="noVisit">لم يزوروا</button>
+        <button type="button" class="chip" data-gap="noId">بدون رقم وظيفة*</button>
+        <button type="button" class="chip" data-gap="both">بدون زيارة وهاتف</button>
+        <button type="button" class="chip" id="refreshGapsBtn">تحديث</button>
+      </div>
+      <div class="stats stats4">
+        <div class="stat"><b id="gapStatStaff">0</b><span>موظف حالي</span></div>
+        <div class="stat"><b id="gapStatNoPhone">0</b><span>بدون هاتف</span></div>
+        <div class="stat"><b id="gapStatNoVisit">0</b><span>لم يزوروا بهويتهم</span></div>
+        <div class="stat"><b id="gapStatGuests">0</b><span>زيارات ضيف (بدون رقم وظيفة)</span></div>
+      </div>
+      <p class="gapNote" id="gapNote">* «بدون رقم وظيفة» = زيارات كضيف دون حفظ رقم الموظف. لا يمكن معرفة أسمائهم، لذلك يُعرض العدد فقط مع قائمة الموظفين الذين لم يظهروا بهويتهم.</p>
+      <div class="list" id="gapsList"></div>
+    </div>
+    <div id="toolsPanel" hidden>
+      <p class="toolsIntro">صفحات وأدوات خاصة للاستخدام عند الحاجة — مطابقة الأرقام، مراجعة المغادرين، وغيرها.</p>
+      <div class="toolsGrid" id="toolsGrid">
+        <div class="empty">جاري تحميل الأدوات...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const PIN = '912';
+      const AUTH_KEY = 'rosterVisitDeskAuth';
+      const MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/index';
+      const PHONES_URL = 'https://mantledb.sh/v2/roster-site-visits/phones';
+      const MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+      let filter = 'today';
+      let view = 'visits';
+      let gapFilter = 'noPhone';
+      let log = [];
+      let phones = [];
+      let staffList = [];
+      let nameById = Object.create(null);
+
+      const gate = document.getElementById('gate');
+      const app = document.getElementById('app');
+      const pinInput = document.getElementById('pinInput');
+      const gateErr = document.getElementById('gateErr');
+
+      function docsBase() {
+        try {
+          const m = String(location.pathname || '').match(/^(.*?\/docs\/)/);
+          return m ? m[1] : '../';
+        } catch (e) {
+          return '../';
+        }
+      }
+
+      function homeUrl() {
+        try {
+          const base = docsBase();
+          if (base && base !== '../') return base.replace(/\/?$/, '/') + 'index.html';
+        } catch (e) {}
+        return '../index.html';
+      }
+
+      const homeOut = document.getElementById('homeOut');
+      if (homeOut) homeOut.href = homeUrl();
+      const gateHomeOut = document.getElementById('gateHomeOut');
+      if (gateHomeOut) gateHomeOut.href = homeUrl();
+
+      function cleanName(name) {
+        return String(name || '')
+          .replace(/\s*[-–—]\s*\d+\s*$/, '')
+          .trim();
+      }
+
+      function rememberName(id, name) {
+        const key = String(id || '').trim();
+        const n = cleanName(name);
+        if (!key || !n) return;
+        if (!nameById[key]) nameById[key] = n;
+      }
+
+      function isGuestRow(r) {
+        if (!r) return false;
+        if (r.guest === true) return true;
+        const id = String(r.id || '').trim();
+        return /^g-/i.test(id) || !/^\d+$/.test(id);
+      }
+
+      function displayName(r) {
+        if (isGuestRow(r)) return 'زائر بدون رقم';
+        const id = String((r && r.id) || '').trim();
+        const fromRow = cleanName(r && r.name);
+        if (fromRow) return fromRow;
+        if (id && nameById[id]) return nameById[id];
+        return '';
+      }
+
+      async function loadNameDirectory() {
+        const base = docsBase();
+        try {
+          const res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            const list = Array.isArray(json && json.employees) ? json.employees : [];
+            list.forEach((emp) => rememberName(emp && emp.id, emp && emp.name));
+          }
+        } catch (e) {}
+
+        (log || []).forEach((r) => rememberName(r && r.id, r && r.name));
+
+        const missing = Array.from(new Set(
+          (log || [])
+            .map((r) => String((r && r.id) || '').trim())
+            .filter((id) => id && /^\d+$/.test(id) && !nameById[id])
+        ));
+        if (!missing.length) return;
+
+        const fetchOne = async (id) => {
+          const urls = [
+            base + 'schedules/' + encodeURIComponent(id) + '.json',
+            base + 'import/schedules/' + encodeURIComponent(id) + '.json'
+          ];
+          for (const url of urls) {
+            try {
+              const res = await fetch(url + '?ts=' + Date.now(), { cache: 'no-store' });
+              if (!res.ok) continue;
+              const json = await res.json();
+              rememberName(id, json && json.name);
+              if (nameById[id]) return;
+            } catch (e) {}
+          }
+        };
+
+        const concurrency = 6;
+        let idx = 0;
+        async function worker() {
+          while (idx < missing.length) {
+            const i = idx++;
+            await fetchOne(missing[i]);
+          }
+        }
+        await Promise.all(Array.from({ length: Math.min(concurrency, missing.length) }, worker));
+      }
+
+      function muscatParts() {
+        try {
+          const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Muscat',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hour12: false
+          }).formatToParts(new Date());
+          const map = {};
+          parts.forEach((p) => { if (p.type !== 'literal') map[p.type] = p.value; });
+          return {
+            day: map.year + '-' + map.month + '-' + map.day,
+            month: map.year + '-' + map.month
+          };
+        } catch (e) {
+          const d = new Date();
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return { day: y + '-' + m + '-' + day, month: y + '-' + m };
+        }
+      }
+
+      function formatTime(at) {
+        try {
+          return new Date(Number(at) || Date.now()).toLocaleString('ar-OM', {
+            timeZone: 'Asia/Muscat',
+            hour: '2-digit',
+            minute: '2-digit',
+            day: 'numeric',
+            month: 'short'
+          });
+        } catch (e) {
+          return String(at || '');
+        }
+      }
+
+      function pageLabel(page) {
+        const raw = String(page || '').trim();
+        if (!raw) return '—';
+        const colon = raw.indexOf(':');
+        const section = colon >= 0 ? raw.slice(0, colon) : raw;
+        const detail = colon >= 0 ? raw.slice(colon + 1) : '';
+        const map = {
+          home: 'الرئيسية',
+          roster: 'الروستر',
+          alumni: 'زملاء سابقون',
+          training: 'التدريب',
+          'my-schedules': 'جدولي',
+          import: 'الوارد',
+          calculator: 'الحاسبة',
+          'ticker-board': 'لوحة الشريط',
+          'my-emoji': 'إيموجي',
+          tools: 'أدوات',
+          'roster-diff': 'فروقات الروستر',
+          'desk-log': 'سجل الزوار',
+          'a-cup-of-book': 'كوب في فنجان',
+          ideas: 'أفكار',
+          site: 'الموقع'
+        };
+        let base = map[section] || section;
+        if (!detail) return base;
+        if (detail === 'now') return base + ' · الآن';
+        if (detail === 'import') return base + ' · وارد';
+        if (detail === 'a-cup-of-book') return 'كوب في فنجان';
+        const empView = detail.match(/^emp:(\d+)$/);
+        if (empView) {
+          const eid = empView[1];
+          const ename = cleanName(nameById[eid] || '');
+          return base + ' · #' + eid + (ename ? ' · ' + ename : '');
+        }
+        if (/^\d{4}-\d{2}-\d{2}(\/now)?$/.test(detail)) {
+          return base + ' · ' + detail.replace('/now', ' · الآن');
+        }
+        return base + ' · ' + detail;
+      }
+
+      function parseScheduleEmpId(pageKey) {
+        const m = String(pageKey || '').match(/^my-schedules:emp:(\d+)$/i);
+        return m ? m[1] : '';
+      }
+
+      function buildScheduleViewStats(rows) {
+        const byEmp = new Map();
+        rows.forEach((r) => {
+          pagesOf(r).forEach((k) => {
+            const eid = parseScheduleEmpId(k);
+            if (!eid) return;
+            byEmp.set(eid, (byEmp.get(eid) || 0) + 1);
+          });
+        });
+        return Array.from(byEmp.entries())
+          .map(([id, count]) => ({
+            id,
+            count,
+            name: cleanName(nameById[id] || '')
+          }))
+          .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
+      }
+
+      function renderScheduleViewStats(rows) {
+        const host = document.getElementById('scheduleViewList');
+        const pill = document.getElementById('scheduleViewPill');
+        if (!host) return;
+        const stats = buildScheduleViewStats(rows);
+        const total = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) {
+          pill.textContent = stats.length
+            ? (stats.length + ' رقم · ' + total + ' مشاهدة')
+            : '0';
+        }
+        if (!stats.length) {
+          host.innerHTML = '<div class="pageStatsEmpty">لا مشاهدات جداول مسجّلة في هذا النطاق بعد. تظهر بعد فتح «جدولي» وكتابة رقم وظيفة.</div>';
+          return;
+        }
+        const max = Math.max.apply(null, stats.map((s) => s.count || 0)) || 1;
+        host.innerHTML = stats.slice(0, 50).map((s) => {
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
+          const label = '#' + s.id + (s.name ? ' · ' + s.name : '');
+          return (
+            '<div class="pageTypeRow">' +
+              '<div class="pageTypeName">' + escapeHtml(label) + '</div>' +
+              '<div class="pageTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function pagesOf(r) {
+        if (!r) return [];
+        if (Array.isArray(r.pages) && r.pages.length) {
+          const out = [];
+          const seen = {};
+          r.pages.forEach((item) => {
+            let k = '';
+            if (typeof item === 'string') k = item.trim();
+            else if (item && typeof item === 'object') k = String(item.k || item.page || item.key || '').trim();
+            if (!k || seen[k]) return;
+            seen[k] = 1;
+            out.push(k);
+          });
+          return out;
+        }
+        if (r.page) return [String(r.page)];
+        return [];
+      }
+
+      function placeText(r) {
+        if (!r) return '';
+        const city = String(r.city || '').trim();
+        const region = String(r.region || '').trim();
+        const country = String(r.country || '').trim();
+        if (city && country) return city + ' · ' + country;
+        if (city) return city;
+        if (region && country) return region + ' · ' + country;
+        return country || String(r.place || '').trim() || '';
+      }
+
+      function ipHint(r) {
+        const ip = String((r && r.ip) || '').trim();
+        if (!ip) return '';
+        // Hide full last octet optionally? show full for admin desk-log
+        return ip;
+      }
+
+      function deviceLabel(device) {
+        const map = {
+          iPhone: 'آيفون',
+          iPad: 'آيباد',
+          Android: 'أندرويد',
+          'Android Tablet': 'تابلت أندرويد',
+          'Windows Phone': 'ويندوز فون',
+          Windows: 'ويندوز',
+          Mac: 'ماك',
+          Linux: 'لينكس',
+          'Linux Tablet': 'تابلت لينكس',
+          Chromebook: 'كروم بوك',
+          Mobile: 'جوال',
+          Other: 'أخرى'
+        };
+        const key = String(device || '').trim();
+        if (!key) return '';
+        return map[key] || key;
+      }
+
+      function rowDeviceText(r) {
+        const type = deviceLabel(r.device);
+        const model = String(r.model || '').trim();
+        if (type && model && model !== r.device && model !== type) {
+          // Avoid "آيفون · iPhone" duplication when model is generic.
+          if (model === 'iPhone' || model === 'Android' || model === 'iPad' || model === 'Windows') {
+            return type;
+          }
+          return type + ' · ' + model;
+        }
+        return type || model || '';
+      }
+
+      function buildDeviceStats(rows) {
+        const byType = new Map();
+        rows.forEach((r) => {
+          if (!r) return;
+          const type = String(r.device || '').trim() || 'Other';
+          const model = String(r.model || '').trim() || type;
+          if (!byType.has(type)) byType.set(type, { count: 0, models: new Map() });
+          const bucket = byType.get(type);
+          bucket.count += 1;
+          bucket.models.set(model, (bucket.models.get(model) || 0) + 1);
+        });
+        return Array.from(byType.entries())
+          .map(([type, data]) => ({
+            type,
+            count: data.count,
+            models: Array.from(data.models.entries())
+              .map(([model, count]) => ({ model, count }))
+              .sort((a, b) => b.count - a.count || a.model.localeCompare(b.model))
+          }))
+          .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+      }
+
+      function renderDeviceStats(rows) {
+        const host = document.getElementById('deviceTypeList');
+        const pill = document.getElementById('deviceCountPill');
+        if (!host) return;
+        const stats = buildDeviceStats(rows);
+        const total = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) pill.textContent = total ? (total + ' زيارة') : '0';
+        if (!stats.length) {
+          host.innerHTML = '<div class="deviceStatsEmpty">لا بيانات أجهزة في هذا النطاق بعد.</div>';
+          return;
+        }
+        const max = Math.max.apply(null, stats.map((s) => s.count || 0)) || 1;
+        host.innerHTML = stats.map((s) => {
+          const showModels = s.models.length > 1 || (s.models[0] && s.models[0].model !== s.type);
+          const modelsHtml = showModels
+            ? '<ul class="deviceModelList">' +
+              s.models.map((m) =>
+                '<li><span>' + escapeHtml(m.model) + '</span><b>' + m.count + '</b></li>'
+              ).join('') +
+              '</ul>'
+            : '';
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
+          return (
+            '<div class="deviceTypeRow">' +
+              '<div class="deviceTypeName">' + escapeHtml(deviceLabel(s.type) || s.type) + '</div>' +
+              '<div class="deviceTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
+              modelsHtml +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function buildPageStats(rows) {
+        const byPage = new Map();
+        rows.forEach((r) => {
+          pagesOf(r).forEach((k) => {
+            byPage.set(k, (byPage.get(k) || 0) + 1);
+          });
+        });
+        return Array.from(byPage.entries())
+          .map(([page, count]) => ({ page, count }))
+          .sort((a, b) => b.count - a.count || a.page.localeCompare(b.page));
+      }
+
+      function renderPageStats(rows) {
+        const host = document.getElementById('pageTypeList');
+        const pill = document.getElementById('pageCountPill');
+        if (!host) return;
+        const stats = buildPageStats(rows);
+        const shown = stats.slice(0, 40);
+        const totalHits = stats.reduce((n, s) => n + (s.count || 0), 0);
+        if (pill) {
+          pill.textContent = stats.length
+            ? (stats.length + ' صفحة · ' + totalHits + ' زيارة')
+            : '0';
+        }
+        if (!stats.length) {
+          host.innerHTML = '<div class="pageStatsEmpty">لا بيانات صفحات في هذا النطاق بعد.</div>';
+          return;
+        }
+        const max = Math.max.apply(null, shown.map((s) => s.count || 0)) || 1;
+        host.innerHTML = shown.map((s) => {
+          const pct = Math.max(4, Math.round(((s.count || 0) / max) * 100));
+          return (
+            '<div class="pageTypeRow">' +
+              '<div class="pageTypeName">' + escapeHtml(pageLabel(s.page)) + '</div>' +
+              '<div class="pageTypeCount">' + s.count + '</div>' +
+              '<div class="barTrack"><span class="barFill" style="width:' + pct + '%"></span></div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function escapeHtml(s) {
+        return String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function unlock() {
+        sessionStorage.setItem(AUTH_KEY, '1');
+        gate.hidden = true;
+        app.hidden = false;
+        setView(view);
+      }
+
+      function lock() {
+        sessionStorage.removeItem(AUTH_KEY);
+        app.hidden = true;
+        gate.hidden = false;
+        pinInput.value = '';
+        gateErr.textContent = '';
+        setTimeout(() => pinInput.focus(), 30);
+      }
+
+      function setView(next) {
+        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1 };
+        view = allowed[next] ? next : 'visits';
+        const visitRelated = view === 'visits' || view === 'devices' || view === 'pages';
+        const chrome = document.getElementById('visitsChrome');
+        if (chrome) chrome.hidden = !visitRelated;
+        document.getElementById('visitsPanel').hidden = view !== 'visits';
+        document.getElementById('devicesPanel').hidden = view !== 'devices';
+        document.getElementById('pagesPanel').hidden = view !== 'pages';
+        document.getElementById('phonesPanel').hidden = view !== 'phones';
+        document.getElementById('gapsPanel').hidden = view !== 'gaps';
+        document.getElementById('toolsPanel').hidden = view !== 'tools';
+        document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-view') === view);
+        });
+        if (view === 'phones') loadPhones();
+        else if (view === 'tools') loadTools();
+        else if (view === 'gaps') loadGaps();
+        else loadLog();
+      }
+
+      function toolHref(href) {
+        try {
+          if (!href) return '#';
+          if (/^https?:\/\//i.test(href)) return href;
+          const base = docsBase();
+          if (href.indexOf('../') === 0) {
+            // catalog paths are relative to desk-log/
+            return href;
+          }
+          return (base.replace(/\/?$/, '/') + href.replace(/^\//, ''));
+        } catch (e) {
+          return href || '#';
+        }
+      }
+
+      async function loadTools() {
+        const host = document.getElementById('toolsGrid');
+        if (!host) return;
+        const fallback = [
+          { id: 'ideas', title: 'اقتراحات وأفكار', desc: 'صفحة الاقتراحات العامة — تثبيت/حذف عبر PIN داخل الصفحة.', href: '../ideas/', tag: 'عرض' },
+          { id: 'ticker-mod', title: 'اعتماد رسائل الشريط', desc: 'مراجعة واعتماد رسائل الموظفين قبل ظهورها في الشريط الإخباري.', href: '../ticker-board/moderate.html', tag: 'بيانات' },
+          { id: 'phone-match', title: 'مطابقة أرقام الموظفين', desc: 'ربط أرقام جهات الاتصال بموظفي الروستر.', href: '../tools/phone-match/', tag: 'بيانات' },
+          { id: 'leavers', title: 'مراجعة المغادرين', desc: 'تأكيد من غادر عند الروستر الجديد.', href: '../tools/leavers/', tag: 'روستر' },
+          { id: 'alumni', title: 'زملاء سابقون', desc: 'صفحة التكريم والعرض العام.', href: '../alumni/', tag: 'عرض' },
+          { id: 'roster-diff', title: 'مقارنة الروستر', desc: 'فروقات بين إصدارات الروستر.', href: '../roster-diff/', tag: 'روستر' },
+          { id: 'training', title: 'التدريب', desc: 'جدول الدورات والحضور.', href: '../training/', tag: 'عرض' }
+        ];
+        let tools = fallback;
+        try {
+          const res = await fetch('../tools/catalog.json?ts=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (Array.isArray(json && json.tools) && json.tools.length) tools = json.tools;
+          }
+        } catch (e) {}
+
+        const byTag = Object.create(null);
+        tools.forEach((t) => {
+          const tag = (t && t.tag) || 'أخرى';
+          if (!byTag[tag]) byTag[tag] = [];
+          byTag[tag].push(t);
+        });
+        const order = ['روستر', 'بيانات', 'عرض', 'أخرى'];
+        const tags = order.filter((t) => byTag[t] && byTag[t].length)
+          .concat(Object.keys(byTag).filter((t) => order.indexOf(t) < 0));
+
+        host.innerHTML = tags.map((tag) => {
+          const cards = byTag[tag].map((t) => (
+            '<a class="toolCard" href="' + escapeHtml(toolHref(t.href)) + '">' +
+              '<div>' +
+                '<div class="toolTag">' + escapeHtml(tag) + '</div>' +
+                '<h3 class="toolTitle">' + escapeHtml(t.title || '') + '</h3>' +
+                '<p class="toolDesc">' + escapeHtml(t.desc || '') + '</p>' +
+              '</div>' +
+              '<span class="toolGo">فتح</span>' +
+            '</a>'
+          )).join('');
+          return '<div class="sectionLabel">' + escapeHtml(tag) + '</div><div class="toolsGrid">' + cards + '</div>';
+        }).join('');
+      }
+
+      function tryPin() {
+        const v = (pinInput.value || '').trim();
+        if (v !== PIN) {
+          gateErr.textContent = 'رمز غير صحيح';
+          pinInput.select();
+          return;
+        }
+        unlock();
+      }
+
+      function digitsOnly(phone) {
+        return String(phone || '').replace(/\D/g, '');
+      }
+
+      function formatPhone(phone) {
+        const p = digitsOnly(phone);
+        if (p.length === 11 && p.startsWith('968')) {
+          return '+968 ' + p.slice(3, 7) + ' ' + p.slice(7);
+        }
+        if (p.length === 8) {
+          return p.slice(0, 4) + ' ' + p.slice(4);
+        }
+        return p || '—';
+      }
+
+      function telHref(phone) {
+        const p = digitsOnly(phone);
+        if (!p) return '#';
+        return 'tel:+' + (p.startsWith('968') ? p : ('968' + p));
+      }
+
+      function showPhoneToast(text) {
+        let toast = document.getElementById('phoneToast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'phoneToast';
+          toast.className = 'phoneToast';
+          document.body.appendChild(toast);
+        }
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(showPhoneToast._t);
+        showPhoneToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
+
+      async function copyPhone(phone) {
+        const text = formatPhone(phone);
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(digitsOnly(phone) || text);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = digitsOnly(phone) || text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          showPhoneToast('تم نسخ الرقم');
+        } catch (e) {
+          showPhoneToast('تعذر النسخ');
+        }
+      }
+
+      async function ensurePhonesLoaded(force) {
+        if (!force && phones && phones.__loaded) return;
+        try {
+          const res = await fetch(PHONES_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (res.status === 404) { phones = []; phones.__loaded = true; return; }
+          if (!res.ok) throw new Error('phones');
+          const json = await res.json().catch(() => ({}));
+          phones = Array.isArray(json.phones) ? json.phones.slice() : [];
+          phones.__loaded = true;
+          phones.forEach((r) => rememberName(r && r.id, r && r.name));
+        } catch (e) {
+          phones = phones || [];
+          phones.__loaded = true;
+        }
+      }
+
+      async function ensureLogLoaded(force) {
+        if (!force && log && log.__loaded) return;
+        try {
+          const res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('log');
+          const json = await res.json();
+          log = Array.isArray(json.log) ? json.log.slice() : [];
+          log.__loaded = true;
+        } catch (e) {
+          log = log || [];
+          log.__loaded = true;
+        }
+      }
+
+      async function loadStaffDirectory() {
+        const base = docsBase();
+        const res = await fetch(base + 'schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('staff');
+        const json = await res.json();
+        const list = Array.isArray(json && json.employees) ? json.employees : [];
+        let currentMonth = '';
+        list.forEach((emp) => {
+          (emp.months || []).forEach((m) => {
+            if (!currentMonth || String(m) > currentMonth) currentMonth = String(m);
+          });
+        });
+        staffList = list
+          .filter((emp) => {
+            const months = emp.months || [];
+            return !currentMonth || months.indexOf(currentMonth) >= 0;
+          })
+          .map((emp) => {
+            const id = String(emp.id || '').trim();
+            rememberName(id, emp.name);
+            return {
+              id,
+              name: cleanName(emp.name) || nameById[id] || ('#' + id),
+              dept: emp.department || '',
+              months: emp.months || [],
+              currentMonth
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+        return currentMonth;
+      }
+
+      function phoneIdsSet() {
+        const set = Object.create(null);
+        (phones || []).forEach((r) => {
+          const id = String((r && r.id) || '').trim();
+          const phone = digitsOnly(r && r.phone);
+          if (id && /^\d+$/.test(id) && phone) set[id] = phone;
+        });
+        return set;
+      }
+
+      function visitedIdsSet() {
+        const set = Object.create(null);
+        (log || []).forEach((r) => {
+          if (isGuestRow(r)) return;
+          const id = String((r && r.id) || '').trim();
+          if (id && /^\d+$/.test(id)) {
+            const at = Number(r.at) || 0;
+            if (!set[id] || at > set[id]) set[id] = at;
+          }
+        });
+        return set;
+      }
+
+      function guestVisitCount() {
+        return (log || []).filter((r) => isGuestRow(r)).length;
+      }
+
+      function uniqueGuestDevices() {
+        const set = Object.create(null);
+        (log || []).forEach((r) => {
+          if (!isGuestRow(r)) return;
+          const id = String((r && r.id) || '').trim() || String(r.at || '');
+          set[id] = 1;
+        });
+        return Object.keys(set).length;
+      }
+
+      async function loadGaps() {
+        const list = document.getElementById('gapsList');
+        list.innerHTML = '<div class="empty">جاري التحليل…</div>';
+        try {
+          await Promise.all([ensurePhonesLoaded(true), ensureLogLoaded(true), loadStaffDirectory()]);
+          await loadNameDirectory();
+          renderGaps();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحليل النواقص</div>';
+        }
+      }
+
+      function gapRows() {
+        const phoneMap = phoneIdsSet();
+        const visitMap = visitedIdsSet();
+        return (staffList || []).map((emp) => {
+          const hasPhone = !!phoneMap[emp.id];
+          const hasVisit = !!visitMap[emp.id];
+          return {
+            ...emp,
+            hasPhone,
+            hasVisit,
+            phone: phoneMap[emp.id] || '',
+            lastVisit: visitMap[emp.id] || 0
+          };
+        }).filter((emp) => {
+          if (gapFilter === 'noPhone') return !emp.hasPhone;
+          if (gapFilter === 'noVisit') return !emp.hasVisit;
+          if (gapFilter === 'both') return !emp.hasPhone && !emp.hasVisit;
+          if (gapFilter === 'noId') return !emp.hasVisit; // employees never identified themselves
+          return true;
+        });
+      }
+
+      function renderGaps() {
+        const phoneMap = phoneIdsSet();
+        const visitMap = visitedIdsSet();
+        const noPhoneN = staffList.filter((e) => !phoneMap[e.id]).length;
+        const noVisitN = staffList.filter((e) => !visitMap[e.id]).length;
+        document.getElementById('gapStatStaff').textContent = String(staffList.length);
+        document.getElementById('gapStatNoPhone').textContent = String(noPhoneN);
+        document.getElementById('gapStatNoVisit').textContent = String(noVisitN);
+        document.getElementById('gapStatGuests').textContent = String(uniqueGuestDevices());
+
+        document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-gap') === gapFilter);
+        });
+
+        const note = document.getElementById('gapNote');
+        if (gapFilter === 'noId') {
+          note.hidden = false;
+          note.textContent = 'زيارات الضيف (بدون رقم وظيفة): ' + guestVisitCount() +
+            ' سجل · ' + uniqueGuestDevices() +
+            ' جهاز/هوية تقريبية. القائمة أدناه = موظفون حاليون لم يزوروا الموقع برقم وظيفتهم.';
+        } else {
+          note.hidden = false;
+          note.textContent = 'التغطية على موظفي الشهر الحالي فقط. الضيف = زار بدون حفظ رقم الوظيفة (' +
+            uniqueGuestDevices() + ' جهاز تقريبي).';
+        }
+
+        const list = document.getElementById('gapsList');
+        const rows = gapRows();
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">لا يوجد أحد في هذا الفلتر — التغطية جيدة.</div>';
+          return;
+        }
+        list.innerHTML = rows.map((emp) => {
+          let badge = '';
+          if (!emp.hasPhone && !emp.hasVisit) {
+            badge = '<span class="gapBadge both">بدون زيارة وهاتف</span>';
+          } else if (!emp.hasPhone) {
+            badge = '<span class="gapBadge phone">بدون هاتف</span>';
+          } else if (!emp.hasVisit) {
+            badge = '<span class="gapBadge visit">لم يزر بهويته</span>';
+          }
+          const meta = [
+            '#' + emp.id,
+            emp.dept || '',
+            emp.hasVisit ? ('آخر زيارة ' + formatTime(emp.lastVisit)) : 'لا زيارة بالهوية',
+            emp.hasPhone ? ('هاتف ' + formatPhone(emp.phone)) : 'لا هاتف'
+          ].filter(Boolean).join(' · ');
+          return (
+            '<article class="row">' +
+              '<p class="rowName"><span class="rowNameText">' + escapeHtml(emp.name) + '</span> ' + badge + '</p>' +
+              '<p class="rowMeta">' + escapeHtml(meta) + '</p>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      async function loadPhones() {
+        const list = document.getElementById('phonesList');
+        list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        try {
+          const res = await fetch(PHONES_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (res.status === 404) {
+            phones = [];
+            renderPhones();
+            return;
+          }
+          if (!res.ok) throw new Error('fail');
+          const json = await res.json().catch(() => ({}));
+          phones = Array.isArray(json.phones) ? json.phones.slice() : [];
+          phones.__loaded = true;
+          phones.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+          phones.forEach((r) => rememberName(r && r.id, r && r.name));
+          renderPhones();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحميل أرقام الهواتف</div>';
+        }
+      }
+
+      function renderPhones() {
+        document.getElementById('statPhones').textContent = String(phones.length);
+        const latest = phones[0];
+        document.getElementById('statPhonesHint').textContent = latest ? formatTime(latest.at) : '—';
+        const list = document.getElementById('phonesList');
+        if (!phones.length) {
+          list.innerHTML = '<div class="empty">لا توجد أرقام محفوظة بعد.</div>';
+          return;
+        }
+        const callSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6A2 2 0 0 1 22 16.9z" fill="currentColor"/></svg>';
+        const copySvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+        list.innerHTML = phones.map((r) => {
+          const id = String((r && r.id) || '').trim();
+          const name = cleanName(r && r.name) || nameById[id] || ('موظف #' + (id || '—'));
+          const phone = digitsOnly(r && r.phone);
+          const nice = formatPhone(phone);
+          const href = telHref(phone);
+          return (
+            '<article class="row phoneRow" data-phone="' + escapeHtml(phone) + '">' +
+              '<div class="phoneRowMain">' +
+                '<p class="rowName"><span class="rowNameText">' + escapeHtml(name) + '</span></p>' +
+                '<div class="phoneDigits" dir="ltr">' + escapeHtml(nice) + '</div>' +
+                '<p class="rowMeta">' + escapeHtml((id ? '#' + id + ' · ' : '') + formatTime(r && r.at)) + '</p>' +
+              '</div>' +
+              '<div class="phoneActions">' +
+                '<a class="phoneAct phoneAct--call" href="' + href + '" title="اتصال" aria-label="اتصال">' + callSvg + '</a>' +
+                '<button type="button" class="phoneAct phoneAct--copy" data-copy="1" title="نسخ" aria-label="نسخ">' + copySvg + '</button>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+
+        list.querySelectorAll('[data-copy="1"]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const row = btn.closest('[data-phone]');
+            copyPhone(row && row.getAttribute('data-phone'));
+          });
+        });
+      }
+
+      // Official visitor counters (same source as the footer counter on the site).
+      // Read-only /get so opening this page never inflates the numbers.
+      const COUNTER_NS = 'khalidsaif912.github.io';
+      let counterVals = { day: null, month: null, total: null };
+
+      function paintCounters() {
+        const set = (id, v) => {
+          if (v == null) return;
+          const el = document.getElementById(id);
+          if (el) el.textContent = String(v);
+        };
+        set('statToday', counterVals.day);
+        set('statMonth', counterVals.month);
+        const totalEl = document.getElementById('statTotal');
+        if (totalEl) totalEl.textContent = counterVals.total != null ? String(counterVals.total) : '—';
+      }
+
+      async function loadCounters() {
+        const keys = muscatParts();
+        const get = async (key) => {
+          try {
+            const res = await fetch('https://abacus.jasoncameron.dev/get/' + COUNTER_NS + '/' + key + '?ts=' + Date.now(), { cache: 'no-store' });
+            if (!res.ok) return res.status === 404 ? 0 : null;
+            const json = await res.json();
+            const v = Number(json && json.value);
+            return isFinite(v) ? v : null;
+          } catch (e) {
+            return null;
+          }
+        };
+        const [d, m, t] = await Promise.all([
+          get('day-' + keys.day),
+          get('month-' + keys.month),
+          get('total-visits')
+        ]);
+        counterVals = { day: d, month: m, total: t };
+        paintCounters();
+      }
+
+      async function loadLog() {
+        const list = document.getElementById('list');
+        list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        loadCounters();
+        try {
+          const res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+            headers: { 'X-Mantle-Key': MANTLE_KEY },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('fail');
+          const json = await res.json();
+          log = Array.isArray(json.log) ? json.log.slice() : [];
+          log.__loaded = true;
+          log.sort((a, b) => (Number(b.at) || 0) - (Number(a.at) || 0));
+          await loadNameDirectory();
+          render();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحميل السجل</div>';
+        }
+      }
+
+      function filtered() {
+        const keys = muscatParts();
+        if (filter === 'today') return log.filter((r) => r && r.day === keys.day);
+        if (filter === 'month') return log.filter((r) => r && String(r.day || '').startsWith(keys.month));
+        return log.slice();
+      }
+
+      function render() {
+        const keys = muscatParts();
+        const todayN = log.filter((r) => r && r.day === keys.day).length;
+        const monthN = log.filter((r) => r && String(r.day || '').startsWith(keys.month)).length;
+        // Log-derived numbers are a fallback; the official counters repaint on top.
+        if (counterVals.day == null) document.getElementById('statToday').textContent = String(todayN);
+        if (counterVals.month == null) document.getElementById('statMonth').textContent = String(monthN);
+        paintCounters();
+        document.querySelectorAll('.chip[data-filter]').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-filter') === filter);
+        });
+        const rows = filtered();
+        const listPill = document.getElementById('listCountPill');
+        if (listPill) listPill.textContent = rows.length + ' سجل';
+        renderDeviceStats(rows);
+        renderPageStats(rows);
+        renderScheduleViewStats(rows);
+        const list = document.getElementById('list');
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">لا توجد زيارات مسجّلة في هذا النطاق بعد.</div>';
+          return;
+        }
+        list.innerHTML = rows.map((r) => {
+          return (
+            '<article class="row">' +
+              '<p class="rowName"><span class="rowNameText"></span></p>' +
+              '<p class="rowMeta"></p>' +
+              '<p class="rowPages" hidden></p>' +
+            '</article>'
+          );
+        }).join('');
+        Array.from(list.children).forEach((el, i) => {
+          const r = rows[i];
+          const nameEl = el.querySelector('.rowName');
+          const textEl = el.querySelector('.rowNameText');
+          const guest = isGuestRow(r);
+          const name = displayName(r);
+          textEl.textContent = name || 'بدون اسم محفوظ';
+          const device = rowDeviceText(r);
+          if (device) {
+            const badge = document.createElement('span');
+            badge.className = 'rowDevice';
+            badge.textContent = device;
+            nameEl.appendChild(badge);
+          }
+          if (guest) {
+            const guestBadge = document.createElement('span');
+            guestBadge.className = 'rowDevice guest';
+            guestBadge.textContent = 'ضيف';
+            nameEl.appendChild(guestBadge);
+          }
+          const place = placeText(r);
+          if (place) {
+            const placeBadge = document.createElement('span');
+            placeBadge.className = 'rowDevice place';
+            placeBadge.textContent = place;
+            placeBadge.title = ipHint(r) || place;
+            nameEl.appendChild(placeBadge);
+          }
+          const metaParts = [];
+          if (guest) {
+            metaParts.push('ضيف');
+            const shortId = String(r.id || '').replace(/^g-/i, '').slice(0, 8);
+            if (shortId) metaParts.push(shortId);
+          } else {
+            metaParts.push('#' + (r.id || '—'));
+            if (name) metaParts.push(name);
+          }
+          metaParts.push(formatTime(r.at));
+          const pages = pagesOf(r);
+          if (pages.length === 1) {
+            metaParts.push(pageLabel(pages[0]));
+          } else if (pages.length > 1) {
+            metaParts.push(pages.length + ' صفحات');
+          } else {
+            metaParts.push(pageLabel(r.page));
+          }
+          if (ipHint(r)) metaParts.push(ipHint(r));
+          el.querySelector('.rowMeta').textContent = metaParts.join(' · ');
+          const pagesEl = el.querySelector('.rowPages');
+          if (pagesEl && pages.length > 1) {
+            pagesEl.hidden = false;
+            pagesEl.textContent = pages.map(pageLabel).join('  ←  ');
+          }
+        });
+      }
+
+      document.getElementById('pinBtn').addEventListener('click', tryPin);
+      pinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') tryPin();
+      });
+      document.getElementById('lockOut').addEventListener('click', lock);
+      document.getElementById('refreshBtn').addEventListener('click', loadLog);
+      document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
+      document.getElementById('refreshGapsBtn').addEventListener('click', loadGaps);
+      document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
+        c.addEventListener('click', () => {
+          gapFilter = c.getAttribute('data-gap') || 'noPhone';
+          renderGaps();
+        });
+      });
+      document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
+        c.addEventListener('click', () => {
+          setView(c.getAttribute('data-view') || 'visits');
+        });
+      });
+      document.querySelectorAll('.chip[data-filter]').forEach((c) => {
+        c.addEventListener('click', () => {
+          filter = c.getAttribute('data-filter') || 'today';
+          render();
+        });
+      });
+
+      if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();
+      else setTimeout(() => pinInput.focus(), 50);
+    })();
+  </script>
+</body>
+</html>

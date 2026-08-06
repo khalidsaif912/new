@@ -1,0 +1,2300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script defer src="../ios-tap-fix.js?v=20260729c"></script>
+  <title>دورات التدريب - June 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg:#f4f7f9;
+  --panel:#ffffff;
+  --panel2:rgba(255,255,255,.97);
+  --border:rgba(15,23,42,.06);
+  --border2:rgba(15,23,42,.09);
+  --text:#152032;
+  --muted:#64748b;
+  --blue:#1d4ed8;
+  --blue2:#2563eb;
+  --teal:#0d9488;
+  --shadow:0 14px 44px rgba(15,23,42,.07);
+  --shadow-soft:0 6px 28px rgba(15,23,42,.06);
+  --shadow-inset:inset 0 1px 0 rgba(255,255,255,.94);
+  --header-grad:linear-gradient(118deg,#2563eb 0%,#1d4ed8 45%,#1e3a8a 100%);
+  --accent-strip:linear-gradient(90deg,#0d9488 0%,#2dd4bf 38%,#2563eb 100%);
+  --row-alt:rgba(248,250,252,.92);
+  --row-fav:rgba(16,185,129,.11);
+  --emp-no-bg:#eef2ff;
+  --emp-no-c:#6366f1;
+  --emp-code:#1e293b;
+  --emp-name:#334155;
+  --row-border:rgba(15,23,42,.05);
+  --today-badge-bg:#dbeafe;
+  --today-badge-c:#1d4ed8;
+  --search-bg:#fff;
+  --search-border:rgba(15,23,42,.1);
+  --empty-bg:#f8fafc;
+  --empty-border:rgba(15,23,42,.08);
+  --footer-c:#94a3b8;
+  --footer-strong:#64748b;
+  --past-opacity:.44;
+  --past-filter:saturate(.52) brightness(1.03);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 95% 55% at 50% -8%, rgba(37,99,235,.08), transparent 52%),
+    linear-gradient(180deg,#eef2f7 0%,var(--bg) 40%,#f1f5f9 100%);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans','IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  min-height:100dvh;direction:ltr;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  touch-action:manipulation;
+}
+.topDock .dockCard.dockAction,.topDock .dockCard.savedChip,.topDock button.dockCard{
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;position:relative;z-index:1;
+}
+.topDock .dockCard *{pointer-events:none}
+.langToggle{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:920px;margin:0 auto;padding:24px 18px 48px}
+.mainPanel{
+  margin-top:22px;
+  background:var(--panel);
+  border-radius:32px;
+  padding:28px 22px 30px;
+  box-shadow:var(--shadow-soft);
+  border:1px solid rgba(255,255,255,.98);
+  position:relative;
+  overflow:hidden;
+}
+.mainPanel::before{
+  content:'';
+  position:absolute;left:0;right:0;top:0;height:5px;
+  background:var(--accent-strip);
+  border-radius:32px 32px 0 0;
+}
+.scheduleSection{margin-top:6px;position:relative;z-index:1}
+.langBar{position:absolute;top:16px;right:18px;z-index:5;display:flex;justify-content:flex-end}
+.langToggle{
+  width:32px;height:32px;border:none;border-radius:999px;
+  background:rgba(255,255,255,.2);color:#fff;
+  font:800 11px/1 'IBM Plex Sans Arabic',sans-serif;cursor:pointer;
+  display:grid;place-items:center;backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.24);
+  transition:background .2s,transform .2s;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+}
+.langToggle:hover{background:rgba(255,255,255,.34);transform:scale(1.06)}
+html[lang="ar"] body,body.ar{direction:rtl}
+html[lang="ar"] .langBar,body.ar .langBar{right:auto;left:18px}
+html[lang="ar"] .courseHead,body.ar .courseHead{flex-direction:row-reverse}
+html[lang="ar"] .courseBadges,body.ar .courseBadges{flex-direction:column;align-items:center}
+html[lang="ar"] .searchRow,body.ar .searchRow{flex-direction:row-reverse}
+html[lang="ar"] .empRow,body.ar .empRow{direction:rtl}
+html[lang="ar"] .myTrainingHead,body.ar .myTrainingHead{flex-direction:row-reverse}
+html[lang="ar"] .myTrainingItem,body.ar .myTrainingItem{direction:rtl;text-align:right}
+html[lang="ar"] .myTrainingTime,body.ar .myTrainingTime{unicode-bidi:isolate}
+html[lang="ar"] .staffModalTop,body.ar .staffModalTop{flex-direction:row-reverse}
+html[lang="ar"] .staffModalActions,body.ar .staffModalActions{flex-direction:row-reverse}
+html[lang="ar"] .courseInfoDesc,body.ar .courseInfoDesc{direction:rtl}
+html[lang="ar"] .courseInfoTitleAr,body.ar .courseInfoTitleAr{direction:rtl}
+.header{
+  position:relative;overflow:hidden;
+  padding:34px 26px 30px;border-radius:36px;
+  background:var(--header-grad);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 20px 52px rgba(30,64,175,.26),0 6px 20px rgba(15,23,42,.08);
+}
+.header::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 88% 10%,rgba(255,255,255,.22) 0%,transparent 44%),
+    radial-gradient(circle at 6% 92%,rgba(255,255,255,.1) 0%,transparent 40%);
+}
+.header::after{
+  content:'';position:absolute;left:6%;bottom:10%;
+  width:clamp(80px,18vw,120px);height:clamp(80px,18vw,120px);
+  opacity:.09;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  transform:rotate(-16deg);
+}
+.hCircle{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.hCircle1{width:240px;height:240px;right:-78px;top:-92px}
+.hCircle2{width:168px;height:168px;right:88px;bottom:-72px}
+.hCircle3{width:96px;height:96px;left:38%;top:-26px}
+.headerText{position:relative;z-index:2;max-width:580px}
+.header h1{
+  margin:0;
+  font:900 clamp(26px,5.2vw,36px)/1.06 'Sora',sans-serif;
+  letter-spacing:-.045em;color:#fff;
+  text-shadow:0 2px 24px rgba(0,0,0,.18);
+}
+.header p{
+  margin:10px 0 0;font-size:13px;color:rgba(255,255,255,.88);
+  font-weight:600;letter-spacing:.02em;
+}
+.dateTag{
+  position:relative;z-index:2;display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+  padding:11px 40px 11px 16px;border-radius:999px;
+  background:rgba(0,0,0,.14);
+  border:1px solid rgba(255,255,255,.26);
+  color:rgba(255,255,255,.96);font-size:13px;font-weight:700;
+  backdrop-filter:blur(12px);
+}
+.dateTag::after{
+  content:'▾';position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  color:rgba(255,255,255,.86);font-size:12px;font-weight:900;pointer-events:none;
+}
+.dateTagSelect{position:absolute;inset:0;opacity:0;cursor:pointer;border:none;appearance:none}
+.topDock{
+  display:flex;
+  justify-content:center;
+  align-items:stretch;
+  gap:12px;
+  margin-top:14px;
+  flex-wrap:wrap;
+  position:relative;
+  z-index:30;
+  isolation:isolate;
+}
+.dockCard{
+  min-width:72px;
+  width:auto;
+  padding:10px 12px;
+  border-radius:14px;
+  min-height:unset;
+  background:#fff;
+  border:1px solid rgba(15,23,42,.1);
+  box-shadow:0 2px 8px rgba(15,23,42,.06);
+  transition:all .25s ease;
+  text-align:center;position:relative;overflow:hidden;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+}
+.dockCard:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(15,23,42,.12);
+  border-color:rgba(37,99,235,.16);
+}
+.dockCard:active{transform:translateY(-1px)}
+.dockAction{cursor:pointer;border:none;font-family:inherit;background:#fff}
+.statChip{
+  pointer-events:none;cursor:default;flex:0 0 auto;
+}
+.statChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06);border-color:rgba(15,23,42,.1)}
+.statsTicker{
+  position:relative;width:100%;min-width:48px;height:42px;overflow:hidden;isolation:isolate;
+}
+.statsFace{
+  position:absolute;left:0;right:0;top:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  opacity:0;transform:translateY(110%);
+  transition:transform .58s cubic-bezier(.22,.7,.2,1),opacity .28s ease;
+  will-change:transform,opacity;
+}
+.statsFace.active{opacity:1;transform:translateY(0);z-index:2}
+.statsFace.prev{opacity:0;transform:translateY(-110%);z-index:1}
+.statsFace .dockLabel{margin-top:4px}
+.otherPageInner{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;min-height:26px;width:100%;padding-inline:0;
+}
+#otherPageBtn{
+  background:linear-gradient(180deg,#f8fbff 0%,#eef6ff 100%);
+  border-color:rgba(37,99,235,.16);
+  min-width:76px;padding:9px 10px 8px;
+}
+#otherPageBtn:hover{
+  border-color:rgba(37,99,235,.28);
+  box-shadow:0 8px 20px rgba(37,99,235,.14);
+}
+.otherIconBadge{
+  width:34px;height:34px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:linear-gradient(160deg,#fff 0%,#dbeafe 100%);
+  border:1px solid rgba(37,99,235,.14);
+  box-shadow:0 4px 12px rgba(37,99,235,.1),inset 0 1px 0 #fff;
+  transition:transform .28s ease,box-shadow .28s ease;
+  overflow:hidden;padding:3px;
+}
+.otherIconWrap{line-height:0;display:inline-flex}
+.cupDockImg{width:100%;height:100%;object-fit:contain;display:block}
+#otherPageBtn:hover .otherIconBadge{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 16px rgba(37,99,235,.16),inset 0 1px 0 #fff}
+.otherIcon{
+  width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
+  filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
+  transform:translateY(-2px);
+  transition:transform .28s ease;
+}
+#otherPageBtn:hover .otherIcon{transform:translateY(-5px) scale(1.06)}
+.rosterCard{display:block;text-decoration:none;color:inherit}
+.rosterInner{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:26px;width:100%}
+.rosterIcon{
+  width:34px;height:34px;display:block;flex-shrink:0;object-fit:contain;
+  filter:drop-shadow(0 3px 8px rgba(15,23,42,.12));
+  transform:translateY(-2px);
+  transition:transform .28s ease;
+}
+.rosterCard:hover .rosterIcon{transform:translateY(-5px) scale(1.06)}
+.bookCupIcon{width:68px;height:68px;display:block;object-fit:contain;position:absolute;left:50%;top:46%;transform:translate(-50%,-50%)}
+.dockValue{font-size:22px;font-weight:900;line-height:1;height:26px;display:flex;align-items:center;justify-content:center;color:#1e40af;font-family:'Sora',sans-serif;letter-spacing:-.03em}
+.searchGlyph{line-height:0;display:flex;align-items:center;justify-content:center;transition:transform .25s ease}
+#searchToggle:hover .searchGlyph{transform:translateY(-3px) scale(1.05)}
+.dockLabel,.rosterLabel,.savedName,.otherPageLabel{
+  margin-top:4px;
+  font-size:9.5px;
+  font-weight:600;
+  line-height:1.1;
+  letter-spacing:.4px;
+  color:#64748b;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  max-width:100%;
+  padding:0;
+}
+.otherPageLabel{
+  margin-top:0;
+  color:#1e40af;
+  text-transform:none;
+  letter-spacing:.01em;
+  font-size:9px;
+  line-height:1.2;
+  font-weight:800;
+  display:block;
+  text-align:center;
+  white-space:normal;
+  max-width:100%;
+  font-family:'Sora','Plus Jakarta Sans','IBM Plex Sans Arabic',sans-serif;
+}
+.rosterLabel{color:#2563eb}
+.savedChip{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;
+  text-align:center;cursor:pointer;padding:10px 12px;
+  background:#fff;
+}
+.savedChip:hover{box-shadow:0 8px 20px rgba(37,99,235,.12)}
+.savedIcon{
+  width:auto;height:26px;flex:0 0 auto;border-radius:0;display:flex;align-items:center;justify-content:center;
+  background:transparent;font-size:18px;border:none;
+  box-shadow:none;transition:transform .25s ease;
+}
+.savedChip:hover .savedIcon{transform:translateY(-2px) scale(1.04)}
+.savedLines{min-width:0;flex:0 0 auto;width:100%}
+.savedName{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;text-transform:none}
+.savedEmpty .savedName{color:#1e40af}
+.myTrainingPanel{
+  margin-top:14px;padding:14px 14px 12px;border-radius:18px;
+  background:linear-gradient(165deg,#fff 0%,#f0fdfa 100%);
+  border:1px solid rgba(13,148,136,.2);
+  box-shadow:0 6px 22px rgba(13,148,136,.08);
+}
+.myTrainingPanel[hidden]{display:none!important}
+.myTrainingHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.myTrainingTitle{font:800 15px/1.25 'Sora',sans-serif;color:#0f766e}
+.myTrainingSub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
+.myTrainingCountChip{
+  flex:0 0 auto;pointer-events:none;cursor:default;
+  background:#fff;border-color:rgba(13,148,136,.18);
+}
+.myTrainingCountChip:hover{transform:none;box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.myTrainingCountChip .dockValue{color:#0f766e}
+.myTrainingCountChip .dockLabel{color:#64748b}
+.myTrainingList{display:flex;flex-direction:column;gap:8px}
+.myTrainingItem{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 12px;align-items:center;
+  padding:10px 12px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.08);
+  text-align:left;cursor:pointer;font-family:inherit;width:100%;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.myTrainingItem:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.08);border-color:rgba(13,148,136,.22)}
+.myTrainingItem.is-past{opacity:.62}
+.myTrainingItem.is-today{border-color:rgba(37,99,235,.28);box-shadow:0 0 0 1px rgba(37,99,235,.12)}
+.myTrainingDate{
+  min-width:50px;text-align:center;padding:6px 8px;border-radius:12px;
+  background:#eff6ff;color:#1d4ed8;font-weight:800;font-size:11px;line-height:1.15;
+}
+.myTrainingDate .dayNum{font-size:17px;display:block;line-height:1;font-family:'Sora',sans-serif}
+.myTrainingMeta{min-width:0}
+.myTrainingCourse{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:'Sora',sans-serif}
+.myTrainingCourseAr{
+  margin-top:2px;font-size:11px;font-weight:700;line-height:1.35;color:var(--muted);
+  font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.myTrainingVenue{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.myTrainingTime{font-size:11px;font-weight:700;color:#0f766e;white-space:nowrap}
+.myTrainingEmpty{
+  padding:16px 12px;text-align:center;font-size:13px;color:var(--muted);
+  border:1px dashed rgba(15,23,42,.12);border-radius:14px;background:#fff;line-height:1.45;
+}
+.filters{
+  display:none;margin-top:4px;margin-bottom:4px;padding:16px 16px 17px;border-radius:22px;
+  background:linear-gradient(165deg,#fafbfc 0%,#f1f5f9 100%);
+  border:1px solid var(--border2);
+  box-shadow:var(--shadow-inset),0 4px 20px rgba(15,23,42,.04);
+  position:relative;z-index:1;
+}
+.filters.active{display:block}
+.searchRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.searchRow input{
+  flex:1;min-width:0;padding:13px 16px;border-radius:18px;
+  border:1px solid var(--search-border);background:var(--search-bg);
+  font-size:14px;outline:none;color:var(--text);font-family:inherit;
+  box-shadow:var(--shadow-inset);
+}
+.searchRow input::placeholder{color:var(--muted);opacity:.65}
+.searchBtn,.clearBtn{border:none;border-radius:16px;padding:12px 16px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.searchBtn{
+  background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;min-width:88px;
+  box-shadow:0 8px 24px rgba(29,78,216,.3);
+}
+.clearBtn{background:#e2e8f0;color:#334155;font-weight:700}
+.cards{margin-top:18px;display:flex;flex-direction:column;gap:16px}
+.pastLabel{
+  display:flex;align-items:center;gap:14px;margin:22px 0 10px;
+  color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;
+}
+.pastLabel::before,.pastLabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.5) 20%,rgba(148,163,184,.5) 80%,transparent)}
+.courseCard{
+  background:var(--panel);border:1px solid rgba(15,23,42,.06);border-radius:26px;overflow:hidden;
+  box-shadow:0 8px 32px rgba(15,23,42,.06),var(--shadow-inset);
+  transition:border-color .3s,box-shadow .3s,opacity .25s,filter .25s,transform .22s;
+}
+.courseCard[open]{transform:translateY(-2px);box-shadow:0 16px 44px rgba(15,23,42,.1)}
+.courseCard.is-today{box-shadow:0 0 0 2px rgba(37,99,235,.2),0 16px 44px rgba(37,99,235,.12)}
+.courseCard.is-saved{box-shadow:0 0 0 2px rgba(13,148,136,.22),0 12px 36px rgba(13,148,136,.08)}
+.courseCard.is-past{opacity:var(--past-opacity);filter:var(--past-filter)}
+.courseCard.pastelT0 .courseHead{
+  --accent:#f59e0b;--surface:#fffbeb;--surface2:#fef3c7;--pill:rgba(245,158,11,.35);--text-on-acc:#92400e;
+}
+.courseCard.pastelT0 .courseBody{background:linear-gradient(180deg,#fffdfb,#fffaf0)}
+.courseCard.pastelT0 .rowsWrap{border-color:rgba(245,158,11,.14)}
+.courseCard.pastelT1 .courseHead{
+  --accent:#fb7185;--surface:#fff1f2;--surface2:#ffe4e6;--pill:rgba(251,113,133,.3);--text-on-acc:#9f1239;
+}
+.courseCard.pastelT1 .courseBody{background:linear-gradient(180deg,#fffafa,#fff5f7)}
+.courseCard.pastelT1 .rowsWrap{border-color:rgba(251,113,133,.14)}
+.courseCard.pastelT2 .courseHead{
+  --accent:#a78bfa;--surface:#f5f3ff;--surface2:#ede9fe;--pill:rgba(167,139,250,.35);--text-on-acc:#5b21b6;
+}
+.courseCard.pastelT2 .courseBody{background:linear-gradient(180deg,#fafaff,#f3f0ff)}
+.courseCard.pastelT2 .rowsWrap{border-color:rgba(167,139,250,.15)}
+.courseCard.pastelT3 .courseHead{
+  --accent:#2dd4bf;--surface:#ecfdf5;--surface2:#d1fae5;--pill:rgba(45,212,191,.35);--text-on-acc:#0f766e;
+}
+.courseCard.pastelT3 .courseBody{background:linear-gradient(180deg,#f6fffb,#ecfdf5)}
+.courseCard.pastelT3 .rowsWrap{border-color:rgba(45,212,191,.14)}
+.courseCard.pastelT4 .courseHead{
+  --accent:#60a5fa;--surface:#eff6ff;--surface2:#dbeafe;--pill:rgba(96,165,250,.4);--text-on-acc:#1e40af;
+}
+.courseCard.pastelT4 .courseBody{background:linear-gradient(180deg,#fafcff,#f0f7ff)}
+.courseCard.pastelT4 .rowsWrap{border-color:rgba(96,165,250,.15)}
+.courseHead{
+  position:relative;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:start;
+  padding:18px 18px 16px;cursor:pointer;list-style:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 100% 0%,rgba(255,255,255,.75),transparent 50%),
+    linear-gradient(175deg,var(--surface,#f8fafc),var(--surface2,#e2e8f0));
+  border-inline-start:5px solid var(--accent,#2563eb);
+  box-shadow:0 4px 20px rgba(15,23,42,.05);
+  transition:background .3s,box-shadow .3s;
+}
+.courseCard[open] .courseHead{box-shadow:0 8px 28px rgba(15,23,42,.08)}
+.courseHead::-webkit-details-marker{display:none}
+.headGlow{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,rgba(255,255,255,.45),transparent 45%);
+}
+.courseIcon{
+  position:relative;z-index:1;align-self:start;margin-top:2px;
+  width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:26px;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.45));
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+  overflow:hidden;
+}
+.courseIcon.hasImg{
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.55));
+  padding:6px;border-color:rgba(255,255,255,.9);
+  box-shadow:0 6px 18px rgba(15,23,42,.08),inset 0 1px 0 #fff;
+}
+.courseIconImg{width:100%;height:100%;object-fit:contain;display:block}
+.courseTitleWrap{position:relative;z-index:1;min-width:0;padding-top:2px}
+.courseTitle{
+  font-size:17px;font-weight:800;letter-spacing:-.035em;color:var(--text-on-acc,var(--text));
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;
+  min-width:0;font-family:'Sora',sans-serif;
+}
+.courseTitleAr{
+  margin-top:4px;
+  font-size:13px;font-weight:700;line-height:1.35;color:var(--text-on-acc,var(--text));
+  opacity:.82;font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.courseSubRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;line-height:1.4;color:var(--muted)}
+.miniMeta strong{color:var(--text-on-acc,var(--text));margin-inline-end:4px;font-weight:700;opacity:.85}
+.miniDot{color:rgba(148,163,184,.9);font-weight:700}
+.courseBadges{
+  position:relative;z-index:1;align-self:start;display:flex!important;flex-direction:column!important;gap:6px!important;
+  align-items:center!important;padding-top:2px;
+}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:7px 12px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.03em;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.75);
+  white-space:nowrap;
+}
+.metaTicker{
+  width:52px;height:52px;border-radius:18px;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.88));
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 6px 16px rgba(15,23,42,.1),inset 0 1px 0 #fff;
+  isolation:isolate;
+}
+.metaTicker.hasInfo{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.metaTicker.hasInfo:hover{box-shadow:0 8px 18px rgba(37,99,235,.16),inset 0 1px 0 #fff;transform:translateY(-1px)}
+.metaTicker.hasInfo:active{transform:translateY(0)}
+.metaTickerStage{position:relative;width:100%;height:100%}
+.metaFace{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  opacity:0;transform:translateY(110%) scale(.92);
+  transition:transform .55s cubic-bezier(.22,.7,.2,1),opacity .28s ease;
+  will-change:transform,opacity;pointer-events:none;
+  color:var(--text-on-acc,#334155);font-weight:900;line-height:1;
+  background:transparent;border:none;padding:0;width:100%;height:100%;
+  font-family:inherit;
+}
+.metaFace.is-active{opacity:1;transform:translateY(0) scale(1);z-index:2}
+.metaFace.is-exit{opacity:0;transform:translateY(-110%) scale(.92);z-index:1}
+.metaFace[data-face="people"]{flex-direction:row;gap:3px;font-size:13px;color:#334155}
+.metaFace[data-face="people"] .peopleIconSvg{width:12px;height:12px;margin:0}
+.metaFace[data-face="info"]{color:#2563eb;font-size:20px}
+.chipPrimary{
+  font-size:15px;font-weight:900;font-family:'Sora',sans-serif;line-height:1;
+  color:var(--text-on-acc,var(--blue2));
+}
+.chipSecondary{
+  font-size:9px;font-weight:700;letter-spacing:.02em;line-height:1.1;
+  color:var(--text-on-acc,var(--blue2));opacity:.72;margin-top:2px;
+  text-transform:uppercase;
+}
+.courseInfoMark{
+  display:inline-block;line-height:1;
+  animation:courseQPulse 2.1s ease-in-out infinite;
+  transform-origin:50% 60%;
+}
+@keyframes courseQPulse{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  25%{transform:scale(1.14) rotate(-10deg)}
+  50%{transform:scale(1.08) rotate(8deg)}
+  75%{transform:scale(1.14) rotate(-6deg)}
+}
+.metaDots{
+  position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+  display:flex;gap:3px;z-index:3;pointer-events:none;
+}
+.metaDot{
+  width:4px;height:4px;border-radius:999px;background:rgba(148,163,184,.45);
+  transition:background .25s,transform .25s;
+}
+.metaDot.is-on{background:var(--accent,#2563eb);transform:scale(1.15)}
+.todayBadge{
+  background:var(--today-badge-bg);color:var(--today-badge-c);
+  min-width:48px;height:auto;padding:5px 8px;border-radius:999px;font-size:9px;
+}
+.courseInfoModal{  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.45);backdrop-filter:blur(10px);z-index:60;padding:20px;
+}
+.courseInfoModal.open{display:flex}
+.courseInfoCard{
+  width:min(100%,390px);position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#ffffff 0%,#f8fafc 55%,#eef6ff 100%);
+  border:1px solid rgba(255,255,255,.9);border-radius:30px;
+  box-shadow:0 28px 80px rgba(15,23,42,.28);padding:28px 24px 22px;text-align:center;
+}
+.courseInfoCard::before{
+  content:"";position:absolute;inset:auto -20% -30% -20%;height:55%;
+  background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.12),transparent 65%);
+  pointer-events:none;
+}
+.courseInfoEmoji{
+  position:relative;z-index:1;width:78px;height:78px;margin:0 auto 14px;
+  border-radius:24px;display:grid;place-items:center;font-size:42px;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.55));
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 12px 28px rgba(15,23,42,.12),inset 0 1px 0 #fff;
+  animation:courseInfoPop .45s cubic-bezier(.2,1.2,.4,1);
+  overflow:hidden;
+}
+.courseInfoEmoji.hasImg{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(241,245,249,.9));
+  padding:10px;border-color:rgba(255,255,255,.95);
+}
+.courseInfoEmoji img{width:100%;height:100%;object-fit:contain;display:block}
+@keyframes courseInfoPop{
+  0%{transform:scale(.6) translateY(10px);opacity:0}
+  100%{transform:scale(1) translateY(0);opacity:1}
+}
+.courseInfoTitle{
+  position:relative;z-index:1;font:800 17px/1.3 'Sora',sans-serif;color:var(--text);
+  letter-spacing:-.02em;
+}
+.courseInfoTitleAr{
+  position:relative;z-index:1;margin-top:6px;
+  font:700 14px/1.45 'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;color:#334155;
+}
+.courseInfoDesc{
+  position:relative;z-index:1;margin:16px 0 0;padding:14px 14px;
+  border-radius:18px;background:rgba(255,255,255,.78);
+  border:1px solid rgba(15,23,42,.06);
+  font:600 14px/1.65 'IBM Plex Sans Arabic','Plus Jakarta Sans',Tahoma,sans-serif;
+  color:#334155;text-wrap:pretty;
+}
+.courseInfoClose{
+  position:relative;z-index:1;margin-top:18px;width:100%;height:46px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;
+  font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;cursor:pointer;
+  box-shadow:0 8px 22px rgba(29,78,216,.28);
+}
+.courseBody{padding:16px 18px 20px}
+.courseCard[open] .courseBody{padding-top:18px}
+.rowsWrap{
+  border:1px solid var(--border2);border-radius:18px;overflow:hidden;
+  background:rgba(255,255,255,.65);
+  box-shadow:0 2px 12px rgba(15,23,42,.04);
+}
+.empRow{
+  display:grid;grid-template-columns:28px minmax(76px,100px) 1fr;gap:12px;align-items:center;
+  padding:12px 14px;background:rgba(255,255,255,.75);border-top:1px solid var(--row-border);
+}
+.empRow:first-child{border-top:none}
+.empRowAlt{background:var(--row-alt)}
+.empRow.favorite{background:var(--row-fav)}
+.empNo{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:24px;width:24px;height:24px;border-radius:999px;
+  background:var(--emp-no-bg);color:var(--emp-no-c);
+  font-size:9px;font-weight:800;
+  box-shadow:0 2px 6px rgba(99,102,241,.12);
+}
+.empCode{font-size:12px;font-weight:700;color:var(--emp-code);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.empName{min-width:0;font-size:13px;font-weight:600;line-height:1.4;color:var(--emp-name);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.favBadge{padding:3px 9px;border-radius:999px;font-size:9px;font-weight:800;background:rgba(13,148,136,.15);color:#0f766e}
+.emptyState{
+  display:none;margin-top:16px;padding:28px;text-align:center;color:var(--muted);
+  border-radius:22px;background:var(--empty-bg);border:2px dashed var(--empty-border);
+  font-size:14px;font-weight:500;
+}
+.footer{
+  margin-top:32px;padding:22px 16px 12px;text-align:center;color:var(--footer-c);
+  font-size:12px;line-height:1.55;
+}
+.footer strong{color:var(--footer-strong);font-weight:600}
+.footerShare{margin-top:18px;display:flex;justify-content:center;padding:0 12px 4px}
+.gamesPanel{
+  margin:30px auto 0;max-width:560px;padding:14px 14px 13px;text-align:center;
+  background:#fff;border:1px solid #e2e8f0;border-radius:20px;
+  box-shadow:0 4px 14px rgba(15,23,42,.06);
+}
+.gamesPanelTitle{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;font-weight:800;color:#334155;margin-bottom:11px;
+  font-family:'Sora','IBM Plex Sans Arabic',sans-serif;
+}
+.gamesGrid{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.gameChip{
+  display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:8px 14px;
+  border-radius:999px;font-size:12px;font-weight:700;color:#0f172a;text-decoration:none;
+  border:1.5px solid #e2e8f0;background:#f8fafc;line-height:1.2;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+.gameChip:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(15,23,42,.1);filter:saturate(1.1)}
+.gameChip:active{transform:translateY(0)}
+.gameChipIcon{font-size:16px;line-height:1}
+.gameChip--pairs{background:#eef2ff;border-color:#c7d2fe}
+.gameChip--similarity{background:#fdf4ff;border-color:#f5d0fe}
+.gameChip--quiz{background:#fff7ed;border-color:#fed7aa}
+.gameChip--air{background:#eff6ff;border-color:#bfdbfe}
+.gameChip--cargo{background:#ecfdf5;border-color:#a7f3d0}
+html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
+.trainingShareBtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:10px 18px;border-radius:999px;border:1.5px solid #86efac;
+  background:#ecfdf5;color:#166534;font-family:inherit;font-size:13px;font-weight:700;
+  line-height:1.2;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 8px rgba(22,101,52,.08);transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+  max-width:min(100%,320px);width:100%;
+}
+.trainingShareBtn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(22,101,52,.14);background:#d1fae5}
+.trainingShareBtn:active{transform:translateY(0)}
+.trainingShareIcon{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;line-height:0}
+.trainingShareIcon svg{display:block;width:18px;height:18px}
+.siteShareSheet{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.45);z-index:10001;padding:16px;
+  pointer-events:none;visibility:hidden;
+}
+.siteShareSheet.open{display:flex;pointer-events:auto;visibility:visible}
+.siteShareCard{
+  width:min(100%,360px);background:#fff;border-radius:18px;padding:18px 16px 14px;
+  border:1px solid rgba(15,23,42,.1);box-shadow:0 20px 48px rgba(15,23,42,.22);text-align:center;
+}
+.siteShareTitle{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 4px;font-family:'Sora',sans-serif}
+.siteShareHint{font-size:12px;color:#64748b;margin:0 0 14px;line-height:1.4}
+.siteShareQr{
+  display:flex;align-items:center;justify-content:center;
+  min-height:220px;margin:0 auto 12px;background:#f8fafc;border-radius:14px;border:1px solid #e2e8f0;padding:10px;
+}
+.siteShareUrl{
+  font-size:11px;color:#475569;word-break:break-all;line-height:1.45;
+  margin:0 0 14px;padding:8px 10px;background:#f1f5f9;border-radius:10px;
+}
+.siteShareActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.siteShareActions .trainingShareBtn{max-width:none;width:auto;min-height:40px;padding:9px 12px;font-size:12px;border-radius:999px}
+.siteShareActions .trainingShareBtn--wide{grid-column:1 / -1}
+.siteShareActions .trainingShareBtn--muted{background:#f1f5f9;border-color:#cbd5e1;color:#475569;box-shadow:none}
+.siteShareActions .trainingShareBtn--wa{background:#ecfdf5;border-color:#86efac;color:#166534}
+.siteShareActions .trainingShareBtn--copy{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+.siteShareCloseWrap{margin-top:4px}
+.siteShareCloseWrap .trainingShareBtn{max-width:none}
+.headerRow{margin-top:18px;position:relative;z-index:2}
+.archiveBtn{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;
+  background:rgba(255,255,255,.24);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-size:13px;font-weight:800;text-decoration:none;
+  backdrop-filter:blur(10px);transition:transform .2s,background .2s,box-shadow .2s;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+}
+.archiveBtn:hover{background:rgba(255,255,255,.34);transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.14)}
+.archiveGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px}
+.archiveCard{
+  display:block;text-decoration:none;color:var(--text);background:var(--panel);
+  border:1px solid var(--border2);border-radius:26px;padding:20px;
+  box-shadow:var(--shadow-soft);transition:transform .22s,box-shadow .22s;
+}
+.archiveCard:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(15,23,42,.1)}
+.archiveMonth{font-size:19px;font-weight:900;font-family:'Sora',sans-serif}
+.archiveMeta{margin-top:10px;color:var(--muted);font-size:13px;line-height:1.45}
+.archiveLatest{display:inline-flex;margin-top:12px;padding:6px 11px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:10px;font-weight:800}
+.staffModal{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.4);backdrop-filter:blur(8px);z-index:50;padding:20px;
+}
+.staffModal.open{display:flex}
+.staffModalCard{
+  width:min(100%,380px);background:#fff;border:1px solid rgba(15,23,42,.08);
+  border-radius:28px;box-shadow:0 28px 80px rgba(15,23,42,.25);padding:22px 22px 18px;
+}
+.staffModalTop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.staffModalTitle{font:800 17px/1.15 'Sora',sans-serif;color:var(--text)}
+.staffModalSub{margin-top:8px;font-size:13px;color:var(--muted)}
+.staffClose{
+  width:38px;height:38px;border:none;border-radius:14px;background:#eff6ff;color:var(--blue);
+  font:900 18px/1 'Sora',sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(37,99,235,.12);
+}
+.staffField{
+  margin-top:16px;width:100%;height:50px;border-radius:18px;border:1px solid rgba(15,23,42,.1);
+  background:#f8fafc;padding:0 16px;color:var(--text);
+  font:600 14px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;outline:none;
+}
+.staffField:focus{border-color:rgba(37,99,235,.45);box-shadow:0 0 0 4px rgba(37,99,235,.1)}
+.staffModalActions{display:flex;gap:10px;margin-top:16px}
+.staffBtn{
+  flex:1;height:46px;border:none;border-radius:16px;cursor:pointer;
+  font:800 13px/1 'Plus Jakarta Sans','IBM Plex Sans Arabic',Tahoma,sans-serif;
+}
+.staffBtnPrimary{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;box-shadow:0 8px 22px rgba(29,78,216,.28)}
+.staffBtnGhost{background:#eff6ff;color:var(--blue);font-weight:700}
+@media(max-width:720px){
+  .wrap{padding:14px 12px 36px}
+  .mainPanel{padding:22px 14px 24px;border-radius:26px}
+  .mainPanel::before{border-radius:26px 26px 0 0}
+  .header{padding:24px 18px 22px;border-radius:28px}
+  .header::after{font-size:56px;left:4%;bottom:8%}
+  .topDock{gap:6px;margin-top:14px}
+  .dockCard{padding:8px 8px;min-width:60px;border-radius:14px}
+  .statsTicker{height:38px}
+  .dockValue{font-size:18px;height:24px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8.5px}
+  .otherPageLabel{font-size:8px}
+  #otherPageBtn{min-width:68px;padding:8px 8px 7px}
+  .otherIconBadge{width:30px;height:30px;border-radius:10px}
+  .myTrainingPanel{padding:12px 10px 10px;border-radius:16px}
+  .myTrainingItem{grid-template-columns:46px minmax(0,1fr);gap:8px 10px}
+  .myTrainingTime{grid-column:2}
+  .courseHead{grid-template-columns:42px minmax(0,1fr) auto;gap:10px;padding:14px 14px}
+  .courseIcon{width:42px;height:42px;font-size:19px;border-radius:16px}
+  .courseTitle{font-size:15px}
+  .courseBody{padding:14px 14px 16px}
+  .filters{padding:14px;border-radius:18px}
+  .searchRow input{padding:12px 14px;font-size:13px}
+  .empRow{grid-template-columns:26px minmax(68px,88px) 1fr;gap:10px;padding:10px 12px}
+}
+@media(max-width:420px){
+  .wrap{padding:12px 10px 30px}
+  .header{padding:22px 14px 18px;border-radius:24px}
+  .topDock{gap:6px}
+  .dockCard{padding:8px 6px;min-width:56px}
+  .statsValue{font-size:18px}
+  .dockLabel,.rosterLabel,.savedName{font-size:8px}
+  .otherPageLabel{font-size:7.5px}
+  .myTrainingCourse{font-size:12px}
+  .miniMeta{font-size:11px}
+  .badge{padding:6px 10px;font-size:9px}
+  .metaTicker{width:46px;height:46px;border-radius:15px}
+  .chipPrimary{font-size:13px}
+  .chipSecondary{font-size:8px}
+  .metaFace[data-face="people"]{font-size:12px}
+  .metaFace[data-face="info"]{font-size:18px}
+}
+@media(min-width:900px){
+  .wrap{padding-left:24px;padding-right:24px}
+  .topDock{gap:14px}
+}
+
+.titleWithIcon{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.titleWithIcon .titleIcon{line-height:0;display:inline-flex}
+.titleWithIcon .titleIcon svg{display:block}
+.quickBtn{display:inline-flex;align-items:center;gap:6px}
+.quickBtn-icon{line-height:0;display:inline-flex;flex-shrink:0}
+.quickBtn-icon svg{display:block}
+.rosterIconWrap,.otherIconWrap,.dockValue.searchGlyph,.savedIcon,.backIcon{
+  line-height:0;display:inline-flex;align-items:center;justify-content:center;
+  transition:transform .28s ease
+}
+.rosterIconWrap svg,.otherIconWrap svg,.dockValue.searchGlyph svg,.savedIcon svg,.backIcon svg{display:block}
+#otherPageBtn:hover .otherIconWrap{transform:none}
+.otherIconBadge{transition:transform .28s ease}
+.cupDockImg{width:100%;height:100%;object-fit:contain;display:block}
+.courseIcon{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  font-size:26px!important;line-height:1!important;color:inherit;
+  overflow:hidden;
+}
+.courseIcon.hasImg{padding:6px!important;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.55))!important}
+.courseIconImg,.courseIcon img{width:100%;height:100%;object-fit:contain;display:block}
+.courseIcon svg{display:block;width:24px;height:24px}
+.peopleBadge .peopleIconSvg{display:inline-block;vertical-align:-2px;margin-inline-end:3px}
+.badge.peopleBadge{display:inline-flex;align-items:center;gap:4px}
+
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="langBar"><button id="langToggle" class="langToggle" type="button" title="Translate to Arabic">ع</button></div>
+    <div class="hCircle hCircle1"></div>
+    <div class="hCircle hCircle2"></div>
+    <div class="hCircle hCircle3"></div>
+    <div class="headerText">
+      <h1 id="pageTitle" class="titleWithIcon"><span class="titleIcon"><svg class="titleIconSvg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="pageTitleText">Training Courses</span></h1>
+      <p id="pageSubtitle">Visual schedule</p>
+      <div class="dateTag">
+        During 01 – 29 June
+        <select id="monthPicker" class="dateTagSelect" aria-label="Choose month"><option value="2026-04.html">April 2026</option><option value="2026-05.html">May 2026</option><option value="2026-06.html" selected>June 2026</option><option value="2026-07.html">July 2026</option><option value="2026-08.html">August 2026</option></select>
+      </div>
+    </div>
+  </div>
+
+  
+<div class="topDock">
+  <div class="dockCard statChip" id="statSwitchChip">
+    <div class="statsTicker"><div class="statsFace"><div class="dockValue">16</div><div class="dockLabel">Sessions</div></div><div class="statsFace"><div class="dockValue">11</div><div class="dockLabel">Types</div></div><div class="statsFace"><div class="dockValue">139</div><div class="dockLabel">Employees</div></div><div class="statsFace"><div class="dockValue">1</div><div class="dockLabel">Venues</div></div></div>
+  </div>
+  <button class="dockCard dockAction rosterCard" id="rosterHomeBtn" type="button" aria-label="Home">
+    <div class="rosterInner"><span class="rosterIconWrap"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-6h4v6"/></svg></span><span class="rosterLabel" id="homeDockLabel" data-label-en="Home" data-label-ar="الرئيسية">Home</span></div>
+  </button>
+  <button class="dockCard dockAction" id="searchToggle" type="button" aria-expanded="false">
+    <div class="dockValue searchGlyph"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="dockLabel" data-key="search">Search</div>
+  </button>
+  <button class="dockCard dockAction" id="otherPageBtn" type="button" aria-label="A Cup of Book">
+    <div class="otherPageInner"><span class="otherIconBadge" aria-hidden="true"><img class="cupDockImg" src="../../assets/course-icons/cup-of-book.png?v=20260725i" alt=""></span><div class="dockLabel otherPageLabel" id="cupBookLabel" data-label-en="A Cup of Book" data-label-ar="كوب من كتاب" aria-label="A Cup of Book">A Cup of Book</div></div>
+  </button>
+  <button class="dockCard savedChip savedEmpty" id="savedChip" type="button">
+    <div class="savedIcon"><svg class="dockSvg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
+    <div class="savedLines">
+      <div class="savedName" id="savedName">My Staff</div>
+    </div>
+  </button>
+</div>
+
+
+  <div class="myTrainingPanel" id="myTrainingPanel" hidden>
+    <div class="myTrainingHead">
+      <div>
+        <div class="myTrainingTitle" id="myTrainingTitle">My training dates</div>
+        <div class="myTrainingSub" id="myTrainingSub"></div>
+      </div>
+      <div class="myTrainingCountChip dockCard" id="myTrainingCount">
+        <div class="dockValue" id="myTrainingCountVal">0</div>
+        <div class="dockLabel" id="myTrainingCountLbl">Sessions</div>
+      </div>
+    </div>
+    <div class="myTrainingList" id="myTrainingList"></div>
+  </div>
+
+  <div class="mainPanel">
+  <div class="filters" id="filtersBox">
+    <div class="searchRow">
+      <input id="searchInput" type="text" placeholder="Search staff / course">
+      <button id="searchBtn" class="searchBtn" type="button">Search</button>
+      <button id="clearFilters" class="clearBtn" type="button">Clear</button>
+    </div>
+  </div>
+
+  <section class="scheduleSection" aria-label="Training schedule">
+    <div class="cards"><div class="pastLabel" id="pastSep">Previous sessions</div>
+<details class="courseCard is-past pastelT0" data-search="lar (refresher) لوائح نقل الحيوانات الحية (تجديد)  cargo training room 08:00 to 15:00 إجراءات نقل الحيوانات الحية وفق المعايير الدولية. live animal transport procedures per international standards. 81300 mr. talal mahmood darwhish al balushi 81402 mr. mohammed ali salim al siyabi 82445 mr. al muthana ahmed salim al shanfari 82578 mr. raad hassan mohamed al farsi 82437 mr. marwan khalfan khamis al difai 8930 mr. fahim salim hamed al hasni 82555 mr. riyadh ahmed said al jabri 81991 mr. hilal khalaf khalfan al-shammakhi 82451 mr. ahmed amour said al harrasi 80833 mr. suleiman salim saif al maharbi 990347 mr. maqbool hussian haji al balishi 82286 mr. mahmood darwish habib al-shamsi 82667 mr. mossa khamis moosa al balushi" data-attendees="13" data-course-date="2026-06-29" data-course-end="2026-06-29" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🐾</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">LAR (refresher)</div>
+      <div class="courseTitleAr">لوائح نقل الحيوانات الحية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="29 June" data-course-emoji="🐾" data-course-icon="" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">29</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>13</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🐾" data-course-icon="" data-course-title="LAR (refresher)" data-course-title-ar="لوائح نقل الحيوانات الحية (تجديد)" data-course-desc-ar="إجراءات نقل الحيوانات الحية وفق المعايير الدولية." data-course-desc-en="Live animal transport procedures per international standards."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">81300</span><span class="empName">Mr. TALAL MAHMOOD DARWHISH AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81402</span><span class="empName">Mr. MOHAMMED ALI SALIM AL SIYABI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82445</span><span class="empName">Mr. AL MUTHANA AHMED SALIM AL SHANFARI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82578</span><span class="empName">Mr. RAAD HASSAN MOHAMED AL FARSI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82437</span><span class="empName">Mr. MARWAN KHALFAN KHAMIS AL DIFAI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">8930</span><span class="empName">Mr. FAHIM SALIM HAMED AL HASNI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82555</span><span class="empName">Mr. RIYADH AHMED SAID AL JABRI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">81991</span><span class="empName">Mr. HILAL KHALAF KHALFAN AL-SHAMMAKHI</span></div><div class="empRow"><span class="empNo">9</span><span class="empCode">82451</span><span class="empName">Mr. AHMED AMOUR SAID AL HARRASI</span></div><div class="empRow empRowAlt"><span class="empNo">10</span><span class="empCode">80833</span><span class="empName">Mr. SULEIMAN SALIM SAIF AL MAHARBI</span></div><div class="empRow"><span class="empNo">11</span><span class="empCode">990347</span><span class="empName">Mr. MAQBOOL HUSSIAN HAJI AL BALISHI</span></div><div class="empRow empRowAlt"><span class="empNo">12</span><span class="empCode">82286</span><span class="empName">Mr. MAHMOOD DARWISH HABIB AL-SHAMSI</span></div><div class="empRow"><span class="empNo">13</span><span class="empCode">82667</span><span class="empName">Mr. MOSSA KHAMIS MOOSA AL BALUSHI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT1" data-search="pcr (refresher) لوائح الشحنات القابلة للتلف (تجديد)  cargo training room 08:00 to 15:00 التعامل الصحيح مع الشحنات سريعة التلف. correct handling of perishable cargo. 82550 mr. saleh ghuwainim mohsin said al aufi 8930 mr. fahim salim hamed al hasni 82445 mr. al muthana ahmed salim al shanfari 82577 mr. ali rashid salim al marjabi 82546 mr. saleh hamed saleh al rashdi 81409 mr. qasim salim qasim al muqbali 990737 mr. said hamood said al amri 8926 mr. salim mohammad hamed al masroori 82555 mr. riyadh ahmed said al jabri 82674 mr. mohammed yahya bader al mamari 82451 mr. ahmed amour said al harrasi 82476 mr. ahmed thunai masaud al rujaibi 82049 mr. majid said salim al-ghafri 82457 mr. adil ali murad al balushi 81983 mr. jabir nasser saif al-julandani 82113 mr. abdullah ali mohammed al sawaai 82660 mr. sulaiman rashid sulaiman al hatmi 82668 mr. ibrahim khalid mohamed al hadhrami" data-attendees="18" data-course-date="2026-06-25" data-course-end="2026-06-25" data-course-title="PCR (refresher)" data-course-title-ar="لوائح الشحنات القابلة للتلف (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">❄️</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">PCR (refresher)</div>
+      <div class="courseTitleAr">لوائح الشحنات القابلة للتلف (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="25 June" data-course-emoji="❄️" data-course-icon="" data-course-title="PCR (refresher)" data-course-title-ar="لوائح الشحنات القابلة للتلف (تجديد)" data-course-desc-ar="التعامل الصحيح مع الشحنات سريعة التلف." data-course-desc-en="Correct handling of perishable cargo." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">25</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>18</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="❄️" data-course-icon="" data-course-title="PCR (refresher)" data-course-title-ar="لوائح الشحنات القابلة للتلف (تجديد)" data-course-desc-ar="التعامل الصحيح مع الشحنات سريعة التلف." data-course-desc-en="Correct handling of perishable cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82550</span><span class="empName">Mr. SALEH GHUWAINIM MOHSIN SAID AL AUFI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">8930</span><span class="empName">Mr. FAHIM SALIM HAMED AL HASNI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82445</span><span class="empName">Mr. AL MUTHANA AHMED SALIM AL SHANFARI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82577</span><span class="empName">Mr. ALI RASHID SALIM AL MARJABI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82546</span><span class="empName">Mr. SALEH HAMED SALEH AL RASHDI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">81409</span><span class="empName">Mr. QASIM SALIM QASIM AL MUQBALI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">990737</span><span class="empName">Mr. SAID HAMOOD SAID AL AMRI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">8926</span><span class="empName">Mr. SALIM MOHAMMAD HAMED AL MASROORI</span></div><div class="empRow"><span class="empNo">9</span><span class="empCode">82555</span><span class="empName">Mr. RIYADH AHMED SAID AL JABRI</span></div><div class="empRow empRowAlt"><span class="empNo">10</span><span class="empCode">82674</span><span class="empName">Mr. MOHAMMED YAHYA BADER AL MAMARI</span></div><div class="empRow"><span class="empNo">11</span><span class="empCode">82451</span><span class="empName">Mr. AHMED AMOUR SAID AL HARRASI</span></div><div class="empRow empRowAlt"><span class="empNo">12</span><span class="empCode">82476</span><span class="empName">Mr. AHMED THUNAI MASAUD AL RUJAIBI</span></div><div class="empRow"><span class="empNo">13</span><span class="empCode">82049</span><span class="empName">Mr. MAJID SAID SALIM AL-GHAFRI</span></div><div class="empRow empRowAlt"><span class="empNo">14</span><span class="empCode">82457</span><span class="empName">Mr. ADIL ALI MURAD AL BALUSHI</span></div><div class="empRow"><span class="empNo">15</span><span class="empCode">81983</span><span class="empName">Mr. JABIR NASSER SAIF AL-JULANDANI</span></div><div class="empRow empRowAlt"><span class="empNo">16</span><span class="empCode">82113</span><span class="empName">Mr. ABDULLAH ALI MOHAMMED AL SAWAAI</span></div><div class="empRow"><span class="empNo">17</span><span class="empCode">82660</span><span class="empName">Mr. SULAIMAN RASHID SULAIMAN AL HATMI</span></div><div class="empRow empRowAlt"><span class="empNo">18</span><span class="empCode">82668</span><span class="empName">Mr. IBRAHIM KHALID MOHAMED AL HADHRAMI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT2" data-search="cwo (cargo warehouse operations) عمليات مستودع الشحن  cargo training room 08:00 to 15:00 إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع. managing, receiving, storing, and handling cargo in the warehouse. 81404 mr. mohammed farid ali al amri 990752 mr. ali yousuf yaqoob al baluchi 82592 mr. mohammed juma salim al subhi 81393 mr. ali suleiman ali al farsi 82598 mr. khalil harib mohamed al mazroei 82661 mr. mohamed abdullah khatim al maskari 80335 mr. ericson saulo puno 82541 mr. mohammed marhoon rashid al wahaibi 990347 mr. maqbool hussian haji al balishi 82470 mr. waheb abdallah hamed al baraidai" data-attendees="10" data-course-date="2026-06-22" data-course-end="2026-06-24" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">📦</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">CWO (Cargo Warehouse Operations)</div>
+      <div class="courseTitleAr">عمليات مستودع الشحن</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="22–24 June" data-course-emoji="📦" data-course-icon="" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">22–24</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>10</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="📦" data-course-icon="" data-course-title="CWO (Cargo Warehouse Operations)" data-course-title-ar="عمليات مستودع الشحن" data-course-desc-ar="إدارة واستلام وتخزين ومناولة الشحنات داخل المستودع." data-course-desc-en="Managing, receiving, storing, and handling cargo in the warehouse."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">81404</span><span class="empName">Mr. MOHAMMED FARID ALI AL AMRI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">990752</span><span class="empName">Mr. ALI YOUSUF YAQOOB AL BALUCHI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82592</span><span class="empName">Mr. MOHAMMED JUMA SALIM AL SUBHI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81393</span><span class="empName">Mr. ALI SULEIMAN ALI AL FARSI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82598</span><span class="empName">Mr. KHALIL HARIB MOHAMED AL MAZROEI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82661</span><span class="empName">Mr. MOHAMED ABDULLAH KHATIM AL MASKARI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">80335</span><span class="empName">Mr. ERICSON SAULO PUNO</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">82541</span><span class="empName">Mr. MOHAMMED MARHOON RASHID AL WAHAIBI</span></div><div class="empRow"><span class="empNo">9</span><span class="empCode">990347</span><span class="empName">Mr. MAQBOOL HUSSIAN HAJI AL BALISHI</span></div><div class="empRow empRowAlt"><span class="empNo">10</span><span class="empCode">82470</span><span class="empName">Mr. WAHEB ABDALLAH HAMED AL BARAIDAI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT3" data-search="airside safety (refresher) سلامة ساحة المطار (تجديد)  cargo training room 08:00 to 15:00 قواعد السلامة أثناء العمل بجوار الطائرات والمعدات. safety rules when working near aircraft and equipment. 82420 mr. mohamed rashid mabiwa al saadi 82654 mr. ahmed rashid nasser al hadi 82658 mr. mohammed nasser said al mazroei 82661 mr. mohamed abdullah khatim al maskari 82665 mr. mahanad khalid abdullah al hadi 82667 mr. mossa khamis moosa al balushi 82550 mr. saleh ghuwainim mohsin said al aufi 81022 mr. faisal noor mohammad al balushi" data-attendees="8" data-course-date="2026-06-21" data-course-end="2026-06-21" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🦺</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Airside Safety (refresher)</div>
+      <div class="courseTitleAr">سلامة ساحة المطار (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="21 June" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">21</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82420</span><span class="empName">Mr. MOHAMED RASHID MABIWA AL SAADI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">82654</span><span class="empName">Mr. AHMED RASHID NASSER AL HADI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82658</span><span class="empName">Mr. MOHAMMED NASSER SAID AL MAZROEI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82661</span><span class="empName">Mr. MOHAMED ABDULLAH KHATIM AL MASKARI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82665</span><span class="empName">Mr. MAHANAD KHALID ABDULLAH AL HADI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82667</span><span class="empName">Mr. MOSSA KHAMIS MOOSA AL BALUSHI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82550</span><span class="empName">Mr. SALEH GHUWAINIM MOHSIN SAID AL AUFI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">81022</span><span class="empName">Mr. FAISAL NOOR MOHAMMAD AL BALUSHI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT4" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 82474 mr. ali juma salim al muqbali 8901 mr. dingiri bandaralage nishautha udugama 82600 mr. habib mohammed janjan al balushi 8859 mr. sultan saif mohammad al riyami 82476 mr. ahmed thunai masaud al rujaibi 80831 mr. jaffer a redha mohammed al ajmi 82113 mr. abdullah ali mohammed al sawaai 82410 mr. said rashid saif al sadi 81404 mr. mohammed farid ali al amri 82658 mr. mohammed nasser said al mazroei" data-attendees="10" data-course-date="2026-06-16" data-course-end="2026-06-16" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../../assets/course-icons/forklift.png?v=20260725h" alt=""></div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="16 June" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">16</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>10</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82474</span><span class="empName">Mr. ALI JUMA SALIM AL MUQBALI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">8901</span><span class="empName">Mr. DINGIRI BANDARALAGE NISHAUTHA UDUGAMA</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82600</span><span class="empName">Mr. HABIB MOHAMMED JANJAN AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">8859</span><span class="empName">Mr. SULTAN SAIF MOHAMMAD AL RIYAMI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82476</span><span class="empName">Mr. AHMED THUNAI MASAUD AL RUJAIBI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">80831</span><span class="empName">Mr. JAFFER A REDHA MOHAMMED AL AJMI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82113</span><span class="empName">Mr. ABDULLAH ALI MOHAMMED AL SAWAAI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">82410</span><span class="empName">Mr. SAID RASHID SAIF AL SADI</span></div><div class="empRow"><span class="empNo">9</span><span class="empCode">81404</span><span class="empName">Mr. MOHAMMED FARID ALI AL AMRI</span></div><div class="empRow empRowAlt"><span class="empNo">10</span><span class="empCode">82658</span><span class="empName">Mr. MOHAMMED NASSER SAID AL MAZROEI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT0" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 82466 mr. waleed salim abdullah al kharusi 82667 mr. mossa khamis moosa al balushi 82596 mr. hamed saif hamed al fulaiti 82666 mr. mohammed sulaiman khamis almaskari 80482 mr. waleed khalifa khamis al haddabi" data-attendees="5" data-course-date="2026-06-15" data-course-end="2026-06-15" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../../assets/course-icons/forklift.png?v=20260725h" alt=""></div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="15 June" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">15</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>5</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82466</span><span class="empName">Mr. WALEED SALIM ABDULLAH AL KHARUSI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">82667</span><span class="empName">Mr. MOSSA KHAMIS MOOSA AL BALUSHI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82596</span><span class="empName">Mr. HAMED SAIF HAMED AL FULAITI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82666</span><span class="empName">Mr. MOHAMMED SULAIMAN KHAMIS ALMASKARI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">80482</span><span class="empName">Mr. WALEED KHALIFA KHAMIS AL HADDABI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT1" data-search="dgr-cbta-acc-dg (acceptance staff) البضائع الخطرة — موظفو القبول  cargo training room 08:00 to 15:00   81300 mr. talal mahmood darwhish al balushi 80276 mr. allan vianzon tajonera 82409 mr. qais salmeen suweilem al rashdi 81394 mr. fahad khalfan abdullah al khamisi 80235 mr. rodolfo cruz magcaling 8899 mr. rajaram sivaliwgam 82479 mr. al muhanad al waleed khalid al abri" data-attendees="7" data-course-date="2026-06-14" data-course-end="2026-06-20" data-course-title="DGR-CBTA-ACC-DG (Acceptance staff)" data-course-title-ar="البضائع الخطرة — موظفو القبول" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">📝</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">DGR-CBTA-ACC-DG (Acceptance staff)</div>
+      <div class="courseTitleAr">البضائع الخطرة — موظفو القبول</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker" data-meta-ticker title="14–20 June" role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">14–20</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</div>
+          
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">81300</span><span class="empName">Mr. TALAL MAHMOOD DARWHISH AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">80276</span><span class="empName">Mr. ALLAN VIANZON TAJONERA</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82409</span><span class="empName">MR. QAIS SALMEEN SUWEILEM AL RASHDI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81394</span><span class="empName">Mr. FAHAD KHALFAN ABDULLAH AL KHAMISI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">80235</span><span class="empName">Mr. RODOLFO CRUZ MAGCALING</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">8899</span><span class="empName">Mr. RAJARAM SIVALIWGAM</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82479</span><span class="empName">Mr. AL MUHANAD AL WALEED KHALID AL ABRI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT2" data-search="forklift (refresher) تشغيل الرافعة الشوكية (تجديد)  cargo training room 08:00 to 15:00 الاستخدام الآمن للرافعة الشوكية. safe forklift operation. 82643 mr. mohamed sulaiman hamed al alawi 8336 mr. khalid yousuf yaqoob al baluschi 82574 mr. ali sultan amur al mamari 82577 mr. ali rashid salim al marjabi 82424 mr. riyadh mubarak juma al sulti 82464 mr. wisam abdulrahman sulaiman al kharousi 8591 mr. aziz zayed mohammad al bulushi 82550 mr. saleh ghuwainim mohsin said al aufi" data-attendees="8" data-course-date="2026-06-14" data-course-end="2026-06-14" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon hasImg" aria-hidden="true"><img class="courseIconImg" src="../../assets/course-icons/forklift.png?v=20260725h" alt=""></div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Forklift (refresher)</div>
+      <div class="courseTitleAr">تشغيل الرافعة الشوكية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="14 June" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">14</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🏗️" data-course-icon="../../assets/course-icons/forklift.png?v=20260725h" data-course-title="Forklift (refresher)" data-course-title-ar="تشغيل الرافعة الشوكية (تجديد)" data-course-desc-ar="الاستخدام الآمن للرافعة الشوكية." data-course-desc-en="Safe forklift operation."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82643</span><span class="empName">Mr. MOHAMED SULAIMAN HAMED AL ALAWI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">8336</span><span class="empName">Mr. KHALID YOUSUF YAQOOB AL BALUSCHI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82574</span><span class="empName">Mr. ALI SULTAN AMUR AL MAMARI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82577</span><span class="empName">Mr. ALI RASHID SALIM AL MARJABI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82424</span><span class="empName">Mr. RIYADH MUBARAK JUMA AL SULTI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82464</span><span class="empName">Mr. WISAM ABDULRAHMAN SULAIMAN AL KHAROUSI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">8591</span><span class="empName">Mr. AZIZ ZAYED MOHAMMAD AL BULUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">82550</span><span class="empName">Mr. SALEH GHUWAINIM MOHSIN SAID AL AUFI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT3" data-search="airside safety (refresher) سلامة ساحة المطار (تجديد)  cargo training room 08:00 to 15:00 قواعد السلامة أثناء العمل بجوار الطائرات والمعدات. safety rules when working near aircraft and equipment. 82660 mr. sulaiman rashid sulaiman al hatmi 82657 ms. bushra khamis mohammed al waheibi 82659 mr. ammar nasser hamed al hashmi 82663 mr. abedallah mohammed hamdon al sinawi 82666 mr. mohammed sulaiman khamis almaskari 8591 mr. aziz zayed mohammad al bulushi" data-attendees="6" data-course-date="2026-06-11" data-course-end="2026-06-11" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🦺</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Airside Safety (refresher)</div>
+      <div class="courseTitleAr">سلامة ساحة المطار (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="11 June" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">11</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>6</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🦺" data-course-icon="" data-course-title="Airside Safety (refresher)" data-course-title-ar="سلامة ساحة المطار (تجديد)" data-course-desc-ar="قواعد السلامة أثناء العمل بجوار الطائرات والمعدات." data-course-desc-en="Safety rules when working near aircraft and equipment."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82660</span><span class="empName">Mr. SULAIMAN RASHID SULAIMAN AL HATMI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">82657</span><span class="empName">Ms. BUSHRA KHAMIS MOHAMMED AL WAHEIBI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82659</span><span class="empName">Mr. AMMAR NASSER HAMED AL HASHMI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82663</span><span class="empName">Mr. ABEDALLAH MOHAMMED HAMDON AL SINAWI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82666</span><span class="empName">Mr. MOHAMMED SULAIMAN KHAMIS ALMASKARI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">8591</span><span class="empName">Mr. AZIZ ZAYED MOHAMMAD AL BULUSHI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT4" data-search="dgr-cbta-ops (recurrent) لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)  cargo training room 08:00 to 15:00 التعامل الآمن مع البضائع الخطرة وفق متطلبات iata. safe handling of dangerous goods per iata requirements. 80481 mr. salim khamis salim al maawali 81399 mr. jamal nasser khamis al sinani 80215 mr. glendo nunez escober" data-attendees="3" data-course-date="2026-06-10" data-course-end="2026-06-10" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">☢️</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">DGR-CBTA-OPS (recurrent)</div>
+      <div class="courseTitleAr">لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="10 June" data-course-emoji="☢️" data-course-icon="" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">10</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>3</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="☢️" data-course-icon="" data-course-title="DGR-CBTA-OPS (recurrent)" data-course-title-ar="لوائح البضائع الخطرة – التدريب والتقييم المبني على الكفاءة (دوري)" data-course-desc-ar="التعامل الآمن مع البضائع الخطرة وفق متطلبات IATA." data-course-desc-en="Safe handling of dangerous goods per IATA requirements."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">80481</span><span class="empName">Mr. SALIM KHAMIS SALIM AL MAAWALI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81399</span><span class="empName">Mr. JAMAL NASSER KHAMIS AL SINANI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">80215</span><span class="empName">Mr. GLENDO NUNEZ ESCOBER</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT0" data-search="sms (initial) نظام إدارة السلامة (أساسي)  cargo training room 08:00 to 15:00 مبادئ إدارة السلامة والإبلاغ عن المخاطر. safety management principles and hazard reporting. 82661 mr. mohamed abdullah khatim al maskari 81404 mr. mohammed farid ali al amri 82651 mr. mazin murad ali al houti 82614 mr. mohamed saif khalfan al mawali" data-attendees="4" data-course-date="2026-06-08" data-course-end="2026-06-08" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">📊</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">SMS (initial)</div>
+      <div class="courseTitleAr">نظام إدارة السلامة (أساسي)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="08 June" data-course-emoji="📊" data-course-icon="" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">8</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>4</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="📊" data-course-icon="" data-course-title="SMS (initial)" data-course-title-ar="نظام إدارة السلامة (أساسي)" data-course-desc-ar="مبادئ إدارة السلامة والإبلاغ عن المخاطر." data-course-desc-en="Safety management principles and hazard reporting."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82661</span><span class="empName">Mr. MOHAMED ABDULLAH KHATIM AL MASKARI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81404</span><span class="empName">Mr. MOHAMMED FARID ALI AL AMRI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82651</span><span class="empName">Mr. MAZIN MURAD ALI AL HOUTI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82614</span><span class="empName">Mr. MOHAMED SAIF KHALFAN AL MAWALI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT1" data-search="cargo security awareness (refresher) التوعية بأمن الشحن (تجديد)  cargo training room 08:00 to 15:00   80709 mr. ibrahim habib darwish al zadjali 80137 mrs. zahra said sulieman al aufi 82450 miss. amal said ahmed saif al muqbali 81402 mr. mohammed ali salim al siyabi 82100 mr. yousuf yaqoob anad al-waheedi 82551 mr. omar mubarak musallam al obaidi" data-attendees="6" data-course-date="2026-06-07" data-course-end="2026-06-07" data-course-title="Cargo Security Awareness (refresher)" data-course-title-ar="التوعية بأمن الشحن (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🔐</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Cargo Security Awareness (refresher)</div>
+      <div class="courseTitleAr">التوعية بأمن الشحن (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker" data-meta-ticker title="07 June" role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">7</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>6</div>
+          
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">80709</span><span class="empName">Mr. IBRAHIM HABIB DARWISH AL ZADJALI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">80137</span><span class="empName">Mrs. ZAHRA SAID SULIEMAN AL AUFI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82450</span><span class="empName">Miss. AMAL SAID AHMED SAIF AL MUQBALI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81402</span><span class="empName">Mr. MOHAMMED ALI SALIM AL SIYABI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82100</span><span class="empName">Mr. YOUSUF YAQOOB ANAD AL-WAHEEDI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82551</span><span class="empName">Mr. OMAR MUBARAK MUSALLAM AL OBAIDI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT2" data-search="gdp-tcr (refresher) الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)  cargo training room 08:00 to 15:00 نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان. safe transport and storage of temperature-sensitive cargo. 80695 mr. hosni mubarak juma al salti 82439 mr. ghaith zayed saif al habsi 82592 mr. mohammed juma salim al subhi 82555 mr. riyadh ahmed said al jabri 81348 mr. asad said ali al omari 82445 mr. al muthana ahmed salim al shanfari 82429 mr. zakariya mohamed yaqoob abdul karim al balushi 82468 mr. badar saif nasser al fulaiti 82467 mr. khamis juma khamis al hinai 82578 mr. raad hassan mohamed al farsi 82113 mr. abdullah ali mohammed al sawaai 80539 mr. jeffrey panopio lopez 82454 mr. hisham saif mubarak al maharbi 81399 mr. jamal nasser khamis al sinani 82473 mrs. alaa sulaiman hamdan al wahaibi 8195 mr. samaramannage jayantha chandranath 82654 mr. ahmed rashid nasser al hadi 990895 mr. mohammed khamis saleem al haddabi 82539 mr. abdullah khalaif rashid al aamri 82533 mr. majid nasser khamis al fakhri 8591 mr. aziz zayed mohammad al bulushi" data-attendees="21" data-course-date="2026-06-04" data-course-end="2026-06-04" data-course-title="GDP-TCR (refresher)" data-course-title-ar="الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🌡️</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">GDP-TCR (refresher)</div>
+      <div class="courseTitleAr">الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="04 June" data-course-emoji="🌡️" data-course-icon="" data-course-title="GDP-TCR (refresher)" data-course-title-ar="الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)" data-course-desc-ar="نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان." data-course-desc-en="Safe transport and storage of temperature-sensitive cargo." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">4</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>21</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🌡️" data-course-icon="" data-course-title="GDP-TCR (refresher)" data-course-title-ar="الممارسات الجيدة لتوزيع الشحنات الحساسة للحرارة (تجديد)" data-course-desc-ar="نقل وتخزين الشحنات الحساسة لدرجة الحرارة بأمان." data-course-desc-en="Safe transport and storage of temperature-sensitive cargo."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">80695</span><span class="empName">Mr. HOSNI MUBARAK JUMA AL SALTI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">82439</span><span class="empName">Mr. GHAITH ZAYED SAIF AL HABSI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82592</span><span class="empName">Mr. MOHAMMED JUMA SALIM AL SUBHI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82555</span><span class="empName">Mr. RIYADH AHMED SAID AL JABRI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">81348</span><span class="empName">Mr. ASAD SAID ALI AL OMARI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82445</span><span class="empName">Mr. AL MUTHANA AHMED SALIM AL SHANFARI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82429</span><span class="empName">Mr. ZAKARIYA MOHAMED YAQOOB ABDUL KARIM AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">82468</span><span class="empName">Mr. BADAR SAIF NASSER AL FULAITI</span></div><div class="empRow"><span class="empNo">9</span><span class="empCode">82467</span><span class="empName">Mr. KHAMIS JUMA KHAMIS AL HINAI</span></div><div class="empRow empRowAlt"><span class="empNo">10</span><span class="empCode">82578</span><span class="empName">Mr. RAAD HASSAN MOHAMED AL FARSI</span></div><div class="empRow"><span class="empNo">11</span><span class="empCode">82113</span><span class="empName">Mr. ABDULLAH ALI MOHAMMED AL SAWAAI</span></div><div class="empRow empRowAlt"><span class="empNo">12</span><span class="empCode">80539</span><span class="empName">Mr. JEFFREY PANOPIO LOPEZ</span></div><div class="empRow"><span class="empNo">13</span><span class="empCode">82454</span><span class="empName">Mr. HISHAM SAIF MUBARAK AL MAHARBI</span></div><div class="empRow empRowAlt"><span class="empNo">14</span><span class="empCode">81399</span><span class="empName">Mr. JAMAL NASSER KHAMIS AL SINANI</span></div><div class="empRow"><span class="empNo">15</span><span class="empCode">82473</span><span class="empName">Mrs. ALAA SULAIMAN HAMDAN AL WAHAIBI</span></div><div class="empRow empRowAlt"><span class="empNo">16</span><span class="empCode">8195</span><span class="empName">Mr. SAMARAMANNAGE JAYANTHA CHANDRANATH</span></div><div class="empRow"><span class="empNo">17</span><span class="empCode">82654</span><span class="empName">Mr. AHMED RASHID NASSER AL HADI</span></div><div class="empRow empRowAlt"><span class="empNo">18</span><span class="empCode">990895</span><span class="empName">Mr. MOHAMMED KHAMIS SALEEM AL HADDABI</span></div><div class="empRow"><span class="empNo">19</span><span class="empCode">82539</span><span class="empName">Mr. ABDULLAH KHALAIF RASHID AL AAMRI</span></div><div class="empRow empRowAlt"><span class="empNo">20</span><span class="empCode">82533</span><span class="empName">Mr. MAJID NASSER KHAMIS AL FAKHRI</span></div><div class="empRow"><span class="empNo">21</span><span class="empCode">8591</span><span class="empName">Mr. AZIZ ZAYED MOHAMMAD AL BULUSHI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT3" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 الحد من الأخطاء البشرية وتحسين الأداء والسلامة. reduce human error and improve performance and safety. 80478 mr.faris yousuf mohammad al baluchi 80834 mr.said hamed khamis al amri 82532 mr. mohamed salim suruor al dughaishi 990465 mr.abdulfattah mubarak sulaiym al shekaili 82574 ali sultan amur al mamari 82583 mr. bader ali abdullah al shehi 82616 ahmed shafi humaid al hashemi 81025 mr.yahya ahmed sulaiman al masoudi" data-attendees="8" data-course-date="2026-06-03" data-course-end="2026-06-03" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="03 June" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">3</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>8</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">80478</span><span class="empName">MR.FARIS YOUSUF MOHAMMAD AL BALUCHI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">80834</span><span class="empName">MR.SAID HAMED KHAMIS AL AMRI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82532</span><span class="empName">MR. MOHAMED SALIM SURUOR AL DUGHAISHI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">990465</span><span class="empName">MR.ABDULFATTAH MUBARAK SULAIYM AL SHEKAILI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82574</span><span class="empName">ALI SULTAN AMUR AL MAMARI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82583</span><span class="empName">MR. BADER ALI ABDULLAH AL SHEHI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82616</span><span class="empName">AHMED SHAFI HUMAID AL HASHEMI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">81025</span><span class="empName">MR.YAHYA AHMED SULAIMAN AL MASOUDI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT4" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 الحد من الأخطاء البشرية وتحسين الأداء والسلامة. reduce human error and improve performance and safety. 80316 mr.grethen jimeno domingo 81354 mr.mulham shakhboot hassan al saadi 82474 mr. ali juma salim al muqbali 82456 mr. ahmed darwish abdullah al farsi 990752 mr.ali yousuf yaqoob al baluchi" data-attendees="5" data-course-date="2026-06-02" data-course-end="2026-06-02" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="02 June" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">2</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>5</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">80316</span><span class="empName">MR.GRETHEN JIMENO DOMINGO</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81354</span><span class="empName">MR.MULHAM SHAKHBOOT HASSAN AL SAADI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82474</span><span class="empName">MR. ALI JUMA SALIM AL MUQBALI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">82456</span><span class="empName">MR. AHMED DARWISH ABDULLAH AL FARSI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">990752</span><span class="empName">MR.ALI YOUSUF YAQOOB AL BALUCHI</span></div></div>
+  </div>
+</details>
+
+<details class="courseCard is-past pastelT0" data-search="human factors (refresher) العوامل البشرية (تجديد)  cargo training room 08:00 to 15:00 الحد من الأخطاء البشرية وتحسين الأداء والسلامة. reduce human error and improve performance and safety. 990669 miss.jumana mansour sulaiman al hasni 81031 mrs. safiya salim abdullah al omairi 82590 mr. nasser mohammed said al mamari 81991 mr.hilal khalaf khalfan al-shammakhi 82464 mr. wisam abdulrahman sulaiman al kharousi 990754 mr.jabir abdulkarim yaqob al baluchi 82114 mr.mubarak hassan obaid al-nofli" data-attendees="7" data-course-date="2026-06-01" data-course-end="2026-06-01" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-venue="Cargo Training Room" data-time="08:00 to 15:00">
+  <summary class="courseHead">
+    <div class="headGlow"></div>
+    <div class="courseIcon" aria-hidden="true">🧠</div>
+    <div class="courseTitleWrap">
+      <div class="courseTitle">Human Factors (refresher)</div>
+      <div class="courseTitleAr">العوامل البشرية (تجديد)</div>
+      <div class="courseSubRow">
+        <span class="miniMeta"><strong>Venue</strong> Cargo Training Room</span>
+        <span class="miniDot">•</span>
+        <span class="miniMeta"><strong>Time</strong> 08:00 to 15:00</span>
+      </div>
+    </div>
+    <div class="courseBadges">
+      
+      <div class="metaTicker hasInfo" data-meta-ticker title="01 June" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety." role="button" tabindex="0" aria-label="Course info">
+        <div class="metaTickerStage">
+          <div class="metaFace is-active" data-face="date">
+            <span class="chipPrimary">1</span>
+            <span class="chipSecondary">Jun</span>
+          </div>
+          <div class="metaFace" data-face="people"><svg class="peopleIconSvg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 18v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M14 18v-1a3 3 0 0 1 2-2.8"/></svg>7</div>
+          <button class="metaFace courseInfoBtn" type="button" data-face="info" aria-label="Course info" data-course-emoji="🧠" data-course-icon="" data-course-title="Human Factors (refresher)" data-course-title-ar="العوامل البشرية (تجديد)" data-course-desc-ar="الحد من الأخطاء البشرية وتحسين الأداء والسلامة." data-course-desc-en="Reduce human error and improve performance and safety."><span class="courseInfoMark" aria-hidden="true">?</span></button>
+        </div>
+        <div class="metaDots"><span class="metaDot is-on" data-dot="0"></span><span class="metaDot" data-dot="1"></span><span class="metaDot" data-dot="2"></span></div>
+      </div>
+    </div>
+  </summary>
+  <div class="courseBody">
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">990669</span><span class="empName">MISS.JUMANA MANSOUR SULAIMAN AL HASNI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81031</span><span class="empName">Mrs. SAFIYA SALIM ABDULLAH AL OMAIRI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">82590</span><span class="empName">MR. NASSER MOHAMMED SAID AL MAMARI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81991</span><span class="empName">MR.HILAL KHALAF KHALFAN AL-SHAMMAKHI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82464</span><span class="empName">MR. WISAM ABDULRAHMAN SULAIMAN AL KHAROUSI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">990754</span><span class="empName">MR.JABIR ABDULKARIM YAQOB AL BALUCHI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82114</span><span class="empName">MR.MUBARAK HASSAN OBAID AL-NOFLI</span></div></div>
+  </div>
+</details>
+</div>
+  </section>
+  <div class="emptyState" id="emptyState">No matching courses found.</div>
+  </div>
+  
+<div class="gamesPanel">
+  <div class="gamesPanelTitle"><span aria-hidden="true">🎮</span><span data-tr-en="Break-time games" data-tr-ar="ألعاب الاستراحة">Break-time games</span></div>
+  <div class="gamesGrid">
+    <a class="gameChip gameChip--pairs" href="https://dgr-exp.netlify.app/m1/pairs.html" target="_blank" rel="noopener">
+      <span class="gameChipIcon" aria-hidden="true">🧩</span><span data-tr-en="Pairs" data-tr-ar="قرائن الصور">Pairs</span>
+    </a>
+    <a class="gameChip gameChip--similarity" href="https://dgr-exp.netlify.app/g2/similarity.html" target="_blank" rel="noopener">
+      <span class="gameChipIcon" aria-hidden="true">🧠</span><span data-tr-en="Similarity" data-tr-ar="التشابه">Similarity</span>
+    </a>
+    <a class="gameChip gameChip--quiz" href="https://dgr-exp.netlify.app/Q/Q.HTML" target="_blank" rel="noopener">
+      <span class="gameChipIcon" aria-hidden="true">🎯</span><span data-tr-en="The Question" data-tr-ar="السؤال">The Question</span>
+    </a>
+    <a class="gameChip gameChip--air" href="https://dgr-exp.netlify.app/g1/airlogo.html" target="_blank" rel="noopener">
+      <span class="gameChipIcon" aria-hidden="true">✈️</span><span data-tr-en="Air Logo" data-tr-ar="Air Logo">Air Logo</span>
+    </a>
+    <a class="gameChip gameChip--cargo" href="https://dgr-exp.netlify.app/g3/cargo-dash.html" target="_blank" rel="noopener">
+      <span class="gameChipIcon" aria-hidden="true">📦</span><span data-tr-en="Cargo Dash" data-tr-ar="شريط التفتيش">Cargo Dash</span>
+    </a>
+  </div>
+</div>
+
+  
+<div class="footerShare">
+  <button type="button" class="trainingShareBtn" id="shareSiteBtn">
+    <span class="trainingShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+    <span class="roster-cta-label">Share page</span>
+  </button>
+</div>
+
+  <div class="footer">TRANSOM Cargo · Training</div>
+  
+<div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+  <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+    <h2 class="siteShareTitle" id="siteShareTitle">Share training page</h2>
+    <p class="siteShareHint" id="siteShareHint">Scan the QR code or copy the link</p>
+    <div class="siteShareQr" id="siteShareQr"></div>
+    <p class="siteShareUrl" id="siteShareUrl"></p>
+    <div class="siteShareActions">
+      <button type="button" class="trainingShareBtn trainingShareBtn--wa" id="siteShareNativeBtn">
+        <span class="trainingShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span class="roster-cta-label">Share</span>
+      </button>
+      <button type="button" class="trainingShareBtn trainingShareBtn--wa" id="siteShareWhatsAppBtn">
+        <span class="trainingShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg></span>
+        <span class="roster-cta-label">WhatsApp</span>
+      </button>
+      <button type="button" class="trainingShareBtn trainingShareBtn--copy trainingShareBtn--wide" id="siteShareCopyBtn">
+        <span class="trainingShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg></span>
+        <span class="roster-cta-label">Copy link</span>
+      </button>
+    </div>
+    <div class="siteShareCloseWrap">
+      <button type="button" class="trainingShareBtn trainingShareBtn--muted trainingShareBtn--wide" id="siteShareCloseBtn">
+        <span class="roster-cta-label">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+  <div class="staffModal" id="staffModal" aria-hidden="true">
+    <div class="staffModalCard">
+      <div class="staffModalTop">
+        <div>
+          <div class="staffModalTitle">Save employee</div>
+          <div class="staffModalSub">Uses your roster saved ID if available, or enter staff number / name</div>
+        </div>
+        <button class="staffClose" id="staffClose" type="button">x</button>
+      </div>
+      <input id="staffInput" class="staffField" type="text" placeholder="e.g. 8715 or Khalid">
+      <div class="staffModalActions">
+        <button id="staffClear" class="staffBtn staffBtnGhost" type="button">Clear</button>
+        <button id="staffSave" class="staffBtn staffBtnPrimary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="courseInfoModal" id="courseInfoModal" aria-hidden="true">
+    <div class="courseInfoCard" role="dialog" aria-modal="true" aria-labelledby="courseInfoTitle">
+      <div class="courseInfoEmoji" id="courseInfoEmoji" aria-hidden="true">📘</div>
+      <div class="courseInfoTitle" id="courseInfoTitle"></div>
+      <div class="courseInfoTitleAr" id="courseInfoTitleAr"></div>
+      <p class="courseInfoDesc" id="courseInfoDesc"></p>
+      <button class="courseInfoClose" id="courseInfoClose" type="button">Close</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const SAVED_QUERY_KEY = 'trainingSavedQuery';
+  const ROSTER_EMP_ID_KEYS = ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'];
+  const ROSTER_EMP_NAME_KEYS = ['exportSavedEmpName', 'savedEmpName', 'importSavedEmpName'];
+  const cards = Array.from(document.querySelectorAll('.courseCard'));
+  const searchToggle = document.getElementById('searchToggle');
+  const filtersBox = document.getElementById('filtersBox');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const clearBtn = document.getElementById('clearFilters');
+  const savedChip = document.getElementById('savedChip');
+  const savedName = document.getElementById('savedName');
+  const staffModal = document.getElementById('staffModal');
+  const staffInput = document.getElementById('staffInput');
+  const staffSave = document.getElementById('staffSave');
+  const staffClear = document.getElementById('staffClear');
+  const staffClose = document.getElementById('staffClose');
+  const emptyState = document.getElementById('emptyState');
+  const monthPicker = document.getElementById('monthPicker');
+  const pastSep = document.getElementById('pastSep');
+  const statsFaces = Array.from(document.querySelectorAll('.statsFace'));
+  const otherPageBtn = document.getElementById('otherPageBtn');
+  const rosterHomeBtn = document.getElementById('rosterHomeBtn');
+
+  const myTrainingPanel = document.getElementById('myTrainingPanel');
+  const myTrainingTitle = document.getElementById('myTrainingTitle');
+  const myTrainingSub = document.getElementById('myTrainingSub');
+  const myTrainingCountVal = document.getElementById('myTrainingCountVal');
+  const myTrainingCountLbl = document.getElementById('myTrainingCountLbl');
+  const myTrainingList = document.getElementById('myTrainingList');
+  const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTH_SHORT_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+  function getRosterSavedEmpId(){
+    for(const key of ROSTER_EMP_ID_KEYS){
+      const value = (localStorage.getItem(key) || '').trim();
+      if(value) return value;
+    }
+    return '';
+  }
+  function getRosterSavedEmpName(){
+    for(const key of ROSTER_EMP_NAME_KEYS){
+      const value = (localStorage.getItem(key) || '').trim();
+      if(value) return value;
+    }
+    return '';
+  }
+  function rememberRosterName(empId, fullName){
+    const name = (fullName || '').trim();
+    const id = (empId || '').trim();
+    if(!name || !id) return;
+    localStorage.setItem('exportSavedEmpName', name);
+    localStorage.setItem('savedEmpName', name);
+    if(localStorage.getItem('importSavedEmpId') === id){
+      localStorage.setItem('importSavedEmpName', name);
+    }
+  }
+  function getSavedQuery(){
+    const rosterId = getRosterSavedEmpId();
+    if(rosterId) return rosterId;
+    const rosterName = getRosterSavedEmpName();
+    if(rosterName) return rosterName;
+    return (localStorage.getItem(SAVED_QUERY_KEY) || '').trim();
+  }
+  function persistSavedQuery(value){
+    const trimmed = (value || '').trim();
+    if(!trimmed){
+      localStorage.removeItem(SAVED_QUERY_KEY);
+      ROSTER_EMP_ID_KEYS.forEach(key => localStorage.removeItem(key));
+      ROSTER_EMP_NAME_KEYS.forEach(key => localStorage.removeItem(key));
+      return;
+    }
+    localStorage.setItem(SAVED_QUERY_KEY, trimmed);
+    if(/^\d+$/.test(trimmed)){
+      const prevId = (localStorage.getItem('exportSavedEmpId') || '').trim();
+      localStorage.setItem('exportSavedEmpId', trimmed);
+      localStorage.removeItem('savedEmpId');
+      if(prevId && prevId !== trimmed){
+        localStorage.removeItem('exportSavedEmpName');
+        localStorage.removeItem('savedEmpName');
+      }
+    }
+  }
+  function getSchedulesBase(){
+    if(window.location.pathname.includes('/new/docs/')) return '/new/docs/schedules/';
+    if(window.location.pathname.includes('/roster-site/')) return '/roster-site/schedules/';
+    return '/schedules/';
+  }
+  function getImportSchedulesBase(){
+    const base = getSchedulesBase();
+    if(base.includes('/import/schedules/')) return base;
+    return base.replace(/\/schedules\/$/, '/import/schedules/');
+  }
+  function fetchRosterDisplayName(empId, done){
+    if(!empId || !/^\d+$/.test(empId)){ done(''); return; }
+    const urls = [
+      getSchedulesBase() + encodeURIComponent(empId) + '.json',
+      getImportSchedulesBase() + encodeURIComponent(empId) + '.json'
+    ];
+    function tryNext(i){
+      if(i >= urls.length){ done(''); return; }
+      fetch(urls[i])
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if(data && data.name) done(data.name);
+          else tryNext(i + 1);
+        })
+        .catch(() => tryNext(i + 1));
+    }
+    tryNext(0);
+  }
+
+  function norm(v){ return (v || '').toLowerCase().trim(); }
+  function firstName(name){
+    let cleaned = String(name || '').trim();
+    cleaned = cleaned.replace(/^(mr|mrs|miss|ms|dr)\.?\s+/i, '');
+    cleaned = cleaned.replace(/^(السيد|السيدة|الانسة|الآنسة|الاستاذ|الأستاذ|الاستاذه|الأستاذة)\.?\s+/u, '');
+    cleaned = cleaned.trim();
+    if(!cleaned) return '';
+    return cleaned.split(/\s+/)[0] || '';
+  }
+  function allRows(){ return Array.from(document.querySelectorAll('.empRow')); }
+  function rowMatchesQuery(row, q){
+    const code = norm(row.querySelector('.empCode')?.textContent || '');
+    const name = norm(row.querySelector('.empName')?.textContent || '');
+    return code === q || name.includes(q) || (code && q.includes(code));
+  }
+  function sessionFromRow(row){
+    const card = row.closest('.courseCard');
+    if(!card) return null;
+    return {
+      row,
+      card,
+      code: row.querySelector('.empCode')?.textContent?.trim() || '',
+      name: row.querySelector('.empName')?.textContent?.trim() || '',
+      title: card.dataset.courseTitle || card.querySelector('.courseTitle')?.textContent?.trim() || '',
+      titleAr: card.dataset.courseTitleAr || card.querySelector('.courseTitleAr')?.textContent?.trim() || '',
+      dateIso: card.dataset.courseDate || '',
+      dateEnd: card.dataset.courseEnd || card.dataset.courseDate || '',
+      venue: card.dataset.venue || '',
+      time: card.dataset.time || '',
+      dateLabel: card.querySelector('.dateBadge')?.textContent?.trim() || '',
+      isPast: card.classList.contains('is-past'),
+      isToday: card.classList.contains('is-today') || !!card.querySelector('.todayBadge')
+    };
+  }
+  function findAllSavedSessions(raw){
+    const q = norm(raw);
+    if(!q) return [];
+    const seen = new Set();
+    const sessions = [];
+    for(const row of allRows()){
+      if(!rowMatchesQuery(row, q)) continue;
+      const session = sessionFromRow(row);
+      if(!session || !session.card) continue;
+      const key = (session.dateIso || '') + '|' + session.title;
+      if(seen.has(key)) continue;
+      seen.add(key);
+      sessions.push(session);
+    }
+    return sessions.sort((a,b) => (a.dateIso || '').localeCompare(b.dateIso || ''));
+  }
+  function matchSaved(raw){
+    const sessions = findAllSavedSessions(raw);
+    return sessions.length ? sessions[0] : null;
+  }
+  function formatSessionDate(iso, isAr){
+    if(!iso || iso.split('-').length < 3) return {dayNum:'—', mon:''};
+    const parts = iso.split('-');
+    const monList = isAr ? MONTH_SHORT_AR : MONTH_SHORT;
+    return {dayNum:String(+parts[2]), mon:monList[+parts[1]-1] || ''};
+  }
+  function formatSessionTime(time, isAr){
+    const raw = String(time || '').trim();
+    if(!raw) return '';
+    const m = raw.match(/(\d{1,2}:\d{2})\s*(?:to|–|-|—|إلى)\s*(\d{1,2}:\d{2})/i);
+    if(m){
+      return isAr ? ('من ' + m[1] + ' إلى ' + m[2]) : (m[1] + ' to ' + m[2]);
+    }
+    return isAr ? raw.replace(/\bto\b/gi, 'إلى') : raw;
+  }
+  function scrollToSession(session){
+    if(!session?.card) return;
+    session.card.open = true;
+    session.card.scrollIntoView({behavior:'smooth', block:'center'});
+    session.row?.classList.add('favorite');
+  }
+  function renderMyTrainingPanel(raw, sessions, displayName, staffCode){
+    if(!myTrainingPanel || !myTrainingList) return;
+    if(!raw){
+      myTrainingPanel.hidden = true;
+      myTrainingList.innerHTML = '';
+      return;
+    }
+    myTrainingPanel.hidden = false;
+    const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+    const who = displayName || raw;
+    const codeText = staffCode ? (' · ' + staffCode) : '';
+    if(myTrainingTitle) myTrainingTitle.textContent = ar ? 'مواعيد التدريب' : 'My training dates';
+    if(myTrainingSub) myTrainingSub.textContent = ar
+      ? ('لـ ' + who + codeText)
+      : ('For ' + who + codeText);
+    if(myTrainingCountVal) myTrainingCountVal.textContent = String(sessions.length);
+    if(myTrainingCountLbl) myTrainingCountLbl.textContent = ar
+      ? (sessions.length === 1 ? 'دورة' : 'دورات')
+      : (sessions.length === 1 ? 'Session' : 'Sessions');
+    if(!sessions.length){
+      myTrainingList.innerHTML = '<div class="myTrainingEmpty">' + (ar
+        ? 'لا توجد دورات مسجّلة لهذا الرقم في هذا الشهر.'
+        : 'No courses found for this staff number in this month.') + '</div>';
+      return;
+    }
+    myTrainingList.innerHTML = sessions.map((session, idx) => {
+      const d = formatSessionDate(session.dateIso, ar);
+      const cls = ['myTrainingItem', session.isPast ? 'is-past' : '', session.isToday ? 'is-today' : ''].filter(Boolean).join(' ');
+      const titleEn = session.title || '';
+      const titleAr = session.titleAr || '';
+      const venue = translateVenueValue(session.venue || '', ar) || (d.mon + ' ' + d.dayNum);
+      const timeTxt = formatSessionTime(session.time || '', ar);
+      const safeTitleEn = String(titleEn).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeTitleAr = String(titleAr).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeVenue = String(venue || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeTime = String(timeTxt || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const arLine = (titleAr && titleAr !== titleEn)
+        ? ('<div class="myTrainingCourseAr">' + safeTitleAr + '</div>')
+        : '';
+      return (
+        '<button type="button" class="' + cls + '" data-session-idx="' + idx + '">' +
+          '<div class="myTrainingDate"><span class="dayNum">' + d.dayNum + '</span>' + d.mon + '</div>' +
+          '<div class="myTrainingMeta">' +
+            '<div class="myTrainingCourse">' + safeTitleEn + '</div>' +
+            arLine +
+            '<div class="myTrainingVenue">' + safeVenue + '</div>' +
+          '</div>' +
+          '<div class="myTrainingTime">' + safeTime + '</div>' +
+        '</button>'
+      );
+    }).join('');
+    myTrainingList.querySelectorAll('[data-session-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.getAttribute('data-session-idx'));
+        scrollToSession(sessions[idx]);
+      });
+    });
+  }
+  function refreshSaved(){
+    document.querySelectorAll('.empRow.favorite').forEach(r => r.classList.remove('favorite'));
+    document.querySelectorAll('.favBadge').forEach(b => b.remove());
+    cards.forEach(c => c.classList.remove('is-saved'));
+    const raw = getSavedQuery();
+    const sessions = findAllSavedSessions(raw);
+    sessions.forEach(session => {
+      session.row.classList.add('favorite');
+      const nameCell = session.row.querySelector('.empName');
+      if(nameCell && !nameCell.querySelector('.favBadge')){
+        const b = document.createElement('span');
+        b.className = 'favBadge';
+        b.textContent = document.documentElement.lang === 'ar' ? 'محفوظ' : 'Saved';
+        nameCell.appendChild(b);
+      }
+      session.card.classList.add('is-saved');
+    });
+    const primary = sessions[0] || null;
+    let displayName = '';
+    let staffCode = '';
+    const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+    const rosterName = getRosterSavedEmpName();
+    if(primary){
+      displayName = firstName(primary.name) || primary.name;
+      staffCode = primary.code;
+      if(staffCode && primary.name) rememberRosterName(staffCode, primary.name);
+      savedChip.classList.remove('savedEmpty');
+      savedName.textContent = displayName;
+    } else if(raw){
+      staffCode = /^\d+$/.test(raw) ? raw : (getRosterSavedEmpId() || '');
+      if(rosterName){
+        displayName = firstName(rosterName) || rosterName;
+      } else if(staffCode && /^\d+$/.test(raw)){
+        displayName = ar ? 'جاري التحميل…' : 'Loading…';
+      } else {
+        displayName = firstName(raw) || raw;
+      }
+      savedChip.classList.remove('savedEmpty');
+      savedName.textContent = displayName;
+      if(staffCode){
+        fetchRosterDisplayName(staffCode, (fullName) => {
+          if(!fullName) return;
+          if(getSavedQuery() !== staffCode && getRosterSavedEmpId() !== staffCode) return;
+          rememberRosterName(staffCode, fullName);
+          const label = firstName(fullName) || fullName;
+          savedName.textContent = label;
+          renderMyTrainingPanel(staffCode, findAllSavedSessions(staffCode), label, staffCode);
+        });
+      }
+    } else {
+      savedChip.classList.add('savedEmpty');
+      savedName.textContent = ar ? 'موظفي' : 'My Staff';
+    }
+    renderMyTrainingPanel(raw, sessions, displayName, staffCode);
+  }
+
+  function openStaffModal(){
+    if(!staffModal) return;
+    const current = getSavedQuery();
+    const rosterName = getRosterSavedEmpName();
+    if(staffInput) staffInput.value = current;
+    const sub = staffModal.querySelector('.staffModalSub');
+    if(sub){
+      const ar = document.documentElement.lang === 'ar' || document.body.classList.contains('ar');
+      if(current && rosterName){
+        sub.textContent = ar
+          ? ('محفوظ من الروستر: ' + rosterName)
+          : ('Saved from roster: ' + rosterName);
+      } else if(current){
+        sub.textContent = ar
+          ? 'تم جلب بياناتك من الروستر تلقائياً. يمكنك التعديل أو المسح.'
+          : 'Loaded automatically from your roster. You can edit or clear.';
+      } else {
+        sub.textContent = ar
+          ? 'يستخدم رقمك المحفوظ في الروستر إن وجد، أو أدخل الرقم / الاسم'
+          : 'Uses your roster saved ID if available, or enter staff number / name';
+      }
+    }
+    staffModal.classList.add('open');
+    staffModal.setAttribute('aria-hidden','false');
+    setTimeout(() => staffInput?.focus(), 30);
+  }
+  function closeStaffModal(){
+    if(!staffModal) return;
+    staffModal.classList.remove('open');
+    staffModal.setAttribute('aria-hidden','true');
+  }
+
+  function applyFilters(){
+    const q = norm(searchInput.value);
+    let visible = 0;
+    let visiblePast = false;
+    cards.forEach(card => {
+      const ok = !q || (card.dataset.search || '').includes(q);
+      card.style.display = ok ? '' : 'none';
+      if(ok){
+        visible += 1;
+        if(card.classList.contains('is-past')) visiblePast = true;
+      }
+    });
+    if(pastSep) pastSep.style.display = visiblePast ? '' : 'none';
+    emptyState.style.display = visible ? 'none' : 'block';
+  }
+  searchToggle?.addEventListener('click', () => {
+    const active = filtersBox.classList.toggle('active');
+    searchToggle.setAttribute('aria-expanded', active ? 'true' : 'false');
+    if(active) searchInput.focus();
+  });
+  searchBtn?.addEventListener('click', applyFilters);
+  searchInput?.addEventListener('input', applyFilters);
+  searchInput?.addEventListener('keydown', e => { if(e.key === 'Enter') applyFilters(); });
+  clearBtn?.addEventListener('click', () => { searchInput.value = ''; applyFilters(); });
+  function mySchedulePageUrl(){
+    const path = window.location.pathname || '';
+    if(path.includes('/training/archive/')) return '../../my-schedules/index.html';
+    return '../my-schedules/index.html';
+  }
+  savedChip?.addEventListener('click', () => {
+    // With a saved employee, jump straight to My Schedule; otherwise ask for the ID first.
+    if(savedChip.classList.contains('savedEmpty')){ openStaffModal(); return; }
+    window.location.href = mySchedulePageUrl();
+  });
+  staffClose?.addEventListener('click', closeStaffModal);
+  staffModal?.addEventListener('click', (e) => { if(e.target === staffModal) closeStaffModal(); });
+  staffClear?.addEventListener('click', () => {
+    persistSavedQuery('');
+    refreshSaved();
+    applyFilters();
+    closeStaffModal();
+  });
+  staffSave?.addEventListener('click', () => {
+    let value = (staffInput?.value || '').trim();
+    const idMatch = value.match(/^(\d{3,})/);
+    if(idMatch) value = idMatch[1];
+    persistSavedQuery(value);
+    refreshSaved();
+    applyFilters();
+    closeStaffModal();
+    if(value && myTrainingPanel && !myTrainingPanel.hidden){
+      myTrainingPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  });
+  staffInput?.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); staffSave?.click(); }
+    if(e.key === 'Escape'){ closeStaffModal(); }
+  });
+  monthPicker?.addEventListener('change', () => { if(monthPicker.value) window.location.href = monthPicker.value; });
+  rosterHomeBtn?.addEventListener('click', () => {
+    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+    const trainingBase = window.location.pathname.includes('/new/docs/') ? '/new/docs' : '';
+    window.location.href = root + trainingBase + '/';
+  });
+  otherPageBtn?.addEventListener('click', () => {
+    const root = window.location.pathname.includes('/roster-site/') ? '/roster-site' : '';
+    const trainingBase = window.location.pathname.includes('/new/docs/') ? '/new/docs' : '';
+    window.location.href = root + trainingBase + '/a-cup-of-book/';
+  });
+  if(statsFaces.length){
+    let idx = 0;
+    const placeFaces = (activeIdx, prevIdx = -1) => {
+      statsFaces.forEach((f,i)=>{
+        f.classList.remove('active','prev');
+        if(i === activeIdx){
+          f.style.transform = 'translateY(0)';
+          f.style.opacity = '1';
+          f.classList.add('active');
+        }else if(i === prevIdx){
+          f.style.transform = 'translateY(-110%)';
+          f.style.opacity = '0';
+          f.classList.add('prev');
+        }else{
+          f.style.transform = 'translateY(110%)';
+          f.style.opacity = '0';
+        }
+      });
+    };
+    placeFaces(0);
+    setInterval(() => {
+      const prev = idx;
+      idx = (idx + 1) % statsFaces.length;
+      placeFaces(idx, prev);
+    }, 2600);
+  }
+  window.addEventListener('storage', (e) => {
+    if(!e.key) return;
+    if([SAVED_QUERY_KEY, ...ROSTER_EMP_ID_KEYS, ...ROSTER_EMP_NAME_KEYS].includes(e.key)){
+      refreshSaved();
+      applyFilters();
+    }
+    if(e.key === 'rosterLang'){
+      applyTrainingLang(e.newValue === 'ar' ? 'ar' : 'en');
+    }
+  });
+
+  const TRAIN_UI = {
+    en: {
+      pageTitle: 'Training Courses',
+      pageSubtitle: 'Visual schedule',
+      during: 'During',
+      search: 'Search',
+      searchPh: 'Search staff / course',
+      clear: 'Clear',
+      roster: 'Home',
+      myStaff: 'My Staff',
+      myTrainingTitle: 'My training dates',
+      sessions: 'Sessions',
+      session: 'Session',
+      types: 'Types',
+      employees: 'Employees',
+      venues: 'Venues',
+      venue: 'Venue',
+      time: 'Time',
+      today: 'Today',
+      past: 'Previous sessions',
+      empty: 'No matching courses found.',
+      saveEmp: 'Save employee',
+      saveEmpSub: 'Uses your roster saved ID if available, or enter staff number / name',
+      saveEmpPh: 'e.g. 8715 or Khalid',
+      save: 'Save',
+      sharePage: 'Share page',
+      langBtn: 'ع',
+      langTitle: 'Translate to Arabic',
+      chooseMonth: 'Choose month',
+      courseInfoClose: 'Close',
+      courseInfoAria: 'Course info',
+      cupBook: 'A Cup of Book'
+    },
+    ar: {
+      pageTitle: 'دورات التدريب',
+      pageSubtitle: 'جدول مرئي',
+      during: 'خلال',
+      search: 'بحث',
+      searchPh: 'ابحث عن موظف / دورة',
+      clear: 'مسح',
+      roster: 'الرئيسية',
+      myStaff: 'موظفي',
+      myTrainingTitle: 'مواعيد التدريب',
+      sessions: 'دورات',
+      session: 'دورة',
+      types: 'أنواع',
+      employees: 'موظفون',
+      venues: 'قاعات',
+      venue: 'المكان',
+      time: 'الوقت',
+      today: 'اليوم',
+      past: 'دورات سابقة',
+      empty: 'لا توجد دورات مطابقة.',
+      saveEmp: 'حفظ الموظف',
+      saveEmpSub: 'يستخدم رقمك المحفوظ في الروستر إن وجد، أو أدخل الرقم / الاسم',
+      saveEmpPh: 'مثال: 8715 أو خالد',
+      save: 'حفظ',
+      sharePage: 'مشاركة الصفحة',
+      langBtn: 'EN',
+      langTitle: 'الترجمة إلى الإنجليزية',
+      chooseMonth: 'اختر الشهر',
+      courseInfoClose: 'إغلاق',
+      courseInfoAria: 'وصف الدورة',
+      cupBook: 'كوب من كتاب'
+    }
+  };
+
+  function trainingLang(){
+    const stored = localStorage.getItem('rosterLang');
+    if(stored === 'ar' || stored === 'en') return stored;
+    return (document.documentElement.lang === 'ar') ? 'ar' : 'en';
+  }
+
+  let NAME_AR_MAP = null;
+  let NAME_AR_LOADING = false;
+  const NAME_AR_WAITERS = [];
+
+  function nameTranslationsUrl(){
+    const path = window.location.pathname || '';
+    const ver = '20260725b';
+    if(path.includes('/training/archive/')) return '../../name_translations.json?v=' + ver;
+    if(path.includes('/training/')) return '../name_translations.json?v=' + ver;
+    return '../name_translations.json?v=' + ver;
+  }
+
+  function normalizeNameKey(name){
+    return String(name || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  }
+
+  function arabicForEnglishName(en){
+    if(!NAME_AR_MAP || !en) return '';
+    const key = normalizeNameKey(en);
+    if(NAME_AR_MAP[key]) return NAME_AR_MAP[key];
+    const stripped = key.replace(/^(MR\.|MRS\.|MISS\.|MS\.)\s*/, '').trim();
+    const prefixes = ['', 'MR. ', 'MISS. ', 'MISS.', 'MRS. ', 'MS. ', 'MR.', 'MRS.', 'MS.'];
+    for(const p of prefixes){
+      const k = (p + stripped).trim();
+      if(NAME_AR_MAP[k]) return NAME_AR_MAP[k];
+    }
+    const compact = stripped.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    if(NAME_AR_MAP[compact]) return NAME_AR_MAP[compact];
+    if(NAME_AR_MAP['MR. ' + compact]) return NAME_AR_MAP['MR. ' + compact];
+    return '';
+  }
+
+  function ensureNameMap(done){
+    if(NAME_AR_MAP && Object.keys(NAME_AR_MAP).length){ done(NAME_AR_MAP); return; }
+    NAME_AR_WAITERS.push(done);
+    if(NAME_AR_LOADING) return;
+    NAME_AR_LOADING = true;
+    fetch(nameTranslationsUrl(), { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        NAME_AR_MAP = (data && data.names) ? data.names : {};
+      })
+      .catch(() => { NAME_AR_MAP = {}; })
+      .finally(() => {
+        NAME_AR_LOADING = false;
+        const waiters = NAME_AR_WAITERS.splice(0, NAME_AR_WAITERS.length);
+        waiters.forEach(fn => fn(NAME_AR_MAP || {}));
+      });
+  }
+
+  function applyEmployeeNames(isAr){
+    document.querySelectorAll('.empName').forEach(el => {
+      const current = (el.textContent || '').trim();
+      if(!el.dataset.nameEn){
+        // Keep English original only; ignore already-translated Arabic text.
+        if(current && !/[\u0600-\u06FF]/.test(current)) el.dataset.nameEn = current;
+      }
+      const en = el.dataset.nameEn || current;
+      const ar = arabicForEnglishName(en);
+      if(ar) el.setAttribute('data-name-ar', ar);
+      el.textContent = (isAr && ar) ? ar : en;
+    });
+  }
+
+  function translateVenueValue(enVal, isAr){
+    const raw = String(enVal || '').trim();
+    if(!isAr) return raw;
+    if(/cargo training room/i.test(raw)) return 'قاعة تدريب الشحن';
+    return raw.replace(/\bto\b/gi, 'إلى');
+  }
+
+  function applyTrainingLang(lang){
+    const L = (lang === 'ar') ? 'ar' : 'en';
+    const t = TRAIN_UI[L];
+    const isAr = L === 'ar';
+    localStorage.setItem('rosterLang', L);
+    document.documentElement.lang = L;
+    document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+    document.body.classList.toggle('ar', isAr);
+
+    const titleText = document.querySelector('#pageTitle .pageTitleText') || document.getElementById('pageTitle');
+    if(titleText){
+      if(titleText.classList && titleText.classList.contains('pageTitleText')) titleText.textContent = t.pageTitle;
+      else {
+        const span = titleText.querySelector('.pageTitleText');
+        if(span) span.textContent = t.pageTitle;
+      }
+    }
+    const sub = document.getElementById('pageSubtitle');
+    if(sub) sub.textContent = t.pageSubtitle;
+
+    const dateTag = document.querySelector('.dateTag');
+    if(dateTag){
+      dateTag.childNodes.forEach(node => {
+        if(node.nodeType === 3){
+          const raw = node.textContent || '';
+          const trimmed = raw.trim();
+          if(!trimmed) return;
+          const range = trimmed.replace(/^(During|خلال)\s*/i, '').trim();
+          node.textContent = ' ' + t.during + ' ' + range + ' ';
+        }
+      });
+    }
+
+    const langBtn = document.getElementById('langToggle');
+    if(langBtn){
+      langBtn.textContent = t.langBtn;
+      langBtn.title = t.langTitle;
+      langBtn.setAttribute('aria-label', t.langTitle);
+    }
+
+    const searchLbl = document.querySelector('#searchToggle .dockLabel');
+    if(searchLbl) searchLbl.textContent = t.search;
+    const rosterLbl = document.querySelector('#rosterHomeBtn .rosterLabel') || document.getElementById('homeDockLabel');
+    if(rosterLbl){
+      const en = rosterLbl.getAttribute('data-label-en') || t.roster;
+      const ar = rosterLbl.getAttribute('data-label-ar') || t.roster;
+      rosterLbl.textContent = isAr ? ar : en;
+    }
+    const rosterBtn = document.getElementById('rosterHomeBtn');
+    if(rosterBtn) rosterBtn.setAttribute('aria-label', isAr ? 'الرئيسية' : 'Home');
+    if(searchInput) searchInput.placeholder = t.searchPh;
+    if(searchBtn) searchBtn.textContent = t.search;
+    if(clearBtn) clearBtn.textContent = t.clear;
+    if(emptyState) emptyState.textContent = t.empty;
+    if(pastSep) pastSep.textContent = t.past;
+    if(monthPicker) monthPicker.setAttribute('aria-label', t.chooseMonth);
+
+    const statLabels = [t.sessions, t.types, t.employees, t.venues];
+    document.querySelectorAll('.statsFace .dockLabel').forEach((el, i) => {
+      if(statLabels[i]) el.textContent = statLabels[i];
+    });
+
+    document.querySelectorAll('.miniMeta').forEach(meta => {
+      const strong = meta.querySelector('strong');
+      if(!strong) return;
+      let rest = '';
+      meta.childNodes.forEach(n => {
+        if(n !== strong && n.nodeType === 3) rest += n.textContent;
+      });
+      rest = rest.trim();
+      if(!meta.dataset.enRest) meta.dataset.enRest = rest;
+      const enRest = meta.dataset.enRest;
+      const labelKey = (strong.textContent || '').trim().toLowerCase();
+      const isVenue = labelKey === 'venue' || labelKey === 'المكان' || meta.dataset.kind === 'venue';
+      const isTime = labelKey === 'time' || labelKey === 'الوقت' || meta.dataset.kind === 'time';
+      if(isVenue) meta.dataset.kind = 'venue';
+      if(isTime) meta.dataset.kind = 'time';
+      strong.textContent = (meta.dataset.kind === 'venue') ? t.venue : t.time;
+      let textNode = null;
+      meta.childNodes.forEach(n => {
+        if(n !== strong && n.nodeType === 3){
+          if(!textNode) textNode = n;
+          else n.textContent = '';
+        }
+      });
+      const shown = ' ' + translateVenueValue(enRest, isAr);
+      if(textNode) textNode.textContent = shown;
+      else meta.appendChild(document.createTextNode(shown));
+    });
+    document.querySelectorAll('.todayBadge').forEach(el => { el.textContent = t.today; });
+
+    const staffTitle = document.querySelector('.staffModalTitle');
+    if(staffTitle) staffTitle.textContent = t.saveEmp;
+    if(staffInput) staffInput.placeholder = t.saveEmpPh;
+    if(staffClear) staffClear.textContent = t.clear;
+    if(staffSave) staffSave.textContent = t.save;
+
+    const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
+    if(shareLbl) shareLbl.textContent = t.sharePage;
+
+    const courseInfoClose = document.getElementById('courseInfoClose');
+    if(courseInfoClose) courseInfoClose.textContent = t.courseInfoClose;
+    document.querySelectorAll('.courseInfoBtn').forEach(btn => {
+      btn.setAttribute('aria-label', t.courseInfoAria);
+    });
+    document.querySelectorAll('[data-meta-ticker].hasInfo').forEach(el => {
+      el.setAttribute('aria-label', t.courseInfoAria);
+    });
+
+    const cupLbl = document.getElementById('cupBookLabel');
+    if(cupLbl){
+      const en = cupLbl.getAttribute('data-label-en') || t.cupBook;
+      const ar = cupLbl.getAttribute('data-label-ar') || t.cupBook;
+      cupLbl.textContent = isAr ? ar : en;
+      cupLbl.setAttribute('aria-label', cupLbl.textContent);
+    }
+    const otherBtn = document.getElementById('otherPageBtn');
+    if(otherBtn && cupLbl) otherBtn.setAttribute('aria-label', cupLbl.textContent);
+
+    if(savedChip && savedChip.classList.contains('savedEmpty') && savedName){
+      savedName.textContent = t.myStaff;
+    }
+    if(myTrainingTitle) myTrainingTitle.textContent = t.myTrainingTitle;
+
+    document.querySelectorAll('[data-tr-en]').forEach(el => {
+      el.textContent = isAr
+        ? (el.getAttribute('data-tr-ar') || el.getAttribute('data-tr-en'))
+        : el.getAttribute('data-tr-en');
+    });
+
+    applyEmployeeNames(isAr);
+    ensureNameMap(() => applyEmployeeNames(isAr));
+    refreshSaved();
+  }
+
+  document.getElementById('langToggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    applyTrainingLang(trainingLang() === 'ar' ? 'en' : 'ar');
+  });
+
+  const courseInfoModal = document.getElementById('courseInfoModal');
+  const courseInfoEmoji = document.getElementById('courseInfoEmoji');
+  const courseInfoTitle = document.getElementById('courseInfoTitle');
+  const courseInfoTitleAr = document.getElementById('courseInfoTitleAr');
+  const courseInfoDesc = document.getElementById('courseInfoDesc');
+  const courseInfoCloseBtn = document.getElementById('courseInfoClose');
+
+  function openCourseInfo(btn){
+    if(!courseInfoModal || !btn) return;
+    const isAr = trainingLang() === 'ar';
+    const emoji = btn.getAttribute('data-course-emoji') || '📘';
+    const icon = (btn.getAttribute('data-course-icon') || '').trim();
+    const titleEn = btn.getAttribute('data-course-title') || '';
+    const titleAr = btn.getAttribute('data-course-title-ar') || '';
+    const descAr = btn.getAttribute('data-course-desc-ar') || '';
+    const descEn = btn.getAttribute('data-course-desc-en') || '';
+    if(courseInfoEmoji){
+      if(icon){
+        courseInfoEmoji.classList.add('hasImg');
+        courseInfoEmoji.innerHTML = '<img src="' + icon.replace(/"/g, '') + '" alt="">';
+      } else {
+        courseInfoEmoji.classList.remove('hasImg');
+        courseInfoEmoji.textContent = emoji;
+      }
+    }
+    if(courseInfoTitle){
+      courseInfoTitle.textContent = isAr ? (titleAr || titleEn) : titleEn;
+    }
+    if(courseInfoTitleAr){
+      const secondary = isAr ? titleEn : titleAr;
+      courseInfoTitleAr.textContent = secondary && secondary !== (isAr ? titleAr : titleEn) ? secondary : '';
+      courseInfoTitleAr.hidden = !courseInfoTitleAr.textContent;
+    }
+    if(courseInfoDesc){
+      courseInfoDesc.textContent = isAr ? (descAr || descEn) : (descEn || descAr);
+      courseInfoDesc.dir = isAr ? 'rtl' : 'ltr';
+    }
+    courseInfoModal.classList.add('open');
+    courseInfoModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeCourseInfo(){
+    if(!courseInfoModal) return;
+    courseInfoModal.classList.remove('open');
+    courseInfoModal.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', (e) => {
+    const ticker = e.target.closest('[data-meta-ticker].hasInfo');
+    if(!ticker) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openCourseInfo(ticker);
+  }, true);
+  courseInfoCloseBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeCourseInfo();
+  });
+  courseInfoModal?.addEventListener('click', (e) => {
+    if(e.target === courseInfoModal) closeCourseInfo();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeCourseInfo();
+  });
+
+  function initMetaTickers(){
+    const tickers = Array.from(document.querySelectorAll('[data-meta-ticker]'));
+    tickers.forEach((ticker, cardIdx) => {
+      const faces = Array.from(ticker.querySelectorAll('.metaFace'));
+      const dots = Array.from(ticker.querySelectorAll('.metaDot'));
+      if(faces.length < 2) return;
+      let idx = Math.max(0, faces.findIndex(f => f.classList.contains('is-active')));
+      if(idx < 0) idx = 0;
+      function show(next){
+        const prev = faces[idx];
+        idx = next;
+        const cur = faces[idx];
+        faces.forEach(f => f.classList.remove('is-active', 'is-exit'));
+        if(prev && prev !== cur) prev.classList.add('is-exit');
+        cur.classList.add('is-active');
+        dots.forEach((d, i) => d.classList.toggle('is-on', i === idx));
+        window.setTimeout(() => {
+          faces.forEach(f => { if(f !== cur) f.classList.remove('is-exit'); });
+        }, 560);
+      }
+      const delay = 2200 + (cardIdx % 5) * 180;
+      window.setInterval(() => show((idx + 1) % faces.length), delay);
+    });
+  }
+  initMetaTickers();
+
+  ensureNameMap(() => {});
+  applyTrainingLang(trainingLang());
+  refreshSaved();
+  applyFilters();
+})();
+</script>
+<script defer src="../../site-share.js?v=20260705a"></script>
+<script defer src="../../training-new-badge.js?v=20260729h"></script>
+</body>
+</html>

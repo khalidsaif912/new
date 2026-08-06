@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>إيموجي الترحيب — My Emoji</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:rgba(255,255,255,.1);
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+    padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 30px);
+  }
+  body.light{ --bg:#f5f7fa; --card:#ffffff; --border:rgba(0,0,0,.12); --text:#1a1f2e; --muted:#57606a; }
+  .wrap{max-width:760px;margin:0 auto}
+
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .topbar h1{font-size:19px;font-weight:800;flex:1;min-width:0}
+  .topbar h1 small{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+  .icon-btn{
+    width:42px;height:42px;flex:0 0 auto;border-radius:12px;cursor:pointer;
+    background:var(--card);border:1px solid var(--border);color:var(--text);
+    font-size:17px;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;transition:background .15s,border-color .15s,transform .1s;
+  }
+  .icon-btn:hover{background:rgba(56,139,253,.15);border-color:rgba(56,139,253,.4)}
+  .icon-btn:active{transform:scale(.95)}
+  #langBtn{font-size:13px;font-weight:800;color:var(--accent)}
+
+  .current{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;
+  }
+  .current .preview{
+    width:64px;height:64px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+    background:rgba(56,139,253,.08);border-radius:14px;font-size:38px;line-height:1;
+  }
+  .current .preview img{width:52px;height:52px;object-fit:contain;display:block}
+  .current .info{flex:1;min-width:0}
+  .current .info b{display:block;font-size:14px;margin-bottom:3px}
+  .current .info span{font-size:12px;color:var(--muted)}
+  .reset-btn{
+    flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--muted);
+    border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .reset-btn:hover{border-color:rgba(248,81,73,.5);color:#f85149}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:8px;
+  }
+  .tile{
+    aspect-ratio:1;border-radius:14px;cursor:pointer;
+    background:var(--card);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s,border-color .15s,background .15s;
+  }
+  .tile img{width:74%;height:74%;object-fit:contain;display:block;pointer-events:none}
+  .tile:hover{transform:scale(1.07);border-color:rgba(56,139,253,.5)}
+  .tile:active{transform:scale(.94)}
+  .tile.selected{
+    border-color:var(--accent);background:rgba(56,139,253,.16);
+    box-shadow:0 0 0 2px rgba(56,139,253,.45);
+  }
+
+  .toast{
+    position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:#1f6feb;color:#fff;font-size:13px;font-weight:700;
+    padding:11px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.35);
+    opacity:0;transition:transform .25s,opacity .25s;pointer-events:none;z-index:50;
+    max-width:88vw;text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  .loading{color:var(--muted);text-align:center;padding:40px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="icon-btn" id="backBtn" href="../my-schedules/index.html" aria-label="Back"
+       onclick="if(document.referrer&&document.referrer.includes(location.host)&&history.length>1){history.back();return false;}">➜</a>
+    <h1><span data-en="My Emoji" data-ar="إيموجي الترحيب">إيموجي الترحيب</span>
+      <small data-en="Pick the emoji shown above your name" data-ar="اختر الإيموجي الذي يظهر فوق اسمك">اختر الإيموجي الذي يظهر فوق اسمك</small>
+    </h1>
+    <button class="icon-btn" id="themeBtn" aria-label="Theme">🌙</button>
+    <button class="icon-btn" id="langBtn">EN</button>
+  </div>
+
+  <div class="current">
+    <div class="preview" id="curPreview">👋</div>
+    <div class="info">
+      <b id="curTitle">اختيارك الحالي</b>
+      <span id="curSub">لم تختر بعد — تظهر اليد الملوّحة الافتراضية</span>
+    </div>
+    <button class="reset-btn" id="resetBtn" data-en="Reset" data-ar="الافتراضي">الافتراضي</button>
+  </div>
+
+  <div class="grid" id="grid"><div class="loading" data-en="Loading…" data-ar="جارٍ التحميل…">جارٍ التحميل…</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  var MAP_KEY = 'empEmojiChoiceMap';
+  var OLD_KEY = 'empEmojiChoice';
+  var CDN = 'https://fonts.gstatic.com/s/e/notoemoji/latest/';
+  var lang = 'ar', theme = 'dark';
+
+  // Which section/employee is this choice for?
+  var section = /[?&]src=import\b/.test(location.search) ? 'import' : 'export';
+  var empId = '';
+  try {
+    empId = section === 'import'
+      ? (localStorage.getItem('importSavedEmpId') || '').trim()
+      : (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim();
+  } catch (e) {}
+  var slot = empId || section;
+
+  function readMap(){
+    try { return JSON.parse(localStorage.getItem(MAP_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function writeMap(m){
+    try { localStorage.setItem(MAP_KEY, JSON.stringify(m)); } catch (e) {}
+  }
+  // Migrate the old single shared key (belonged to the export flow) once
+  try {
+    var old = (localStorage.getItem(OLD_KEY) || '').trim();
+    if (old) {
+      var mm = readMap();
+      var expSlot = (localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '').trim() || 'export';
+      if (!mm[expSlot]) { mm[expSlot] = old; writeMap(mm); }
+      localStorage.removeItem(OLD_KEY);
+    }
+  } catch (e) {}
+
+  var T = {
+    ar: { saved: 'تم الحفظ ✓ سيظهر فوق اسمك في الصفحة الرئيسية',
+          resetDone: 'تمت الاستعادة — سيظهر إيموجيك العشوائي الافتراضي',
+          curTitle: 'اختيارك الحالي', curNone: 'إيموجي عشوائي مُعيّن لك — اضغط أي إيموجي لتغييره',
+          curSet: 'اضغط أي إيموجي آخر للتغيير' },
+    en: { saved: 'Saved ✓ It will appear above your name on the home page',
+          resetDone: 'Reset — your random default emoji will be shown',
+          curTitle: 'Your current choice', curNone: 'A random emoji is assigned to you — tap any emoji to change it',
+          curSet: 'Tap any other emoji to change' }
+  };
+
+  try {
+    var sl = localStorage.getItem('rosterLang') || localStorage.getItem('prefLang');
+    var st = localStorage.getItem('prefTheme');
+    if (sl === 'en' || sl === 'ar') lang = sl;
+    if (st === 'light' || st === 'dark') theme = st;
+  } catch (e) {}
+
+  function url(cp){ return CDN + cp + '/512.webp'; }
+  function getChoice(){ return readMap()[slot] || ''; }
+  function setChoice(cp){
+    var m = readMap();
+    if (cp) m[slot] = cp; else delete m[slot];
+    writeMap(m);
+  }
+  var emojiList = null;
+  function emojiHash(s){
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  var EMOJI_DEFAULTS = { '82437': '1f349' };
+  function getDefault(){
+    if (EMOJI_DEFAULTS[slot]) return EMOJI_DEFAULTS[slot];
+    if (!emojiList || !emojiList.length) return '';
+    return emojiList[emojiHash(slot) % emojiList.length].cp;
+  }
+
+  function applyTheme(){
+    document.body.classList.toggle('light', theme === 'light');
+    document.getElementById('themeBtn').textContent = (theme === 'dark' ? '🌙' : '☀️');
+  }
+  function applyLang(){
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
+    document.getElementById('langBtn').textContent = (lang === 'ar' ? 'EN' : 'ع');
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      el.textContent = el.getAttribute(lang === 'ar' ? 'data-ar' : 'data-en');
+    });
+    renderCurrent();
+  }
+
+  function renderCurrent(){
+    var cp = getChoice();
+    var prev = document.getElementById('curPreview');
+    var secLabel = (lang === 'ar' ? (section === 'import' ? 'الوارد' : 'الصادر') : (section === 'import' ? 'Import' : 'Export'));
+    var who = secLabel + (empId ? ' — ' + empId : '');
+    document.getElementById('curTitle').textContent = T[lang].curTitle + ' (' + who + ')';
+    var shown = cp || getDefault();
+    if (shown) {
+      prev.innerHTML = '<img alt="" src="' + url(shown) + '">';
+      document.getElementById('curSub').textContent = cp ? T[lang].curSet : T[lang].curNone;
+    } else {
+      prev.textContent = '👋';
+      document.getElementById('curSub').textContent = T[lang].curNone;
+    }
+    document.querySelectorAll('.tile').forEach(function(t){
+      t.classList.toggle('selected', t.getAttribute('data-cp') === shown);
+    });
+  }
+
+  var toastTimer = null;
+  function toast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2400);
+  }
+
+  function buildGrid(list){
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    var cur = getChoice();
+    list.forEach(function(item){
+      var tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'tile' + (item.cp === cur ? ' selected' : '');
+      tile.setAttribute('data-cp', item.cp);
+      tile.title = item.tag || '';
+      var img = document.createElement('img');
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.alt = item.tag || '';
+      img.src = url(item.cp);
+      tile.appendChild(img);
+      tile.addEventListener('click', function(){
+        setChoice(item.cp);
+        renderCurrent();
+        toast(T[lang].saved);
+      });
+      grid.appendChild(tile);
+    });
+  }
+
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    theme = (theme === 'dark' ? 'light' : 'dark');
+    try { localStorage.setItem('prefTheme', theme); } catch(e){}
+    applyTheme();
+  });
+  document.getElementById('langBtn').addEventListener('click', function(){
+    lang = (lang === 'ar' ? 'en' : 'ar');
+    try {
+      localStorage.setItem('prefLang', lang);
+      localStorage.setItem('rosterLang', lang);
+      localStorage.setItem('importPrefLang', lang);
+      localStorage.setItem('appLang', lang);
+    } catch(e){}
+    applyLang();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    setChoice('');
+    renderCurrent();
+    toast(T[lang].resetDone);
+  });
+
+  applyTheme();
+  applyLang();
+
+  fetch('emojis.json')
+    .then(function(r){ return r.json(); })
+    .then(function(list){ emojiList = list; buildGrid(list); renderCurrent(); })
+    .catch(function(){
+      document.getElementById('grid').innerHTML =
+        '<div class="loading">' + (lang === 'ar' ? 'تعذر التحميل — أعد المحاولة' : 'Failed to load — try again') + '</div>';
+    });
+})();
+</script>
+<script defer src="../site-visits.js?v=20260806d"></script>
+</body>
+</html>

@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script defer src="../ios-tap-fix.js?v=20260803f"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Roster Versions Auto Diff</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      margin:0; padding:0;
+      min-height:100dvh;
+      background:#eef1f7;
+      font-family:'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      touch-action:manipulation;
+    }
+    * { box-sizing:border-box; }
+    .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+    .header {
+      background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color:#fff;
+      padding:26px 18px 24px;
+      border-radius:20px;
+      text-align:center;
+      box-shadow:0 4px 16px rgba(30,64,175,.14);
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before {
+      content:''; position:absolute;
+      top:-30px; right:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .header::after {
+      content:''; position:absolute;
+      bottom:-50px; left:-30px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,.06);
+    }
+    .header .bannerTitle {
+      margin:0;
+      position:relative;
+      z-index:1;
+      line-height:1.1;
+      color:#fff;
+    }
+    .header .bannerTitleEyebrow {
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+    .header .bannerTitleMain {
+      display:block;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+    body.ar .header .bannerTitleEyebrow {
+      letter-spacing:.06em;
+      text-transform:none;
+      font-size:12px;
+    }
+    body.ar .header .bannerTitleMain {
+      font-size:26px;
+      letter-spacing:0;
+    }
+    .langToggle {
+      position:absolute; top:12px; right:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; height:auto; padding:4px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      transition:transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+    body.ar .langToggle { right:12px; left:auto; }
+    .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
+    .langToggle-icon svg {
+      display:block; width:18px; height:18px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      text-shadow:0 1px 3px rgba(0,0,0,.65);
+    }
+    #banner-changer-btn {
+      position:absolute; top:12px; left:12px; z-index:30;
+      background:transparent; border:none; border-radius:0;
+      min-width:auto; min-height:auto; padding:4px;
+      color:#fff; cursor:pointer; line-height:0;
+      box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+    #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+    #banner-changer-btn .banner-changer-icon svg {
+      display:block; width:20px; height:20px;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    body.ar #banner-changer-btn { left:12px; right:auto; }
+    body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
+    .datePickerWrapper {
+      position:relative;
+      display:inline-block;
+      margin-top:14px;
+      z-index:20;
+      min-height:44px;
+      min-width:min(100%, 220px);
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .header .dateTag {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
+      cursor:pointer;
+      transition:all .3s;
+      border:2px solid rgba(255,255,255,.2);
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      -webkit-user-select:none;
+      direction:ltr;
+      pointer-events:none;
+      color:#fff;
+    
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .dateTag-icon {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
+    }
+    .dateTag-icon svg {
+      display:block;
+      width:16px;
+      height:16px;
+          pointer-events:none;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
+    }
+    .dateTag-label {
+      line-height:1.2;
+      pointer-events:none;
+    text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+    }
+    .dateTag-icon {
+      pointer-events:none;
+    }
+    .summaryBar {
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      gap:12px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    a.summaryChip:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+    .summaryChip {
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      border-radius:14px;
+      padding:10px 12px;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+      transition:all .25s ease;
+      min-width:72px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+    }
+.summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .summaryChip .chip-icon { display:block; flex-shrink:0; }
+    .summaryChip .chipLabel {
+      font-size:9.5px;
+      font-weight:600;
+      color:#64748b;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      margin-top:4px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+    .welcomeChip { display:none; text-decoration:none; cursor:pointer; }
+    .welcomeChip.visible { display:flex; }
+    .welcomeChip .chipLabel {
+      max-width:96px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .waveHand {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:0;
+    }
+    #myScheduleBtn.is-hidden { display:none !important; }
+    .quickActions {
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn {
+      display:inline-block;
+      padding:11px 18px;
+      border-radius:16px;
+      background:linear-gradient(135deg, #1e40af, #1976d2);
+      color:#fff !important;
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      box-shadow:0 6px 20px rgba(30,64,175,.3);
+      min-width:170px;
+      text-align:center;
+      white-space:nowrap;
+      border:none;
+      cursor:pointer;
+    }
+    .card {
+      margin-top: 0;
+      background: #f8fafc;
+      border: 1px solid #dbe4f3;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(15,23,42,.08);
+    }
+    h1 { margin: 0 0 10px; font-size: 24px; color: #1e40af; }
+    .muted { color: #64748b; font-size: 13px; margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .field { flex: 1 1 280px; }
+    label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #334155; }
+    input[type="file"], input[type="text"] { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; }
+    .btn { margin-top: 10px; border: none; background: linear-gradient(135deg, #1e40af, #1976d2); color: #fff; padding: 10px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    .pill { display: inline-block; margin-top: 8px; background: #eaf2ff; color: #1e3a8a; border: 1px solid #d6e4ff; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 700; }
+    .warn { color: #b91c1c; font-weight: 700; }
+    .pageNote {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      padding: 8px 4px 2px;
+    }
+    .sourceMeta {
+      margin-top: 8px;
+      padding: 8px 10px 2px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    .sourceMetaRow {
+      margin: 2px 0;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .sourceBadge {
+      display: inline-block;
+      min-width: 46px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-inline-end: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+    }
+    .sourceBadgeNew {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .sourceFileName { font-weight: 700; color: #334155; }
+    .sourceMetaHint {
+      margin-top: 4px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .diffList {
+      margin-top: 10px;
+      display: grid;
+      gap: 9px;
+    }
+    .deptFold {
+      border:1px solid #cfdbf6;
+      border-radius: 14px;
+      background:#edf3ff;
+      overflow: hidden;
+    }
+    .deptFold > summary {
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-weight:900;
+      color:#1f3b8f;
+      gap:10px;
+    }
+    .deptFold > summary::-webkit-details-marker { display:none; }
+    .deptRows { padding:0 8px 8px; display:grid; gap:8px; }
+    .empFold {
+      border:1px solid #d7e0f2;
+      border-radius: 14px;
+      background:#f9fbff;
+      overflow: hidden;
+    }
+    .empFold > summary {
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-weight:800;
+      color:#0f172a;
+      gap:10px;
+    }
+    .empFold > summary::-webkit-details-marker { display:none; }
+    .empLeft { display:flex; align-items:center; gap:10px; min-width:0; }
+    .empArrow { color:#64748b; font-size:10px; transition:transform .2s ease; }
+    .empFold[open] .empArrow { transform:rotate(90deg); }
+    .empNameText { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .empCount {
+      min-width:30px;
+      height:30px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+      font-weight:900;
+      border:1px solid #bfdbfe;
+      color:#1d4ed8;
+      background:#dbeafe;
+      flex-shrink:0;
+    }
+    .mineAbsenceEmpty,
+    .mineChangeEmpty {
+      border:1px solid #bbf7d0;
+      background:linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%);
+      color:#166534;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:800;
+      font-size:15px;
+      text-align:center;
+      margin-bottom:2px;
+    }
+    .empFold.empFoldMine {
+      border-color:#93c5fd;
+      box-shadow:0 0 0 2px rgba(59, 130, 246, 0.12);
+    }
+    .changeRows { padding:0 10px 10px; display:grid; gap:8px; }
+    .changeRow {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border:1px solid #ccd9fb;
+      background:#f1f5ff;
+      color:#312e81;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:700;
+    }
+    .changeDay {
+      width:36px;
+      height:28px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#1d4ed8;
+      background:#dbeafe;
+      border:1px solid #bfdbfe;
+      flex-shrink:0;
+    }
+    .changeFlow { white-space:nowrap; }
+    .changeDate {
+      flex:1;
+      text-align:center;
+      color:#475569;
+      font-weight:700;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .changeOld { color:#991b1b; }
+    .changeNew { color:#065f46; }
+    .diffTabs {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      background: linear-gradient(180deg, #4457bb 0%, #3f51b5 100%);
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(63,81,181,.20);
+      border: 1px solid #5e71cf;
+      border-bottom: none;
+    }
+    .diffTab {
+      border: none;
+      border-bottom: 3px solid transparent;
+      border-right: 1px solid rgba(255,255,255,.12);
+      background: transparent;
+      color: rgba(255,255,255,.55);
+      padding: 12px 8px 10px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+    }
+    .diffTab:last-child { border-right: none; }
+    .diffTab:hover {
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.05);
+    }
+    .diffTab.active {
+      color: #ffffff;
+      border-bottom-color: #29b6f6;
+      background: rgba(255,255,255,.06);
+    }
+    @media (max-width:720px){
+      .langToggle { padding:6px; }
+      .langToggle-icon svg { width:20px; height:20px; }
+      .langToggle-label { font-size:11px; }
+      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+    }
+    @media (max-width:480px){
+      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
+      .wrap { padding:12px 10px 22px; }
+      }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <button class="langToggle" id="langToggle" type="button" title="Switch language" onclick="toggleLang()">
+        <span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span class="langToggle-label" id="langToggleLabel">ع</span>
+      </button>
+      <h1 id="pageTitle" class="bannerTitle">
+        <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
+        <span class="bannerTitleMain" id="pageTitleMain">Auto Diff</span>
+      </h1>
+      <div class="datePickerWrapper">
+        <div class="dateTag" id="dateTag"></div>
+      </div>
+    </div>
+
+    <div class="summaryBar">
+      <a href="#" id="exportBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+        <div class="chipLabel">Export</div>
+      </a>
+      <a href="#" id="trainingBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div class="chipLabel">Training</div>
+      </a>
+      <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+        <div class="chipLabel">My Schedule</div>
+      </a>
+      <a href="#" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
+        <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+        <div class="chipLabel" id="welcomeName"></div>
+      </a>
+      <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal" id="compareChipIcon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
+        <div class="chipLabel" id="compareChipLabel">Diff</div>
+      </a>
+    </div>
+    <div class="diffTabs">
+      <button class="diffTab" id="tabRosterDiff" type="button">Roster Diff</button>
+      <button class="diffTab" id="tabAbsence" type="button">Absence</button>
+    </div>
+
+    <div class="card">
+      <div class="pill" id="summary">No diff loaded yet.</div>
+      <div id="errors" class="warn" style="margin-top:8px;"></div>
+      <div id="diffList" class="diffList"></div>
+    </div>
+    <div class="pageNote">Automatic comparison between latest and previous version of the same month. No manual upload required.</div>
+    <div class="sourceMeta" id="sourceMeta">
+      <div class="sourceMetaRow"><span class="sourceBadge sourceBadgeNew">الجديد</span><span id="newSourceName" class="sourceFileName">-</span></div>
+      <div class="sourceMetaRow"><span class="sourceBadge">السابق</span><span id="oldSourceName" class="sourceFileName">-</span></div>
+      <div class="sourceMetaHint" id="sourceMetaHint">مصدر المقارنة يظهر من ملفي الإكسل المستخدمين في حساب الفروقات.</div>
+    </div>
+  </div>
+
+  <script>
+    let currentDiffKind = 'export';
+    let currentPanel = 'diff';
+    let lastDiffData = null;
+    function readLang() {
+      const roster = localStorage.getItem('rosterLang');
+      const diff = localStorage.getItem('rosterDiffLang');
+      if (roster === 'ar' || roster === 'en') return roster;
+      if (diff === 'ar' || diff === 'en') return diff;
+      return 'en';
+    }
+    let currentLang = readLang();
+    let latestIsoDate = '';
+    let lastSummaryStats = null;
+
+    const I18N = {
+      en: {
+        tabDiff: 'ROSTER DIFF',
+        tabAbsence: 'ABSENCE',
+        titleEyebrowExport: 'Export',
+        titleEyebrowImport: 'Import',
+        titleMain: 'Auto Diff',
+        chipExport: 'Export',
+        chipTraining: 'Training',
+        chipMySchedule: 'My Schedule',
+        welcomeTitle: 'Open my schedule',
+        chipExpDiff: 'Exp Diff',
+        chipImpDiff: 'Imp Diff',
+        switchDiff: 'Switch Diff',
+        langBtn: 'ع',
+        noDiffLoaded: 'No diff loaded yet.',
+        note: 'Automatic comparison between latest and previous version of the same month. No manual upload required.',
+        noDiffFound: 'No differences found between previous and current versions.',
+        sourceNew: 'NEW',
+        sourceOld: 'PREVIOUS',
+        sourceHint: 'Comparison source is shown from the two Excel files used to compute this diff.',
+        summaryStats: '{changes} changes across {employees} employees in {departments} departments',
+        noSavedEmp: 'No saved employee ID found for this section.',
+        noAbsence: 'You have no absences.',
+        noAbsenceAll: 'No absence records found.',
+        noChangeMine: 'You have no changes in your schedule.',
+        absenceSummary: '{employees} employees · {days} absence days · {departments} departments',
+        absent: 'Absent',
+        recorded: 'Recorded',
+        dayFallback: 'Day {day}',
+        noAutoDiff: 'No {kind} auto diff found yet. Generate two versions of the same month first.',
+        dept_other: 'Other',
+        dept_officers: 'Officers',
+        dept_supervisors: 'Supervisors',
+        dept_loadControl: 'Load Control',
+        dept_exportChecker: 'Export Checker',
+        dept_exportOps: 'Export Operators',
+        dept_unassigned: 'Unassigned',
+        dept_documentation: 'Documentation',
+        dept_importCheckers: 'Import Checkers',
+        dept_importOps: 'Import Operators',
+        dept_cargoOps: 'Cargo - Exp/Imp Operation',
+        shift_off: 'Off Day',
+        shift_annual: 'Annual Leave',
+        shift_sick: 'Sick Leave',
+        shift_training: 'Training',
+        shift_standby: 'Standby',
+        shift_leave: 'Leave'
+      },
+      ar: {
+        tabDiff: 'فروقات الروستر',
+        tabAbsence: 'الغياب',
+        titleEyebrowExport: 'الصادر',
+        titleEyebrowImport: 'الوارد',
+        titleMain: 'فروقات تلقائية',
+        chipExport: 'الصادر',
+        chipTraining: 'التدريب',
+        chipMySchedule: 'جدولي',
+        welcomeTitle: 'افتح جدولي',
+        chipExpDiff: 'فرق الصادر',
+        chipImpDiff: 'فرق الوارد',
+        switchDiff: 'تبديل نوع الفروقات',
+        langBtn: 'EN',
+        noDiffLoaded: 'لا توجد فروقات محملة بعد.',
+        note: 'مقارنة تلقائية بين أحدث نسخة والنسخة السابقة لنفس الشهر بدون رفع يدوي.',
+        noDiffFound: 'لا توجد فروقات بين النسخة السابقة والحالية.',
+        sourceNew: 'الجديد',
+        sourceOld: 'السابق',
+        sourceHint: 'مصدر المقارنة يظهر من ملفي الإكسل المستخدمين في حساب الفروقات.',
+        summaryStats: '{changes} تغييرات بين {employees} موظفين في {departments} أقسام',
+        noSavedEmp: 'لا يوجد رقم وظيفي محفوظ لهذا القسم.',
+        noAbsence: 'لا يوجد غياب لديك',
+        noAbsenceAll: 'لا توجد سجلات غياب.',
+        noChangeMine: 'لا يوجد تغيّر في جدولك',
+        absenceSummary: '{employees} موظفين · {days} أيام غياب · {departments} أقسام',
+        absent: 'غياب',
+        recorded: 'مسجل',
+        dayFallback: 'اليوم {day}',
+        noAutoDiff: 'لا يوجد ملف فروقات {kind} حتى الآن. أنشئ نسختين من نفس الشهر أولاً.',
+        dept_other: 'أخرى',
+        dept_officers: 'الضباط',
+        dept_supervisors: 'المشرفون',
+        dept_loadControl: 'مراقبة الحمولة',
+        dept_exportChecker: 'مدقق الصادرات',
+        dept_exportOps: 'مشغلو الصادرات',
+        dept_unassigned: 'غير مُعيَّن',
+        dept_documentation: 'التوثيق',
+        dept_importCheckers: 'مدققو الواردات',
+        dept_importOps: 'مشغلو الواردات',
+        dept_cargoOps: 'عمليات الشحن الصادر/الوارد',
+        shift_off: 'إجازة',
+        shift_annual: 'إجازة سنوية',
+        shift_sick: 'إجازة مرضية',
+        shift_training: 'تدريب',
+        shift_standby: 'احتياط',
+        shift_leave: 'إجازة'
+      }
+    };
+
+    function t(key, vars) {
+      const dict = I18N[currentLang] || I18N.en;
+      let text = dict[key] || I18N.en[key] || key;
+      if (vars) {
+        Object.keys(vars).forEach((k) => {
+          text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(vars[k]));
+        });
+      }
+      return text;
+    }
+
+    function updateSummaryText() {
+      const summary = document.getElementById('summary');
+      if (!summary) return;
+      if (!lastSummaryStats) {
+        summary.textContent = t('noDiffLoaded');
+        return;
+      }
+      summary.textContent = t('summaryStats', lastSummaryStats);
+    }
+
+    function updateDateTag() {
+      if (!latestIsoDate) return;
+      const dateTag = document.getElementById('dateTag');
+      if (!dateTag) return;
+      const dt = new Date(`${latestIsoDate}T00:00:00`);
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      const formatted = dt.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
+      dateTag.textContent = formatted;
+    }
+
+    async function toggleLang() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('rosterDiffLang', currentLang);
+      localStorage.setItem('rosterLang', currentLang);
+      applyLanguageUi();
+      try {
+        if (currentPanel === 'absence') {
+          await renderAbsencePanel(currentDiffKind);
+        } else if (lastDiffData) {
+          await renderDiffRows(lastDiffData, currentDiffKind);
+        }
+      } catch (_) {}
+    }
+    window.toggleLang = toggleLang;
+
+    function updateBannerTitle() {
+      const eyebrow = document.getElementById('pageTitleEyebrow');
+      const main = document.getElementById('pageTitleMain');
+      const isImport = currentDiffKind === 'import';
+      if (eyebrow) eyebrow.textContent = t(isImport ? 'titleEyebrowImport' : 'titleEyebrowExport');
+      if (main) main.textContent = t('titleMain');
+    }
+
+    function applyLanguageUi() {
+      document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+      document.body.classList.toggle('ar', currentLang === 'ar');
+      document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      updateBannerTitle();
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      const note = document.querySelector('.pageNote');
+      const sourceHint = document.getElementById('sourceMetaHint');
+      const newBadge = document.querySelector('.sourceBadgeNew');
+      const oldBadge = document.querySelector('#sourceMeta .sourceBadge:not(.sourceBadgeNew)');
+      if (tabRosterDiff) tabRosterDiff.textContent = t('tabDiff');
+      if (tabAbsence) tabAbsence.textContent = t('tabAbsence');
+      if (note) note.textContent = t('note');
+      if (sourceHint) sourceHint.textContent = t('sourceHint');
+      if (newBadge) newBadge.textContent = t('sourceNew');
+      if (oldBadge) oldBadge.textContent = t('sourceOld');
+      const langLbl = document.getElementById('langToggleLabel');
+      if (langLbl) langLbl.textContent = t('langBtn');
+      const exportLbl = document.querySelector('#exportBtn .chipLabel');
+      const trainingLbl = document.querySelector('#trainingBtn .chipLabel');
+      const scheduleLbl = document.querySelector('#myScheduleBtn .chipLabel');
+      const welcome = document.getElementById('welcomeChip');
+      if (exportLbl) exportLbl.textContent = t('chipExport');
+      if (trainingLbl) trainingLbl.textContent = t('chipTraining');
+      if (scheduleLbl) scheduleLbl.textContent = t('chipMySchedule');
+      if (welcome) welcome.title = t('welcomeTitle');
+      updateSummaryText();
+      updateDateTag();
+      applyDiffModeUi(currentDiffKind);
+      updateWelcomeChip(currentDiffKind);
+    }
+
+    function updateSourceMeta(data) {
+      const newEl = document.getElementById('newSourceName');
+      const oldEl = document.getElementById('oldSourceName');
+      if (!newEl || !oldEl) return;
+      const newFile = (data && data.new_file) ? String(data.new_file) : '-';
+      const oldFile = (data && data.old_file) ? String(data.old_file) : '-';
+      newEl.textContent = newFile;
+      oldEl.textContent = oldFile;
+    }
+
+    function applyDiffModeUi(kind) {
+      currentDiffKind = kind === 'import' ? 'import' : 'export';
+      const nextKind = currentDiffKind === 'export' ? 'import' : 'export';
+      const compareChipLabel = document.getElementById('compareChipLabel');
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      updateBannerTitle();
+      compareChipLabel.textContent = nextKind === 'export' ? t('chipExpDiff') : t('chipImpDiff');
+      if (tabRosterDiff && tabAbsence) {
+        tabRosterDiff.classList.toggle('active', currentPanel === 'diff');
+        tabAbsence.classList.toggle('active', currentPanel === 'absence');
+      }
+      updateWelcomeChip(currentDiffKind);
+    }
+
+    function getSavedEmpIdForKind(kind) {
+      const primaryKey = kind === 'import' ? 'importSavedEmpId' : 'exportSavedEmpId';
+      const fallbackKey = kind === 'import' ? 'exportSavedEmpId' : 'importSavedEmpId';
+      return (localStorage.getItem(primaryKey) || localStorage.getItem(fallbackKey) || localStorage.getItem('savedEmpId') || '').trim();
+    }
+
+    async function paintWelcomeName(kind, empId, enFull) {
+      const nameEl = document.getElementById('welcomeName');
+      if (!nameEl) return;
+      const en = String(enFull || empId || '').trim();
+      if (currentLang === 'ar') {
+        const lookup = await getArabicNameLookup(kind);
+        const shown = displayEmployeeName(empId, en, lookup);
+        const first = String(shown).replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
+        nameEl.textContent = first || empId;
+        return;
+      }
+      const first = en.replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
+      nameEl.textContent = first || empId;
+    }
+
+    function updateWelcomeChip(kind) {
+      const root = getSiteRootPath();
+      const myBtn = document.getElementById('myScheduleBtn');
+      const welcome = document.getElementById('welcomeChip');
+      const nameEl = document.getElementById('welcomeName');
+      if (!welcome || !nameEl) return;
+
+      const empId = getSavedEmpIdForKind(kind);
+      const scheduleBase = kind === 'import'
+        ? `${root}/import/my-schedules/index.html`
+        : `${root}/my-schedules/index.html`;
+
+      if (!empId) {
+        welcome.classList.remove('visible');
+        welcome.removeAttribute('href');
+        welcome.dataset.loadedEmp = '';
+        welcome.dataset.enName = '';
+        nameEl.textContent = '';
+        if (myBtn) {
+          myBtn.classList.remove('is-hidden');
+          myBtn.href = `${root}/my-schedules/`;
+        }
+        return;
+      }
+
+      if (myBtn) myBtn.classList.add('is-hidden');
+      welcome.href = `${scheduleBase}?emp=${encodeURIComponent(empId)}`;
+      welcome.title = t('welcomeTitle');
+      welcome.classList.add('visible');
+
+      if (welcome.dataset.loadedEmp === empId && welcome.dataset.enName) {
+        paintWelcomeName(kind, empId, welcome.dataset.enName);
+        return;
+      }
+
+      welcome.dataset.loadedEmp = empId;
+      welcome.dataset.enName = empId;
+      nameEl.textContent = empId;
+
+      const schedulePath = kind === 'import'
+        ? `import/schedules/${encodeURIComponent(empId)}.json`
+        : `schedules/${encodeURIComponent(empId)}.json`;
+
+      fetch(`${root}/${schedulePath}?ts=${Date.now()}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data || !data.name) {
+            paintWelcomeName(kind, empId, empId);
+            return;
+          }
+          welcome.dataset.enName = String(data.name).trim();
+          paintWelcomeName(kind, empId, welcome.dataset.enName);
+        })
+        .catch(() => {
+          paintWelcomeName(kind, empId, empId);
+        });
+    }
+
+    async function activatePanel(panel) {
+      currentPanel = panel === 'absence' ? 'absence' : 'diff';
+      applyDiffModeUi(currentDiffKind);
+      if (currentPanel === 'absence') {
+        await renderAbsencePanel(currentDiffKind);
+      } else if (lastDiffData) {
+        await renderDiffRows(lastDiffData, currentDiffKind);
+      }
+    }
+
+    function getSiteRootPath() {
+      if (location.protocol === 'file:') return '';
+      const path = location.pathname || '/';
+      const diffIdx = path.indexOf('/roster-diff');
+      if (diffIdx >= 0) return path.slice(0, diffIdx) || '';
+      if (path.includes('/roster-site/')) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        const segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+
+    (function wireTopNav() {
+      const root = getSiteRootPath();
+      const today = new Date();
+      const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      latestIsoDate = isoDate;
+      const importEmpId = (localStorage.getItem('importSavedEmpId') || '').trim();
+      const exportEmpId = (localStorage.getItem('exportSavedEmpId') || '').trim();
+      const initialKind = importEmpId && !exportEmpId ? 'import' : 'export';
+      document.getElementById('exportBtn').href = `${root}/date/${isoDate}/`;
+      document.getElementById('trainingBtn').href = `${root}/training/`;
+      document.getElementById('myScheduleBtn').href = `${root}/my-schedules/`;
+      const compareBtn = document.getElementById('compareChipBtn');
+      const tabRosterDiff = document.getElementById('tabRosterDiff');
+      const tabAbsence = document.getElementById('tabAbsence');
+      compareBtn.href = '#';
+      compareBtn.onclick = (e) => {
+        e.preventDefault();
+        loadDiff(currentDiffKind === 'export' ? 'import' : 'export');
+      };
+      applyDiffModeUi(initialKind);
+      updateWelcomeChip(initialKind);
+      compareBtn.title = t('switchDiff');
+      tabRosterDiff.onclick = () => activatePanel('diff');
+      tabAbsence.onclick = () => activatePanel('absence');
+      applyLanguageUi();
+    })();
+
+    function formatDiffDate(day, monthKey) {
+      const m = String(monthKey || '').match(/^(\d{4})-(\d{2})$/);
+      if (!m) return t('dayFallback', { day });
+      const year = Number(m[1]);
+      const month = Number(m[2]) - 1;
+      const d = Number(day);
+      const dt = new Date(year, month, d);
+      if (Number.isNaN(dt.getTime())) return t('dayFallback', { day });
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatAbsenceDate(dateStr) {
+      const m = String(dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return String(dateStr || '-');
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      if (Number.isNaN(dt.getTime())) return String(dateStr || '-');
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatAbsenceMonth(monthKey) {
+      const m = String(monthKey || '').match(/^(\d{4})-(\d{2})$/);
+      if (!m) return String(monthKey || '-');
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, 1);
+      if (Number.isNaN(dt.getTime())) return String(monthKey || '-');
+      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
+      return dt.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+    }
+
+    function extractEmpId(v) {
+      const s = String(v || '').trim();
+      if (!s) return '';
+      const tail = s.match(/(\d{3,})\s*$/);
+      if (tail) return tail[1];
+      const any = s.match(/(\d{3,})/);
+      return any ? any[1] : '';
+    }
+
+    function normalizeId(v) {
+      return extractEmpId(v) || String(v || '').replace(/\D+/g, '').trim();
+    }
+
+    function idsMatch(a, b) {
+      const na = extractEmpId(a);
+      const nb = extractEmpId(b);
+      if (!na || !nb) return false;
+      return na === nb;
+    }
+
+    function isSavedEmployee(savedEmpId, empId, employeeName) {
+      if (!savedEmpId) return false;
+      const saved = extractEmpId(savedEmpId) || String(savedEmpId).trim();
+      if (!saved) return false;
+      if (idsMatch(empId, saved) || idsMatch(employeeName, saved)) return true;
+      const en = String(employeeName || '');
+      return en === saved || en.endsWith(' - ' + saved) || en.includes(saved);
+    }
+
+    function normalizeName(v) {
+      return String(v || '')
+        .replace(/-\s*\d+\s*$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\u0600-\u06ff]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    const nameLangCache = { export: null, import: null, loading: {} };
+
+    function translateDepartment(dept) {
+      const raw = String(dept || '').trim();
+      if (!raw) return t('dept_other');
+      const key = raw.toLowerCase();
+      const map = {
+        'other': 'dept_other',
+        'officers': 'dept_officers',
+        'supervisors': 'dept_supervisors',
+        'load control': 'dept_loadControl',
+        'export checker': 'dept_exportChecker',
+        'export operators': 'dept_exportOps',
+        'unassigned': 'dept_unassigned',
+        'documentation': 'dept_documentation',
+        'import checkers': 'dept_importCheckers',
+        'import checker': 'dept_importCheckers',
+        'import operators': 'dept_importOps',
+        'import ops': 'dept_importOps',
+        'cargo - exp/imp operation': 'dept_cargoOps',
+        'cargo - exp/imp operations': 'dept_cargoOps',
+      };
+      return map[key] ? t(map[key]) : raw;
+    }
+
+    function translateShiftValue(code) {
+      const raw = String(code || '').trim();
+      if (!raw || raw === '-') return '-';
+      if (currentLang !== 'ar') return raw;
+      const u = raw.toUpperCase();
+      if (/^(OFF|OFF\s*DAY)$/i.test(raw) || u === 'O') return t('shift_off');
+      if (/^(LV|AL|ANNUAL|ANNUAL\s*LEAVE)$/i.test(raw)) return t('shift_annual');
+      if (/^(SL|SICK|SICK\s*LEAVE)$/i.test(raw)) return t('shift_sick');
+      if (/^(TR|TRAINING)$/i.test(raw)) return t('shift_training');
+      if (/^(ST|STANDBY)$/i.test(raw)) return t('shift_standby');
+      if (/^(LEAVE|L)$/i.test(raw)) return t('shift_leave');
+      return raw;
+    }
+
+    function ingestArabicNamePair(byId, byEn, arFull, enFull) {
+      const ar = String(arFull || '').trim();
+      const en = String(enFull || '').trim();
+      if (!ar || !en) return;
+      const id = extractEmpId(en) || extractEmpId(ar);
+      const enName = en.replace(/-\s*\d+\s*$/, '').trim();
+      const arName = ar.replace(/-\s*\d+\s*$/, '').trim();
+      if (id && !byId.has(id)) byId.set(id, arName || ar);
+      if (enName) byEn.set(normalizeName(enName), arName || ar);
+    }
+
+    async function getArabicNameLookup(kind) {
+      const k = kind === 'import' ? 'import' : 'export';
+      if (nameLangCache[k]) return nameLangCache[k];
+      if (nameLangCache.loading[k]) return nameLangCache.loading[k];
+
+      nameLangCache.loading[k] = (async () => {
+        const root = getSiteRootPath();
+        const byId = new Map();
+        const byEn = new Map();
+
+        try {
+          const res = await fetch(`${root}/roster-diff/names-ar.json?ts=${Date.now()}`);
+          if (res.ok) {
+            const json = await res.json();
+            const pack = (json && json[k]) || {};
+            Object.entries(pack.byId || {}).forEach(([id, ar]) => {
+              if (id && ar) byId.set(String(id), String(ar));
+            });
+            Object.entries(pack.byEn || {}).forEach(([en, ar]) => {
+              if (en && ar) byEn.set(normalizeName(en), String(ar));
+            });
+          }
+        } catch (_) {}
+
+        if (!byId.size && !byEn.size) {
+          const urls = k === 'import'
+            ? [`${root}/import/`, `${root}/import/index.html`, `${root}/import/now/`]
+            : [`${root}/`, `${root}/index.html`, `${root}/now/`];
+          for (const url of urls) {
+            try {
+              const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}ts=${Date.now()}`);
+              if (!res.ok) continue;
+              const html = await res.text();
+              try {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.querySelectorAll('[data-name-ar]').forEach((el) => {
+                  ingestArabicNamePair(byId, byEn, el.getAttribute('data-name-ar'), el.textContent || '');
+                });
+              } catch (_) {
+                const re = /data-name-ar="([^"]+)"[^>]*>([^<]+)</gi;
+                let m;
+                while ((m = re.exec(html))) ingestArabicNamePair(byId, byEn, m[1], m[2]);
+              }
+              if (byId.size || byEn.size) break;
+            } catch (_) {}
+          }
+        }
+
+        const lookup = { byId, byEn };
+        nameLangCache[k] = lookup;
+        delete nameLangCache.loading[k];
+        return lookup;
+      })();
+
+      return nameLangCache.loading[k];
+    }
+
+    function displayEmployeeName(empId, employeeName, nameLookup) {
+      const enFull = String(employeeName || '-').trim();
+      const enName = enFull.replace(/-\s*\d+\s*$/, '').trim() || enFull;
+      const id = extractEmpId(empId) || extractEmpId(enFull);
+      if (currentLang === 'ar' && nameLookup) {
+        const ar =
+          (id && nameLookup.byId.get(id)) ||
+          nameLookup.byEn.get(normalizeName(enName));
+        if (ar) return id ? `${ar} - ${id}` : ar;
+      }
+      return enFull;
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function getDeptLookup(kind) {
+      const root = getSiteRootPath();
+      const candidates = kind === 'import'
+        ? [`${root}/import/schedules/index.json`, `${root}/schedules/index.json`]
+        : [`${root}/schedules/index.json`];
+      for (const url of candidates) {
+        try {
+          const res = await fetch(`${url}?ts=${Date.now()}`);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const idToDept = new Map();
+          const nameToDept = new Map();
+          ((json && json.employees) || []).forEach((e) => {
+            const empId = extractEmpId((e && e.id) || '') || String((e && e.id) || '').trim();
+            const dep = String((e && e.department) || '').trim();
+            const nm = normalizeName((e && e.name) || '');
+            if (empId && dep && !idToDept.has(empId)) idToDept.set(empId, dep);
+            if (nm && dep && !nameToDept.has(nm)) nameToDept.set(nm, dep);
+          });
+          return { idToDept, nameToDept };
+        } catch (_) {}
+      }
+      return { idToDept: new Map(), nameToDept: new Map() };
+    }
+
+    function resolveDepartment(empId, employeeName, lookup) {
+      const id = extractEmpId(empId) || extractEmpId(employeeName);
+      if (id && lookup.idToDept.has(id)) return lookup.idToDept.get(id);
+      const nameKey = normalizeName(employeeName);
+      if (nameKey && lookup.nameToDept.has(nameKey)) return lookup.nameToDept.get(nameKey);
+      return 'Other';
+    }
+
+    function appendMineEmptyNotice(diffList) {
+      const empty = document.createElement('div');
+      empty.className = 'mineChangeEmpty';
+      empty.setAttribute('data-mine-empty', '1');
+      empty.textContent = t('noChangeMine');
+      diffList.appendChild(empty);
+    }
+
+    async function renderDiffRows(data, kind) {
+      const err = document.getElementById('errors');
+      const summary = document.getElementById('summary');
+      const diffList = document.getElementById('diffList');
+      const savedEmpId = getSavedEmpIdForKind(kind);
+      err.textContent = '';
+      diffList.innerHTML = '';
+      const rows = (data && data.changes) || [];
+      summary.textContent = '';
+      if (!rows.length) {
+        if (savedEmpId) appendMineEmptyNotice(diffList);
+        err.textContent = t('noDiffFound');
+        lastSummaryStats = null;
+        updateSummaryText();
+        return;
+      }
+
+      const [lookup, nameLookup] = await Promise.all([
+        getDeptLookup(kind),
+        getArabicNameLookup(kind),
+      ]);
+      const grouped = new Map();
+      rows.forEach((x) => {
+        const key = `${x.emp_id || ''}||${x.name || '-'}`;
+        if (!grouped.has(key)) grouped.set(key, []);
+        grouped.get(key).push(x);
+      });
+      const groups = Array.from(grouped.entries()).map(([key, changes]) => {
+        const [empId, name] = key.split('||');
+        const employeeName = (name || '-').trim();
+        const matchSaved = isSavedEmployee(savedEmpId, empId, employeeName);
+        const department = resolveDepartment(empId, employeeName, lookup);
+        return { empId, employeeName, changes, matchSaved, department };
+      });
+
+      if (savedEmpId && !groups.some((g) => g.matchSaved)) {
+        appendMineEmptyNotice(diffList);
+      }
+
+      const byDept = new Map();
+      groups.forEach((g) => {
+        if (!byDept.has(g.department)) byDept.set(g.department, []);
+        byDept.get(g.department).push(g);
+      });
+      const deptGroups = Array.from(byDept.entries()).map(([department, employees]) => ({
+        department,
+        employees,
+        hasSaved: employees.some(e => e.matchSaved),
+        totalChanges: employees.reduce((n, e) => n + e.changes.length, 0)
+      }));
+      deptGroups.sort((a, b) => {
+        if (a.hasSaved && !b.hasSaved) return -1;
+        if (!a.hasSaved && b.hasSaved) return 1;
+        return a.department.localeCompare(b.department);
+      });
+      lastSummaryStats = { changes: rows.length, employees: groups.length, departments: deptGroups.length };
+      updateSummaryText();
+
+      deptGroups.forEach((d, deptIdx) => {
+        d.employees.sort((a, b) => {
+          if (a.matchSaved && !b.matchSaved) return -1;
+          if (!a.matchSaved && b.matchSaved) return 1;
+          return a.employeeName.localeCompare(b.employeeName);
+        });
+        const deptDetails = document.createElement('details');
+        deptDetails.className = 'deptFold';
+        if ((savedEmpId && d.hasSaved) || (!savedEmpId && deptIdx === 0)) deptDetails.open = true;
+
+        const deptRows = document.createElement('div');
+        deptRows.className = 'deptRows';
+        d.employees.forEach((g, empIdx) => {
+          const details = document.createElement('details');
+          details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
+          if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+          const shownName = displayEmployeeName(g.empId, g.employeeName, nameLookup);
+          const rowsHtml = g.changes
+            .sort((a, b) => Number(a.day) - Number(b.day))
+            .map((c) => `<div class="changeRow"><span class="changeDay">${c.day}</span><span class="changeDate">${formatDiffDate(c.day, data.month)}</span><span class="changeFlow"><span class="changeOld">${escapeHtml(translateShiftValue(c.v1))}</span> → <span class="changeNew">${escapeHtml(translateShiftValue(c.v2))}</span></span></div>`)
+            .join('');
+          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+          deptRows.appendChild(details);
+        });
+        deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalChanges}</span></summary>`;
+        deptDetails.appendChild(deptRows);
+        diffList.appendChild(deptDetails);
+      });
+    }
+
+    function nameMatch(a, b) {
+      const na = String(a || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, ' ').replace(/\s+/g, ' ').trim();
+      const nb = String(b || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!na || !nb) return false;
+      if (na === nb) return true;
+      const wa = na.split(' ').filter(x => x.length > 3);
+      const wb = nb.split(' ').filter(x => x.length > 3);
+      return wa.filter(w => wb.includes(w)).length >= 2;
+    }
+
+    async function renderAbsencePanel(kind) {
+      const err = document.getElementById('errors');
+      const summary = document.getElementById('summary');
+      const diffList = document.getElementById('diffList');
+      err.textContent = '';
+      summary.textContent = '';
+      diffList.innerHTML = '';
+      lastSummaryStats = null;
+
+      try {
+        const root = getSiteRootPath();
+        const savedEmpId = getSavedEmpIdForKind(kind);
+
+        const absRes = await fetch(`${root}/absence-data.json?ts=${Date.now()}`);
+        if (!absRes.ok) throw new Error('Could not load absence data.');
+        const absData = await absRes.json();
+        const records = (absData && absData.records) || [];
+        if (!records.length) {
+          err.textContent = t('noAbsenceAll');
+          return;
+        }
+
+        const [lookup, nameLookup] = await Promise.all([
+          getDeptLookup(kind),
+          getArabicNameLookup(kind),
+        ]);
+        const byEmp = new Map();
+
+        records.forEach((rec) => {
+          if (!rec || !rec.date) return;
+          const names = Array.isArray(rec.names) ? rec.names : [];
+          const empNos = Array.isArray(rec.empNos) ? rec.empNos : [];
+          const sections = Array.isArray(rec.sections) ? rec.sections : [];
+          const len = Math.max(names.length, empNos.length, sections.length);
+          for (let i = 0; i < len; i++) {
+            const empNo = String(empNos[i] || '').trim();
+            const employeeName = String(names[i] || '').trim() || '-';
+            const section = String(sections[i] || '').trim();
+            const key = empNo
+              ? `id:${normalizeId(empNo)}`
+              : `name:${normalizeName(employeeName) || employeeName}`;
+            if (!key || key === 'id:' || key === 'name:') continue;
+            if (!byEmp.has(key)) {
+              byEmp.set(key, {
+                empId: empNo,
+                employeeName,
+                dates: [],
+                section: section || '',
+              });
+            }
+            const g = byEmp.get(key);
+            g.dates.push(String(rec.date));
+            if ((!g.employeeName || g.employeeName === '-') && employeeName && employeeName !== '-') {
+              g.employeeName = employeeName;
+            }
+            if (!g.section && section) g.section = section;
+            if (!g.empId && empNo) g.empId = empNo;
+          }
+        });
+
+        const groups = Array.from(byEmp.values()).map((g) => {
+          const uniqDates = Array.from(new Set(g.dates)).sort((a, b) => b.localeCompare(a));
+          const matchSaved = isSavedEmployee(savedEmpId, g.empId, g.employeeName);
+          const department =
+            g.section ||
+            resolveDepartment(g.empId, g.employeeName, lookup) ||
+            'Other';
+          return {
+            empId: g.empId,
+            employeeName: g.employeeName || '-',
+            dates: uniqDates,
+            matchSaved,
+            department,
+          };
+        }).filter((g) => g.dates.length);
+
+        if (!groups.length) {
+          err.textContent = t('noAbsenceAll');
+          return;
+        }
+
+        const mine = savedEmpId ? groups.find((g) => g.matchSaved) : null;
+        if (savedEmpId && !mine) {
+          const empty = document.createElement('div');
+          empty.className = 'mineAbsenceEmpty';
+          empty.textContent = t('noAbsence');
+          diffList.appendChild(empty);
+        }
+
+        const byDept = new Map();
+        groups.forEach((g) => {
+          if (!byDept.has(g.department)) byDept.set(g.department, []);
+          byDept.get(g.department).push(g);
+        });
+        const deptGroups = Array.from(byDept.entries()).map(([department, employees]) => ({
+          department,
+          employees,
+          hasSaved: employees.some((e) => e.matchSaved),
+          totalDays: employees.reduce((n, e) => n + e.dates.length, 0),
+        }));
+        deptGroups.sort((a, b) => {
+          if (a.hasSaved && !b.hasSaved) return -1;
+          if (!a.hasSaved && b.hasSaved) return 1;
+          return a.department.localeCompare(b.department);
+        });
+
+        const totalDays = groups.reduce((n, g) => n + g.dates.length, 0);
+        summary.textContent = t('absenceSummary', {
+          employees: groups.length,
+          days: totalDays,
+          departments: deptGroups.length,
+        });
+
+        deptGroups.forEach((d, deptIdx) => {
+          d.employees.sort((a, b) => {
+            if (a.matchSaved && !b.matchSaved) return -1;
+            if (!a.matchSaved && b.matchSaved) return 1;
+            return a.employeeName.localeCompare(b.employeeName);
+          });
+          const deptDetails = document.createElement('details');
+          deptDetails.className = 'deptFold';
+          if ((savedEmpId && d.hasSaved) || (!savedEmpId && deptIdx === 0)) deptDetails.open = true;
+
+          const deptRows = document.createElement('div');
+          deptRows.className = 'deptRows';
+          d.employees.forEach((g, empIdx) => {
+            const details = document.createElement('details');
+            details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
+            if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
+            const shownName = displayEmployeeName(g.empId, g.empId ? `${g.employeeName} - ${g.empId}` : g.employeeName, nameLookup);
+            const rowsHtml = g.dates
+              .map((dateStr, i) => {
+                const dayNum = String(dateStr || '').match(/^\d{4}-\d{2}-(\d{2})$/);
+                const day = dayNum ? String(Number(dayNum[1])) : String(i + 1);
+                return `<div class="changeRow"><span class="changeDay">${day}</span><span class="changeDate">${formatAbsenceDate(dateStr)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`;
+              })
+              .join('');
+            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+            deptRows.appendChild(details);
+          });
+          deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalDays}</span></summary>`;
+          deptDetails.appendChild(deptRows);
+          diffList.appendChild(deptDetails);
+        });
+      } catch (e) {
+        err.textContent = e.message || String(e);
+      }
+    }
+
+    async function loadDiff(kind) {
+      applyDiffModeUi(kind);
+      try {
+        const root = getSiteRootPath();
+        const res = await fetch(`${root}/roster-diff/data/${kind}-latest.json?ts=${Date.now()}`);
+        if (!res.ok) throw new Error(t('noAutoDiff', { kind }));
+        lastDiffData = await res.json();
+        updateSourceMeta(lastDiffData);
+        if (currentPanel === 'absence') {
+          await renderAbsencePanel(kind);
+        } else {
+          await renderDiffRows(lastDiffData, kind);
+        }
+      } catch (e) {
+        updateSourceMeta(null);
+        const err = document.getElementById('errors');
+        err.textContent = e.message || String(e);
+      }
+    }
+
+    (function loadBannerChanger(){
+      const root = getSiteRootPath();
+      const s = document.createElement('script');
+      s.src = `${root}/banner-changer.js?v=20260521b`;
+      s.defer = true;
+      document.body.appendChild(s);
+    })();
+
+    loadDiff(currentDiffKind);
+  </script>
+<script defer src="../site-visits.js?v=20260806d"></script>
+</body>
+</html>

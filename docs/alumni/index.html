@@ -1,0 +1,1680 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>زملاء سابقون · Former Colleagues</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+      touch-action: manipulation;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+    }
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color: #fff;
+      padding: 26px 18px 24px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(30,64,175,.14);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -40px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: -30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+    }
+    .bannerTitle {
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      line-height: 1.1;
+      color: #fff;
+    }
+    .headerDecor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .floatEmo {
+      position: absolute;
+      font-size: 18px;
+      line-height: 1;
+      opacity: .42;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.12));
+      animation: emoFloat 5.5s ease-in-out infinite;
+    }
+    .floatEmo:nth-child(1) { top: 14px; inset-inline-start: 52px; font-size: 16px; animation-delay: 0s; }
+    .floatEmo:nth-child(2) { top: 18px; inset-inline-end: 54px; font-size: 15px; animation-delay: .8s; }
+    .floatEmo:nth-child(3) { bottom: 16px; inset-inline-start: 22%; font-size: 14px; animation-delay: 1.6s; opacity: .34; }
+    .floatEmo:nth-child(4) { bottom: 18px; inset-inline-end: 18%; font-size: 15px; animation-delay: 2.2s; opacity: .36; }
+    @keyframes emoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .tabEmo {
+      display: inline-block;
+      margin-inline-end: 4px;
+      font-size: 14px;
+      line-height: 1;
+      vertical-align: -1px;
+    }
+    .summaryEmo {
+      font-size: 14px;
+      line-height: 1;
+    }
+    .composeEmo {
+      display: inline-block;
+      margin-inline-end: 6px;
+      font-size: 16px;
+      vertical-align: -2px;
+    }
+    .tributeHeart {
+      position: absolute;
+      top: 10px;
+      inset-inline-end: 12px;
+      font-size: 13px;
+      opacity: .55;
+      line-height: 1;
+    }
+    .emptyEmo {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    .footEmo {
+      display: inline-block;
+      margin-inline-end: 6px;
+      font-size: 14px;
+      vertical-align: -2px;
+    }
+    .bannerTitleEyebrow {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      opacity: .88;
+      margin-bottom: 5px;
+    }
+    body.ar .bannerTitleEyebrow {
+      letter-spacing: .06em;
+      text-transform: none;
+      font-size: 12px;
+    }
+    .bannerTitleMain {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+    body.ar .bannerTitleMain {
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+    .bannerSub {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.45;
+      opacity: .92;
+      position: relative;
+      z-index: 1;
+    }
+    .langToggle {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      background: transparent;
+      border: none;
+      min-width: auto;
+      height: auto;
+      padding: 4px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #fff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.ar .langToggle { right: 12px; left: auto; }
+    .langToggle-icon { line-height: 0; display: flex; }
+    .langToggle-icon svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,.65);
+    }
+    .homeBtn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      color: #fff;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.ar .homeBtn { left: 12px; right: auto; }
+    .homeBtn svg {
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(30,64,175,.06);
+    }
+    .tab {
+      border: 0;
+      background: #f8fafc;
+      min-height: 46px;
+      font-weight: 800;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border-bottom: 3px solid transparent;
+      padding: 0 6px;
+    }
+    .tab.active {
+      background: #eff6ff;
+      color: #1e40af;
+      border-bottom-color: #2563eb;
+    }
+    @media (max-width: 420px) {
+      .tab { font-size: 12px; }
+    }
+    .summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #1e40af;
+      margin-bottom: 12px;
+    }
+    .list { display: grid; gap: 12px; }
+    .deptCard {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(30,64,175,.06);
+    }
+    .deptAccent {
+      height: 5px;
+      background: linear-gradient(to right, #2563eb, #2563ebcc);
+    }
+    .deptHead {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 2px solid #2563eb18;
+    }
+    .deptIcon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb15;
+      color: #2563eb;
+      flex-shrink: 0;
+    }
+    .deptTitle {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+    .deptCount {
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb22;
+      color: #1e40af;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .empRow {
+      display: grid;
+      gap: 6px;
+      padding: 12px 14px;
+      border-top: 1px solid #eef2ff;
+    }
+    .empRow:first-of-type { border-top: 0; }
+    .empRowAlt { background: #f8faff; }
+    .cardName {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.35;
+      margin: 0;
+    }
+    body.ar .cardName { direction: rtl; unicode-bidi: plaintext; }
+    body:not(.ar) .cardName { direction: ltr; unicode-bidi: plaintext; }
+    .note {
+      margin: 4px 0 0;
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #334155;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .empty, .error {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 16px;
+      padding: 22px 16px;
+      text-align: center;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .error {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+    .footNote {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.65;
+    }
+    body.roster-bg-textured .footNote {
+      color: #1e293b;
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
+    }
+    .footerShare {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      padding: 0 4px 2px;
+    }
+    .alumniShareBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid #86efac;
+      background: #ecfdf5;
+      color: #166534;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(22,101,52,.1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .alumniShareBtn:active { transform: translateY(1px); }
+    .alumniShareIcon { display: inline-flex; line-height: 0; }
+    .alumniBgMount {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 0;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    body.roster-bg-textured .alumniBgMount {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    .alumniBgMount .bgTextureShuffleWrap {
+      margin-top: 0;
+      width: auto;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(196,181,253,.55);
+      box-shadow: 0 2px 10px rgba(91,33,182,.08);
+      gap: 4px;
+    }
+    body.roster-bg-textured .alumniBgMount .bgTextureShuffleWrap {
+      background: rgba(255,255,255,.78);
+    }
+    .alumniBgMount .roster-cta-btn--texture {
+      border-radius: 999px;
+      padding: 6px 10px;
+      min-height: 28px;
+      box-shadow: none;
+    }
+    .alumniBgMount .bgScrollTopBtn,
+    .alumniBgMount .bgRefreshBtn {
+      border-radius: 999px;
+      width: 30px;
+      height: 30px;
+    }
+    body.roster-bg-textured .deptCard,
+    body.roster-bg-textured .tributeCompose,
+    body.roster-bg-textured .tributeCard,
+    body.roster-bg-textured .tabs,
+    body.roster-bg-textured .empty,
+    body.roster-bg-textured .error {
+      background: rgba(255,255,255,.92);
+    }
+    .tributesPanel[hidden], .peoplePanel[hidden] { display: none !important; }
+    .tributeCompose {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 18px;
+      box-shadow: 0 2px 10px rgba(30,64,175,.06);
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .tributeComposeSummary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e3a8a;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .tributeComposeSummary::-webkit-details-marker { display: none; }
+    .tributeComposeSummary::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-inline-end: 2px solid #64748b;
+      border-bottom: 2px solid #64748b;
+      transform: rotate(45deg);
+      transition: transform .18s ease;
+      flex-shrink: 0;
+      margin-top: -4px;
+    }
+    .tributeCompose[open] .tributeComposeSummary::after {
+      transform: rotate(225deg);
+      margin-top: 4px;
+    }
+    .tributeComposeSummarySub {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .tributeForm {
+      padding: 0 14px 16px;
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid #eef2ff;
+      padding-top: 14px;
+    }
+    .tributeLabel {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+    }
+    .tributeField, .tributeSelect, .tributeArea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      background: #f8fafc;
+      outline: none;
+    }
+    .tributeField:focus, .tributeSelect:focus, .tributeArea:focus {
+      border-color: #60a5fa;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .tributeArea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .tributeMetaRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .tributeSubmit {
+      border: 0;
+      border-radius: 12px;
+      min-height: 46px;
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeSubmit:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+    .tributeStatus {
+      min-height: 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .tributeStatus.ok { color: #15803d; }
+    .tributeStatus.err { color: #b91c1c; }
+    .tributeWall {
+      display: grid;
+      gap: 10px;
+    }
+    .tributeCard {
+      background: #fff;
+      border: 1px solid #dbe4f5;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 1px 6px rgba(30,64,175,.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .tributeCard::before {
+      content: '';
+      position: absolute;
+      inset-inline-start: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(#2563eb, #0ea5e9);
+    }
+    .tributeText {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #0f172a;
+      font-weight: 600;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tributeBy {
+      margin: 10px 0 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #1e40af;
+    }
+    .tributeTo {
+      margin: 4px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .tributeDate {
+      margin: 8px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .tributeCardHead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      padding-inline-end: 22px;
+    }
+    .tributeDelete,
+    .tributePinBtn {
+      flex-shrink: 0;
+      border-radius: 10px;
+      min-width: 34px;
+      min-height: 34px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeDelete {
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 16px;
+    }
+    .tributePinBtn {
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+      color: #b45309;
+    }
+    .tributePinBtn.is-pinned {
+      border-color: #fbbf24;
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .tributeModActions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tributeCard.is-pinned {
+      border-color: #fbbf24;
+      box-shadow: 0 2px 12px rgba(245,158,11,.16);
+    }
+    .tributePinnedBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0 0 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .alumniModHotspot {
+      width: 28px;
+      height: 30px;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      flex: none;
+      cursor: default;
+      opacity: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeModBar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 14px 0 2px;
+      padding: 6px 0;
+    }
+    .tributeModBar[hidden] { display: none !important; }
+    .tributeModBtn {
+      border: 0;
+      background: transparent;
+      color: #475569;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      cursor: pointer;
+      padding: 4px 8px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: #94a3b8;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tributeModBtn:hover,
+    .tributeModBtn:focus-visible {
+      color: #0f172a;
+      text-decoration-color: #64748b;
+    }
+    #tributeModState {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body class="ar">
+  <div class="wrap">
+    <header class="header">
+      <div class="headerDecor" aria-hidden="true">
+        <span class="floatEmo">✨</span>
+        <span class="floatEmo">💙</span>
+        <span class="floatEmo">🕊️</span>
+        <span class="floatEmo">🌟</span>
+      </div>
+      <a class="homeBtn" id="homeBtn" href="../" title="Home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M6.5 10.5V20h11V10.5"/></svg>
+      </a>
+      <button type="button" class="langToggle" id="langToggle" title="Switch language">
+        <span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span class="langToggle-label" id="langToggleLabel">EN</span>
+      </button>
+      <h1 class="bannerTitle">
+        <span class="bannerTitleEyebrow" id="pageEyebrow">تكريم</span>
+        <span class="bannerTitleMain" id="pageTitle">زملاء سابقون</span>
+      </h1>
+      <p class="bannerSub" id="pageSub">تقديراً لزملاء خدموا معنا</p>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" id="tabExport" data-kind="export"><span class="tabLabel">الصادر</span></button>
+      <button type="button" class="tab" id="tabImport" data-kind="import"><span class="tabLabel">الوارد</span></button>
+      <button type="button" class="tab" id="tabTributes" data-kind="tributes"><span class="tabEmo" aria-hidden="true">💌</span><span class="tabLabel">رسائل شكر</span></button>
+    </div>
+
+    <div class="peoplePanel" id="peoplePanel">
+      <div class="summary" id="summary">—</div>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="tributesPanel" id="tributesPanel" hidden>
+      <div class="summary" id="tributeSummary">—</div>
+      <div class="tributeWall" id="tributeWall"></div>
+      <details class="tributeCompose" id="tributeCompose">
+        <summary class="tributeComposeSummary">
+          <span>
+            <span id="tributeFormTitle"><span class="composeEmo" aria-hidden="true">💌</span>اترك كلمة شكر</span>
+            <span class="tributeComposeSummarySub" id="tributeFormHint">رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.</span>
+          </span>
+        </summary>
+        <form class="tributeForm" id="tributeForm">
+          <label class="tributeLabel" id="tributeToLabel">إلى
+            <select class="tributeSelect" id="tributeTo" required>
+              <option value="__all__">جميع الزملاء السابقين</option>
+            </select>
+          </label>
+          <label class="tributeLabel" id="tributeFromLabel">من
+            <input class="tributeField" id="tributeFrom" type="text" maxlength="60" autocomplete="name" required>
+          </label>
+          <label class="tributeLabel" id="tributeMsgLabel">الرسالة
+            <textarea class="tributeArea" id="tributeMsg" maxlength="280" required></textarea>
+          </label>
+          <div class="tributeMetaRow">
+            <span id="tributeCount">0 / 280</span>
+            <span id="tributeAnonHint"></span>
+          </div>
+          <button class="tributeSubmit" id="tributeSubmit" type="submit">نشر الرسالة</button>
+          <div class="tributeStatus" id="tributeStatus" aria-live="polite"></div>
+        </form>
+      </details>
+      <div class="tributeModBar" id="tributeModBar" hidden>
+        <button type="button" class="tributeModBtn" id="tributeModBtn">إدارة الرسائل</button>
+        <span id="tributeModState"></span>
+      </div>
+    </div>
+
+    <div class="footNote" id="footNote"></div>
+    <div class="footerShare">
+      <button type="button" class="alumniShareBtn" id="shareSiteBtn">
+        <span class="alumniShareIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+        <span class="roster-cta-label">مشاركة</span>
+      </button>
+    </div>
+    <div class="alumniBgMount" id="alumniFooter" data-bg-texture-mount></div>
+  </div>
+
+  <script>
+    let currentLang = (localStorage.getItem('rosterLang') === 'en') ? 'en' : 'ar';
+    let currentKind = 'export';
+    let data = null;
+    let tributeMessages = [];
+    let tributesLoading = false;
+
+    const TAB_KEY = 'alumniActiveTab';
+
+    function getSavedTab() {
+      try {
+        const k = sessionStorage.getItem(TAB_KEY);
+        if (k === 'export' || k === 'import' || k === 'tributes') return k;
+      } catch (e) {}
+      return 'export';
+    }
+
+    function rememberTab(kind) {
+      try { sessionStorage.setItem(TAB_KEY, kind); } catch (e) {}
+    }
+
+    const MANTLE_NS = 'roster-alumni-tributes';
+    const MANTLE_KEY = '90faa716d4bfea99e331c89c800accc7a22d07e2e3b4cda8c62be3b411a452bd';
+    const MANTLE_INDEX = 'https://mantledb.sh/v2/' + MANTLE_NS + '/index';
+    const MSG_MAX = 280;
+    const RATE_KEY = 'alumniTributeLastAt';
+    const RATE_MS = 20000;
+    const MOD_PIN = '912';
+    const MOD_KEY = 'alumniTributeMod';
+    const MOD_REVEAL_KEY = 'alumniTributeModReveal';
+    let modUnlocked = sessionStorage.getItem(MOD_KEY) === '1';
+    let modRevealed = sessionStorage.getItem(MOD_REVEAL_KEY) === '1';
+
+    const DEPT_AR = {
+      'Export Operators': 'مشغلو الصادرات',
+      'Export Checker': 'مدقق الصادرات',
+      'Export Checkers': 'مدققو الصادرات',
+      'Officers': 'الضباط',
+      'Supervisors': 'المشرفون',
+      'Load Control': 'مراقبة الحمولة',
+      'Documentation': 'التوثيق',
+      'Import Checkers': 'مدققو الواردات',
+      'Import Operators': 'مشغلو الواردات',
+      'Release Control': 'مراقبة الإفراج',
+      'Delivery': 'التسليم',
+      'Flight Dispatch (Import)': 'تسيير الرحلات (وارد)',
+      'Flight Dispatch (Export)': 'تسيير الرحلات (صادر)'
+    };
+
+    const I18N = {
+      ar: {
+        eyebrow: 'تكريم',
+        lang: 'EN',
+        export: 'الصادر',
+        import: 'الوارد',
+        tributes: 'رسائل شكر',
+        summary: '{n} زملاء · {d} أقسام',
+        empty: 'لا توجد أسماء في هذا القسم بعد.',
+        id: 'الرقم',
+        loadFail: 'تعذر تحميل قائمة الزملاء السابقين.',
+        foot: 'نحتفظ بأسمائهم عرفاناً بفترة خدمتهم معنا.',
+        homeTitle: 'الرئيسية',
+        share: 'مشاركة',
+        formTitle: 'اترك كلمة شكر',
+        formHint: 'رسالة قصيرة لزميل سابق أو لجميع الزملاء — تظهر للجميع هنا.',
+        to: 'إلى',
+        from: 'من',
+        message: 'الرسالة',
+        submit: 'نشر الرسالة',
+        everyone: 'جميع الزملاء السابقين',
+        tributeSummary: '{n} رسالة',
+        tributeEmpty: 'كن أول من يترك كلمة شكر.',
+        tributeLoadFail: 'تعذر تحميل الرسائل. حاول مرة أخرى.',
+        tributeOk: 'تم نشر رسالتك. شكراً لك.',
+        tributeErr: 'تعذر النشر. حاول لاحقاً.',
+        tributeRate: 'انتظر قليلاً قبل إرسال رسالة أخرى.',
+        tributeNeed: 'أدخل اسمك ورسالة قصيرة.',
+        countTpl: '{n} / {m}',
+        toPrefix: 'إلى: ',
+        modUnlock: 'إدارة الرسائل',
+        modLock: 'إغلاق الإدارة',
+        modOn: 'وضع الإدارة مفعّل',
+        modAsk: 'أدخل رمز الإدارة:',
+        modBad: 'رمز غير صحيح.',
+        modConfirm: 'حذف هذه الرسالة؟',
+        modDeleted: 'تم حذف الرسالة.',
+        modDeleteFail: 'تعذر الحذف.',
+        pin: 'تثبيت',
+        unpin: 'إلغاء التثبيت',
+        pinned: 'مثبّتة',
+        pinOk: 'تم تثبيت الرسالة.',
+        unpinOk: 'تم إلغاء التثبيت.',
+        pinFail: 'تعذر تحديث التثبيت.'
+      },
+      en: {
+        eyebrow: 'Tribute',
+        lang: 'ع',
+        export: 'Export',
+        import: 'Import',
+        tributes: 'Thanks',
+        summary: '{n} colleagues · {d} departments',
+        empty: 'No names in this section yet.',
+        id: 'ID',
+        loadFail: 'Could not load former colleagues list.',
+        foot: 'We keep their names in appreciation of their service with us.',
+        homeTitle: 'Home',
+        share: 'Share',
+        formTitle: 'Leave a thank-you note',
+        formHint: 'A short message for one colleague or everyone — visible to all here.',
+        to: 'To',
+        from: 'From',
+        message: 'Message',
+        submit: 'Post message',
+        everyone: 'All former colleagues',
+        tributeSummary: '{n} messages',
+        tributeEmpty: 'Be the first to leave a thank-you note.',
+        tributeLoadFail: 'Could not load messages. Try again.',
+        tributeOk: 'Your message was posted. Thank you.',
+        tributeErr: 'Could not post. Try again later.',
+        tributeRate: 'Please wait a moment before posting again.',
+        tributeNeed: 'Enter your name and a short message.',
+        countTpl: '{n} / {m}',
+        toPrefix: 'To: ',
+        modUnlock: 'Moderate messages',
+        modLock: 'Exit moderation',
+        modOn: 'Moderation mode on',
+        modAsk: 'Enter the moderation PIN:',
+        modBad: 'Incorrect PIN.',
+        modConfirm: 'Delete this message?',
+        modDeleted: 'Message deleted.',
+        modDeleteFail: 'Could not delete.',
+        pin: 'Pin',
+        unpin: 'Unpin',
+        pinned: 'Pinned',
+        pinOk: 'Message pinned.',
+        unpinOk: 'Message unpinned.',
+        pinFail: 'Could not update pin.'
+      }
+    };
+
+    function toArabicDigits(n) {
+      return String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    function t(key, vars) {
+      let s = (I18N[currentLang] || I18N.ar)[key] || key;
+      if (vars) Object.keys(vars).forEach((k) => {
+        let v = String(vars[k]);
+        if (currentLang === 'ar' && /^\d+$/.test(v)) v = toArabicDigits(v);
+        s = s.replace('{' + k + '}', v);
+      });
+      return s;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getSiteRootPath() {
+      if (location.protocol === 'file:') return '..';
+      const path = location.pathname || '/';
+      const ghDocs = path.match(/^(\/[^/]+\/docs)(?=\/|$)/);
+      if (ghDocs) return ghDocs[1];
+      const idx = path.indexOf('/alumni');
+      if (idx >= 0) return path.slice(0, idx) || '';
+      if (path.includes('/roster-site/')) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        const segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '..';
+    }
+
+    function getRosterName() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpName') ||
+          localStorage.getItem('savedEmpName') ||
+          localStorage.getItem('importSavedEmpName') ||
+          ''
+        ).trim();
+      } catch (e) { return ''; }
+    }
+
+    function getRosterId() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          ''
+        ).trim();
+      } catch (e) { return ''; }
+    }
+
+    function cleanDisplayName(name) {
+      return String(name || '')
+        .replace(/^(mr|mrs|ms|miss|dr)\.?\s+/i, '')
+        .trim();
+    }
+
+    function rememberRosterName(empId, fullName) {
+      const name = cleanDisplayName(fullName);
+      const id = String(empId || '').trim();
+      if (!name) return name;
+      try {
+        localStorage.setItem('exportSavedEmpName', name);
+        localStorage.setItem('savedEmpName', name);
+        if (id && localStorage.getItem('importSavedEmpId') === id) {
+          localStorage.setItem('importSavedEmpName', name);
+        }
+      } catch (e) {}
+      return name;
+    }
+
+    function getSchedulesBase() {
+      const root = getSiteRootPath();
+      if (root === '..') return '../schedules/';
+      return root.replace(/\/$/, '') + '/schedules/';
+    }
+
+    function getImportSchedulesBase() {
+      return getSchedulesBase().replace(/\/schedules\/$/, '/import/schedules/');
+    }
+
+    function fetchRosterDisplayName(empId, done) {
+      if (!empId || !/^\d+$/.test(empId)) { done(''); return; }
+      const urls = [
+        getSchedulesBase() + encodeURIComponent(empId) + '.json',
+        getImportSchedulesBase() + encodeURIComponent(empId) + '.json'
+      ];
+      function tryNext(i) {
+        if (i >= urls.length) { done(''); return; }
+        fetch(urls[i])
+          .then((r) => (r.ok ? r.json() : null))
+          .then((json) => {
+            if (json && json.name) done(json.name);
+            else tryNext(i + 1);
+          })
+          .catch(() => tryNext(i + 1));
+      }
+      tryNext(0);
+    }
+
+    function applyFromName(name, fromInp) {
+      const cleaned = cleanDisplayName(name);
+      if (!cleaned || !fromInp) return;
+      fromInp.value = cleaned;
+      fromInp.dataset.autofilled = '1';
+    }
+
+    function ensureTributeFromName() {
+      const fromInp = document.getElementById('tributeFrom');
+      if (!fromInp) return;
+      const current = (fromInp.value || '').trim();
+      const wasAuto = fromInp.dataset.autofilled === '1';
+      if (current && !wasAuto) return;
+
+      const rosterName = getRosterName();
+      if (rosterName) {
+        applyFromName(rosterName, fromInp);
+        return;
+      }
+
+      const empId = getRosterId();
+      if (!empId) return;
+      if (!current) fromInp.placeholder = empId;
+      fetchRosterDisplayName(empId, (fullName) => {
+        if (!fullName) return;
+        const still = document.getElementById('tributeFrom');
+        if (!still) return;
+        const now = (still.value || '').trim();
+        if (now && still.dataset.autofilled !== '1') return;
+        const saved = rememberRosterName(empId, fullName);
+        applyFromName(saved || fullName, still);
+        still.placeholder = '';
+      });
+    }
+
+    function personDisplayName(p) {
+      if (!p) return '';
+      return currentLang === 'ar' ? (p.nameAr || p.name || '') : (p.name || p.nameAr || '');
+    }
+
+    const CONFIRMED_ALUMNI_URL = 'https://mantledb.sh/v2/roster-site-visits/alumni-confirmed';
+    const CONFIRMED_ALUMNI_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+
+    async function loadAlumniData() {
+      const roots = [];
+      const primary = getSiteRootPath();
+      if (primary) roots.push(primary);
+      if (location.hostname && location.hostname.endsWith('github.io')) roots.push('/new/docs');
+      roots.push('..');
+      const seen = new Set();
+      let base = null;
+      for (const root of roots) {
+        if (!root || seen.has(root)) continue;
+        seen.add(root);
+        try {
+          const res = await fetch(root + '/alumni.json?ts=' + Date.now());
+          if (!res.ok) continue;
+          base = await res.json();
+          break;
+        } catch (e) { /* try next root */ }
+      }
+      if (!base) throw new Error('fail');
+
+      // Merge live confirmations from leavers review tool
+      try {
+        const res = await fetch(CONFIRMED_ALUMNI_URL + '?ts=' + Date.now(), {
+          headers: { Accept: 'application/json', 'X-Mantle-Key': CONFIRMED_ALUMNI_KEY },
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const extra = await res.json();
+          const more = Array.isArray(extra && extra.people) ? extra.people : [];
+          const map = Object.create(null);
+          (base.people || []).forEach((p) => {
+            if (p && p.id) map[String(p.id)] = p;
+          });
+          more.forEach((p) => {
+            if (!p || !p.id) return;
+            const id = String(p.id);
+            if (map[id]) return;
+            map[id] = {
+              id,
+              name: p.name || '',
+              nameAr: p.nameAr || '',
+              department: p.department || '',
+              kind: p.kind === 'import' ? 'import' : 'export',
+              note: p.note || '',
+              noteAr: p.noteAr || ''
+            };
+          });
+          base.people = Object.values(map);
+        }
+      } catch (e) { /* keep static list */ }
+
+      return base;
+    }
+
+    async function loadTributes() {
+      tributesLoading = true;
+      try {
+        const res = await fetch(MANTLE_INDEX + '?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('fail');
+        const json = await res.json();
+        tributeMessages = Array.isArray(json.messages) ? json.messages.slice() : [];
+        sortTributeMessages();
+      } catch (e) {
+        tributeMessages = [];
+        throw e;
+      } finally {
+        tributesLoading = false;
+      }
+    }
+
+    function sortTributeMessages() {
+      tributeMessages.sort((a, b) => {
+        const ap = a && a.pinned ? 1 : 0;
+        const bp = b && b.pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return (Number(b.at) || 0) - (Number(a.at) || 0);
+      });
+    }
+
+    async function writeTributeList(list) {
+      sortTributeMessagesList(list);
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const putRes = await fetch(MANTLE_INDEX, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ messages: list })
+      });
+      if (!putRes.ok) throw new Error('write');
+      tributeMessages = list;
+      sortTributeMessages();
+    }
+
+    function sortTributeMessagesList(list) {
+      list.sort((a, b) => {
+        const ap = a && a.pinned ? 1 : 0;
+        const bp = b && b.pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return (Number(b.at) || 0) - (Number(a.at) || 0);
+      });
+    }
+
+    async function saveTribute(msg) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = Array.isArray(cur.messages) ? cur.messages.slice() : [];
+      list.unshift(msg);
+      if (list.length > 180) list.length = 180;
+      await writeTributeList(list);
+    }
+
+    async function deleteTributeById(id) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = (Array.isArray(cur.messages) ? cur.messages : []).filter((m) => String(m.id) !== String(id));
+      await writeTributeList(list);
+    }
+
+    async function setTributePinned(id, pinned) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Mantle-Key': MANTLE_KEY
+      };
+      const getRes = await fetch(MANTLE_INDEX, { headers, cache: 'no-store' });
+      if (!getRes.ok) throw new Error('read');
+      const cur = await getRes.json();
+      const list = Array.isArray(cur.messages) ? cur.messages.slice() : [];
+      let found = false;
+      list.forEach((m) => {
+        if (String(m.id) === String(id)) {
+          m.pinned = !!pinned;
+          found = true;
+        }
+      });
+      if (!found) throw new Error('missing');
+      await writeTributeList(list);
+    }
+
+    function updateModBar() {
+      const bar = document.getElementById('tributeModBar');
+      const btn = document.getElementById('tributeModBtn');
+      const state = document.getElementById('tributeModState');
+      if (!bar || !btn || !state) return;
+      bar.hidden = !modRevealed;
+      btn.textContent = modUnlocked ? t('modLock') : t('modUnlock');
+      state.textContent = modUnlocked ? t('modOn') : '';
+    }
+
+    function revealModBar() {
+      modRevealed = true;
+      sessionStorage.setItem(MOD_REVEAL_KEY, '1');
+      if (currentKind !== 'tributes') setActiveTab('tributes');
+      updateModBar();
+      const bar = document.getElementById('tributeModBar');
+      bar?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function bindRefreshRightModReveal() {
+      let taps = 0;
+      let resetTimer = null;
+      function attach() {
+        const wrap =
+          document.querySelector('.alumniBgMount .bgTextureShuffleWrap') ||
+          document.querySelector('.bgTextureShuffleWrap');
+        const refresh = document.getElementById('bgRefreshBtn');
+        if (!wrap || !refresh) return false;
+        if (document.getElementById('alumniModHotspot')) return true;
+        const hot = document.createElement('button');
+        hot.type = 'button';
+        hot.id = 'alumniModHotspot';
+        hot.className = 'alumniModHotspot';
+        hot.setAttribute('aria-hidden', 'true');
+        hot.tabIndex = -1;
+        wrap.appendChild(hot);
+        hot.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          taps += 1;
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => { taps = 0; }, 1000);
+          if (taps >= 3) {
+            taps = 0;
+            revealModBar();
+          }
+        });
+        return true;
+      }
+      if (attach()) return;
+      const iv = setInterval(() => {
+        if (attach()) clearInterval(iv);
+      }, 250);
+      setTimeout(() => clearInterval(iv), 8000);
+    }
+
+    function toggleModMode() {
+      if (modUnlocked) {
+        modUnlocked = false;
+        sessionStorage.removeItem(MOD_KEY);
+        updateModBar();
+        renderTributes();
+        return;
+      }
+      const pin = window.prompt(t('modAsk'), '');
+      if (pin === null) return;
+      if (String(pin).trim() !== MOD_PIN) {
+        window.alert(t('modBad'));
+        return;
+      }
+      modUnlocked = true;
+      sessionStorage.setItem(MOD_KEY, '1');
+      updateModBar();
+      renderTributes();
+    }
+
+    function deptLabel(dept) {
+      if (currentLang === 'ar') return DEPT_AR[dept] || dept;
+      return dept;
+    }
+
+    function setActiveTab(kind) {
+      if (kind !== 'export' && kind !== 'import' && kind !== 'tributes') kind = 'export';
+      currentKind = kind;
+      rememberTab(kind);
+      document.getElementById('tabExport').classList.toggle('active', kind === 'export');
+      document.getElementById('tabImport').classList.toggle('active', kind === 'import');
+      document.getElementById('tabTributes').classList.toggle('active', kind === 'tributes');
+      const peoplePanel = document.getElementById('peoplePanel');
+      const tributesPanel = document.getElementById('tributesPanel');
+      const showTributes = kind === 'tributes';
+      peoplePanel.hidden = showTributes;
+      tributesPanel.hidden = !showTributes;
+      if (showTributes) {
+        fillTributeForm();
+        renderTributes();
+        if (!tributeMessages.length && !tributesLoading) {
+          loadTributes().then(renderTributes).catch(() => {
+            document.getElementById('tributeWall').innerHTML =
+              '<div class="error">' + escapeHtml(t('tributeLoadFail')) + '</div>';
+          });
+        }
+      } else {
+        renderPeople();
+      }
+    }
+
+    function fillTributeForm() {
+      const toSel = document.getElementById('tributeTo');
+      const fromInp = document.getElementById('tributeFrom');
+      const prev = toSel.value || '__all__';
+      toSel.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = '__all__';
+      optAll.textContent = t('everyone');
+      toSel.appendChild(optAll);
+      const people = (data && data.people) ? data.people.slice() : [];
+      people
+        .sort((a, b) => personDisplayName(a).localeCompare(personDisplayName(b), currentLang === 'ar' ? 'ar' : 'en'))
+        .forEach((p) => {
+          const opt = document.createElement('option');
+          opt.value = String(p.id || '');
+          opt.textContent = personDisplayName(p);
+          toSel.appendChild(opt);
+        });
+      if (prev && [...toSel.options].some((o) => o.value === prev)) toSel.value = prev;
+      else toSel.value = '__all__';
+      ensureTributeFromName();
+      updateTributeCount();
+    }
+
+    function updateTributeCount() {
+      const n = (document.getElementById('tributeMsg').value || '').length;
+      document.getElementById('tributeCount').textContent = t('countTpl', { n, m: MSG_MAX });
+    }
+
+    function formatTributeDate(at) {
+      const d = new Date(Number(at) || Date.now());
+      try {
+        return d.toLocaleDateString(currentLang === 'ar' ? 'ar-OM' : 'en-GB', {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+      } catch (e) {
+        return d.toISOString().slice(0, 10);
+      }
+    }
+
+    function resolveToName(msg) {
+      if (!msg) return '';
+      if (!msg.toId) return t('everyone');
+      const p = (data && data.people || []).find((x) => String(x.id) === String(msg.toId));
+      if (p) return personDisplayName(p);
+      return msg.toName || msg.toId;
+    }
+
+    function renderTributes() {
+      const wall = document.getElementById('tributeWall');
+      const summary = document.getElementById('tributeSummary');
+      summary.innerHTML =
+        '<span class="summaryEmo" aria-hidden="true">💌</span>' +
+        escapeHtml(t('tributeSummary', { n: tributeMessages.length }));
+      updateModBar();
+      if (!tributeMessages.length) {
+        wall.innerHTML =
+          '<div class="empty"><span class="emptyEmo" aria-hidden="true">🌸</span>' +
+          escapeHtml(t('tributeEmpty')) +
+          '</div>';
+        return;
+      }
+      wall.innerHTML = tributeMessages.map((msg) => {
+        const text = escapeHtml(msg.text || '');
+        const from = escapeHtml(msg.from || '');
+        const to = escapeHtml(resolveToName(msg));
+        const date = escapeHtml(formatTributeDate(msg.at));
+        const id = escapeHtml(msg.id || '');
+        const pinned = !!(msg && msg.pinned);
+        let modActions = '';
+        if (modUnlocked) {
+          modActions =
+            '<div class="tributeModActions">' +
+              '<button type="button" class="tributePinBtn' + (pinned ? ' is-pinned' : '') + '" data-pin-id="' + id + '" data-pinned="' + (pinned ? '1' : '0') + '" title="' + escapeHtml(pinned ? t('unpin') : t('pin')) + '">' + (pinned ? '📌' : '📍') + '</button>' +
+              '<button type="button" class="tributeDelete" data-del-id="' + id + '" title="' + escapeHtml(t('modConfirm')) + '" aria-label="Delete">×</button>' +
+            '</div>';
+        }
+        return (
+          '<article class="tributeCard' + (pinned ? ' is-pinned' : '') + '">' +
+            '<span class="tributeHeart" aria-hidden="true">💕</span>' +
+            (pinned ? ('<div class="tributePinnedBadge">📌 ' + escapeHtml(t('pinned')) + '</div>') : '') +
+            '<div class="tributeCardHead">' +
+              '<p class="tributeText">' + text + '</p>' +
+              modActions +
+            '</div>' +
+            '<p class="tributeBy">' + from + '</p>' +
+            '<p class="tributeTo">' + escapeHtml(t('toPrefix')) + to + '</p>' +
+            '<p class="tributeDate">' + date + '</p>' +
+          '</article>'
+        );
+      }).join('');
+      wall.querySelectorAll('[data-del-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-del-id');
+          if (!id || !window.confirm(t('modConfirm'))) return;
+          btn.disabled = true;
+          try {
+            await deleteTributeById(id);
+            renderTributes();
+            const status = document.getElementById('tributeStatus');
+            if (status) {
+              status.className = 'tributeStatus ok';
+              status.textContent = t('modDeleted');
+            }
+          } catch (e) {
+            btn.disabled = false;
+            window.alert(t('modDeleteFail'));
+          }
+        });
+      });
+      wall.querySelectorAll('[data-pin-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-pin-id');
+          const wasPinned = btn.getAttribute('data-pinned') === '1';
+          if (!id) return;
+          btn.disabled = true;
+          try {
+            await setTributePinned(id, !wasPinned);
+            renderTributes();
+            const status = document.getElementById('tributeStatus');
+            if (status) {
+              status.className = 'tributeStatus ok';
+              status.textContent = wasPinned ? t('unpinOk') : t('pinOk');
+            }
+          } catch (e) {
+            btn.disabled = false;
+            window.alert(t('pinFail'));
+          }
+        });
+      });
+    }
+
+    function applyUi() {
+      document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      document.body.classList.toggle('ar', currentLang === 'ar');
+      document.getElementById('langToggleLabel').textContent = t('lang');
+      document.getElementById('pageEyebrow').textContent = t('eyebrow');
+      const setTabLabel = (id, text) => {
+        const tab = document.getElementById(id);
+        const lbl = tab && tab.querySelector('.tabLabel');
+        if (lbl) lbl.textContent = text;
+        else if (tab) tab.textContent = text;
+      };
+      setTabLabel('tabExport', t('export'));
+      setTabLabel('tabImport', t('import'));
+      setTabLabel('tabTributes', t('tributes'));
+      document.getElementById('footNote').innerHTML =
+        '<span class="footEmo" aria-hidden="true">💙</span>' + escapeHtml(t('foot'));
+      document.getElementById('homeBtn').title = t('homeTitle');
+      document.getElementById('homeBtn').setAttribute('aria-label', t('homeTitle'));
+      const shareLbl = document.querySelector('#shareSiteBtn .roster-cta-label');
+      if (shareLbl) shareLbl.textContent = t('share');
+      document.getElementById('tributeFormTitle').innerHTML =
+        '<span class="composeEmo" aria-hidden="true">💌</span>' + escapeHtml(t('formTitle'));
+      document.getElementById('tributeFormHint').textContent = t('formHint');
+      const setLabel = (id, text) => {
+        const el = document.getElementById(id);
+        const control = el.querySelector('select, input, textarea');
+        el.textContent = '';
+        el.appendChild(document.createTextNode(text));
+        if (control) el.appendChild(control);
+      };
+      setLabel('tributeToLabel', t('to'));
+      setLabel('tributeFromLabel', t('from'));
+      setLabel('tributeMsgLabel', t('message'));
+      document.getElementById('tributeSubmit').textContent = t('submit');
+      if (data) {
+        document.getElementById('pageTitle').textContent =
+          currentLang === 'ar' ? (data.titleAr || data.title) : (data.title || data.titleAr);
+        document.getElementById('pageSub').textContent =
+          currentLang === 'ar' ? (data.subtitleAr || data.subtitle) : (data.subtitle || data.subtitleAr);
+      }
+      if (currentKind === 'tributes') {
+        fillTributeForm();
+        renderTributes();
+      } else {
+        renderPeople();
+      }
+    }
+
+    function renderPeople() {
+      const list = document.getElementById('list');
+      const summary = document.getElementById('summary');
+      list.innerHTML = '';
+      if (!data) return;
+      const people = (data.people || []).filter((p) => p.kind === currentKind);
+      const byDept = new Map();
+      people.forEach((p) => {
+        const d = p.department || 'Other';
+        if (!byDept.has(d)) byDept.set(d, []);
+        byDept.get(d).push(p);
+      });
+      summary.textContent = t('summary', { n: people.length, d: byDept.size });
+      if (!people.length) {
+        list.innerHTML = '<div class="empty">' + t('empty') + '</div>';
+        return;
+      }
+      Array.from(byDept.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .forEach(([dept, rows]) => {
+          const card = document.createElement('section');
+          card.className = 'deptCard';
+          card.innerHTML =
+            '<div class="deptAccent"></div>' +
+            '<div class="deptHead">' +
+            '<div class="deptIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/><rect x="9" y="14" width="2" height="3"/><rect x="13" y="14" width="2" height="3"/></svg></div>' +
+            '<div class="deptTitle"></div>' +
+            '<span class="deptCount"></span>' +
+            '</div>';
+          card.querySelector('.deptTitle').textContent = deptLabel(dept);
+          card.querySelector('.deptCount').textContent = String(rows.length);
+
+          rows
+            .slice()
+            .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+            .forEach((p, i) => {
+              const row = document.createElement('article');
+              row.className = 'empRow' + (i % 2 ? ' empRowAlt' : '');
+              const mainName = personDisplayName(p);
+              const note = currentLang === 'ar' ? (p.noteAr || p.note) : (p.note || p.noteAr);
+              row.innerHTML =
+                '<h2 class="cardName"></h2>' +
+                (note ? '<p class="note"></p>' : '');
+              row.querySelector('.cardName').textContent = mainName || '-';
+              if (note) row.querySelector('.note').textContent = note;
+              card.appendChild(row);
+            });
+          list.appendChild(card);
+        });
+    }
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('rosterLang', currentLang);
+      applyUi();
+      try { document.dispatchEvent(new Event('rosterLangChange')); } catch (e) {}
+      if (window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
+    });
+    document.getElementById('tabExport').addEventListener('click', () => setActiveTab('export'));
+    document.getElementById('tabImport').addEventListener('click', () => setActiveTab('import'));
+    document.getElementById('tabTributes').addEventListener('click', () => setActiveTab('tributes'));
+    document.getElementById('tributeModBtn').addEventListener('click', toggleModMode);
+    document.getElementById('tributeMsg').addEventListener('input', updateTributeCount);
+    document.getElementById('tributeFrom').addEventListener('input', () => {
+      const fromInp = document.getElementById('tributeFrom');
+      if (fromInp && (fromInp.value || '').trim()) fromInp.dataset.autofilled = '0';
+    });
+
+    document.getElementById('tributeCompose').addEventListener('toggle', () => {
+      if (document.getElementById('tributeCompose').open) {
+        ensureTributeFromName();
+        setTimeout(() => document.getElementById('tributeMsg')?.focus(), 40);
+      }
+    });
+    document.getElementById('tributeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('tributeStatus');
+      const btn = document.getElementById('tributeSubmit');
+      status.className = 'tributeStatus';
+      status.textContent = '';
+      const from = (document.getElementById('tributeFrom').value || '').trim().slice(0, 60);
+      const text = (document.getElementById('tributeMsg').value || '').trim().slice(0, MSG_MAX);
+      const toRaw = document.getElementById('tributeTo').value || '__all__';
+      const toId = toRaw === '__all__' ? '' : toRaw;
+      if (!from || !text) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeNeed');
+        return;
+      }
+      const last = Number(localStorage.getItem(RATE_KEY) || 0);
+      if (Date.now() - last < RATE_MS) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeRate');
+        return;
+      }
+      const toPerson = toId
+        ? (data && data.people || []).find((p) => String(p.id) === String(toId))
+        : null;
+      const msg = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        from,
+        text,
+        toId: toId || '',
+        toName: toPerson ? personDisplayName(toPerson) : '',
+        empId: getRosterId(),
+        at: Date.now()
+      };
+      btn.disabled = true;
+      try {
+        await saveTribute(msg);
+        localStorage.setItem(RATE_KEY, String(Date.now()));
+        document.getElementById('tributeMsg').value = '';
+        updateTributeCount();
+        renderTributes();
+        status.className = 'tributeStatus ok';
+        status.textContent = t('tributeOk');
+        const compose = document.getElementById('tributeCompose');
+        if (compose) compose.open = false;
+      } catch (err) {
+        status.className = 'tributeStatus err';
+        status.textContent = t('tributeErr');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function openComposeFromShare() {
+      try {
+        const params = new URLSearchParams(location.search || '');
+        if (params.get('compose') !== '1' && location.hash !== '#compose') return false;
+        setActiveTab('tributes');
+        const compose = document.getElementById('tributeCompose');
+        if (compose) compose.open = true;
+        ensureTributeFromName();
+        setTimeout(() => {
+          document.getElementById('tributeMsg')?.focus();
+          compose?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 80);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    (async function init() {
+      const root = getSiteRootPath();
+      document.getElementById('homeBtn').href = root + '/';
+      currentKind = getSavedTab();
+      updateModBar();
+      bindRefreshRightModReveal();
+      try {
+        data = await loadAlumniData();
+        applyUi();
+        await loadTributes().catch(() => {});
+        if (!openComposeFromShare()) setActiveTab(currentKind);
+      } catch (e) {
+        document.getElementById('list').innerHTML = '<div class="error">' + t('loadFail') + '</div>';
+        applyUi();
+        if (!openComposeFromShare()) setActiveTab(currentKind);
+      }
+    })();
+  </script>
+  <script defer src="../site-share.js?v=20260716alumni"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260718b"></script>
+<script defer src="../site-visits.js?v=20260806d"></script>
+</body>
+</html>

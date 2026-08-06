@@ -1,0 +1,171 @@
+{
+  "kind": "export",
+  "month": "2026-07",
+  "generated_at": "2026-07-23T07:54:22.287886Z",
+  "old_file": "Operation Roster July2026 Version 5.xlsx",
+  "new_file": "Operation Roster July2026 Version 5.1.xlsx",
+  "total_changes": 23,
+  "changes": [
+    {
+      "emp_id": "name:Adil Al Oraimi - 8941",
+      "name": "Adil Al Oraimi - 8941",
+      "day": 28,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Oraimi - 8941",
+      "name": "Adil Al Oraimi - 8941",
+      "day": 29,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Oraimi - 8941",
+      "name": "Adil Al Oraimi - 8941",
+      "day": 30,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Adil Al Oraimi - 8941",
+      "name": "Adil Al Oraimi - 8941",
+      "day": 31,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Ahmed Al Mawali - 82283",
+      "name": "Ahmed Al Mawali - 82283",
+      "day": 30,
+      "v1": "AE14",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Badar Al Fulaiti - 82468",
+      "name": "Badar Al Fulaiti - 82468",
+      "day": 28,
+      "v1": "ME06",
+      "v2": "AE14"
+    },
+    {
+      "emp_id": "name:Ghaith al Habsi - 82439",
+      "name": "Ghaith al Habsi - 82439",
+      "day": 30,
+      "v1": "NE22",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Khalid Al Raqadi - 8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 30,
+      "v1": "ME06",
+      "v2": "NE22"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 23,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 24,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 25,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 26,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 27,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 28,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 29,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 30,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Maskari - 82666",
+      "name": "Mohamed Al Maskari - 82666",
+      "day": 31,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 27,
+      "v1": "ME12",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 28,
+      "v1": "ME12",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 29,
+      "v1": "ME12",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 30,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
+      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "day": 31,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Zakariya Al Balushi - 82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 30,
+      "v1": "AE14",
+      "v2": "ME06"
+    }
+  ]
+}

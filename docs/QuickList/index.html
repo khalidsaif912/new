@@ -1,0 +1,2131 @@
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>قوائم المشتريات — Shopping Lists</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#12181F">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Rubik:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #12181F;
+      --ink-2: #1C2733;
+      --steel: #2E5D7D;
+      --steel-2: #3F7BA3;
+      --amber: #F5A623;
+      --amber-2: #FFC145;
+      --paper: #F7F4EC;
+      --paper-2: #EEE9DA;
+      --paper-3: #E4DCC6;
+      --line: #DCD5C2;
+      --text: #1B222B;
+      --muted: #726A5C;
+      --good: #2F9E5B;
+      --good-bg: #E4F5EB;
+      --bad: #E4483C;
+      --bad-bg: #FBE7E5;
+
+      --primary-color: var(--steel-2);
+      --secondary-color: var(--steel);
+      --accent-color: var(--amber);
+      --danger-color: var(--bad);
+      --danger-bg-color: var(--bad-bg);
+      --success-color: var(--good);
+      --info-color: var(--steel);
+      --info-bg-color: #E8F1F7;
+
+      --bg-gradient: var(--paper);
+      --header-gradient: linear-gradient(165deg, var(--ink), var(--ink-2) 60%, var(--steel));
+      --button-gradient: linear-gradient(180deg, var(--amber-2), var(--amber));
+      --button-hover-gradient: linear-gradient(180deg, #FFD06A, var(--amber-2));
+
+      --text-dark: var(--text);
+      --text-light: #ffffff;
+      --text-muted: var(--muted);
+      --text-on-primary: #241705;
+      --text-on-secondary: #ffffff;
+
+      --border-radius-sm: 8px;
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+      --border-color: var(--paper-3);
+
+      --shadow-sm: 0 2px 8px rgba(18, 24, 31, 0.08);
+      --shadow-md: 0 10px 26px -18px rgba(18, 24, 31, 0.5);
+
+      --font-family: 'Rubik', sans-serif;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.125rem;
+    }
+
+    /* --- General Styles & Reset --- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+body {
+  font-family: var(--font-family);
+  color: var(--text-dark);
+  background: var(--paper);
+  min-height: 100%;
+  min-height: 100dvh;
+  direction: rtl;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+    button, input, textarea {
+      font-family: inherit;
+      border: none;
+    }
+
+    /* --- Header (cargo) --- */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      color: #fff;
+      padding: max(14px, env(safe-area-inset-top)) 14px 16px;
+      padding-left: calc(14px + env(safe-area-inset-left, 0px));
+      padding-right: calc(14px + env(safe-area-inset-right, 0px));
+      background: var(--header-gradient);
+      box-shadow: none;
+      overflow: hidden;
+      display: block;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      inset-inline-end: -40px;
+      top: -40px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(245,166,35,.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hd-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hd-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .hd-title .mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(245,166,35,.16);
+      border: 1px solid rgba(245,166,35,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hd-title h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 16.5px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .hd-icons {
+      display: flex;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn,
+    .header-home-btn,
+    .header-refresh-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: .15s;
+      text-decoration: none;
+      box-shadow: none;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon-btn:hover,
+    .header-home-btn:hover,
+    .header-refresh-btn:hover {
+      background: rgba(255,255,255,.18);
+    }
+
+    .icon-btn:active,
+    .header-home-btn:active,
+    .header-refresh-btn:active {
+      transform: scale(.9);
+    }
+
+    .header-home-btn img,
+    .header-refresh-btn svg,
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .header-refresh-btn.spinning svg {
+      animation: refresh-spin 0.65s ease;
+    }
+
+    @keyframes refresh-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    #datetime {
+      display: block;
+      text-align: start;
+      min-width: 0;
+      line-height: 1.25;
+      margin-top: 2px;
+    }
+
+    #datetime .header-day {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      color: rgba(255,255,255,.7);
+      text-shadow: none;
+      line-height: 1.2;
+    }
+
+    #datetime .header-date {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 500;
+      opacity: 0.55;
+      letter-spacing: 0.4px;
+      line-height: 1.25;
+      margin-top: 1px;
+      color: rgba(255,255,255,.55);
+    }
+
+
+main.container {
+  margin: 0.75rem auto;
+  padding: 0 0 1rem;
+  max-width: 720px;
+  width: calc(100% - 1rem);
+  background: #fff;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--paper-3);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+    /* --- Tabs (folder style) --- */
+    .tabs-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 12px 10px 0;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--paper-3);
+    }
+
+    .tabs-nav {
+      display: flex;
+      align-items: flex-end;
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 0;
+      padding: 0 2px;
+      scroll-padding-inline: 12px;
+      scroll-snap-type: x proximity;
+    }
+
+    .tabs-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      position: relative;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      margin-inline-end: -10px;
+      padding: 8px 20px 10px;
+      min-height: 36px;
+      max-width: 132px;
+      border: 1px solid #DCD5C2;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      background: linear-gradient(180deg, #F7F4EC 0%, #EEE9DA 100%);
+      color: #726A5C;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: inherit;
+      line-height: 1.15;
+      transform: translateY(5px);
+      box-shadow: 1px -1px 0 rgba(255, 255, 255, 0.65) inset, 2px -3px 8px rgba(18, 24, 31, 0.08);
+      transition: transform 0.2s ease, padding 0.2s ease, font-size 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, z-index 0s;
+      z-index: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    .tab-btn.active {
+      z-index: 6;
+      margin-inline-end: -6px;
+      min-height: 42px;
+      padding: 10px 24px 12px;
+      max-width: 160px;
+      font-size: 0.9rem;
+      color: var(--ink);
+      border-color: var(--paper-3);
+      transform: translateY(0);
+      background: #fff;
+      box-shadow: 0 -2px 10px rgba(18, 24, 31, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .tab-add-btn {
+      flex-shrink: 0;
+      align-self: flex-end;
+      width: 38px;
+      height: 38px;
+      margin-bottom: 2px;
+      margin-inline-start: 4px;
+      border: 1px solid #DCD5C2;
+      border-radius: 10px 10px 0 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #F7F4EC 0%, #EEE9DA 100%);
+      color: #2E5D7D;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 1px -2px 6px rgba(18, 24, 31, 0.08);
+      transition: background 0.2s ease, transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-add-btn:hover {
+      background: linear-gradient(180deg, #F7F4EC 0%, #E4DCC6 100%);
+    }
+
+    .tab-add-btn:active {
+      transform: scale(0.94);
+    }
+
+    .container-body {
+      padding: 1rem;
+      background: #fff;
+      border-top: 1px solid var(--paper-3);
+    }
+
+    .entry-panel {
+      padding: 0.85rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--paper-3);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 10px 26px -18px rgba(18, 24, 31, 0.45);
+    }
+
+    .entry-panel .main-button {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      display: none;
+    }
+    
+    /* --- Forms & Buttons --- */
+    textarea#inputList {
+      display: block;
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-size: var(--font-size-lg);
+      text-align: center;
+      background: #F7F4EC;
+      border: 2px solid #DCD5C2;
+      border-radius: var(--border-radius-md);
+      box-shadow: 0 2px 8px rgba(18, 24, 31, 0.08);
+      transition: border-color 0.2s, box-shadow 0.3s;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    textarea#inputList:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(63, 123, 163, 0.16);
+      outline: none;
+    }
+
+.main-button {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 16px;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #241705;
+  background: var(--button-gradient);
+  border-radius: 11px;
+  box-shadow: 0 8px 18px -9px rgba(245, 166, 35, 0.7);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.main-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(18, 24, 31, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.main-button:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 2px 8px rgba(18, 24, 31, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+    /* --- Purchase History --- */
+    .history-title {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--ink);
+        margin-bottom: 0.75rem;
+    }
+
+    #purchaseHistory > p {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 1.5rem 0.5rem;
+      font-size: var(--font-size-md);
+    }
+    .purchase-list {
+      margin-bottom: 0.85rem;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #E4DCC6;
+      box-shadow: 0 2px 10px rgba(18, 24, 31, 0.1);
+      background: #fff;
+    }
+
+    .purchase-list.over {
+      border-color: var(--danger-color);
+    }
+
+    .purchase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.7rem 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      user-select: none;
+      cursor: pointer;
+      background: var(--paper);
+      color: var(--ink);
+      border-bottom: 1px solid var(--paper-3);
+      font-family: var(--font-display);
+    }
+
+    .purchase-list:nth-child(even) .purchase-header {
+      background: var(--paper-2);
+      color: var(--ink);
+    }
+
+    .purchase-header.over {
+      background: var(--danger-bg-color) !important;
+      color: var(--danger-color);
+      border-bottom-color: #f5c6cb;
+    }
+
+    .ph-date {
+      font-weight: 800;
+      font-size: 1.08rem;
+      flex: 0 0 auto;
+      color: #12181F;
+      letter-spacing: 0.02em;
+    }
+
+    .ph-budget {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.55rem;
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      min-width: 0;
+    }
+
+    .ph-budget-label {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #12181F;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      padding-bottom: 5px;
+    }
+
+    .budget-input,
+    .total-input {
+      width: auto;
+      min-width: 76px;
+      max-width: 120px;
+      min-height: auto;
+      padding: 0 8px 4px;
+      direction: ltr;
+      text-align: center;
+      border: none;
+      border-bottom: 2.5px solid #3F7BA3;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #12181F;
+      letter-spacing: 0.05em;
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.2s ease, color 0.2s ease;
+      -moz-appearance: textfield;
+    }
+
+    .budget-input::-webkit-outer-spin-button,
+    .budget-input::-webkit-inner-spin-button,
+    .total-input::-webkit-outer-spin-button,
+    .total-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .budget-input::placeholder,
+    .total-input::placeholder {
+      color: #DCD5C2;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      opacity: 0.85;
+    }
+
+    .budget-input:focus,
+    .total-input:focus {
+      outline: none;
+      border-bottom-color: #2E5D7D;
+      border-bottom-width: 3px;
+      padding-bottom: 3px;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .total-input {
+      min-width: 84px;
+      border-bottom-color: #2F9E5B;
+      color: #2F9E5B;
+    }
+
+    .total-input.edited {
+      border-bottom-color: var(--info-color);
+      color: var(--info-color);
+      background: transparent;
+    }
+
+    .purchase-list.closed .ph-budget { display: none; }
+    .ph-total { font-weight: 800; font-size: 1rem; }
+    .purchase-list.closed .ph-total { display: block; }
+
+    .purchase-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      padding: 0;
+      background: #fff;
+    }
+
+    .purchase-content.open {
+      max-height: 2000px;
+      padding: 0;
+    }
+
+    .table-scroll-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .purchase-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+
+    .purchase-table th,
+    .purchase-table td {
+      padding: 0.55rem 0.35rem;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #e3edf7;
+    }
+
+    .purchase-table thead th {
+      font-weight: 700;
+      background: #E4F5EB;
+      color: #2F9E5B;
+      border-bottom: 1px solid #C8EBD6;
+      padding: 0.6rem 0.35rem;
+    }
+
+    .purchase-table .col-buy { width: 11%; }
+    .purchase-table .col-item {
+      width: 34%;
+      text-align: start;
+      font-weight: 600;
+      word-break: break-word;
+      padding-inline: 0.45rem;
+    }
+    .purchase-table .col-qty { width: 18%; }
+    .purchase-table .col-price { width: 22%; }
+    .purchase-table .col-del { width: 15%; }
+
+    .purchase-table tbody tr {
+      background: #fff;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .purchase-table tbody tr:not(.checked):hover {
+      background-color: #F7F4EC;
+    }
+
+    .purchase-table tbody tr.checked {
+      color: var(--text-muted);
+      background: #F7F4EC;
+    }
+
+    .purchase-table tbody tr.checked .col-item {
+      text-decoration: line-through;
+    }
+
+    .purchase-table .col-buy input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #2E5D7D;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      color: var(--danger-color);
+      font-weight: 700;
+      font-size: 1.25rem;
+      line-height: 1;
+      user-select: none;
+      border-radius: 50%;
+      background: transparent;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .delete-btn:hover {
+      background: rgba(211, 47, 47, 0.1);
+      transform: scale(1.05);
+    }
+
+    .quantity-input,
+    .price-input {
+      width: 100%;
+      max-width: 64px;
+      min-height: 34px;
+      padding: 4px 6px;
+      font-size: 0.82rem;
+      text-align: center;
+      background: #fffef5;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      direction: ltr;
+    }
+
+    .quantity-input:focus,
+    .price-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(63, 123, 163, 0.15);
+    }
+
+    .total-row-table td {
+      padding: 0.65rem 0.35rem;
+      font-weight: 800;
+      font-size: 0.88rem;
+      background: #E4F5EB !important;
+      color: #2F9E5B;
+      border-bottom: none;
+      border-top: 1px solid #C8EBD6;
+      vertical-align: middle;
+    }
+
+    .total-row-table td.over,
+    .total-row-table.over td {
+      background: var(--danger-bg-color) !important;
+      color: var(--danger-color);
+    }
+
+    .total-row-table .totals-label {
+      text-align: start;
+      padding-inline: 0.45rem;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+    }
+
+    .total-row-table .sum-cell {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .total-row-table .sum-qty {
+      color: var(--steel);
+    }
+
+    .total-row-table .sum-price {
+      color: #1B6B3A;
+      font-size: 0.95rem;
+    }
+
+    .total-actions {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+
+    .total-actions > span:first-child {
+      padding-bottom: 5px;
+      font-weight: 800;
+      color: #2F9E5B;
+    }
+
+    .notes-btn {
+      display: block;
+      width: calc(100% - 1rem);
+      margin: 0.75rem auto 0.65rem;
+      padding: 0.65rem 1rem;
+      min-height: 44px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(180deg, #3F7BA3 0%, #3F7BA3 55%, #2E5D7D 100%);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(18, 24, 31, 0.22);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .notes-btn:hover {
+      box-shadow: 0 4px 14px rgba(18, 24, 31, 0.28);
+    }
+
+    .notes-btn:active {
+      transform: scale(0.99);
+    }
+
+    .notes-display {
+      margin: 0 0.5rem 0.65rem;
+      padding: 0.75rem;
+      background: #fffde7;
+      border: 1px solid #ffd54f;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.88rem;
+    }
+
+    .total-edited-mark {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: var(--info-color);
+      background: var(--info-bg-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* --- Modals (centered card) --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      inset: 0;
+      justify-content: center;
+      align-items: center;
+      background: rgba(12, 17, 22, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 18px;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      padding-top: calc(18px + env(safe-area-inset-top, 0px));
+    }
+
+    .modal.show { display: flex; }
+
+    .modal-content {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      padding: 1.35rem 1.2rem 1.2rem;
+      text-align: center;
+      background: linear-gradient(180deg, #ffffff 0%, var(--paper) 100%);
+      border: 1px solid var(--paper-3);
+      border-radius: 18px;
+      box-shadow: 0 18px 48px -12px rgba(18, 24, 31, 0.45);
+      transform: translateY(12px) scale(0.96);
+      opacity: 0;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-content::before {
+      content: '';
+      display: none;
+    }
+
+    .modal-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 0.85rem;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      background: var(--bad-bg);
+      border: 1px solid #F6C9C4;
+      color: var(--bad);
+    }
+
+    .modal-content h3 {
+      margin: 0 0 0.45rem;
+      font-family: var(--font-display);
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .modal-content p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 0.6rem;
+      margin-top: 1.2rem;
+    }
+
+    .modal-button {
+      flex: 1;
+      width: auto;
+      padding: 0.72rem 1rem;
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s, box-shadow 0.15s;
+      min-height: 46px;
+      border: none;
+    }
+
+    .modal-button:active {
+      transform: scale(0.97);
+    }
+
+    .modal-button:hover { opacity: 0.95; }
+    .modal-button.confirm {
+      background: linear-gradient(180deg, #ef5350 0%, #d32f2f 100%);
+      color: #fff;
+      box-shadow: 0 8px 16px -8px rgba(228, 72, 60, 0.65);
+      order: 2;
+    }
+    .modal-button.confirm-add {
+      background: linear-gradient(180deg, var(--amber-2), var(--amber));
+      color: #241705;
+      box-shadow: 0 8px 16px -8px rgba(245, 166, 35, 0.65);
+      order: 2;
+    }
+    .modal-button.cancel {
+      background: #fff;
+      border: 1.5px solid var(--paper-3);
+      color: var(--muted);
+      order: 1;
+    }
+
+    #addTabDialog input, #notesModalTextarea {
+        width: 100%;
+        margin-top: 0.85rem;
+        padding: 0.8rem 0.85rem;
+        font-size: var(--font-size-md);
+        border: 1.5px solid var(--border-color);
+        border-radius: 12px;
+        background: #f8f8ff;
+        transition: border-color 0.2s;
+    }
+    #addTabDialog input:focus, #notesModalTextarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+    #notesModalTextarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      padding: 1rem 1.5rem;
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--text-light);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      z-index: 4000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    #budgetToast { background: rgba(211, 47, 47, 0.95); }
+    #correctionToast 
+    { background: linear-gradient(135deg, rgba(46, 93, 125, 0.92), rgba(63, 123, 163, 0.88)
+    ); }
+
+    /* --- Footer removed --- */
+
+    /* --- Animations --- */
+.shake { animation: shake 0.4s; }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+.row-glow { animation: rowGlow 0.6s; }
+@keyframes rowGlow {
+  from { background-color: #fff3cd; }
+  to { background-color: inherit; }
+}
+
+/* --- Tablet & Mobile --- */
+@media (max-width: 768px) {
+  main.container {
+    margin: 0.5rem auto;
+    border-radius: var(--border-radius-md);
+  }
+
+  .container-body {
+    padding: 0.85rem;
+  }
+
+  .entry-panel {
+    padding: 0.75rem;
+  }
+
+  .history-title {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 520px) {
+  body {
+    background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+    overscroll-behavior-y: contain;
+  }
+
+  .header {
+    min-height: calc(60px + env(safe-area-inset-top, 0px));
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+
+  .header-home-btn,
+  .header-refresh-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .tab-btn {
+    max-width: 108px;
+    padding: 7px 16px 9px;
+    font-size: 0.74rem;
+    margin-inline-end: -8px;
+  }
+
+  .tab-btn.active {
+    max-width: 128px;
+    min-height: 40px;
+    padding: 9px 18px 11px;
+    font-size: 0.84rem;
+  }
+
+  .tab-add-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1.1rem;
+  }
+
+  #datetime .header-day {
+    font-size: 1.18rem;
+  }
+
+  #datetime .header-date {
+    font-size: 0.66rem;
+  }
+
+  main.container {
+    margin: 0.4rem;
+    max-width: calc(100vw - 0.8rem);
+    width: auto;
+    border-radius: 14px;
+  }
+
+  .container-body {
+    padding: 0.75rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .entry-panel {
+    padding: 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+
+  textarea#inputList {
+    font-size: 16px;
+    min-height: 88px;
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .main-button {
+    font-size: var(--font-size-md);
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .tab-add-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1.2rem;
+  }
+
+  .history-title {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .purchase-list {
+    border-radius: 12px;
+    margin-bottom: 0.65rem;
+  }
+
+  .budget-input,
+  .quantity-input,
+  .price-input,
+  .total-input,
+  #addTabDialog input,
+  #notesModalTextarea {
+    font-size: 16px;
+  }
+
+  .budget-input,
+  .quantity-input,
+  .price-input,
+  .total-input {
+    min-height: auto;
+  }
+
+  .purchase-table th,
+  .purchase-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.78rem;
+  }
+
+  .purchase-table .col-item {
+    font-size: 0.86rem;
+  }
+
+  .quantity-input,
+  .price-input {
+    max-width: 58px;
+    min-height: 36px;
+  }
+
+  .budget-input {
+    min-width: 68px;
+    font-size: 1.05rem;
+    padding-bottom: 5px;
+  }
+
+  .total-input {
+    min-width: 76px;
+    width: auto;
+    padding-bottom: 5px;
+  }
+
+  /* إشعارات في الأعلى */
+  .toast {
+    top: calc(4.5rem + env(safe-area-inset-top, 0px));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) scale(0.9);
+    width: calc(100vw - 2rem);
+    max-width: 320px;
+    text-align: center;
+    font-size: var(--font-size-md);
+    padding: 0.85rem 1rem;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@media (max-width: 360px) {
+  #datetime .header-day {
+    font-size: 1.05rem;
+  }
+
+  #datetime .header-date {
+    font-size: 0.62rem;
+  }
+
+  .purchase-table .col-item {
+    font-size: 0.8rem;
+  }
+}
+
+/* إلغاء تأثيرات hover على الشاشات اللمسية */
+@media (hover: none) and (pointer: coarse) {
+  .header-refresh-btn:hover,
+  .main-button:hover,
+  .tab-add-btn:hover,
+  .tab-btn:hover,
+  .delete-btn:hover,
+  .notes-btn:hover,
+  .modal-button:hover {
+    transform: none;
+    box-shadow: inherit;
+    opacity: 1;
+    background: inherit;
+  }
+
+  .main-button:active {
+    transform: scale(0.98);
+  }
+
+  .tab-btn:active {
+    transform: scale(0.97);
+  }
+
+  .tab-add-btn:active {
+    transform: scale(0.92);
+  }
+}
+
+
+/* إجبار كل النصوص الرقمية على استخدام الأرقام الإنجليزية */
+
+
+/* فرض الأرقام الإنجليزية على كل العناصر */
+* {
+  font-variant-numeric: lining-nums !important;
+  font-feature-settings: "lnum" 1 !important;
+  -moz-font-feature-settings: "lnum" 1 !important;
+  -webkit-font-feature-settings: "lnum" 1 !important;
+}
+
+/* التأكد من الأرقام الإنجليزية في الحقول */
+input[type="number"],
+input[type="text"],
+textarea,
+.ph-date,
+.budget-input,
+.price-input,
+.quantity-input,
+.total-input,
+.ph-total,
+td,
+th {
+  font-family: 'Tajawal', Arial, sans-serif !important;
+  font-variant-numeric: lining-nums !important;
+  font-feature-settings: "lnum" 1 !important;
+  -moz-font-feature-settings: "lnum" 1 !important;
+  -webkit-font-feature-settings: "lnum" 1 !important;
+}
+
+/* الحفاظ على اتجاه النص العربي */
+html, body {
+  font-family: 'Tajawal', Arial, sans-serif;
+  direction: rtl;
+}
+
+
+
+
+
+
+
+/* إجبار جميع النصوص على استخدام الأرقام الإنجليزية */
+html, body, *:lang(ar) {
+  font-family: 'Tajawal', Arial, sans-serif;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  font-variant-numeric: normal;
+  font-feature-settings: "lnum";
+}
+.purchase-list {
+  transition: all 0.2s ease;
+}
+
+.total-input {
+  transition: all 0.2s ease;
+}
+
+.total-edited-mark {
+  transition: opacity 0.2s ease;
+}
+  
+  </style>
+</head>
+<body>
+  
+  <!-- Toasts -->
+  <div class="toast" id="budgetToast"></div>
+  <div class="toast" id="correctionToast">✅ تم التصحيح</div>
+  
+  <!-- Modals -->
+  <div id="deleteTabModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-icon" aria-hidden="true">🗑️</div>
+      <h3>حذف التبويب</h3>
+      <p>هل أنت متأكد من حذف هذا التبويب مع كل القوائم داخله؟</p>
+      <div class="modal-buttons">
+        <button class="modal-button cancel" data-action="cancel">إلغاء</button>
+        <button class="modal-button confirm" data-action="confirm">حذف</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="deleteListModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-icon" aria-hidden="true">🗑️</div>
+      <h3>حذف القائمة</h3>
+      <p>هل أنت متأكد أنك تريد حذف هذه القائمة بالكامل؟ لا يمكن التراجع عن ذلك.</p>
+      <div class="modal-buttons">
+        <button class="modal-button cancel" data-action="cancel">إلغاء</button>
+        <button class="modal-button confirm" data-action="confirm">نعم، حذف</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="addTabModal" class="modal">
+    <div class="modal-content" id="addTabDialog">
+      <h3>إضافة تبويب جديد</h3>
+      <input id="addTabInput" type="text" maxlength="18" placeholder="اسم التبويب" dir="auto"/>
+      <div class="modal-buttons">
+        <button id="addTabOk" class="modal-button confirm-add">إضافة</button>
+        <button id="addTabCancel" class="modal-button cancel">إلغاء</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="notesModal" class="modal">
+    <div class="modal-content">
+      <h3>📝 ملاحظات القائمة</h3>
+      <textarea id="notesModalTextarea" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+      <div class="modal-buttons">
+        <button class="modal-button confirm-add notes-modal-save">حفظ</button>
+        <button class="modal-button cancel notes-modal-cancel">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="hd-row">
+      <div class="hd-title">
+        <div class="mark" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2h12v4H6z"/>
+            <path d="M4 6h16l-1.5 14h-13z"/>
+            <path d="M9 10v6M15 10v6"/>
+          </svg>
+        </div>
+        <div>
+          <h1>قوائم المشتريات</h1>
+          <time id="datetime"></time>
+        </div>
+      </div>
+      <div class="hd-icons">
+        <a href="https://khalidsaif912.github.io/new/" class="header-home-btn icon-btn" id="homeBtn" title="العودة للروستر" aria-label="العودة للروستر">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        </a>
+        <button type="button" class="header-refresh-btn icon-btn" id="refreshBtn" title="تحديث الصفحة" aria-label="تحديث الصفحة">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v6h-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  
+<main class="container" id="mainContainer">
+    <div class="tabs-wrap">
+      <div class="tabs-nav" id="tabsNav"></div>
+      <button type="button" id="addTabBtn" class="tab-add-btn" title="إضافة تبويب جديد" aria-label="إضافة تبويب جديد">+</button>
+    </div>
+    <div class="container-body">
+    <div class="entry-panel">
+    <h2 class="section-title">إضافة قائمة مشتريات جديدة 📝</h2>
+    <textarea id="inputList" placeholder="الصق قائمة المشتريات هنا..."></textarea>
+    <button id="addBtn" class="main-button" aria-label="إضافة الأغراض">إضافة الأغراض</button>
+    </div>
+    <h3 class="history-title">سجل القوائم السابقة</h3>
+    <div id="purchaseHistory" aria-live="polite"></div>
+    </div>
+</main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- DOM Elements ---
+        const DOMElements = {
+            inputList: document.getElementById("inputList"),
+            addBtn: document.getElementById("addBtn"),
+            purchaseHistory: document.getElementById("purchaseHistory"),
+            tabsNav: document.getElementById("tabsNav"),
+            addTabBtn: document.getElementById("addTabBtn"),
+            addTabModal: document.getElementById("addTabModal"),
+            addTabInput: document.getElementById("addTabInput"),
+            addTabOk: document.getElementById("addTabOk"),
+            addTabCancel: document.getElementById("addTabCancel"),
+            notesModal: document.getElementById("notesModal"),
+            notesModalTextarea: document.getElementById("notesModalTextarea"),
+            budgetToast: document.getElementById("budgetToast"),
+            correctionToast: document.getElementById("correctionToast"),
+            mainContainer: document.getElementById("mainContainer"),
+            dateTime: document.getElementById("datetime"),
+            deleteTabModal: document.getElementById("deleteTabModal"),
+            deleteListModal: document.getElementById("deleteListModal"),
+
+
+        };
+
+        // --- State Management ---
+        const TABS_KEY = "shoppingTabs2025_v2";
+        let state = {
+            tabs: [],
+            currentTab: 0,
+        };
+
+        const loadState = () => {
+            const data = localStorage.getItem(TABS_KEY);
+            state.tabs = data ? JSON.parse(data) : [{ name: "المنزل", lists: [] }];
+            if (state.currentTab >= state.tabs.length) {
+                state.currentTab = Math.max(0, state.tabs.length - 1);
+            }
+        };
+
+        const saveState = () => {
+            localStorage.setItem(TABS_KEY, JSON.stringify(state.tabs));
+        };
+
+        // --- Utility Functions ---
+// تحويل الأرقام العربية إلى إنجليزية
+        const convertToEnglishNumbers = (str) => {
+            const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            let result = str;
+            for (let i = 0; i < arabicNumbers.length; i++) {
+                result = result.replace(new RegExp(arabicNumbers[i], 'g'), englishNumbers[i]);
+            }
+            return result;
+        };
+
+const updateDateTime = () => {
+    const now = new Date();
+    const dayName = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+    const datePart = now.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    DOMElements.dateTime.innerHTML =
+        `<span class="header-day">${convertToEnglishNumbers(dayName)}</span>` +
+        `<span class="header-date">${convertToEnglishNumbers(datePart)}</span>`;
+};
+        
+        const showToast = (element, message, duration = 2000) => {
+            if(message) element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => element.classList.remove('show'), duration);
+        };
+        
+        const showModal = (modalElement) => {
+            modalElement.classList.add('show');
+        };
+        
+        const hideModal = (modalElement) => {
+            modalElement.classList.remove('show');
+        };
+
+
+
+
+
+
+
+
+
+
+
+const parseInputToItems = (input) => {
+  const lines = input
+    .split(/[\n\r]+/)
+    .map(line => line.trim())
+    .filter(line => line);
+
+  const items = [];
+  const seen = new Set();
+
+  lines.forEach(line => {
+    let cleanLine = line;
+
+    // إزالة تنسيقات الواتساب
+    cleanLine = cleanLine.replace(/^\[.+?\]\s*/, "");     // التوقيت
+    cleanLine = cleanLine.replace(/^[^:]+:\s*/, "");      // أسماء المرسلين
+    cleanLine = cleanLine.replace(/^[\d\-•\*\+.\)]+\s*/, ""); // أرقام أو رموز في البداية
+
+    // إزالة الإيموجي والرموز
+    cleanLine = cleanLine.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, "");
+    cleanLine = cleanLine.trim().replace(/\s+/g, " ");
+
+    if (!cleanLine) return;
+
+    // افصل فقط عند فواصل واضحة (فاصلة / و / شرطة محاطة بمسافات)
+    // لا تفصل على المسافات حتى تبقى أسماء مثل "فلفل كبار" و"فلفل أخضر" كاملة
+    const subItems = cleanLine
+      .split(/\s+و\s+|[,،|]+|(?:\s+[-–—]\s+)/)
+      .map(item => item.trim().replace(/\s+/g, " "))
+      .filter(item => item);
+
+    subItems.forEach(item => {
+      if (seen.has(item)) return;
+      seen.add(item);
+      items.push(item);
+    });
+  });
+
+  return items;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // --- Rendering Logic ---
+        const renderTabs = () => {
+            const { tabsNav } = DOMElements;
+            tabsNav.innerHTML = "";
+
+            state.tabs.forEach((tab, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "tab-btn tab-tone-" + (index % 5) + (index === state.currentTab ? " active" : "");
+                btn.textContent = tab.name;
+                btn.dataset.index = index;
+
+                btn.addEventListener("click", () => {
+                    if (state.currentTab === index) return;
+                    state.currentTab = index;
+                    saveState();
+                    render();
+                });
+
+                let tabPressTimer = null;
+                btn.addEventListener("pointerdown", () => {
+                    if (index !== state.currentTab) return;
+                    tabPressTimer = setTimeout(() => {
+                        showModal(DOMElements.deleteTabModal);
+                        DOMElements.deleteTabModal.dataset.tabToDelete = index;
+                    }, 600);
+                });
+                btn.addEventListener("pointerup", () => clearTimeout(tabPressTimer));
+                btn.addEventListener("pointercancel", () => clearTimeout(tabPressTimer));
+                btn.addEventListener("pointerleave", () => clearTimeout(tabPressTimer));
+
+                tabsNav.appendChild(btn);
+            });
+
+            requestAnimationFrame(() => {
+                const activeTab = tabsNav.querySelector(".tab-btn.active");
+                if (activeTab) {
+                    activeTab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                }
+            });
+        };
+
+        const renderPurchaseHistory = () => {
+            const { purchaseHistory } = DOMElements;
+            purchaseHistory.innerHTML = '';
+            const currentList = state.tabs[state.currentTab]?.lists;
+
+            if (!currentList || currentList.length === 0) {
+                purchaseHistory.innerHTML = '<p>لا توجد قوائم محفوظة بعد.</p>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            currentList.forEach((purchase, listIndex) => {
+                // Sanitize data
+                purchase.open = purchase.open ?? true;
+                purchase.budget = purchase.budget ?? "";
+                
+                // Skip rendering empty lists and schedule them for removal
+                if (!purchase.items || purchase.items.length === 0) {
+                  setTimeout(() => {
+                    state.tabs[state.currentTab].lists.splice(listIndex, 1);
+                    saveState();
+                    render();
+                  }, 50);
+                  return;
+                }
+
+                const sortedItems = [...purchase.items].sort((a, b) => Number(a.checked) - Number(b.checked));
+                const qtySum = purchase.items.reduce((sum, it) => sum + (parseInt(it.quantity, 10) || 0), 0);
+                const priceSum = purchase.items.reduce((sum, it) => sum + (parseFloat(it.price) || 0), 0);
+                const moneyTotal = purchase.items.reduce((sum, it) => {
+                    const q = parseInt(it.quantity, 10) || 0;
+                    const p = parseFloat(it.price) || 0;
+                    return sum + (p * q);
+                }, 0);
+                const budgetVal = parseFloat(purchase.budget) || 0;
+                const isOver = budgetVal > 0 && moneyTotal > budgetVal;
+
+                const formatPlainSum = (n) => {
+                    if (!n) return '—';
+                    return String(n);
+                };
+                const formatPriceSum = (n) => {
+                    if (!n) return '—';
+                    return Number(n).toFixed(3).replace(/\.?0+$/, '');
+                };
+                
+                const listDiv = document.createElement('div');
+                listDiv.className = `purchase-list ${isOver ? 'over' : ''} ${purchase.open ? '' : 'closed'}`;
+                listDiv.dataset.listIndex = listIndex;
+
+                const displayTotal = purchase.manualTotal ?? formatPriceSum(moneyTotal);
+
+                listDiv.innerHTML = `
+                    <div class="purchase-header ${isOver ? 'over' : ''}">
+                        <span class="ph-date">${purchase.date}</span>
+                        ${purchase.open ? 
+                            `<span class="ph-budget">
+                                <span class="ph-budget-label">الميزانية : ريال</span>
+                                <input class="budget-input" type="number" min="0" step="0.1" value="${purchase.budget}" placeholder="ـــــ" inputmode="decimal"/>
+                             </span>` :
+                            `<span class="ph-total">المجموع: ${displayTotal === '—' ? '—' : displayTotal + ' ر.ع.'}</span>`
+                        }
+                    </div>
+                    <div class="purchase-content ${purchase.open ? 'open' : ''}">
+                        <div class="table-scroll-wrap">
+                        <table class="purchase-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-buy">✓</th>
+                                    <th class="col-item">الصنف</th>
+                                    <th class="col-qty">الكمية</th>
+                                    <th class="col-price">السعر</th>
+                                    <th class="col-del">🗑️</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sortedItems.map(item => {
+                                    const itemIndex = purchase.items.findIndex(i => i === item);
+                                    const qtyVal = (item.quantity !== undefined && item.quantity !== null && String(item.quantity).trim() !== '')
+                                        ? item.quantity
+                                        : '';
+                                    const priceRaw = item.price;
+                                    const priceNum = parseFloat(priceRaw);
+                                    const priceVal = (priceRaw !== undefined && priceRaw !== null && String(priceRaw).trim() !== '' && !isNaN(priceNum) && priceNum !== 0)
+                                        ? priceRaw
+                                        : '';
+                                    return `
+                                    <tr class="${item.checked ? 'checked' : ''}" data-item-index="${itemIndex}">
+                                        <td><input type="checkbox" ${item.checked ? 'checked' : ''}/></td>
+                                        <td class="col-item">${item.item}</td>
+                                        <td><input class="quantity-input" type="number" min="1" value="${qtyVal}" placeholder="" inputmode="numeric"/></td>
+                                        <td><input class="price-input" type="number" min="0" step="any" value="${priceVal}" placeholder="" inputmode="decimal"/></td>
+                                        <td><span class="delete-btn">×</span></td>
+                                    </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row-table ${isOver ? 'over' : ''}">
+                                    <td></td>
+                                    <td class="col-item totals-label">المجموع</td>
+                                    <td class="sum-cell sum-qty">${formatPlainSum(qtySum)}</td>
+                                    <td class="sum-cell sum-price">${formatPriceSum(priceSum)}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        </div>
+                        <button class="notes-btn">📝 الملاحظات</button>
+                        ${purchase.notes ? `<div class="notes-display">${purchase.notes}</div>` : ''}
+                    </div>
+                `;
+                fragment.appendChild(listDiv);
+            });
+            purchaseHistory.appendChild(fragment);
+        };
+
+        const render = () => {
+            renderTabs();
+            renderPurchaseHistory();
+        };
+
+        // --- Event Handlers & Logic ---
+        const handleAddItem = () => {
+            const input = DOMElements.inputList.value.trim();
+            if (!input) {
+                alert('يرجى إدخال قائمة الأغراض');
+                return;
+            }
+            const items = parseInputToItems(input);
+            // استخدام التاريخ الإنجليزي
+const now = new Date();
+const day = String(now.getDate()).padStart(2, '0');
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const year = now.getFullYear();
+const today = `${year}/${month}/${day}`;
+            
+            let todayPurchase = state.tabs[state.currentTab].lists.find(p => p.date === today);
+            if (!todayPurchase) {
+                todayPurchase = { date: today, items: [], notes: '', open: true, budget: "" };
+                state.tabs[state.currentTab].lists.unshift(todayPurchase);
+            }
+
+            items.forEach(itemName => {
+                if (!todayPurchase.items.some(i => i.item === itemName)) {
+                    todayPurchase.items.push({ item: itemName, quantity: '', price: '', checked: false });
+                }
+            });
+
+            saveState();
+            DOMElements.inputList.value = '';
+            render();
+        };
+
+        const handleHistoryClick = (e) => {
+            const listDiv = e.target.closest('.purchase-list');
+            if (!listDiv) return;
+            const listIndex = parseInt(listDiv.dataset.listIndex);
+            const purchase = state.tabs[state.currentTab].lists[listIndex];
+            
+            // Toggle list open/close
+            if (e.target.closest('.purchase-header') && !e.target.closest('.ph-budget')) {
+                purchase.open = !purchase.open;
+                saveState();
+                render();
+            }
+            
+            // Delete item
+            if (e.target.classList.contains('delete-btn')) {
+                const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                purchase.items.splice(itemIndex, 1);
+                saveState();
+                render();
+            }
+
+            // Show notes
+            if (e.target.classList.contains('notes-btn')) {
+                DOMElements.notesModalTextarea.value = purchase.notes || '';
+                DOMElements.notesModal.dataset.listIndex = listIndex;
+                showModal(DOMElements.notesModal);
+            }
+
+            // Check item
+            if (e.target.type === 'checkbox') {
+                 const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                 purchase.items[itemIndex].checked = e.target.checked;
+                 saveState();
+                 render();
+            }
+        };
+
+        const handleHistoryChange = (e) => {
+            const listDiv = e.target.closest('.purchase-list');
+            if (!listDiv) return;
+            const listIndex = parseInt(listDiv.dataset.listIndex);
+            const purchase = state.tabs[state.currentTab].lists[listIndex];
+            const originalTotal = purchase.items.reduce((sum, it) => {
+                const q = parseInt(it.quantity, 10) || 0;
+                const p = parseFloat(it.price) || 0;
+                return sum + (p * q);
+            }, 0);
+
+            // Update budget, quantity, or price
+            if (e.target.classList.contains('budget-input')) {
+                purchase.budget = e.target.value;
+            } else if (e.target.classList.contains('quantity-input')) {
+                const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                purchase.items[itemIndex].quantity = e.target.value;
+                delete purchase.manualTotal;
+            } else if (e.target.classList.contains('price-input')) {
+                const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                const raw = e.target.value;
+                purchase.items[itemIndex].price = (raw === '' || Number(raw) === 0) ? '' : raw;
+                delete purchase.manualTotal;
+            } else if (e.target.classList.contains('total-input')) {
+                if (parseFloat(e.target.value).toFixed(2) !== originalTotal.toFixed(2)) {
+                    purchase.manualTotal = e.target.value;
+                } else {
+                    delete purchase.manualTotal;
+                }
+            }
+            saveState();
+            render();
+        };
+
+const handleHistoryDblClick = (e) => {
+    e.preventDefault(); // 🚫 يمنع الحركة الافتراضية في الهاتف
+
+    const tr = e.target.closest('tbody tr');
+    if (tr && !e.target.matches('input, .delete-btn')) {
+        const listIndex = parseInt(tr.closest('.purchase-list').dataset.listIndex);
+        const itemIndex = parseInt(tr.dataset.itemIndex);
+        const item = state.tabs[state.currentTab].lists[listIndex].items[itemIndex];
+        item.quantity = '';
+        item.price = '';
+        tr.classList.add('row-glow');
+        setTimeout(() => tr.classList.remove('row-glow'), 600);
+        saveState();
+        render();
+    }
+
+    const totalActions = e.target.closest('.total-actions');
+    if (totalActions && !e.target.matches('.total-input')) {
+        const listIndex = parseInt(totalActions.closest('.purchase-list').dataset.listIndex);
+        const purchase = state.tabs[state.currentTab].lists[listIndex];
+
+        // ✅ لا يتم التصحيح إلا إذا كان فيه تعديل
+        if (purchase.manualTotal) {
+            delete purchase.manualTotal;
+            saveState();
+            render();
+            showToast(DOMElements.correctionToast);
+        }
+    }
+};
+
+        
+// --- Initialization ---
+const init = () => {
+    // Load initial data
+    loadState();
+
+    // Initial render
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+    window.addEventListener('resize', updateDateTime);
+    render();
+
+    document.addEventListener('focusin', (e) => {
+        if (e.target.matches('textarea, input[type="number"], input[type="text"]')) {
+            setTimeout(() => {
+                e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 350);
+        }
+    });
+
+    // Attach event listeners
+    DOMElements.addBtn.addEventListener('click', handleAddItem);
+    DOMElements.purchaseHistory.addEventListener('click', handleHistoryClick);
+    DOMElements.purchaseHistory.addEventListener('change', handleHistoryChange);
+    DOMElements.purchaseHistory.addEventListener('dblclick', handleHistoryDblClick);
+
+
+
+const startListPress = (evt) => {
+    const header = evt.target.closest(".purchase-header");
+    if (!header) return;
+    listLongPressFired = false;
+    listPressTimer = setTimeout(() => {
+        listLongPressFired = true;
+        const listDiv = header.closest(".purchase-list");
+        if (listDiv) {  // ✅ تحقق أنه موجود
+            DOMElements.deleteListModal.dataset.listToDelete = listDiv.dataset.listIndex;
+            showModal(DOMElements.deleteListModal);
+        }
+    }, 600);
+};
+
+
+
+
+
+
+    const cancelListPress = () => {
+        if (listPressTimer) {
+            clearTimeout(listPressTimer);
+            listPressTimer = null;
+        }
+    };
+
+    DOMElements.purchaseHistory.addEventListener("pointerdown", startListPress);
+    DOMElements.purchaseHistory.addEventListener("pointerup", cancelListPress);
+    DOMElements.purchaseHistory.addEventListener("pointerleave", cancelListPress);
+    DOMElements.purchaseHistory.addEventListener("pointercancel", cancelListPress);
+
+    // ✅ Delete List Modal actions
+    DOMElements.deleteListModal.addEventListener("click", (e) => {
+        if (e.target.dataset.action === "confirm") {
+            const listIndex = parseInt(DOMElements.deleteListModal.dataset.listToDelete);
+            state.tabs[state.currentTab].lists.splice(listIndex, 1);
+            saveState();
+            render();
+            hideModal(DOMElements.deleteListModal);
+        } else if (e.target.dataset.action === "cancel") {
+            hideModal(DOMElements.deleteListModal);
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Add Tab Modal
+    DOMElements.addTabBtn.addEventListener('click', () => {
+        DOMElements.addTabInput.value = '';
+        showModal(DOMElements.addTabModal);
+        DOMElements.addTabInput.focus();
+    });
+
+    DOMElements.addTabCancel.addEventListener('click', () => hideModal(DOMElements.addTabModal));
+    DOMElements.addTabOk.addEventListener('click', () => {
+        const name = DOMElements.addTabInput.value.trim();
+        if (name) {
+            state.tabs.push({ name: name.slice(0, 18), lists: [] });
+            state.currentTab = state.tabs.length - 1;
+            saveState();
+            render();
+            hideModal(DOMElements.addTabModal);
+        }
+    });
+
+    // Notes Modal
+    DOMElements.notesModal.querySelector('.notes-modal-save').addEventListener('click', () => {
+        const listIndex = parseInt(DOMElements.notesModal.dataset.listIndex);
+        state.tabs[state.currentTab].lists[listIndex].notes = DOMElements.notesModalTextarea.value.trim();
+        saveState();
+        render();
+        hideModal(DOMElements.notesModal);
+    });
+    DOMElements.notesModal.querySelector('.notes-modal-cancel').addEventListener('click', () => hideModal(DOMElements.notesModal));
+
+    // ✅ Delete Tab Modal
+    DOMElements.deleteTabModal.addEventListener("click", (e) => {
+        if (e.target.dataset.action === "confirm") {
+            const tabIndex = parseInt(DOMElements.deleteTabModal.dataset.tabToDelete);
+            if (state.tabs.length > 1) {
+                state.tabs.splice(tabIndex, 1);
+                state.currentTab = Math.max(0, state.currentTab - 1);
+                saveState();
+                render();
+            } else {
+                alert("لا يمكن حذف جميع التبويبات. يجب أن يبقى واحد على الأقل.");
+            }
+            hideModal(DOMElements.deleteTabModal);
+        } else if (e.target.dataset.action === "cancel") {
+            hideModal(DOMElements.deleteTabModal);
+        }
+    });
+};
+
+init();
+
+    });
+  </script>
+  <script>
+    function getRosterHomeUrl() {
+      var rosterHome = 'https://khalidsaif912.github.io/new/';
+      var path = location.pathname || '';
+
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') {
+          try {
+            return new URL('/' + segs[0] + '/', location.origin).toString();
+          } catch (e) {}
+        }
+      }
+
+      if (/\/docs\/QuickList(\/|$)/i.test(path) || /^\/docs\//.test(path)) {
+        try {
+          return new URL('../../', location.href).toString();
+        } catch (e) {}
+      }
+
+      return rosterHome;
+    }
+
+  (function setupHeaderButtons() {
+    var homeBtn = document.getElementById('homeBtn');
+    if (homeBtn) {
+      homeBtn.href = getRosterHomeUrl();
+      homeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.assign(getRosterHomeUrl());
+      });
+    }
+
+    var refreshBtn = document.getElementById('refreshBtn');
+    if (!refreshBtn) return;
+
+    function hardRefreshQuickList() {
+      refreshBtn.classList.add('spinning');
+      var url = new URL(window.location.href);
+      url.searchParams.set('v', String(Date.now()));
+
+      function reload() {
+        window.setTimeout(function() {
+          window.location.replace(url.toString());
+        }, 120);
+      }
+
+      var tasks = [];
+      if ('serviceWorker' in navigator) {
+        tasks.push(
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            return Promise.all(regs.map(function(reg) { return reg.unregister(); }));
+          })
+        );
+      }
+      if (window.caches && caches.keys) {
+        tasks.push(
+          caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(key) { return caches.delete(key); }));
+          })
+        );
+      }
+
+      if (tasks.length) {
+        Promise.all(tasks).then(reload).catch(reload);
+      } else {
+        reload();
+      }
+    }
+
+    refreshBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      hardRefreshQuickList();
+    });
+  })();
+  </script>
+  <!-- ✅ تسجيل Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js?v=3").then(function(reg) {
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        reg.addEventListener('updatefound', function() {
+          var worker = reg.installing;
+          if (!worker) return;
+          worker.addEventListener('statechange', function() {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              worker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
+        console.log("✅ Service Worker Registered");
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (window.__qlSwReloading) return;
+        window.__qlSwReloading = true;
+        window.location.reload();
+      });
+    }
+    <!-- زر إضافة تبويب جديد -->
+
+    
+
+// === منع النسخ والتحديد بشكل شامل ===
+
+// منع النسخ والقص واللصق خارج inputList
+["copy", "cut", "paste"].forEach(eventType => {
+  document.addEventListener(eventType, (e) => {
+    if (e.target.id !== "inputList" && !e.target.classList.contains("notes-modal-textarea")) {
+      e.preventDefault();
+      return false;
+    }
+  });
+});
+
+// منع تحديد النص بالماوس (selectstart) — مع السماح للحقول
+document.addEventListener("selectstart", (e) => {
+  if (e.target.matches("input, textarea")) return;
+  e.preventDefault();
+  return false;
+});
+
+// منع قائمة السياق (الزر الأيمن)
+document.addEventListener("contextmenu", (e) => {
+  if (e.target.id !== "inputList" && e.target.id !== "notesModalTextarea") {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// منع اختصارات لوحة المفاتيح
+document.addEventListener("keydown", (e) => {
+  // منع Ctrl+A (تحديد الكل)
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+    if (e.target.id !== "inputList" && e.target.id !== "notesModalTextarea") {
+      e.preventDefault();
+      return false;
+    }
+  }
+  
+  // منع Ctrl+C (نسخ) و Ctrl+X (قص) و Ctrl+V (لصق)
+  if ((e.ctrlKey || e.metaKey) && ["c", "x", "v"].includes(e.key.toLowerCase())) {
+    if (e.target.id !== "inputList" && e.target.id !== "notesModalTextarea") {
+      e.preventDefault();
+      return false;
+    }
+  }
+});
+
+// منع السحب والإفلات للنصوص
+document.addEventListener("dragstart", (e) => {
+  if (e.target.id !== "inputList") {
+    e.preventDefault();
+    return false;
+  }
+});
+
+
+
+  </script>
+</body>
+</html>

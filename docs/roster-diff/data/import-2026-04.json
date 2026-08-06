@@ -1,0 +1,9 @@
+{
+  "kind": "import",
+  "month": "2026-04",
+  "generated_at": "2026-04-28T07:29:41.822190Z",
+  "old_file": "previous.xlsx",
+  "new_file": "current.xlsx",
+  "total_changes": 0,
+  "changes": []
+}

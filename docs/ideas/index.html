@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e40af">
+  <title>اقتراحات وأفكار</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: calc(16px + var(--safe-top)) 14px calc(36px + var(--safe-bottom));
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color: #fff;
+      padding: 26px 18px 22px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(30, 64, 175, .14);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before, .header::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .08);
+    }
+    .header::before { top: -30px; right: -40px; width: 140px; height: 140px; }
+    .header::after { bottom: -50px; left: -30px; width: 160px; height: 160px; background: rgba(255, 255, 255, .06); }
+    .header a.back {
+      position: absolute; top: 12px; right: 12px; z-index: 4;
+      color: #fff; text-decoration: none; font-size: 12px; font-weight: 800;
+      background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 999px; padding: 6px 12px;
+    }
+    .header button.adminGear {
+      position: absolute; top: 12px; left: 12px; z-index: 4;
+      border: 0; background: rgba(255, 255, 255, .16); color: #fff;
+      border-radius: 999px; width: 36px; height: 36px; font-size: 16px; cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .22);
+    }
+    .bannerTitleEyebrow {
+      position: relative; z-index: 1;
+      display: block; font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; opacity: .9; margin-bottom: 6px;
+    }
+    .bannerTitleMain {
+      position: relative; z-index: 1;
+      display: block; font-size: 26px; font-weight: 800; letter-spacing: 0; margin: 0;
+    }
+    .header p.lead {
+      position: relative; z-index: 1;
+      margin: 10px auto 0; max-width: 34ch;
+      font-size: 13px; line-height: 1.5; font-weight: 600; opacity: .92;
+    }
+
+    .summaryBar {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 14px; justify-content: center;
+    }
+    .summaryChip {
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, .1);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+      min-width: 86px;
+      text-align: center;
+    }
+    .summaryChip .chipVal {
+      font-size: 22px; font-weight: 900; color: #1e40af; line-height: 1.1;
+    }
+    .summaryChip .chipLabel {
+      margin-top: 4px; font-size: 10px; font-weight: 800;
+      color: #64748b; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .summaryChip.score .chipVal { color: #d97706; }
+    .summaryChip.pin .chipVal { color: #7c3aed; }
+
+    .composeCard, .ideaCard, .adminBar {
+      margin-top: 16px;
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, .07);
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .08);
+      overflow: hidden;
+    }
+    .composeCard .topBar, .ideaCard .topBar {
+      height: 5px;
+      background: linear-gradient(to left, #2563eb, #0ea5e9);
+    }
+    .composeCard .body, .ideaCard .body { padding: 16px 16px 14px; }
+    .composeCard h2 {
+      margin: 0 0 6px; font-size: 16px; font-weight: 800; color: #0f172a;
+    }
+    .composeCard .hint {
+      margin: 0 0 12px; font-size: 12px; color: #64748b; font-weight: 600; line-height: 1.45;
+    }
+    label.field {
+      display: block; margin: 0 0 10px;
+      font-size: 12px; font-weight: 800; color: #334155;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 15px;
+      color: #0f172a;
+      background: #f8fafc;
+      outline: none;
+      resize: vertical;
+      min-height: 96px;
+    }
+    textarea:focus, input[type="text"]:focus {
+      border-color: #60a5fa;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+    .row-opts {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin: 10px 0 14px;
+    }
+    .anonSwitch {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; color: #334155; cursor: pointer;
+      user-select: none;
+    }
+    .anonSwitch input { width: 18px; height: 18px; accent-color: #2563eb; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      border: 0; border-radius: 999px; min-height: 44px; padding: 0 18px;
+      font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: #fff; box-shadow: 0 6px 16px rgba(37, 99, 235, .25);
+    }
+    .btn-muted {
+      background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0;
+    }
+    .btn-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .btn-pin { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+    .msg {
+      margin: 10px 0 0; min-height: 18px; font-size: 12px; font-weight: 700; color: #64748b;
+    }
+    .msg.ok { color: #15803d; }
+    .msg.err { color: #b91c1c; }
+
+    .sectionHead {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin: 22px 4px 10px;
+    }
+    .sectionHead h2 {
+      margin: 0; font-size: 15px; font-weight: 800; color: #1e293b;
+    }
+    .sectionHead span {
+      font-size: 12px; font-weight: 800; color: #64748b;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 4px 10px;
+    }
+
+    .ideaCard { position: relative; }
+    .ideaCard.pinned {
+      border-color: #c4b5fd;
+      box-shadow: 0 6px 22px rgba(124, 58, 237, .12);
+    }
+    .ideaCard.pinned .topBar {
+      background: linear-gradient(to left, #7c3aed, #a78bfa);
+    }
+    .pinBadge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 800; color: #6d28d9;
+      background: #ede9fe; border-radius: 999px; padding: 3px 9px; margin-bottom: 8px;
+    }
+    .ideaText {
+      margin: 0 0 12px; font-size: 15px; line-height: 1.65; font-weight: 600; color: #0f172a;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .ideaMeta {
+      display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
+      font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 12px;
+    }
+    .ideaMeta .who { color: #1e40af; }
+    .ideaMeta .anon { color: #94a3b8; }
+
+    .stars {
+      display: inline-flex; gap: 4px; direction: ltr;
+    }
+    .stars button {
+      border: 0; background: transparent; padding: 2px; cursor: pointer;
+      font-size: 22px; line-height: 1; color: #cbd5e1;
+      transition: transform .12s ease, color .12s ease;
+    }
+    .stars button.on { color: #f59e0b; }
+    .stars button:hover { transform: scale(1.12); }
+    .stars button:disabled { cursor: default; opacity: .85; }
+    .rateRow {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9;
+    }
+    .avg {
+      font-size: 12px; font-weight: 800; color: #b45309;
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 999px; padding: 4px 10px;
+    }
+    .adminActs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .empty {
+      text-align: center; padding: 28px 14px; color: #94a3b8;
+      font-weight: 700; font-size: 14px;
+      background: #fff; border-radius: 18px; border: 1px dashed #cbd5e1;
+      margin-top: 10px;
+    }
+
+    .sheet {
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(15, 23, 42, .45); z-index: 10040; padding: 16px;
+    }
+    .sheet.open { display: flex; }
+    .sheetCard {
+      width: min(100%, 360px); background: #fff; border-radius: 18px;
+      padding: 18px 16px 14px; border: 1px solid rgba(15, 23, 42, .1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, .22);
+    }
+    .sheetCard h3 { margin: 0 0 6px; font-size: 17px; font-weight: 800; }
+    .sheetCard p { margin: 0 0 12px; font-size: 13px; color: #64748b; font-weight: 600; line-height: 1.45; }
+    .sheetCard input[type="password"] {
+      width: 100%; min-height: 48px; text-align: center; letter-spacing: .25em;
+      font-size: 18px; margin-bottom: 12px; border-radius: 12px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc;
+    }
+    .footer {
+      margin-top: 22px; text-align: center; font-size: 12px; color: #94a3b8; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <a class="back" id="homeLink" href="../index.html">الرئيسية</a>
+      <button type="button" class="adminGear" id="adminBtn" title="إدارة">⚙</button>
+      <span class="bannerTitleEyebrow">صندوق الأفكار</span>
+      <h1 class="bannerTitleMain">اقتراحات وأفكار</h1>
+      <p class="lead">شاركنا فكرتك لتحسين الروستر والموقع — يمكنك إخفاء هويتك أو إظهارها.</p>
+    </header>
+
+    <div class="summaryBar">
+      <div class="summaryChip">
+        <div class="chipVal" id="statIdeas">0</div>
+        <div class="chipLabel">أفكار</div>
+      </div>
+      <div class="summaryChip pin">
+        <div class="chipVal" id="statPinned">0</div>
+        <div class="chipLabel">مثبّت</div>
+      </div>
+      <div class="summaryChip score">
+        <div class="chipVal" id="statSiteScore">—</div>
+        <div class="chipLabel">تقييم الموقع</div>
+      </div>
+    </div>
+
+    <section class="composeCard" id="composeCard">
+      <div class="topBar"></div>
+      <div class="body">
+        <h2>أضف فكرة جديدة</h2>
+        <p class="hint">اكتب بوضوح ما تودّه من تحسين أو ميزة جديدة. التقييم يكون للأفكار بعد نشرها.</p>
+        <label class="field" for="ideaText">فكرتك</label>
+        <textarea id="ideaText" maxlength="800" placeholder="مثال: إضافة تنبيه قبل بداية الوردية…"></textarea>
+        <div class="row-opts">
+          <label class="anonSwitch">
+            <input type="checkbox" id="ideaAnon" checked>
+            <span>إخفاء هويتي</span>
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="submitIdea">نشر الفكرة</button>
+        </div>
+        <p class="msg" id="composeMsg"></p>
+      </div>
+    </section>
+
+    <div class="sectionHead">
+      <h2>الأفكار المنشورة</h2>
+      <span id="listCount">0</span>
+    </div>
+    <div id="ideasHost"><div class="empty">جاري التحميل…</div></div>
+
+    <p class="footer">يُدار المحتوى من هذه الصفحة · PIN الإدارة: من أيقونة ⚙</p>
+  </div>
+
+  <div class="sheet" id="adminSheet" aria-hidden="true">
+    <div class="sheetCard" role="dialog">
+      <h3>دخول الإدارة</h3>
+      <p>لتثبيت أو حذف الأفكار. الجلسة تبقى مفتوحة حتى إغلاق التبويب.</p>
+      <input type="password" id="adminPin" inputmode="numeric" maxlength="12" placeholder="••••" autocomplete="off">
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="adminUnlock">دخول</button>
+        <button type="button" class="btn btn-muted" id="adminCancel">إلغاء</button>
+      </div>
+      <p class="msg err" id="adminErr"></p>
+    </div>
+  </div>
+
+  <script defer src="../site-visits.js?v=20260806sched"></script>
+  <script>
+  (function () {
+    var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
+    var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var PIN = '912';
+    var AUTH_KEY = 'rosterIdeasAdminAuth';
+    var VOTE_KEY = 'rosterIdeaVotesV1';
+    var state = { ideas: [], siteRatings: [] };
+    var saving = false;
+
+    function headers(write) {
+      var h = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
+      if (write) h['Content-Type'] = 'application/json';
+      return h;
+    }
+
+    function isAdmin() {
+      try { return sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    function setAdmin(on) {
+      try {
+        if (on) sessionStorage.setItem(AUTH_KEY, '1');
+        else sessionStorage.removeItem(AUTH_KEY);
+      } catch (e) {}
+      render();
+    }
+
+    function visitorKey() {
+      try {
+        var id =
+          localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          '';
+        if (id) return 'e:' + String(id);
+        var g = localStorage.getItem('rosterVisitGuestId') || '';
+        if (!g) {
+          g = 'g' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+          localStorage.setItem('rosterVisitGuestId', g);
+        }
+        return 'g:' + g;
+      } catch (e) {
+        return 'g:anon';
+      }
+    }
+
+    function displayName() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpName') ||
+          localStorage.getItem('savedEmpName') ||
+          localStorage.getItem('importSavedEmpName') ||
+          ''
+        ).trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function empId() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          ''
+        ).trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function loadVotes() {
+      try { return JSON.parse(localStorage.getItem(VOTE_KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+
+    function saveVoteLocal(ideaId, score) {
+      try {
+        var m = loadVotes();
+        m[ideaId] = score;
+        localStorage.setItem(VOTE_KEY, JSON.stringify(m));
+      } catch (e) {}
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatTime(at) {
+      try {
+        return new Date(at).toLocaleString('ar-OM', {
+          timeZone: 'Asia/Muscat',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function avgIdea(idea) {
+      var c = Number(idea.ratingCount || 0);
+      var s = Number(idea.ratingSum || 0);
+      if (!c) return 0;
+      return Math.round((s / c) * 10) / 10;
+    }
+
+    function siteAvg() {
+      var list = state.siteRatings || [];
+      if (!list.length) return null;
+      var sum = 0;
+      list.forEach(function (r) { sum += Number(r.score || 0); });
+      return Math.round((sum / list.length) * 10) / 10;
+    }
+
+    function normalized(doc) {
+      var ideas = Array.isArray(doc && doc.ideas) ? doc.ideas.slice() : [];
+      var siteRatings = Array.isArray(doc && doc.siteRatings) ? doc.siteRatings.slice() : [];
+      ideas = ideas
+        .filter(function (x) { return x && String(x.body || x.text || '').trim(); })
+        .map(function (x) {
+          return {
+            id: String(x.id || ''),
+            body: String(x.body || x.text || '').slice(0, 800),
+            anonymous: !!x.anonymous,
+            name: String(x.name || '').slice(0, 80),
+            empId: String(x.empId || '').slice(0, 16),
+            at: Number(x.at) || Date.now(),
+            pinned: !!x.pinned,
+            ratingSum: Number(x.ratingSum) || 0,
+            ratingCount: Number(x.ratingCount) || 0,
+            votes: (x.votes && typeof x.votes === 'object') ? x.votes : {}
+          };
+        });
+      siteRatings = siteRatings
+        .filter(function (r) { return r && Number(r.score) >= 1 && Number(r.score) <= 5; })
+        .map(function (r) {
+          return {
+            score: Math.min(5, Math.max(1, Math.round(Number(r.score)))),
+            at: Number(r.at) || Date.now(),
+            anonymous: !!r.anonymous,
+            name: String(r.name || '').slice(0, 80),
+            empId: String(r.empId || '').slice(0, 16),
+            comment: String(r.comment || '').slice(0, 400)
+          };
+        })
+        .slice(0, 400);
+      ideas.sort(function (a, b) {
+        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        return (b.at || 0) - (a.at || 0);
+      });
+      if (ideas.length > 120) ideas = ideas.slice(0, 120);
+      return { ideas: ideas, siteRatings: siteRatings };
+    }
+
+    async function fetchDoc() {
+      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+        headers: headers(false),
+        cache: 'no-store'
+      });
+      if (res.status === 404) return { ideas: [], siteRatings: [] };
+      if (!res.ok) throw new Error('read ' + res.status);
+      var j = await res.json();
+      return normalized(j);
+    }
+
+    async function saveDoc(doc) {
+      var payload = normalized(doc);
+      // keep payload lean
+      payload.ideas = payload.ideas.map(function (x) {
+        var votes = x.votes || {};
+        var keys = Object.keys(votes);
+        if (keys.length > 80) {
+          var slim = {};
+          keys.slice(-80).forEach(function (k) { slim[k] = votes[k]; });
+          votes = slim;
+        }
+        return {
+          id: x.id,
+          body: x.body,
+          anonymous: x.anonymous,
+          name: x.anonymous ? '' : x.name,
+          empId: x.anonymous ? '' : x.empId,
+          at: x.at,
+          pinned: x.pinned,
+          ratingSum: x.ratingSum,
+          ratingCount: x.ratingCount,
+          votes: votes
+        };
+      });
+      var res = await fetch(MANTLE_URL, {
+        method: 'POST',
+        headers: headers(true),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('write ' + res.status);
+      state = payload;
+      return payload;
+    }
+
+    async function withDoc(mutator) {
+      if (saving) throw new Error('busy');
+      saving = true;
+      try {
+        var doc = await fetchDoc();
+        doc = mutator(doc) || doc;
+        await saveDoc(doc);
+        render();
+      } finally {
+        saving = false;
+      }
+    }
+
+    function paintStats() {
+      document.getElementById('statIdeas').textContent = String(state.ideas.length);
+      document.getElementById('statPinned').textContent = String(
+        state.ideas.filter(function (i) { return i.pinned; }).length
+      );
+      var avg = siteAvg();
+      document.getElementById('statSiteScore').textContent = avg == null ? '—' : (avg + '★');
+      document.getElementById('listCount').textContent = state.ideas.length + '';
+    }
+
+    function starButtons(ideaId, current, disabled) {
+      var html = '<div class="stars" data-id="' + escapeHtml(ideaId) + '">';
+      for (var i = 1; i <= 5; i++) {
+        html +=
+          '<button type="button" data-score="' + i + '"' +
+          (current >= i ? ' class="on"' : '') +
+          (disabled ? ' disabled' : '') +
+          ' aria-label="' + i + '">★</button>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function render() {
+      paintStats();
+      var host = document.getElementById('ideasHost');
+      var votes = loadVotes();
+      var admin = isAdmin();
+      if (!state.ideas.length) {
+        host.innerHTML = '<div class="empty">لا أفكار بعد — كن أول من يقترح.</div>';
+        return;
+      }
+      host.innerHTML = state.ideas.map(function (idea) {
+        var avg = avgIdea(idea);
+        var mine = Number(votes[idea.id] || (idea.votes && idea.votes[visitorKey()]) || 0);
+        var voted = mine >= 1;
+        var who = idea.anonymous
+          ? '<span class="anon">مجهول</span>'
+          : '<span class="who">' + escapeHtml(idea.name || ('#' + (idea.empId || '—'))) + '</span>';
+        var adminHtml = admin
+          ? '<div class="adminActs">' +
+              '<button type="button" class="btn btn-pin" data-act="pin" data-id="' + escapeHtml(idea.id) + '">' +
+              (idea.pinned ? 'إلغاء التثبيت' : 'تثبيت') + '</button>' +
+              '<button type="button" class="btn btn-danger" data-act="del" data-id="' + escapeHtml(idea.id) + '">حذف</button>' +
+            '</div>'
+          : '';
+        return (
+          '<article class="ideaCard' + (idea.pinned ? ' pinned' : '') + '">' +
+            '<div class="topBar"></div>' +
+            '<div class="body">' +
+              (idea.pinned ? '<div class="pinBadge">📌 مثبّت</div>' : '') +
+              '<p class="ideaText">' + escapeHtml(idea.body) + '</p>' +
+              '<div class="ideaMeta">' + who + '<span>·</span><span>' + escapeHtml(formatTime(idea.at)) + '</span></div>' +
+              '<div class="rateRow">' +
+                starButtons(idea.id, mine || Math.round(avg), voted && !admin) +
+                '<span class="avg">' +
+                  (avg ? (avg + ' من 5 · ' + (idea.ratingCount || 0) + ' تقييم') : 'بدون تقييم بعد') +
+                '</span>' +
+              '</div>' +
+              adminHtml +
+            '</div>' +
+          '</article>'
+        );
+      }).join('');
+    }
+
+    async function reload() {
+      try {
+        state = await fetchDoc();
+        render();
+      } catch (e) {
+        document.getElementById('ideasHost').innerHTML =
+          '<div class="empty">تعذر تحميل الأفكار. حاول مرة أخرى.</div>';
+      }
+    }
+
+    document.getElementById('submitIdea').addEventListener('click', async function () {
+      var msg = document.getElementById('composeMsg');
+      var text = String(document.getElementById('ideaText').value || '').trim();
+      if (text.length < 4) {
+        msg.className = 'msg err';
+        msg.textContent = 'اكتب فكرة أوضح (٤ أحرف على الأقل).';
+        return;
+      }
+      var anon = !!document.getElementById('ideaAnon').checked;
+      msg.className = 'msg';
+      msg.textContent = 'جاري النشر…';
+      try {
+        await withDoc(function (doc) {
+          doc.ideas.unshift({
+            id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+            body: text.slice(0, 800),
+            anonymous: anon,
+            name: anon ? '' : displayName(),
+            empId: anon ? '' : empId(),
+            at: Date.now(),
+            pinned: false,
+            ratingSum: 0,
+            ratingCount: 0,
+            votes: {}
+          });
+          return doc;
+        });
+        document.getElementById('ideaText').value = '';
+        msg.className = 'msg ok';
+        msg.textContent = 'تم نشر فكرتك ✓';
+      } catch (e) {
+        msg.className = 'msg err';
+        msg.textContent = 'تعذر النشر. أعد المحاولة.';
+      }
+    });
+
+    document.getElementById('ideasHost').addEventListener('click', async function (ev) {
+      var t = ev.target;
+      if (!t) return;
+      var actBtn = t.closest('[data-act]');
+      if (actBtn) {
+        if (!isAdmin()) return;
+        var id = actBtn.getAttribute('data-id');
+        var act = actBtn.getAttribute('data-act');
+        try {
+          await withDoc(function (doc) {
+            if (act === 'del') {
+              doc.ideas = doc.ideas.filter(function (x) { return x.id !== id; });
+            } else if (act === 'pin') {
+              doc.ideas.forEach(function (x) {
+                if (x.id === id) x.pinned = !x.pinned;
+              });
+            }
+            return doc;
+          });
+        } catch (e) {}
+        return;
+      }
+      var star = t.closest('.stars button[data-score]');
+      if (!star || star.disabled) return;
+      var wrap = star.closest('.stars');
+      var ideaId = wrap && wrap.getAttribute('data-id');
+      var score = Number(star.getAttribute('data-score') || 0);
+      if (!ideaId || score < 1 || score > 5) return;
+      var localVotes = loadVotes();
+      if (localVotes[ideaId] && !isAdmin()) return;
+      try {
+        await withDoc(function (doc) {
+          var idea = null;
+          doc.ideas.forEach(function (x) { if (x.id === ideaId) idea = x; });
+          if (!idea) return doc;
+          if (!idea.votes) idea.votes = {};
+          var vk = visitorKey();
+          var prev = Number(idea.votes[vk] || 0);
+          if (prev >= 1 && prev <= 5) {
+            idea.ratingSum = Math.max(0, Number(idea.ratingSum || 0) - prev);
+            idea.ratingCount = Math.max(0, Number(idea.ratingCount || 0) - 1);
+          }
+          idea.votes[vk] = score;
+          idea.ratingSum = Number(idea.ratingSum || 0) + score;
+          idea.ratingCount = Number(idea.ratingCount || 0) + 1;
+          return doc;
+        });
+        saveVoteLocal(ideaId, score);
+      } catch (e) {}
+    });
+
+    var sheet = document.getElementById('adminSheet');
+    document.getElementById('adminBtn').addEventListener('click', function () {
+      if (isAdmin()) {
+        setAdmin(false);
+        return;
+      }
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      document.getElementById('adminPin').value = '';
+      document.getElementById('adminErr').textContent = '';
+      setTimeout(function () { document.getElementById('adminPin').focus(); }, 50);
+    });
+    document.getElementById('adminCancel').addEventListener('click', function () {
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+    });
+    document.getElementById('adminUnlock').addEventListener('click', function () {
+      var pin = document.getElementById('adminPin').value;
+      if (String(pin) !== PIN) {
+        document.getElementById('adminErr').textContent = 'رمز خاطئ';
+        return;
+      }
+      setAdmin(true);
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+    });
+    document.getElementById('adminPin').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('adminUnlock').click();
+    });
+
+    try {
+      var path = location.pathname || '';
+      if (path.indexOf('/new/docs/') >= 0) {
+        document.getElementById('homeLink').href = '../index.html';
+      }
+    } catch (e) {}
+
+    reload();
+  })();
+  </script>
+</body>
+</html>

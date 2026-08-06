@@ -1,0 +1,38 @@
+{
+  "kind": "export",
+  "month": "2026-04",
+  "generated_at": "2026-04-28T06:59:24.213466Z",
+  "old_file": "previous.xlsx",
+  "new_file": "current.xlsx",
+  "total_changes": 4,
+  "changes": [
+    {
+      "emp_id": "name:Assad Al Omairi - 81348",
+      "name": "Assad Al Omairi - 81348",
+      "day": 6,
+      "v1": "MN06",
+      "v2": "OFF"
+    },
+    {
+      "emp_id": "name:Hamed Al Fulaiti - 82596",
+      "name": "Hamed Al Fulaiti - 82596",
+      "day": 6,
+      "v1": "OFF",
+      "v2": "AN13"
+    },
+    {
+      "emp_id": "name:Mubarak Al Nofli - 82114",
+      "name": "Mubarak Al Nofli - 82114",
+      "day": 4,
+      "v1": "OFF",
+      "v2": "NN21"
+    },
+    {
+      "emp_id": "name:Saleh Al Aufi - 82550",
+      "name": "Saleh Al Aufi - 82550",
+      "day": 6,
+      "v1": "OFF",
+      "v2": "NN21"
+    }
+  ]
+}
