@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="desk-log-build" content="20260806sched">
+  <meta name="desk-log-build" content="20260806tabs2">
   <title>·</title>
   <style>
     :root {
@@ -56,7 +56,7 @@
       width: min(220px, 100%);
     }
     .gateErr { min-height: 20px; margin-top: 10px; color: #f87171; font-size: 13px; font-weight: 700; }
-    .app[hidden], .gate[hidden] { display: none !important; }
+    .app[hidden], .gate[hidden], [hidden] { display: none !important; }
     .head {
       display: flex;
       align-items: flex-start;
@@ -90,37 +90,28 @@
     .stats.stats3 { grid-template-columns: repeat(3, 1fr); }
     .stat b { display: block; font-size: 22px; color: #93c5fd; margin-bottom: 4px; }
     .stat span { font-size: 11px; color: #94a3b8; font-weight: 700; }
-    .foldStack {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .fold {
+    .visitsChrome { margin-bottom: 0; }
+    .statsPanel {
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 14px;
-      overflow: hidden;
+      padding: 12px 14px;
+      margin-bottom: 14px;
     }
-    .fold > summary {
-      list-style: none;
-      cursor: pointer;
+    .statsPanelHead {
       display: flex;
-      align-items: center;
+      align-items: baseline;
+      justify-content: space-between;
       gap: 10px;
-      min-height: 48px;
-      padding: 10px 14px;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      margin-bottom: 10px;
     }
-    .fold > summary::-webkit-details-marker { display: none; }
-    .foldTitle {
-      flex: 1;
-      min-width: 0;
+    .statsPanelHead h2 {
+      margin: 0;
       font-size: 14px;
       font-weight: 800;
       color: #f1f5f9;
     }
-    .fold .countPill {
+    .statsPanelHead .countPill {
       font-size: 12px;
       font-weight: 800;
       color: #93c5fd;
@@ -130,27 +121,6 @@
       padding: 3px 10px;
       white-space: nowrap;
     }
-    .foldChevron {
-      width: 22px;
-      height: 22px;
-      border-radius: 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #94a3b8;
-      background: #0f172a88;
-      border: 1px solid #33415555;
-      font-size: 12px;
-      line-height: 1;
-      transition: transform .18s ease;
-      flex-shrink: 0;
-    }
-    .fold[open] > summary {
-      border-bottom: 1px solid #33415588;
-      background: #172033;
-    }
-    .fold[open] .foldChevron { transform: rotate(-180deg); color: #93c5fd; }
-    .foldBody { padding: 12px 14px 14px; }
     .statsPanelNote {
       margin: 0 0 12px;
       font-size: 11px;
@@ -395,16 +365,22 @@
     }
     .toolbar.mainTabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 16px;
     }
     .toolbar.mainTabs .chip {
       width: 100%;
       justify-content: center;
-      min-height: 42px;
+      min-height: 44px;
       font-size: 12px;
-      padding: 0 8px;
+      font-weight: 800;
+      padding: 0 6px;
+    }
+    @media (min-width: 640px) {
+      .toolbar.mainTabs {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
     }
     .toolsIntro {
       margin: 0 0 12px;
@@ -545,11 +521,13 @@
     </div>
     <div class="toolbar mainTabs" id="mainTabs">
       <button type="button" class="chip active" data-view="visits" id="tabVisits">الزيارات</button>
+      <button type="button" class="chip" data-view="devices" id="tabDevices">الأجهزة</button>
+      <button type="button" class="chip" data-view="pages" id="tabPages">الصفحات</button>
       <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
       <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
       <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
     </div>
-    <div id="visitsPanel">
+    <div id="visitsChrome">
       <div class="toolbar">
         <button type="button" class="chip active" data-filter="today" id="fToday">اليوم</button>
         <button type="button" class="chip" data-filter="month" id="fMonth">هذا الشهر</button>
@@ -561,47 +539,36 @@
         <div class="stat"><b id="statMonth">0</b><span>هذا الشهر</span></div>
         <div class="stat"><b id="statTotal">—</b><span>إجمالي الزوار</span></div>
       </div>
-      <div class="foldStack" id="statsFolds">
-        <details class="fold" id="devicesFold">
-          <summary>
-            <span class="foldTitle">إحصائية الأجهزة</span>
-            <span class="countPill" id="deviceCountPill">0</span>
-            <span class="foldChevron" aria-hidden="true">▼</span>
-          </summary>
-          <div class="foldBody">
-            <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
-            <div class="deviceTypeList" id="deviceTypeList"></div>
-          </div>
-        </details>
-        <details class="fold" id="pagesFold">
-          <summary>
-            <span class="foldTitle">إحصائية الصفحات</span>
-            <span class="countPill" id="pageCountPill">0</span>
-            <span class="foldChevron" aria-hidden="true">▼</span>
-          </summary>
-          <div class="foldBody">
-            <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
-            <div class="pageTypeList" id="pageTypeList"></div>
-          </div>
-        </details>
-        <details class="fold" id="scheduleViewsFold">
-          <summary>
-            <span class="foldTitle">أرقام شوهدت في جدولي</span>
-            <span class="countPill" id="scheduleViewPill">0</span>
-            <span class="foldChevron" aria-hidden="true">▼</span>
-          </summary>
-          <div class="foldBody">
-            <p class="statsPanelNote">أرقام الوظيفة التي فتح أحد الزوار جدولها من صفحة «جدولي» (حسب الفلتر).</p>
-            <div class="pageTypeList" id="scheduleViewList"></div>
-          </div>
-        </details>
-      </div>
+    </div>
+    <div id="visitsPanel">
       <div class="listHead">
         <h2>سجل الزيارات</h2>
         <span class="countPill" id="listCountPill">0</span>
       </div>
       <div class="list" id="list"></div>
     </div>
+    <section class="statsPanel" id="devicesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الأجهزة</h2>
+        <span class="countPill" id="deviceCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · موديل الآيفون تقديري من حجم الشاشة (آبل لا تُظهر الموديل بدقة).</p>
+      <div class="deviceTypeList" id="deviceTypeList"></div>
+    </section>
+    <section class="statsPanel" id="pagesPanel" hidden>
+      <div class="statsPanelHead">
+        <h2>إحصائية الصفحات</h2>
+        <span class="countPill" id="pageCountPill">0</span>
+      </div>
+      <p class="statsPanelNote">حسب الفلتر الحالي · كل صفحة زارها الشخص في ذلك اليوم (حتى 30 صفحة/يوم).</p>
+      <div class="pageTypeList" id="pageTypeList"></div>
+      <div class="statsPanelHead" style="margin-top:18px">
+        <h2>أرقام شوهدت في جدولي</h2>
+        <span class="countPill" id="scheduleViewPill">0</span>
+      </div>
+      <p class="statsPanelNote">أرقام الوظيفة التي فتح أحد الزوار جدولها من صفحة «جدولي» (حسب الفلتر).</p>
+      <div class="pageTypeList" id="scheduleViewList"></div>
+    </section>
     <div id="phonesPanel" hidden>
       <div class="toolbar">
         <button type="button" class="chip" id="refreshPhonesBtn">تحديث</button>
@@ -1075,9 +1042,14 @@
       }
 
       function setView(next) {
-        const allowed = { visits: 1, phones: 1, gaps: 1, tools: 1 };
+        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1 };
         view = allowed[next] ? next : 'visits';
+        const visitRelated = view === 'visits' || view === 'devices' || view === 'pages';
+        const chrome = document.getElementById('visitsChrome');
+        if (chrome) chrome.hidden = !visitRelated;
         document.getElementById('visitsPanel').hidden = view !== 'visits';
+        document.getElementById('devicesPanel').hidden = view !== 'devices';
+        document.getElementById('pagesPanel').hidden = view !== 'pages';
         document.getElementById('phonesPanel').hidden = view !== 'phones';
         document.getElementById('gapsPanel').hidden = view !== 'gaps';
         document.getElementById('toolsPanel').hidden = view !== 'tools';
