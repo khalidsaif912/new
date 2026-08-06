@@ -728,17 +728,18 @@
   }
 
   function shrinkLogPayload(kept) {
-    if (kept.length > 400) kept.length = 400;
-    // mantledb free tier rejects payloads over 64KB (HTTP 413).
-    while (kept.length > 1 && JSON.stringify({ log: kept }).length > 50000) {
+    // Keep well under Mantle free-tier limit (~64KB) so page merges still fit.
+    var maxRows = 220;
+    var maxBytes = 42000;
+    if (kept.length > maxRows) kept.length = maxRows;
+    while (kept.length > 1 && JSON.stringify({ log: kept }).length > maxBytes) {
       kept.pop();
     }
-    // If still oversized (many pages per row), trim page histories on oldest rows first.
     var i = kept.length - 1;
-    while (i >= 0 && JSON.stringify({ log: kept }).length > 50000) {
+    while (i >= 0 && JSON.stringify({ log: kept }).length > maxBytes) {
       var row = kept[i];
-      if (row && Array.isArray(row.pages) && row.pages.length > 4) {
-        row.pages = row.pages.slice(-Math.max(4, Math.floor(row.pages.length / 2)));
+      if (row && Array.isArray(row.pages) && row.pages.length > 3) {
+        row.pages = row.pages.slice(-Math.max(3, Math.floor(row.pages.length / 2)));
       } else if (kept.length > 1) {
         kept.pop();
         i = kept.length - 1;
@@ -751,10 +752,23 @@
     return kept;
   }
 
-  function postVisitRow(row, stamp) {
+  function postVisitRow(row, stamp, attempt) {
+    attempt = attempt || 0;
     var headers = visitHeaders();
     var pageKey = String((row && row.page) || '').trim() || 'site';
     var at = Number(row && row.at) || Date.now();
+    var hints = [];
+    try {
+      hints = readLocalPageKeys(stamp).slice();
+    } catch (e0) {}
+    if (Array.isArray(row.localHints)) {
+      row.localHints.forEach(function (k) {
+        k = String(k || '').trim();
+        if (k && hints.indexOf(k) < 0) hints.push(k);
+      });
+    }
+    if (hints.indexOf(pageKey) < 0) hints.push(pageKey);
+
     return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('read');
@@ -776,7 +790,34 @@
         if (!basePages.length && prev && prev.page) {
           basePages = [{ k: String(prev.page), at: Number(prev.at) || 0 }];
         }
-        var pages = mergeVisitPages(basePages, pageKey, at);
+        // Always re-merge every known local page so a wipe/race cannot permanently drop history.
+        var pages = basePages.slice();
+        hints.forEach(function (k) {
+          pages = mergeVisitPages(pages, k, at);
+        });
+        pages = mergeVisitPages(pages, pageKey, at);
+
+        var serverKeys = {};
+        (basePages || []).forEach(function (p) {
+          var e = normalizePageEntry(p);
+          if (e) serverKeys[e.k] = 1;
+        });
+        var needWrite = false;
+        pages.forEach(function (p) {
+          if (p && p.k && !serverKeys[p.k]) needWrite = true;
+        });
+        if (!needWrite && prev && String(prev.page || '') === pageKey) {
+          try {
+            writeLocalPageKeys(
+              stamp,
+              pages.map(function (p) {
+                return p.k;
+              })
+            );
+            localStorage.setItem(VISIT_LOGGED_KEY, stamp);
+          } catch (e1) {}
+          return null;
+        }
 
         var merged = {
           id: row.id,
@@ -787,22 +828,36 @@
           page: pageKey,
           pages: pages,
           device: (row.device || (prev && prev.device) || 'Other') || 'Other',
-          model: (row.model || (prev && prev.model) || '') || ''
+          model: (row.model || (prev && prev.model) || '') || '',
+          v: 5
         };
         kept.unshift(merged);
         kept = shrinkLogPayload(kept);
+        var body = JSON.stringify({ log: kept });
 
         return fetch(VISIT_LOG_URL, {
           method: 'POST',
           headers: headers,
-          body: JSON.stringify({ log: kept })
+          body: body
         }).then(function (r) {
-          if (!r.ok) throw new Error('write');
+          if (!r.ok) throw new Error('write ' + r.status);
           try {
             localStorage.setItem(VISIT_LOGGED_KEY, stamp);
-            var keys = pages.map(function (p) { return p.k; });
-            writeLocalPageKeys(stamp, keys);
+            writeLocalPageKeys(
+              stamp,
+              pages.map(function (p) {
+                return p.k;
+              })
+            );
           } catch (e2) {}
+        });
+      })
+      .catch(function (err) {
+        if (attempt >= 2) throw err;
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 400 * (attempt + 1));
+        }).then(function () {
+          return postVisitRow(row, stamp, attempt + 1);
         });
       });
   }
@@ -815,9 +870,14 @@
     var stamp = keys.day + ':' + visitId;
     var info = pageVisitInfo();
     var pageKey = info.key || pagePathLabel() || 'site';
-    var localPages = readLocalPageKeys(stamp);
-    // Already logged this exact page today → skip network.
-    if (localPages.indexOf(pageKey) >= 0) return;
+    // Remember intent immediately (even if network fails).
+    try {
+      var known = readLocalPageKeys(stamp);
+      if (known.indexOf(pageKey) < 0) {
+        known.push(pageKey);
+        writeLocalPageKeys(stamp, known);
+      }
+    } catch (eLocal) {}
 
     var namePromise = isGuest
       ? Promise.resolve('')
@@ -836,17 +896,21 @@
           } catch (e3) {}
         }
         var at = Date.now();
-        return postVisitRow({
-          id: visitId,
-          name: resolvedName || '',
-          guest: !!isGuest,
-          day: keys.day,
-          at: at,
-          page: pageKey,
-          pages: [{ k: pageKey, at: at }],
-          device: (dev && dev.device) || 'Other',
-          model: (dev && dev.model) || ''
-        }, stamp);
+        return postVisitRow(
+          {
+            id: visitId,
+            name: resolvedName || '',
+            guest: !!isGuest,
+            day: keys.day,
+            at: at,
+            page: pageKey,
+            localHints: readLocalPageKeys(stamp),
+            pages: [{ k: pageKey, at: at }],
+            device: (dev && dev.device) || 'Other',
+            model: (dev && dev.model) || ''
+          },
+          stamp
+        );
       })
       .catch(function () {});
   }
@@ -1085,8 +1149,9 @@
         }, 1800);
       }
     } catch (eBoot) {}
-    // Visit log (staff or guest) — page keys accumulate per day.
-    window.setTimeout(logSiteVisit, 800);
+    // Visit log immediately so short stays still register.
+    window.setTimeout(logSiteVisit, 120);
+    window.setTimeout(logSiteVisit, 1600);
     window.setTimeout(maybeAskPhone, 2200);
   }
 

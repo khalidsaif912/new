@@ -665,7 +665,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
   </div>
 </div>
 <script>{PAGE_JS}</script>
-<script defer src="../site-visits.js?v=20260806b"></script>
+<script defer src="../site-visits.js?v=20260806c"></script>
 </body>
 </html>
 '''
@@ -808,6 +808,7 @@ def render_cup_of_book_page() -> str:
     window.location.href = target;
   });
 </script>
+<script defer src="../site-visits.js?v=20260806c"></script>
 </body>
 </html>'''.replace("https://omanair-my.sharepoint.com/:u:/p/8715_hq/IQCtTYRlRXrAT4iThomS-xbtAZoXbZtGbVaak_14uDpqev8?e=X8mLMK", source_url)
 
@@ -829,9 +830,21 @@ def collect_gallery_images(images_dir: Path) -> list[str]:
     return sorted(names)
 
 
-def render_local_gallery_page(title: str, image_names: list[str]) -> str:
+def visits_script_src_for(out_dir: Path) -> str:
+    """Relative path from out_dir to docs/site-visits.js."""
+    try:
+        docs_root = Path("docs").resolve()
+        depth = len(out_dir.resolve().relative_to(docs_root).parts)
+    except Exception:
+        depth = 2
+    return ("../" * max(depth, 1)) + "site-visits.js?v=20260806c"
+
+
+def render_local_gallery_page(title: str, image_names: list[str], visits_src: str | None = None) -> str:
     names_js = json.dumps(image_names, ensure_ascii=False)
     safe_title = title.strip() or "A Cup of Book"
+    if not visits_src:
+        visits_src = "../../site-visits.js?v=20260806c"
     return """<!doctype html>
 <html lang="en">
 <head>
@@ -934,9 +947,10 @@ def render_local_gallery_page(title: str, image_names: list[str]) -> str:
     selectAt(0);
   }})();
 </script>
+<script defer src="{visits_src}"></script>
 </body>
 </html>
-""".format(title=safe_title, names_js=names_js)
+""".format(title=safe_title, names_js=names_js, visits_src=visits_src)
 
 
 def main() -> None:
@@ -950,7 +964,8 @@ def main() -> None:
     if args.images_dir is not None:
         args.output_dir.mkdir(parents=True, exist_ok=True)
         names = collect_gallery_images(args.images_dir)
-        html = render_local_gallery_page(args.title, names)
+        visits_src = visits_script_src_for(args.output_dir)
+        html = render_local_gallery_page(args.title, names, visits_src=visits_src)
         (args.output_dir / "index.html").write_text(html, encoding="utf-8")
         print(f"[OK] built gallery page in {args.output_dir.resolve()} with {len(names)} image(s)")
         return
