@@ -2125,12 +2125,11 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
         .catch(function () { return null; });
     }
     function fillLabels() {
-      setText('siteVisitsDayLabel', ar() ? 'زوار اليوم:' : 'Visitors today:');
-      setText('siteVisitsMonthLabel', ar() ? 'هذا الشهر:' : 'This month:');
-      setText('siteVisitsTotalLabel', ar() ? 'الإجمالي:' : 'Total:');
+      setText('siteVisitsDayLabel', ar() ? 'زوار اليوم' : 'Today');
+      setText('siteVisitsMonthLabel', ar() ? 'هذا الشهر' : 'This month');
+      setText('siteVisitsTotalLabel', ar() ? 'الإجمالي' : 'Total');
       var host = document.getElementById('siteVisitsHost');
       if (host) {
-        host.style.display = 'block';
         host.hidden = false;
         host.setAttribute('dir', ar() ? 'rtl' : 'ltr');
       }
