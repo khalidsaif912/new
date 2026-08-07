@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260728c"></script>
-  <title>Duty Roster · v20260807o</title>
+  <title>Duty Roster · v20260807p</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1111,14 +1111,11 @@
 <style id="ideasStaticCss">
 #ideasPromptSheetInline{
   position:fixed;inset:0;z-index:2147483646!important;
-  display:none!important;align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   background:rgba(15,23,42,.55);padding:16px;
   padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
-  pointer-events:none;visibility:hidden;
 }
-#ideasPromptSheetInline.is-open{
-  display:flex!important;pointer-events:auto;visibility:visible;
-}
+#ideasPromptSheetInline.is-open{display:flex!important}
 html.ideas-sheet-open #chg-card{display:none!important}
 html.ideas-sheet-open #chg-dot{opacity:.35}
 html.ideas-sheet-open #visitsFloatDock{display:none!important}
@@ -1141,12 +1138,19 @@ html.ideas-sheet-open #visitsFloatDock{display:none!important}
 #ideasPromptSheetInline .ipbtn.lnk{background:#fff;color:#1d4ed8;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;text-decoration:none}
 #ideasPromptSheetInline .ipm{min-height:18px;margin:10px 0 0;text-align:center;font-size:12px;font-weight:700;color:#64748b}
 #ideasPromptSheetInline .ipm.err{color:#b91c1c}#ideasPromptSheetInline .ipm.ok{color:#15803d}
+#ideasFab{
+  position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));
+  z-index:100050;border:0;border-radius:999px;min-height:44px;padding:0 14px;
+  font:inherit;font-size:13px;font-weight:800;cursor:pointer;
+  color:#fff;background:linear-gradient(135deg,#1e40af,#2563eb);
+  box-shadow:0 8px 20px rgba(37,99,235,.35);
+}
+html.ideas-sheet-open #ideasFab{display:none!important}
 #visitsFloatDock{position:fixed;left:12px;right:12px;bottom:calc(54px + env(safe-area-inset-bottom,0px));z-index:100055;background:rgba(255,255,255,.96);border:1px solid rgba(15,23,42,.12);border-radius:14px;box-shadow:0 8px 22px rgba(15,23,42,.14);padding:8px 12px;text-align:center;font-size:12px;line-height:1.55;color:#334155;font-weight:700;pointer-events:none}
 #visitsFloatDock b{color:#1e40af;font-weight:900}
 html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{bottom:calc(58px + env(safe-area-inset-bottom,0px))}
 </style>
-<!-- always starts hidden; never put is-open in markup (prevents FOUC / cache flash) -->
-<div id="ideasPromptSheetInline" role="dialog" aria-modal="true" aria-hidden="true" hidden style="display:none!important">
+<div id="ideasPromptSheetInline" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="ipc">
     <div class="iph">
       <div class="eye" id="ipiEye">صندوق الأفكار</div>
@@ -1174,6 +1178,7 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     </div>
   </div>
 </div>
+<button type="button" id="ideasFab" aria-label="صندوق الأفكار">صندوق الأفكار</button>
 <div id="visitsFloatDock" dir="rtl" aria-live="polite">
   <span id="vfdDayL">زوار اليوم:</span> <b id="vfdDay">--</b>
   <span aria-hidden="true"> · </span>
@@ -1184,78 +1189,50 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
 <script>
 (function () {
   window.__rosterIdeasPromptBooted = true;
-  var DONE_KEY = 'rosterIdeasDoneV7';
-  var SKIP_KEY = 'rosterIdeasSkipSessionV2';
+  // Fresh key so old broken V5/V6/V7/session flags never block the modal again.
+  var DONE_KEY = 'rosterIdeasDoneV8';
+  var SKIP_KEY = 'rosterIdeasSkipSessionV8';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var score = 0;
-  var allowClose = false;
   var sheet = document.getElementById('ideasPromptSheetInline');
+  if (!sheet) return;
 
-  // Root-flash kill: force hidden before any other script can paint it open.
-  function forceHide() {
-    if (!sheet) return;
-    try {
-      sheet.classList.remove('is-open');
-      sheet.hidden = true;
-      sheet.setAttribute('aria-hidden', 'true');
-      sheet.style.setProperty('display', 'none', 'important');
-      sheet.style.setProperty('visibility', 'hidden', 'important');
-      sheet.style.setProperty('pointer-events', 'none', 'important');
-      document.documentElement.classList.remove('ideas-sheet-open');
-      document.body.style.overflow = '';
-    } catch (e) {}
-  }
-  forceHide();
-
-  function forceIdeas() {
+  function forceParam() {
     try {
       var q = new URLSearchParams(location.search || '');
       return q.get('ideas') === '1' || q.get('ideas') === 'force';
     } catch (e) { return false; }
   }
-  function done() {
-    try { return localStorage.getItem(DONE_KEY) === '1' || localStorage.getItem('rosterIdeasDoneV6') === '1'; } catch (e) { return false; }
+  function isDone() {
+    try { return localStorage.getItem(DONE_KEY) === '1'; } catch (e) { return false; }
   }
-  function sessionSkipped() {
-    try {
-      return sessionStorage.getItem(SKIP_KEY) === '1' ||
-        sessionStorage.getItem('rosterIdeasSkipSessionV1') === '1';
-    } catch (e) { return false; }
+  function isSkipped() {
+    try { return sessionStorage.getItem(SKIP_KEY) === '1'; } catch (e) { return false; }
   }
-  function markSessionSkip() {
-    try {
-      sessionStorage.setItem(SKIP_KEY, '1');
-      sessionStorage.setItem('rosterIdeasSkipSessionV1', '1');
-    } catch (e) {}
-  }
-  function shouldShow() {
-    if (forceIdeas()) return true;
-    if (done()) return false;
-    if (sessionSkipped()) return false;
+  function shouldAutoShow() {
+    if (forceParam()) return true;
+    if (isDone()) return false;
+    if (isSkipped()) return false;
     return true;
   }
 
-  function setOpen(on, byUser) {
-    if (!sheet) return;
+  function setOpen(on) {
     if (on) {
-      allowClose = false;
-      sheet.hidden = false;
-      sheet.setAttribute('aria-hidden', 'false');
       sheet.classList.add('is-open');
-      sheet.style.setProperty('display', 'flex', 'important');
-      sheet.style.setProperty('visibility', 'visible', 'important');
-      sheet.style.setProperty('pointer-events', 'auto', 'important');
+      sheet.setAttribute('aria-hidden', 'false');
       try {
         document.documentElement.classList.add('ideas-sheet-open');
         document.body.style.overflow = 'hidden';
       } catch (e) {}
-      return;
+    } else {
+      sheet.classList.remove('is-open');
+      sheet.setAttribute('aria-hidden', 'true');
+      try {
+        document.documentElement.classList.remove('ideas-sheet-open');
+        document.body.style.overflow = '';
+      } catch (e2) {}
     }
-    // Ignore accidental / residual closes (page-load taps, other scripts).
-    if (!byUser && !allowClose) return;
-    allowClose = false;
-    forceHide();
   }
 
   function isAr() {
@@ -1269,16 +1246,16 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     var map = ar ? {
       eye: 'صندوق الأفكار', title: 'رأيك يهمنا', sub: 'قيّم الموقع بالنجوم واكتب مقترحك هنا مباشرة.',
       rate: 'تقييم الموقع', idea: 'اكتب اقتراحك', ph: 'ما الذي تود تحسينه؟', anon: 'إخفاء هويتي',
-      send: 'إرسال', later: 'لاحقاً', browse: 'كل الأفكار'
+      send: 'إرسال', later: 'لاحقاً', browse: 'كل الأفكار', fab: 'صندوق الأفكار'
     } : {
       eye: 'Ideas box', title: 'We value your feedback', sub: 'Rate with stars and write your idea here.',
       rate: 'Site rating', idea: 'Write your idea', ph: 'What would you improve?', anon: 'Stay anonymous',
-      send: 'Send', later: 'Later', browse: 'All ideas'
+      send: 'Send', later: 'Later', browse: 'All ideas', fab: 'Ideas'
     };
     function t(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     t('ipiEye', map.eye); t('ipiTitle', map.title); t('ipiSub', map.sub); t('ipiRateL', map.rate);
     t('ipiIdeaL', map.idea); t('ipiAnonL', map.anon); t('ipiSend', map.send); t('ipiLater', map.later);
-    t('ipiBrowse', map.browse);
+    t('ipiBrowse', map.browse); t('ideasFab', map.fab);
     var ta = document.getElementById('ipiText'); if (ta) ta.placeholder = map.ph;
   }
   paintLang();
@@ -1296,15 +1273,11 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   };
 
   function close(fromSubmit) {
-    allowClose = true;
-    markSessionSkip();
+    setOpen(false);
+    try { sessionStorage.setItem(SKIP_KEY, '1'); } catch (e) {}
     if (fromSubmit) {
-      try {
-        localStorage.setItem(DONE_KEY, '1');
-        localStorage.setItem('rosterIdeasDoneV6', '1');
-      } catch (e) {}
+      try { localStorage.setItem(DONE_KEY, '1'); } catch (e2) {}
     }
-    setOpen(false, true);
   }
 
   var later = document.getElementById('ipiLater');
@@ -1312,11 +1285,14 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     if (ev) { try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {} }
     close(false);
   };
+  // No backdrop close — avoids accidental dismiss.
 
-  // No backdrop-close — that was a major source of instant flash-dismiss.
-  if (sheet) sheet.addEventListener('click', function (ev) {
-    ev.stopPropagation();
-  });
+  var fab = document.getElementById('ideasFab');
+  if (fab) fab.onclick = function () {
+    try { sessionStorage.removeItem(SKIP_KEY); } catch (e) {}
+    setOpen(true);
+    paintLang();
+  };
 
   function identity() {
     var empId = '', name = '';
@@ -1326,6 +1302,7 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     } catch (e) {}
     return { empId: String(empId || '').trim(), name: String(name || '').trim() };
   }
+
   var send = document.getElementById('ipiSend');
   if (send) send.onclick = function () {
     var msg = document.getElementById('ipiMsg');
@@ -1387,29 +1364,21 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       });
   };
 
-  // Open only after full load — never during parse/paint races.
-  function tryOpen() {
-    if (!shouldShow()) {
-      forceHide();
-      return;
-    }
-    setOpen(true, true);
+  // Auto-open only if never submitted / not skipped this session.
+  // Multiple attempts so late layout scripts cannot prevent first open.
+  function tryAutoOpen() {
+    if (!shouldAutoShow()) return;
+    if (sheet.classList.contains('is-open')) return;
+    setOpen(true);
   }
-  if (document.readyState === 'complete') {
-    setTimeout(tryOpen, 400);
-  } else {
-    window.addEventListener('load', function () {
-      setTimeout(tryOpen, 400);
-    }, { once: true });
-  }
+  setTimeout(tryAutoOpen, 600);
+  setTimeout(tryAutoOpen, 1500);
+  setTimeout(tryAutoOpen, 3000);
 
   window.rosterIdeasPrompt = {
     open: function () {
-      try {
-        sessionStorage.removeItem(SKIP_KEY);
-        sessionStorage.removeItem('rosterIdeasSkipSessionV1');
-      } catch (e) {}
-      setOpen(true, true);
+      try { sessionStorage.removeItem(SKIP_KEY); } catch (e) {}
+      setOpen(true);
       paintLang();
     },
     close: function () { close(false); }
@@ -2170,8 +2139,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807o"></script>
-  <script src="home-ui-force.js?v=20260807o"></script>
+  <script src="site-visits.js?v=20260807p"></script>
+  <script src="home-ui-force.js?v=20260807p"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
