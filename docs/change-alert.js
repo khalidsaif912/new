@@ -214,8 +214,10 @@
       /\/roster-site\/date\//.test(path) ||
       /\/docs\/?$/.test(path) ||
       /\/docs\/index\.html$/.test(path) ||
+      /\/docs\/home\.html$/.test(path) ||
       /^\/$/.test(path) ||
       /\/index\.html$/.test(path) ||
+      /\/home\.html$/.test(path) ||
       /\/date\//.test(path)
     );
   }
