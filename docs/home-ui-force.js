@@ -1,6 +1,6 @@
 /**
  * Force footer visitor counts on homepage (and old cached shells).
- * Ideas modal is owned ONLY by the inline script in home.html — do not touch it.
+ * READ-ONLY for Abacus — never /hit. Unique visitor increments belong solely to site-visits.js.
  */
 (function () {
   'use strict';
@@ -13,7 +13,6 @@
     if (document.getElementById('ideasStaticCssForce')) return;
     var st = document.createElement('style');
     st.id = 'ideasStaticCssForce';
-    // Visits only — never redefine ideas modal open rules here.
     st.textContent =
       '#visitsFloatDock{position:fixed;left:12px;right:12px;bottom:calc(54px + env(safe-area-inset-bottom,0px));z-index:100055;background:rgba(255,255,255,.96);border:1px solid rgba(15,23,42,.12);border-radius:14px;box-shadow:0 8px 22px rgba(15,23,42,.14);padding:8px 12px;text-align:center;font-size:12px;line-height:1.55;color:#334155;font-weight:700;pointer-events:none}' +
       '#visitsFloatDock b{color:#1e40af;font-weight:900}';
@@ -73,6 +72,14 @@
 
   function fillVisits() {
     ensureFooterVisits();
+    // Prefer the real counter owner (once-per-day claim + paint).
+    try {
+      if (window.rosterSiteVisits && typeof window.rosterSiteVisits.refresh === 'function') {
+        window.rosterSiteVisits.refresh();
+        return;
+      }
+    } catch (e0) {}
+
     function set(id, v) {
       var el = document.getElementById(id);
       if (el && v != null) el.textContent = String(v);
@@ -103,15 +110,15 @@
         .catch(function () { return null; });
     }
     var keys = ymd();
-    function one(key, hit) {
+    // GET only — never /hit (that was double-counting returning visitors).
+    function one(key) {
       var g = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
-      var h = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
-      return getCount(g).then(function (v) { return v != null ? v : (hit ? getCount(h) : null); });
+      return getCount(g);
     }
     Promise.all([
-      one('day-' + keys.day, true),
-      one('month-' + keys.month, false),
-      one('total-visits', false)
+      one('day-' + keys.day),
+      one('month-' + keys.month),
+      one('total-visits')
     ]).then(function (vals) {
       if (vals[0] != null) set('siteVisitsDay', vals[0]);
       if (vals[1] != null) set('siteVisitsMonth', vals[1]);
@@ -126,10 +133,8 @@
       if (document.querySelector('.footer')) {
         ensureFooterVisits();
         fillVisits();
-        setTimeout(fillVisits, 800);
-        setTimeout(fillVisits, 2200);
+        setTimeout(fillVisits, 1200);
         setTimeout(ensureFooterVisits, 3500);
-        setTimeout(ensureFooterVisits, 7000);
       }
     } catch (eVisits) {}
   }
@@ -137,6 +142,5 @@
   window.rosterForceHomeUI = run;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
-  setTimeout(run, 1500);
-  setTimeout(run, 4000);
+  setTimeout(run, 2000);
 })();

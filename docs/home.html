@@ -1796,8 +1796,8 @@
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807r"></script>
-  <script src="home-ui-force.js?v=20260807r"></script>
+  <script src="site-visits.js?v=20260807y"></script>
+  <script src="home-ui-force.js?v=20260807y"></script>
   <script src="ideas-prompt.js?v=20260807x"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
@@ -1871,12 +1871,7 @@
         if (vals[0] != null) setText('siteVisitsDay', vals[0]);
         if (vals[1] != null) setText('siteVisitsMonth', vals[1]);
         if (vals[2] != null) setText('siteVisitsTotal', vals[2]);
-        // إن فشل get لليوم، اسمح بـ hit مرة واحدة عبر الملف الأساسي بعد تأخره
-        if (vals[0] == null) {
-          getCount('https://abacus.jasoncameron.dev/hit/' + NS + '/' + dayKey).then(function (v) {
-            if (v != null) setText('siteVisitsDay', v);
-          });
-        }
+        // Never /hit here — site-visits.js owns once-per-day increments.
         if (vals[0] != null || vals[1] != null) window.__inlineVisitsFilled = true;
       });
     }

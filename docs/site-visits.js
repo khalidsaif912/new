@@ -44,11 +44,14 @@
 
   var NS = 'khalidsaif912.github.io';
   var TOTAL_KEY = 'total-visits';
+  // Once per browser calendar-day (Muscat). Claimed BEFORE network hit — never cleared on cache miss.
   var COUNTED_KEY = 'rosterVisitCountedDay';
+  var SESSION_CLAIM_KEY = 'rosterVisitHitClaimSession';
   var CACHE_KEY = 'rosterVisitCountsV2';
   var cached = { day: null, month: null, total: null, dayKey: '', monthKey: '' };
   var booted = false;
   var loading = false;
+  var loadPromise = null;
 
   var I18N = {
     en: { day: 'Today', month: 'This month', total: 'Total' },
@@ -211,35 +214,42 @@
 
   function parseCount(data) {
     if (data == null) return null;
-    if (typeof data.value === 'number') return data.value;
-    if (typeof data.count === 'number') return data.count;
+    if (typeof data.value === 'number' && isFinite(data.value)) return Math.max(0, Math.floor(data.value));
+    if (typeof data.count === 'number' && isFinite(data.count)) return Math.max(0, Math.floor(data.count));
     return null;
   }
 
-  function requestCount(key, doUp) {
-    var abacusHit = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
+  /** Read-only. Never hit — a failed GET must not inflate unique-visitor stats. */
+  function getCountOnly(key) {
     var abacusGet = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
-    var counterUp = 'https://api.counterapi.dev/v1/roster-site-new/' + key + '/up';
     var counterGet = 'https://api.counterapi.dev/v1/roster-site-new/' + key;
-
-    var primary = doUp ? abacusHit : abacusGet;
-    var secondary = doUp ? counterUp : counterGet;
-
-    return fetchJson(primary)
+    return fetchJson(abacusGet)
       .then(parseCount)
       .catch(function () {
-        return fetchJson(secondary).then(parseCount);
-      })
-      .catch(function () {
-        // First-of-day GET is often 404 until a hit creates the key.
-        if (!doUp) {
-          return fetchJson(abacusHit).then(parseCount);
-        }
-        return null;
+        return fetchJson(counterGet).then(parseCount);
       })
       .catch(function () {
         return null;
       });
+  }
+
+  /** Increment once. Used only after a local once-per-day claim succeeds. */
+  function hitCountOnly(key) {
+    var abacusHit = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
+    var counterUp = 'https://api.counterapi.dev/v1/roster-site-new/' + key + '/up';
+    return fetchJson(abacusHit)
+      .then(parseCount)
+      .catch(function () {
+        return fetchJson(counterUp).then(parseCount);
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  /** @deprecated name kept for any external callers — always read-only. */
+  function requestCount(key, doUp) {
+    return doUp ? hitCountOnly(key) : getCountOnly(key);
   }
 
   function removeLegacyFooterRow() {
@@ -335,72 +345,107 @@
 
   function alreadyCounted(dayKey) {
     try {
-      return localStorage.getItem(COUNTED_KEY) === dayKey;
-    } catch (e) {
-      return false;
-    }
+      if (localStorage.getItem(COUNTED_KEY) === dayKey) return true;
+    } catch (e) {}
+    try {
+      if (sessionStorage.getItem(SESSION_CLAIM_KEY) === dayKey) return true;
+    } catch (e2) {}
+    return false;
   }
 
   function markCounted(dayKey) {
     try {
       localStorage.setItem(COUNTED_KEY, dayKey);
     } catch (e) {}
+    try {
+      sessionStorage.setItem(SESSION_CLAIM_KEY, dayKey);
+    } catch (e2) {}
+  }
+
+  /**
+   * Claim exclusive right to increment Abacus for this browser/day.
+   * Must run before any /hit request so concurrent tabs/scripts cannot all hit.
+   */
+  function claimHitForDay(dayKey) {
+    try {
+      if (localStorage.getItem(COUNTED_KEY) === dayKey) return false;
+      if (sessionStorage.getItem(SESSION_CLAIM_KEY) === dayKey) return false;
+      // Write claim first (sync). Race window is tiny between two tabs.
+      sessionStorage.setItem(SESSION_CLAIM_KEY, dayKey);
+      localStorage.setItem(COUNTED_KEY, dayKey);
+      return true;
+    } catch (e) {
+      // Storage blocked: still try one hit per page session via memory flag.
+      if (window.__rosterVisitHitClaimed === dayKey) return false;
+      window.__rosterVisitHitClaimed = dayKey;
+      return true;
+    }
   }
 
   function loadCounts() {
+    if (loadPromise) return loadPromise;
+    loadPromise = doLoadCounts().then(
+      function (v) {
+        loadPromise = null;
+        return v;
+      },
+      function (err) {
+        loadPromise = null;
+        throw err;
+      }
+    );
+    return loadPromise;
+  }
+
+  function doLoadCounts() {
     if (loading) return Promise.resolve();
     loading = true;
     var keys = muscatYmd();
     var dayKey = 'day-' + keys.day;
     var monthKey = 'month-' + keys.month;
-    var counted = alreadyCounted(keys.day);
-    var hasCache = cached.day != null && cached.month != null;
 
-    // Stuck state: flagged as counted but no numbers saved (common after failed API).
-    if (counted && !hasCache) {
-      try { localStorage.removeItem(COUNTED_KEY); } catch (e) {}
-      counted = false;
-    }
+    // Only one hit path per browser day. No "clear claim on empty cache" (that re-counted people).
+    var doHit = claimHitForDay(keys.day);
 
-    var shouldUp = !counted;
-
-    // Optimistic local bump so the UI is never stuck on -- for a first visit.
-    if (shouldUp) {
+    // Optimistic local bump only when we own the hit for this day.
+    if (doHit) {
       cached.day = Number(cached.day || 0) + 1;
       cached.month = Number(cached.month || 0) + 1;
       if (cached.total != null) cached.total = Number(cached.total) + 1;
+      else cached.total = 1;
       cached.dayKey = keys.day;
       cached.monthKey = keys.month;
       paint();
       persistCounts(keys);
     }
 
-    return Promise.all([
-      requestCount(dayKey, shouldUp),
-      requestCount(monthKey, shouldUp),
-      requestCount(TOTAL_KEY, shouldUp)
-    ])
+    var dayReq = doHit ? hitCountOnly(dayKey) : getCountOnly(dayKey);
+    var monthReq = doHit ? hitCountOnly(monthKey) : getCountOnly(monthKey);
+    var totalReq = doHit ? hitCountOnly(TOTAL_KEY) : getCountOnly(TOTAL_KEY);
+
+    return Promise.all([dayReq, monthReq, totalReq])
       .then(function (vals) {
+        // Prefer authoritative server values (never overwrite with null).
         if (vals[0] != null) cached.day = vals[0];
         if (vals[1] != null) cached.month = vals[1];
         if (vals[2] != null) cached.total = vals[2];
         cached.dayKey = keys.day;
         cached.monthKey = keys.month;
-        if (shouldUp) markCounted(keys.day);
+        // Claim already set before hit; keep it even if network failed (undercount beats overcount).
+        if (doHit) markCounted(keys.day);
         persistCounts(keys);
         paint();
 
-        // If still empty, force one hit attempt even for returning visitors.
-        if (cached.day == null || cached.month == null) {
+        // Empty display: re-GET only (never hit again).
+        if (cached.day == null || cached.month == null || cached.total == null) {
           return Promise.all([
-            requestCount(dayKey, true),
-            requestCount(monthKey, true),
-            requestCount(TOTAL_KEY, true)
+            getCountOnly(dayKey),
+            getCountOnly(monthKey),
+            getCountOnly(TOTAL_KEY)
           ]).then(function (vals2) {
             if (vals2[0] != null) cached.day = vals2[0];
             if (vals2[1] != null) cached.month = vals2[1];
             if (vals2[2] != null) cached.total = vals2[2];
-            markCounted(keys.day);
             persistCounts(keys);
             paint();
           });
@@ -1408,16 +1453,14 @@
         hookLang();
         hookFooter();
         paint();
-        loadCounts().then(function () {
-          if (cached.day == null || cached.month == null) {
-            return new Promise(function (r) { setTimeout(r, 800); }).then(loadCounts);
-          }
-        });
+        // Single load path — re-paint host later, but do not re-hit (loadCounts serializes + claim).
+        loadCounts();
         window.setTimeout(paint, 250);
         window.setTimeout(paint, 900);
         window.setTimeout(function () {
+          // Re-GET if numbers still missing (never hit).
           if (cached.day == null || cached.month == null) loadCounts();
-        }, 1800);
+        }, 2200);
         // Re-assert host for ~30s (lang switch / texture buttons / alerts).
         var guardN = 0;
         var guard = window.setInterval(function () {
