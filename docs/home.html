@@ -1137,7 +1137,7 @@ html.ideas-sheet-open #visitsFloatDock{display:none!important}
 #visitsFloatDock b{color:#1e40af;font-weight:900}
 html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{bottom:calc(58px + env(safe-area-inset-bottom,0px))}
 </style>
-<div id="ideasPromptSheetInline" class="is-open" role="dialog" aria-modal="true" aria-hidden="false">
+<div id="ideasPromptSheetInline" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="ipc">
     <div class="iph">
       <div class="eye" id="ipiEye">صندوق الأفكار</div>
@@ -1202,9 +1202,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       try { document.documentElement.classList.remove('ideas-sheet-open'); document.body.style.overflow = ''; } catch (e2) {}
     }
   }
-  // افتح فوراً من HTML؛ اخفِ فقط إذا أُرسل سابقاً
-  if (done() && !forceIdeas()) setOpen(false);
-  else setOpen(true);
+  // افتح فقط إذا لم يُرسل سابقاً
+  if (!done() || forceIdeas()) setOpen(true);
 
   function isAr() {
     try {
@@ -2081,8 +2080,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807j"></script>
-  <script src="home-ui-force.js?v=20260807j"></script>
+  <script src="site-visits.js?v=20260807k"></script>
+  <script src="home-ui-force.js?v=20260807k"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {

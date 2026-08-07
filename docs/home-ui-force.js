@@ -195,7 +195,7 @@
     if (document.getElementById('ideasPromptSheetInline')) return document.getElementById('ideasPromptSheetInline');
     var sheet = document.createElement('div');
     sheet.id = 'ideasPromptSheetInline';
-    sheet.className = 'is-open';
+    sheet.className = '';
     sheet.setAttribute('role', 'dialog');
     sheet.setAttribute('aria-modal', 'true');
     sheet.innerHTML =
