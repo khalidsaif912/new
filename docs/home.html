@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260728c"></script>
-  <title>Duty Roster · v20260807n</title>
+  <title>Duty Roster · v20260807o</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1109,8 +1109,16 @@
 </head>
 <body>
 <style id="ideasStaticCss">
-#ideasPromptSheetInline{position:fixed;inset:0;z-index:2147483646!important;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));pointer-events:auto}
-#ideasPromptSheetInline.is-open{display:flex!important}
+#ideasPromptSheetInline{
+  position:fixed;inset:0;z-index:2147483646!important;
+  display:none!important;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.55);padding:16px;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  pointer-events:none;visibility:hidden;
+}
+#ideasPromptSheetInline.is-open{
+  display:flex!important;pointer-events:auto;visibility:visible;
+}
 html.ideas-sheet-open #chg-card{display:none!important}
 html.ideas-sheet-open #chg-dot{opacity:.35}
 html.ideas-sheet-open #visitsFloatDock{display:none!important}
@@ -1137,7 +1145,8 @@ html.ideas-sheet-open #visitsFloatDock{display:none!important}
 #visitsFloatDock b{color:#1e40af;font-weight:900}
 html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{bottom:calc(58px + env(safe-area-inset-bottom,0px))}
 </style>
-<div id="ideasPromptSheetInline" role="dialog" aria-modal="true" aria-hidden="true">
+<!-- always starts hidden; never put is-open in markup (prevents FOUC / cache flash) -->
+<div id="ideasPromptSheetInline" role="dialog" aria-modal="true" aria-hidden="true" hidden style="display:none!important">
   <div class="ipc">
     <div class="iph">
       <div class="eye" id="ipiEye">صندوق الأفكار</div>
@@ -1175,13 +1184,29 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
 <script>
 (function () {
   window.__rosterIdeasPromptBooted = true;
-  var DONE_KEY = 'rosterIdeasDoneV6';
-  var SKIP_KEY = 'rosterIdeasSkipSessionV1';
+  var DONE_KEY = 'rosterIdeasDoneV7';
+  var SKIP_KEY = 'rosterIdeasSkipSessionV2';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var score = 0;
-  var openedAt = 0;
+  var allowClose = false;
   var sheet = document.getElementById('ideasPromptSheetInline');
+
+  // Root-flash kill: force hidden before any other script can paint it open.
+  function forceHide() {
+    if (!sheet) return;
+    try {
+      sheet.classList.remove('is-open');
+      sheet.hidden = true;
+      sheet.setAttribute('aria-hidden', 'true');
+      sheet.style.setProperty('display', 'none', 'important');
+      sheet.style.setProperty('visibility', 'hidden', 'important');
+      sheet.style.setProperty('pointer-events', 'none', 'important');
+      document.documentElement.classList.remove('ideas-sheet-open');
+      document.body.style.overflow = '';
+    } catch (e) {}
+  }
+  forceHide();
 
   function forceIdeas() {
     try {
@@ -1190,13 +1215,19 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     } catch (e) { return false; }
   }
   function done() {
-    try { return localStorage.getItem(DONE_KEY) === '1'; } catch (e) { return false; }
+    try { return localStorage.getItem(DONE_KEY) === '1' || localStorage.getItem('rosterIdeasDoneV6') === '1'; } catch (e) { return false; }
   }
   function sessionSkipped() {
-    try { return sessionStorage.getItem(SKIP_KEY) === '1'; } catch (e) { return false; }
+    try {
+      return sessionStorage.getItem(SKIP_KEY) === '1' ||
+        sessionStorage.getItem('rosterIdeasSkipSessionV1') === '1';
+    } catch (e) { return false; }
   }
   function markSessionSkip() {
-    try { sessionStorage.setItem(SKIP_KEY, '1'); } catch (e) {}
+    try {
+      sessionStorage.setItem(SKIP_KEY, '1');
+      sessionStorage.setItem('rosterIdeasSkipSessionV1', '1');
+    } catch (e) {}
   }
   function shouldShow() {
     if (forceIdeas()) return true;
@@ -1204,24 +1235,27 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
     if (sessionSkipped()) return false;
     return true;
   }
-  function setOpen(on) {
+
+  function setOpen(on, byUser) {
     if (!sheet) return;
     if (on) {
-      sheet.classList.add('is-open');
+      allowClose = false;
+      sheet.hidden = false;
       sheet.setAttribute('aria-hidden', 'false');
-      openedAt = Date.now();
-      try { document.documentElement.classList.add('ideas-sheet-open'); document.body.style.overflow = 'hidden'; } catch (e) {}
-    } else {
-      sheet.classList.remove('is-open');
-      sheet.setAttribute('aria-hidden', 'true');
-      try { document.documentElement.classList.remove('ideas-sheet-open'); document.body.style.overflow = ''; } catch (e2) {}
+      sheet.classList.add('is-open');
+      sheet.style.setProperty('display', 'flex', 'important');
+      sheet.style.setProperty('visibility', 'visible', 'important');
+      sheet.style.setProperty('pointer-events', 'auto', 'important');
+      try {
+        document.documentElement.classList.add('ideas-sheet-open');
+        document.body.style.overflow = 'hidden';
+      } catch (e) {}
+      return;
     }
-  }
-  // Open after first paint so residual taps/clicks from page load cannot close it.
-  if (shouldShow()) {
-    setTimeout(function () {
-      if (shouldShow()) setOpen(true);
-    }, 900);
+    // Ignore accidental / residual closes (page-load taps, other scripts).
+    if (!byUser && !allowClose) return;
+    allowClose = false;
+    forceHide();
   }
 
   function isAr() {
@@ -1260,23 +1294,28 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       else btns[i].classList.remove('on');
     }
   };
+
   function close(fromSubmit) {
-    setOpen(false);
+    allowClose = true;
     markSessionSkip();
     if (fromSubmit) {
-      try { localStorage.setItem(DONE_KEY, '1'); } catch (e) {}
+      try {
+        localStorage.setItem(DONE_KEY, '1');
+        localStorage.setItem('rosterIdeasDoneV6', '1');
+      } catch (e) {}
     }
+    setOpen(false, true);
   }
+
   var later = document.getElementById('ipiLater');
   if (later) later.onclick = function (ev) {
     if (ev) { try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {} }
     close(false);
   };
-  // Backdrop close only after the open settle window (blocks residual page-load taps).
+
+  // No backdrop-close — that was a major source of instant flash-dismiss.
   if (sheet) sheet.addEventListener('click', function (ev) {
-    if (ev.target !== sheet) return;
-    if (Date.now() - openedAt < 900) return;
-    close(false);
+    ev.stopPropagation();
   });
 
   function identity() {
@@ -1348,10 +1387,29 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       });
   };
 
+  // Open only after full load — never during parse/paint races.
+  function tryOpen() {
+    if (!shouldShow()) {
+      forceHide();
+      return;
+    }
+    setOpen(true, true);
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(tryOpen, 400);
+  } else {
+    window.addEventListener('load', function () {
+      setTimeout(tryOpen, 400);
+    }, { once: true });
+  }
+
   window.rosterIdeasPrompt = {
     open: function () {
-      try { sessionStorage.removeItem(SKIP_KEY); } catch (e) {}
-      setOpen(true);
+      try {
+        sessionStorage.removeItem(SKIP_KEY);
+        sessionStorage.removeItem('rosterIdeasSkipSessionV1');
+      } catch (e) {}
+      setOpen(true, true);
       paintLang();
     },
     close: function () { close(false); }
@@ -2112,8 +2170,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807n"></script>
-  <script src="home-ui-force.js?v=20260807n"></script>
+  <script src="site-visits.js?v=20260807o"></script>
+  <script src="home-ui-force.js?v=20260807o"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
