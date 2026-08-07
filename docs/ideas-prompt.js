@@ -11,7 +11,7 @@
   var SKIP_KEY = 'rosterIdeasSkipSessionV8';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
-  var CSS_ID = 'rosterIdeasPromptCssV9';
+  var CSS_ID = 'rosterIdeasPromptCssV10';
   var score = 0;
   var sheet = null;
   var fab = null;
@@ -97,11 +97,16 @@
       '#ideasPromptSheetInline .iph p{margin:8px 0 0;font-size:13px;font-weight:600;opacity:.93;line-height:1.45}' +
       '#ideasPromptSheetInline .ipb{padding:14px 16px;overflow:auto}' +
       '#ideasPromptSheetInline .ipl{display:block;font-size:12px;font-weight:800;color:#334155;margin:0 0 8px}' +
-      '#ideasPromptSheetInline .ips{display:flex;gap:8px;direction:ltr;justify-content:center;background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:10px;margin:0 0 12px}' +
-      '#ideasPromptSheetInline .ips button{border:0;background:0;font-size:30px;color:#cbd5e1;cursor:pointer;padding:2px;line-height:1}' +
-      '#ideasPromptSheetInline .ips button.on{color:#f59e0b}' +
+      '#ideasPromptSheetInline .ipl.rate{color:#92400e;font-size:13px;font-weight:900;margin:0 0 10px;text-align:center}' +
+      '#ideasPromptSheetInline .ips{display:flex;gap:10px;direction:ltr;justify-content:center;background:linear-gradient(180deg,#fffbeb,#fef3c7);border:1.5px solid #fbbf24;border-radius:16px;padding:14px 12px;margin:0 0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 10px rgba(245,158,11,.14)}' +
+      '#ideasPromptSheetInline .ips button{border:0;background:0;font-size:36px;color:#e2e8f0;cursor:pointer;padding:2px 4px;line-height:1;filter:drop-shadow(0 1px 0 rgba(15,23,42,.08));transition:transform .12s ease,color .12s ease}' +
+      '#ideasPromptSheetInline .ips button.on{color:#f59e0b;filter:drop-shadow(0 1px 2px rgba(245,158,11,.45))}' +
+      '#ideasPromptSheetInline .ips button:hover{transform:scale(1.12)}' +
       '#ideasPromptSheetInline textarea{width:100%;min-height:96px;border:1.5px solid #e2e8f0;border-radius:12px;padding:11px 12px;font:inherit;font-size:14px;background:#f8fafc;resize:vertical;box-sizing:border-box}' +
-      '#ideasPromptSheetInline .ipa{display:flex;align-items:center;gap:8px;margin:10px 0 12px;font-size:13px;font-weight:700;color:#334155}' +
+      '#ideasPromptSheetInline .ipaWrap{display:flex;flex-direction:column;gap:8px;margin:10px 0 12px}' +
+      '#ideasPromptSheetInline .ipa{display:flex;align-items:center;gap:10px;margin:0;font-size:13px;font-weight:700;color:#334155;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;cursor:pointer}' +
+      '#ideasPromptSheetInline .ipa:has(input:checked){border-color:#93c5fd;background:#eff6ff;color:#1e40af}' +
+      '#ideasPromptSheetInline .ipa input{width:18px;height:18px;accent-color:#2563eb;margin:0;flex-shrink:0}' +
       '#ideasPromptSheetInline .ipacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
       '#ideasPromptSheetInline .ipbtn{border:0;border-radius:999px;min-height:44px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 12px}' +
       '#ideasPromptSheetInline .ipbtn.pri{grid-column:1/-1;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff}' +
@@ -261,6 +266,13 @@
     if (!host) return false;
 
     sheet = document.getElementById('ideasPromptSheetInline');
+    if (sheet && sheet.isConnected && !document.querySelector('input[name="ipiIdMode"]')) {
+      // Upgrade older modal markup (anon checkbox only).
+      try {
+        if (sheet.parentNode) sheet.parentNode.removeChild(sheet);
+      } catch (eUp) {}
+      sheet = null;
+    }
     if (!sheet || !sheet.isConnected) {
       if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
       sheet = document.createElement('div');
@@ -271,7 +283,7 @@
       sheet.innerHTML =
         '<div class="ipc">' +
         '<div class="iph"><div class="eye" id="ipiEye"></div><h2 id="ipiTitle"></h2><p id="ipiSub"></p></div>' +
-        '<div class="ipb"><span class="ipl" id="ipiRateL"></span>' +
+        '<div class="ipb"><span class="ipl rate" id="ipiRateL"></span>' +
         '<div class="ips" id="ipiStars">' +
         [1, 2, 3, 4, 5]
           .map(function (n) {
@@ -281,7 +293,10 @@
         '</div>' +
         '<label class="ipl" for="ipiText" id="ipiIdeaL"></label>' +
         '<textarea id="ipiText" maxlength="500"></textarea>' +
-        '<label class="ipa"><input type="checkbox" id="ipiAnon" checked><span id="ipiAnonL"></span></label>' +
+        '<div class="ipaWrap" role="radiogroup">' +
+        '<label class="ipa"><input type="radio" name="ipiIdMode" value="show" checked><span id="ipiShowL"></span></label>' +
+        '<label class="ipa"><input type="radio" name="ipiIdMode" value="anon"><span id="ipiAnonL"></span></label>' +
+        '</div>' +
         '<div class="ipacts">' +
         '<button type="button" class="ipbtn pri" id="ipiSend"></button>' +
         '<button type="button" class="ipbtn mut" id="ipiLater"></button>' +
@@ -336,9 +351,10 @@
           eye: 'صندوق الأفكار',
           title: 'رأيك يهمنا',
           sub: 'قيّم الموقع بالنجوم واكتب مقترحك هنا مباشرة.',
-          rate: 'تقييم الموقع',
+          rate: 'قيّم الموقع بالنجوم',
           idea: 'اكتب اقتراحك',
           ph: 'ما الذي تود تحسينه؟',
+          show: 'إظهار اسمي',
           anon: 'إخفاء هويتي',
           send: 'إرسال',
           later: 'لاحقاً',
@@ -349,9 +365,10 @@
           eye: 'Ideas box',
           title: 'We value your feedback',
           sub: 'Rate with stars and write your idea here.',
-          rate: 'Site rating',
+          rate: 'Rate this site',
           idea: 'Write your idea',
           ph: 'What would you improve?',
+          show: 'Show my name',
           anon: 'Stay anonymous',
           send: 'Send',
           later: 'Later',
@@ -367,6 +384,7 @@
     t('ipiSub', map.sub);
     t('ipiRateL', map.rate);
     t('ipiIdeaL', map.idea);
+    t('ipiShowL', map.show);
     t('ipiAnonL', map.anon);
     t('ipiSend', map.send);
     t('ipiLater', map.later);
@@ -469,7 +487,8 @@
           msg.textContent = isAr() ? 'اكتب اقتراحاً (٤ أحرف+)' : 'Write an idea (4+ chars)';
           return;
         }
-        var anon = !!(document.getElementById('ipiAnon') && document.getElementById('ipiAnon').checked);
+        var anonEl = document.querySelector('input[name="ipiIdMode"][value="anon"]');
+        var anon = !!(anonEl && anonEl.checked);
         var idn = identity();
         msg.className = 'ipm';
         msg.textContent = '…';

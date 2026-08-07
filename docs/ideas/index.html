@@ -55,7 +55,9 @@
       border: 0; background: rgba(255, 255, 255, .16); color: #fff;
       border-radius: 999px; width: 36px; height: 36px; font-size: 16px; cursor: pointer;
       border: 1px solid rgba(255, 255, 255, .22);
+      display: none; /* only for owner id */
     }
+    .header button.adminGear.is-owner { display: inline-flex; align-items: center; justify-content: center; }
     .bannerTitleEyebrow {
       position: relative; z-index: 1;
       display: block; font-size: 12px; font-weight: 700;
@@ -136,15 +138,20 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
     }
     .row-opts {
-      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      display: flex; flex-direction: column; gap: 8px;
       margin: 10px 0 14px;
     }
-    .anonSwitch {
-      display: inline-flex; align-items: center; gap: 8px;
+    .idOpt {
+      display: flex; align-items: center; gap: 10px;
       font-size: 13px; font-weight: 700; color: #334155; cursor: pointer;
       user-select: none;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 10px 12px;
     }
-    .anonSwitch input { width: 18px; height: 18px; accent-color: #2563eb; }
+    .idOpt:has(input:checked) {
+      border-color: #93c5fd; background: #eff6ff; color: #1e40af;
+    }
+    .idOpt input { width: 18px; height: 18px; accent-color: #2563eb; margin: 0; flex-shrink: 0; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; }
     .btn {
       border: 0; border-radius: 999px; min-height: 44px; padding: 0 18px;
@@ -203,25 +210,44 @@
     .ideaMeta .who { color: #1e40af; }
     .ideaMeta .anon { color: #94a3b8; }
 
-    .stars {
-      display: inline-flex; gap: 4px; direction: ltr;
+    .rateBlock {
+      margin-top: 4px; padding-top: 12px; border-top: 1px solid #f1f5f9;
     }
-    .stars button {
-      border: 0; background: transparent; padding: 2px; cursor: pointer;
-      font-size: 22px; line-height: 1; color: #cbd5e1;
-      transition: transform .12s ease, color .12s ease;
+    .rateLabel {
+      display: block; margin: 0 0 8px;
+      font-size: 12px; font-weight: 900; color: #92400e; letter-spacing: .02em;
     }
-    .stars button.on { color: #f59e0b; }
-    .stars button:hover { transform: scale(1.12); }
-    .stars button:disabled { cursor: default; opacity: .85; }
     .rateRow {
       display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-      gap: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9;
+      gap: 10px;
     }
+    .stars {
+      display: inline-flex; gap: 6px; direction: ltr;
+      background: linear-gradient(180deg, #fffbeb, #fef3c7);
+      border: 1.5px solid #fbbf24;
+      border-radius: 14px;
+      padding: 8px 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 8px rgba(245, 158, 11, .12);
+    }
+    .stars button {
+      border: 0; background: transparent; padding: 2px 3px; cursor: pointer;
+      font-size: 30px; line-height: 1; color: #e2e8f0;
+      text-shadow: 0 0 0 #94a3b8;
+      filter: drop-shadow(0 1px 0 rgba(15,23,42,.08));
+      transition: transform .12s ease, color .12s ease, filter .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stars button.on {
+      color: #f59e0b;
+      filter: drop-shadow(0 1px 2px rgba(245, 158, 11, .45));
+    }
+    .stars button:not(:disabled):hover { transform: scale(1.14); }
+    .stars button:not(:disabled):active { transform: scale(1.06); }
+    .stars button:disabled { cursor: default; opacity: .95; }
     .avg {
       font-size: 12px; font-weight: 800; color: #b45309;
       background: #fffbeb; border: 1px solid #fde68a;
-      border-radius: 999px; padding: 4px 10px;
+      border-radius: 999px; padding: 6px 12px;
     }
     .adminActs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .empty {
@@ -257,10 +283,10 @@
   <div class="wrap">
     <header class="header">
       <a class="back" id="homeLink" href="../index.html">الرئيسية</a>
-      <button type="button" class="adminGear" id="adminBtn" title="إدارة">⚙</button>
+      <button type="button" class="adminGear" id="adminBtn" aria-label="Admin" hidden></button>
       <span class="bannerTitleEyebrow">صندوق الأفكار</span>
       <h1 class="bannerTitleMain">اقتراحات وأفكار</h1>
-      <p class="lead">شاركنا فكرتك لتحسين الروستر والموقع — يمكنك إخفاء هويتك أو إظهارها.</p>
+      <p class="lead">شاركنا فكرتك لتحسين الروستر والموقع.</p>
     </header>
 
     <div class="summaryBar">
@@ -285,9 +311,13 @@
         <p class="hint">اكتب بوضوح ما تودّه من تحسين أو ميزة جديدة. التقييم يكون للأفكار بعد نشرها.</p>
         <label class="field" for="ideaText">فكرتك</label>
         <textarea id="ideaText" maxlength="800" placeholder="مثال: إضافة تنبيه قبل بداية الوردية…"></textarea>
-        <div class="row-opts">
-          <label class="anonSwitch">
-            <input type="checkbox" id="ideaAnon" checked>
+        <div class="row-opts" role="radiogroup" aria-label="الهوية">
+          <label class="idOpt">
+            <input type="radio" name="ideaIdMode" value="show" checked>
+            <span>إظهار اسمي</span>
+          </label>
+          <label class="idOpt">
+            <input type="radio" name="ideaIdMode" value="anon">
             <span>إخفاء هويتي</span>
           </label>
         </div>
@@ -304,13 +334,13 @@
     </div>
     <div id="ideasHost"><div class="empty">جاري التحميل…</div></div>
 
-    <p class="footer">يُدار المحتوى من هذه الصفحة · PIN الإدارة: من أيقونة ⚙</p>
+    <p class="footer">شكراً لمشاركتك</p>
   </div>
 
   <div class="sheet" id="adminSheet" aria-hidden="true">
     <div class="sheetCard" role="dialog">
-      <h3>دخول الإدارة</h3>
-      <p>لتثبيت أو حذف الأفكار. الجلسة تبقى مفتوحة حتى إغلاق التبويب.</p>
+      <h3>دخول</h3>
+      <p>أدخل الرمز للمتابعة.</p>
       <input type="password" id="adminPin" inputmode="numeric" maxlength="12" placeholder="••••" autocomplete="off">
       <div class="actions">
         <button type="button" class="btn btn-primary" id="adminUnlock">دخول</button>
@@ -326,6 +356,7 @@
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
     var PIN = '912';
+    var OWNER_EMP_ID = '8715';
     var AUTH_KEY = 'rosterIdeasAdminAuth';
     var VOTE_KEY = 'rosterIdeaVotesV1';
     var state = { ideas: [], siteRatings: [] };
@@ -337,6 +368,23 @@
       return h;
     }
 
+    function readSavedEmpId() {
+      try {
+        return String(
+          localStorage.getItem('exportSavedEmpId') ||
+            localStorage.getItem('savedEmpId') ||
+            localStorage.getItem('importSavedEmpId') ||
+            ''
+        ).trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function isOwner() {
+      return readSavedEmpId() === OWNER_EMP_ID;
+    }
+
     function isAdmin() {
       try { return sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) { return false; }
     }
@@ -346,7 +394,25 @@
         if (on) sessionStorage.setItem(AUTH_KEY, '1');
         else sessionStorage.removeItem(AUTH_KEY);
       } catch (e) {}
+      syncAdminGear();
       render();
+    }
+
+    function syncAdminGear() {
+      var btn = document.getElementById('adminBtn');
+      if (!btn) return;
+      // Visible only for the owner device (saved employee id). No public hints.
+      if (isOwner() || isAdmin()) {
+        btn.hidden = false;
+        btn.classList.add('is-owner');
+        btn.textContent = isAdmin() ? '✓' : '⚙';
+        btn.title = '';
+        btn.removeAttribute('title');
+      } else {
+        btn.hidden = true;
+        btn.classList.remove('is-owner');
+        btn.textContent = '';
+      }
     }
 
     function visitorKey() {
@@ -595,11 +661,14 @@
               (idea.pinned ? '<div class="pinBadge">📌 مثبّت</div>' : '') +
               '<p class="ideaText">' + escapeHtml(idea.body) + '</p>' +
               '<div class="ideaMeta">' + who + '<span>·</span><span>' + escapeHtml(formatTime(idea.at)) + '</span></div>' +
-              '<div class="rateRow">' +
-                starButtons(idea.id, mine || Math.round(avg), voted && !admin) +
-                '<span class="avg">' +
-                  (avg ? (avg + ' من 5 · ' + (idea.ratingCount || 0) + ' تقييم') : 'بدون تقييم بعد') +
-                '</span>' +
+              '<div class="rateBlock">' +
+                '<span class="rateLabel">قيّم هذه الفكرة</span>' +
+                '<div class="rateRow">' +
+                  starButtons(idea.id, mine || Math.round(avg), voted && !admin) +
+                  '<span class="avg">' +
+                    (avg ? (avg + ' من 5 · ' + (idea.ratingCount || 0) + ' تقييم') : 'بدون تقييم بعد') +
+                  '</span>' +
+                '</div>' +
               '</div>' +
               adminHtml +
             '</div>' +
@@ -626,7 +695,8 @@
         msg.textContent = 'اكتب فكرة أوضح (٤ أحرف على الأقل).';
         return;
       }
-      var anon = !!document.getElementById('ideaAnon').checked;
+      var anonEl = document.querySelector('input[name="ideaIdMode"][value="anon"]');
+      var anon = !!(anonEl && anonEl.checked);
       msg.className = 'msg';
       msg.textContent = 'جاري النشر…';
       try {
@@ -707,6 +777,7 @@
 
     var sheet = document.getElementById('adminSheet');
     document.getElementById('adminBtn').addEventListener('click', function () {
+      if (!isOwner() && !isAdmin()) return;
       if (isAdmin()) {
         setAdmin(false);
         return;
@@ -722,6 +793,10 @@
       sheet.setAttribute('aria-hidden', 'true');
     });
     document.getElementById('adminUnlock').addEventListener('click', function () {
+      if (!isOwner() && !isAdmin()) {
+        document.getElementById('adminErr').textContent = 'غير مسموح';
+        return;
+      }
       var pin = document.getElementById('adminPin').value;
       if (String(pin) !== PIN) {
         document.getElementById('adminErr').textContent = 'رمز خاطئ';
@@ -742,6 +817,7 @@
       }
     } catch (e) {}
 
+    syncAdminGear();
     reload();
   })();
   </script>
