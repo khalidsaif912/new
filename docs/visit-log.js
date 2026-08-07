@@ -146,6 +146,12 @@
         return fetchJson(secondary).then(parseCount);
       })
       .catch(function () {
+        if (!doUp) {
+          return fetchJson(abacusHit).then(parseCount);
+        }
+        return null;
+      })
+      .catch(function () {
         return null;
       });
   }
@@ -1320,6 +1326,12 @@
         window.setTimeout(function () {
           if (cached.day == null || cached.month == null) loadCounts();
         }, 1800);
+        var guardN = 0;
+        var guard = window.setInterval(function () {
+          guardN += 1;
+          paint();
+          if (guardN >= 12) window.clearInterval(guard);
+        }, 1000);
       }
     } catch (eBoot) {}
     // Visit log immediately so short stays still register.

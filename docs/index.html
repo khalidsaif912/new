@@ -895,6 +895,18 @@
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
+    /* Visitor stats: always visible (lang switch / sheets must not hide this) */
+    #siteVisitsHost.siteVisitsHost,
+    .footer #siteVisitsHost {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative;
+      z-index: 2;
+      margin: 6px 0 10px !important;
+      min-height: 1.4em;
+      pointer-events: auto;
+    }
 
     /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
     .captureSheet {
@@ -3263,7 +3275,7 @@ function goToRosterDiff(event) {
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260806f');
+  addScript(root + '/site-visits.js?v=20260807a');
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);

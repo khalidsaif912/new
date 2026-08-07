@@ -146,6 +146,13 @@
         return fetchJson(secondary).then(parseCount);
       })
       .catch(function () {
+        // First-of-day GET is often 404 until a hit creates the key.
+        if (!doUp) {
+          return fetchJson(abacusHit).then(parseCount);
+        }
+        return null;
+      })
+      .catch(function () {
         return null;
       });
   }
@@ -1321,6 +1328,13 @@
         window.setTimeout(function () {
           if (cached.day == null || cached.month == null) loadCounts();
         }, 1800);
+        // Re-assert host for ~12s in case another script mutates the footer.
+        var guardN = 0;
+        var guard = window.setInterval(function () {
+          guardN += 1;
+          paint();
+          if (guardN >= 12) window.clearInterval(guard);
+        }, 1000);
       }
     } catch (eBoot) {}
     // Visit log immediately so short stays still register.
