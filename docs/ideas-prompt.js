@@ -1,129 +1,237 @@
 /**
- * Homepage modal: site rating + suggestion (3-day campaign).
- * Loads early; shows reliably on homepage visits during the campaign.
+ * Ideas/rating modal — creates its own DOM (never relies on static early-body HTML).
+ * Early-body nodes on home.html can disappear after other homepage scripts run, so
+ * anything that only binds to those nodes will silently never show.
  */
 (function () {
   if (window.__rosterIdeasPromptBooted) return;
   window.__rosterIdeasPromptBooted = true;
 
+  var DONE_KEY = 'rosterIdeasDoneV8';
+  var SKIP_KEY = 'rosterIdeasSkipSessionV8';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
-  var CAMPAIGN_KEY = 'rosterIdeasCampaignV3';
-  var SESSION_SKIP = 'rosterIdeasPromptSkipSession';
-  var WINDOW_MS = 3 * 24 * 3600 * 1000;
+  var CSS_ID = 'rosterIdeasPromptCssV8';
+  var score = 0;
+  var sheet = null;
+  var fab = null;
 
+  function forceParam() {
+    try {
+      var q = new URLSearchParams(location.search || '');
+      return q.get('ideas') === '1' || q.get('ideas') === 'force';
+    } catch (e) {
+      return false;
+    }
+  }
+  function isDone() {
+    try {
+      return localStorage.getItem(DONE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+  function isSkipped() {
+    try {
+      return sessionStorage.getItem(SKIP_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+  function shouldAutoShow() {
+    if (forceParam()) return true;
+    if (isDone()) return false;
+    if (isSkipped()) return false;
+    return true;
+  }
   function isAr() {
     try {
-      return document.body && document.body.classList.contains('ar');
+      return (
+        localStorage.getItem('rosterLang') === 'ar' ||
+        (document.body && document.body.classList.contains('ar'))
+      );
     } catch (e) {
       return true;
     }
   }
-
-  function t(key) {
-    var ar = {
-      title: 'رأيك يهمنا',
-      sub: 'لمدة 3 أيام: قيّم الموقع بالنجوم واكتب مقترحك في نفس النافذة.',
-      rate: 'تقييم الموقع (نجوم)',
-      idea: 'اكتب اقتراحك أو فكرتك',
-      ph: 'مثال: أريد تنبيهاً قبل بداية الوردية…',
-      anon: 'إخفاء هويتي',
-      send: 'إرسال',
-      later: 'لاحقاً',
-      browse: 'كل الأفكار',
-      thanks: 'شكراً لمشاركتك ✦',
-      needStars: 'اختر تقييماً بالنجوم أولاً',
-      needIdea: 'اكتب اقتراحاً (٤ أحرف على الأقل)',
-      err: 'تعذر الإرسال. حاول لاحقاً.',
-      daysLeft: 'متبقي'
-    };
-    var en = {
-      title: 'We value your feedback',
-      sub: 'For 3 days: rate with stars and write your idea in this same window.',
-      rate: 'Site rating (stars)',
-      idea: 'Write your suggestion or idea',
-      ph: 'e.g. A reminder before my shift…',
-      anon: 'Stay anonymous',
-      send: 'Send',
-      later: 'Later',
-      browse: 'All ideas',
-      thanks: 'Thanks for sharing ✦',
-      needStars: 'Pick a star rating first',
-      needIdea: 'Write a suggestion (at least 4 characters)',
-      err: 'Could not send. Try later.',
-      daysLeft: 'Left'
-    };
-    return (isAr() ? ar : en)[key] || key;
-  }
-
   function ideasHref() {
     try {
       var path = String(location.pathname || '');
       if (/\/docs\//.test(path)) return path.replace(/\/docs\/.*$/, '/docs/ideas/');
       if (/\/roster-site\//.test(path)) return path.replace(/\/roster-site\/.*$/, '/roster-site/ideas/');
-      if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/ideas/';
     } catch (e) {}
     return 'ideas/';
   }
 
-  function readCampaign() {
-    try {
-      var j = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || 'null');
-      if (j && Number(j.start) > 0) return j;
-    } catch (e) {}
-    return null;
+  function injectCss() {
+    if (document.getElementById(CSS_ID)) return;
+    var st = document.createElement('style');
+    st.id = CSS_ID;
+    st.textContent =
+      '#ideasPromptSheetInline{position:fixed;inset:0;z-index:2147483646!important;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}' +
+      '#ideasPromptSheetInline.is-open{display:flex!important}' +
+      'html.ideas-sheet-open #chg-card{display:none!important}' +
+      'html.ideas-sheet-open #visitsFloatDock{display:none!important}' +
+      '#ideasPromptSheetInline .ipc{width:min(100%,390px);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 22px 54px rgba(15,23,42,.3);border:1px solid rgba(15,23,42,.1);max-height:min(92dvh,720px);display:flex;flex-direction:column}' +
+      '#ideasPromptSheetInline .iph{background:linear-gradient(135deg,#1e40af,#1976d2 50%,#0ea5e9);color:#fff;padding:18px}' +
+      '#ideasPromptSheetInline .iph .eye{font-size:11px;font-weight:800;opacity:.9;margin-bottom:4px}' +
+      '#ideasPromptSheetInline .iph h2{margin:0;font-size:20px;font-weight:800}' +
+      '#ideasPromptSheetInline .iph p{margin:8px 0 0;font-size:13px;font-weight:600;opacity:.93;line-height:1.45}' +
+      '#ideasPromptSheetInline .ipb{padding:14px 16px;overflow:auto}' +
+      '#ideasPromptSheetInline .ipl{display:block;font-size:12px;font-weight:800;color:#334155;margin:0 0 8px}' +
+      '#ideasPromptSheetInline .ips{display:flex;gap:8px;direction:ltr;justify-content:center;background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:10px;margin:0 0 12px}' +
+      '#ideasPromptSheetInline .ips button{border:0;background:0;font-size:30px;color:#cbd5e1;cursor:pointer;padding:2px;line-height:1}' +
+      '#ideasPromptSheetInline .ips button.on{color:#f59e0b}' +
+      '#ideasPromptSheetInline textarea{width:100%;min-height:96px;border:1.5px solid #e2e8f0;border-radius:12px;padding:11px 12px;font:inherit;font-size:14px;background:#f8fafc;resize:vertical;box-sizing:border-box}' +
+      '#ideasPromptSheetInline .ipa{display:flex;align-items:center;gap:8px;margin:10px 0 12px;font-size:13px;font-weight:700;color:#334155}' +
+      '#ideasPromptSheetInline .ipacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
+      '#ideasPromptSheetInline .ipbtn{border:0;border-radius:999px;min-height:44px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 12px}' +
+      '#ideasPromptSheetInline .ipbtn.pri{grid-column:1/-1;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff}' +
+      '#ideasPromptSheetInline .ipbtn.mut{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}' +
+      '#ideasPromptSheetInline .ipbtn.lnk{background:#fff;color:#1d4ed8;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;text-decoration:none}' +
+      '#ideasPromptSheetInline .ipm{min-height:18px;margin:10px 0 0;text-align:center;font-size:12px;font-weight:700;color:#64748b}' +
+      '#ideasPromptSheetInline .ipm.err{color:#b91c1c}#ideasPromptSheetInline .ipm.ok{color:#15803d}' +
+      '#ideasFab{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:100050;border:0;border-radius:999px;min-height:44px;padding:0 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,#1e40af,#2563eb);box-shadow:0 8px 20px rgba(37,99,235,.35)}' +
+      'html.ideas-sheet-open #ideasFab{display:none!important}';
+    (document.head || document.documentElement).appendChild(st);
   }
 
-  function writeCampaign(j) {
-    try {
-      localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(j));
-    } catch (e) {}
+  function mount() {
+    injectCss();
+    var host = document.body || document.documentElement;
+    if (!host) return false;
+
+    sheet = document.getElementById('ideasPromptSheetInline');
+    if (!sheet || !sheet.isConnected) {
+      if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
+      sheet = document.createElement('div');
+      sheet.id = 'ideasPromptSheetInline';
+      sheet.setAttribute('role', 'dialog');
+      sheet.setAttribute('aria-modal', 'true');
+      sheet.setAttribute('aria-hidden', 'true');
+      sheet.innerHTML =
+        '<div class="ipc">' +
+        '<div class="iph"><div class="eye" id="ipiEye"></div><h2 id="ipiTitle"></h2><p id="ipiSub"></p></div>' +
+        '<div class="ipb"><span class="ipl" id="ipiRateL"></span>' +
+        '<div class="ips" id="ipiStars">' +
+        [1, 2, 3, 4, 5]
+          .map(function (n) {
+            return '<button type="button" data-s="' + n + '" aria-label="' + n + '">★</button>';
+          })
+          .join('') +
+        '</div>' +
+        '<label class="ipl" for="ipiText" id="ipiIdeaL"></label>' +
+        '<textarea id="ipiText" maxlength="500"></textarea>' +
+        '<label class="ipa"><input type="checkbox" id="ipiAnon" checked><span id="ipiAnonL"></span></label>' +
+        '<div class="ipacts">' +
+        '<button type="button" class="ipbtn pri" id="ipiSend"></button>' +
+        '<button type="button" class="ipbtn mut" id="ipiLater"></button>' +
+        '<a class="ipbtn lnk" id="ipiBrowse" href="ideas/"></a>' +
+        '</div><p class="ipm" id="ipiMsg"></p></div></div>';
+      host.appendChild(sheet);
+    }
+
+    fab = document.getElementById('ideasFab');
+    if (!fab || !fab.isConnected) {
+      if (fab && fab.parentNode) fab.parentNode.removeChild(fab);
+      fab = document.createElement('button');
+      fab.type = 'button';
+      fab.id = 'ideasFab';
+      fab.setAttribute('aria-label', 'Ideas');
+      host.appendChild(fab);
+    }
+
+    bind();
+    paintLang();
+    return true;
   }
 
-  function ensureCampaign() {
-    var j = readCampaign();
-    if (j) return j;
-    j = { start: Date.now(), done: false };
-    writeCampaign(j);
-    return j;
-  }
-
-  function daysLeft() {
-    var j = ensureCampaign();
-    var left = Math.ceil((Number(j.start) + WINDOW_MS - Date.now()) / (24 * 3600 * 1000));
-    return Math.max(0, left);
-  }
-
-  function shouldShow() {
-    try {
-      var q = new URLSearchParams(location.search || '');
-      if (q.get('ideas') === '1' || q.get('ideas') === 'force') return true;
-      if (sessionStorage.getItem(SESSION_SKIP) === '1') return false;
-      var j = ensureCampaign();
-      if (j.done) return false;
-      if (Date.now() - Number(j.start) > WINDOW_MS) return false;
-      return true;
-    } catch (e) {
-      return true;
+  function setOpen(on) {
+    if (!sheet || !sheet.isConnected) mount();
+    if (!sheet) return;
+    if (on) {
+      // Always re-append so a detached node never "opens" invisibly.
+      if (!sheet.isConnected) (document.body || document.documentElement).appendChild(sheet);
+      sheet.classList.add('is-open');
+      sheet.setAttribute('aria-hidden', 'false');
+      try {
+        document.documentElement.classList.add('ideas-sheet-open');
+        document.body.style.overflow = 'hidden';
+      } catch (e) {}
+    } else {
+      sheet.classList.remove('is-open');
+      sheet.setAttribute('aria-hidden', 'true');
+      try {
+        document.documentElement.classList.remove('ideas-sheet-open');
+        document.body.style.overflow = '';
+      } catch (e2) {}
     }
   }
 
-  function markSessionSkip() {
-    try {
-      sessionStorage.setItem(SESSION_SKIP, '1');
-    } catch (e) {}
+  function paintLang() {
+    var ar = isAr();
+    var map = ar
+      ? {
+          eye: 'صندوق الأفكار',
+          title: 'رأيك يهمنا',
+          sub: 'قيّم الموقع بالنجوم واكتب مقترحك هنا مباشرة.',
+          rate: 'تقييم الموقع',
+          idea: 'اكتب اقتراحك',
+          ph: 'ما الذي تود تحسينه؟',
+          anon: 'إخفاء هويتي',
+          send: 'إرسال',
+          later: 'لاحقاً',
+          browse: 'كل الأفكار',
+          fab: 'صندوق الأفكار'
+        }
+      : {
+          eye: 'Ideas box',
+          title: 'We value your feedback',
+          sub: 'Rate with stars and write your idea here.',
+          rate: 'Site rating',
+          idea: 'Write your idea',
+          ph: 'What would you improve?',
+          anon: 'Stay anonymous',
+          send: 'Send',
+          later: 'Later',
+          browse: 'All ideas',
+          fab: 'Ideas'
+        };
+    function t(id, v) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = v;
+    }
+    t('ipiEye', map.eye);
+    t('ipiTitle', map.title);
+    t('ipiSub', map.sub);
+    t('ipiRateL', map.rate);
+    t('ipiIdeaL', map.idea);
+    t('ipiAnonL', map.anon);
+    t('ipiSend', map.send);
+    t('ipiLater', map.later);
+    t('ipiBrowse', map.browse);
+    t('ideasFab', map.fab);
+    var ta = document.getElementById('ipiText');
+    if (ta) ta.placeholder = map.ph;
+    var br = document.getElementById('ipiBrowse');
+    if (br) br.href = ideasHref();
   }
 
-  function markCampaignDone() {
-    var j = ensureCampaign();
-    j.done = true;
-    writeCampaign(j);
-    markSessionSkip();
+  function close(fromSubmit) {
+    setOpen(false);
+    try {
+      sessionStorage.setItem(SKIP_KEY, '1');
+    } catch (e) {}
+    if (fromSubmit) {
+      try {
+        localStorage.setItem(DONE_KEY, '1');
+      } catch (e2) {}
+    }
   }
 
   function identity() {
-    var empId = '';
-    var name = '';
+    var empId = '',
+      name = '';
     try {
       empId =
         localStorage.getItem('exportSavedEmpId') ||
@@ -139,306 +247,170 @@
     return { empId: String(empId || '').trim(), name: String(name || '').trim() };
   }
 
-  function ensureCss() {
-    if (document.getElementById('rosterIdeasPromptCss')) return;
-    var style = document.createElement('style');
-    style.id = 'rosterIdeasPromptCss';
-    style.textContent =
-      '.ideasPromptSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;' +
-      'background:rgba(15,23,42,.55);z-index:200000!important;padding:16px;' +
-      'padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}' +
-      '.ideasPromptSheet.open{display:flex!important}' +
-      '.ideasPromptCard{width:min(100%,390px);background:#fff;border-radius:20px;padding:0;overflow:hidden;' +
-      'border:1px solid rgba(15,23,42,.1);box-shadow:0 22px 54px rgba(15,23,42,.28);' +
-      'animation:ideasPromptIn .28s ease;max-height:min(92dvh,720px);display:flex;flex-direction:column}' +
-      '@keyframes ideasPromptIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}' +
-      '.ideasPromptHero{background:linear-gradient(135deg,#1e40af 0%,#1976d2 50%,#0ea5e9 100%);' +
-      'color:#fff;padding:18px 18px 14px;position:relative;overflow:hidden;flex:none}' +
-      '.ideasPromptHero:before,.ideasPromptHero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.1)}' +
-      '.ideasPromptHero:before{width:100px;height:100px;top:-30px;left:-20px}' +
-      '.ideasPromptHero:after{width:120px;height:120px;bottom:-50px;right:-30px}' +
-      '.ideasPromptEyebrow{position:relative;z-index:1;display:block;font-size:11px;font-weight:800;opacity:.9;margin-bottom:4px}' +
-      '.ideasPromptTitle{position:relative;z-index:1;margin:0;font-size:20px;font-weight:800}' +
-      '.ideasPromptSub{position:relative;z-index:1;margin:8px 0 0;font-size:12.5px;line-height:1.5;font-weight:600;opacity:.93}' +
-      '.ideasPromptDays{position:relative;z-index:1;display:inline-flex;margin-top:10px;font-size:11px;font-weight:800;' +
-      'background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 10px}' +
-      '.ideasPromptBody{padding:14px 16px 14px;overflow:auto;-webkit-overflow-scrolling:touch}' +
-      '.ideasPromptLabel{display:block;font-size:12px;font-weight:800;color:#334155;margin:0 0 8px}' +
-      '.ideasPromptStars{display:flex;gap:8px;direction:ltr;margin:0 0 14px;justify-content:center;' +
-      'background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:10px 8px}' +
-      '.ideasPromptStars button{border:0;background:transparent;font-size:30px;line-height:1;color:#cbd5e1;cursor:pointer;padding:2px}' +
-      '.ideasPromptStars button.on{color:#f59e0b}' +
-      '.ideasPromptTA{width:100%;min-height:100px;resize:vertical;border:1.5px solid #e2e8f0;border-radius:12px;' +
-      'padding:11px 12px;font:inherit;font-size:14px;background:#f8fafc;color:#0f172a;outline:none}' +
-      '.ideasPromptTA:focus{border-color:#60a5fa;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}' +
-      '.ideasPromptAnon{display:flex;align-items:center;gap:8px;margin:10px 0 14px;font-size:13px;font-weight:700;color:#334155;cursor:pointer}' +
-      '.ideasPromptAnon input{width:17px;height:17px;accent-color:#2563eb}' +
-      '.ideasPromptActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
-      '.ideasPromptBtn{border:0;border-radius:999px;min-height:44px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 12px}' +
-      '.ideasPromptBtn--primary{background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;box-shadow:0 8px 18px rgba(37,99,235,.28);grid-column:1/-1}' +
-      '.ideasPromptBtn--muted{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}' +
-      '.ideasPromptBtn--link{background:transparent;color:#1d4ed8;border:1px solid #bfdbfe;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}' +
-      '.ideasPromptMsg{min-height:18px;margin:10px 0 0;font-size:12px;font-weight:700;color:#64748b;text-align:center}' +
-      '.ideasPromptMsg.ok{color:#15803d}.ideasPromptMsg.err{color:#b91c1c}';
-    document.head.appendChild(style);
-  }
-
-  function inject() {
-    if (document.getElementById('ideasPromptSheet')) return;
-    ensureCss();
-    var sheet = document.createElement('div');
-    sheet.id = 'ideasPromptSheet';
-    sheet.className = 'ideasPromptSheet';
-    sheet.setAttribute('aria-hidden', 'true');
-    sheet.innerHTML =
-      '<div class="ideasPromptCard" role="dialog" aria-modal="true">' +
-        '<div class="ideasPromptHero">' +
-          '<span class="ideasPromptEyebrow" id="ideasPromptEye"></span>' +
-          '<h2 class="ideasPromptTitle" id="ideasPromptTitle"></h2>' +
-          '<p class="ideasPromptSub" id="ideasPromptSub"></p>' +
-          '<span class="ideasPromptDays" id="ideasPromptDays"></span>' +
-        '</div>' +
-        '<div class="ideasPromptBody">' +
-          '<span class="ideasPromptLabel" id="ideasPromptRateLabel"></span>' +
-          '<div class="ideasPromptStars" id="ideasPromptStars">' +
-            [1, 2, 3, 4, 5]
-              .map(function (n) {
-                return '<button type="button" data-score="' + n + '">★</button>';
-              })
-              .join('') +
-          '</div>' +
-          '<label class="ideasPromptLabel" for="ideasPromptText" id="ideasPromptIdeaLabel"></label>' +
-          '<textarea class="ideasPromptTA" id="ideasPromptText" maxlength="500"></textarea>' +
-          '<label class="ideasPromptAnon"><input type="checkbox" id="ideasPromptAnon" checked><span id="ideasPromptAnonLabel"></span></label>' +
-          '<div class="ideasPromptActions">' +
-            '<button type="button" class="ideasPromptBtn ideasPromptBtn--primary" id="ideasPromptSend"></button>' +
-            '<button type="button" class="ideasPromptBtn ideasPromptBtn--muted" id="ideasPromptLater"></button>' +
-            '<a class="ideasPromptBtn ideasPromptBtn--link" id="ideasPromptBrowse" href="ideas/"></a>' +
-          '</div>' +
-          '<p class="ideasPromptMsg" id="ideasPromptMsg"></p>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(sheet);
-  }
-
-  function applyI18n() {
-    var el = function (id) {
-      return document.getElementById(id);
-    };
-    if (!el('ideasPromptTitle')) return;
-    el('ideasPromptTitle').textContent = t('title');
-    el('ideasPromptSub').textContent = t('sub');
-    el('ideasPromptRateLabel').textContent = t('rate');
-    el('ideasPromptIdeaLabel').textContent = t('idea');
-    el('ideasPromptText').placeholder = t('ph');
-    el('ideasPromptAnonLabel').textContent = t('anon');
-    el('ideasPromptSend').textContent = t('send');
-    el('ideasPromptLater').textContent = t('later');
-    el('ideasPromptBrowse').textContent = t('browse');
-    el('ideasPromptBrowse').href = ideasHref();
-    el('ideasPromptEye').textContent = isAr() ? 'صندوق الأفكار' : 'Ideas box';
-    el('ideasPromptDays').textContent =
-      t('daysLeft') + ': ' + daysLeft() + (isAr() ? ' يوم' : ' day(s)');
-  }
-
-  var score = 0;
-  var bound = false;
-
-  function paintStars() {
-    var nodes = document.querySelectorAll('#ideasPromptStars button');
-    for (var i = 0; i < nodes.length; i++) {
-      var b = nodes[i];
-      var n = Number(b.getAttribute('data-score') || 0);
-      if (n <= score) b.classList.add('on');
-      else b.classList.remove('on');
-    }
-  }
-
-  function open() {
-    try {
-      inject();
-      applyI18n();
-      score = 0;
-      paintStars();
-      var ta = document.getElementById('ideasPromptText');
-      if (ta) ta.value = '';
-      var msg = document.getElementById('ideasPromptMsg');
-      if (msg) {
-        msg.textContent = '';
-        msg.className = 'ideasPromptMsg';
-      }
-      var sheet = document.getElementById('ideasPromptSheet');
-      if (!sheet) return;
-      sheet.classList.add('open');
-      sheet.setAttribute('aria-hidden', 'false');
-      try {
-        document.body.style.overflow = 'hidden';
-      } catch (e0) {}
-    } catch (e) {}
-  }
-
-  function close(fromSubmit) {
-    var sheet = document.getElementById('ideasPromptSheet');
-    if (sheet) {
-      sheet.classList.remove('open');
-      sheet.setAttribute('aria-hidden', 'true');
-    }
-    try {
-      document.body.style.overflow = '';
-    } catch (e) {}
-    if (fromSubmit) markCampaignDone();
-    else markSessionSkip();
-  }
-
-  function headers(write) {
-    var h = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
-    if (write) h['Content-Type'] = 'application/json';
-    return h;
-  }
-
-  function submit() {
-    var msg = document.getElementById('ideasPromptMsg');
-    if (!score) {
-      if (msg) {
-        msg.className = 'ideasPromptMsg err';
-        msg.textContent = t('needStars');
-      }
-      return;
-    }
-    var text = String((document.getElementById('ideasPromptText') || {}).value || '').trim();
-    if (text.length < 4) {
-      if (msg) {
-        msg.className = 'ideasPromptMsg err';
-        msg.textContent = t('needIdea');
-      }
-      return;
-    }
-    var anon = !!(document.getElementById('ideasPromptAnon') || {}).checked;
-    var idn = identity();
-    if (msg) {
-      msg.className = 'ideasPromptMsg';
-      msg.textContent = '…';
-    }
-
-    fetch(MANTLE_URL + '?ts=' + Date.now(), { headers: headers(false), cache: 'no-store' })
-      .then(function (res) {
-        if (!res.ok && res.status !== 404) throw new Error('read');
-        return res.status === 404 ? {} : res.json().catch(function () { return {}; });
-      })
-      .then(function (doc) {
-        if (!doc || typeof doc !== 'object') doc = {};
-        if (!Array.isArray(doc.ideas)) doc.ideas = [];
-        if (!Array.isArray(doc.siteRatings)) doc.siteRatings = [];
-        doc.siteRatings.unshift({
-          score: score,
-          at: Date.now(),
-          anonymous: anon,
-          name: anon ? '' : idn.name,
-          empId: anon ? '' : idn.empId,
-          comment: text.slice(0, 400)
-        });
-        if (doc.siteRatings.length > 400) doc.siteRatings = doc.siteRatings.slice(0, 400);
-        doc.ideas.unshift({
-          id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-          body: text.slice(0, 800),
-          anonymous: anon,
-          name: anon ? '' : idn.name,
-          empId: anon ? '' : idn.empId,
-          at: Date.now(),
-          pinned: false,
-          ratingSum: 0,
-          ratingCount: 0,
-          votes: {}
-        });
-        if (doc.ideas.length > 120) doc.ideas = doc.ideas.slice(0, 120);
-        return fetch(MANTLE_URL, {
-          method: 'POST',
-          headers: headers(true),
-          body: JSON.stringify(doc)
-        });
-      })
-      .then(function (put) {
-        if (!put.ok) throw new Error('write');
-        if (msg) {
-          msg.className = 'ideasPromptMsg ok';
-          msg.textContent = t('thanks');
-        }
-        window.setTimeout(function () {
-          close(true);
-        }, 1000);
-      })
-      .catch(function () {
-        if (msg) {
-          msg.className = 'ideasPromptMsg err';
-          msg.textContent = t('err');
-        }
-      });
-  }
-
   function bind() {
-    if (bound) return;
-    inject();
-    applyI18n();
-    var stars = document.getElementById('ideasPromptStars');
-    if (stars) {
-      stars.addEventListener('click', function (ev) {
-        var b = ev.target && ev.target.closest ? ev.target.closest('button[data-score]') : null;
+    var stars = document.getElementById('ipiStars');
+    if (stars && !stars.__ideasBound) {
+      stars.__ideasBound = true;
+      stars.onclick = function (ev) {
+        var b = ev.target && ev.target.closest && ev.target.closest('button[data-s]');
         if (!b) return;
-        score = Number(b.getAttribute('data-score') || 0);
-        paintStars();
-      });
+        score = Number(b.getAttribute('data-s') || 0);
+        var btns = stars.querySelectorAll('button');
+        for (var i = 0; i < btns.length; i++) {
+          if (Number(btns[i].getAttribute('data-s')) <= score) btns[i].classList.add('on');
+          else btns[i].classList.remove('on');
+        }
+      };
     }
-    var send = document.getElementById('ideasPromptSend');
-    if (send) send.addEventListener('click', submit);
-    var later = document.getElementById('ideasPromptLater');
-    if (later)
-      later.addEventListener('click', function () {
+    var later = document.getElementById('ipiLater');
+    if (later && !later.__ideasBound) {
+      later.__ideasBound = true;
+      later.onclick = function (ev) {
+        if (ev) {
+          try {
+            ev.preventDefault();
+            ev.stopPropagation();
+          } catch (e) {}
+        }
         close(false);
-      });
-    var sheet = document.getElementById('ideasPromptSheet');
-    if (sheet) {
-      sheet.addEventListener('click', function (ev) {
-        if (ev.target === sheet) close(false);
-      });
+      };
     }
-    bound = true;
+    var fabEl = document.getElementById('ideasFab');
+    if (fabEl && !fabEl.__ideasBound) {
+      fabEl.__ideasBound = true;
+      fabEl.onclick = function () {
+        try {
+          sessionStorage.removeItem(SKIP_KEY);
+        } catch (e) {}
+        setOpen(true);
+        paintLang();
+      };
+    }
+    var send = document.getElementById('ipiSend');
+    if (send && !send.__ideasBound) {
+      send.__ideasBound = true;
+      send.onclick = function () {
+        var msg = document.getElementById('ipiMsg');
+        if (!msg) return;
+        if (!score) {
+          msg.className = 'ipm err';
+          msg.textContent = isAr() ? 'اختر النجوم أولاً' : 'Pick stars first';
+          return;
+        }
+        var text = String((document.getElementById('ipiText') || {}).value || '').trim();
+        if (text.length < 4) {
+          msg.className = 'ipm err';
+          msg.textContent = isAr() ? 'اكتب اقتراحاً (٤ أحرف+)' : 'Write an idea (4+ chars)';
+          return;
+        }
+        var anon = !!(document.getElementById('ipiAnon') && document.getElementById('ipiAnon').checked);
+        var idn = identity();
+        msg.className = 'ipm';
+        msg.textContent = '…';
+        fetch(MANTLE_URL + '?ts=' + Date.now(), {
+          headers: { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY },
+          cache: 'no-store'
+        })
+          .then(function (r) {
+            if (r.status === 404) return {};
+            if (!r.ok) throw new Error('r');
+            return r.json().catch(function () {
+              return {};
+            });
+          })
+          .then(function (doc) {
+            doc = doc || {};
+            if (!Array.isArray(doc.ideas)) doc.ideas = [];
+            if (!Array.isArray(doc.siteRatings)) doc.siteRatings = [];
+            doc.siteRatings.unshift({
+              score: score,
+              at: Date.now(),
+              anonymous: anon,
+              name: anon ? '' : idn.name,
+              empId: anon ? '' : idn.empId,
+              comment: text.slice(0, 400)
+            });
+            doc.ideas.unshift({
+              id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+              body: text.slice(0, 800),
+              anonymous: anon,
+              name: anon ? '' : idn.name,
+              empId: anon ? '' : idn.empId,
+              at: Date.now(),
+              pinned: false,
+              ratingSum: 0,
+              ratingCount: 0,
+              votes: {}
+            });
+            if (doc.ideas.length > 120) doc.ideas = doc.ideas.slice(0, 120);
+            if (doc.siteRatings.length > 400) doc.siteRatings = doc.siteRatings.slice(0, 400);
+            return fetch(MANTLE_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY },
+              body: JSON.stringify(doc)
+            });
+          })
+          .then(function (put) {
+            if (!put.ok) throw new Error('w');
+            msg.className = 'ipm ok';
+            msg.textContent = isAr() ? 'شكراً ✦' : 'Thanks ✦';
+            setTimeout(function () {
+              close(true);
+            }, 900);
+          })
+          .catch(function () {
+            msg.className = 'ipm err';
+            msg.textContent = isAr() ? 'تعذر الإرسال' : 'Could not send';
+          });
+      };
+    }
   }
 
-  function tryOpen() {
-    try {
-      bind();
-      if (!shouldShow()) return;
-      open();
-    } catch (e) {}
+  function tryAutoOpen() {
+    mount();
+    if (!shouldAutoShow()) return;
+    setOpen(true);
   }
 
   function boot() {
-    // Open shortly after page is interactive so phone prompt doesn't permanently block
-    window.setTimeout(tryOpen, 1200);
-    window.setTimeout(function () {
-      // Retry if first attempt was blocked by an empty body / race
-      if (!document.getElementById('ideasPromptSheet') || !document.getElementById('ideasPromptSheet').classList.contains('open')) {
-        tryOpen();
+    mount();
+    // Staggered opens: tolerate late removers / late layout scripts.
+    [200, 700, 1500, 2800, 5000].forEach(function (ms) {
+      setTimeout(tryAutoOpen, ms);
+    });
+    // Keep nodes alive for a short window if another script cleans early body nodes.
+    var n = 0;
+    var keep = setInterval(function () {
+      n += 1;
+      mount();
+      if (shouldAutoShow() && sheet && !sheet.classList.contains('is-open') && n < 6) {
+        setOpen(true);
       }
-    }, 3500);
+      if (n >= 12) clearInterval(keep);
+    }, 800);
   }
+
+  window.rosterIdeasPrompt = {
+    open: function () {
+      try {
+        sessionStorage.removeItem(SKIP_KEY);
+      } catch (e) {}
+      mount();
+      setOpen(true);
+      paintLang();
+    },
+    close: function () {
+      close(false);
+    }
+  };
+
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest && e.target.closest('#langToggle')) setTimeout(paintLang, 0);
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {
     boot();
   }
-
-  window.rosterIdeasPrompt = {
-    open: function () {
-      try {
-        sessionStorage.removeItem(SESSION_SKIP);
-      } catch (e) {}
-      bind();
-      open();
-    },
-    close: function () {
-      close(false);
-    }
-  };
 })();
