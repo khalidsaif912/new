@@ -121,18 +121,26 @@
     (document.head || document.documentElement).appendChild(st);
   }
 
+  function starEmojiHtml() {
+    return (
+      '<img alt="" aria-hidden="true" decoding="async" ' +
+      'src="https://fonts.gstatic.com/s/e/notoemoji/latest/2b50/512.gif">'
+    );
+  }
+
   function fabFrames() {
     var ar = isAr();
+    var star = starEmojiHtml();
     return ar
       ? [
           { kind: 'text', html: 'صندوق' },
           { kind: 'text', html: 'الأفكار' },
-          { kind: 'emoji', html: '⭐' }
+          { kind: 'emoji', html: star }
         ]
       : [
           { kind: 'text', html: 'Box' },
           { kind: 'text', html: 'Ideas' },
-          { kind: 'emoji', html: '⭐' }
+          { kind: 'emoji', html: star }
         ];
   }
 
