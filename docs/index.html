@@ -1737,6 +1737,99 @@
     </div>
   </div>
 
+  <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
+  <script src="site-visits.js?v=20260807b"></script>
+  <script>
+  /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
+  (function () {
+    function setText(id, v) {
+      var el = document.getElementById(id);
+      if (el && v != null && v !== '') el.textContent = String(v);
+    }
+    function ar() {
+      try { return document.body && document.body.classList.contains('ar'); } catch (e) { return false; }
+    }
+    function ymd() {
+      try {
+        var parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
+        }).formatToParts(new Date());
+        var map = {};
+        parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
+        return { day: map.year + '-' + map.month + '-' + map.day, month: map.year + '-' + map.month };
+      } catch (e) {
+        var d = new Date();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return { day: d.getFullYear() + '-' + m + '-' + day, month: d.getFullYear() + '-' + m };
+      }
+    }
+    function getCount(url) {
+      return fetch(url, { cache: 'no-store', mode: 'cors' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('n');
+          return r.json();
+        })
+        .then(function (j) {
+          if (j && typeof j.value === 'number') return j.value;
+          if (j && typeof j.count === 'number') return j.count;
+          return null;
+        })
+        .catch(function () { return null; });
+    }
+    function fillLabels() {
+      setText('siteVisitsDayLabel', ar() ? 'زوار اليوم:' : 'Visitors today:');
+      setText('siteVisitsMonthLabel', ar() ? 'هذا الشهر:' : 'This month:');
+      setText('siteVisitsTotalLabel', ar() ? 'الإجمالي:' : 'Total:');
+      var host = document.getElementById('siteVisitsHost');
+      if (host) {
+        host.style.display = 'block';
+        host.hidden = false;
+        host.setAttribute('dir', ar() ? 'rtl' : 'ltr');
+      }
+    }
+    function fill() {
+      fillLabels();
+      if (window.__inlineVisitsFilled) return;
+      var host = document.getElementById('siteVisitsHost');
+      if (!host) return;
+      // إن سبق site-visits.js وملأ الأرقام، لا تزِد
+      var dayEl = document.getElementById('siteVisitsDay');
+      if (dayEl && dayEl.textContent && dayEl.textContent !== '--') {
+        window.__inlineVisitsFilled = true;
+        return;
+      }
+      var keys = ymd();
+      var NS = 'khalidsaif912.github.io';
+      var dayKey = 'day-' + keys.day;
+      var monthKey = 'month-' + keys.month;
+      var totalKey = 'total-visits';
+      function one(key) {
+        // قراءة فقط — الزيادة تتم عبر site-visits.js حتى لا تتضاعف
+        return getCount('https://abacus.jasoncameron.dev/get/' + NS + '/' + key);
+      }
+      Promise.all([one(dayKey), one(monthKey), one(totalKey)]).then(function (vals) {
+        if (vals[0] != null) setText('siteVisitsDay', vals[0]);
+        if (vals[1] != null) setText('siteVisitsMonth', vals[1]);
+        if (vals[2] != null) setText('siteVisitsTotal', vals[2]);
+        // إن فشل get لليوم، اسمح بـ hit مرة واحدة عبر الملف الأساسي بعد تأخره
+        if (vals[0] == null) {
+          getCount('https://abacus.jasoncameron.dev/hit/' + NS + '/' + dayKey).then(function (v) {
+            if (v != null) setText('siteVisitsDay', v);
+          });
+        }
+        if (vals[0] != null || vals[1] != null) window.__inlineVisitsFilled = true;
+      });
+    }
+    fill();
+    setTimeout(fill, 600);
+    setTimeout(fill, 2000);
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('#langToggle')) setTimeout(fillLabels, 0);
+    });
+  })();
+  </script>
+
 </div>
 
 <div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
@@ -3275,7 +3368,7 @@ function goToRosterDiff(event) {
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260807a');
+  // site-visits: محمول مبكراً عبر مسار نسبي فوق — لا تعِد التحميل هنا
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
@@ -3579,10 +3672,7 @@ function goToRosterDiff(event) {
 
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
-  var DONE_KEY = 'rosterIdeasDoneV4';
-  var SESSION_SKIP = 'rosterIdeasSkipV4';
-  var START_KEY = 'rosterIdeasStartV4';
-  var CAMPAIGN_MS = 3 * 24 * 60 * 60 * 1000; // 3 أيام من أول زيارة
+  var DONE_KEY = 'rosterIdeasDoneV5';
   var score = 0;
 
   function isAr() {
@@ -3631,15 +3721,9 @@ function goToRosterDiff(event) {
     try {
       var q = new URLSearchParams(location.search || '');
       if (q.get('ideas') === '1' || q.get('ideas') === 'force') return true;
-      if (sessionStorage.getItem(SESSION_SKIP) === '1') return false;
+      // تظهر دائماً حتى يُرسل المستخدم (لا تخزين "لاحقاً" يخفيها)
       if (localStorage.getItem(DONE_KEY) === '1') return false;
-      var now = Date.now();
-      var start = Number(localStorage.getItem(START_KEY) || 0);
-      if (!start || !isFinite(start)) {
-        start = now;
-        localStorage.setItem(START_KEY, String(start));
-      }
-      return (now - start) <= CAMPAIGN_MS;
+      return true;
     } catch (e) {
       return true;
     }
@@ -3737,20 +3821,20 @@ function goToRosterDiff(event) {
   }
 
   function open() {
-    try {
-      ensureUi();
-      paintLang();
-      score = 0;
-      var btns = document.querySelectorAll('#ipiStars button');
-      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
-      document.getElementById('ipiText').value = '';
-      document.getElementById('ipiMsg').textContent = '';
-      document.getElementById('ipiMsg').className = 'ipm';
-      var sheet = document.getElementById('ideasPromptSheetInline');
-      sheet.classList.add('open');
-      sheet.setAttribute('aria-hidden', 'false');
-      try { document.body.style.overflow = 'hidden'; } catch (e) {}
-    } catch (e) {}
+    ensureUi();
+    paintLang();
+    score = 0;
+    var btns = document.querySelectorAll('#ipiStars button');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+    var textEl = document.getElementById('ipiText');
+    if (textEl) textEl.value = '';
+    var msgEl = document.getElementById('ipiMsg');
+    if (msgEl) { msgEl.textContent = ''; msgEl.className = 'ipm'; }
+    var sheet = document.getElementById('ideasPromptSheetInline');
+    if (!sheet) return;
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    try { document.body.style.overflow = 'hidden'; } catch (e) {}
   }
 
   function close(fromSubmit) {
@@ -3762,16 +3846,17 @@ function goToRosterDiff(event) {
     try { document.body.style.overflow = ''; } catch (e) {}
     try {
       if (fromSubmit) localStorage.setItem(DONE_KEY, '1');
-      sessionStorage.setItem(SESSION_SKIP, '1');
     } catch (e2) {}
   }
 
   function submit() {
     var msg = document.getElementById('ipiMsg');
+    if (!msg) return;
     if (!score) { msg.className = 'ipm err'; msg.textContent = t('needStars'); return; }
-    var text = String(document.getElementById('ipiText').value || '').trim();
+    var text = String((document.getElementById('ipiText') || {}).value || '').trim();
     if (text.length < 4) { msg.className = 'ipm err'; msg.textContent = t('needIdea'); return; }
-    var anon = !!document.getElementById('ipiAnon').checked;
+    var anonEl = document.getElementById('ipiAnon');
+    var anon = !!(anonEl && anonEl.checked);
     var idn = identity();
     msg.className = 'ipm'; msg.textContent = '…';
     var headers = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
@@ -3819,12 +3904,13 @@ function goToRosterDiff(event) {
   }
 
   function boot() {
-    // بعد لحظات من التحميل — وقبل نافذة الهاتف إن أمكن
-    setTimeout(tryOpen, 900);
+    tryOpen();
+    setTimeout(tryOpen, 400);
+    setTimeout(tryOpen, 1200);
     setTimeout(function () {
       var el = document.getElementById('ideasPromptSheetInline');
       if (!el || !el.classList.contains('open')) tryOpen();
-    }, 2500);
+    }, 2800);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
