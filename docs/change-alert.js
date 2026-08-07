@@ -1267,7 +1267,7 @@ function boot() {
       if (typeof window.rosterForceHomeUI === 'function') window.rosterForceHomeUI();
       else {
         var s = document.createElement('script');
-        s.src = getBase() + 'home-ui-force.js?v=20260807h';
+        s.src = getBase() + 'home-ui-force.js?v=20260807i';
         s.async = true;
         document.head.appendChild(s);
       }

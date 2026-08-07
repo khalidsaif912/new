@@ -94,11 +94,11 @@
       'letter-spacing:.01em!important;color:#64748b!important;background:none!important;border:0!important}' +
       '#siteVisitsHost .svPart{display:flex!important;flex-direction:row!important;' +
       'align-items:baseline!important;gap:4px!important;white-space:nowrap!important}' +
-      '#siteVisitsHost .svLabel{font-size:13px!important;font-weight:400!important;color:#94a3b8!important;line-height:1.6!important}' +
-      '#siteVisitsHost .svNum{font-size:13px!important;font-weight:700!important;color:#1e40af!important;' +
+      '#siteVisitsHost .svLabel{font-size:11px!important;font-weight:400!important;color:#94a3b8!important;line-height:1.6!important}' +
+      '#siteVisitsHost .svNum{font-size:11px!important;font-weight:700!important;color:#1e40af!important;' +
       'font-variant-numeric:tabular-nums!important;line-height:1.6!important}' +
-      '#siteVisitsHost .svDot{display:block!important;width:28px!important;text-align:center!important;' +
-      'color:#cbd5e1!important;font-size:13px!important;line-height:1.6!important;flex-shrink:0!important}';
+      '#siteVisitsHost .svDot{display:block!important;width:22px!important;text-align:center!important;' +
+      'color:#cbd5e1!important;font-size:11px!important;line-height:1.6!important;flex-shrink:0!important}';
     document.head.appendChild(st);
   }
 
