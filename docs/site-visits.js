@@ -85,18 +85,20 @@
     st.id = 'siteVisitsStyles';
     st.textContent =
       '#siteVisitsHost.siteVisitsHost,.footer #siteVisitsHost{' +
-      'display:block!important;visibility:visible!important;opacity:1!important;' +
-      'position:relative!important;z-index:5!important;margin:14px auto 12px!important;' +
-      'padding:0 8px!important;text-align:center!important;' +
+      'display:flex!important;flex-direction:row!important;justify-content:center!important;' +
+      'align-items:baseline!important;flex-wrap:nowrap!important;gap:0!important;' +
+      'visibility:visible!important;opacity:1!important;position:relative!important;z-index:5!important;' +
+      'margin:13px auto 11px!important;padding:0!important;width:auto!important;max-width:100%!important;' +
       'font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif!important;' +
-      'font-size:13px!important;font-weight:400!important;line-height:1.85!important;' +
-      'letter-spacing:.01em!important;color:#64748b!important;' +
-      'background:none!important;border:0!important;box-shadow:none!important}' +
-      '#siteVisitsHost .svPart{display:inline;white-space:nowrap}' +
-      '#siteVisitsHost .svLabel{display:inline;font-size:12.5px;font-weight:500;color:#64748b;margin-inline-end:.4em}' +
-      '#siteVisitsHost .svNum{display:inline;font-size:14.5px;font-weight:700;color:#1e3a8a;' +
-      'font-variant-numeric:tabular-nums;letter-spacing:.01em}' +
-      '#siteVisitsHost .svDot{display:inline-block;margin:0 .7em;color:#94a3b8;opacity:.7}';
+      'font-size:13px!important;font-weight:400!important;line-height:1.6!important;' +
+      'letter-spacing:.01em!important;color:#64748b!important;background:none!important;border:0!important}' +
+      '#siteVisitsHost .svPart{display:flex!important;flex-direction:row!important;' +
+      'align-items:baseline!important;gap:4px!important;white-space:nowrap!important}' +
+      '#siteVisitsHost .svLabel{font-size:13px!important;font-weight:400!important;color:#94a3b8!important;line-height:1.6!important}' +
+      '#siteVisitsHost .svNum{font-size:13px!important;font-weight:700!important;color:#1e40af!important;' +
+      'font-variant-numeric:tabular-nums!important;line-height:1.6!important}' +
+      '#siteVisitsHost .svDot{display:block!important;width:28px!important;text-align:center!important;' +
+      'color:#cbd5e1!important;font-size:13px!important;line-height:1.6!important;flex-shrink:0!important}';
     document.head.appendChild(st);
   }
 
