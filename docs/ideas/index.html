@@ -52,12 +52,28 @@
     }
     .header button.adminGear {
       position: absolute; top: 12px; left: 12px; z-index: 4;
-      border: 0; background: rgba(255, 255, 255, .16); color: #fff;
-      border-radius: 999px; width: 36px; height: 36px; font-size: 16px; cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, .22);
-      display: none; /* only for owner id */
+      border: 0 !important;
+      background: rgba(255, 255, 255, .16) !important;
+      color: #fff !important;
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .22) !important;
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
     }
-    .header button.adminGear.is-owner { display: inline-flex; align-items: center; justify-content: center; }
+    .header button.adminGear.is-owner {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      opacity: 1 !important;
+    }
     .bannerTitleEyebrow {
       position: relative; z-index: 1;
       display: block; font-size: 12px; font-weight: 700;
@@ -283,7 +299,7 @@
   <div class="wrap">
     <header class="header">
       <a class="back" id="homeLink" href="../index.html">الرئيسية</a>
-      <button type="button" class="adminGear" id="adminBtn" aria-label="Admin" hidden></button>
+      <!-- Admin control is injected only for owner emp id — never in static public HTML. -->
       <span class="bannerTitleEyebrow">صندوق الأفكار</span>
       <h1 class="bannerTitleMain">اقتراحات وأفكار</h1>
       <p class="lead">شاركنا فكرتك لتحسين الروستر والموقع.</p>
@@ -357,7 +373,9 @@
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
     var PIN = '912';
     var OWNER_EMP_ID = '8715';
-    var AUTH_KEY = 'rosterIdeasAdminAuth';
+    // Bump key so leftover public "admin unlocked" sessions from the old open gear die.
+    var AUTH_KEY = 'rosterIdeasAdminAuthV2';
+    var LEGACY_AUTH_KEYS = ['rosterIdeasAdminAuth', 'rosterIdeasAdminAuthV1'];
     var VOTE_KEY = 'rosterIdeaVotesV1';
     var state = { ideas: [], siteRatings: [] };
     var saving = false;
@@ -375,7 +393,9 @@
             localStorage.getItem('savedEmpId') ||
             localStorage.getItem('importSavedEmpId') ||
             ''
-        ).trim();
+        )
+          .replace(/\D/g, '')
+          .trim();
       } catch (e) {
         return '';
       }
@@ -385,11 +405,27 @@
       return readSavedEmpId() === OWNER_EMP_ID;
     }
 
+    function scrubLegacyAdminSessions() {
+      try {
+        LEGACY_AUTH_KEYS.forEach(function (k) {
+          sessionStorage.removeItem(k);
+        });
+        // Non-owners must never keep admin rights.
+        if (!isOwner()) sessionStorage.removeItem(AUTH_KEY);
+      } catch (e) {}
+    }
+
     function isAdmin() {
-      try { return sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) { return false; }
+      if (!isOwner()) return false;
+      try {
+        return sessionStorage.getItem(AUTH_KEY) === '1';
+      } catch (e) {
+        return false;
+      }
     }
 
     function setAdmin(on) {
+      if (on && !isOwner()) return;
       try {
         if (on) sessionStorage.setItem(AUTH_KEY, '1');
         else sessionStorage.removeItem(AUTH_KEY);
@@ -398,21 +434,47 @@
       render();
     }
 
+    /** Ensure the gear exists only for owner — remove from DOM completely otherwise. */
     function syncAdminGear() {
+      scrubLegacyAdminSessions();
+      var header = document.querySelector('.header');
       var btn = document.getElementById('adminBtn');
-      if (!btn) return;
-      // Visible only for the owner device (saved employee id). No public hints.
-      if (isOwner() || isAdmin()) {
-        btn.hidden = false;
-        btn.classList.add('is-owner');
-        btn.textContent = isAdmin() ? '✓' : '⚙';
-        btn.title = '';
-        btn.removeAttribute('title');
-      } else {
-        btn.hidden = true;
-        btn.classList.remove('is-owner');
-        btn.textContent = '';
+
+      if (!isOwner()) {
+        if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+        return;
       }
+
+      if (!header) return;
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'adminBtn';
+        btn.className = 'adminGear is-owner';
+        btn.setAttribute('aria-label', 'Admin');
+        btn.addEventListener('click', onAdminBtnClick);
+        header.appendChild(btn);
+      } else {
+        btn.classList.add('is-owner');
+      }
+      btn.textContent = isAdmin() ? '✓' : '⚙';
+    }
+
+    function onAdminBtnClick() {
+      if (!isOwner()) return;
+      var sheet = document.getElementById('adminSheet');
+      if (!sheet) return;
+      if (isAdmin()) {
+        setAdmin(false);
+        return;
+      }
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      document.getElementById('adminPin').value = '';
+      document.getElementById('adminErr').textContent = '';
+      setTimeout(function () {
+        document.getElementById('adminPin').focus();
+      }, 50);
     }
 
     function visitorKey() {
@@ -776,24 +838,12 @@
     });
 
     var sheet = document.getElementById('adminSheet');
-    document.getElementById('adminBtn').addEventListener('click', function () {
-      if (!isOwner() && !isAdmin()) return;
-      if (isAdmin()) {
-        setAdmin(false);
-        return;
-      }
-      sheet.classList.add('open');
-      sheet.setAttribute('aria-hidden', 'false');
-      document.getElementById('adminPin').value = '';
-      document.getElementById('adminErr').textContent = '';
-      setTimeout(function () { document.getElementById('adminPin').focus(); }, 50);
-    });
     document.getElementById('adminCancel').addEventListener('click', function () {
       sheet.classList.remove('open');
       sheet.setAttribute('aria-hidden', 'true');
     });
     document.getElementById('adminUnlock').addEventListener('click', function () {
-      if (!isOwner() && !isAdmin()) {
+      if (!isOwner()) {
         document.getElementById('adminErr').textContent = 'غير مسموح';
         return;
       }
@@ -817,6 +867,7 @@
       }
     } catch (e) {}
 
+    scrubLegacyAdminSessions();
     syncAdminGear();
     reload();
   })();
