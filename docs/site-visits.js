@@ -19,18 +19,11 @@
   };
 
   var HOST_HTML =
-    '<div class="svChip">' +
-      '<span class="svLabel" id="siteVisitsDayLabel"></span>' +
-      '<span class="svNum" id="siteVisitsDay">--</span>' +
-    '</div>' +
-    '<div class="svChip">' +
-      '<span class="svLabel" id="siteVisitsMonthLabel"></span>' +
-      '<span class="svNum" id="siteVisitsMonth">--</span>' +
-    '</div>' +
-    '<div class="svChip">' +
-      '<span class="svLabel" id="siteVisitsTotalLabel"></span>' +
-      '<span class="svNum" id="siteVisitsTotal">--</span>' +
-    '</div>';
+    '<span class="svPart"><span class="svLabel" id="siteVisitsDayLabel"></span><span class="svNum" id="siteVisitsDay">--</span></span>' +
+    '<span class="svDot" aria-hidden="true">·</span>' +
+    '<span class="svPart"><span class="svLabel" id="siteVisitsMonthLabel"></span><span class="svNum" id="siteVisitsMonth">--</span></span>' +
+    '<span class="svDot" aria-hidden="true">·</span>' +
+    '<span class="svPart"><span class="svLabel" id="siteVisitsTotalLabel"></span><span class="svNum" id="siteVisitsTotal">--</span></span>';
 
   function lang() {
     var l = localStorage.getItem('rosterLang') || document.documentElement.getAttribute('lang') || 'en';
@@ -73,25 +66,37 @@
     }
   }
 
+  function ensureVisitsFont() {
+    if (document.getElementById('siteVisitsFont')) return;
+    try {
+      var link = document.createElement('link');
+      link.id = 'siteVisitsFont';
+      link.rel = 'stylesheet';
+      link.href =
+        'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
+      document.head.appendChild(link);
+    } catch (e) {}
+  }
+
   function injectVisitsStyles() {
+    ensureVisitsFont();
     if (document.getElementById('siteVisitsStyles')) return;
     var st = document.createElement('style');
     st.id = 'siteVisitsStyles';
     st.textContent =
       '#siteVisitsHost.siteVisitsHost,.footer #siteVisitsHost{' +
-      'display:flex!important;flex-wrap:wrap!important;justify-content:center!important;' +
-      'align-items:stretch!important;gap:8px!important;visibility:visible!important;opacity:1!important;' +
-      'position:relative!important;z-index:5!important;margin:12px auto!important;padding:0!important;' +
-      'max-width:400px!important;width:100%!important;box-sizing:border-box!important;' +
-      'font-family:inherit!important;line-height:1.25!important;color:#64748b!important}' +
-      '#siteVisitsHost .svChip{flex:1 1 96px;min-width:96px;max-width:128px;display:flex;flex-direction:column;' +
-      'align-items:center;justify-content:center;gap:3px;padding:9px 10px 8px;border-radius:14px;' +
-      'background:rgba(255,255,255,.72);border:1px solid rgba(30,64,175,.13);' +
-      'box-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 4px 12px rgba(15,23,42,.05)}' +
-      '#siteVisitsHost .svLabel{display:block;font-size:10.5px;font-weight:700;color:#64748b;line-height:1.2;white-space:nowrap}' +
-      '#siteVisitsHost .svNum{display:block;font-size:17px;font-weight:800;color:#1e40af;' +
-      'font-variant-numeric:tabular-nums;line-height:1.15;letter-spacing:-.02em}' +
-      'body.roster-bg-textured #siteVisitsHost .svChip{background:rgba(255,255,255,.82)}';
+      'display:block!important;visibility:visible!important;opacity:1!important;' +
+      'position:relative!important;z-index:5!important;margin:14px auto 12px!important;' +
+      'padding:0 8px!important;text-align:center!important;' +
+      'font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif!important;' +
+      'font-size:13px!important;font-weight:400!important;line-height:1.85!important;' +
+      'letter-spacing:.01em!important;color:#64748b!important;' +
+      'background:none!important;border:0!important;box-shadow:none!important}' +
+      '#siteVisitsHost .svPart{display:inline;white-space:nowrap}' +
+      '#siteVisitsHost .svLabel{display:inline;font-size:12.5px;font-weight:500;color:#64748b;margin-inline-end:.4em}' +
+      '#siteVisitsHost .svNum{display:inline;font-size:14.5px;font-weight:700;color:#1e3a8a;' +
+      'font-variant-numeric:tabular-nums;letter-spacing:.01em}' +
+      '#siteVisitsHost .svDot{display:inline-block;margin:0 .7em;color:#94a3b8;opacity:.7}';
     document.head.appendChild(st);
   }
 
@@ -237,8 +242,12 @@
       host.className = 'siteVisitsHost';
       host.setAttribute('aria-label', 'Visitor stats');
       host.innerHTML = HOST_HTML;
-    } else if (!host.querySelector('.svChip') || !document.getElementById('siteVisitsDay')) {
-      // Upgrade legacy single-line markup to chip layout
+    } else if (
+      !host.querySelector('.svPart') ||
+      host.querySelector('.svChip') ||
+      !document.getElementById('siteVisitsDay')
+    ) {
+      // Upgrade legacy chip / single-line markup to pure text layout
       host.className = 'siteVisitsHost';
       host.innerHTML = HOST_HTML;
     }

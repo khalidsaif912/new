@@ -58,22 +58,22 @@
     var footer = document.querySelector('.footer');
     if (!footer) return null;
     var host = document.getElementById('siteVisitsHost');
+    var textHtml =
+      '<span class="svPart"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></span>' +
+      '<span class="svDot" aria-hidden="true">·</span>' +
+      '<span class="svPart"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></span>' +
+      '<span class="svDot" aria-hidden="true">·</span>' +
+      '<span class="svPart"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></span>';
     if (!host) {
       host = document.createElement('div');
       host.id = 'siteVisitsHost';
       host.className = 'siteVisitsHost';
       host.setAttribute('dir', 'rtl');
       host.setAttribute('aria-label', 'Visitor stats');
-      host.innerHTML =
-        '<div class="svChip"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></div>' +
-        '<div class="svChip"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></div>' +
-        '<div class="svChip"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></div>';
-    } else if (!host.querySelector('.svChip')) {
+      host.innerHTML = textHtml;
+    } else if (!host.querySelector('.svPart') || host.querySelector('.svChip')) {
       host.className = 'siteVisitsHost';
-      host.innerHTML =
-        '<div class="svChip"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></div>' +
-        '<div class="svChip"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></div>' +
-        '<div class="svChip"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></div>';
+      host.innerHTML = textHtml;
     }
     // Keep above the 3 footer action buttons (↑ · خلفية · ↻)
     host.hidden = false;
