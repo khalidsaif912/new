@@ -121,10 +121,30 @@
     (document.head || document.documentElement).appendChild(st);
   }
 
+  function starEmojiUrl() {
+    try {
+      var path = String(location.pathname || '');
+      if (/\/docs\//.test(path)) return path.replace(/\/docs\/.*$/, '/docs/assets/icons/ideas-star.webp');
+      if (/\/roster-site\//.test(path)) return path.replace(/\/roster-site\/.*$/, '/roster-site/assets/icons/ideas-star.webp');
+    } catch (e) {}
+    try {
+      var scripts = document.getElementsByTagName('script');
+      for (var i = 0; i < scripts.length; i++) {
+        var src = scripts[i].src || '';
+        if (/ideas-prompt\.js/i.test(src)) {
+          return src.replace(/ideas-prompt\.js(?:\?.*)?$/i, 'assets/icons/ideas-star.webp');
+        }
+      }
+    } catch (e2) {}
+    return 'assets/icons/ideas-star.webp';
+  }
+
   function starEmojiHtml() {
     return (
       '<img alt="" aria-hidden="true" decoding="async" ' +
-      'src="https://fonts.gstatic.com/s/e/notoemoji/latest/2b50/512.gif">'
+      'src="' +
+      starEmojiUrl() +
+      '">'
     );
   }
 
