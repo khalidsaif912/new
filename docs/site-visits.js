@@ -88,7 +88,7 @@
       'display:flex!important;flex-direction:row!important;justify-content:center!important;' +
       'align-items:baseline!important;flex-wrap:nowrap!important;gap:0!important;' +
       'visibility:visible!important;opacity:1!important;position:relative!important;z-index:5!important;' +
-      'margin:13px auto 11px!important;padding:0!important;width:auto!important;max-width:100%!important;' +
+      'margin:0!important;padding:0!important;width:auto!important;max-width:100%!important;' +
       'font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif!important;' +
       'font-size:13px!important;font-weight:400!important;line-height:1.6!important;' +
       'letter-spacing:.01em!important;color:#64748b!important;background:none!important;border:0!important}' +

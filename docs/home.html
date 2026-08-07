@@ -896,8 +896,20 @@
     }
 
     /* ═══════ FOOTER ═══════ */
-    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      padding: 12px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      line-height: 1.4;
+    }
     .footer strong { color:#64748b; }
+    .footer .footerLine { display:block; }
     /* Visitor stats — flex row, equal gap, single font size */
     #siteVisitsHost.siteVisitsHost,
     .footer #siteVisitsHost {
@@ -911,7 +923,7 @@
       opacity: 1 !important;
       position: relative !important;
       z-index: 5 !important;
-      margin: 13px auto 11px !important;
+      margin: 0 !important;
       padding: 0 !important;
       width: auto !important;
       max-width: 100% !important;
@@ -2061,16 +2073,16 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;" id="footerLastUpdatedLabel">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong><br>
-    <strong style="color:#475569;font-size:13px;" id="footerSourceLabel">Source:</strong> <strong id="footerSourceValue">Operation Roster August 2026 Version 2.xlsx</strong>
+    <span class="footerLine"><strong style="color:#475569;font-size:12px;" id="footerLastUpdatedLabel">Last Updated:</strong> <strong style="color:#1e40af;font-size:12px;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong></span>
+    <span class="footerLine"><strong style="color:#475569;font-size:12px;" id="footerSourceLabel">Source:</strong> <strong style="font-size:12px;" id="footerSourceValue">Operation Roster August 2026 Version 2.xlsx</strong></span>
     <div id="siteVisitsHost" class="siteVisitsHost" dir="rtl" aria-label="Visitor stats">
       <span class="svPart"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></span><span class="svDot" aria-hidden="true">·</span><span class="svPart"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></span><span class="svDot" aria-hidden="true">·</span><span class="svPart"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></span>
     </div>
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807i"></script>
-  <script src="home-ui-force.js?v=20260807i"></script>
+  <script src="site-visits.js?v=20260807j"></script>
+  <script src="home-ui-force.js?v=20260807j"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
