@@ -34,7 +34,7 @@
         else base = location.origin + (path.replace(/\/[^/]*$/, '/') || '/');
       }
       var s = document.createElement('script');
-      s.src = base + 'ideas-prompt.js?v=20260807u';
+      s.src = base + 'ideas-prompt.js?v=20260807v';
       s.async = true;
       s.setAttribute('data-ideas-prompt', '1');
       s.setAttribute('data-local-src', s.src);

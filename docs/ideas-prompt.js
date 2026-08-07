@@ -131,16 +131,17 @@
   function fabFrames() {
     var ar = isAr();
     var star = starEmojiHtml();
+    // Star GIF loop is ~2.2s — hold that frame long enough to finish.
     return ar
       ? [
-          { kind: 'text', html: 'صندوق' },
-          { kind: 'text', html: 'الأفكار' },
-          { kind: 'emoji', html: star }
+          { kind: 'text', holdMs: 1400, html: 'صندوق' },
+          { kind: 'text', holdMs: 1400, html: 'الأفكار' },
+          { kind: 'emoji', holdMs: 2500, html: star }
         ]
       : [
-          { kind: 'text', html: 'Box' },
-          { kind: 'text', html: 'Ideas' },
-          { kind: 'emoji', html: star }
+          { kind: 'text', holdMs: 1400, html: 'Box' },
+          { kind: 'text', holdMs: 1400, html: 'Ideas' },
+          { kind: 'emoji', holdMs: 2500, html: star }
         ];
   }
 
@@ -168,12 +169,34 @@
           (i === fabRotateIdx % frames.length ? ' is-on' : '') +
           '" data-i="' +
           i +
+          '" data-kind="' +
+          f.kind +
+          '" data-hold="' +
+          f.holdMs +
           '">' +
           f.html +
           '</span>'
         );
       })
       .join('');
+  }
+
+  function restartStarGif(frameEl) {
+    if (!frameEl) return;
+    var img = frameEl.querySelector('img');
+    if (!img) return;
+    try {
+      var src = img.getAttribute('src') || img.src || '';
+      if (!src) return;
+      // Force GIF animation to restart from frame 0 when this slide becomes active.
+      img.style.visibility = 'hidden';
+      img.src = '';
+      img.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'r=' + Date.now();
+      img.onload = function () {
+        img.style.visibility = '';
+      };
+      img.style.visibility = '';
+    } catch (e) {}
   }
 
   function paintFabFrame() {
@@ -184,22 +207,35 @@
     var n = frames.length;
     fabRotateIdx = ((fabRotateIdx % n) + n) % n;
     for (var i = 0; i < n; i++) {
-      if (i === fabRotateIdx) frames[i].classList.add('is-on');
-      else frames[i].classList.remove('is-on');
+      if (i === fabRotateIdx) {
+        frames[i].classList.add('is-on');
+        if (frames[i].getAttribute('data-kind') === 'emoji') restartStarGif(frames[i]);
+      } else {
+        frames[i].classList.remove('is-on');
+      }
     }
+  }
+
+  function currentHoldMs() {
+    if (!fab) return 1400;
+    var on = fab.querySelector('.ideasFabFrame.is-on');
+    var hold = on && Number(on.getAttribute('data-hold'));
+    return hold > 0 ? hold : 1400;
   }
 
   function startFabRotate() {
     if (fabRotateTimer) return;
     paintFabFrame();
-    fabRotateTimer = window.setInterval(function () {
+    function tick() {
+      fabRotateTimer = 0;
       if (!fab || !fab.isConnected) return;
-      // Refresh emoji if employee chose one later.
       ensureFabStructure();
       var n = fab.querySelectorAll('.ideasFabFrame').length || 1;
       fabRotateIdx = (fabRotateIdx + 1) % n;
       paintFabFrame();
-    }, 1600);
+      fabRotateTimer = window.setTimeout(tick, currentHoldMs());
+    }
+    fabRotateTimer = window.setTimeout(tick, currentHoldMs());
   }
 
   function mount() {
