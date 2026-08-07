@@ -176,6 +176,11 @@
       }
     } catch (eVisits) {}
 
+    // Ideas modal is owned by the inline homepage boot script.
+    // Do not open/close/bind it here — that caused open/flash/close races.
+    if (window.__rosterIdeasPromptBooted && document.getElementById('ideasPromptSheetInline')) {
+      return;
+    }
     if (!onHome()) return;
     try {
       var force = false;
@@ -185,11 +190,12 @@
       } catch (e) {}
       var done = false;
       try { done = localStorage.getItem(DONE_KEY) === '1'; } catch (e2) {}
+      var skipped = false;
+      try { skipped = sessionStorage.getItem('rosterIdeasSkipSessionV1') === '1'; } catch (eSkip) {}
       ensureIdeas();
       bindIdeas();
       // Only OPEN — never close from a background/retry run.
-      // Closing is done only by user actions (Later button, backdrop click, send).
-      if (force || !done) setOpen(true);
+      if (force || (!done && !skipped)) setOpen(true);
     } catch (e3) {}
   }
 
@@ -218,10 +224,12 @@
     return sheet;
   }
 
+  var openedAt = 0;
   function setOpen(on) {
     var sheet = ensureIdeas();
     if (on) {
       sheet.classList.add('is-open');
+      openedAt = Date.now();
       try {
         document.documentElement.classList.add('ideas-sheet-open');
         document.body.style.overflow = 'hidden';
@@ -254,11 +262,21 @@
     var later = document.getElementById('ipiLater');
     if (later && !later.__bound) {
       later.__bound = true;
-      later.onclick = function () { setOpen(false); };
+      later.onclick = function (ev) {
+        if (ev) { try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {} }
+        try { sessionStorage.setItem('rosterIdeasSkipSessionV1', '1'); } catch (e2) {}
+        setOpen(false);
+      };
     }
     if (sheet && !sheet.__bound) {
       sheet.__bound = true;
-      sheet.onclick = function (ev) { if (ev.target === sheet) setOpen(false); };
+      // Ignore residual load taps that would immediately dismiss the sheet.
+      sheet.addEventListener('click', function (ev) {
+        if (ev.target !== sheet) return;
+        if (Date.now() - openedAt < 900) return;
+        try { sessionStorage.setItem('rosterIdeasSkipSessionV1', '1'); } catch (e) {}
+        setOpen(false);
+      });
     }
     var send = document.getElementById('ipiSend');
     if (send && !send.__bound) {

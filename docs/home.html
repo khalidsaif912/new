@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260728c"></script>
-  <title>Duty Roster · v20260807g</title>
+  <title>Duty Roster · v20260807n</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1176,9 +1176,11 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
 (function () {
   window.__rosterIdeasPromptBooted = true;
   var DONE_KEY = 'rosterIdeasDoneV6';
+  var SKIP_KEY = 'rosterIdeasSkipSessionV1';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var score = 0;
+  var openedAt = 0;
   var sheet = document.getElementById('ideasPromptSheetInline');
 
   function forceIdeas() {
@@ -1190,11 +1192,24 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   function done() {
     try { return localStorage.getItem(DONE_KEY) === '1'; } catch (e) { return false; }
   }
+  function sessionSkipped() {
+    try { return sessionStorage.getItem(SKIP_KEY) === '1'; } catch (e) { return false; }
+  }
+  function markSessionSkip() {
+    try { sessionStorage.setItem(SKIP_KEY, '1'); } catch (e) {}
+  }
+  function shouldShow() {
+    if (forceIdeas()) return true;
+    if (done()) return false;
+    if (sessionSkipped()) return false;
+    return true;
+  }
   function setOpen(on) {
     if (!sheet) return;
     if (on) {
       sheet.classList.add('is-open');
       sheet.setAttribute('aria-hidden', 'false');
+      openedAt = Date.now();
       try { document.documentElement.classList.add('ideas-sheet-open'); document.body.style.overflow = 'hidden'; } catch (e) {}
     } else {
       sheet.classList.remove('is-open');
@@ -1202,11 +1217,11 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       try { document.documentElement.classList.remove('ideas-sheet-open'); document.body.style.overflow = ''; } catch (e2) {}
     }
   }
-  // افتح فقط إذا لم يُرسل سابقاً — بتأخير قصير حتى تستقر بقية السكربتات
-  if (!done() || forceIdeas()) {
+  // Open after first paint so residual taps/clicks from page load cannot close it.
+  if (shouldShow()) {
     setTimeout(function () {
-      if (!done() || forceIdeas()) setOpen(true);
-    }, 350);
+      if (shouldShow()) setOpen(true);
+    }, 900);
   }
 
   function isAr() {
@@ -1247,13 +1262,22 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   };
   function close(fromSubmit) {
     setOpen(false);
+    markSessionSkip();
     if (fromSubmit) {
       try { localStorage.setItem(DONE_KEY, '1'); } catch (e) {}
     }
   }
   var later = document.getElementById('ipiLater');
-  if (later) later.onclick = function () { close(false); };
-  if (sheet) sheet.onclick = function (ev) { if (ev.target === sheet) close(false); };
+  if (later) later.onclick = function (ev) {
+    if (ev) { try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {} }
+    close(false);
+  };
+  // Backdrop close only after the open settle window (blocks residual page-load taps).
+  if (sheet) sheet.addEventListener('click', function (ev) {
+    if (ev.target !== sheet) return;
+    if (Date.now() - openedAt < 900) return;
+    close(false);
+  });
 
   function identity() {
     var empId = '', name = '';
@@ -1325,7 +1349,11 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   };
 
   window.rosterIdeasPrompt = {
-    open: function () { setOpen(true); paintLang(); },
+    open: function () {
+      try { sessionStorage.removeItem(SKIP_KEY); } catch (e) {}
+      setOpen(true);
+      paintLang();
+    },
     close: function () { close(false); }
   };
   document.addEventListener('click', function (e) {
@@ -2084,8 +2112,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807m"></script>
-  <script src="home-ui-force.js?v=20260807m"></script>
+  <script src="site-visits.js?v=20260807n"></script>
+  <script src="home-ui-force.js?v=20260807n"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
