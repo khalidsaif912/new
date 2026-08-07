@@ -386,7 +386,7 @@
       var section = 'home';
       var detail = '';
 
-      } else if (/\/ideas(\/|$)/.test(p)) {
+      if (/\/ideas(\/|$)/.test(p)) {
         section = 'ideas';
       } else if (/\/desk-log(\/|$)/.test(p)) {
         section = 'desk-log';

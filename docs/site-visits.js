@@ -162,13 +162,25 @@
     if (legacy && legacy.parentNode) legacy.parentNode.removeChild(legacy);
   }
 
+  /**
+   * Place stats ABOVE the 3 footer buttons.
+   * Prefer inside .footer; if language switch rewrites footer.innerHTML and
+   * drops the host, re-insert. Falls back to a sibling after .footer so a full
+   * footer wipe cannot orphan counts forever.
+   */
   function placeHostInFooter(host, footer) {
-    var buttons = footer.querySelector('.bgTextureShuffleWrap');
-    if (buttons) {
+    var buttons =
+      footer.querySelector('.bgTextureShuffleWrap') ||
+      document.querySelector('.bgTextureShuffleWrap');
+    if (buttons && buttons.parentNode === footer) {
       footer.insertBefore(host, buttons);
-    } else {
-      footer.appendChild(host);
+      return;
     }
+    if (buttons && buttons.parentNode) {
+      buttons.parentNode.insertBefore(host, buttons);
+      return;
+    }
+    footer.appendChild(host);
   }
 
   function ensureHost() {
@@ -177,36 +189,30 @@
     if (!footer) return null;
 
     var host = document.getElementById('siteVisitsHost');
-    if (host) {
-      // Keep the counter inside the footer frame, above the action buttons.
-      if (host.parentNode !== footer) placeHostInFooter(host, footer);
-      else {
-        var buttons = footer.querySelector('.bgTextureShuffleWrap');
-        if (buttons && host.nextSibling !== buttons) footer.insertBefore(host, buttons);
-      }
-      // Always visible (never left display:none after lang swaps / sheets)
-      host.style.display = '';
-      host.hidden = false;
-      return host;
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'siteVisitsHost';
+      host.className = 'siteVisitsHost';
+      host.setAttribute('aria-label', 'Visitor stats');
+      host.innerHTML =
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel"></strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>' +
+        '<span aria-hidden="true"> · </span>' +
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>' +
+        '<span aria-hidden="true"> · </span>' +
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel"></strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>';
     }
 
-    host = document.createElement('div');
-    host.id = 'siteVisitsHost';
-    host.className = 'siteVisitsHost';
-    host.style.cssText =
-      'margin:2px 0 8px;padding:0;text-align:center;font-size:12px;' +
-      'line-height:1.7;color:#94a3b8;font-family:inherit;';
-    host.innerHTML =
-      '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsDay">--</strong>' +
-      '<span aria-hidden="true"> · </span>' +
-      '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>' +
-      '<span aria-hidden="true"> · </span>' +
-      '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel"></strong> ' +
-      '<strong style="color:#1e40af;" id="siteVisitsTotal">--</strong>';
-
     placeHostInFooter(host, footer);
+    host.style.cssText =
+      'display:block!important;visibility:visible!important;opacity:1!important;' +
+      'margin:8px 0 10px!important;padding:4px 0!important;text-align:center!important;' +
+      'font-size:13px!important;line-height:1.9!important;color:#334155!important;' +
+      'font-weight:700!important;position:relative!important;z-index:5!important;';
+    host.hidden = false;
+    host.removeAttribute('hidden');
     return host;
   }
 
@@ -388,7 +394,7 @@
       var section = 'home';
       var detail = '';
 
-      } else if (/\/ideas(\/|$)/.test(p)) {
+      if (/\/ideas(\/|$)/.test(p)) {
         section = 'ideas';
       } else if (/\/desk-log(\/|$)/.test(p)) {
         section = 'desk-log';
@@ -1328,12 +1334,12 @@
         window.setTimeout(function () {
           if (cached.day == null || cached.month == null) loadCounts();
         }, 1800);
-        // Re-assert host for ~12s in case another script mutates the footer.
+        // Re-assert host for ~30s (lang switch / texture buttons / alerts).
         var guardN = 0;
         var guard = window.setInterval(function () {
           guardN += 1;
           paint();
-          if (guardN >= 12) window.clearInterval(guard);
+          if (guardN >= 30) window.clearInterval(guard);
         }, 1000);
       }
     } catch (eBoot) {}

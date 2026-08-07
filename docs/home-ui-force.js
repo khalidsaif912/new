@@ -164,9 +164,21 @@
   }
 
   function run() {
-    if (!onHome()) return;
     ensureCss();
-    ensureFooterVisits();
+    // Always try to restore footer stats when a footer exists (do not gate
+    // only on “home” path — short paths / query variants must not skip this).
+    try {
+      if (document.querySelector('.footer')) {
+        ensureFooterVisits();
+        fillVisits();
+        setTimeout(fillVisits, 800);
+        setTimeout(fillVisits, 2200);
+        setTimeout(ensureFooterVisits, 3500);
+        setTimeout(ensureFooterVisits, 7000);
+      }
+    } catch (eVisits) {}
+
+    if (!onHome()) return;
     try {
       var force = false;
       try {
@@ -179,10 +191,6 @@
       bindIdeas();
       setOpen(force || !done);
     } catch (e3) {}
-    fillVisits();
-    setTimeout(fillVisits, 800);
-    setTimeout(fillVisits, 2200);
-    setTimeout(ensureFooterVisits, 3500);
   }
 
   function ensureIdeas() {
