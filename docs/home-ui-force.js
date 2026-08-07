@@ -65,22 +65,20 @@
       host.setAttribute('dir', 'rtl');
       host.setAttribute('aria-label', 'Visitor stats');
       host.innerHTML =
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">زوار اليوم:</strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>' +
-        '<span aria-hidden="true"> · </span>' +
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">هذا الشهر:</strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>' +
-        '<span aria-hidden="true"> · </span>' +
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">الإجمالي:</strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>';
+        '<div class="svChip"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></div>' +
+        '<div class="svChip"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></div>' +
+        '<div class="svChip"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></div>';
+    } else if (!host.querySelector('.svChip')) {
+      host.className = 'siteVisitsHost';
+      host.innerHTML =
+        '<div class="svChip"><span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span><span class="svNum" id="siteVisitsDay">--</span></div>' +
+        '<div class="svChip"><span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span><span class="svNum" id="siteVisitsMonth">--</span></div>' +
+        '<div class="svChip"><span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span><span class="svNum" id="siteVisitsTotal">--</span></div>';
     }
     // Keep above the 3 footer action buttons (↑ · خلفية · ↻)
-    host.style.cssText =
-      'display:block!important;visibility:visible!important;opacity:1!important;' +
-      'margin:8px 0 10px!important;padding:4px 0!important;text-align:center!important;' +
-      'font-size:13px!important;line-height:1.9!important;color:#475569!important;' +
-      'font-weight:700!important;position:relative!important;z-index:5!important;';
     host.hidden = false;
+    host.style.visibility = 'visible';
+    host.style.opacity = '1';
     var buttons = footer.querySelector('.bgTextureShuffleWrap');
     if (host.parentNode !== footer) {
       if (buttons) footer.insertBefore(host, buttons);
@@ -103,9 +101,9 @@
         el.textContent = isAr ? ar : en;
       }
     }
-    ensureLbl('siteVisitsDayLabel', 'زوار اليوم:', 'Visitors today:');
-    ensureLbl('siteVisitsMonthLabel', 'هذا الشهر:', 'This month:');
-    ensureLbl('siteVisitsTotalLabel', 'الإجمالي:', 'Total:');
+    ensureLbl('siteVisitsDayLabel', 'زوار اليوم', 'Today');
+    ensureLbl('siteVisitsMonthLabel', 'هذا الشهر', 'This month');
+    ensureLbl('siteVisitsTotalLabel', 'الإجمالي', 'Total');
     return host;
   }
 

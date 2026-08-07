@@ -895,29 +895,74 @@
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
-    /* Visitor stats: always visible (lang switch / sheets must not hide this) */
+    /* Visitor stats — chip row between meta and footer buttons */
     #siteVisitsHost.siteVisitsHost,
     .footer #siteVisitsHost {
-      display: block !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: stretch !important;
+      gap: 8px !important;
       visibility: visible !important;
       opacity: 1 !important;
       position: relative !important;
       z-index: 5 !important;
-      margin: 8px 0 10px !important;
-      min-height: 1.6em !important;
+      margin: 12px auto 12px !important;
+      padding: 0 !important;
+      max-width: 400px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      min-height: 0 !important;
       height: auto !important;
-      max-height: none !important;
       overflow: visible !important;
       pointer-events: auto !important;
-      text-align: center !important;
-      font-size: 13px !important;
-      line-height: 1.9 !important;
-      color: #475569 !important;
-      font-weight: 700 !important;
+      font-family: inherit !important;
+      font-weight: 400 !important;
+      line-height: 1.25 !important;
+      color: #64748b !important;
+    }
+    #siteVisitsHost .svChip {
+      flex: 1 1 96px;
+      min-width: 96px;
+      max-width: 128px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 9px 10px 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(30, 64, 175, 0.13);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.65) inset,
+        0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+    #siteVisitsHost .svLabel {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: #64748b;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    #siteVisitsHost .svNum {
+      display: block;
+      font-size: 17px;
+      font-weight: 800;
+      color: #1e40af;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
     }
     body.roster-bg-textured .footer #siteVisitsHost {
-      display: block !important;
+      display: flex !important;
       opacity: 1 !important;
+    }
+    body.roster-bg-textured #siteVisitsHost .svChip {
+      background: rgba(255, 255, 255, 0.82);
+      border-color: rgba(30, 64, 175, 0.14);
     }
 
     /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
@@ -2022,21 +2067,25 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   <div class="footer">
     <strong style="color:#475569;font-size:13px;" id="footerLastUpdatedLabel">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong><br>
     <strong style="color:#475569;font-size:13px;" id="footerSourceLabel">Source:</strong> <strong id="footerSourceValue">Operation Roster August 2026 Version 2.xlsx</strong>
-    <div id="siteVisitsHost" class="siteVisitsHost" dir="rtl" aria-label="Visitor stats" style="display:block!important;visibility:visible!important;margin:8px 0 10px;padding:4px 0;text-align:center;font-size:13px;line-height:1.9;color:#475569;font-family:inherit;font-weight:700">
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">زوار اليوم:</strong>
-      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>
-      <span aria-hidden="true"> · </span>
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">هذا الشهر:</strong>
-      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>
-      <span aria-hidden="true"> · </span>
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">الإجمالي:</strong>
-      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>
+    <div id="siteVisitsHost" class="siteVisitsHost" dir="rtl" aria-label="Visitor stats">
+      <div class="svChip">
+        <span class="svLabel" id="siteVisitsDayLabel">زوار اليوم</span>
+        <span class="svNum" id="siteVisitsDay">--</span>
+      </div>
+      <div class="svChip">
+        <span class="svLabel" id="siteVisitsMonthLabel">هذا الشهر</span>
+        <span class="svNum" id="siteVisitsMonth">--</span>
+      </div>
+      <div class="svChip">
+        <span class="svLabel" id="siteVisitsTotalLabel">الإجمالي</span>
+        <span class="svNum" id="siteVisitsTotal">--</span>
+      </div>
     </div>
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807e"></script>
-  <script src="home-ui-force.js?v=20260807e"></script>
+  <script src="site-visits.js?v=20260807f"></script>
+  <script src="home-ui-force.js?v=20260807f"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {

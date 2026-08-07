@@ -14,9 +14,23 @@
   var loading = false;
 
   var I18N = {
-    en: { day: 'Visitors today:', month: 'This month:', total: 'Total:' },
-    ar: { day: 'زوار اليوم:', month: 'هذا الشهر:', total: 'الإجمالي:' }
+    en: { day: 'Today', month: 'This month', total: 'Total' },
+    ar: { day: 'زوار اليوم', month: 'هذا الشهر', total: 'الإجمالي' }
   };
+
+  var HOST_HTML =
+    '<div class="svChip">' +
+      '<span class="svLabel" id="siteVisitsDayLabel"></span>' +
+      '<span class="svNum" id="siteVisitsDay">--</span>' +
+    '</div>' +
+    '<div class="svChip">' +
+      '<span class="svLabel" id="siteVisitsMonthLabel"></span>' +
+      '<span class="svNum" id="siteVisitsMonth">--</span>' +
+    '</div>' +
+    '<div class="svChip">' +
+      '<span class="svLabel" id="siteVisitsTotalLabel"></span>' +
+      '<span class="svNum" id="siteVisitsTotal">--</span>' +
+    '</div>';
 
   function lang() {
     var l = localStorage.getItem('rosterLang') || document.documentElement.getAttribute('lang') || 'en';
@@ -51,7 +65,34 @@
   function formatCount(n) {
     var num = Number(n);
     if (!isFinite(num) || num < 0) return '--';
-    return String(Math.floor(num));
+    num = Math.floor(num);
+    try {
+      return num.toLocaleString(lang() === 'ar' ? 'ar' : 'en-US');
+    } catch (e) {
+      return String(num);
+    }
+  }
+
+  function injectVisitsStyles() {
+    if (document.getElementById('siteVisitsStyles')) return;
+    var st = document.createElement('style');
+    st.id = 'siteVisitsStyles';
+    st.textContent =
+      '#siteVisitsHost.siteVisitsHost,.footer #siteVisitsHost{' +
+      'display:flex!important;flex-wrap:wrap!important;justify-content:center!important;' +
+      'align-items:stretch!important;gap:8px!important;visibility:visible!important;opacity:1!important;' +
+      'position:relative!important;z-index:5!important;margin:12px auto!important;padding:0!important;' +
+      'max-width:400px!important;width:100%!important;box-sizing:border-box!important;' +
+      'font-family:inherit!important;line-height:1.25!important;color:#64748b!important}' +
+      '#siteVisitsHost .svChip{flex:1 1 96px;min-width:96px;max-width:128px;display:flex;flex-direction:column;' +
+      'align-items:center;justify-content:center;gap:3px;padding:9px 10px 8px;border-radius:14px;' +
+      'background:rgba(255,255,255,.72);border:1px solid rgba(30,64,175,.13);' +
+      'box-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 4px 12px rgba(15,23,42,.05)}' +
+      '#siteVisitsHost .svLabel{display:block;font-size:10.5px;font-weight:700;color:#64748b;line-height:1.2;white-space:nowrap}' +
+      '#siteVisitsHost .svNum{display:block;font-size:17px;font-weight:800;color:#1e40af;' +
+      'font-variant-numeric:tabular-nums;line-height:1.15;letter-spacing:-.02em}' +
+      'body.roster-bg-textured #siteVisitsHost .svChip{background:rgba(255,255,255,.82)}';
+    document.head.appendChild(st);
   }
 
   function readPersisted(keys) {
@@ -184,6 +225,7 @@
   }
 
   function ensureHost() {
+    injectVisitsStyles();
     removeLegacyFooterRow();
     var footer = document.querySelector('.footer');
     if (!footer) return null;
@@ -194,25 +236,19 @@
       host.id = 'siteVisitsHost';
       host.className = 'siteVisitsHost';
       host.setAttribute('aria-label', 'Visitor stats');
-      host.innerHTML =
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel"></strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>' +
-        '<span aria-hidden="true"> · </span>' +
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel"></strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>' +
-        '<span aria-hidden="true"> · </span>' +
-        '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel"></strong> ' +
-        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>';
+      host.innerHTML = HOST_HTML;
+    } else if (!host.querySelector('.svChip') || !document.getElementById('siteVisitsDay')) {
+      // Upgrade legacy single-line markup to chip layout
+      host.className = 'siteVisitsHost';
+      host.innerHTML = HOST_HTML;
     }
 
     placeHostInFooter(host, footer);
-    host.style.cssText =
-      'display:block!important;visibility:visible!important;opacity:1!important;' +
-      'margin:8px 0 10px!important;padding:4px 0!important;text-align:center!important;' +
-      'font-size:13px!important;line-height:1.9!important;color:#334155!important;' +
-      'font-weight:700!important;position:relative!important;z-index:5!important;';
     host.hidden = false;
     host.removeAttribute('hidden');
+    host.style.display = '';
+    host.style.visibility = 'visible';
+    host.style.opacity = '1';
     return host;
   }
 
