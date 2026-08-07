@@ -187,7 +187,9 @@
       try { done = localStorage.getItem(DONE_KEY) === '1'; } catch (e2) {}
       ensureIdeas();
       bindIdeas();
-      setOpen(force || !done);
+      // Only OPEN — never close from a background/retry run.
+      // Closing is done only by user actions (Later button, backdrop click, send).
+      if (force || !done) setOpen(true);
     } catch (e3) {}
   }
 

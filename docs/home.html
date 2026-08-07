@@ -1109,8 +1109,8 @@
 </head>
 <body>
 <style id="ideasStaticCss">
-#ideasPromptSheetInline{position:fixed;inset:0;z-index:2147483646!important;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));pointer-events:auto}
-#ideasPromptSheetInline.is-open{display:flex!important}
+#ideasPromptSheetInline{position:fixed;inset:0;z-index:2147483646!important;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.0);padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));pointer-events:none;transition:background .22s ease,opacity .22s ease;opacity:0}
+#ideasPromptSheetInline.is-open{display:flex!important;background:rgba(15,23,42,.55);opacity:1;pointer-events:auto}
 html.ideas-sheet-open #chg-card{display:none!important}
 html.ideas-sheet-open #chg-dot{opacity:.35}
 html.ideas-sheet-open #visitsFloatDock{display:none!important}
@@ -1202,8 +1202,12 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
       try { document.documentElement.classList.remove('ideas-sheet-open'); document.body.style.overflow = ''; } catch (e2) {}
     }
   }
-  // افتح فقط إذا لم يُرسل سابقاً
-  if (!done() || forceIdeas()) setOpen(true);
+  // افتح فقط إذا لم يُرسل سابقاً — بتأخير قصير حتى تستقر بقية السكربتات
+  if (!done() || forceIdeas()) {
+    setTimeout(function () {
+      if (!done() || forceIdeas()) setOpen(true);
+    }, 350);
+  }
 
   function isAr() {
     try {
@@ -2080,8 +2084,8 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807k"></script>
-  <script src="home-ui-force.js?v=20260807k"></script>
+  <script src="site-visits.js?v=20260807l"></script>
+  <script src="home-ui-force.js?v=20260807l"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
