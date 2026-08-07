@@ -1260,6 +1260,16 @@ function boot() {
   }
 
   function start() {
+    // Force homepage feedback UI even if index shell is an older cache.
+    try {
+      if (typeof window.rosterForceHomeUI === 'function') window.rosterForceHomeUI();
+      else {
+        var s = document.createElement('script');
+        s.src = getBase() + 'home-ui-force.js?v=20260807c';
+        s.async = true;
+        document.head.appendChild(s);
+      }
+    } catch (forceErr) {}
     boot();
     loadFeatureUpdateBadge();
     // One delayed retry in case another script sets the saved employee id shortly after load.
