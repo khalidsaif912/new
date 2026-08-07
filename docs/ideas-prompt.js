@@ -151,17 +151,17 @@
   function fabFrames() {
     var ar = isAr();
     var star = starEmojiHtml();
-    // Star GIF loop is ~2.2s — hold that frame long enough to finish.
+    // Local animated WebP loop ≈1.6s; hold for ~3 full loops so motion is fully readable.
     return ar
       ? [
           { kind: 'text', holdMs: 1400, html: 'صندوق' },
           { kind: 'text', holdMs: 1400, html: 'الأفكار' },
-          { kind: 'emoji', holdMs: 2500, html: star }
+          { kind: 'emoji', holdMs: 5200, html: star }
         ]
       : [
           { kind: 'text', holdMs: 1400, html: 'Box' },
           { kind: 'text', holdMs: 1400, html: 'Ideas' },
-          { kind: 'emoji', holdMs: 2500, html: star }
+          { kind: 'emoji', holdMs: 5200, html: star }
         ];
   }
 
@@ -206,16 +206,13 @@
     var img = frameEl.querySelector('img');
     if (!img) return;
     try {
-      var src = img.getAttribute('src') || img.src || '';
-      if (!src) return;
-      // Force GIF animation to restart from frame 0 when this slide becomes active.
-      img.style.visibility = 'hidden';
-      img.src = '';
-      img.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'r=' + Date.now();
-      img.onload = function () {
-        img.style.visibility = '';
-      };
-      img.style.visibility = '';
+      // Restart animation without re-fetch: re-set decoded src in place.
+      var base = img.getAttribute('data-src') || img.getAttribute('src') || img.src || '';
+      if (!base) return;
+      base = String(base).replace(/[?&]r=\d+/g, '').replace(/\?$/, '');
+      img.setAttribute('data-src', base);
+      // Force decoder restart (WebP ANIM)
+      img.src = base + (base.indexOf('?') >= 0 ? '&' : '?') + 'r=' + Date.now();
     } catch (e) {}
   }
 

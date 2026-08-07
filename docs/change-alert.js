@@ -1266,7 +1266,7 @@ function boot() {
       if (window.__rosterIdeasPromptBooted) return;
       if (document.querySelector('script[data-ideas-prompt="1"]')) return;
       var s = document.createElement('script');
-      s.src = getBase() + 'ideas-prompt.js?v=20260807w';
+      s.src = getBase() + 'ideas-prompt.js?v=20260807x';
       s.async = true;
       s.setAttribute('data-ideas-prompt', '1');
       s.setAttribute('data-local-src', s.src);
