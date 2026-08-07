@@ -54,16 +54,135 @@
     document.head.appendChild(st);
   }
 
+  function ensureFooterVisits() {
+    var footer = document.querySelector('.footer');
+    if (!footer) return null;
+    var host = document.getElementById('siteVisitsHost');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'siteVisitsHost';
+      host.className = 'siteVisitsHost';
+      host.setAttribute('dir', 'rtl');
+      host.setAttribute('aria-label', 'Visitor stats');
+      host.innerHTML =
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">زوار اليوم:</strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>' +
+        '<span aria-hidden="true"> · </span>' +
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">هذا الشهر:</strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>' +
+        '<span aria-hidden="true"> · </span>' +
+        '<strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">الإجمالي:</strong> ' +
+        '<strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>';
+    }
+    // Keep above the 3 footer action buttons (↑ · خلفية · ↻)
+    host.style.cssText =
+      'display:block!important;visibility:visible!important;opacity:1!important;' +
+      'margin:8px 0 10px!important;padding:4px 0!important;text-align:center!important;' +
+      'font-size:13px!important;line-height:1.9!important;color:#475569!important;' +
+      'font-weight:700!important;position:relative!important;z-index:5!important;';
+    host.hidden = false;
+    var buttons = footer.querySelector('.bgTextureShuffleWrap');
+    if (host.parentNode !== footer) {
+      if (buttons) footer.insertBefore(host, buttons);
+      else footer.appendChild(host);
+    } else if (buttons && host.nextSibling !== buttons) {
+      footer.insertBefore(host, buttons);
+    }
+    // Ensure label text exists (Arabic default; site-visits may override)
+    function ensureLbl(id, ar, en) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var t = String(el.textContent || '').trim();
+      if (!t || t === '...' || t === '—') {
+        var isAr = true;
+        try {
+          var L = localStorage.getItem('rosterLang') || '';
+          if (L === 'en') isAr = false;
+          else if (document.body && document.body.classList.contains('ar')) isAr = true;
+        } catch (e) {}
+        el.textContent = isAr ? ar : en;
+      }
+    }
+    ensureLbl('siteVisitsDayLabel', 'زوار اليوم:', 'Visitors today:');
+    ensureLbl('siteVisitsMonthLabel', 'هذا الشهر:', 'This month:');
+    ensureLbl('siteVisitsTotalLabel', 'الإجمالي:', 'Total:');
+    return host;
+  }
+
   function ensureVisitsDock() {
-    if (document.getElementById('visitsFloatDock')) return;
-    var dock = document.createElement('div');
-    dock.id = 'visitsFloatDock';
-    dock.setAttribute('dir', 'rtl');
-    dock.innerHTML =
-      '<span>زوار اليوم:</span> <b id="vfdDay">--</b> · ' +
-      '<span>هذا الشهر:</span> <b id="vfdMonth">--</b> · ' +
-      '<span>الإجمالي:</span> <b id="vfdTotal">--</b>';
-    document.body.appendChild(dock);
+    // Footer host is the primary placement (user expects stats there).
+    ensureFooterVisits();
+  }
+
+  function fillVisits() {
+    ensureFooterVisits();
+    function set(id, v) {
+      var el = document.getElementById(id);
+      if (el && v != null) el.textContent = String(v);
+    }
+    function ymd() {
+      try {
+        var parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
+        }).formatToParts(new Date());
+        var map = {};
+        parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
+        return { day: map.year + '-' + map.month + '-' + map.day, month: map.year + '-' + map.month };
+      } catch (e) {
+        var d = new Date();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return { day: d.getFullYear() + '-' + m + '-' + day, month: d.getFullYear() + '-' + m };
+      }
+    }
+    function getCount(url) {
+      return fetch(url, { cache: 'no-store', mode: 'cors' })
+        .then(function (r) { if (!r.ok) throw new Error('n'); return r.json(); })
+        .then(function (j) {
+          if (j && typeof j.value === 'number') return j.value;
+          if (j && typeof j.count === 'number') return j.count;
+          return null;
+        })
+        .catch(function () { return null; });
+    }
+    var keys = ymd();
+    function one(key, hit) {
+      var g = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
+      var h = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
+      return getCount(g).then(function (v) { return v != null ? v : (hit ? getCount(h) : null); });
+    }
+    Promise.all([
+      one('day-' + keys.day, true),
+      one('month-' + keys.month, false),
+      one('total-visits', false)
+    ]).then(function (vals) {
+      if (vals[0] != null) set('siteVisitsDay', vals[0]);
+      if (vals[1] != null) set('siteVisitsMonth', vals[1]);
+      if (vals[2] != null) set('siteVisitsTotal', vals[2]);
+      ensureFooterVisits();
+    });
+  }
+
+  function run() {
+    if (!onHome()) return;
+    ensureCss();
+    ensureFooterVisits();
+    try {
+      var force = false;
+      try {
+        var q = new URLSearchParams(location.search || '');
+        force = q.get('ideas') === '1' || q.get('ideas') === 'force';
+      } catch (e) {}
+      var done = false;
+      try { done = localStorage.getItem(DONE_KEY) === '1'; } catch (e2) {}
+      ensureIdeas();
+      bindIdeas();
+      setOpen(force || !done);
+    } catch (e3) {}
+    fillVisits();
+    setTimeout(fillVisits, 800);
+    setTimeout(fillVisits, 2200);
+    setTimeout(ensureFooterVisits, 3500);
   }
 
   function ensureIdeas() {
@@ -187,75 +306,9 @@
     }
   }
 
-  function fillVisits() {
-    function set(id, v) {
-      var el = document.getElementById(id);
-      if (el && v != null) el.textContent = String(v);
-    }
-    function ymd() {
-      try {
-        var parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
-        }).formatToParts(new Date());
-        var map = {};
-        parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
-        return { day: map.year + '-' + map.month + '-' + map.day, month: map.year + '-' + map.month };
-      } catch (e) {
-        var d = new Date();
-        var m = String(d.getMonth() + 1).padStart(2, '0');
-        var day = String(d.getDate()).padStart(2, '0');
-        return { day: d.getFullYear() + '-' + m + '-' + day, month: d.getFullYear() + '-' + m };
-      }
-    }
-    function getCount(url) {
-      return fetch(url, { cache: 'no-store', mode: 'cors' })
-        .then(function (r) { if (!r.ok) throw new Error('n'); return r.json(); })
-        .then(function (j) {
-          if (j && typeof j.value === 'number') return j.value;
-          if (j && typeof j.count === 'number') return j.count;
-          return null;
-        })
-        .catch(function () { return null; });
-    }
-    var keys = ymd();
-    function one(key, hit) {
-      var g = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
-      var h = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
-      return getCount(g).then(function (v) { return v != null ? v : (hit ? getCount(h) : null); });
-    }
-    Promise.all([
-      one('day-' + keys.day, true),
-      one('month-' + keys.month, false),
-      one('total-visits', false)
-    ]).then(function (vals) {
-      if (vals[0] != null) { set('vfdDay', vals[0]); set('siteVisitsDay', vals[0]); }
-      if (vals[1] != null) { set('vfdMonth', vals[1]); set('siteVisitsMonth', vals[1]); }
-      if (vals[2] != null) { set('vfdTotal', vals[2]); set('siteVisitsTotal', vals[2]); }
-    });
-  }
-
-  function run() {
-    if (!onHome()) return;
-    ensureCss();
-    ensureVisitsDock();
-    try {
-      var force = false;
-      try {
-        var q = new URLSearchParams(location.search || '');
-        force = q.get('ideas') === '1' || q.get('ideas') === 'force';
-      } catch (e) {}
-      var done = false;
-      try { done = localStorage.getItem(DONE_KEY) === '1'; } catch (e2) {}
-      ensureIdeas();
-      bindIdeas();
-      setOpen(force || !done);
-    } catch (e3) {}
-    fillVisits();
-    setTimeout(fillVisits, 1200);
-  }
-
   window.rosterForceHomeUI = run;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
   setTimeout(run, 1500);
+  setTimeout(run, 4000);
 })();

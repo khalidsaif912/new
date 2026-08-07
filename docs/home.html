@@ -901,11 +901,23 @@
       display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
-      position: relative;
-      z-index: 2;
-      margin: 6px 0 10px !important;
-      min-height: 1.4em;
-      pointer-events: auto;
+      position: relative !important;
+      z-index: 5 !important;
+      margin: 8px 0 10px !important;
+      min-height: 1.6em !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      pointer-events: auto !important;
+      text-align: center !important;
+      font-size: 13px !important;
+      line-height: 1.9 !important;
+      color: #475569 !important;
+      font-weight: 700 !important;
+    }
+    body.roster-bg-textured .footer #siteVisitsHost {
+      display: block !important;
+      opacity: 1 !important;
     }
 
     /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
@@ -2010,21 +2022,21 @@ html.has-news-ticker #visitsFloatDock,html.has-float-dock #visitsFloatDock{botto
   <div class="footer">
     <strong style="color:#475569;font-size:13px;" id="footerLastUpdatedLabel">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">5 August 2026 / 17:21</strong><br>
     <strong style="color:#475569;font-size:13px;" id="footerSourceLabel">Source:</strong> <strong id="footerSourceValue">Operation Roster August 2026 Version 2.xlsx</strong>
-    <div id="siteVisitsHost" class="siteVisitsHost" dir="ltr" style="margin:2px 0 8px;padding:0;text-align:center;font-size:12px;line-height:1.7;color:#94a3b8;font-family:inherit">
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">Visitors today:</strong>
-      <strong style="color:#1e40af;" id="siteVisitsDay">--</strong>
+    <div id="siteVisitsHost" class="siteVisitsHost" dir="rtl" aria-label="Visitor stats" style="display:block!important;visibility:visible!important;margin:8px 0 10px;padding:4px 0;text-align:center;font-size:13px;line-height:1.9;color:#475569;font-family:inherit;font-weight:700">
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsDayLabel">زوار اليوم:</strong>
+      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsDay">--</strong>
       <span aria-hidden="true"> · </span>
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">This month:</strong>
-      <strong style="color:#1e40af;" id="siteVisitsMonth">--</strong>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsMonthLabel">هذا الشهر:</strong>
+      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsMonth">--</strong>
       <span aria-hidden="true"> · </span>
-      <strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">Total:</strong>
-      <strong style="color:#1e40af;" id="siteVisitsTotal">--</strong>
+      <strong style="color:#475569;font-size:13px;" id="siteVisitsTotalLabel">الإجمالي:</strong>
+      <strong style="color:#1e40af;font-size:13px;" id="siteVisitsTotal">--</strong>
     </div>
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807c"></script>
-  <script src="home-ui-force.js?v=20260807c"></script>
+  <script src="site-visits.js?v=20260807d"></script>
+  <script src="home-ui-force.js?v=20260807d"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {

@@ -337,6 +337,17 @@
     wrap.appendChild(refreshBtn);
     wrap.appendChild(deskHot);
     footer.appendChild(wrap);
+    // Keep visitor stats row above these buttons
+    try {
+      if (window.rosterSiteVisits && typeof window.rosterSiteVisits.refresh === 'function') {
+        window.rosterSiteVisits.refresh();
+      }
+      if (window.rosterForceHomeUI) window.rosterForceHomeUI();
+      var host = document.getElementById('siteVisitsHost');
+      if (host && host.parentNode === footer && host.nextSibling !== wrap) {
+        footer.insertBefore(host, wrap);
+      }
+    } catch (ePlace) {}
 
     document.addEventListener('rosterLangChange', function () {
       if (labelEl) labelEl.textContent = t('btn');
