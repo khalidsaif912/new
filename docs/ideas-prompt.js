@@ -17,7 +17,6 @@
   var fab = null;
   var fabRotateTimer = 0;
   var fabRotateIdx = 0;
-  var fabEmojiCp = '';
 
   function forceParam() {
     try {
@@ -122,57 +121,19 @@
     (document.head || document.documentElement).appendChild(st);
   }
 
-  function validEmojiCp(cp) {
-    return /^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/i.test(String(cp || '').trim());
-  }
-
-  function readLocalEmojiCp() {
-    try {
-      var idn = identity();
-      var empId = idn.empId;
-      var map = {};
-      try {
-        map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
-      } catch (eMap) {
-        map = {};
-      }
-      var cp = String(
-        (empId && map[empId]) || map.export || map.import || localStorage.getItem('empEmojiChoice') || ''
-      ).trim();
-      if (validEmojiCp(cp)) return cp.toLowerCase();
-    } catch (e) {}
-    return '';
-  }
-
-  function emojiImgHtml(cp) {
-    cp = String(cp || '').trim().toLowerCase();
-    if (!validEmojiCp(cp)) return '';
-    return (
-      '<img alt="" aria-hidden="true" decoding="async" ' +
-      'src="https://fonts.gstatic.com/s/e/notoemoji/latest/' +
-      cp +
-      '/512.webp">'
-    );
-  }
-
   function fabFrames() {
     var ar = isAr();
-    fabEmojiCp = readLocalEmojiCp();
-    var frames = ar
+    return ar
       ? [
           { kind: 'text', html: 'صندوق' },
-          { kind: 'text', html: 'الأفكار' }
+          { kind: 'text', html: 'الأفكار' },
+          { kind: 'emoji', html: '⭐' }
         ]
       : [
           { kind: 'text', html: 'Box' },
-          { kind: 'text', html: 'Ideas' }
+          { kind: 'text', html: 'Ideas' },
+          { kind: 'emoji', html: '⭐' }
         ];
-    if (fabEmojiCp) {
-      frames.push({ kind: 'emoji', html: emojiImgHtml(fabEmojiCp) });
-    } else {
-      frames.push({ kind: 'emoji', html: '💡' });
-    }
-    return frames;
   }
 
   function ensureFabStructure() {
