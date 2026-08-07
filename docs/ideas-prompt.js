@@ -24,6 +24,21 @@
       return false;
     }
   }
+  /** Real user landings: /date/* after home redirect, import rows, home shell. */
+  function isRosterLanding() {
+    var p = (location.pathname || '').toLowerCase();
+    if (/\/(tools|roster-diff|ticker-board|my-emoji|alumni|calculator|quicklist|ideas|training)\//.test(p)) {
+      return false;
+    }
+    return (
+      /\/date\//.test(p) ||
+      /home\.html/.test(p) ||
+      /\/now(\/|$)/.test(p) ||
+      /\/docs\/?$/.test(p) ||
+      /\/import(\/|$)/.test(p) ||
+      /\/my-schedules(\/|$)/.test(p)
+    );
+  }
   function isDone() {
     try {
       return localStorage.getItem(DONE_KEY) === '1';
@@ -39,6 +54,7 @@
     }
   }
   function shouldAutoShow() {
+    if (!isRosterLanding()) return false;
     if (forceParam()) return true;
     if (isDone()) return false;
     if (isSkipped()) return false;
@@ -373,6 +389,7 @@
   }
 
   function boot() {
+    if (!isRosterLanding() && !forceParam()) return;
     mount();
     // Staggered opens: tolerate late removers / late layout scripts.
     [200, 700, 1500, 2800, 5000].forEach(function (ms) {

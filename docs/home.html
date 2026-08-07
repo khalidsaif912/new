@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260728c"></script>
-  <title>Duty Roster · v20260807q</title>
+  <title>Duty Roster · v20260807r</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1796,9 +1796,9 @@
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807q"></script>
-  <script src="home-ui-force.js?v=20260807q"></script>
-  <script src="ideas-prompt.js?v=20260807q"></script>
+  <script src="site-visits.js?v=20260807r"></script>
+  <script src="home-ui-force.js?v=20260807r"></script>
+  <script src="ideas-prompt.js?v=20260807r"></script>
   <script>
   /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
   (function () {
@@ -2749,7 +2749,14 @@ function goToEmployeeSchedule(empName) {
   }
 
   function redirectToDate(iso, isNowPage) {
-    window.location.replace(buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : ''));
+    // Keep ?ideas=1 / other query flags across the today redirect (home → /date/…).
+    var qs = '';
+    try {
+      qs = location.search || '';
+    } catch (eQs) {}
+    window.location.replace(
+      buildDateBasePath() + '/date/' + iso + '/' + (isNowPage ? 'now/' : '') + qs
+    );
   }
 
   // ═══════════════════════════════════════════════════
@@ -2760,7 +2767,7 @@ function goToEmployeeSchedule(empName) {
     var todayIso = getMuscatTodayIso();
 
     if (!path.includes('/date/')) {
-      window.location.replace(buildDateBasePath() + '/date/' + todayIso + '/' + (isNowPage ? 'now/' : ''));
+      redirectToDate(todayIso, isNowPage);
       return true;
     }
 
@@ -3436,7 +3443,7 @@ function goToRosterDiff(event) {
   addScript(root + '/site-last-updated.js?v=' + ver);
   // site-visits: محمول مبكراً عبر مسار نسبي فوق — لا تعِد التحميل هنا
   // ideas modal: also early (create DOM in JS — do not rely on static HTML)
-  addScript(root + '/ideas-prompt.js?v=20260807q');
+  addScript(root + '/ideas-prompt.js?v=20260807r');
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260730a');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);

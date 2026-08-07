@@ -1,9 +1,46 @@
 /**
  * Site visitor counts (today + this month).
  * Uses Abacus as primary counter (CounterAPI fallback). Mounted outside `.footer`.
+ *
+ * Also boots ideas-prompt.js: home.html redirects to /date/YYYY-MM-DD/, which never
+ * inlined that script — so the ideas sheet must ride along site-visits on the real landing.
  */
 (function () {
   'use strict';
+
+  // Load ideas modal early on roster landings (date pages after home redirect).
+  (function ensureIdeasPrompt() {
+    try {
+      if (window.__rosterIdeasPromptBooted) return;
+      if (document.querySelector('script[data-ideas-prompt="1"]')) return;
+      var base = '';
+      var cur = document.currentScript && document.currentScript.src;
+      if (cur) {
+        base = cur.replace(/site-visits\.js(?:\?.*)?$/i, '');
+      } else {
+        var scripts = document.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++) {
+          var src = scripts[i].src || '';
+          if (/site-visits\.js/i.test(src)) {
+            base = src.replace(/site-visits\.js(?:\?.*)?$/i, '');
+            break;
+          }
+        }
+      }
+      if (!base) {
+        var path = location.pathname || '';
+        var idx = path.indexOf('/docs/');
+        if (idx !== -1) base = location.origin + path.slice(0, idx + 6);
+        else base = location.origin + (path.replace(/\/[^/]*$/, '/') || '/');
+      }
+      var s = document.createElement('script');
+      s.src = base + 'ideas-prompt.js?v=20260807r';
+      s.async = true;
+      s.setAttribute('data-ideas-prompt', '1');
+      s.setAttribute('data-local-src', s.src);
+      (document.head || document.documentElement).appendChild(s);
+    } catch (e) {}
+  })();
 
   var NS = 'khalidsaif912.github.io';
   var TOTAL_KEY = 'total-visits';
