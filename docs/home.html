@@ -1796,11 +1796,11 @@
   </div>
 
   <!-- عدّاد الزوار: مسار نسبي (لا يعتمد على getSiteRootUrl) -->
-  <script src="site-visits.js?v=20260807y"></script>
-  <script src="home-ui-force.js?v=20260807y"></script>
+  <script src="site-visits.js?v=20260809a"></script>
+  <script src="home-ui-force.js?v=20260809a"></script>
   <script src="ideas-prompt.js?v=20260807z"></script>
   <script>
-  /* احتياط: تعبئة الأرقام مباشرة إن تأخر الملف الخارجي */
+  /* احتياط: تسميات الزوار فقط — الأرقام من site-visits.js (سجل فريد) */
   (function () {
     function setText(id, v) {
       var el = document.getElementById(id);
@@ -1808,34 +1808,6 @@
     }
     function ar() {
       try { return document.body && document.body.classList.contains('ar'); } catch (e) { return false; }
-    }
-    function ymd() {
-      try {
-        var parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
-        }).formatToParts(new Date());
-        var map = {};
-        parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
-        return { day: map.year + '-' + map.month + '-' + map.day, month: map.year + '-' + map.month };
-      } catch (e) {
-        var d = new Date();
-        var m = String(d.getMonth() + 1).padStart(2, '0');
-        var day = String(d.getDate()).padStart(2, '0');
-        return { day: d.getFullYear() + '-' + m + '-' + day, month: d.getFullYear() + '-' + m };
-      }
-    }
-    function getCount(url) {
-      return fetch(url, { cache: 'no-store', mode: 'cors' })
-        .then(function (r) {
-          if (!r.ok) throw new Error('n');
-          return r.json();
-        })
-        .then(function (j) {
-          if (j && typeof j.value === 'number') return j.value;
-          if (j && typeof j.count === 'number') return j.count;
-          return null;
-        })
-        .catch(function () { return null; });
     }
     function fillLabels() {
       setText('siteVisitsDayLabel', ar() ? 'زوار اليوم' : 'Today');
@@ -1847,37 +1819,17 @@
         host.setAttribute('dir', ar() ? 'rtl' : 'ltr');
       }
     }
-    function fill() {
+    function refresh() {
       fillLabels();
-      if (window.__inlineVisitsFilled) return;
-      var host = document.getElementById('siteVisitsHost');
-      if (!host) return;
-      // إن سبق site-visits.js وملأ الأرقام، لا تزِد
-      var dayEl = document.getElementById('siteVisitsDay');
-      if (dayEl && dayEl.textContent && dayEl.textContent !== '--') {
-        window.__inlineVisitsFilled = true;
-        return;
-      }
-      var keys = ymd();
-      var NS = 'khalidsaif912.github.io';
-      var dayKey = 'day-' + keys.day;
-      var monthKey = 'month-' + keys.month;
-      var totalKey = 'total-visits';
-      function one(key) {
-        // قراءة فقط — الزيادة تتم عبر site-visits.js حتى لا تتضاعف
-        return getCount('https://abacus.jasoncameron.dev/get/' + NS + '/' + key);
-      }
-      Promise.all([one(dayKey), one(monthKey), one(totalKey)]).then(function (vals) {
-        if (vals[0] != null) setText('siteVisitsDay', vals[0]);
-        if (vals[1] != null) setText('siteVisitsMonth', vals[1]);
-        if (vals[2] != null) setText('siteVisitsTotal', vals[2]);
-        // Never /hit here — site-visits.js owns once-per-day increments.
-        if (vals[0] != null || vals[1] != null) window.__inlineVisitsFilled = true;
-      });
+      try {
+        if (window.rosterSiteVisits && typeof window.rosterSiteVisits.refresh === 'function') {
+          window.rosterSiteVisits.refresh();
+        }
+      } catch (e) {}
     }
-    fill();
-    setTimeout(fill, 600);
-    setTimeout(fill, 2000);
+    refresh();
+    setTimeout(refresh, 800);
+    setTimeout(refresh, 2200);
     document.addEventListener('click', function (e) {
       if (e.target && e.target.closest && e.target.closest('#langToggle')) setTimeout(fillLabels, 0);
     });

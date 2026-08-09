@@ -72,59 +72,13 @@
 
   function fillVisits() {
     ensureFooterVisits();
-    // Prefer the real counter owner (once-per-day claim + paint).
+    // Only delegate to site-visits (Mantle unique log). Never paint Abacus day/month here —
+    // Abacus undercounted after inflation fixes and overwritten correct log totals.
     try {
       if (window.rosterSiteVisits && typeof window.rosterSiteVisits.refresh === 'function') {
         window.rosterSiteVisits.refresh();
-        return;
       }
     } catch (e0) {}
-
-    function set(id, v) {
-      var el = document.getElementById(id);
-      if (el && v != null) el.textContent = String(v);
-    }
-    function ymd() {
-      try {
-        var parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
-        }).formatToParts(new Date());
-        var map = {};
-        parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
-        return { day: map.year + '-' + map.month + '-' + map.day, month: map.year + '-' + map.month };
-      } catch (e) {
-        var d = new Date();
-        var m = String(d.getMonth() + 1).padStart(2, '0');
-        var day = String(d.getDate()).padStart(2, '0');
-        return { day: d.getFullYear() + '-' + m + '-' + day, month: d.getFullYear() + '-' + m };
-      }
-    }
-    function getCount(url) {
-      return fetch(url, { cache: 'no-store', mode: 'cors' })
-        .then(function (r) { if (!r.ok) throw new Error('n'); return r.json(); })
-        .then(function (j) {
-          if (j && typeof j.value === 'number') return j.value;
-          if (j && typeof j.count === 'number') return j.count;
-          return null;
-        })
-        .catch(function () { return null; });
-    }
-    var keys = ymd();
-    // GET only — never /hit (that was double-counting returning visitors).
-    function one(key) {
-      var g = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
-      return getCount(g);
-    }
-    Promise.all([
-      one('day-' + keys.day),
-      one('month-' + keys.month),
-      one('total-visits')
-    ]).then(function (vals) {
-      if (vals[0] != null) set('siteVisitsDay', vals[0]);
-      if (vals[1] != null) set('siteVisitsMonth', vals[1]);
-      if (vals[2] != null) set('siteVisitsTotal', vals[2]);
-      ensureFooterVisits();
-    });
   }
 
   function run() {

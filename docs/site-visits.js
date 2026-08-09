@@ -43,11 +43,10 @@
   })();
 
   var NS = 'khalidsaif912.github.io';
+  // Legacy Abacus keys kept for optional TOTAL baseline only (read, never hit from here).
   var TOTAL_KEY = 'total-visits';
-  // Once per browser calendar-day (Muscat). Claimed BEFORE network hit — never cleared on cache miss.
-  var COUNTED_KEY = 'rosterVisitCountedDay';
-  var SESSION_CLAIM_KEY = 'rosterVisitHitClaimSession';
-  var CACHE_KEY = 'rosterVisitCountsV2';
+  var CACHE_KEY = 'rosterVisitCountsV3';
+  var TOTAL_FLOOR_KEY = 'rosterVisitTotalFloor';
   var cached = { day: null, month: null, total: null, dayKey: '', monthKey: '' };
   var booted = false;
   var loading = false;
@@ -145,6 +144,7 @@
   function readPersisted(keys) {
     try {
       var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) raw = localStorage.getItem('rosterVisitCountsV2');
       if (!raw) raw = localStorage.getItem('rosterVisitCountsV1');
       if (!raw) return;
       var data = JSON.parse(raw);
@@ -219,10 +219,10 @@
     return null;
   }
 
-  /** Read-only. Never hit — a failed GET must not inflate unique-visitor stats. */
-  function getCountOnly(key) {
-    var abacusGet = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + key;
-    var counterGet = 'https://api.counterapi.dev/v1/roster-site-new/' + key;
+  /** Read-only Abacus/CounterAPI — used only as a lifetime floor when Mantle log is pruned. */
+  function getLegacyTotalOnly() {
+    var abacusGet = 'https://abacus.jasoncameron.dev/get/' + NS + '/' + TOTAL_KEY;
+    var counterGet = 'https://api.counterapi.dev/v1/roster-site-new/' + TOTAL_KEY;
     return fetchJson(abacusGet)
       .then(parseCount)
       .catch(function () {
@@ -231,25 +231,6 @@
       .catch(function () {
         return null;
       });
-  }
-
-  /** Increment once. Used only after a local once-per-day claim succeeds. */
-  function hitCountOnly(key) {
-    var abacusHit = 'https://abacus.jasoncameron.dev/hit/' + NS + '/' + key;
-    var counterUp = 'https://api.counterapi.dev/v1/roster-site-new/' + key + '/up';
-    return fetchJson(abacusHit)
-      .then(parseCount)
-      .catch(function () {
-        return fetchJson(counterUp).then(parseCount);
-      })
-      .catch(function () {
-        return null;
-      });
-  }
-
-  /** @deprecated name kept for any external callers — always read-only. */
-  function requestCount(key, doUp) {
-    return doUp ? hitCountOnly(key) : getCountOnly(key);
   }
 
   function removeLegacyFooterRow() {
@@ -343,43 +324,85 @@
     paintCounts();
   }
 
-  function alreadyCounted(dayKey) {
-    try {
-      if (localStorage.getItem(COUNTED_KEY) === dayKey) return true;
-    } catch (e) {}
-    try {
-      if (sessionStorage.getItem(SESSION_CLAIM_KEY) === dayKey) return true;
-    } catch (e2) {}
-    return false;
-  }
-
-  function markCounted(dayKey) {
-    try {
-      localStorage.setItem(COUNTED_KEY, dayKey);
-    } catch (e) {}
-    try {
-      sessionStorage.setItem(SESSION_CLAIM_KEY, dayKey);
-    } catch (e2) {}
-  }
-
   /**
-   * Claim exclusive right to increment Abacus for this browser/day.
-   * Must run before any /hit request so concurrent tabs/scripts cannot all hit.
+   * Authoritative counts from Mantle visit log.
+   * One log row = one unique visitor for that calendar day (merged by id+day).
    */
-  function claimHitForDay(dayKey) {
+  function countsFromLog(list, keys) {
+    var dayN = 0;
+    var monthN = 0;
+    var totalN = 0;
+    var seenDay = Object.create(null);
+    var seenMonth = Object.create(null);
+    var seenTotal = Object.create(null);
+    (Array.isArray(list) ? list : []).forEach(function (row) {
+      if (!row) return;
+      var id = String(row.id || '').trim();
+      var day = String(row.day || '').trim();
+      if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+      var stamp = day + ':' + id;
+      if (!seenTotal[stamp]) {
+        seenTotal[stamp] = 1;
+        totalN += 1;
+      }
+      if (day === keys.day && !seenDay[id]) {
+        seenDay[id] = 1;
+        dayN += 1;
+      }
+      if (day.indexOf(keys.month) === 0 && !seenMonth[stamp]) {
+        seenMonth[stamp] = 1;
+        monthN += 1;
+      }
+    });
+    return { day: dayN, month: monthN, total: totalN };
+  }
+
+  function readTotalFloor() {
     try {
-      if (localStorage.getItem(COUNTED_KEY) === dayKey) return false;
-      if (sessionStorage.getItem(SESSION_CLAIM_KEY) === dayKey) return false;
-      // Write claim first (sync). Race window is tiny between two tabs.
-      sessionStorage.setItem(SESSION_CLAIM_KEY, dayKey);
-      localStorage.setItem(COUNTED_KEY, dayKey);
-      return true;
+      var n = Number(localStorage.getItem(TOTAL_FLOOR_KEY));
+      return isFinite(n) && n > 0 ? Math.floor(n) : 0;
     } catch (e) {
-      // Storage blocked: still try one hit per page session via memory flag.
-      if (window.__rosterVisitHitClaimed === dayKey) return false;
-      window.__rosterVisitHitClaimed = dayKey;
-      return true;
+      return 0;
     }
+  }
+
+  function raiseTotalFloor(n) {
+    n = Number(n);
+    if (!isFinite(n) || n < 0) return;
+    n = Math.floor(n);
+    try {
+      var cur = readTotalFloor();
+      if (n > cur) localStorage.setItem(TOTAL_FLOOR_KEY, String(n));
+    } catch (e) {}
+  }
+
+  function applyCountsFromList(list, keys) {
+    keys = keys || muscatYmd();
+    var c = countsFromLog(list, keys);
+    cached.day = c.day;
+    cached.month = c.month;
+    cached.dayKey = keys.day;
+    cached.monthKey = keys.month;
+    // Total: never go below log-derived value or a previously observed floor /
+    // legacy Abacus total (log is capped ~220 rows by size, so lifetime can be higher).
+    var floor = Math.max(c.total, readTotalFloor());
+    cached.total = floor;
+    raiseTotalFloor(floor);
+    persistCounts(keys);
+    paint();
+    return c;
+  }
+
+  function fetchVisitLogList() {
+    return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), {
+      headers: visitHeaders(),
+      cache: 'no-store'
+    }).then(function (r) {
+      if (!r.ok) throw new Error('read');
+      return r.json();
+    }).then(function (cur) {
+      return Array.isArray(cur && cur.log) ? cur.log.slice() : [];
+    });
   }
 
   function loadCounts() {
@@ -401,55 +424,20 @@
     if (loading) return Promise.resolve();
     loading = true;
     var keys = muscatYmd();
-    var dayKey = 'day-' + keys.day;
-    var monthKey = 'month-' + keys.month;
 
-    // Only one hit path per browser day. No "clear claim on empty cache" (that re-counted people).
-    var doHit = claimHitForDay(keys.day);
-
-    // Optimistic local bump only when we own the hit for this day.
-    if (doHit) {
-      cached.day = Number(cached.day || 0) + 1;
-      cached.month = Number(cached.month || 0) + 1;
-      if (cached.total != null) cached.total = Number(cached.total) + 1;
-      else cached.total = 1;
-      cached.dayKey = keys.day;
-      cached.monthKey = keys.month;
-      paint();
-      persistCounts(keys);
-    }
-
-    var dayReq = doHit ? hitCountOnly(dayKey) : getCountOnly(dayKey);
-    var monthReq = doHit ? hitCountOnly(monthKey) : getCountOnly(monthKey);
-    var totalReq = doHit ? hitCountOnly(TOTAL_KEY) : getCountOnly(TOTAL_KEY);
-
-    return Promise.all([dayReq, monthReq, totalReq])
-      .then(function (vals) {
-        // Prefer authoritative server values (never overwrite with null).
-        if (vals[0] != null) cached.day = vals[0];
-        if (vals[1] != null) cached.month = vals[1];
-        if (vals[2] != null) cached.total = vals[2];
-        cached.dayKey = keys.day;
-        cached.monthKey = keys.month;
-        // Claim already set before hit; keep it even if network failed (undercount beats overcount).
-        if (doHit) markCounted(keys.day);
-        persistCounts(keys);
-        paint();
-
-        // Empty display: re-GET only (never hit again).
-        if (cached.day == null || cached.month == null || cached.total == null) {
-          return Promise.all([
-            getCountOnly(dayKey),
-            getCountOnly(monthKey),
-            getCountOnly(TOTAL_KEY)
-          ]).then(function (vals2) {
-            if (vals2[0] != null) cached.day = vals2[0];
-            if (vals2[1] != null) cached.month = vals2[1];
-            if (vals2[2] != null) cached.total = vals2[2];
+    return fetchVisitLogList()
+      .then(function (list) {
+        applyCountsFromList(list, keys);
+        // Blend legacy public total so pruning Mantle does not shrink the displayed lifetime total.
+        return getLegacyTotalOnly().then(function (legacy) {
+          if (legacy != null) {
+            var next = Math.max(Number(cached.total || 0), Number(legacy) || 0, countsFromLog(list, keys).total);
+            cached.total = next;
+            raiseTotalFloor(next);
             persistCounts(keys);
             paint();
-          });
-        }
+          }
+        });
       })
       .catch(function () {
         paint();
@@ -1055,6 +1043,12 @@
             );
             localStorage.setItem(VISIT_LOGGED_KEY, stamp);
           } catch (e1) {}
+          try {
+            // Still refresh footer from current list (includes prev row).
+            var snap = kept.slice();
+            snap.unshift(prev);
+            applyCountsFromList(snap, muscatYmd());
+          } catch (eSnap) {}
           return null;
         }
 
@@ -1094,6 +1088,9 @@
               })
             );
           } catch (e2) {}
+          try {
+            applyCountsFromList(kept, muscatYmd());
+          } catch (eCount) {}
           try {
             pingVisitServer(merged);
           } catch (e3) {}
@@ -1470,9 +1467,17 @@
         }, 1000);
       }
     } catch (eBoot) {}
-    // Visit log immediately so short stays still register.
-    window.setTimeout(logSiteVisit, 120);
-    window.setTimeout(logSiteVisit, 1600);
+    // Visit log first, then recount so "زوار اليوم" matches real unique visitors.
+    window.setTimeout(function () {
+      logSiteVisit();
+      window.setTimeout(function () {
+        loadCounts();
+      }, 900);
+    }, 120);
+    window.setTimeout(function () {
+      logSiteVisit();
+      loadCounts();
+    }, 2000);
     window.setTimeout(maybeAskPhone, 2200);
   }
 
