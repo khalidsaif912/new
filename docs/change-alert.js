@@ -1261,32 +1261,17 @@ function boot() {
     } catch (err) {}
   }
 
-  function loadIdeasPrompt() {
-    try {
-      if (window.__rosterIdeasPromptBooted) return;
-      if (document.querySelector('script[data-ideas-prompt="1"]')) return;
-      var s = document.createElement('script');
-      s.src = getBase() + 'ideas-prompt.js?v=20260807z';
-      s.async = true;
-      s.setAttribute('data-ideas-prompt', '1');
-      s.setAttribute('data-local-src', s.src);
-      document.head.appendChild(s);
-    } catch (err) {}
-  }
-
   function start() {
     // Force homepage feedback UI even if index shell is an older cache.
     try {
       if (typeof window.rosterForceHomeUI === 'function') window.rosterForceHomeUI();
       else {
         var s = document.createElement('script');
-        s.src = getBase() + 'home-ui-force.js?v=20260809a';
+        s.src = getBase() + 'home-ui-force.js?v=20260811b';
         s.async = true;
         document.head.appendChild(s);
       }
     } catch (forceErr) {}
-    // Ideas sheet: real landing is /date/* (home.html redirects) — load on those pages too.
-    loadIdeasPrompt();
     boot();
     loadFeatureUpdateBadge();
     // One delayed retry in case another script sets the saved employee id shortly after load.
