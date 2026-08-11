@@ -275,6 +275,8 @@
     patchQuicklistLink();
     ensureBookAppLink();
     ensureWhatsAppAppLink();
+    ensureIdeasAppLink();
+    organizeAppsGrid();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -1082,6 +1084,8 @@
     patchQuicklistLink();
     ensureBookAppLink();
     ensureWhatsAppAppLink();
+    ensureIdeasAppLink();
+    organizeAppsGrid();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {
       if (!sessionStorage.getItem('spotlightShown')) {
