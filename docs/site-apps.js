@@ -37,6 +37,8 @@
       store: 'Mobhar Store · متجر مُبهر',
       storeSub: 'Electronics & gadgets',
       alumni: 'Former Colleagues',
+      ideas: 'Ideas & suggestions',
+      ideasSub: 'Share ideas and rate the site',
       spotlightBtn: 'Surprise me',
       spotlightBtnSub: 'A quick pick from the site',
       spotlightTitle: 'For you',
@@ -84,6 +86,8 @@
       store: 'متجر مُبهر · Mobhar Store',
       storeSub: 'أجهزة وتسوق',
       alumni: 'زملاء سابقون',
+      ideas: 'اقتراحات وأفكار',
+      ideasSub: 'شارك فكرتك وقيّم الموقع',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'اقتراح لك',
@@ -171,6 +175,13 @@
       '<rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
       '<rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>' +
       '</svg>',
+    ideas:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<path d="M32 8a16 16 0 0 0-9 29v7h18v-7A16 16 0 0 0 32 8z" fill="#fde68a" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M32 8c4 6 6 12 6 18H26c0-6 2-12 6-18z" fill="#fef3c7"/>' +
+      '<path d="M26 48h12M28 54h8" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M28 22h8M30 28h4" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/>' +
+      '</svg>',
     games: null
   };
 
@@ -246,6 +257,7 @@
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
     ensureWhatsAppAppLink();
+    ensureIdeasAppLink();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
@@ -440,7 +452,7 @@
         href: ideasPageUrl(),
         external: false,
         classes: 'roster-cta-btn--share',
-        icon: '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true"><path d="M32 8a16 16 0 0 0-9 29v7h18v-7A16 16 0 0 0 32 8z" fill="#fde68a" stroke="#0f172a" stroke-width="2.2"/><path d="M26 48h12M28 54h8" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><path d="M28 22h8M30 28h4" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/></svg>'
+        icon: iconForApp('ideas')
       }
     ];
   }
@@ -543,6 +555,52 @@
     if (icon && !icon.innerHTML.trim()) icon.innerHTML = iconForApp('wa');
   }
 
+  function ensureIdeasAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var href = ideasPageUrl();
+    var existing = grid.querySelector('a.siteAppsLink[data-app-id="ideas"], .siteAppsLink--ideas');
+    if (!existing) {
+      var card = document.createElement('a');
+      card.className = 'siteAppsLink siteAppsLink--ideas';
+      card.href = href;
+      card.setAttribute('data-app-id', 'ideas');
+      card.setAttribute('data-open-same', '1');
+      card.innerHTML =
+        '<span class="siteAppsLink-icon">' +
+        iconForApp('ideas') +
+        '</span>' +
+        '<span class="siteAppsLink-text">' +
+        '<span class="siteAppsLink-title" data-i18n="ideas">' +
+        t('ideas') +
+        '</span>' +
+        '<span class="siteAppsLink-sub" data-i18n-sub="ideas">' +
+        t('ideasSub') +
+        '</span>' +
+        '</span>';
+      // Place after WhatsApp / first row for high visibility; fall back to end of grid.
+      var wa = grid.querySelector('[data-app-id="wa"]');
+      if (wa && wa.nextSibling) grid.insertBefore(card, wa.nextSibling);
+      else if (wa) grid.appendChild(card);
+      else {
+        var games = grid.querySelector('[data-app-id="games"]');
+        if (games) grid.insertBefore(card, games);
+        else grid.appendChild(card);
+      }
+      existing = card;
+    }
+    existing.href = href;
+    existing.setAttribute('data-open-same', '1');
+    existing.removeAttribute('target');
+    existing.removeAttribute('rel');
+    var tEl = existing.querySelector('[data-i18n="ideas"]');
+    var sEl = existing.querySelector('[data-i18n-sub="ideas"]');
+    if (tEl) tEl.textContent = t('ideas');
+    if (sEl) sEl.textContent = t('ideasSub');
+    var ico = existing.querySelector('.siteAppsLink-icon');
+    if (ico) ico.innerHTML = iconForApp('ideas');
+  }
+
   function openCalcFromPwa(e) {
     var link = e.target.closest('a.siteAppsLink--calc');
     if (!link) return;
@@ -576,6 +634,7 @@
     patchQuicklistLink();
     ensureBookAppLink();
     ensureWhatsAppAppLink();
+    ensureIdeasAppLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
@@ -683,6 +742,7 @@
       '.siteAppsLink--calc .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--store{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
       '.siteAppsLink--games{background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
