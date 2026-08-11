@@ -258,7 +258,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    removeFlightsAppLink();
+    organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
@@ -570,7 +570,7 @@
         t('ideasSub') +
         '</span>' +
         '</span>';
-      // Place after WhatsApp / first row for high visibility; fall back to end of grid.
+      // Place after WhatsApp temporarily; organizeAppsGrid() sets final order.
       var wa = grid.querySelector('[data-app-id="wa"]');
       if (wa && wa.nextSibling) grid.insertBefore(card, wa.nextSibling);
       else if (wa) grid.appendChild(card);
@@ -601,6 +601,63 @@
     ).forEach(function (el) {
       el.parentNode && el.parentNode.removeChild(el);
     });
+  }
+
+  /** Stable, balanced layout: featured top/bottom + even 2-col pairs (no empty slots). */
+  function organizeAppsGrid() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    removeFlightsAppLink();
+
+    function findApp(id) {
+      return (
+        grid.querySelector('a.siteAppsLink[data-app-id="' + id + '"]') ||
+        grid.querySelector('a.siteAppsLink--' + id)
+      );
+    }
+
+    var order = ['wa', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var seen = {};
+    order.forEach(function (id) {
+      var el = findApp(id);
+      if (!el) return;
+      seen[id] = true;
+      grid.appendChild(el);
+      if (!el.getAttribute('data-app-id')) el.setAttribute('data-app-id', id);
+    });
+
+    // Keep any unexpected remaining links between store and games (or at end).
+    Array.prototype.slice.call(grid.querySelectorAll('a.siteAppsLink')).forEach(function (el) {
+      var id = el.getAttribute('data-app-id') || '';
+      if (seen[id]) return;
+      if (id === 'flights' || el.classList.contains('siteAppsLink--flights')) {
+        el.parentNode && el.parentNode.removeChild(el);
+        return;
+      }
+      var games = findApp('games');
+      if (games) grid.insertBefore(el, games);
+      else grid.appendChild(el);
+    });
+
+    // Store is a normal half tile (pair with ideas); games stays full-width banner.
+    var store = findApp('store');
+    if (store) {
+      var title = store.querySelector('.siteAppsLink-title');
+      var sub = store.querySelector('.siteAppsLink-sub');
+      var icon = store.querySelector('.siteAppsLink-icon');
+      var text = store.querySelector('.siteAppsLink-text');
+      if (title && sub && !text) {
+        text = document.createElement('span');
+        text.className = 'siteAppsLink-text';
+        title.parentNode.insertBefore(text, title);
+        text.appendChild(title);
+        text.appendChild(sub);
+      }
+      if (icon && text && icon.nextElementSibling !== text) {
+        store.insertBefore(icon, store.firstChild);
+        if (icon.nextSibling !== text) store.appendChild(text);
+      }
+    }
   }
 
   function openCalcFromPwa(e) {
@@ -637,7 +694,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    removeFlightsAppLink();
+    organizeAppsGrid();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
@@ -711,11 +768,20 @@
       '.spotlightPreviewTitle{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.25;}',
       '.spotlightPreviewSub{font-size:10.5px;font-weight:600;color:#64748b;line-height:1.35;margin-top:2px;}',
       '.spotlightPreviewGo{flex-shrink:0;font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:999px;padding:5px 8px;white-space:nowrap;}',
-      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:72px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;}',
+      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:64px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;}',
       '.siteAppsLink--wa .siteAppsLink-icon{background:#dcfce7!important;border-color:#86efac!important;flex-shrink:0!important;}',
       '.siteAppsLink--wa .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
       '.siteAppsLink--wa .siteAppsLink-title,.siteAppsLink--wa .siteAppsLink-sub{text-align:start!important;}',
       '.siteAppsLink--wa::after{content:none!important;display:none!important;}',
+      '.siteAppsLink--games{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-height:64px!important;padding:10px 14px!important;gap:12px!important;background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
+      '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;flex-shrink:0!important;}',
+      '.siteAppsLink--games .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
+      '.siteAppsLink--games .siteAppsLink-title,.siteAppsLink--games .siteAppsLink-sub{text-align:start!important;}',
+      '.siteAppsLink--store{grid-column:auto!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-height:0!important;padding:12px 8px!important;gap:8px!important;background:linear-gradient(160deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
+      '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
+      '.siteAppsLink--store .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;flex:0 1 auto!important;min-width:0!important;width:100%!important;}',
+      '.siteAppsLink--store .siteAppsLink-title,.siteAppsLink--store .siteAppsLink-sub{text-align:center!important;}',
+      '.siteAppsLink--ideas{background:linear-gradient(160deg,#fffbeb 0%,#fef3c7 100%)!important;border-color:#fcd34d!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
       '#spotlightEmojiBtn img{width:22px;height:22px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
@@ -740,18 +806,11 @@
       '.siteAppsLink-text{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}',
       '.siteAppsLink-title{font-size:12px!important;line-height:1.25!important;font-weight:800!important;}',
       '.siteAppsLink-sub{font-size:10px!important;line-height:1.3!important;}',
-      '.siteAppsLink--flights .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
       '.siteAppsLink--labels .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
       '.siteAppsLink--calc .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
-      '.siteAppsLink--store{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
-      '.siteAppsLink--games{background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
-      '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
-      '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
-      '.siteAppsLink--store,.siteAppsLink--games{min-height:64px!important;padding:10px 14px!important;gap:12px!important;}',
-      '.siteAppsLink--store .siteAppsLink-text,.siteAppsLink--games .siteAppsLink-text{align-items:flex-start;flex:1;}',
       '.siteAppsCloseWrap{margin-top:4px!important;flex-shrink:0;}',
       '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:42px;padding-top:9px;padding-bottom:9px;border-radius:14px!important;}',
       '@media (hover:hover){.siteAppsLink:hover{transform:translateY(-2px)!important;box-shadow:0 10px 22px rgba(15,23,42,.1)!important;}}',
@@ -764,7 +823,7 @@
       '.siteAppsLink-icon svg,.siteAppsFlatSvg,.siteAppsFlatImg{width:26px!important;height:26px!important;}',
       '.siteAppsLink-title{font-size:11px!important;}',
       '.siteAppsLink-sub{display:none!important;}',
-      '.siteAppsLink--store,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
+      '.siteAppsLink--wa,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
       '.siteAppsTitle{font-size:15px!important;}',
       '}',
       '@media (max-height:560px){',
