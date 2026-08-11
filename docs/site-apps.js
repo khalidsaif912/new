@@ -258,6 +258,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    removeFlightsAppLink();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
       paintSpotlightPopup(currentSpotlightItem());
@@ -336,15 +337,6 @@
         external: false,
         classes: 'roster-cta-btn--apps',
         icon: iconForApp('wa')
-      },
-      {
-        id: 'flights',
-        title: t('flights'),
-        sub: t('flightsSub'),
-        href: 'https://khalidsaif912.github.io/live-flights/',
-        external: true,
-        classes: 'roster-cta-btn--apps',
-        icon: iconForApp('flights')
       },
       {
         id: 'labels',
@@ -601,6 +593,16 @@
     if (ico) ico.innerHTML = iconForApp('ideas');
   }
 
+  function removeFlightsAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    grid.querySelectorAll(
+      'a.siteAppsLink[data-app-id="flights"], a.siteAppsLink--flights, a.siteAppsLink[href*="live-flights"]'
+    ).forEach(function (el) {
+      el.parentNode && el.parentNode.removeChild(el);
+    });
+  }
+
   function openCalcFromPwa(e) {
     var link = e.target.closest('a.siteAppsLink--calc');
     if (!link) return;
@@ -635,6 +637,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    removeFlightsAppLink();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
