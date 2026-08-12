@@ -352,7 +352,7 @@
     }
     table.log tr.missing td { background: #fff7ed; }
     .logToolbar {
-      margin: 0 0 12px;
+      margin: 14px 0 0;
       justify-content: flex-start;
     }
     .logToolbar .summaryChip.actionChip {
@@ -550,12 +550,6 @@
         <div class="circRow" style="margin-top:10px;">
           <input id="logSearch" type="search" placeholder="Search by name or ID" data-i18n-placeholder="searchPlaceholder">
         </div>
-        <div class="summaryBar logToolbar">
-          <button type="button" class="summaryChip actionChip" id="printLogBtn" title="Print log">
-            <div class="chipVal">🖨️</div>
-            <div class="chipLabel" data-i18n="printLog">Print log</div>
-          </button>
-        </div>
         <div class="printLogHead" id="printLogHead" aria-hidden="true">
           <div class="printLogKicker" data-i18n="logHeading">Acknowledgement log</div>
           <div class="printLogTitle" id="printLogTitle">—</div>
@@ -575,6 +569,12 @@
           </table>
         </div>
         <p class="msg" id="logMsg"></p>
+        <div class="summaryBar logToolbar">
+          <button type="button" class="summaryChip actionChip" id="printLogBtn" title="Print log">
+            <div class="chipVal">🖨️</div>
+            <div class="chipLabel" data-i18n="printLog">Print log</div>
+          </button>
+        </div>
       </div>
     </section>
   </div>
