@@ -351,11 +351,93 @@
       border-bottom: 2px solid #99f6e4;
     }
     table.log tr.missing td { background: #fff7ed; }
+    .logToolbar {
+      margin: 0 0 12px;
+      justify-content: flex-start;
+    }
+    .logToolbar .summaryChip.actionChip {
+      flex: 0 0 auto;
+      min-width: 88px;
+    }
     .empty {
       text-align: center; padding: 28px 12px;
       color: var(--muted); font-weight: 700; font-size: 14px;
     }
     .hidden { display: none !important; }
+
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      html, body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body * { visibility: hidden !important; }
+      #viewLog,
+      #viewLog * {
+        visibility: visible !important;
+      }
+      #viewLog {
+        display: block !important;
+        position: absolute;
+        left: 0; top: 0; width: 100%;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+      }
+      #viewLog .topBar,
+      #viewLog .hint,
+      #viewLog .circRow,
+      #viewLog #logFilters,
+      #viewLog .logToolbar,
+      #viewLog #logMsg,
+      .header,
+      #statsAndTabsBar {
+        display: none !important;
+      }
+      #viewLog h2 { display: none !important; }
+      #viewLog .body { padding: 0 !important; }
+      .printLogHead {
+        display: block !important;
+        visibility: visible !important;
+        margin: 0 0 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #0f766e;
+      }
+      .printLogHead .printLogKicker {
+        font-size: 11px; font-weight: 800; color: #0f766e;
+        text-transform: uppercase; letter-spacing: .04em;
+        margin: 0 0 6px;
+      }
+      .printLogHead .printLogTitle {
+        font-size: 18px; font-weight: 900; color: #0f172a;
+        margin: 0 0 6px; line-height: 1.35;
+      }
+      .printLogHead .printLogMeta {
+        font-size: 12px; font-weight: 700; color: #475569;
+      }
+      .logTableWrap {
+        overflow: visible !important;
+        margin: 0 !important;
+      }
+      table.log {
+        width: 100% !important;
+        font-size: 11px !important;
+      }
+      table.log thead { background: #d1fae5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      table.log thead th {
+        background: #d1fae5 !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      table.log tr.missing td {
+        background: #fff7ed !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    .printLogHead { display: none; }
   </style>
 </head>
 <body>
@@ -468,8 +550,19 @@
         <div class="circRow" style="margin-top:10px;">
           <input id="logSearch" type="search" placeholder="Search by name or ID" data-i18n-placeholder="searchPlaceholder">
         </div>
+        <div class="summaryBar logToolbar">
+          <button type="button" class="summaryChip actionChip" id="printLogBtn" title="Print log">
+            <div class="chipVal">🖨️</div>
+            <div class="chipLabel" data-i18n="printLog">Print log</div>
+          </button>
+        </div>
+        <div class="printLogHead" id="printLogHead" aria-hidden="true">
+          <div class="printLogKicker" data-i18n="logHeading">Acknowledgement log</div>
+          <div class="printLogTitle" id="printLogTitle">—</div>
+          <div class="printLogMeta" id="printLogMeta">—</div>
+        </div>
         <div class="logTableWrap">
-          <table class="log">
+          <table class="log" id="logTable">
             <thead>
               <tr>
                 <th data-i18n="colName">Name</th>
@@ -553,6 +646,9 @@
         saveError: 'Could not save. Try again.',
         logSummary: 'Read: {read} / {total} · Showing: {shown}',
         noCirculars: 'No circulars.',
+        printLog: 'Print log',
+        printIssueDate: 'Issue date',
+        printPrintedAt: 'Printed',
         locale: 'en-GB'
       },
       ar: {
@@ -603,6 +699,9 @@
         saveError: 'تعذّر الحفظ. حاول مرة أخرى.',
         logSummary: 'اطلع: {read} / {total} · المعروض: {shown}',
         noCirculars: 'لا توجد تعميمات.',
+        printLog: 'طباعة السجل',
+        printIssueDate: 'تاريخ الصدور',
+        printPrintedAt: 'طُبع في',
         locale: 'ar-OM'
       }
     };
@@ -1122,6 +1221,7 @@
         .replace('{read}', String(readN))
         .replace('{total}', String(staff.length))
         .replace('{shown}', String(rows.length));
+      updatePrintLogHead();
       body.innerHTML = rows
         .map(function (r) {
           return (
@@ -1146,6 +1246,43 @@
           );
         })
         .join('');
+    }
+
+    function updatePrintLogHead() {
+      var c = circulars.find(function (x) { return x.id === currentId; }) || {};
+      var titleEl = document.getElementById('printLogTitle');
+      var metaEl = document.getElementById('printLogMeta');
+      if (titleEl) titleEl.textContent = c.title || c.id || '—';
+      if (metaEl) {
+        var issue = c.date || '—';
+        var printed = '';
+        try {
+          printed = new Date().toLocaleString(t('locale'), {
+            timeZone: 'Asia/Muscat',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch (e) {
+          printed = '';
+        }
+        metaEl.textContent =
+          t('printIssueDate') + ': ' + issue +
+          (printed ? '  ·  ' + t('printPrintedAt') + ': ' + printed : '');
+      }
+    }
+
+    function printLog() {
+      if (!circulars.length) return;
+      if (!currentId && circulars[0]) currentId = circulars[0].id;
+      setView('log');
+      renderLog();
+      updatePrintLogHead();
+      window.setTimeout(function () {
+        window.print();
+      }, 50);
     }
 
     function normalizedAcks(doc) {
@@ -1322,6 +1459,10 @@
       fillLogSelect();
       setView('log');
       renderLog();
+    });
+
+    document.getElementById('printLogBtn').addEventListener('click', function () {
+      printLog();
     });
 
     document.getElementById('tabList').addEventListener('click', function () {
