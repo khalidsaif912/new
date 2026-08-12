@@ -297,9 +297,41 @@
       justify-content: center;
       overflow-x: auto;
     }
-    .pdfFrame {
-      width: 100%; height: min(70vh, 560px);
-      border: 1px solid #e2e8f0; border-radius: 12px; background: #f1f5f9;
+    .pdfShell {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .pdfHost {
+      width: 100%;
+      max-height: min(75vh, 640px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .pdfHost canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      margin: 0 auto 10px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, .1);
+    }
+    .pdfHost .pdfMsg {
+      text-align: center;
+      padding: 48px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .pdfHost .pdfMsg a {
+      color: var(--teal);
+      font-weight: 800;
     }
     .logTableWrap { overflow-x: auto; margin-top: 8px; }
     table.log {
@@ -309,9 +341,14 @@
       text-align: start; padding: 10px 8px;
       border-bottom: 1px solid #e2e8f0;
     }
-    table.log th {
+    table.log thead {
+      background: #d1fae5;
+    }
+    table.log thead th {
       font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
-      color: var(--muted); font-weight: 800;
+      color: #0f766e; font-weight: 800;
+      background: #d1fae5 !important;
+      border-bottom: 2px solid #99f6e4;
     }
     table.log tr.missing td { background: #fff7ed; }
     .empty {
@@ -384,7 +421,9 @@
         <div id="detailMeta" style="margin:8px 0 12px;font-size:12px;color:#64748b;font-weight:700;"></div>
         <div id="detailStatus"></div>
         <div style="margin-top:12px;">
-          <iframe class="pdfFrame" id="pdfFrame" title="PDF"></iframe>
+          <div class="pdfShell">
+            <div class="pdfHost" id="pdfHost" aria-live="polite"></div>
+          </div>
         </div>
         <div class="detailActions summaryBar" style="margin-top:14px;">
           <a class="summaryChip actionChip" id="openPdf" href="#" target="_blank" rel="noopener">
@@ -484,6 +523,8 @@
         listHint: 'Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.',
         back: 'Back',
         openPdf: 'Open PDF',
+        pdfLoading: 'Loading PDF…',
+        pdfError: 'Could not display the PDF here. Use Open PDF.',
         ack: 'Acknowledge',
         ackDone: 'Acknowledged',
         ackNeedLogin: 'Sign in required',
@@ -532,6 +573,8 @@
         listHint: 'اضغط على تعميم لقراءته والإقرار. تظهر حالتك: اطلعت / لم تطلع. الهوية من الصفحة الرئيسية.',
         back: 'رجوع',
         openPdf: 'فتح PDF',
+        pdfLoading: 'جاري تحميل PDF…',
+        pdfError: 'تعذر عرض PDF هنا. استخدم فتح PDF.',
         ack: 'أقرّ بالاطلاع',
         ackDone: 'تم الإقرار',
         ackNeedLogin: 'يتطلب تسجيل الدخول',
@@ -885,6 +928,103 @@
         .join('');
     }
 
+    var pdfRenderToken = 0;
+    var pdfJsReady = null;
+
+    function loadPdfJs() {
+      if (window.pdfjsLib) {
+        return Promise.resolve(window.pdfjsLib);
+      }
+      if (pdfJsReady) return pdfJsReady;
+      pdfJsReady = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.async = true;
+        s.onload = function () {
+          try {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+              'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            resolve(window.pdfjsLib);
+          } catch (e) {
+            reject(e);
+          }
+        };
+        s.onerror = function () {
+          pdfJsReady = null;
+          reject(new Error('pdf.js load failed'));
+        };
+        document.head.appendChild(s);
+      });
+      return pdfJsReady;
+    }
+
+    function clearPdfHost(msgHtml) {
+      var host = document.getElementById('pdfHost');
+      if (!host) return;
+      host.innerHTML = msgHtml || '';
+    }
+
+    function renderPdfInPage(fileUrl) {
+      var host = document.getElementById('pdfHost');
+      var openPdf = document.getElementById('openPdf');
+      if (!host) return;
+      var token = ++pdfRenderToken;
+      if (!fileUrl) {
+        clearPdfHost('<div class="pdfMsg">' + escapeHtml(t('pdfError')) + '</div>');
+        return;
+      }
+      if (openPdf) openPdf.href = fileUrl;
+      clearPdfHost('<div class="pdfMsg">' + escapeHtml(t('pdfLoading')) + '</div>');
+
+      loadPdfJs()
+        .then(function (pdfjsLib) {
+          if (token !== pdfRenderToken) return null;
+          var abs = new URL(fileUrl, location.href).href;
+          return pdfjsLib.getDocument({ url: abs }).promise;
+        })
+        .then(function (doc) {
+          if (!doc || token !== pdfRenderToken) return null;
+          host.innerHTML = '';
+          var width = Math.max(280, (host.clientWidth || host.parentElement.clientWidth || 320) - 16);
+          var chain = Promise.resolve();
+          for (var i = 1; i <= doc.numPages; i++) {
+            (function (pageNum) {
+              chain = chain.then(function () {
+                if (token !== pdfRenderToken) return;
+                return doc.getPage(pageNum).then(function (page) {
+                  if (token !== pdfRenderToken) return;
+                  var base = page.getViewport({ scale: 1 });
+                  var scale = Math.min(2.2, width / base.width);
+                  var viewport = page.getViewport({ scale: scale });
+                  var canvas = document.createElement('canvas');
+                  canvas.width = viewport.width;
+                  canvas.height = viewport.height;
+                  canvas.setAttribute('aria-label', 'PDF page ' + pageNum);
+                  host.appendChild(canvas);
+                  return page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport: viewport
+                  }).promise;
+                });
+              });
+            })(i);
+          }
+          return chain;
+        })
+        .catch(function () {
+          if (token !== pdfRenderToken) return;
+          clearPdfHost(
+            '<div class="pdfMsg">' +
+              escapeHtml(t('pdfError')) +
+              '<br><a href="' +
+              escapeHtml(fileUrl) +
+              '" target="_blank" rel="noopener">' +
+              escapeHtml(t('openPdf')) +
+              '</a></div>'
+          );
+        });
+    }
+
     function openDetail(id) {
       var c = circulars.find(function (x) { return x.id === id; });
       if (!c) return;
@@ -893,10 +1033,9 @@
       document.getElementById('detailTitle').textContent = c.title || c.id;
       document.getElementById('detailMeta').textContent = (c.date || '') + (c.sourceName ? ' · ' + c.sourceName : '');
       var fileUrl = c.file || '';
-      var frame = document.getElementById('pdfFrame');
       var openPdf = document.getElementById('openPdf');
-      frame.src = fileUrl;
-      openPdf.href = fileUrl;
+      if (openPdf) openPdf.href = fileUrl || '#';
+      renderPdfInPage(fileUrl);
       var me = empId();
       var status = document.getElementById('detailStatus');
       var btn = document.getElementById('ackBtn');
