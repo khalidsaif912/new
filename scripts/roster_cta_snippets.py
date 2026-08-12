@@ -342,6 +342,16 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     #myScheduleBtn .feature-new-badge{
       display:none !important;
     }
+    /* Emp/Depts count: large screens only (Read&Sign keeps the mobile slot) */
+    #summarySwitchChip { display:none !important; }
+    @media (min-width:1024px){
+      #summarySwitchChip {
+        display:flex !important;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+      }
+    }
 """
 
 CTA_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
@@ -1128,14 +1138,17 @@ def export_cta_html(
 
 
 def import_summary_bar_html(total_emp: int) -> str:
-    """Mirror export duty-page summary chips (Read&Sign → My Schedule → …)."""
-    _ = total_emp  # kept for call-site compatibility
+    """Mirror export duty-page summary chips (Read&Sign → Emp/Depts → My Schedule → …)."""
     return f"""
   <div class="summaryBar">
     <a href="{{{{BASE}}}}/read-and-sign/" id="readSignChipBtn" class="summaryChip readSignChip" style="text-decoration:none;">
       {CHIP_READ_SIGN_HTML}
       <div class="chipLabel" data-key="readSignPage">Read&amp;Sign</div>
     </a>
+    <div class="summaryChip" id="summarySwitchChip">
+      <div class="chipVal" id="summarySwitchVal">{total_emp}</div>
+      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
+    </div>
     <a href="{{{{BASE}}}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>

@@ -146,6 +146,14 @@
     }
     .summaryChip.warn .chipVal { color: var(--warn); }
     .summaryChip.ok .chipVal { color: var(--ok); }
+    /* Small screens: Read + Pending rotate in one chip */
+    #statSwitchChip { display: none !important; }
+    #statSwitchChip .chipVal,
+    #statSwitchChip .chipLabel { transition: opacity .2s ease; }
+    @media (max-width: 720px) {
+      .statPairWide { display: none !important; }
+      #statSwitchChip { display: flex !important; }
+    }
     .summaryChip.tabChip .chipVal { color: #0ea5e9; font-size: 18px; }
     .summaryChip.tabChip.active {
       background: #ecfdf5;
@@ -341,8 +349,12 @@
         <div class="chipVal" id="statTotal">0</div>
         <div class="chipLabel" data-i18n="circulars">Circulars</div>
       </button>
-      <div class="summaryChip ok"><div class="chipVal" id="statRead">0</div><div class="chipLabel" data-i18n="read">Read</div></div>
-      <div class="summaryChip warn"><div class="chipVal" id="statPending">0</div><div class="chipLabel" data-i18n="pending">Pending</div></div>
+      <div class="summaryChip ok statPairWide"><div class="chipVal" id="statRead">0</div><div class="chipLabel" data-i18n="read">Read</div></div>
+      <div class="summaryChip warn statPairWide"><div class="chipVal" id="statPending">0</div><div class="chipLabel" data-i18n="pending">Pending</div></div>
+      <div class="summaryChip ok" id="statSwitchChip" aria-live="polite">
+        <div class="chipVal" id="statSwitchVal">0</div>
+        <div class="chipLabel" id="statSwitchLabel">Read</div>
+      </div>
       <button type="button" class="summaryChip tabChip" id="tabLog" data-view="log" title="Acknowledgement log" data-i18n-title="logTitle">
         <div class="chipVal">📋</div>
         <div class="chipLabel" data-i18n="log">Log</div>
@@ -581,6 +593,7 @@
         var key = el.getAttribute('data-i18n-aria');
         if (key) el.setAttribute('aria-label', t(key));
       });
+      updateStatSwitchChip();
       if (view === 'list') renderList();
       else if (view === 'detail' && currentId) openDetail(currentId);
       else if (view === 'log') renderLog();
@@ -776,6 +789,37 @@
       return hit ? hit.at : 0;
     }
 
+    window.__rsStatSwitchMode = 'read';
+    window.__rsStats = { read: '—', pending: '—' };
+
+    function updateStatSwitchChip() {
+      var chip = document.getElementById('statSwitchChip');
+      var val = document.getElementById('statSwitchVal');
+      var lbl = document.getElementById('statSwitchLabel');
+      if (!chip || !val || !lbl) return;
+      var mode = window.__rsStatSwitchMode || 'read';
+      var stats = window.__rsStats || {};
+      if (mode === 'pending') {
+        chip.classList.remove('ok');
+        chip.classList.add('warn');
+        val.textContent = stats.pending != null ? stats.pending : '—';
+        lbl.textContent = t('pending');
+      } else {
+        chip.classList.remove('warn');
+        chip.classList.add('ok');
+        val.textContent = stats.read != null ? stats.read : '—';
+        lbl.textContent = t('read');
+      }
+    }
+
+    function startStatSwitchLoop() {
+      if (window.__rsStatSwitchTimer) return;
+      window.__rsStatSwitchTimer = setInterval(function () {
+        window.__rsStatSwitchMode = window.__rsStatSwitchMode === 'read' ? 'pending' : 'read';
+        updateStatSwitchChip();
+      }, 2200);
+    }
+
     function paintStats() {
       var id = empId();
       var total = circulars.length;
@@ -785,9 +829,13 @@
           if (hasAck(c.id, id)) read += 1;
         });
       }
+      var readTxt = id ? String(read) : '—';
+      var pendingTxt = id ? String(Math.max(0, total - read)) : '—';
+      window.__rsStats = { read: readTxt, pending: pendingTxt };
       document.getElementById('statTotal').textContent = String(total);
-      document.getElementById('statRead').textContent = id ? String(read) : '—';
-      document.getElementById('statPending').textContent = id ? String(Math.max(0, total - read)) : '—';
+      document.getElementById('statRead').textContent = readTxt;
+      document.getElementById('statPending').textContent = pendingTxt;
+      updateStatSwitchChip();
     }
 
     function setView(name) {
@@ -1093,6 +1141,7 @@
       absorbEmpFromQuery();
       applyLang(LANG);
       paintWho();
+      startStatSwitchLoop();
       var listMsg = document.getElementById('listMsg');
       listMsg.textContent = t('loading');
       try {
