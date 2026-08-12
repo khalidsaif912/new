@@ -476,6 +476,8 @@
 
       if (/\/ideas(\/|$)/.test(p)) {
         section = 'ideas';
+      } else if (/\/read-and-sign(\/|$)/.test(p)) {
+        section = 'read-and-sign';
       } else if (/\/desk-log(\/|$)/.test(p)) {
         section = 'desk-log';
       } else if (/\/a-cup-of-book(\/|$)/.test(p)) {

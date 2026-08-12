@@ -180,6 +180,12 @@ SVG_CHIP_CLIPBOARD = _chip_svg(
     '<rect x="9" y="3" width="6" height="4" rx="1"/>',
     stroke="#1e40af",
 )
+SVG_CHIP_READ_SIGN = _chip_svg(
+    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
+    '<path d="M14 2v6h6"/>'
+    '<path d="M9 15l2 2 4-4"/>',
+    stroke="#0f766e",
+)
 
 CHIP_SCHEDULE_HTML = _chip_val(SVG_CHIP_SCHEDULE)
 CHIP_FLIGHT_HTML = _chip_val(SVG_CHIP_FLIGHT)
@@ -191,6 +197,7 @@ CHIP_MORNING_HTML = _chip_val(SVG_CHIP_SUN)
 CHIP_AFTERNOON_HTML = _chip_val(SVG_CHIP_CLOUD_SUN)
 CHIP_NIGHT_HTML = _chip_val(SVG_CHIP_MOON)
 CHIP_ALL_HTML = _chip_val(SVG_CHIP_CLIPBOARD)
+CHIP_READ_SIGN_HTML = _chip_val(SVG_CHIP_READ_SIGN)
 
 SVG_LANG_GLOBE = (
     '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
@@ -702,6 +709,8 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
     .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
     .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
+    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
     .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
       animation: siteAppsStorePulse 2.4s ease-in-out infinite;
       transform-origin: center;
@@ -1119,13 +1128,14 @@ def export_cta_html(
 
 
 def import_summary_bar_html(total_emp: int) -> str:
-    """Mirror export duty-page summary chips (Employees Ã¢â€ â€™ My Schedule Ã¢â€ â€™ cross-link Ã¢â€ â€™ Welcome Ã¢â€ â€™ Training Ã¢â€ â€™ Diff)."""
+    """Mirror export duty-page summary chips (Read&Sign → My Schedule → …)."""
+    _ = total_emp  # kept for call-site compatibility
     return f"""
   <div class="summaryBar">
-    <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">{total_emp}</div>
-      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
-    </div>
+    <a href="{{{{BASE}}}}/read-and-sign/" id="readSignChipBtn" class="summaryChip readSignChip" style="text-decoration:none;">
+      {CHIP_READ_SIGN_HTML}
+      <div class="chipLabel" data-key="readSignPage">Read&amp;Sign</div>
+    </a>
     <a href="{{{{BASE}}}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>

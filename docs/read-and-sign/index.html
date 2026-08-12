@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <title>Read and Sign</title>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --teal: #0f766e;
+      --teal-2: #14b8a6;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --bg: #eef6f5;
+      --card: #fff;
+      --ok: #166534;
+      --warn: #b45309;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', Tahoma, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: calc(16px + var(--safe-top)) 14px calc(36px + var(--safe-bottom));
+    }
+    .header {
+      background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #14b8a6 100%);
+      color: #fff;
+      padding: 26px 18px 22px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(15, 118, 110, .18);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before, .header::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .08);
+    }
+    .header::before { top: -30px; right: -40px; width: 140px; height: 140px; }
+    .header::after { bottom: -50px; left: -30px; width: 160px; height: 160px; }
+    .header a.back {
+      position: absolute; top: 12px; left: 12px; z-index: 4;
+      color: #fff; text-decoration: none; font-size: 12px; font-weight: 800;
+      background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 999px; padding: 6px 12px;
+    }
+    .langToggle {
+      position: absolute; top: 12px; right: 12px; z-index: 30;
+      background: transparent; border: none; border-radius: 0;
+      min-width: auto; height: auto; padding: 4px;
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; color: #fff; font-size: 0; cursor: pointer;
+      box-shadow: none;
+      transition: transform .2s ease, opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .langToggle:hover { transform: scale(1.08); opacity: .92; }
+    .langToggle-icon { line-height: 0; display: flex; align-items: center; justify-content: center; }
+    .langToggle-icon svg {
+      display: block; width: 18px; height: 18px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
+    }
+    .langToggle-label {
+      font-size: 10px; font-weight: 800; line-height: 1; letter-spacing: .02em;
+      text-shadow: 0 1px 3px rgba(0,0,0,.65);
+    }
+    .bannerTitleEyebrow {
+      position: relative; z-index: 1;
+      display: block; font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; opacity: .9; margin-bottom: 6px;
+    }
+    .bannerTitleMain {
+      position: relative; z-index: 1;
+      display: block; font-size: 24px; font-weight: 800; margin: 0;
+    }
+    .header p.lead {
+      position: relative; z-index: 1;
+      margin: 10px auto 0; max-width: 40ch;
+      font-size: 13px; line-height: 1.5; font-weight: 600; opacity: .92;
+    }
+
+    .summaryBar {
+      display: flex; flex-wrap: nowrap; gap: 8px;
+      margin-top: 12px; justify-content: center;
+      align-items: stretch;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .summaryChip,
+    a.summaryChip,
+    button.summaryChip {
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, .1);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+      min-width: 72px;
+      flex: 1 1 0;
+      text-align: center;
+      font: inherit;
+      color: inherit;
+      text-decoration: none;
+      cursor: default;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    a.summaryChip,
+    button.summaryChip {
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    a.summaryChip:hover,
+    button.summaryChip:hover {
+      box-shadow: 0 8px 20px rgba(15, 118, 110, .14);
+      transform: translateY(-1px);
+    }
+    a.summaryChip:active,
+    button.summaryChip:active { transform: scale(.98); }
+    .summaryChip .chipVal {
+      font-size: 22px; font-weight: 900; color: var(--teal); line-height: 1.1;
+      display: inline-flex; align-items: center; justify-content: center; min-height: 28px;
+    }
+    .summaryChip .chipLabel {
+      margin-top: 4px; font-size: 10px; font-weight: 800;
+      color: #64748b; letter-spacing: .04em; text-transform: uppercase;
+      max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .summaryChip.warn .chipVal { color: var(--warn); }
+    .summaryChip.ok .chipVal { color: var(--ok); }
+    .summaryChip.tabChip .chipVal { color: #0ea5e9; font-size: 18px; }
+    .summaryChip.tabChip.active {
+      background: #ecfdf5;
+      border-color: #99f6e4;
+      box-shadow: 0 6px 16px rgba(15, 118, 110, .12);
+    }
+    .summaryChip.tabChip.active .chipLabel { color: var(--teal); }
+    .summaryChip.actionChip {
+      min-width: 0;
+      flex: 1 1 0;
+    }
+    .summaryChip.actionChip .chipVal { color: var(--teal); font-size: 18px; }
+    .summaryChip.actionChip.primary {
+      background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%);
+      border-color: #99f6e4;
+    }
+    .summaryChip.actionChip.primary .chipLabel { color: var(--teal); }
+    .summaryChip.actionChip:disabled {
+      opacity: .55; cursor: not-allowed; transform: none; box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+    }
+    .summaryChip.filterChip .chipVal { font-size: 14px; color: #475569; }
+    .summaryChip.filterChip.active {
+      background: #ecfdf5; border-color: #99f6e4;
+    }
+    .summaryChip.filterChip.active .chipLabel,
+    .summaryChip.filterChip.active .chipVal { color: var(--teal); }
+
+    .welcomeChip {
+      display: none !important;
+      text-decoration: none;
+      cursor: pointer;
+      min-width: 0;
+    }
+    .welcomeChip.visible { display: flex !important; }
+    .welcomeChip .chipVal { color: #db2777; }
+    .welcomeChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .welcomeChip .chipVal .waveHand .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+    }
+    .welcomeChip .chipLabel {
+      max-width: 72px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 10px;
+      color: #64748b;
+    }
+    .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      transform-origin: 50% 88%;
+      animation: waveHand 1.8s ease-in-out infinite;
+    }
+    .waveHand img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: block;
+    }
+    @keyframes waveHand {
+      0%, 50%, 100% { transform: rotate(0deg); }
+      10% { transform: rotate(16deg); }
+      20% { transform: rotate(-10deg); }
+      30% { transform: rotate(16deg); }
+      40% { transform: rotate(-6deg); }
+    }
+    .loginHintChip {
+      display: none !important;
+      min-width: 0;
+    }
+    .loginHintChip.visible { display: flex !important; }
+    .loginHintChip .chipVal { color: #db2777; font-size: 18px; }
+    .loginHintChip .chipLabel {
+      text-transform: none; letter-spacing: .04em; font-size: 10px;
+      color: #64748b;
+    }
+
+    .card {
+      margin-top: 14px;
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, .07);
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .08);
+      overflow: hidden;
+    }
+    .card .topBar { height: 5px; background: linear-gradient(to left, #0f766e, #14b8a6); }
+    .card .body { padding: 16px; }
+    .card h2 { margin: 0 0 6px; font-size: 16px; font-weight: 800; }
+    .hint { margin: 0 0 12px; font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.45; }
+    .msg {
+      margin-top: 10px; font-size: 13px; font-weight: 700; min-height: 18px;
+    }
+    .msg.err { color: var(--danger); }
+    .msg.ok { color: var(--ok); }
+
+    .circRow {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .circRow input, .circRow select {
+      flex: 1; min-width: 140px;
+      border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 10px 12px; font: inherit; font-size: 14px; background: #f8fafc;
+    }
+
+    .circItem {
+      display: flex; flex-direction: column; align-items: stretch; width: 100%; text-align: start;
+      border: 1px solid rgba(15, 23, 42, .1); background: #fff;
+      border-radius: 14px; padding: 14px; margin: 0 0 10px;
+      cursor: pointer; font: inherit; color: inherit;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+      transition: border-color .15s, box-shadow .15s, transform .15s;
+    }
+    .circItem:hover, .circItem:focus-visible {
+      border-color: #99f6e4; box-shadow: 0 8px 20px rgba(15, 118, 110, .12);
+      outline: none; transform: translateY(-1px);
+    }
+    .circItem .title { font-size: 15px; font-weight: 800; margin: 0 0 6px; }
+    .circItem .row {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      font-size: 12px; color: var(--muted); font-weight: 600;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      border-radius: 999px; padding: 3px 10px;
+      font-size: 11px; font-weight: 800;
+    }
+    .badge.ok { background: #dcfce7; color: #166534; }
+    .badge.no { background: #ffedd5; color: #9a3412; }
+    .badge.neu { background: #e2e8f0; color: #475569; }
+
+    .detailActions {
+      display: flex; flex-wrap: nowrap; gap: 8px; margin-top: 14px;
+      justify-content: center;
+      overflow-x: auto;
+    }
+    .pdfFrame {
+      width: 100%; height: min(70vh, 560px);
+      border: 1px solid #e2e8f0; border-radius: 12px; background: #f1f5f9;
+    }
+    .logTableWrap { overflow-x: auto; margin-top: 8px; }
+    table.log {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    table.log th, table.log td {
+      text-align: start; padding: 10px 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    table.log th {
+      font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--muted); font-weight: 800;
+    }
+    table.log tr.missing td { background: #fff7ed; }
+    .empty {
+      text-align: center; padding: 28px 12px;
+      color: var(--muted); font-weight: 700; font-size: 14px;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <a class="back" id="homeLink" href="../index.html" data-i18n="home">Home</a>
+      <button class="langToggle" id="langToggle" type="button" title="Switch language">
+        <span class="langToggle-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+        </span>
+        <span class="langToggle-label" id="langToggleLabel">ع</span>
+      </button>
+      <span class="bannerTitleEyebrow" data-i18n="eyebrow">Export</span>
+      <h1 class="bannerTitleMain">Read and Sign</h1>
+      <p class="lead" data-i18n="lead">Read each circular and acknowledge electronically. Everyone can browse the log by topic.</p>
+    </header>
+
+    <div class="summaryBar" id="statsAndTabsBar" role="tablist">
+      <a href="../my-schedules/index.html" id="welcomeChip" class="summaryChip welcomeChip" title="My Schedule" data-i18n-title="myScheduleTitle">
+        <div class="chipVal"><span class="waveHand" id="welcomeEmojiSlot" aria-hidden="true"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+        <div class="chipLabel" id="welcomeName">—</div>
+      </a>
+      <a href="../index.html" id="loginHintChip" class="summaryChip loginHintChip" title="Sign in from Home" data-i18n-title="loginTitle">
+        <div class="chipVal">👤</div>
+        <div class="chipLabel" data-i18n="login">Sign in</div>
+      </a>
+      <button type="button" class="summaryChip tabChip active" id="tabList" data-view="list" title="Circulars" data-i18n-title="circularsTitle">
+        <div class="chipVal" id="statTotal">0</div>
+        <div class="chipLabel" data-i18n="circulars">Circulars</div>
+      </button>
+      <div class="summaryChip ok"><div class="chipVal" id="statRead">0</div><div class="chipLabel" data-i18n="read">Read</div></div>
+      <div class="summaryChip warn"><div class="chipVal" id="statPending">0</div><div class="chipLabel" data-i18n="pending">Pending</div></div>
+      <button type="button" class="summaryChip tabChip" id="tabLog" data-view="log" title="Acknowledgement log" data-i18n-title="logTitle">
+        <div class="chipVal">📋</div>
+        <div class="chipLabel" data-i18n="log">Log</div>
+      </button>
+    </div>
+
+    <section class="card" id="viewList">
+      <div class="topBar"></div>
+      <div class="body">
+        <h2 data-i18n="listHeading">Circulars list</h2>
+        <p class="hint" data-i18n="listHint">Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.</p>
+        <div id="listHost"></div>
+        <p class="msg" id="listMsg"></p>
+      </div>
+    </section>
+
+    <section class="card hidden" id="viewDetail">
+      <div class="topBar"></div>
+      <div class="body">
+        <div class="summaryBar" style="margin-top:0;margin-bottom:12px;justify-content:flex-start;">
+          <button type="button" class="summaryChip actionChip" id="backToList">
+            <div class="chipVal">↩️</div>
+            <div class="chipLabel" data-i18n="back">Back</div>
+          </button>
+        </div>
+        <h2 id="detailTitle">—</h2>
+        <div id="detailMeta" style="margin:8px 0 12px;font-size:12px;color:#64748b;font-weight:700;"></div>
+        <div id="detailStatus"></div>
+        <div style="margin-top:12px;">
+          <iframe class="pdfFrame" id="pdfFrame" title="PDF"></iframe>
+        </div>
+        <div class="detailActions summaryBar" style="margin-top:14px;">
+          <a class="summaryChip actionChip" id="openPdf" href="#" target="_blank" rel="noopener">
+            <div class="chipVal">📎</div>
+            <div class="chipLabel" data-i18n="openPdf">Open PDF</div>
+          </a>
+          <button type="button" class="summaryChip actionChip primary" id="ackBtn">
+            <div class="chipVal">✅</div>
+            <div class="chipLabel" id="ackBtnLabel" data-i18n="ack">Acknowledge</div>
+          </button>
+          <button type="button" class="summaryChip actionChip" id="gotoLogBtn">
+            <div class="chipVal">📋</div>
+            <div class="chipLabel" data-i18n="log">Log</div>
+          </button>
+        </div>
+        <p class="msg" id="detailMsg"></p>
+      </div>
+    </section>
+
+    <section class="card hidden" id="viewLog">
+      <div class="topBar"></div>
+      <div class="body">
+        <h2 data-i18n="logHeading">Acknowledgement log</h2>
+        <p class="hint" data-i18n="logHint">Browse topics. See who read and who did not (Export Operators are excluded).</p>
+        <div class="circRow">
+          <select id="logCircularSelect" aria-label="Select circular" data-i18n-aria="selectCircular"></select>
+        </div>
+        <div class="summaryBar" id="logFilters" style="margin-top:0;margin-bottom:10px;">
+          <button type="button" class="summaryChip filterChip active" data-filter="all">
+            <div class="chipVal">*</div>
+            <div class="chipLabel" data-i18n="filterAll">All</div>
+          </button>
+          <button type="button" class="summaryChip filterChip" data-filter="read">
+            <div class="chipVal">✓</div>
+            <div class="chipLabel" data-i18n="filterRead">Read</div>
+          </button>
+          <button type="button" class="summaryChip filterChip" data-filter="pending">
+            <div class="chipVal">!</div>
+            <div class="chipLabel" data-i18n="filterPending">Pending</div>
+          </button>
+        </div>
+        <div class="circRow" style="margin-top:10px;">
+          <input id="logSearch" type="search" placeholder="Search by name or ID" data-i18n-placeholder="searchPlaceholder">
+        </div>
+        <div class="logTableWrap">
+          <table class="log">
+            <thead>
+              <tr>
+                <th data-i18n="colName">Name</th>
+                <th data-i18n="colId">ID</th>
+                <th data-i18n="colStatus">Status</th>
+                <th data-i18n="colWhen">Date &amp; time</th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+        <p class="msg" id="logMsg"></p>
+      </div>
+    </section>
+  </div>
+
+  <script defer src="../site-visits.js?v=20260812a"></script>
+  <script>
+  (function () {
+    var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/read-and-sign';
+    var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var circulars = [];
+    var staff = [];
+    var acks = [];
+    var currentId = '';
+    var logFilter = 'all';
+    var saving = false;
+    var view = 'list';
+    var LANG = 'en';
+    try {
+      var savedLang = localStorage.getItem('rosterLang');
+      LANG = savedLang === 'ar' ? 'ar' : 'en';
+    } catch (e) {}
+
+    var I18N = {
+      en: {
+        langBtn: 'ع',
+        home: 'Home',
+        eyebrow: 'Export',
+        lead: 'Read each circular and acknowledge electronically. Everyone can browse the log by topic.',
+        login: 'Sign in',
+        loginTitle: 'Sign in from Home',
+        myScheduleTitle: 'My Schedule',
+        circulars: 'Circulars',
+        circularsTitle: 'Circulars',
+        read: 'Read',
+        pending: 'Pending',
+        log: 'Log',
+        logTitle: 'Acknowledgement log',
+        listHeading: 'Circulars list',
+        listHint: 'Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.',
+        back: 'Back',
+        openPdf: 'Open PDF',
+        ack: 'Acknowledge',
+        ackDone: 'Acknowledged',
+        ackNeedLogin: 'Sign in required',
+        logHeading: 'Acknowledgement log',
+        logHint: 'Browse topics. See who read and who did not (Export Operators are excluded).',
+        selectCircular: 'Select circular',
+        filterAll: 'All',
+        filterRead: 'Read',
+        filterPending: 'Pending',
+        searchPlaceholder: 'Search by name or ID',
+        colName: 'Name',
+        colId: 'ID',
+        colStatus: 'Status',
+        colWhen: 'Date & time',
+        emptyCirculars: 'No circulars yet.\nPut PDF files in the sync folder, then run the script.',
+        badgeFromHome: 'From Home',
+        badgeRead: 'Read',
+        badgePending: 'Pending',
+        statusNeedLogin: 'Sign in from the home page first',
+        statusPending: 'Not acknowledged yet',
+        loading: 'Loading…',
+        loadError: 'Could not load data.',
+        ackNeedHome: 'Sign in from the home page first (pick your name to save your employee ID).',
+        saving: 'Saving…',
+        saved: 'Your acknowledgement was saved.',
+        saveError: 'Could not save. Try again.',
+        logSummary: 'Read: {read} / {total} · Showing: {shown}',
+        noCirculars: 'No circulars.',
+        locale: 'en-GB'
+      },
+      ar: {
+        langBtn: 'EN',
+        home: 'الرئيسية',
+        eyebrow: 'الصادر',
+        lead: 'اقرأ التعميم ثم أقر إلكترونياً. السجل متاح للجميع مع إمكانية التنقل بين المواضيع.',
+        login: 'دخول',
+        loginTitle: 'تسجيل الدخول من الرئيسية',
+        myScheduleTitle: 'جدولي',
+        circulars: 'التعميمات',
+        circularsTitle: 'قائمة التعميمات',
+        read: 'اطلعت',
+        pending: 'متبقي',
+        log: 'السجل',
+        logTitle: 'سجل الاطلاع',
+        listHeading: 'قائمة التعميمات',
+        listHint: 'اضغط على تعميم لقراءته والإقرار. تظهر حالتك: اطلعت / لم تطلع. الهوية من الصفحة الرئيسية.',
+        back: 'رجوع',
+        openPdf: 'فتح PDF',
+        ack: 'أقرّ بالاطلاع',
+        ackDone: 'تم الإقرار',
+        ackNeedLogin: 'يتطلب تسجيل الدخول',
+        logHeading: 'سجل الاطلاع',
+        logHint: 'تنقّل بين المواضيع. يظهر من اطلع ومن لم يطلع (باستثناء مشغّلي الصادرات — غير ملزمين).',
+        selectCircular: 'اختر التعميم',
+        filterAll: 'الكل',
+        filterRead: 'اطلع',
+        filterPending: 'لم يطلع',
+        searchPlaceholder: 'بحث بالاسم أو الرقم الوظيفي',
+        colName: 'الاسم',
+        colId: 'الرقم',
+        colStatus: 'الحالة',
+        colWhen: 'التاريخ والوقت',
+        emptyCirculars: 'لا توجد تعميمات بعد.\nضع ملفات PDF في مجلد المزامنة ثم شغّل السكربت.',
+        badgeFromHome: 'من الرئيسية',
+        badgeRead: 'اطلعت',
+        badgePending: 'لم تطلع',
+        statusNeedLogin: 'سجّل دخولك من الصفحة الرئيسية أولاً',
+        statusPending: 'لم تطلع بعد',
+        loading: 'جاري التحميل…',
+        loadError: 'تعذّر تحميل البيانات.',
+        ackNeedHome: 'سجّل دخولك من الصفحة الرئيسية أولاً (اختر اسمك لحفظ الرقم الوظيفي).',
+        saving: 'جاري الحفظ…',
+        saved: 'تم تسجيل إقرارك.',
+        saveError: 'تعذّر الحفظ. حاول مرة أخرى.',
+        logSummary: 'اطلع: {read} / {total} · المعروض: {shown}',
+        noCirculars: 'لا توجد تعميمات.',
+        locale: 'ar-OM'
+      }
+    };
+
+    function t(key) {
+      var pack = I18N[LANG] || I18N.en;
+      return pack[key] || I18N.en[key] || key;
+    }
+
+    function applyLang(lang) {
+      LANG = lang === 'ar' ? 'ar' : 'en';
+      try { localStorage.setItem('rosterLang', LANG); } catch (e) {}
+      document.documentElement.lang = LANG;
+      document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+      document.body.classList.toggle('ar', LANG === 'ar');
+      var lbl = document.getElementById('langToggleLabel');
+      if (lbl) lbl.textContent = t('langBtn');
+      document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        var key = el.getAttribute('data-i18n');
+        if (key) el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+        var key = el.getAttribute('data-i18n-title');
+        if (key) el.setAttribute('title', t(key));
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (key) el.setAttribute('placeholder', t(key));
+      });
+      document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+        var key = el.getAttribute('data-i18n-aria');
+        if (key) el.setAttribute('aria-label', t(key));
+      });
+      if (view === 'list') renderList();
+      else if (view === 'detail' && currentId) openDetail(currentId);
+      else if (view === 'log') renderLog();
+    }
+
+    function headers(write) {
+      var h = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
+      if (write) h['Content-Type'] = 'application/json';
+      return h;
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatTime(at) {
+      if (!at) return '—';
+      try {
+        return new Date(at).toLocaleString(t('locale'), {
+          timeZone: 'Asia/Muscat',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function readSavedEmpId() {
+      try {
+        return String(
+          localStorage.getItem('exportSavedEmpId') ||
+            localStorage.getItem('savedEmpId') ||
+            localStorage.getItem('importSavedEmpId') ||
+            ''
+        ).replace(/\D/g, '').trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function readSavedEmpName() {
+      try {
+        return (
+          localStorage.getItem('exportSavedEmpName') ||
+          localStorage.getItem('savedEmpName') ||
+          localStorage.getItem('importSavedEmpName') ||
+          ''
+        ).trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function saveEmp(id, name) {
+      id = String(id || '').replace(/\D/g, '').trim();
+      if (!id) return;
+      try {
+        localStorage.setItem('exportSavedEmpId', id);
+        localStorage.setItem('savedEmpId', id);
+        if (name) {
+          localStorage.setItem('exportSavedEmpName', name);
+          localStorage.setItem('savedEmpName', name);
+        }
+      } catch (e) {}
+    }
+
+    function absorbEmpFromQuery() {
+      try {
+        var q = new URLSearchParams(location.search || '');
+        var emp = String(q.get('emp') || '').replace(/\D/g, '').trim();
+        if (emp) saveEmp(emp, '');
+      } catch (e) {}
+    }
+
+    function empId() {
+      return readSavedEmpId();
+    }
+
+    function displayName() {
+      var n = readSavedEmpName();
+      if (n) return n;
+      var id = empId();
+      var hit = staff.find(function (s) { return s.id === id; });
+      return hit ? hit.name : '';
+    }
+
+    function firstNameOf(name) {
+      var n = String(name || '').trim();
+      if (!n) return '';
+      return n.split(/\s+/)[0];
+    }
+
+    function paintWho() {
+      var id = empId();
+      var name = displayName();
+      var chip = document.getElementById('welcomeChip');
+      var nameEl = document.getElementById('welcomeName');
+      var hint = document.getElementById('loginHintChip');
+      if (id) {
+        if (nameEl) nameEl.textContent = firstNameOf(name) || ('#' + id);
+        if (chip) {
+          chip.classList.add('visible');
+          chip.style.display = 'flex';
+        }
+        if (hint) {
+          hint.classList.remove('visible');
+          hint.style.display = 'none';
+        }
+        applyWelcomeEmoji(id);
+      } else {
+        if (chip) {
+          chip.classList.remove('visible');
+          chip.style.display = 'none';
+        }
+        if (hint) {
+          hint.classList.add('visible');
+          hint.style.display = 'flex';
+        }
+      }
+    }
+
+    function emojiHash(s) {
+      var h = 0;
+      for (var i = 0; i < String(s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+      return h;
+    }
+
+    function validEmojiCp(cp) {
+      return /^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/i.test(String(cp || '').trim());
+    }
+
+    function setWelcomeEmoji(cp) {
+      var slot = document.getElementById('welcomeEmojiSlot');
+      if (!slot || !validEmojiCp(cp)) return;
+      var img = document.createElement('img');
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.decoding = 'async';
+      img.style.cssText = 'display:block;width:22px;height:22px;object-fit:contain;pointer-events:none;';
+      img.onload = function () {
+        slot.innerHTML = '';
+        slot.appendChild(img);
+        slot.style.animation = 'none';
+      };
+      img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + String(cp).toLowerCase() + '/512.webp';
+    }
+
+    function applyWelcomeEmoji(empId) {
+      var cp = '';
+      try {
+        var map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+        var legacy = (localStorage.getItem('empEmojiChoice') || '').trim();
+        if (legacy && !map[empId || 'export']) cp = legacy;
+        else cp = map[empId || 'export'] || '';
+      } catch (e) {}
+      if (validEmojiCp(cp)) {
+        setWelcomeEmoji(cp);
+        return;
+      }
+      if (!empId) return;
+      fetch('../my-emoji/emojis.json')
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (list) {
+          if (!list || !list.length) return;
+          var item = list[emojiHash(empId) % list.length];
+          if (item && item.cp) setWelcomeEmoji(item.cp);
+        })
+        .catch(function () {});
+    }
+
+    function hasAck(circularId, id) {
+      id = String(id || '');
+      circularId = String(circularId || '');
+      return acks.some(function (a) {
+        return String(a.circularId) === circularId && String(a.empId) === id;
+      });
+    }
+
+    function ackAt(circularId, id) {
+      id = String(id || '');
+      circularId = String(circularId || '');
+      var hit = acks.find(function (a) {
+        return String(a.circularId) === circularId && String(a.empId) === id;
+      });
+      return hit ? hit.at : 0;
+    }
+
+    function paintStats() {
+      var id = empId();
+      var total = circulars.length;
+      var read = 0;
+      if (id) {
+        circulars.forEach(function (c) {
+          if (hasAck(c.id, id)) read += 1;
+        });
+      }
+      document.getElementById('statTotal').textContent = String(total);
+      document.getElementById('statRead').textContent = id ? String(read) : '—';
+      document.getElementById('statPending').textContent = id ? String(Math.max(0, total - read)) : '—';
+    }
+
+    function setView(name) {
+      view = name;
+      document.getElementById('viewList').classList.toggle('hidden', name !== 'list');
+      document.getElementById('viewDetail').classList.toggle('hidden', name !== 'detail');
+      document.getElementById('viewLog').classList.toggle('hidden', name !== 'log');
+      document.getElementById('tabList').classList.toggle('active', name === 'list' || name === 'detail');
+      document.getElementById('tabLog').classList.toggle('active', name === 'log');
+    }
+
+    function renderList() {
+      var host = document.getElementById('listHost');
+      var msg = document.getElementById('listMsg');
+      msg.textContent = '';
+      if (!circulars.length) {
+        host.innerHTML =
+          '<div class="empty">' + escapeHtml(t('emptyCirculars')).replace(/\n/g, '<br>') + '</div>';
+        return;
+      }
+      var id = empId();
+      host.innerHTML = circulars
+        .map(function (c) {
+          var done = id && hasAck(c.id, id);
+          var badge = !id
+            ? '<span class="badge neu">' + escapeHtml(t('badgeFromHome')) + '</span>'
+            : done
+              ? '<span class="badge ok">' + escapeHtml(t('badgeRead')) + '</span>'
+              : '<span class="badge no">' + escapeHtml(t('badgePending')) + '</span>';
+          var when = done ? ' · ' + formatTime(ackAt(c.id, id)) : '';
+          return (
+            '<button type="button" class="circItem" data-id="' +
+            escapeHtml(c.id) +
+            '">' +
+            '<div class="title">' +
+            escapeHtml(c.title || c.id) +
+            '</div>' +
+            '<div class="row">' +
+            '<span>' +
+            escapeHtml(c.date || '') +
+            '</span>' +
+            badge +
+            (when ? '<span>' + escapeHtml(when) + '</span>' : '') +
+            '</div></button>'
+          );
+        })
+        .join('');
+    }
+
+    function openDetail(id) {
+      var c = circulars.find(function (x) { return x.id === id; });
+      if (!c) return;
+      currentId = id;
+      setView('detail');
+      document.getElementById('detailTitle').textContent = c.title || c.id;
+      document.getElementById('detailMeta').textContent = (c.date || '') + (c.sourceName ? ' · ' + c.sourceName : '');
+      var fileUrl = c.file || '';
+      var frame = document.getElementById('pdfFrame');
+      var openPdf = document.getElementById('openPdf');
+      frame.src = fileUrl;
+      openPdf.href = fileUrl;
+      var me = empId();
+      var status = document.getElementById('detailStatus');
+      var btn = document.getElementById('ackBtn');
+      var ackLabel = document.getElementById('ackBtnLabel');
+      var detailMsg = document.getElementById('detailMsg');
+      detailMsg.textContent = '';
+      if (!me) {
+        status.innerHTML = '<span class="badge neu">' + escapeHtml(t('statusNeedLogin')) + '</span>';
+        btn.disabled = true;
+        if (ackLabel) ackLabel.textContent = t('ackNeedLogin');
+      } else if (hasAck(id, me)) {
+        status.innerHTML =
+          '<span class="badge ok">' + escapeHtml(t('badgeRead')) + '</span> <span style="font-size:12px;color:#64748b;font-weight:700;">' +
+          escapeHtml(formatTime(ackAt(id, me))) +
+          '</span>';
+        btn.disabled = true;
+        if (ackLabel) ackLabel.textContent = t('ackDone');
+      } else {
+        status.innerHTML = '<span class="badge no">' + escapeHtml(t('statusPending')) + '</span>';
+        btn.disabled = false;
+        if (ackLabel) ackLabel.textContent = t('ack');
+      }
+    }
+
+    function fillLogSelect() {
+      var sel = document.getElementById('logCircularSelect');
+      sel.innerHTML = circulars
+        .map(function (c) {
+          return (
+            '<option value="' +
+            escapeHtml(c.id) +
+            '">' +
+            escapeHtml((c.date || '') + ' — ' + (c.title || c.id)) +
+            '</option>'
+          );
+        })
+        .join('');
+      if (currentId) sel.value = currentId;
+      else if (circulars[0]) {
+        currentId = circulars[0].id;
+        sel.value = currentId;
+      }
+    }
+
+    function renderLog() {
+      var body = document.getElementById('logBody');
+      var msg = document.getElementById('logMsg');
+      msg.textContent = '';
+      if (!circulars.length) {
+        body.innerHTML = '';
+        msg.textContent = t('noCirculars');
+        return;
+      }
+      if (!currentId && circulars[0]) currentId = circulars[0].id;
+      var q = String(document.getElementById('logSearch').value || '')
+        .trim()
+        .toLowerCase();
+      var rows = staff.map(function (s) {
+        var done = hasAck(currentId, s.id);
+        var at = ackAt(currentId, s.id);
+        return {
+          id: s.id,
+          name: s.name,
+          done: done,
+          at: at
+        };
+      });
+      rows = rows.filter(function (r) {
+        if (logFilter === 'read' && !r.done) return false;
+        if (logFilter === 'pending' && r.done) return false;
+        if (!q) return true;
+        return (
+          String(r.name).toLowerCase().indexOf(q) !== -1 ||
+          String(r.id).indexOf(q) !== -1
+        );
+      });
+      rows.sort(function (a, b) {
+        if (a.done !== b.done) return a.done ? -1 : 1;
+        if (a.done && b.done) return (b.at || 0) - (a.at || 0);
+        return String(a.name).localeCompare(String(b.name), 'ar');
+      });
+      var readN = staff.filter(function (s) { return hasAck(currentId, s.id); }).length;
+      msg.textContent = t('logSummary')
+        .replace('{read}', String(readN))
+        .replace('{total}', String(staff.length))
+        .replace('{shown}', String(rows.length));
+      body.innerHTML = rows
+        .map(function (r) {
+          return (
+            '<tr class="' +
+            (r.done ? '' : 'missing') +
+            '">' +
+            '<td>' +
+            escapeHtml(r.name) +
+            '</td>' +
+            '<td>' +
+            escapeHtml(r.id) +
+            '</td>' +
+            '<td>' +
+            (r.done
+              ? '<span class="badge ok">' + escapeHtml(t('filterRead')) + '</span>'
+              : '<span class="badge no">' + escapeHtml(t('filterPending')) + '</span>') +
+            '</td>' +
+            '<td>' +
+            escapeHtml(r.done ? formatTime(r.at) : '—') +
+            '</td>' +
+            '</tr>'
+          );
+        })
+        .join('');
+    }
+
+    function normalizedAcks(doc) {
+      var list = Array.isArray(doc && doc.acks) ? doc.acks : [];
+      var out = [];
+      var seen = {};
+      list.forEach(function (a) {
+        if (!a) return;
+        var cid = String(a.circularId || '').slice(0, 100);
+        var eid = String(a.empId || '').replace(/\D/g, '').slice(0, 16);
+        if (!cid || !eid) return;
+        var key = cid + '|' + eid;
+        if (seen[key]) return;
+        seen[key] = 1;
+        out.push({
+          circularId: cid,
+          empId: eid,
+          name: String(a.name || '').slice(0, 80),
+          at: Number(a.at) || Date.now()
+        });
+      });
+      if (out.length > 8000) out = out.slice(-8000);
+      return out;
+    }
+
+    async function fetchAcks() {
+      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
+        headers: headers(false),
+        cache: 'no-store'
+      });
+      if (res.status === 404) return [];
+      if (!res.ok) throw new Error('read ' + res.status);
+      var j = await res.json();
+      return normalizedAcks(j);
+    }
+
+    async function saveAcks(list) {
+      var payload = { acks: normalizedAcks({ acks: list }), updatedAt: Date.now() };
+      var res = await fetch(MANTLE_URL, {
+        method: 'POST',
+        headers: headers(true),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('write ' + res.status);
+      acks = payload.acks;
+      return acks;
+    }
+
+    async function acknowledgeCurrent() {
+      var msg = document.getElementById('detailMsg');
+      var id = empId();
+      var name = displayName();
+      if (!currentId) return;
+      if (!id) {
+        msg.className = 'msg err';
+        msg.textContent = t('ackNeedHome');
+        return;
+      }
+      if (saving) return;
+      saving = true;
+      msg.className = 'msg';
+      msg.textContent = t('saving');
+      try {
+        var list = await fetchAcks();
+        if (!list.some(function (a) { return a.circularId === currentId && a.empId === id; })) {
+          list.push({
+            circularId: currentId,
+            empId: id,
+            name: name || ('#' + id),
+            at: Date.now()
+          });
+        }
+        await saveAcks(list);
+        msg.className = 'msg ok';
+        msg.textContent = t('saved');
+        paintWho();
+        paintStats();
+        openDetail(currentId);
+        renderList();
+      } catch (e) {
+        msg.className = 'msg err';
+        msg.textContent = t('saveError');
+      } finally {
+        saving = false;
+      }
+    }
+
+    async function loadCirculars() {
+      var res = await fetch('circulars.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('circulars ' + res.status);
+      var j = await res.json();
+      circulars = Array.isArray(j.circulars) ? j.circulars : [];
+    }
+
+    async function loadStaff() {
+      var res = await fetch('../schedules/index.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('staff ' + res.status);
+      var j = await res.json();
+      var list = Array.isArray(j.employees) ? j.employees : [];
+      var months = {};
+      list.forEach(function (e) {
+        (e.months || []).forEach(function (m) {
+          months[m] = (months[m] || 0) + 1;
+        });
+      });
+      var latest = Object.keys(months).sort().pop() || '';
+      staff = list
+        .filter(function (e) {
+          if (latest && (e.months || []).indexOf(latest) === -1) return false;
+          var dept = String(e.department || '').trim().toLowerCase();
+          // مشغلو الصادرات غير ملزمين بـ Read and Sign
+          if (dept === 'export operators') return false;
+          return true;
+        })
+        .map(function (e) {
+          return {
+            id: String(e.id || '').replace(/\D/g, ''),
+            name: String(e.name || '').trim() || ('#' + e.id),
+            department: String(e.department || '').trim()
+          };
+        })
+        .filter(function (e) { return e.id; });
+      // Resolve saved name from roster if missing
+      var id = empId();
+      if (id && !readSavedEmpName()) {
+        var hit = staff.find(function (s) { return s.id === id; });
+        if (hit) saveEmp(id, hit.name);
+      }
+    }
+
+    async function boot() {
+      absorbEmpFromQuery();
+      applyLang(LANG);
+      paintWho();
+      var listMsg = document.getElementById('listMsg');
+      listMsg.textContent = t('loading');
+      try {
+        await Promise.all([loadCirculars(), loadStaff()]);
+        try {
+          acks = await fetchAcks();
+        } catch (e) {
+          acks = [];
+        }
+        paintWho();
+        paintStats();
+        renderList();
+        fillLogSelect();
+        listMsg.textContent = '';
+      } catch (e) {
+        listMsg.className = 'msg err';
+        listMsg.textContent = t('loadError');
+      }
+    }
+
+    document.getElementById('langToggle').addEventListener('click', function () {
+      applyLang(LANG === 'en' ? 'ar' : 'en');
+    });
+
+    document.getElementById('listHost').addEventListener('click', function (e) {
+      var btn = e.target.closest('.circItem[data-id]');
+      if (!btn) return;
+      openDetail(btn.getAttribute('data-id'));
+    });
+
+    document.getElementById('backToList').addEventListener('click', function () {
+      setView('list');
+      renderList();
+    });
+
+    document.getElementById('ackBtn').addEventListener('click', acknowledgeCurrent);
+
+    document.getElementById('gotoLogBtn').addEventListener('click', function () {
+      fillLogSelect();
+      setView('log');
+      renderLog();
+    });
+
+    document.getElementById('tabList').addEventListener('click', function () {
+      setView('list');
+      renderList();
+    });
+    document.getElementById('tabLog').addEventListener('click', function () {
+      fillLogSelect();
+      setView('log');
+      renderLog();
+    });
+
+    document.getElementById('logCircularSelect').addEventListener('change', function () {
+      currentId = this.value;
+      renderLog();
+    });
+
+    document.getElementById('logFilters').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-filter]');
+      if (!btn) return;
+      logFilter = btn.getAttribute('data-filter') || 'all';
+      Array.prototype.forEach.call(document.querySelectorAll('#logFilters button'), function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+      renderLog();
+    });
+
+    document.getElementById('logSearch').addEventListener('input', function () {
+      renderLog();
+    });
+
+    try {
+      var root = '';
+      if (typeof getSiteRootUrl === 'function') root = getSiteRootUrl();
+      else {
+        var m = (location.pathname || '').match(/^(.*?\/(?:docs|roster-site))(?:\/|$)/);
+        root = m ? m[1] : '..';
+      }
+      var homeHref = root.replace(/\/$/, '') + '/index.html';
+      var scheduleBase = root.replace(/\/$/, '') + '/my-schedules/index.html';
+      var homeLink = document.getElementById('homeLink');
+      var welcome = document.getElementById('welcomeChip');
+      var loginHint = document.getElementById('loginHintChip');
+      if (homeLink) homeLink.href = homeHref;
+      if (loginHint) loginHint.href = homeHref;
+      function syncWelcomeHref() {
+        if (!welcome) return;
+        var id = empId();
+        welcome.href = id
+          ? scheduleBase + '?emp=' + encodeURIComponent(id)
+          : scheduleBase;
+      }
+      syncWelcomeHref();
+      var _paintWho = paintWho;
+      paintWho = function () {
+        _paintWho();
+        syncWelcomeHref();
+      };
+    } catch (e) {}
+
+    boot();
+  })();
+  </script>
+</body>
+</html>

@@ -39,6 +39,8 @@
       alumni: 'Former Colleagues',
       ideas: 'Ideas & suggestions',
       ideasSub: 'Share ideas and rate the site',
+      readSign: 'Read and Sign',
+      readSignSub: 'Circulars & acknowledgements',
       spotlightBtn: 'Surprise me',
       spotlightBtnSub: 'A quick pick from the site',
       spotlightTitle: 'For you',
@@ -88,6 +90,8 @@
       alumni: 'زملاء سابقون',
       ideas: 'اقتراحات وأفكار',
       ideasSub: 'شارك فكرتك وقيّم الموقع',
+      readSign: 'Read and Sign',
+      readSignSub: 'التعميمات والإقرار',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'اقتراح لك',
@@ -182,6 +186,12 @@
       '<path d="M26 48h12M28 54h8" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
       '<path d="M28 22h8M30 28h4" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/>' +
       '</svg>',
+    readSign:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>',
     games: null
   };
 
@@ -258,6 +268,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    ensureReadSignAppLink();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
@@ -276,6 +287,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    ensureReadSignAppLink();
     organizeAppsGrid();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -327,6 +339,11 @@
   function ideasPageUrl() {
     if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/ideas/';
     return 'https://khalidsaif912.github.io/new/docs/ideas/';
+  }
+
+  function readSignPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/read-and-sign/';
+    return 'https://khalidsaif912.github.io/roster-site/read-and-sign/';
   }
 
   function spotlightItems() {
@@ -595,6 +612,51 @@
     if (ico) ico.innerHTML = iconForApp('ideas');
   }
 
+  function ensureReadSignAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var href = readSignPageUrl();
+    var existing = grid.querySelector('a.siteAppsLink[data-app-id="readSign"], .siteAppsLink--readSign');
+    if (!existing) {
+      var card = document.createElement('a');
+      card.className = 'siteAppsLink siteAppsLink--readSign';
+      card.href = href;
+      card.setAttribute('data-app-id', 'readSign');
+      card.setAttribute('data-open-same', '1');
+      card.innerHTML =
+        '<span class="siteAppsLink-icon">' +
+        iconForApp('readSign') +
+        '</span>' +
+        '<span class="siteAppsLink-text">' +
+        '<span class="siteAppsLink-title" data-i18n="readSign">' +
+        t('readSign') +
+        '</span>' +
+        '<span class="siteAppsLink-sub" data-i18n-sub="readSign">' +
+        t('readSignSub') +
+        '</span>' +
+        '</span>';
+      var ideas = grid.querySelector('[data-app-id="ideas"]');
+      if (ideas && ideas.nextSibling) grid.insertBefore(card, ideas.nextSibling);
+      else if (ideas) grid.appendChild(card);
+      else {
+        var games = grid.querySelector('[data-app-id="games"]');
+        if (games) grid.insertBefore(card, games);
+        else grid.appendChild(card);
+      }
+      existing = card;
+    }
+    existing.href = href;
+    existing.setAttribute('data-open-same', '1');
+    existing.removeAttribute('target');
+    existing.removeAttribute('rel');
+    var tEl = existing.querySelector('[data-i18n="readSign"]');
+    var sEl = existing.querySelector('[data-i18n-sub="readSign"]');
+    if (tEl) tEl.textContent = t('readSign');
+    if (sEl) sEl.textContent = t('readSignSub');
+    var ico = existing.querySelector('.siteAppsLink-icon');
+    if (ico) ico.innerHTML = iconForApp('readSign');
+  }
+
   function removeFlightsAppLink() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
@@ -618,7 +680,7 @@
       );
     }
 
-    var order = ['wa', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var order = ['wa', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'readSign', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -1085,6 +1147,7 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    ensureReadSignAppLink();
     organizeAppsGrid();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {

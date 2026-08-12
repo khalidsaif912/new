@@ -1,0 +1,16 @@
+{
+  "updated": "2026-08-12T15:18:00Z",
+  "source": "read-and-sign-inbox",
+  "count": 1,
+  "circulars": [
+    {
+      "id": "2026-08-12-sample-circular-read-and-sign",
+      "title": "Sample Circular - Read and Sign (Test)",
+      "date": "2026-08-12",
+      "file": "files/2026-08-12-sample-circular-read-and-sign.pdf",
+      "bytes": 42006,
+      "hash": "4524a689c316d0fb",
+      "sourceName": "2026-08-12 - Sample Circular Read and Sign.pdf"
+    }
+  ]
+}
