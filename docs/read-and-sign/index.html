@@ -534,14 +534,14 @@
   <div class="wrap">
     <header class="header">
       <a class="back" id="homeLink" href="../index.html" data-i18n="home">Home</a>
-      <button class="langToggle" id="langToggle" type="button" title="Switch language">
+      <button class="langToggle" id="langToggle" type="button" title="Switch language" data-i18n-title="langSwitchTitle">
         <span class="langToggle-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
         </span>
         <span class="langToggle-label" id="langToggleLabel">ع</span>
       </button>
       <span class="bannerTitleEyebrow" data-i18n="eyebrow">Export</span>
-      <h1 class="bannerTitleMain">Read and Sign</h1>
+      <h1 class="bannerTitleMain" data-i18n="pageTitle">Read and Sign</h1>
       <p class="lead" data-i18n="lead">Read each circular and acknowledge electronically. Everyone can browse the log by topic.</p>
     </header>
 
@@ -591,18 +591,18 @@
             <div class="pdfHost" id="pdfHost" aria-live="polite"></div>
           </div>
         </div>
-        <nav class="detailActions" aria-label="Circular actions">
+        <nav class="detailActions" aria-label="Circular actions" data-i18n-aria="actionsAria">
           <a class="roster-cta-btn roster-cta-btn--roster" id="openPdf" href="#" target="_blank" rel="noopener">
             <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h5v5"/><path d="M10 14L19 5"/><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg></span>
             <span class="roster-cta-label" data-i18n="openPdf">Open PDF</span>
           </a>
           <button type="button" class="roster-cta-btn roster-cta-btn--apps" id="ackBtn">
             <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
-            <span class="roster-cta-label" id="ackBtnLabel" data-i18n="ack">Acknowledge</span>
+            <span class="roster-cta-label" id="ackBtnLabel">Acknowledge</span>
           </button>
-          <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn" title="Share">
+          <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn" title="Share" data-i18n-title="share">
             <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
-            <span class="roster-cta-label">Share</span>
+            <span class="roster-cta-label" data-i18n="share">Share</span>
           </button>
           <button type="button" class="roster-cta-btn roster-cta-btn--muted" id="backToList">
             <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg></span>
@@ -658,7 +658,7 @@
         </div>
         <p class="msg" id="logMsg"></p>
         <div class="summaryBar logToolbar">
-          <button type="button" class="summaryChip actionChip" id="printLogBtn" title="Print log">
+          <button type="button" class="summaryChip actionChip" id="printLogBtn" title="Print log" data-i18n-title="printLog">
             <div class="chipVal">🖨️</div>
             <div class="chipLabel" data-i18n="printLog">Print log</div>
           </button>
@@ -673,7 +673,7 @@
       <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
       <div id="siteShareTools">
         <div class="siteShareQr" id="siteShareQr"></div>
-        <input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>
+        <input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL" data-i18n-aria="shareUrlAria"/>
         <div class="siteShareActions">
           <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
             <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
@@ -698,7 +698,7 @@
   </div>
 
   <script defer src="../site-visits.js?v=20260812a"></script>
-  <script defer src="../site-share.js?v=20260813rs3"></script>
+  <script defer src="../site-share.js?v=20260813rs4"></script>
   <script>
   (function () {
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/read-and-sign';
@@ -719,9 +719,12 @@
     var I18N = {
       en: {
         langBtn: 'ع',
+        langSwitchTitle: 'Switch language',
+        docTitle: 'Read and Sign',
+        pageTitle: 'Read and Sign',
         home: 'Home',
         eyebrow: 'Export',
-        lead: 'Read each circular and acknowledge electronically. Everyone can browse the log by topic.',
+        lead: 'Read each circular and acknowledge it electronically. Everyone can browse the log by topic.',
         login: 'Sign in',
         loginTitle: 'Sign in from Home',
         myScheduleTitle: 'My Schedule',
@@ -731,9 +734,12 @@
         pending: 'Pending',
         log: 'Log',
         logTitle: 'Acknowledgement log',
-        listHeading: 'Circulars list',
-        listHint: 'Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.',
+        listHeading: 'Circulars',
+        listHint: 'Open a circular to read and acknowledge. Your status shows as Read or Pending. Sign in from the home page first.',
         back: 'Back',
+        share: 'Share',
+        actionsAria: 'Circular actions',
+        shareUrlAria: 'Share URL',
         openPdf: 'Open PDF',
         pdfLoading: 'Loading PDF…',
         pdfError: 'Could not display the PDF here. Use Open PDF.',
@@ -741,17 +747,17 @@
         ackDone: 'Acknowledged',
         ackNeedLogin: 'Sign in required',
         logHeading: 'Acknowledgement log',
-        logHint: 'Browse topics. See who read and who did not (Export Operators are excluded).',
+        logHint: 'Choose a circular to see who has read it and who has not. Export Operators are not required to acknowledge.',
         selectCircular: 'Select circular',
         filterAll: 'All',
         filterRead: 'Read',
         filterPending: 'Pending',
-        searchPlaceholder: 'Search by name or ID',
+        searchPlaceholder: 'Search by name or employee ID',
         colName: 'Name',
         colId: 'ID',
         colStatus: 'Status',
         colWhen: 'Date & time',
-        emptyCirculars: 'No circulars yet.\nPut PDF files in the sync folder, then run the script.',
+        emptyCirculars: 'No circulars yet.',
         badgeFromHome: 'From Home',
         badgeRead: 'Read',
         badgePending: 'Pending',
@@ -772,55 +778,61 @@
       },
       ar: {
         langBtn: 'EN',
+        langSwitchTitle: 'تغيير اللغة',
+        docTitle: 'إقرار',
+        pageTitle: 'إقرار',
         home: 'الرئيسية',
         eyebrow: 'الصادر',
-        lead: 'اقرأ التعميم ثم أقر إلكترونياً. السجل متاح للجميع مع إمكانية التنقل بين المواضيع.',
-        login: 'دخول',
-        loginTitle: 'تسجيل الدخول من الرئيسية',
+        lead: 'اقرأ كل تعميم وأقرّ بالاطلاع إلكترونياً. يمكنك تصفّح السجل حسب الموضوع.',
+        login: 'تسجيل الدخول',
+        loginTitle: 'سجّل دخولك من الصفحة الرئيسية',
         myScheduleTitle: 'جدولي',
         circulars: 'التعميمات',
         circularsTitle: 'قائمة التعميمات',
-        read: 'اطلعت',
+        read: 'اطّلعت',
         pending: 'متبقي',
         log: 'السجل',
         logTitle: 'سجل الاطلاع',
         listHeading: 'قائمة التعميمات',
-        listHint: 'اضغط على تعميم لقراءته والإقرار. تظهر حالتك: اطلعت / لم تطلع. الهوية من الصفحة الرئيسية.',
+        listHint: 'افتح التعميم للقراءة ثم أقرّ بالاطلاع. تظهر حالتك: اطّلعت أو متبقي. سجّل دخولك أولاً من الصفحة الرئيسية.',
         back: 'رجوع',
-        openPdf: 'فتح PDF',
-        pdfLoading: 'جاري تحميل PDF…',
-        pdfError: 'تعذر عرض PDF هنا. استخدم فتح PDF.',
+        share: 'مشاركة',
+        actionsAria: 'إجراءات التعميم',
+        shareUrlAria: 'رابط المشاركة',
+        openPdf: 'فتح الملف',
+        pdfLoading: 'جاري تحميل الملف…',
+        pdfError: 'تعذّر عرض الملف هنا. استخدم زر فتح الملف.',
         ack: 'أقرّ بالاطلاع',
         ackDone: 'تم الإقرار',
-        ackNeedLogin: 'يتطلب تسجيل الدخول',
+        ackNeedLogin: 'يلزم تسجيل الدخول',
         logHeading: 'سجل الاطلاع',
-        logHint: 'تنقّل بين المواضيع. يظهر من اطلع ومن لم يطلع (باستثناء مشغّلي الصادرات — غير ملزمين).',
+        logHint: 'اختر تعميماً لعرض من اطّلع ومن لم يطلع. مشغّلو الصادر غير ملزمين بالإقرار.',
         selectCircular: 'اختر التعميم',
         filterAll: 'الكل',
-        filterRead: 'اطلع',
+        filterRead: 'اطّلع',
         filterPending: 'لم يطلع',
-        searchPlaceholder: 'بحث بالاسم أو الرقم الوظيفي',
+        searchPlaceholder: 'ابحث بالاسم أو الرقم الوظيفي',
         colName: 'الاسم',
-        colId: 'الرقم',
+        colId: 'الرقم الوظيفي',
         colStatus: 'الحالة',
         colWhen: 'التاريخ والوقت',
-        emptyCirculars: 'لا توجد تعميمات بعد.\nضع ملفات PDF في مجلد المزامنة ثم شغّل السكربت.',
+        emptyCirculars: 'لا توجد تعميمات حالياً.',
         badgeFromHome: 'من الرئيسية',
-        badgeRead: 'اطلعت',
-        badgePending: 'لم تطلع',
+        badgeRead: 'اطّلعت',
+        badgePending: 'متبقي',
         statusNeedLogin: 'سجّل دخولك من الصفحة الرئيسية أولاً',
-        statusPending: 'لم تطلع بعد',
+        statusPending: 'لم تقرّ بالاطلاع بعد',
         loading: 'جاري التحميل…',
         loadError: 'تعذّر تحميل البيانات.',
         ackNeedHome: 'سجّل دخولك من الصفحة الرئيسية أولاً (اختر اسمك لحفظ الرقم الوظيفي).',
         saving: 'جاري الحفظ…',
-        saved: 'تم تسجيل إقرارك.',
+        saved: 'تم تسجيل إقرارك بنجاح.',
         saveError: 'تعذّر الحفظ. حاول مرة أخرى.',
-        logSummary: 'اطلع: {read} / {total} · المعروض: {shown}',
+        logSummary: 'اطّلع: {read} من {total} · المعروض: {shown}',
         noCirculars: 'لا توجد تعميمات.',
         printLog: 'طباعة السجل',
         printIssueDate: 'تاريخ الصدور',
-        printPrintedAt: 'طُبع في',
+        printPrintedAt: 'تاريخ الطباعة',
         locale: 'ar-OM'
       }
     };
@@ -830,12 +842,8 @@
       return pack[key] || I18N.en[key] || key;
     }
 
-    function applyLang(lang) {
-      LANG = lang === 'ar' ? 'ar' : 'en';
-      try { localStorage.setItem('rosterLang', LANG); } catch (e) {}
-      document.documentElement.lang = LANG;
-      document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
-      document.body.classList.toggle('ar', LANG === 'ar');
+    function applyStaticI18n() {
+      document.title = t('docTitle');
       var lbl = document.getElementById('langToggleLabel');
       if (lbl) lbl.textContent = t('langBtn');
       document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -858,6 +866,33 @@
       if (window.rosterSiteShare && window.rosterSiteShare.setLang) {
         window.rosterSiteShare.setLang();
       }
+    }
+
+    function applyAckButtonLabel(id) {
+      var btn = document.getElementById('ackBtn');
+      var ackLabel = document.getElementById('ackBtnLabel');
+      if (!btn || !ackLabel) return;
+      var me = empId();
+      if (!me) {
+        btn.disabled = true;
+        ackLabel.textContent = t('ackNeedLogin');
+      } else if (id && hasAck(id, me)) {
+        btn.disabled = true;
+        ackLabel.textContent = t('ackDone');
+      } else {
+        btn.disabled = false;
+        ackLabel.textContent = t('ack');
+      }
+    }
+
+    function applyLang(lang) {
+      LANG = lang === 'ar' ? 'ar' : 'en';
+      try { localStorage.setItem('rosterLang', LANG); } catch (e) {}
+      document.documentElement.lang = LANG;
+      document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+      document.body.classList.toggle('ar', LANG === 'ar');
+      applyStaticI18n();
+      applyAckButtonLabel(currentId);
       if (view === 'list') renderList();
       else if (view === 'detail' && currentId) openDetail(currentId);
       else if (view === 'log') renderLog();
@@ -1251,6 +1286,8 @@
       if (!c) return;
       currentId = id;
       setView('detail');
+      // Re-apply chrome translations every time detail opens (avoids stale EN labels).
+      applyStaticI18n();
       document.getElementById('detailTitle').textContent = c.title || c.id;
       document.getElementById('detailMeta').textContent = (c.date || '') + (c.sourceName ? ' · ' + c.sourceName : '');
       var fileUrl = c.file || '';
@@ -1259,26 +1296,19 @@
       renderPdfInPage(fileUrl);
       var me = empId();
       var status = document.getElementById('detailStatus');
-      var btn = document.getElementById('ackBtn');
-      var ackLabel = document.getElementById('ackBtnLabel');
       var detailMsg = document.getElementById('detailMsg');
       detailMsg.textContent = '';
       if (!me) {
         status.innerHTML = '<span class="badge neu">' + escapeHtml(t('statusNeedLogin')) + '</span>';
-        btn.disabled = true;
-        if (ackLabel) ackLabel.textContent = t('ackNeedLogin');
       } else if (hasAck(id, me)) {
         status.innerHTML =
           '<span class="badge ok">' + escapeHtml(t('badgeRead')) + '</span> <span style="font-size:12px;color:#64748b;font-weight:700;">' +
           escapeHtml(formatTime(ackAt(id, me))) +
           '</span>';
-        btn.disabled = true;
-        if (ackLabel) ackLabel.textContent = t('ackDone');
       } else {
         status.innerHTML = '<span class="badge no">' + escapeHtml(t('statusPending')) + '</span>';
-        btn.disabled = false;
-        if (ackLabel) ackLabel.textContent = t('ack');
       }
+      applyAckButtonLabel(id);
     }
 
     function fillLogSelect() {
@@ -1572,6 +1602,7 @@
 
     document.getElementById('backToList').addEventListener('click', function () {
       setView('list');
+      applyStaticI18n();
       renderList();
     });
 
@@ -1583,11 +1614,13 @@
 
     document.getElementById('tabList').addEventListener('click', function () {
       setView('list');
+      applyStaticI18n();
       renderList();
     });
     document.getElementById('tabLog').addEventListener('click', function () {
       fillLogSelect();
       setView('log');
+      applyStaticI18n();
       renderLog();
     });
 

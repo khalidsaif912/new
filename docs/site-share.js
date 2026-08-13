@@ -76,7 +76,7 @@
   var I18N_READ_SIGN = {
     en: {
       btn: 'Share',
-      title: 'Share this site',
+      title: 'Share this page',
       hint: 'Scan the QR code or share the link',
       share: 'Share',
       whatsapp: 'WhatsApp',
@@ -87,14 +87,14 @@
     },
     ar: {
       btn: 'مشاركة',
-      title: 'شارك الموقع',
+      title: 'مشاركة صفحة الإقرار',
       hint: 'امسح رمز QR أو شارك الرابط',
       share: 'مشاركة',
       whatsapp: 'واتساب',
       copy: 'نسخ الرابط',
       copied: 'تم النسخ!',
       close: 'إغلاق',
-      shareText: 'إقرار — التعميمات والاطلاع',
+      shareText: 'إقرار — اقرأ التعميمات وأقرّ بالاطلاع',
     },
   };
 
