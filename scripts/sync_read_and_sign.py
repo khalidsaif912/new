@@ -72,6 +72,28 @@ def sync(inbox: Path) -> dict:
     circulars: list[dict] = []
     used_ids: set[str] = set()
 
+    prev_by_id: dict[str, dict] = {}
+    prev_by_hash: dict[str, dict] = {}
+    if CATALOG.exists():
+        try:
+            old = json.loads(CATALOG.read_text(encoding="utf-8"))
+            for item in old.get("circulars") or []:
+                if isinstance(item, dict) and item.get("id"):
+                    prev_by_id[str(item["id"])] = item
+                if isinstance(item, dict) and item.get("hash"):
+                    prev_by_hash[str(item["hash"])] = item
+        except Exception:
+            pass
+
+    def merge_i18n(entry: dict) -> dict:
+        prev = prev_by_id.get(entry["id"]) or prev_by_hash.get(entry.get("hash") or "")
+        if not prev:
+            return entry
+        for key in ("titleAr", "sourceNameAr", "fileAr"):
+            if prev.get(key) and not entry.get(key):
+                entry[key] = prev[key]
+        return entry
+
     for src in pdfs:
         digest = sha256_file(src)
         base_id = slugify(src.name)
@@ -86,15 +108,17 @@ def sync(inbox: Path) -> dict:
             shutil.copy2(src, dest)
 
         circulars.append(
-            {
-                "id": cid,
-                "title": title_from_name(src.name),
-                "date": file_date(src),
-                "file": f"files/{dest_name}",
-                "bytes": dest.stat().st_size,
-                "hash": digest,
-                "sourceName": src.name,
-            }
+            merge_i18n(
+                {
+                    "id": cid,
+                    "title": title_from_name(src.name),
+                    "date": file_date(src),
+                    "file": f"files/{dest_name}",
+                    "bytes": dest.stat().st_size,
+                    "hash": digest,
+                    "sourceName": src.name,
+                }
+            )
         )
 
     # Also include any PDFs already in files/ that are not from this inbox pass
@@ -109,15 +133,17 @@ def sync(inbox: Path) -> dict:
             cid = f"{cid}-{sha256_file(existing)[:6]}"
         used_ids.add(cid)
         circulars.append(
-            {
-                "id": cid,
-                "title": title_from_name(existing.name),
-                "date": file_date(existing),
-                "file": rel,
-                "bytes": existing.stat().st_size,
-                "hash": sha256_file(existing),
-                "sourceName": existing.name,
-            }
+            merge_i18n(
+                {
+                    "id": cid,
+                    "title": title_from_name(existing.name),
+                    "date": file_date(existing),
+                    "file": rel,
+                    "bytes": existing.stat().st_size,
+                    "hash": sha256_file(existing),
+                    "sourceName": existing.name,
+                }
+            )
         )
 
     circulars.sort(key=lambda c: (c.get("date") or "", c.get("id") or ""), reverse=True)

@@ -885,6 +885,18 @@
       }
     }
 
+    function circTitle(c) {
+      if (!c) return '';
+      if (LANG === 'ar' && c.titleAr) return c.titleAr;
+      return c.title || c.id || '';
+    }
+
+    function circSourceName(c) {
+      if (!c) return '';
+      if (LANG === 'ar' && c.sourceNameAr) return c.sourceNameAr;
+      return c.sourceName || '';
+    }
+
     function applyLang(lang) {
       LANG = lang === 'ar' ? 'ar' : 'en';
       try { localStorage.setItem('rosterLang', LANG); } catch (e) {}
@@ -1170,7 +1182,7 @@
             escapeHtml(c.id) +
             '">' +
             '<div class="title">' +
-            escapeHtml(c.title || c.id) +
+            escapeHtml(circTitle(c)) +
             '</div>' +
             '<div class="row">' +
             '<span>' +
@@ -1288,8 +1300,12 @@
       setView('detail');
       // Re-apply chrome translations every time detail opens (avoids stale EN labels).
       applyStaticI18n();
-      document.getElementById('detailTitle').textContent = c.title || c.id;
-      document.getElementById('detailMeta').textContent = (c.date || '') + (c.sourceName ? ' · ' + c.sourceName : '');
+      document.getElementById('detailTitle').textContent = circTitle(c);
+      var metaBits = [];
+      if (c.date) metaBits.push(c.date);
+      var src = circSourceName(c);
+      if (src) metaBits.push(src);
+      document.getElementById('detailMeta').textContent = metaBits.join(' · ');
       var fileUrl = c.file || '';
       var openPdf = document.getElementById('openPdf');
       if (openPdf) openPdf.href = fileUrl || '#';
@@ -1319,7 +1335,7 @@
             '<option value="' +
             escapeHtml(c.id) +
             '">' +
-            escapeHtml((c.date || '') + ' — ' + (c.title || c.id)) +
+            escapeHtml((c.date || '') + ' — ' + circTitle(c)) +
             '</option>'
           );
         })
@@ -1404,7 +1420,7 @@
       var c = circulars.find(function (x) { return x.id === currentId; }) || {};
       var titleEl = document.getElementById('printLogTitle');
       var metaEl = document.getElementById('printLogMeta');
-      if (titleEl) titleEl.textContent = c.title || c.id || '—';
+      if (titleEl) titleEl.textContent = circTitle(c) || '—';
       if (metaEl) {
         var issue = c.date || '—';
         var printed = '';
