@@ -487,8 +487,12 @@ def _fix_share_apps_grid_css(html: str) -> str:
     return html
 
 
-def _inject_chip_icon_css(html: str) -> str:
+def _inject_chip_icon_css(html: str, *, import_page: bool = False) -> str:
     if ".summaryChip .chipVal .chip-icon" in html:
+        if import_page and "always visible on import" not in html:
+            marker = "#summarySwitchChip .chipVal { transition:opacity .2s ease; }"
+            if marker in html:
+                html = html.replace(marker, IMPORT_SUMMARY_SWITCH_VISIBLE_CSS + "\n" + marker, 1)
         return html
     html = re.sub(
         r"    \.(?:roster-icon|chipIcon)[^\n]*\{[^}]*\}\s*",
@@ -511,16 +515,17 @@ def _inject_chip_icon_css(html: str) -> str:
         html,
     )
     if "    .summaryChip .chipVal {" in html:
+        css = CHIP_ICON_CSS + (IMPORT_SUMMARY_SWITCH_VISIBLE_CSS if import_page else "")
         return html.replace(
             "    .summaryChip .chipVal {",
-            CHIP_ICON_CSS + "    .summaryChip .chipVal {",
+            css + "    .summaryChip .chipVal {",
             1,
         )
     return html
 
 
-def patch_summary_chips(html: str) -> str:
-    html = _inject_chip_icon_css(html)
+def patch_summary_chips(html: str, *, import_page: bool = False) -> str:
+    html = _inject_chip_icon_css(html, import_page=import_page)
     chip_patches = (
         (r'(<a[^>]*id="myScheduleBtn"[^>]*>\s*)<div class="chipVal">[^<]*</div>', r"\1" + CHIP_SCHEDULE_HTML),
         (r'(<a[^>]*id="importBtn"[^>]*>\s*)<div class="chipVal">.*?</div>', r"\1" + CHIP_FLIGHT_HTML),
