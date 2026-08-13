@@ -293,14 +293,99 @@
     .badge.neu { background: #e2e8f0; color: #475569; }
 
     .detailActions {
-      display: flex; flex-wrap: nowrap; gap: 8px; margin-top: 14px;
-      justify-content: center;
-      overflow-x: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+      width: 100%;
     }
-    .detailActions .summaryChip.actionChip {
-      flex: 1 1 0;
-      min-width: 68px;
-      max-width: 120px;
+    .detailActions .roster-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .detailActions .roster-cta-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 0;
+      pointer-events: none;
+    }
+    .detailActions .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .detailActions .roster-cta-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+    .detailActions .roster-cta-btn--roster {
+      background: #e8f1ff;
+      border-color: #b8c9f5;
+      color: #1e3a8a;
+    }
+    .detailActions .roster-cta-btn--share {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .detailActions .roster-cta-btn--apps {
+      background: #f0f9ff;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+    .detailActions .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .detailActions .roster-cta-btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+    @media (hover: hover) {
+      .detailActions .roster-cta-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      }
+      .detailActions .roster-cta-btn--roster:hover:not(:disabled) { background: #dce8ff; }
+      .detailActions .roster-cta-btn--share:hover:not(:disabled) { background: #d1fae5; }
+      .detailActions .roster-cta-btn--apps:hover:not(:disabled) { background: #e0f2fe; }
+      .detailActions .roster-cta-btn--muted:hover:not(:disabled) { background: #e2e8f0; }
+    }
+    .detailActions .roster-cta-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+    @media (max-width: 380px) {
+      .detailActions .roster-cta-btn {
+        padding: 9px 8px;
+        font-size: 11px;
+        gap: 5px;
+        min-height: 40px;
+      }
     }
     .pdfShell {
       width: 100%;
@@ -506,24 +591,24 @@
             <div class="pdfHost" id="pdfHost" aria-live="polite"></div>
           </div>
         </div>
-        <div class="detailActions summaryBar" style="margin-top:14px;">
-          <a class="summaryChip actionChip" id="openPdf" href="#" target="_blank" rel="noopener">
-            <div class="chipVal">📎</div>
-            <div class="chipLabel" data-i18n="openPdf">Open PDF</div>
+        <nav class="detailActions" aria-label="Circular actions">
+          <a class="roster-cta-btn roster-cta-btn--roster" id="openPdf" href="#" target="_blank" rel="noopener">
+            <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h5v5"/><path d="M10 14L19 5"/><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg></span>
+            <span class="roster-cta-label" data-i18n="openPdf">Open PDF</span>
           </a>
-          <button type="button" class="summaryChip actionChip primary" id="ackBtn">
-            <div class="chipVal">✅</div>
-            <div class="chipLabel" id="ackBtnLabel" data-i18n="ack">Acknowledge</div>
+          <button type="button" class="roster-cta-btn roster-cta-btn--apps" id="ackBtn">
+            <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span class="roster-cta-label" id="ackBtnLabel" data-i18n="ack">Acknowledge</span>
           </button>
-          <button type="button" class="summaryChip actionChip" id="shareCircularBtn">
-            <div class="chipVal">📤</div>
-            <div class="chipLabel" data-i18n="shareCircular">Share</div>
+          <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn" title="Share">
+            <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+            <span class="roster-cta-label">Share</span>
           </button>
-          <button type="button" class="summaryChip actionChip" id="backToList">
-            <div class="chipVal">↩️</div>
-            <div class="chipLabel" data-i18n="back">Back</div>
+          <button type="button" class="roster-cta-btn roster-cta-btn--muted" id="backToList">
+            <span class="roster-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg></span>
+            <span class="roster-cta-label" data-i18n="back">Back</span>
           </button>
-        </div>
+        </nav>
         <p class="msg" id="detailMsg"></p>
       </div>
     </section>
@@ -582,7 +667,38 @@
     </section>
   </div>
 
+  <div id="siteShareSheet" class="siteShareSheet" aria-hidden="true">
+    <div class="siteShareCard" role="dialog" aria-labelledby="siteShareTitle">
+      <h2 class="siteShareTitle" id="siteShareTitle">Share this site</h2>
+      <p class="siteShareHint" id="siteShareHint">Scan the QR code or share the link</p>
+      <div id="siteShareTools">
+        <div class="siteShareQr" id="siteShareQr"></div>
+        <input class="siteShareUrl" id="siteShareUrl" type="text" readonly dir="ltr" inputmode="none" aria-label="Share URL"/>
+        <div class="siteShareActions">
+          <button type="button" class="roster-cta-btn roster-cta-btn--roster siteShareNativeBtn" id="siteShareNativeBtn">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
+            <span class="roster-cta-label">Share</span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--share siteShareWhatsAppBtn" id="siteShareWhatsAppBtn">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#22c55e"/><path d="M8.5 9.5c.4 2.2 2.4 4.2 4.8 4.8l1-2.2c.1-.2.3-.3.5-.2l1.8.8c.2.1.4 0 .5-.2.4-.9.9-1.7 1.5-2.4.1-.2 0-.5-.2-.6l-1.6-.9c-.2-.1-.5 0-.6.2-.3.6-.7 1.1-1.1 1.6-.1.2-.4.2-.6.1l-1.4-.7c-.2-.1-.4-.1-.5.1z" fill="#fff"/></svg></span>
+            <span class="roster-cta-label">WhatsApp</span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--compare siteShareCopyBtn" id="siteShareCopyBtn">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 0 0 7.07 7.07L14 19"/></svg></span>
+            <span class="roster-cta-label">Copy link</span>
+          </button>
+        </div>
+      </div>
+      <div class="siteShareCloseWrap">
+        <button type="button" class="roster-cta-btn roster-cta-btn--muted siteShareCloseBtn" id="siteShareCloseBtn">
+          <span class="roster-cta-label">Close</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script defer src="../site-visits.js?v=20260812a"></script>
+  <script defer src="../site-share.js?v=20260813rs3"></script>
   <script>
   (function () {
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/read-and-sign';
@@ -619,9 +735,6 @@
         listHint: 'Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.',
         back: 'Back',
         openPdf: 'Open PDF',
-        shareCircular: 'Share',
-        shareDone: 'Link copied',
-        shareFail: 'Could not share',
         pdfLoading: 'Loading PDF…',
         pdfError: 'Could not display the PDF here. Use Open PDF.',
         ack: 'Acknowledge',
@@ -675,9 +788,6 @@
         listHint: 'اضغط على تعميم لقراءته والإقرار. تظهر حالتك: اطلعت / لم تطلع. الهوية من الصفحة الرئيسية.',
         back: 'رجوع',
         openPdf: 'فتح PDF',
-        shareCircular: 'مشاركة',
-        shareDone: 'تم نسخ الرابط',
-        shareFail: 'تعذرت المشاركة',
         pdfLoading: 'جاري تحميل PDF…',
         pdfError: 'تعذر عرض PDF هنا. استخدم فتح PDF.',
         ack: 'أقرّ بالاطلاع',
@@ -745,6 +855,9 @@
         if (key) el.setAttribute('aria-label', t(key));
       });
       updateStatSwitchChip();
+      if (window.rosterSiteShare && window.rosterSiteShare.setLang) {
+        window.rosterSiteShare.setLang();
+      }
       if (view === 'list') renderList();
       else if (view === 'detail' && currentId) openDetail(currentId);
       else if (view === 'log') renderLog();
@@ -1457,79 +1570,12 @@
       openDetail(btn.getAttribute('data-id'));
     });
 
-    function shareCircularCurrent() {
-      var c = circulars.find(function (x) { return x.id === currentId; });
-      var detailMsg = document.getElementById('detailMsg');
-      var title = (c && (c.title || c.id)) || 'Read and Sign';
-      var fileRel = (c && c.file) || '';
-      var fileAbs = fileRel ? new URL(fileRel, location.href).href : location.href;
-      var pageUrl = location.href.split('#')[0].replace(/\/?$/, '/') +
-        (currentId ? ('#c=' + encodeURIComponent(currentId)) : '');
-      // Prefer sharing the page link so recipients open Read and Sign; include PDF URL in text.
-      var text = title + '\n' + pageUrl + (fileAbs ? ('\n' + fileAbs) : '');
-      var payload = { title: title, text: text, url: pageUrl };
-
-      function showShareMsg(ok) {
-        if (!detailMsg) return;
-        detailMsg.className = ok ? 'msg ok' : 'msg err';
-        detailMsg.textContent = ok ? t('shareDone') : t('shareFail');
-        window.setTimeout(function () {
-          if (detailMsg.textContent === t('shareDone') || detailMsg.textContent === t('shareFail')) {
-            detailMsg.textContent = '';
-            detailMsg.className = 'msg';
-          }
-        }, 2200);
-      }
-
-      if (navigator.share) {
-        navigator.share(payload).then(function () {
-          showShareMsg(true);
-        }).catch(function (err) {
-          if (err && err.name === 'AbortError') return;
-          copyShareText(text, showShareMsg);
-        });
-        return;
-      }
-      copyShareText(text, showShareMsg);
-    }
-
-    function copyShareText(text, done) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { done(true); }).catch(function () {
-          fallbackCopy(text, done);
-        });
-        return;
-      }
-      fallbackCopy(text, done);
-    }
-
-    function fallbackCopy(text, done) {
-      try {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        var ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        done(!!ok);
-      } catch (e) {
-        done(false);
-      }
-    }
-
     document.getElementById('backToList').addEventListener('click', function () {
       setView('list');
       renderList();
     });
 
     document.getElementById('ackBtn').addEventListener('click', acknowledgeCurrent);
-
-    document.getElementById('shareCircularBtn').addEventListener('click', function () {
-      shareCircularCurrent();
-    });
 
     document.getElementById('printLogBtn').addEventListener('click', function () {
       printLog();

@@ -73,6 +73,31 @@
     },
   };
 
+  var I18N_READ_SIGN = {
+    en: {
+      btn: 'Share',
+      title: 'Share this site',
+      hint: 'Scan the QR code or share the link',
+      share: 'Share',
+      whatsapp: 'WhatsApp',
+      copy: 'Copy link',
+      copied: 'Copied!',
+      close: 'Close',
+      shareText: 'Read and Sign — circulars & acknowledgements',
+    },
+    ar: {
+      btn: 'مشاركة',
+      title: 'شارك الموقع',
+      hint: 'امسح رمز QR أو شارك الرابط',
+      share: 'مشاركة',
+      whatsapp: 'واتساب',
+      copy: 'نسخ الرابط',
+      copied: 'تم النسخ!',
+      close: 'إغلاق',
+      shareText: 'إقرار — التعميمات والاطلاع',
+    },
+  };
+
   var I18N_ALUMNI = {
     en: {
       btn: 'Share',
@@ -118,8 +143,18 @@
     return /\/alumni(\/|$)/.test(location.pathname || '');
   }
 
+  function isReadSignPage() {
+    return /\/read-and-sign(\/|$)/.test(location.pathname || '');
+  }
+
   function activeI18n() {
-    var pack = isAlumniPage() ? I18N_ALUMNI : isTrainingPage() ? I18N_TRAINING : I18N;
+    var pack = isAlumniPage()
+      ? I18N_ALUMNI
+      : isTrainingPage()
+        ? I18N_TRAINING
+        : isReadSignPage()
+          ? I18N_READ_SIGN
+          : I18N;
     return pack[lang()] || pack.en;
   }
 
@@ -129,7 +164,9 @@
       ? I18N_ALUMNI.en
       : isTrainingPage()
         ? I18N_TRAINING.en
-        : I18N.en;
+        : isReadSignPage()
+          ? I18N_READ_SIGN.en
+          : I18N.en;
     return pack[key] || fallback[key] || key;
   }
 
@@ -174,6 +211,7 @@
     }
     if (/\/training(\/|$)/.test(path)) return '/training/';
     if (/\/alumni(\/|$)/.test(path)) return '/alumni/';
+    if (/\/read-and-sign(\/|$)/.test(path)) return '/read-and-sign/';
     if (/\/roster-diff(\/|$)/.test(path)) return '/roster-diff/';
     if (/\/a-cup-of-book(\/|$)/.test(path)) return '/a-cup-of-book/';
     return '/';
@@ -245,7 +283,9 @@
   function applyI18n() {
     var btn = document.getElementById('shareSiteBtn');
     if (btn) {
-      var lbl = btn.querySelector('.roster-cta-label');
+      var lbl =
+        btn.querySelector('.roster-cta-label') ||
+        btn.querySelector('.chipLabel');
       if (lbl) lbl.textContent = t('btn');
       else btn.textContent = t('btn');
     }
