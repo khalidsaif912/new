@@ -876,4 +876,10 @@ def main() -> int:
         if patch_file(path):
             changed += 1
             if changed <= 8 or "--verbose" in sys.argv:
-                print(f"patched {path.relative
+                print(f"patched {path.relative_to(ROOT)}")
+    print(f"patched {changed} html files")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
