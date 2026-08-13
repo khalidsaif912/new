@@ -297,6 +297,11 @@
       justify-content: center;
       overflow-x: auto;
     }
+    .detailActions .summaryChip.actionChip {
+      flex: 1 1 0;
+      min-width: 68px;
+      max-width: 120px;
+    }
     .pdfShell {
       width: 100%;
       border: 1px solid #e2e8f0;
@@ -493,12 +498,6 @@
     <section class="card hidden" id="viewDetail">
       <div class="topBar"></div>
       <div class="body">
-        <div class="summaryBar" style="margin-top:0;margin-bottom:12px;justify-content:flex-start;">
-          <button type="button" class="summaryChip actionChip" id="backToList">
-            <div class="chipVal">↩️</div>
-            <div class="chipLabel" data-i18n="back">Back</div>
-          </button>
-        </div>
         <h2 id="detailTitle">—</h2>
         <div id="detailMeta" style="margin:8px 0 12px;font-size:12px;color:#64748b;font-weight:700;"></div>
         <div id="detailStatus"></div>
@@ -516,9 +515,13 @@
             <div class="chipVal">✅</div>
             <div class="chipLabel" id="ackBtnLabel" data-i18n="ack">Acknowledge</div>
           </button>
-          <button type="button" class="summaryChip actionChip" id="gotoLogBtn">
-            <div class="chipVal">📋</div>
-            <div class="chipLabel" data-i18n="log">Log</div>
+          <button type="button" class="summaryChip actionChip" id="shareCircularBtn">
+            <div class="chipVal">📤</div>
+            <div class="chipLabel" data-i18n="shareCircular">Share</div>
+          </button>
+          <button type="button" class="summaryChip actionChip" id="backToList">
+            <div class="chipVal">↩️</div>
+            <div class="chipLabel" data-i18n="back">Back</div>
           </button>
         </div>
         <p class="msg" id="detailMsg"></p>
@@ -616,6 +619,9 @@
         listHint: 'Open a circular to read and acknowledge. Your status shows as Read / Pending. Identity comes from the home page.',
         back: 'Back',
         openPdf: 'Open PDF',
+        shareCircular: 'Share',
+        shareDone: 'Link copied',
+        shareFail: 'Could not share',
         pdfLoading: 'Loading PDF…',
         pdfError: 'Could not display the PDF here. Use Open PDF.',
         ack: 'Acknowledge',
@@ -669,6 +675,9 @@
         listHint: 'اضغط على تعميم لقراءته والإقرار. تظهر حالتك: اطلعت / لم تطلع. الهوية من الصفحة الرئيسية.',
         back: 'رجوع',
         openPdf: 'فتح PDF',
+        shareCircular: 'مشاركة',
+        shareDone: 'تم نسخ الرابط',
+        shareFail: 'تعذرت المشاركة',
         pdfLoading: 'جاري تحميل PDF…',
         pdfError: 'تعذر عرض PDF هنا. استخدم فتح PDF.',
         ack: 'أقرّ بالاطلاع',
@@ -1448,6 +1457,69 @@
       openDetail(btn.getAttribute('data-id'));
     });
 
+    function shareCircularCurrent() {
+      var c = circulars.find(function (x) { return x.id === currentId; });
+      var detailMsg = document.getElementById('detailMsg');
+      var title = (c && (c.title || c.id)) || 'Read and Sign';
+      var fileRel = (c && c.file) || '';
+      var fileAbs = fileRel ? new URL(fileRel, location.href).href : location.href;
+      var pageUrl = location.href.split('#')[0].replace(/\/?$/, '/') +
+        (currentId ? ('#c=' + encodeURIComponent(currentId)) : '');
+      // Prefer sharing the page link so recipients open Read and Sign; include PDF URL in text.
+      var text = title + '\n' + pageUrl + (fileAbs ? ('\n' + fileAbs) : '');
+      var payload = { title: title, text: text, url: pageUrl };
+
+      function showShareMsg(ok) {
+        if (!detailMsg) return;
+        detailMsg.className = ok ? 'msg ok' : 'msg err';
+        detailMsg.textContent = ok ? t('shareDone') : t('shareFail');
+        window.setTimeout(function () {
+          if (detailMsg.textContent === t('shareDone') || detailMsg.textContent === t('shareFail')) {
+            detailMsg.textContent = '';
+            detailMsg.className = 'msg';
+          }
+        }, 2200);
+      }
+
+      if (navigator.share) {
+        navigator.share(payload).then(function () {
+          showShareMsg(true);
+        }).catch(function (err) {
+          if (err && err.name === 'AbortError') return;
+          copyShareText(text, showShareMsg);
+        });
+        return;
+      }
+      copyShareText(text, showShareMsg);
+    }
+
+    function copyShareText(text, done) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }).catch(function () {
+          fallbackCopy(text, done);
+        });
+        return;
+      }
+      fallbackCopy(text, done);
+    }
+
+    function fallbackCopy(text, done) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        done(!!ok);
+      } catch (e) {
+        done(false);
+      }
+    }
+
     document.getElementById('backToList').addEventListener('click', function () {
       setView('list');
       renderList();
@@ -1455,10 +1527,8 @@
 
     document.getElementById('ackBtn').addEventListener('click', acknowledgeCurrent);
 
-    document.getElementById('gotoLogBtn').addEventListener('click', function () {
-      fillLogSelect();
-      setView('log');
-      renderLog();
+    document.getElementById('shareCircularBtn').addEventListener('click', function () {
+      shareCircularCurrent();
     });
 
     document.getElementById('printLogBtn').addEventListener('click', function () {
