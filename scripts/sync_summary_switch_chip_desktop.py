@@ -85,6 +85,9 @@ def iter_html() -> list[Path]:
         # Import always shows Emp/Depts (no Read&Sign); do not re-hide.
         if rel == "import" or rel.startswith("import/"):
             continue
+        # Diff pages use Read&Sign instead of Emp/Depts — never inject hide CSS / switch chip.
+        if rel.startswith("roster-diff/"):
+            continue
         paths.append(p)
     return paths
 
