@@ -23,7 +23,7 @@ CSS_SNIPPET = """    a.summaryChip.readSignChip .chipVal { color:#0f766e; }
 """
 
 HREF_SNIPPET = """  var readSign = document.getElementById('readSignChipBtn');
-  if (readSign) readSign.href = base + '/read-and-sign/';
+  if (readSign) readSign.href = (typeof root !== 'undefined' && root ? root : (typeof base !== 'undefined' && base ? base : getSiteRootUrl())) + '/read-and-sign/';
 """
 
 
