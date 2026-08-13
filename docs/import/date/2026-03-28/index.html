@@ -361,18 +361,14 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     }
 .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
 .summaryChip .chipIcon.diffIcon { width:35px; height:35px; }
-    /* Emp/Depts count: large screens only (Read&Sign keeps the mobile slot) */
-    #summarySwitchChip { display:none !important; }
-    @media (min-width:1024px){
-      #summarySwitchChip {
-        display:flex !important;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-      }
+    /* Emp/Depts count: always visible on import (no Read&Sign chip) */
+    #summarySwitchChip {
+      display:flex !important;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
-
-    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
+#summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
       font-size:9.5px;

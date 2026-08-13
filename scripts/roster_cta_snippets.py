@@ -342,7 +342,8 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
     #myScheduleBtn .feature-new-badge{
       display:none !important;
     }
-    /* Emp/Depts count: large screens only (Read&Sign keeps the mobile slot) */
+    /* Emp/Depts count: large screens only on export (Read&Sign keeps the mobile slot).
+       Import pages override this to always show the chip. */
     #summarySwitchChip { display:none !important; }
     @media (min-width:1024px){
       #summarySwitchChip {
@@ -351,6 +352,15 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
         align-items:center;
         justify-content:center;
       }
+    }
+"""
+
+IMPORT_SUMMARY_SWITCH_VISIBLE_CSS = r"""    /* Emp/Depts count: always visible on import (no Read&Sign chip) */
+    #summarySwitchChip {
+      display:flex !important;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
 """
 

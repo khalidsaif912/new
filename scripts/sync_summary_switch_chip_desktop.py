@@ -82,6 +82,9 @@ def iter_html() -> list[Path]:
         rel = p.relative_to(DOCS).as_posix()
         if rel.startswith("read-and-sign/"):
             continue
+        # Import always shows Emp/Depts (no Read&Sign); do not re-hide.
+        if rel == "import" or rel.startswith("import/"):
+            continue
         paths.append(p)
     return paths
 

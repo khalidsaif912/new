@@ -22,6 +22,7 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_EXPORT_HTML,
     CHIP_FLIGHT_HTML,
     CHIP_ICON_CSS,
+    IMPORT_SUMMARY_SWITCH_VISIBLE_CSS,
     CHIP_MORNING_HTML,
     CHIP_NIGHT_HTML,
     CHIP_SCHEDULE_HTML,
@@ -806,7 +807,7 @@ def patch_alumni_css(html: str) -> str:
     return html
 
 
-def patch_css_and_js(html: str) -> str:
+def patch_css_and_js(html: str, *, import_page: bool = False) -> str:
     if "/* ═══════ QUICK ACTIONS" in html:
         html = CTA_CSS_RE.sub(CTA_CSS, html, count=1)
     elif "/* ═══════ CTA ═══════ */" in html and 'id="ctaBtn"' in html:
@@ -818,7 +819,7 @@ def patch_css_and_js(html: str) -> str:
     html = patch_shift_copy_modal(html)
     html = patch_secondary_bar(html)
     html = cleanup_secondary_comments(html)
-    html = patch_summary_chips(html)
+    html = patch_summary_chips(html, import_page=import_page)
     html = patch_lang_toggle(html)
     html = patch_compare_cta_icon(html)
     html = patch_remove_compare(html)
@@ -853,6 +854,8 @@ def patch_file(path: Path) -> bool:
     raw = path.read_text(encoding="utf-8")
     if 'id="ctaBtn"' not in raw and "quickActions" not in raw and 'class="btnWrap"' not in raw:
         return False
+    rel = path.relative_to(DOCS).as_posix()
+    import_page = rel == "import" or rel.startswith("import/")
     updated = raw
     if 'class="btnWrap"' in updated and "roster-cta-btn--roster" not in updated:
         updated = patch_legacy_btn_wrap(updated)
@@ -860,7 +863,7 @@ def patch_file(path: Path) -> bool:
         "roster-cta" in updated or 'class="importBottom"' in updated
     ):
         updated = patch_export_cta(updated)
-    updated = patch_css_and_js(updated)
+    updated = patch_css_and_js(updated, import_page=import_page)
     if updated != raw:
         path.write_text(updated, encoding="utf-8", newline="\n")
         return True
@@ -873,10 +876,4 @@ def main() -> int:
         if patch_file(path):
             changed += 1
             if changed <= 8 or "--verbose" in sys.argv:
-                print(f"patched {path.relative_to(ROOT)}")
-    print(f"patched {changed} html files")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+                print(f"patched {path.relative
