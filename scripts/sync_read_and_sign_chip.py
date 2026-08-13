@@ -33,6 +33,9 @@ def iter_html() -> list[Path]:
         rel = p.relative_to(DOCS).as_posix()
         if rel.startswith("read-and-sign/"):
             continue
+        # Read&Sign is export-only — never inject into import pages.
+        if rel == "import" or rel.startswith("import/"):
+            continue
         paths.append(p)
     return paths
 
