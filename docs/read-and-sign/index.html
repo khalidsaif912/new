@@ -90,8 +90,13 @@
     }
     .header p.lead {
       position: relative; z-index: 1;
-      margin: 10px auto 0; max-width: 40ch;
-      font-size: 13px; line-height: 1.5; font-weight: 600; opacity: .92;
+      margin: 10px auto 0; max-width: 36ch;
+      font-size: 13px; line-height: 1.45; font-weight: 600; opacity: .92;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
     }
 
     .summaryBar {
@@ -761,7 +766,7 @@
         pageTitle: 'Read and Sign',
         home: 'Home',
         eyebrow: 'Export',
-        lead: 'Read each circular and acknowledge it electronically. Everyone can browse the log by topic.',
+        lead: 'Read each circular and acknowledge it. Browse the log by topic.',
         login: 'Sign in',
         loginTitle: 'Sign in from Home',
         myScheduleTitle: 'My Schedule',
@@ -820,7 +825,7 @@
         pageTitle: 'إقرار',
         home: 'الرئيسية',
         eyebrow: 'الصادر',
-        lead: 'اقرأ كل تعميم وأقرّ بالاطلاع إلكترونياً. يمكنك تصفّح السجل حسب الموضوع.',
+        lead: 'اقرأ كل تعميم وأقرّ بالاطلاع. تصفّح السجل حسب الموضوع.',
         login: 'تسجيل الدخول',
         loginTitle: 'سجّل دخولك من الصفحة الرئيسية',
         myScheduleTitle: 'جدولي',
