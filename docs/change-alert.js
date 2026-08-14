@@ -1285,7 +1285,7 @@ function boot() {
       if (window.rosterAlertSound) return;
       if (document.querySelector('script[data-alert-sound="1"]')) return;
       var s = document.createElement('script');
-      s.src = getBase() + 'alert-sound.js?v=20260814s';
+      s.src = getBase() + 'alert-sound.js?v=20260814t';
       s.async = true;
       s.setAttribute('data-alert-sound', '1');
       document.body.appendChild(s);

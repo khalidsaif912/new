@@ -1404,10 +1404,7 @@
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
             : 'تم النشر.';
           try {
-            if (window.rosterAlertSound) {
-              window.rosterAlertSound.unlock();
-              window.rosterAlertSound.play('send');
-            }
+            if (window.rosterAlertSound) window.rosterAlertSound.play('send');
           } catch (soundErr) {}
           messagesCache = null;
           refresh();
