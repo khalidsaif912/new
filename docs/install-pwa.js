@@ -89,21 +89,22 @@
 
     banner.style.cssText = `
       position:fixed;
-      bottom:16px;
+      top:calc(10px + env(safe-area-inset-top, 0px));
+      bottom:auto;
       left:50%;
-      transform:translateX(-50%) translateY(20px);
+      transform:translateX(-50%) translateY(-16px);
       opacity:0;
       background:rgba(20,20,24,0.94);
       border:1px solid rgba(201,168,76,0.28);
       border-radius:16px;
       padding:10px 12px;
-      z-index:9999;
+      z-index:100040;
       display:flex;
       align-items:center;
       gap:10px;
       direction:rtl;
       min-width:260px;
-      max-width:calc(100vw - 24px);
+      max-width:min(420px, calc(100vw - 24px));
       box-shadow:0 10px 30px rgba(0,0,0,0.28);
       backdrop-filter:blur(12px);
       transition:opacity .25s ease, transform .25s ease;
@@ -175,7 +176,7 @@
     if (!banner) return;
 
     banner.style.opacity = '0';
-    banner.style.transform = 'translateX(-50%) translateY(20px)';
+    banner.style.transform = 'translateX(-50%) translateY(-16px)';
 
     setTimeout(() => {
       banner.remove();
