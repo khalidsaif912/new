@@ -157,8 +157,9 @@
       grid-template-columns: 1fr;
       gap: 8px;
     }
+    #speedOpts { grid-template-columns: repeat(2, 1fr); }
     @media (min-width: 520px) {
-      .modeOpts { grid-template-columns: repeat(3, 1fr); }
+      .modeOpts, #speedOpts { grid-template-columns: repeat(3, 1fr); }
     }
     .modeOpt {
       border: 1px solid var(--line);
@@ -196,6 +197,14 @@
       border-color: #ef444488;
       color: #fecaca;
     }
+    .dangerBtn {
+      width: 100%;
+      background: #7f1d1d;
+      color: #fecaca;
+      border: 1px solid #ef444488;
+      font-weight: 900;
+    }
+    .dangerBtn:disabled { opacity: .55; cursor: wait; }
     .statusLine {
       margin: 10px 0 0;
       min-height: 18px;
@@ -297,6 +306,35 @@
         </div>
       </div>
 
+      <div class="card">
+        <h2>سرعة الشريط</h2>
+        <p>تحكم في سرعة مرور الرسائل في الشريط المتحرك أسفل الصفحة.</p>
+        <div class="modeOpts" id="speedOpts">
+          <button type="button" class="modeOpt" data-speed="crawl">أبطأ جداً<br><span style="opacity:.75;font-weight:700;font-size:10px">160 ثانية</span></button>
+          <button type="button" class="modeOpt" data-speed="slower">أبطأ<br><span style="opacity:.75;font-weight:700;font-size:10px">110 ثانية</span></button>
+          <button type="button" class="modeOpt" data-speed="slow">بطيء<br><span style="opacity:.75;font-weight:700;font-size:10px">80 ثانية</span></button>
+          <button type="button" class="modeOpt" data-speed="medium">متوسط<br><span style="opacity:.75;font-weight:700;font-size:10px">50 ثانية</span></button>
+          <button type="button" class="modeOpt" data-speed="fast">سريع<br><span style="opacity:.75;font-weight:700;font-size:10px">28 ثانية</span></button>
+          <button type="button" class="modeOpt" data-speed="faster">أسرع<br><span style="opacity:.75;font-weight:700;font-size:10px">16 ثانية</span></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>حذف الرسائل تلقائياً</h2>
+        <p>تُحذف رسائل الموظفين من الشريط والدردشة بعد المدة المختارة، حسب وقت الإرسال.</p>
+        <div class="modeOpts" id="expireOpts">
+          <button type="button" class="modeOpt" data-expire="0">بدون حذف</button>
+          <button type="button" class="modeOpt" data-expire="24">بعد 24 ساعة</button>
+          <button type="button" class="modeOpt" data-expire="48">بعد 48 ساعة</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>حذف كل الرسائل</h2>
+        <p>يزيل كل الرسائل المعتمدة والمعلّقة فوراً. لا يمكن التراجع عن هذا الإجراء.</p>
+        <button type="button" class="chip dangerBtn" id="purgeAllBtn">حذف كل الرسائل الآن</button>
+      </div>
+
       <div class="statusLine" id="settingsStatus" aria-live="polite"></div>
     </section>
   </div>
@@ -311,12 +349,21 @@
     var imageCache = Object.create(null);
     var tab = 'messages';
     var filter = 'pending';
-    var store = { pending: [], approved: [], showMode: 'both', hidden: false, requireApproval: true };
+    var store = { pending: [], approved: [], showMode: 'both', hidden: false, requireApproval: true, scrollSpeed: 'slow', expireHours: 0 };
     var MODE_LABELS = {
       official: 'الرسائل الرسمية فقط',
       staff: 'رسائل الموظفين فقط',
       both: 'الاثنان معاً'
     };
+    var SPEED_LABELS = {
+      crawl: 'أبطأ جداً',
+      slower: 'أبطأ',
+      slow: 'بطيء',
+      medium: 'متوسط',
+      fast: 'سريع',
+      faster: 'أسرع'
+    };
+    var EXPIRE_LABELS = { 0: 'بدون حذف', 24: 'بعد 24 ساعة', 48: 'بعد 48 ساعة' };
 
     var gate = document.getElementById('gate');
     var app = document.getElementById('app');
@@ -344,8 +391,47 @@
     }
 
     function normalizeRequireApproval(v) {
-      // default true when missing
       return v !== false;
+    }
+
+    function normalizeScrollSpeed(s) {
+      s = String(s || '').trim();
+      if (
+        s === 'crawl' ||
+        s === 'slower' ||
+        s === 'slow' ||
+        s === 'medium' ||
+        s === 'fast' ||
+        s === 'faster'
+      ) {
+        return s;
+      }
+      return 'slow';
+    }
+
+    function normalizeExpireHours(v) {
+      v = Number(v);
+      if (v === 24 || v === 48) return v;
+      return 0;
+    }
+
+    function messageTime(m) {
+      return Number((m && (m.at || m.approvedAt)) || 0);
+    }
+
+    function pruneExpired(next) {
+      var hours = normalizeExpireHours(next.expireHours);
+      if (!hours) return 0;
+      var cutoff = Date.now() - hours * 3600 * 1000;
+      function keep(m) {
+        var t = messageTime(m);
+        return !t || t >= cutoff;
+      }
+      var p = next.pending || [];
+      var a = next.approved || [];
+      next.pending = p.filter(keep);
+      next.approved = a.filter(keep);
+      return p.length - next.pending.length + (a.length - next.approved.length);
     }
 
     function headers() {
@@ -390,7 +476,9 @@
         approved: Array.isArray(json.approved) ? json.approved.slice() : [],
         showMode: normalizeMode(json.showMode),
         hidden: !!json.hidden,
-        requireApproval: normalizeRequireApproval(json.requireApproval)
+        requireApproval: normalizeRequireApproval(json.requireApproval),
+        scrollSpeed: normalizeScrollSpeed(json.scrollSpeed),
+        expireHours: normalizeExpireHours(json.expireHours)
       };
     }
 
@@ -400,6 +488,8 @@
       next.showMode = normalizeMode(next.showMode);
       next.hidden = !!next.hidden;
       next.requireApproval = normalizeRequireApproval(next.requireApproval);
+      next.scrollSpeed = normalizeScrollSpeed(next.scrollSpeed);
+      next.expireHours = normalizeExpireHours(next.expireHours);
       while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
       while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
       var res = await fetch(MANTLE_URL, {
@@ -425,10 +515,18 @@
       approvalToggle.classList.toggle('on', !needApproval);
       approvalToggle.textContent = needApproval ? 'مطلوب' : 'غير مطلوب';
       var mode = normalizeMode(store.showMode);
-      document.querySelectorAll('.modeOpt').forEach(function (btn) {
+      document.querySelectorAll('#modeOpts .modeOpt').forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
         btn.disabled = hidden;
         btn.style.opacity = hidden ? '0.55' : '1';
+      });
+      var speed = normalizeScrollSpeed(store.scrollSpeed);
+      document.querySelectorAll('#speedOpts .modeOpt').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-speed') === speed);
+      });
+      var expire = String(normalizeExpireHours(store.expireHours));
+      document.querySelectorAll('#expireOpts .modeOpt').forEach(function (btn) {
+        btn.classList.toggle('active', String(btn.getAttribute('data-expire')) === expire);
       });
     }
 
@@ -447,6 +545,7 @@
       try {
         store = await readStore();
         Object.keys(patch).forEach(function (k) { store[k] = patch[k]; });
+        pruneExpired(store);
         await writeStore(store);
         store = await readStore();
         paintSettings();
@@ -587,6 +686,11 @@
       list.innerHTML = '<div class="empty">جاري التحميل…</div>';
       try {
         store = await readStore();
+        var removed = pruneExpired(store);
+        if (removed) {
+          await writeStore(store);
+          store = await readStore();
+        }
         render();
       } catch (e) {
         list.innerHTML = '<div class="error">تعذر تحميل الرسائل</div>';
@@ -597,11 +701,14 @@
       try {
         store = await readStore();
         fn(store);
+        pruneExpired(store);
         await writeStore(store);
         store = await readStore();
         render();
+        return true;
       } catch (e) {
         alert('تعذر حفظ التعديل');
+        return false;
       }
     }
 
@@ -651,7 +758,7 @@
         paintList();
       });
     });
-    document.querySelectorAll('.modeOpt').forEach(function (btn) {
+    document.querySelectorAll('#modeOpts .modeOpt').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (store.hidden) {
           setStatus('أظهر الشريط أولاً لتغيير المحتوى', true);
@@ -659,6 +766,41 @@
         }
         var mode = btn.getAttribute('data-mode') || 'both';
         savePatch({ showMode: mode }, 'تم الحفظ: ' + (MODE_LABELS[mode] || mode));
+      });
+    });
+    document.querySelectorAll('#speedOpts .modeOpt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var speed = btn.getAttribute('data-speed') || 'slow';
+        savePatch({ scrollSpeed: speed }, 'تم حفظ السرعة: ' + (SPEED_LABELS[speed] || speed));
+      });
+    });
+    document.querySelectorAll('#expireOpts .modeOpt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var hours = normalizeExpireHours(btn.getAttribute('data-expire'));
+        savePatch(
+          { expireHours: hours },
+          hours
+            ? 'سيتم حذف الرسائل تلقائياً ' + (EXPIRE_LABELS[hours] || '')
+            : 'تم إيقاف الحذف التلقائي'
+        );
+      });
+    });
+    document.getElementById('purgeAllBtn').addEventListener('click', function () {
+      var n = (store.pending || []).length + (store.approved || []).length;
+      if (!n) {
+        setStatus('لا توجد رسائل لحذفها', true);
+        return;
+      }
+      if (!window.confirm('حذف كل الرسائل (' + n + ') من الشريط والدردشة؟ لا يمكن التراجع.')) return;
+      var btn = document.getElementById('purgeAllBtn');
+      btn.disabled = true;
+      mutate(function (s) {
+        s.pending = [];
+        s.approved = [];
+      }).then(function (ok) {
+        if (ok) setStatus('تم حذف كل الرسائل');
+      }).finally(function () {
+        btn.disabled = false;
       });
     });
     hideToggle.addEventListener('click', function () {

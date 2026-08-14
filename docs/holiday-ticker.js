@@ -17,6 +17,7 @@
   var messagesCache = null;
   var imageCache = Object.create(null);
   var showModeCache = 'both';
+  var scrollSpeedCache = 'slow';
   var staffById = null;
   var emojiListCache = null;
   var composeBound = false;
@@ -25,6 +26,67 @@
     m = String(m || '').trim();
     if (m === 'official' || m === 'staff' || m === 'both') return m;
     return 'both';
+  }
+
+  function normalizeScrollSpeed(s) {
+    s = String(s || '').trim();
+    if (
+      s === 'crawl' ||
+      s === 'slower' ||
+      s === 'slow' ||
+      s === 'medium' ||
+      s === 'fast' ||
+      s === 'faster'
+    ) {
+      return s;
+    }
+    return 'slow';
+  }
+
+  function scrollSeconds(s) {
+    var map = { crawl: 160, slower: 110, slow: 80, medium: 50, fast: 28, faster: 16 };
+    return map[normalizeScrollSpeed(s)] || 80;
+  }
+
+  function normalizeExpireHours(v) {
+    v = Number(v);
+    if (v === 24 || v === 48) return v;
+    return 0;
+  }
+
+  function messageTime(m) {
+    return Number((m && (m.at || m.approvedAt)) || 0);
+  }
+
+  function pruneExpired(store) {
+    var hours = normalizeExpireHours(store && store.expireHours);
+    if (!hours) return 0;
+    var cutoff = Date.now() - hours * 3600 * 1000;
+    function keep(m) {
+      var t = messageTime(m);
+      return !t || t >= cutoff;
+    }
+    var pending = Array.isArray(store.pending) ? store.pending : [];
+    var approved = Array.isArray(store.approved) ? store.approved : [];
+    var nextPending = pending.filter(keep);
+    var nextApproved = approved.filter(keep);
+    var removed = pending.length - nextPending.length + (approved.length - nextApproved.length);
+    store.pending = nextPending;
+    store.approved = nextApproved;
+    return removed;
+  }
+
+  function normalizeStore(json) {
+    json = json || {};
+    return {
+      pending: Array.isArray(json.pending) ? json.pending : [],
+      approved: Array.isArray(json.approved) ? json.approved : [],
+      showMode: normalizeMode(json.showMode),
+      hidden: !!json.hidden,
+      requireApproval: json.requireApproval !== false,
+      scrollSpeed: normalizeScrollSpeed(json.scrollSpeed),
+      expireHours: normalizeExpireHours(json.expireHours)
+    };
   }
 
   function lang() {
@@ -237,23 +299,13 @@
     });
     if (!res.ok) throw new Error('read');
     var json = await res.json();
-    return {
-      pending: Array.isArray(json.pending) ? json.pending : [],
-      approved: Array.isArray(json.approved) ? json.approved : [],
-      showMode: normalizeMode(json.showMode),
-      hidden: !!json.hidden,
-      requireApproval: json.requireApproval !== false
-    };
+    return normalizeStore(json);
   }
 
   async function writeFullStore(store) {
-    var payload = {
-      pending: (store.pending || []).slice(0, 80),
-      approved: (store.approved || []).slice(0, 40),
-      showMode: normalizeMode(store.showMode),
-      hidden: !!store.hidden,
-      requireApproval: store.requireApproval !== false
-    };
+    var payload = normalizeStore(store);
+    payload.pending = (payload.pending || []).slice(0, 80);
+    payload.approved = (payload.approved || []).slice(0, 40);
     while (JSON.stringify(payload).length > 50000 && payload.pending.length > 1) payload.pending.pop();
     while (JSON.stringify(payload).length > 50000 && payload.approved.length > 1) payload.approved.pop();
     var res = await fetch(MANTLE_URL, {
@@ -1394,6 +1446,8 @@
     el.classList.add('on');
     layoutTicker(el);
     el.setAttribute('dir', ar ? 'rtl' : 'ltr');
+    var mq = el.querySelector('.ht-marquee');
+    if (mq) mq.style.animationDuration = scrollSeconds(scrollSpeedCache) + 's';
     function onOpen(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -1502,33 +1556,24 @@
 
   function loadTickerStore() {
     if (messagesCache) return messagesCache;
-    messagesCache = fetch(MANTLE_URL + '?ts=' + Date.now(), {
-      headers: { 'X-Mantle-Key': MANTLE_KEY },
-      cache: 'no-store'
-    })
-      .then(function (r) {
-        if (!r.ok) throw new Error('msgs');
-        return r.json();
-      })
-      .then(function (json) {
-        showModeCache = normalizeMode(json && json.showMode);
-        return {
-          approved: Array.isArray(json && json.approved) ? json.approved : [],
-          showMode: showModeCache,
-          hidden: !!(json && json.hidden)
-        };
-      })
-      .catch(function () {
-        showModeCache = 'both';
-        return { approved: [], showMode: 'both', hidden: false };
-      });
+    messagesCache = readFullStore().catch(function () {
+      showModeCache = 'both';
+      scrollSpeedCache = 'slow';
+      return normalizeStore({});
+    });
     return messagesCache;
   }
 
   function refresh() {
-    messagesCache = null; // always re-check approved list + mode
+    messagesCache = null;
     Promise.all([loadTickerStore(), loadHolidays()]).then(function (pair) {
-      var store = pair[0] || { approved: [], showMode: 'both', hidden: false };
+      var store = pair[0] || normalizeStore({});
+      showModeCache = store.showMode;
+      scrollSpeedCache = store.scrollSpeed;
+      var removed = pruneExpired(store);
+      if (removed) {
+        writeFullStore(store).catch(function () {});
+      }
       if (store.hidden) {
         paintParts([], lang() === 'ar');
         return;
