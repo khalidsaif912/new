@@ -545,7 +545,7 @@
       'overflow:hidden;font-family:Tajawal,system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;',
       'letter-spacing:0;text-transform:none;box-sizing:border-box;',
-      'pointer-events:auto;cursor:pointer;',
+      'pointer-events:auto;cursor:pointer;direction:ltr;',
       '}',
       '#' + TICKER_ID + '.on{display:flex}',
       /* Soft glow fade on left + right edges */
@@ -597,18 +597,18 @@
       'html.has-news-ticker #siteVisitsHost{position:relative;z-index:1}',
       '#' + TICKER_ID + ' .ht-ico{display:none!important}',
       '#' + TICKER_ID + ' .ht-track{',
-      'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;',
-      'mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
-      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
-      '}',
-      'html[dir="rtl"] #' + TICKER_ID + ' .ht-track,body.ar #' + TICKER_ID + ' .ht-track{',
+      'flex:1 1 auto;min-width:0;width:100%;overflow:hidden;cursor:pointer;direction:ltr;',
       'mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
       '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);',
       '}',
       '#' + TICKER_ID + ' .ht-marquee{',
-      'display:inline-block;white-space:nowrap;padding-inline:28px;',
+      'display:inline-block;white-space:nowrap;padding-inline:28px;direction:ltr;',
       'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
       'letter-spacing:0;animation:htScroll 80s linear infinite;',
+      'animation-direction:normal;',
+      '}',
+      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{',
+      'animation-name:htScroll;animation-direction:normal;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900;unicode-bidi:isolate}',
       '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;unicode-bidi:isolate}',
@@ -616,7 +616,7 @@
       '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .3em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
-      '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
+      '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap,html.has-news-ticker .wrap{',
       'padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
@@ -1469,7 +1469,7 @@
       '<span class="ht-sep">•</span>' +
       joinedHtml;
     el.innerHTML =
-      '<div class="ht-track" id="htOpenTrack"><div class="ht-marquee">' +
+      '<div class="ht-track" id="htOpenTrack" dir="ltr"><div class="ht-marquee" dir="ltr">' +
       strip +
       '</div></div>';
     el.title = plain + (ar ? ' — اضغط للكتابة' : ' — Tap to write');
