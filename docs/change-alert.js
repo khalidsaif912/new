@@ -819,6 +819,24 @@
     clearHomeUI();
   }
 
+  function maybePlayAlertSound(empId, alert) {
+    if (!empId || empId === GUEST_EMP_ID) return;
+    if (!alert || !alert.change_hash) return;
+    var hash = empId + '_' + alert.change_hash;
+    var n = 0;
+    function tryPlay() {
+      try {
+        if (window.rosterAlertSound && typeof window.rosterAlertSound.playOnce === 'function') {
+          window.rosterAlertSound.playOnce('alert', hash);
+          return;
+        }
+      } catch (e) {}
+      n += 1;
+      if (n < 15) setTimeout(tryPlay, 200);
+    }
+    tryPlay();
+  }
+
   function ensureHomeUI(empId, alert, lang, absences, empName) {
     var icon = document.getElementById(HOME_ICON_ID);
     if (!icon) {
@@ -1215,6 +1233,7 @@ function renderForEmployee(empId) {
 
       lastRenderedEmpId = empId;
       lastRenderedHash = alert.change_hash || '';
+      maybePlayAlertSound(empId, alert);
 
       if (onHomePage()) {
         ensureHomeUI(empId, alert, lang, absences, empName);
@@ -1261,7 +1280,20 @@ function boot() {
     } catch (err) {}
   }
 
+  function loadAlertSound() {
+    try {
+      if (window.rosterAlertSound) return;
+      if (document.querySelector('script[data-alert-sound="1"]')) return;
+      var s = document.createElement('script');
+      s.src = getBase() + 'alert-sound.js?v=20260814s';
+      s.async = true;
+      s.setAttribute('data-alert-sound', '1');
+      document.body.appendChild(s);
+    } catch (err) {}
+  }
+
   function start() {
+    loadAlertSound();
     // Force homepage feedback UI even if index shell is an older cache.
     try {
       if (typeof window.rosterForceHomeUI === 'function') window.rosterForceHomeUI();
