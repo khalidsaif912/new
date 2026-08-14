@@ -608,15 +608,13 @@
       'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
       'letter-spacing:0;animation:htScroll 80s linear infinite;',
       '}',
-      '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
-      '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle}',
+      '#' + TICKER_ID + ' .ht-msg{font-weight:900;unicode-bidi:isolate}',
+      '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;unicode-bidi:isolate}',
       '#' + TICKER_ID + ' .ht-emoji{width:14px;height:14px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-2px}',
       '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .3em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
-      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{animation-name:htScrollRtl}',
       '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
       '@keyframes htScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}',
-      '@keyframes htScrollRtl{0%{transform:translateX(0)}100%{transform:translateX(33.333%)}}',
       '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
       'html.has-float-dock .wrap,html.has-news-ticker .wrap{',
       'padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
@@ -632,15 +630,19 @@
       'background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);color:#0f172a;',
       '}',
       '#' + MODAL_ID + ' .htc-top{',
-      'flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;',
-      'padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px;',
+      'flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;',
+      'padding:calc(6px + env(safe-area-inset-top,0px)) 10px 6px;',
       'background:#0f172a;color:#f8fafc;border-bottom:1px solid #1e293b;',
+      'min-height:0;',
       '}',
-      '#' + MODAL_ID + ' .htc-top h2{margin:0;font-size:17px;font-weight:900}',
-      '#' + MODAL_ID + ' .htc-top .htc-subline{margin:3px 0 0;font-size:11px;font-weight:700;color:#94a3b8}',
+      '#' + MODAL_ID + ' .htc-top .htc-titles{',
+      'display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;min-width:0;',
+      '}',
+      '#' + MODAL_ID + ' .htc-top h2{margin:0;font-size:13px;font-weight:900;line-height:1.2}',
+      '#' + MODAL_ID + ' .htc-top .htc-subline{margin:0;font-size:10px;font-weight:700;color:#94a3b8;line-height:1.2}',
       '#' + MODAL_ID + ' .htc-close{',
-      'width:40px;height:40px;border:0;border-radius:12px;background:#1e293b;color:#e2e8f0;',
-      'font-size:20px;font-weight:900;cursor:pointer;flex-shrink:0;',
+      'width:28px;height:28px;border:0;border-radius:8px;background:#1e293b;color:#e2e8f0;',
+      'font-size:16px;font-weight:900;cursor:pointer;flex-shrink:0;line-height:1;',
       '}',
       '#' + MODAL_ID + ' .htc-feed{',
       'flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;',
@@ -996,7 +998,7 @@
     modal.innerHTML =
       '<div class="htc-sheet" role="dialog" aria-modal="true" aria-labelledby="htcTitle">' +
         '<div class="htc-top">' +
-          '<div>' +
+          '<div class="htc-titles">' +
             '<h2 id="htcTitle">🎉 دردشة الشريط</h2>' +
             '<p class="htc-subline" id="htcSub">رسائل الموظفين المعتمدة</p>' +
           '</div>' +
@@ -1445,7 +1447,7 @@
     el.hidden = false;
     el.classList.add('on');
     layoutTicker(el);
-    el.setAttribute('dir', ar ? 'rtl' : 'ltr');
+    el.setAttribute('dir', 'ltr');
     var mq = el.querySelector('.ht-marquee');
     if (mq) mq.style.animationDuration = scrollSeconds(scrollSpeedCache) + 's';
     function onOpen(e) {
@@ -1499,7 +1501,7 @@
       if (hasImg && text) label = '📷 ' + text;
       else if (hasImg) label = '📷 ' + label;
       var bit =
-        '<span class="ht-msg" style="color:' +
+        '<span class="ht-msg" dir="auto" style="color:' +
         c.ink +
         '">' +
         escapeHtml(label) +
