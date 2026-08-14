@@ -1,27 +1,13 @@
 (function () {
   'use strict';
 
-  var TOUR_KEY = 'seenDayNotesTour_v1';
-  var FAB_DISMISS_KEY = 'featureNotesFabDismissed_v1';
-  var FAB_CLICKS_KEY = 'featureNotesFabClicks_v1';
+  var FAB_CLICKS_KEY = 'featureTickerImgFabClicks_v1';
   var FAB_CLICKS_NEEDED = 3;
   var STYLE_ID = 'featureUpdateBadgeCss';
   var FAB_ID = 'featureNotesFab';
 
-  function hasSeenTour() {
-    try {
-      return localStorage.getItem(TOUR_KEY) === '1';
-    } catch (e) {
-      return true;
-    }
-  }
-
   function getFabClicks() {
     try {
-      // Clear legacy one-click dismiss so the 3-click rule applies.
-      if (localStorage.getItem(FAB_DISMISS_KEY) === '1') {
-        localStorage.removeItem(FAB_DISMISS_KEY);
-      }
       var n = parseInt(localStorage.getItem(FAB_CLICKS_KEY) || '0', 10);
       return isNaN(n) || n < 0 ? 0 : n;
     } catch (e) {
@@ -49,20 +35,22 @@
       (document.documentElement.dir || '') === 'rtl';
   }
 
-  function siteRoot() {
-    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl();
-    var path = location.pathname || '/';
-    var segs = path.split('/').filter(Boolean);
-    if (path.indexOf('/roster-site/') !== -1) return location.origin + '/roster-site';
-    if (location.hostname && location.hostname.indexOf('github.io') !== -1) {
-      if (segs.length >= 2 && segs[1] === 'docs') return location.origin + '/' + segs[0] + '/docs';
-      return location.origin + (segs.length ? '/' + segs[0] : '');
+  function openTickerChat() {
+    if (window.rosterHolidayTicker && typeof window.rosterHolidayTicker.openCompose === 'function') {
+      window.rosterHolidayTicker.openCompose();
+      return true;
     }
-    return location.origin + (segs.length && segs[0] === 'docs' ? '' : '');
-  }
-
-  function scheduleTourUrl() {
-    return siteRoot() + '/my-schedules/?tour=1';
+    var n = 0;
+    var t = setInterval(function () {
+      n += 1;
+      if (window.rosterHolidayTicker && typeof window.rosterHolidayTicker.openCompose === 'function') {
+        clearInterval(t);
+        window.rosterHolidayTicker.openCompose();
+      } else if (n >= 20) {
+        clearInterval(t);
+      }
+    }, 100);
+    return false;
   }
 
   function injectStyles() {
@@ -123,19 +111,13 @@
   }
 
   function ensureChipBadge(el) {
-    if (!el || hasSeenTour()) return;
+    if (!el) return;
     if (el.querySelector('.feature-new-badge')) return;
     var badge = document.createElement('span');
     badge.className = 'feature-new-badge';
     badge.textContent = isAr() ? 'جديد' : 'NEW';
     badge.setAttribute('aria-hidden', 'true');
     el.appendChild(badge);
-    try {
-      var href = el.getAttribute('href') || '';
-      if (href && href.indexOf('tour=') === -1) {
-        el.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 'tour=1');
-      }
-    } catch (e) {}
   }
 
   function removeChipBadges() {
@@ -166,23 +148,24 @@
       document.body.appendChild(fab);
       fab.addEventListener('click', function () {
         registerFabClick();
-        location.href = scheduleTourUrl();
+        openTickerChat();
+        refresh();
       });
     }
     var ar = isAr();
     var clicks = getFabClicks();
     var left = Math.max(0, FAB_CLICKS_NEEDED - clicks);
     fab.innerHTML =
-      '<span class="feature-fab-emoji" aria-hidden="true">📌</span>' +
+      '<span class="feature-fab-emoji" aria-hidden="true">📷</span>' +
       '<span class="feature-fab-text">' +
-        '<span class="feature-fab-title">' + (ar ? 'ملاحظة اليوم' : 'Day notes') + '</span>' +
-        '<span class="feature-fab-sub">' + (ar ? 'تحديث في جدولي' : 'Update in My Schedule') + '</span>' +
+        '<span class="feature-fab-title">' + (ar ? 'شريط الدردشة' : 'Chat ticker') + '</span>' +
+        '<span class="feature-fab-sub">' + (ar ? 'يمكنك إرسال صورة' : 'You can send a photo') + '</span>' +
       '</span>' +
       '<span class="feature-fab-pill">' + (ar ? 'جديد' : 'NEW') + '</span>';
-    fab.setAttribute('aria-label', ar ? 'تحديث جديد: ملاحظات اليوم' : 'New update: day notes');
+    fab.setAttribute('aria-label', ar ? 'تحديث جديد: إرسال صورة في شريط الدردشة' : 'New update: send a photo in the chat ticker');
     fab.title = ar
-      ? ('اضغط لمعرفة التحديث' + (left > 0 ? ' · يبقى ' + left + ' حتى يختفي' : ''))
-      : ('Tap to see the update' + (left > 0 ? ' · ' + left + ' left until hide' : ''));
+      ? ('اضغط لفتح الدردشة' + (left > 0 ? ' · يبقى ' + left + ' حتى يختفي' : ''))
+      : ('Tap to open chat' + (left > 0 ? ' · ' + left + ' left until hide' : ''));
     fab.hidden = false;
     fab.removeAttribute('hidden');
     fab.style.display = 'inline-flex';
@@ -211,10 +194,10 @@
     var timer = setInterval(function () {
       refresh();
       n += 1;
-      if (n >= 12 || hasSeenTour()) clearInterval(timer);
+      if (n >= 12 || isFabDismissed()) clearInterval(timer);
     }, 800);
     window.addEventListener('storage', function (e) {
-      if (e && e.key === TOUR_KEY) refresh();
+      if (e && e.key === FAB_CLICKS_KEY) refresh();
     });
   }
 
