@@ -10,10 +10,12 @@
   var STYLE_ID = 'holidayTickerCss';
   var MODAL_ID = 'htComposeModal';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
+  var MANTLE_IMG_NS = 'https://mantledb.sh/v2/roster-site-visits/ticker-img-';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var EMOJI_DEFAULTS = { '82437': '1f349' };
   var holidaysCache = null;
   var messagesCache = null;
+  var imageCache = Object.create(null);
   var showModeCache = 'both';
   var staffById = null;
   var emojiListCache = null;
@@ -262,6 +264,136 @@
     if (!res.ok) throw new Error('write');
   }
 
+  function validTickerId(id) {
+    return /^t[a-z0-9]{8,32}$/i.test(String(id || ''));
+  }
+
+  function messageHasImage(m) {
+    return !!(m && (m.img === 1 || m.img === true || m.img === '1'));
+  }
+
+  function imageDocUrl(id) {
+    return MANTLE_IMG_NS + encodeURIComponent(id);
+  }
+
+  function safeImageData(s) {
+    s = String(s || '').replace(/\s+/g, '');
+    if (/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/i.test(s)) return s;
+    return '';
+  }
+
+  async function writeTickerImage(id, dataUrl) {
+    if (!validTickerId(id)) throw new Error('id');
+    var safe = safeImageData(dataUrl);
+    if (!safe) throw new Error('img');
+    var res = await fetch(imageDocUrl(id), {
+      method: 'POST',
+      headers: mantleHeaders(),
+      body: JSON.stringify({ d: safe, at: Date.now() })
+    });
+    if (!res.ok) throw new Error('imgwrite');
+    imageCache[id] = safe;
+  }
+
+  async function loadTickerImage(id) {
+    if (!validTickerId(id)) return '';
+    if (imageCache[id]) return imageCache[id];
+    try {
+      var res = await fetch(imageDocUrl(id) + '?ts=' + Date.now(), {
+        headers: { 'X-Mantle-Key': MANTLE_KEY },
+        cache: 'no-store'
+      });
+      if (!res.ok) return '';
+      var json = await res.json();
+      var safe = safeImageData(json && json.d);
+      if (safe) imageCache[id] = safe;
+      return safe;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function blobToImage(file) {
+    return new Promise(function (resolve, reject) {
+      function fallback() {
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          reject(new Error('load'));
+        };
+        img.src = url;
+      }
+      if (typeof createImageBitmap === 'function') {
+        createImageBitmap(file, { imageOrientation: 'from-image' })
+          .then(resolve)
+          .catch(fallback);
+      } else {
+        fallback();
+      }
+    });
+  }
+
+  function isLikelyImageFile(file) {
+    if (!file) return false;
+    var t = String(file.type || '').toLowerCase();
+    if (/^image\//.test(t)) return true;
+    var n = String(file.name || '').toLowerCase();
+    return /\.(jpe?g|png|gif|webp|heic|heif|bmp)$/.test(n);
+  }
+
+  async function compressImage(file) {
+    if (!isLikelyImageFile(file)) throw new Error('type');
+    if (file.size > 25 * 1024 * 1024) throw new Error('size');
+    var src = await blobToImage(file);
+    var w = src.width || src.naturalWidth || 0;
+    var h = src.height || src.naturalHeight || 0;
+    if (!w || !h) throw new Error('load');
+    var max = 720;
+    if (w > max || h > max) {
+      if (w >= h) {
+        h = Math.round((h * max) / w);
+        w = max;
+      } else {
+        w = Math.round((w * max) / h);
+        h = max;
+      }
+    }
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var quality = 0.7;
+    var data = '';
+    function paint(cw, ch, q) {
+      canvas.width = cw;
+      canvas.height = ch;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(src, 0, 0, cw, ch);
+      return canvas.toDataURL('image/jpeg', q);
+    }
+    data = paint(w, h, quality);
+    while (data.length > 38000 && quality > 0.38) {
+      quality -= 0.08;
+      data = paint(w, h, quality);
+    }
+    while (data.length > 38000 && w > 280) {
+      w = Math.round(w * 0.82);
+      h = Math.round(h * 0.82);
+      data = paint(w, h, 0.52);
+    }
+    if (typeof src.close === 'function') {
+      try {
+        src.close();
+      } catch (e) {}
+    }
+    if (!safeImageData(data) || data.length > 45000) throw new Error('size');
+    return data;
+  }
+
   function muscatToday() {
     try {
       var parts = new Intl.DateTimeFormat('en-CA', {
@@ -422,7 +554,7 @@
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-block;white-space:nowrap;padding-inline:28px;',
       'font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
-      'letter-spacing:0;animation:htScroll 40s linear infinite;',
+      'letter-spacing:0;animation:htScroll 80s linear infinite;',
       '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900}',
       '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle}',
@@ -562,7 +694,56 @@
       '#' + MODAL_ID + ' .htc-status{',
       'min-height:16px;margin-top:8px;font-size:11px;font-weight:800;color:#15803d;text-align:center;',
       '}',
-      '#' + MODAL_ID + ' .htc-status.err{color:#b91c1c}'
+      '#' + MODAL_ID + ' .htc-status.err{color:#b91c1c}',
+      '#' + MODAL_ID + ' .htc-attach{',
+      'position:relative;overflow:hidden;flex:0 0 auto;width:42px;height:42px;',
+      'border:1px solid #fdba74;border-radius:12px;',
+      'background:#fff7ed;color:#c2410c;cursor:pointer;padding:0;margin:0;',
+      'display:inline-flex;align-items:center;justify-content:center;',
+      '}',
+      '#' + MODAL_ID + ' .htc-attach:active{transform:scale(.94);background:#ffedd5;border-color:#f59e0b}',
+      '#' + MODAL_ID + ' .htc-attach.on{background:#ffedd5;border-color:#f59e0b;color:#9a3412}',
+      '#' + MODAL_ID + ' .htc-attach input[type=file]{',
+      'position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;',
+      'font-size:16px;margin:0;padding:0;border:0;background:transparent;z-index:2;',
+      '}',
+      '#' + MODAL_ID + ' .htc-attach svg{pointer-events:none;position:relative;z-index:1}',
+      '#' + MODAL_ID + ' .htc-cam{display:none}',
+      '@media (pointer:coarse){#' + MODAL_ID + ' .htc-cam{display:inline-flex}}',
+      '#' + MODAL_ID + ' .htc-composer.drop{outline:2px dashed #f59e0b;outline-offset:-4px;background:#fffbeb}',
+      '#' + MODAL_ID + ' .htc-preview{',
+      'display:none;align-items:center;gap:10px;margin:0 0 10px;padding:8px;',
+      'border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;position:relative;',
+      '}',
+      '#' + MODAL_ID + ' .htc-preview.on{display:flex}',
+      '#' + MODAL_ID + ' .htc-preview img{',
+      'width:64px;height:64px;object-fit:cover;border-radius:10px;background:#e2e8f0;flex:0 0 auto',
+      '}',
+      '#' + MODAL_ID + ' .htc-preview span{flex:1 1 auto;font-size:12px;font-weight:800;color:#334155}',
+      '#' + MODAL_ID + ' .htc-preview button{',
+      'flex:0 0 auto;width:32px;height:32px;border:0;border-radius:10px;',
+      'background:#fee2e2;color:#991b1b;font-size:18px;font-weight:900;cursor:pointer;',
+      '}',
+      '#' + MODAL_ID + ' .htc-photo{margin:6px 0 2px}',
+      '#' + MODAL_ID + ' .htc-photo img{',
+      'display:block;max-width:100%;max-height:220px;border-radius:12px;',
+      'object-fit:cover;cursor:zoom-in;background:#e2e8f0;',
+      '}',
+      '#' + MODAL_ID + ' .htc-photo-wait{display:block;font-size:11px;font-weight:800;color:#94a3b8;padding:8px 0}',
+      '#' + MODAL_ID + ' .htc-lightbox{',
+      'position:fixed;inset:0;z-index:100130;display:none;align-items:center;justify-content:center;',
+      'background:rgba(15,23,42,.88);padding:18px;',
+      '}',
+      '#' + MODAL_ID + ' .htc-lightbox.on{display:flex}',
+      '#' + MODAL_ID + ' .htc-lightbox img{',
+      'max-width:min(96vw,920px);max-height:86vh;border-radius:14px;object-fit:contain;',
+      'box-shadow:0 18px 50px rgba(0,0,0,.35);',
+      '}',
+      '#' + MODAL_ID + ' .htc-lightbox-x{',
+      'position:absolute;top:calc(10px + env(safe-area-inset-top,0px));inset-inline-end:14px;',
+      'width:42px;height:42px;border:0;border-radius:12px;background:#1e293b;color:#fff;',
+      'font-size:22px;font-weight:900;cursor:pointer;',
+      '}'
     ].join('');
     if (!document.getElementById('htTajawalFont')) {
       var fontLink = document.createElement('link');
@@ -653,9 +834,27 @@
     return palette[h % palette.length];
   }
 
+  function closeLightbox() {
+    var box = document.getElementById('htcLightbox');
+    if (!box) return;
+    box.classList.remove('on');
+    var img = document.getElementById('htcLightboxImg');
+    if (img) img.removeAttribute('src');
+  }
+
+  function openLightbox(src) {
+    var box = document.getElementById('htcLightbox');
+    var img = document.getElementById('htcLightboxImg');
+    src = safeImageData(src);
+    if (!box || !img || !src) return;
+    img.src = src;
+    box.classList.add('on');
+  }
+
   function closeCompose() {
     var modal = document.getElementById(MODAL_ID);
     if (!modal) return;
+    closeLightbox();
     modal.classList.remove('on');
     modal.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
@@ -680,6 +879,9 @@
             escapeHtml(cp) +
             '/512.webp">'
           : '';
+        var photo = messageHasImage(m)
+          ? '<div class="htc-photo"><span class="htc-photo-wait">جاري تحميل الصورة…</span><img alt="صورة" hidden></div>'
+          : '';
         return (
           '<article class="htc-bubble' +
           (mine ? ' mine' : '') +
@@ -696,6 +898,7 @@
           emoji +
           '<span></span>' +
           '</div>' +
+          photo +
           '<div class="htc-text"></div>' +
           '<div class="htc-time"></div>' +
           '</article>'
@@ -705,8 +908,28 @@
     Array.from(feed.children).forEach(function (el, i) {
       var m = list[i];
       el.querySelector('.htc-meta span').textContent = m.name || 'موظف';
-      el.querySelector('.htc-text').textContent = m.text || '';
+      var textEl = el.querySelector('.htc-text');
+      textEl.textContent = m.text || '';
+      if (!m.text) textEl.style.display = 'none';
       el.querySelector('.htc-time').textContent = formatChatTime(m.approvedAt || m.at);
+      if (messageHasImage(m)) {
+        var photoWrap = el.querySelector('.htc-photo');
+        var imgEl = photoWrap && photoWrap.querySelector('img');
+        var waitEl = photoWrap && photoWrap.querySelector('.htc-photo-wait');
+        loadTickerImage(m.id).then(function (src) {
+          if (!imgEl) return;
+          if (src) {
+            imgEl.src = src;
+            imgEl.hidden = false;
+            if (waitEl) waitEl.remove();
+            imgEl.addEventListener('click', function () {
+              openLightbox(src);
+            });
+          } else if (waitEl) {
+            waitEl.textContent = 'تعذر تحميل الصورة';
+          }
+        });
+      }
     });
     feed.scrollTop = feed.scrollHeight;
   }
@@ -736,8 +959,21 @@
               '<button type="button" id="htcEmpSave">حفظ</button>' +
             '</div>' +
           '</div>' +
+          '<div class="htc-preview" id="htcPreview">' +
+            '<img id="htcPreviewImg" alt="معاينة">' +
+            '<span>صورة جاهزة للإرسال</span>' +
+            '<button type="button" id="htcPreviewClear" aria-label="إزالة الصورة">×</button>' +
+          '</div>' +
           '<div class="htc-composebox">' +
-            '<input type="text" id="htcMsg" maxlength="120" enterkeyhint="send" autocomplete="off" inputmode="text" dir="rtl" placeholder="اكتب رسالة للزملاء…" />' +
+            '<label class="htc-attach" id="htcAttach" title="إرفاق صورة" aria-label="إرفاق صورة">' +
+              '<input type="file" id="htcImgFile" accept="image/*,image/heic,image/heif,.heic,.heif" />' +
+              '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8.5A1.5 1.5 0 1 1 8 5.5 1.5 1.5 0 0 1 8 8.5z"/></svg>' +
+            '</label>' +
+            '<label class="htc-attach htc-cam" id="htcCam" title="التقاط صورة" aria-label="التقاط صورة">' +
+              '<input type="file" id="htcCamFile" accept="image/*" capture="environment" />' +
+              '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm8-9h-2.78l-.91-1.22A2 2 0 0 0 14.76 4.5H9.24a2 2 0 0 0-1.55.78L6.78 6.5H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z"/></svg>' +
+            '</label>' +
+            '<input type="text" id="htcMsg" maxlength="120" enterkeyhint="send" autocomplete="off" inputmode="text" dir="rtl" placeholder="اكتب رسالة أو أرفق صورة…" />' +
             '<button type="button" class="htc-send" id="htcSend">نشر</button>' +
           '</div>' +
           '<div class="htc-toolrow">' +
@@ -777,6 +1013,10 @@
           '</div>' +
           '<div class="htc-status" id="htcStatus" aria-live="polite"></div>' +
         '</div>' +
+        '<div class="htc-lightbox" id="htcLightbox">' +
+          '<button type="button" class="htc-lightbox-x" id="htcLightboxClose" aria-label="إغلاق">×</button>' +
+          '<img id="htcLightboxImg" alt="">' +
+        '</div>' +
       '</div>';
     document.body.appendChild(modal);
 
@@ -784,7 +1024,13 @@
       composeBound = true;
       document.getElementById('htcClose').addEventListener('click', closeCompose);
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modal.classList.contains('on')) closeCompose();
+        if (e.key !== 'Escape' || !modal.classList.contains('on')) return;
+        var box = document.getElementById('htcLightbox');
+        if (box && box.classList.contains('on')) {
+          closeLightbox();
+          return;
+        }
+        closeCompose();
       });
       var msgInput = document.getElementById('htcMsg');
       var countEl = document.getElementById('htcCount');
@@ -795,7 +1041,56 @@
       var idRow = document.getElementById('htcIdRow');
       var empIdInput = document.getElementById('htcEmpId');
       var empIdSave = document.getElementById('htcEmpSave');
+      var attachBtn = document.getElementById('htcAttach');
+      var imgFile = document.getElementById('htcImgFile');
+      var camFile = document.getElementById('htcCamFile');
+      var previewEl = document.getElementById('htcPreview');
+      var previewImg = document.getElementById('htcPreviewImg');
+      var previewClear = document.getElementById('htcPreviewClear');
+      var lightboxEl = document.getElementById('htcLightbox');
+      var lightboxClose = document.getElementById('htcLightboxClose');
+      var composerEl = modal.querySelector('.htc-composer');
+      var pendingImage = '';
       var resolvedEmp = { id: '', name: '' };
+
+      function setPendingImage(dataUrl) {
+        pendingImage = safeImageData(dataUrl);
+        if (previewEl) previewEl.classList.toggle('on', !!pendingImage);
+        if (attachBtn) attachBtn.classList.toggle('on', !!pendingImage);
+        var camBtn = document.getElementById('htcCam');
+        if (camBtn) camBtn.classList.toggle('on', !!pendingImage);
+        if (previewImg) {
+          if (pendingImage) previewImg.src = pendingImage;
+          else previewImg.removeAttribute('src');
+        }
+        if (msgInput) {
+          msgInput.placeholder = pendingImage
+            ? 'تعليق على الصورة (اختياري)…'
+            : 'اكتب رسالة أو أرفق صورة…';
+        }
+      }
+
+      async function pickImageFile(file) {
+        if (!file) return;
+        statusEl.className = 'htc-status';
+        statusEl.textContent = 'جاري تجهيز الصورة…';
+        try {
+          var data = await compressImage(file);
+          setPendingImage(data);
+          statusEl.textContent = 'تم إرفاق الصورة. يمكنك إضافة تعليق ثم الإرسال.';
+        } catch (err) {
+          statusEl.className = 'htc-status err';
+          var why = String((err && err.message) || err || '');
+          statusEl.textContent =
+            why === 'type'
+              ? 'اختر ملف صورة (JPG أو PNG أو من الكاميرا).'
+              : why === 'size'
+                ? 'الصورة كبيرة جداً. جرّب صورة أصغر.'
+                : 'تعذر تجهيز الصورة. جرّب صورة أصغر أو صيغة JPG.';
+        }
+        if (imgFile) imgFile.value = '';
+        if (camFile) camFile.value = '';
+      }
 
       function paintIdentity(r) {
         resolvedEmp = r && r.ok ? { id: r.id, name: r.name || '' } : { id: '', name: '' };
@@ -880,6 +1175,74 @@
       msgInput.addEventListener('input', function () {
         countEl.textContent = String(msgInput.value.length);
       });
+      msgInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendBtn.click();
+        }
+      });
+      if (imgFile) {
+        imgFile.addEventListener('change', function () {
+          pickImageFile(imgFile.files && imgFile.files[0]);
+        });
+      }
+      if (camFile) {
+        camFile.addEventListener('change', function () {
+          pickImageFile(camFile.files && camFile.files[0]);
+        });
+      }
+      if (previewClear) {
+        previewClear.addEventListener('click', function () {
+          setPendingImage('');
+          statusEl.className = 'htc-status';
+          statusEl.textContent = '';
+        });
+      }
+      if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+      if (lightboxEl) {
+        lightboxEl.addEventListener('click', function (ev) {
+          if (ev.target === lightboxEl) closeLightbox();
+        });
+      }
+      function isFileDrag(ev) {
+        var types = ev.dataTransfer && ev.dataTransfer.types;
+        if (!types) return false;
+        for (var i = 0; i < types.length; i++) {
+          if (types[i] === 'Files') return true;
+        }
+        return false;
+      }
+      modal.addEventListener('dragover', function (ev) {
+        if (!isFileDrag(ev)) return;
+        ev.preventDefault();
+        if (composerEl) composerEl.classList.add('drop');
+      });
+      modal.addEventListener('dragleave', function (ev) {
+        if (ev.target === modal || (composerEl && ev.target === composerEl)) {
+          if (composerEl) composerEl.classList.remove('drop');
+        }
+      });
+      modal.addEventListener('drop', function (ev) {
+        if (composerEl) composerEl.classList.remove('drop');
+        var files = ev.dataTransfer && ev.dataTransfer.files;
+        if (!files || !files.length) return;
+        ev.preventDefault();
+        pickImageFile(files[0]);
+      });
+      modal.addEventListener('paste', function (ev) {
+        var items = ev.clipboardData && ev.clipboardData.items;
+        if (!items) return;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i] && items[i].type && items[i].type.indexOf('image/') === 0) {
+            var blob = items[i].getAsFile();
+            if (blob) {
+              ev.preventDefault();
+              pickImageFile(blob);
+            }
+            break;
+          }
+        }
+      });
 
       var emojiBar = document.getElementById('htcEmojis');
       if (emojiBar) {
@@ -924,14 +1287,14 @@
           if (empIdInput) empIdInput.focus();
           return;
         }
-        if (text.length < 3) {
+        if (!pendingImage && text.length < 3) {
           statusEl.className = 'htc-status err';
-          statusEl.textContent = 'اكتب رسالة أوضح (٣ أحرف على الأقل).';
+          statusEl.textContent = 'اكتب رسالة أو أرفق صورة.';
           msgInput.focus();
           return;
         }
         sendBtn.disabled = true;
-        statusEl.textContent = 'جاري الإرسال…';
+        statusEl.textContent = pendingImage ? 'جاري رفع الصورة…' : 'جاري الإرسال…';
         try {
           var store = await readFullStore();
           var needApproval = store.requireApproval !== false;
@@ -945,6 +1308,10 @@
             at: Date.now(),
             status: needApproval ? 'pending' : 'approved'
           };
+          if (pendingImage) {
+            row.img = 1;
+            await writeTickerImage(row.id, pendingImage);
+          }
           if (needApproval) {
             store.pending = [row].concat(store.pending || []).slice(0, 80);
           } else {
@@ -954,6 +1321,7 @@
           await writeFullStore(store);
           msgInput.value = '';
           countEl.textContent = '0';
+          setPendingImage('');
           statusEl.textContent = needApproval
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
             : 'تم النشر.';
@@ -1063,14 +1431,24 @@
   function buildParts(approved, holidays) {
     var ar = lang() === 'ar';
     var parts = [];
-    sortMessagesNewestFirst(approved).forEach(function (m) {
-      if (!m || !m.text) return;
+    sortMessagesNewestFirst(approved)
+      .filter(function (m) {
+        return m && (String(m.text || '').trim() || messageHasImage(m));
+      })
+      .slice(0, 8)
+      .forEach(function (m) {
+      var hasImg = messageHasImage(m);
+      var text = String((m && m.text) || '').trim();
+      if (!m || (!text && !hasImg)) return;
       var c = authorColors(authorKey(m));
+      var label = text || (ar ? 'صورة' : 'Photo');
+      if (hasImg && text) label = '📷 ' + text;
+      else if (hasImg) label = '📷 ' + label;
       var bit =
         '<span class="ht-msg" style="color:' +
         c.ink +
         '">' +
-        escapeHtml(m.text) +
+        escapeHtml(label) +
         '</span>';
       if (m.name) {
         bit +=

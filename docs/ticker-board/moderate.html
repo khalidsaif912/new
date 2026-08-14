@@ -113,6 +113,16 @@
       margin-bottom: 10px;
     }
     .rowText { font-size: 15px; font-weight: 800; line-height: 1.5; margin: 0 0 8px; color: #fef3c7; }
+    .rowPhoto {
+      display: block;
+      max-width: 100%;
+      max-height: 240px;
+      border-radius: 12px;
+      margin: 0 0 10px;
+      object-fit: contain;
+      background: #0f172a;
+    }
+    .rowPhotoWait { font-size: 12px; color: #94a3b8; font-weight: 800; margin: 0 0 10px; }
     .rowMeta { font-size: 12px; color: #7dd3fc; font-weight: 800; margin: 0 0 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
     .rowMeta .metaTime { color: #94a3b8; }
     .rowMeta img { width: 16px; height: 16px; object-fit: contain; flex: 0 0 auto; }
@@ -296,7 +306,9 @@
     var PIN = '912';
     var AUTH_KEY = 'rosterTickerModAuth';
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
+    var MANTLE_IMG_NS = 'https://mantledb.sh/v2/roster-site-visits/ticker-img-';
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var imageCache = Object.create(null);
     var tab = 'messages';
     var filter = 'pending';
     var store = { pending: [], approved: [], showMode: 'both', hidden: false, requireApproval: true };
@@ -338,6 +350,35 @@
 
     function headers() {
       return { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY };
+    }
+
+    function messageHasImage(m) {
+      return !!(m && (m.img === 1 || m.img === true || m.img === '1'));
+    }
+
+    function safeImageData(s) {
+      s = String(s || '').replace(/\s+/g, '');
+      if (/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/i.test(s)) return s;
+      return '';
+    }
+
+    async function loadTickerImage(id) {
+      id = String(id || '');
+      if (!/^t[a-z0-9]{8,32}$/i.test(id)) return '';
+      if (imageCache[id]) return imageCache[id];
+      try {
+        var res = await fetch(MANTLE_IMG_NS + encodeURIComponent(id) + '?ts=' + Date.now(), {
+          headers: headers(),
+          cache: 'no-store'
+        });
+        if (!res.ok) return '';
+        var json = await res.json();
+        var safe = safeImageData(json && json.d);
+        if (safe) imageCache[id] = safe;
+        return safe;
+      } catch (e) {
+        return '';
+      }
     }
 
     async function readStore() {
@@ -461,6 +502,8 @@
         return (
           '<article class="row">' +
             '<p class="rowText"></p>' +
+            '<p class="rowPhotoWait" hidden>جاري تحميل الصورة…</p>' +
+            '<img class="rowPhoto" alt="صورة" hidden>' +
             '<p class="rowMeta"></p>' +
             '<div class="rowActs"></div>' +
           '</article>'
@@ -468,7 +511,23 @@
       }).join('');
       Array.from(list.children).forEach(function (el, i) {
         var m = rows[i];
-        el.querySelector('.rowText').textContent = m.text || '';
+        var textEl = el.querySelector('.rowText');
+        textEl.textContent = m.text || (messageHasImage(m) ? '📷 صورة' : '');
+        if (messageHasImage(m)) {
+          var waitEl = el.querySelector('.rowPhotoWait');
+          var imgEl = el.querySelector('.rowPhoto');
+          if (waitEl) waitEl.hidden = false;
+          loadTickerImage(m.id).then(function (src) {
+            if (waitEl) waitEl.hidden = true;
+            if (src && imgEl) {
+              imgEl.src = src;
+              imgEl.hidden = false;
+            } else if (waitEl) {
+              waitEl.hidden = false;
+              waitEl.textContent = 'تعذر تحميل الصورة';
+            }
+          });
+        }
         var who = [];
         if (m.name) who.push(m.name);
         if (m.empId) who.push('#' + m.empId);
