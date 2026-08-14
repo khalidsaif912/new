@@ -580,6 +580,18 @@
       'left:72px!important;',
       'bottom:calc(48px + env(safe-area-inset-bottom,0px))!important;',
       '}',
+      '#install-banner{',
+      'z-index:100028!important;',
+      '}',
+      'html.has-float-dock #install-banner{',
+      'bottom:calc(76px + env(safe-area-inset-bottom,0px))!important;',
+      '}',
+      'html.has-news-ticker #install-banner{',
+      'bottom:calc(112px + env(safe-area-inset-bottom,0px))!important;',
+      '}',
+      'html.has-news-ticker #pwa-help{',
+      'bottom:calc(40px + env(safe-area-inset-bottom,0px))!important;',
+      '}',
       /* Footer stays above dock + ticker clear zone */
       'html.has-news-ticker .footer,html.has-float-dock .footer{',
       'position:relative;z-index:1!important;isolation:auto;',
@@ -817,6 +829,42 @@
     return null;
   }
 
+  function overlayVisible(el, extraOk) {
+    if (!el || el.hidden) return false;
+    try {
+      var cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return false;
+    } catch (e) {
+      return false;
+    }
+    return extraOk ? !!extraOk(el) : true;
+  }
+
+  function layoutOverlays() {
+    var tickerEl = document.getElementById(TICKER_ID);
+    var tickerOn = !!(tickerEl && tickerEl.classList.contains('on') && !tickerEl.hidden);
+    var fab = document.getElementById('featureNotesFab');
+    var chg = document.getElementById('chg-dot');
+    var abs = document.getElementById('abs-dot');
+    var alertOn =
+      overlayVisible(chg) ||
+      overlayVisible(abs, function (el) {
+        return el.classList.contains('abs-on');
+      });
+    var fabOn = overlayVisible(fab);
+    if (fab) fab.classList.toggle('beside-alert', alertOn);
+    var banner = document.getElementById('install-banner');
+    if (!banner) return;
+    var dock = tickerOn ? 48 : 16;
+    var row = fabOn || alertOn ? 56 : 0;
+    banner.style.setProperty(
+      'bottom',
+      'calc(' + (dock + row + 8) + 'px + env(safe-area-inset-bottom, 0px))',
+      'important'
+    );
+    banner.style.setProperty('z-index', '100028', 'important');
+  }
+
   function layoutTicker(el) {
     if (!el) return;
     // Edge-to-edge bar; alert icons float above it via CSS.
@@ -827,6 +875,7 @@
     el.style.maxWidth = '';
     el.style.bottom = '';
     document.documentElement.classList.toggle('has-news-ticker', el.classList.contains('on') && !el.hidden);
+    layoutOverlays();
   }
 
   function ensureTicker() {
@@ -1425,6 +1474,7 @@
       el.hidden = true;
       el.innerHTML = '';
       document.documentElement.classList.remove('has-news-ticker');
+      layoutOverlays();
       return;
     }
     var joinedHtml = parts.join('<span class="ht-sep">•</span>');
@@ -1593,6 +1643,7 @@
     setInterval(function () {
       var el = document.getElementById(TICKER_ID);
       if (el && el.classList.contains('on')) layoutTicker(el);
+      else layoutOverlays();
     }, 1500);
     // Refresh approved messages periodically
     setInterval(function () {
