@@ -21,6 +21,8 @@
   var staffById = null;
   var emojiListCache = null;
   var composeBound = false;
+  var seenMsgIds = null;
+  var justSentIds = Object.create(null);
 
   function normalizeMode(m) {
     m = String(m || '').trim();
@@ -1397,6 +1399,7 @@
             store.approved = [row].concat(store.approved || []).slice(0, 40);
           }
           await writeFullStore(store);
+          markLocalSend(row.id);
           msgInput.value = '';
           countEl.textContent = '0';
           setPendingImage('');
@@ -1567,6 +1570,62 @@
     return parts;
   }
 
+  function collectMessageIds(store) {
+    var ids = [];
+    function add(list) {
+      (list || []).forEach(function (m) {
+        if (m && m.id) ids.push(String(m.id));
+      });
+    }
+    add(store && store.approved);
+    add(store && store.pending);
+    return ids;
+  }
+
+  function markLocalSend(id) {
+    id = String(id || '');
+    if (!id) return;
+    justSentIds[id] = Date.now();
+    if (!seenMsgIds) seenMsgIds = Object.create(null);
+    seenMsgIds[id] = 1;
+  }
+
+  function noticeIncoming(store) {
+    var ids = collectMessageIds(store);
+    if (!seenMsgIds) {
+      seenMsgIds = Object.create(null);
+      ids.forEach(function (id) {
+        seenMsgIds[id] = 1;
+      });
+      return;
+    }
+    var now = Date.now();
+    Object.keys(justSentIds).forEach(function (id) {
+      if (now - justSentIds[id] > 120000) delete justSentIds[id];
+    });
+    var incoming = 0;
+    ids.forEach(function (id) {
+      if (seenMsgIds[id]) return;
+      seenMsgIds[id] = 1;
+      if (justSentIds[id]) return;
+      incoming += 1;
+    });
+    var seenKeys = Object.keys(seenMsgIds);
+    if (seenKeys.length > 240) {
+      seenKeys.slice(0, seenKeys.length - 180).forEach(function (id) {
+        delete seenMsgIds[id];
+      });
+    }
+    if (!incoming || document.hidden) return;
+    try {
+      if (window.rosterAlertSound) window.rosterAlertSound.play('alert');
+    } catch (e) {}
+    var modal = document.getElementById(MODAL_ID);
+    if (modal && modal.classList.contains('on') && typeof modal._htcRefreshFeed === 'function') {
+      modal._htcRefreshFeed();
+    }
+  }
+
   function loadHolidays() {
     if (holidaysCache) return holidaysCache;
     var url = docsBase() + 'data/oman-holidays.json?v=20260802b';
@@ -1604,6 +1663,7 @@
       if (removed) {
         writeFullStore(store).catch(function () {});
       }
+      noticeIncoming(store);
       if (store.hidden) {
         paintParts([], lang() === 'ar');
         return;
@@ -1623,11 +1683,14 @@
       if (el && el.classList.contains('on')) layoutTicker(el);
       else layoutOverlays();
     }, 1500);
-    // Refresh approved messages periodically
-    setInterval(function () {
-      messagesCache = null;
+    function pollMessages() {
       refresh();
-    }, 60000);
+      setTimeout(pollMessages, document.hidden ? 20000 : 4000);
+    }
+    setTimeout(pollMessages, 4000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) refresh();
+    });
     document.addEventListener('click', function (e) {
       if (e.target && e.target.closest && e.target.closest('#langToggle, #langBtn')) {
         setTimeout(refresh, 50);
