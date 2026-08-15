@@ -871,10 +871,12 @@
       e.stopPropagation();
       openCompose();
     });
-    el.addEventListener('pointerenter', function () {
-      marqueePaused = true;
+    el.addEventListener('mouseenter', function () {
+      try {
+        if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) marqueePaused = true;
+      } catch (e) {}
     });
-    el.addEventListener('pointerleave', function () {
+    el.addEventListener('mouseleave', function () {
       marqueePaused = false;
       marqueeLastTs = 0;
     });
@@ -955,6 +957,8 @@
     modal.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
+    marqueePaused = false;
+    marqueeLastTs = 0;
   }
 
   function renderChatFeed(approved, myId) {
@@ -1486,7 +1490,12 @@
   function stepMarquee(ts) {
     marqueeRaf = requestAnimationFrame(stepMarquee);
     var mq = document.querySelector('#' + TICKER_ID + ' .ht-marquee');
-    if (!mq || !marqueeLoopW || marqueePaused || document.hidden || reducedMotion()) {
+    if (!mq || document.hidden || reducedMotion()) {
+      marqueeLastTs = 0;
+      return;
+    }
+    if (!marqueeLoopW) measureLoop(mq);
+    if (!marqueeLoopW || marqueePaused) {
       marqueeLastTs = 0;
       return;
     }
@@ -1497,12 +1506,17 @@
     var dt = Math.min(48, ts - marqueeLastTs) / 1000;
     marqueeLastTs = ts;
     marqueeOffset += scrollPxPerSec(scrollSpeedCache) * dt;
-    while (marqueeOffset >= marqueeLoopW) marqueeOffset -= marqueeLoopW;
+    while (marqueeLoopW && marqueeOffset >= marqueeLoopW) marqueeOffset -= marqueeLoopW;
     mq.style.transform = 'translate3d(' + (marqueeOffset - marqueeLoopW) + 'px,0,0)';
   }
 
   function startMarquee() {
     if (reducedMotion()) return;
+    try {
+      if (!(window.matchMedia && window.matchMedia('(pointer: fine)').matches)) marqueePaused = false;
+    } catch (e) {
+      marqueePaused = false;
+    }
     if (!marqueeRaf) marqueeRaf = requestAnimationFrame(stepMarquee);
   }
 
@@ -1546,20 +1560,27 @@
     }
     var keep = marqueeOffset;
     lastPaintKey = key;
+    el.hidden = false;
+    el.classList.add('on');
+    el.setAttribute('dir', 'ltr');
     el.innerHTML =
       '<div class="ht-track" id="htOpenTrack" dir="ltr"><div class="ht-marquee" dir="ltr"></div></div>';
     mq = el.querySelector('.ht-marquee');
     var track = el.querySelector('.ht-track');
-    fillMarqueeCopies(mq, unit, track ? track.clientWidth : 360);
+    layoutTicker(el);
+    fillMarqueeCopies(mq, unit, (track && track.clientWidth) || window.innerWidth || 360);
     if (marqueeLoopW) marqueeOffset = keep % marqueeLoopW;
     el.title = plain + (ar ? ' — اضغط للكتابة' : ' — Tap to write');
     el.setAttribute('role', 'button');
     el.setAttribute('aria-label', ar ? 'فتح كتابة رسالة للشريط' : 'Open ticker message compose');
-    el.hidden = false;
-    el.classList.add('on');
-    layoutTicker(el);
-    el.setAttribute('dir', 'ltr');
     startMarquee();
+    requestAnimationFrame(function () {
+      var live = el.querySelector('.ht-marquee');
+      if (!live) return;
+      measureLoop(live);
+      if (marqueeLoopW) marqueeOffset = keep % marqueeLoopW;
+      startMarquee();
+    });
   }
 
   function emojiImgHtml(cp) {
@@ -1757,7 +1778,14 @@
     }
     setTimeout(pollMessages, 4000);
     document.addEventListener('visibilitychange', function () {
+      marqueePaused = false;
+      marqueeLastTs = 0;
       if (!document.hidden) refresh();
+    });
+    window.addEventListener('resize', function () {
+      var mq = document.querySelector('#' + TICKER_ID + ' .ht-marquee');
+      measureLoop(mq);
+      marqueeLastTs = 0;
     });
     document.addEventListener('click', function (e) {
       if (e.target && e.target.closest && e.target.closest('#langToggle, #langBtn')) {
