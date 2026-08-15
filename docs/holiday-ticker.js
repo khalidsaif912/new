@@ -23,6 +23,12 @@
   var composeBound = false;
   var seenMsgIds = null;
   var justSentIds = Object.create(null);
+  var lastPaintKey = '';
+  var marqueeOffset = 0;
+  var marqueeLastTs = 0;
+  var marqueeLoopW = 0;
+  var marqueeRaf = 0;
+  var marqueePaused = false;
 
   function normalizeMode(m) {
     m = String(m || '').trim();
@@ -45,9 +51,9 @@
     return 'slow';
   }
 
-  function scrollSeconds(s) {
-    var map = { crawl: 160, slower: 110, slow: 80, medium: 50, fast: 28, faster: 16 };
-    return map[normalizeScrollSpeed(s)] || 80;
+  function scrollPxPerSec(s) {
+    var map = { crawl: 16, slower: 24, slow: 38, medium: 56, fast: 82, faster: 118 };
+    return map[normalizeScrollSpeed(s)] || 38;
   }
 
   function normalizeExpireHours(v) {
@@ -604,21 +610,17 @@
       '#' + TICKER_ID + ' .ht-marquee{',
       'display:inline-flex;flex-wrap:nowrap;align-items:center;white-space:nowrap;',
       'padding:0;direction:ltr;font-size:12px;font-weight:800;color:#1c1917;line-height:1.3;',
-      'letter-spacing:0;animation:htScroll 80s linear infinite;',
-      'animation-direction:normal;will-change:transform;',
+      'letter-spacing:0;will-change:transform;backface-visibility:hidden;',
+      'transform:translate3d(0,0,0);',
       '}',
       '#' + TICKER_ID + ' .ht-loop{flex:0 0 auto;white-space:nowrap;direction:ltr}',
-      'html[dir="rtl"] #' + TICKER_ID + ' .ht-marquee,body.ar #' + TICKER_ID + ' .ht-marquee{',
-      'animation-name:htScroll;animation-direction:normal;',
-      '}',
       '#' + TICKER_ID + ' .ht-msg{font-weight:900;unicode-bidi:isolate}',
       '#' + TICKER_ID + ' .ht-from{font-weight:800;display:inline-flex;align-items:center;gap:3px;vertical-align:middle;unicode-bidi:isolate}',
       '#' + TICKER_ID + ' .ht-emoji{width:14px;height:14px;object-fit:contain;flex:0 0 auto;display:inline-block;vertical-align:-2px}',
       '#' + TICKER_ID + ' .ht-sep{color:#94a3b8;opacity:.9;margin:0 .3em}',
       '#' + TICKER_ID + ' .ht-hol{color:#9a3412;font-weight:800}',
       '#' + TICKER_ID + ' .ht-label{color:#9a3412;font-weight:900;margin-inline-end:6px}',
-      '@keyframes htScroll{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}',
-      '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{animation:none;transform:none}}',
+      '@media (prefers-reduced-motion:reduce){#' + TICKER_ID + ' .ht-marquee{transform:none!important}}',
       'html.has-float-dock .wrap,html.has-news-ticker .wrap{',
       'padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}',
       'html.has-float-dock .footer,html.has-news-ticker .footer{',
@@ -863,6 +865,19 @@
     el.id = TICKER_ID;
     el.setAttribute('role', 'status');
     el.setAttribute('aria-live', 'polite');
+    el.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('#' + MODAL_ID)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openCompose();
+    });
+    el.addEventListener('pointerenter', function () {
+      marqueePaused = true;
+    });
+    el.addEventListener('pointerleave', function () {
+      marqueePaused = false;
+      marqueeLastTs = 0;
+    });
     document.body.appendChild(el);
     return el;
   }
@@ -1448,10 +1463,68 @@
       });
   }
 
+  function reducedMotion() {
+    try {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function stopMarquee() {
+    if (marqueeRaf) cancelAnimationFrame(marqueeRaf);
+    marqueeRaf = 0;
+    marqueeLastTs = 0;
+  }
+
+  function measureLoop(mq) {
+    var unit = mq && mq.querySelector('.ht-loop');
+    marqueeLoopW = unit ? unit.getBoundingClientRect().width : 0;
+    return marqueeLoopW;
+  }
+
+  function stepMarquee(ts) {
+    marqueeRaf = requestAnimationFrame(stepMarquee);
+    var mq = document.querySelector('#' + TICKER_ID + ' .ht-marquee');
+    if (!mq || !marqueeLoopW || marqueePaused || document.hidden || reducedMotion()) {
+      marqueeLastTs = 0;
+      return;
+    }
+    if (!marqueeLastTs) {
+      marqueeLastTs = ts;
+      return;
+    }
+    var dt = Math.min(48, ts - marqueeLastTs) / 1000;
+    marqueeLastTs = ts;
+    marqueeOffset += scrollPxPerSec(scrollSpeedCache) * dt;
+    while (marqueeOffset >= marqueeLoopW) marqueeOffset -= marqueeLoopW;
+    mq.style.transform = 'translate3d(' + (marqueeOffset - marqueeLoopW) + 'px,0,0)';
+  }
+
+  function startMarquee() {
+    if (reducedMotion()) return;
+    if (!marqueeRaf) marqueeRaf = requestAnimationFrame(stepMarquee);
+  }
+
+  function fillMarqueeCopies(mq, unit, minWidth) {
+    mq.innerHTML = '<span class="ht-loop">' + unit + '</span>';
+    var w = measureLoop(mq) || 1;
+    var copies = Math.min(8, Math.max(2, Math.ceil((Math.max(minWidth, 1) * 2) / w) + 1));
+    var html = '';
+    var i;
+    for (i = 0; i < copies; i++) {
+      html += '<span class="ht-loop"' + (i ? ' aria-hidden="true"' : '') + '>' + unit + '</span>';
+    }
+    mq.innerHTML = html;
+    measureLoop(mq);
+  }
+
   function paintParts(parts, ar) {
     injectStyles();
     var el = ensureTicker();
     if (!parts || !parts.length) {
+      lastPaintKey = '';
+      stopMarquee();
       el.classList.remove('on');
       el.hidden = true;
       el.innerHTML = '';
@@ -1464,11 +1537,21 @@
       return String(p).replace(/<[^>]+>/g, '');
     }).join('  •  ');
     var unit = joinedHtml + '<span class="ht-sep">•</span>';
+    var key = unit + '|' + (ar ? 'ar' : 'en');
+    var mq = el.querySelector('.ht-marquee');
+    if (key === lastPaintKey && mq) {
+      measureLoop(mq);
+      startMarquee();
+      return;
+    }
+    var keep = marqueeOffset;
+    lastPaintKey = key;
     el.innerHTML =
-      '<div class="ht-track" id="htOpenTrack" dir="ltr"><div class="ht-marquee" dir="ltr">' +
-      '<span class="ht-loop">' + unit + '</span>' +
-      '<span class="ht-loop" aria-hidden="true">' + unit + '</span>' +
-      '</div></div>';
+      '<div class="ht-track" id="htOpenTrack" dir="ltr"><div class="ht-marquee" dir="ltr"></div></div>';
+    mq = el.querySelector('.ht-marquee');
+    var track = el.querySelector('.ht-track');
+    fillMarqueeCopies(mq, unit, track ? track.clientWidth : 360);
+    if (marqueeLoopW) marqueeOffset = keep % marqueeLoopW;
     el.title = plain + (ar ? ' — اضغط للكتابة' : ' — Tap to write');
     el.setAttribute('role', 'button');
     el.setAttribute('aria-label', ar ? 'فتح كتابة رسالة للشريط' : 'Open ticker message compose');
@@ -1476,19 +1559,7 @@
     el.classList.add('on');
     layoutTicker(el);
     el.setAttribute('dir', 'ltr');
-    var mq = el.querySelector('.ht-marquee');
-    if (mq) mq.style.animationDuration = scrollSeconds(scrollSpeedCache) + 's';
-    function onOpen(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openCompose();
-    }
-    var track = document.getElementById('htOpenTrack');
-    if (track) track.addEventListener('click', onOpen);
-    el.onclick = function (e) {
-      if (e.target && e.target.closest && e.target.closest('#' + MODAL_ID)) return;
-      onOpen(e);
-    };
+    startMarquee();
   }
 
   function emojiImgHtml(cp) {
