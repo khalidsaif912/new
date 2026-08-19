@@ -18,6 +18,7 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_ICON_CSS,
     CHIP_MORNING_HTML,
     CHIP_NIGHT_HTML,
+    CHIP_READ_SIGN_HTML,
     CHIP_SCHEDULE_HTML,
     CHIP_TRAINING_HTML,
     CHIP_WAVE_HTML,
@@ -1029,6 +1030,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     a.summaryChip.trainingChip:hover {{ box-shadow:0 8px 20px rgba(124,58,237,.18); }}
     a.summaryChip.diffChip .chipVal {{ color:#ef4444; }}
     a.summaryChip.diffChip:hover {{ box-shadow:0 8px 20px rgba(239,68,68,.18); }}
+    a.summaryChip.readSignChip .chipVal {{ color:#0f766e; }}
+    a.summaryChip.readSignChip:hover {{ box-shadow:0 8px 20px rgba(15,118,110,.18); }}
     .summaryChip {{
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -1601,6 +1604,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
   <!-- ════ SUMMARY CHIPS ════ -->
   <div class="summaryBar">
+    <a href="{pages_base}/read-and-sign/" id="readSignChipBtn" class="summaryChip readSignChip" style="text-decoration:none;">
+      {CHIP_READ_SIGN_HTML}
+      <div class="chipLabel" data-key="readSignPage">Read&amp;Sign</div>
+    </a>
     <div class="summaryChip" id="summarySwitchChip">
       <div class="chipVal" id="summarySwitchVal">{employees_total}</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
@@ -2574,7 +2581,7 @@ var T = {{
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
   ar: {{
@@ -2587,7 +2594,7 @@ var T = {{
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }}
 }};
@@ -2641,6 +2648,7 @@ function applyLang(lang) {{
     else if(k==='importRoster') el.textContent=t.importRoster;
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
+    else if(k==='readSignPage') el.textContent=t.readSignPage;
   }});
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) {{ el.textContent=t.total; }});
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -2723,11 +2731,13 @@ function setSummaryChipHrefs() {{
   var imp = document.getElementById('importBtn');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
+  var readSign = document.getElementById('readSignChipBtn');
   var welcome = document.getElementById('welcomeChip');
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
   if (trn) trn.href = base + '/training/';
   if (diff) diff.href = base + '/roster-diff/index.html';
+  if (readSign) readSign.href = base + '/read-and-sign/';
   if (welcome) {{
     var wid = localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId');
     var wbase = base + '/my-schedules/index.html';

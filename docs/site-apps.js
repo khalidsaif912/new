@@ -90,7 +90,7 @@
       alumni: 'زملاء سابقون',
       ideas: 'اقتراحات وأفكار',
       ideasSub: 'شارك فكرتك وقيّم الموقع',
-      readSign: 'Read and Sign',
+      readSign: 'إقرار',
       readSignSub: 'التعميمات والإقرار',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
@@ -269,6 +269,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
+    ensureReadSignSummaryChip();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
@@ -288,6 +289,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
+    ensureReadSignSummaryChip();
     organizeAppsGrid();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -657,6 +659,34 @@
     if (ico) ico.innerHTML = iconForApp('readSign');
   }
 
+  function ensureReadSignSummaryChip() {
+    if (/\/import(\/|$)/.test(location.pathname || '')) return;
+    var bar = document.querySelector('.summaryBar');
+    if (!bar) return;
+    var href = readSignPageUrl();
+    var existing = document.getElementById('readSignChipBtn');
+    if (!existing) {
+      existing = document.createElement('a');
+      existing.id = 'readSignChipBtn';
+      existing.className = 'summaryChip readSignChip';
+      existing.style.textDecoration = 'none';
+      existing.setAttribute('data-open-same', '1');
+      existing.innerHTML =
+        '<div class="chipVal">' +
+        '<svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+        '<path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>' +
+        '</div>' +
+        '<div class="chipLabel" data-key="readSignPage">' +
+        (lang() === 'ar' ? 'إقرار' : 'Read&Sign') +
+        '</div>';
+      bar.insertBefore(existing, bar.firstChild);
+    }
+    existing.href = href;
+    var label = existing.querySelector('.chipLabel');
+    if (label) label.textContent = lang() === 'ar' ? 'إقرار' : 'Read&Sign';
+  }
+
   function removeFlightsAppLink() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
@@ -758,6 +788,8 @@
     ensureBookAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
+    ensureReadSignAppLink();
+    ensureReadSignSummaryChip();
     organizeAppsGrid();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
@@ -875,6 +907,8 @@
       '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
+      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      'a.summaryChip.readSignChip .chipVal{color:#0f766e;}',
       '.siteAppsCloseWrap{margin-top:4px!important;flex-shrink:0;}',
       '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:42px;padding-top:9px;padding-bottom:9px;border-radius:14px!important;}',
       '@media (hover:hover){.siteAppsLink:hover{transform:translateY(-2px)!important;box-shadow:0 10px 22px rgba(15,23,42,.1)!important;}}',
@@ -1148,6 +1182,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
+    ensureReadSignSummaryChip();
     organizeAppsGrid();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {

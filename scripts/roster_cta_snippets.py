@@ -1262,7 +1262,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§Ã˜Âª'"
 
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
-IOS_PERF_VER = "20260728c"
+IOS_PERF_VER = "20260819a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {

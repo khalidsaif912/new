@@ -93,22 +93,14 @@ def patch_file(path: Path) -> bool:
             )
             changed = True
 
-    chip = CHIP_HTML.replace("{BASE}", "https://khalidsaif912.github.io/roster-site")
+    chip = CHIP_HTML.replace("{BASE}", "https://khalidsaif912.github.io/new/docs")
     if 'id="readSignChipBtn"' not in text:
-        if 'id="ideasChipBtn"' in text:
-            text2, n = re.subn(
-                r'(<a href="[^"]*" id="ideasChipBtn"[\s\S]*?</a>)',
-                r"\1\n" + chip,
-                text,
-                count=1,
-            )
-        else:
-            text2, n = re.subn(
-                r'(<a href="[^"]*" id="diffChipBtn"[\s\S]*?</a>)',
-                r"\1\n" + chip,
-                text,
-                count=1,
-            )
+        text2, n = re.subn(
+            r'(<div class="summaryBar">\s*)',
+            r"\1" + chip,
+            text,
+            count=1,
+        )
         if n:
             text = text2
             changed = True
@@ -116,6 +108,9 @@ def patch_file(path: Path) -> bool:
     # i18n keys
     if "readSignPage:'Read&Sign'" not in text and "ideasPage:'Ideas'" in text:
         text = text.replace("ideasPage:'Ideas'", "ideasPage:'Ideas', readSignPage:'Read&Sign'", 1)
+        changed = True
+    elif "readSignPage:'Read&Sign'" not in text and "diffPage:'Diff'" in text:
+        text = text.replace("diffPage:'Diff'", "diffPage:'Diff', readSignPage:'Read&Sign'", 1)
         changed = True
     if "readSignPage:'إقرار'" not in text and "ideasPage:'أفكار'" in text:
         text = text.replace("ideasPage:'أفكار'", "ideasPage:'أفكار', readSignPage:'إقرار'", 1)
