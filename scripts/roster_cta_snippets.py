@@ -330,8 +330,6 @@ CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       position:relative;
     }
     a.summaryChip.trainingChip .trainingNewPill{display:none!important}
-    50%{opacity:.4}
-    }
     a.summaryChip.trainingChip .chipLabel::after{
       content:none !important;
       display:none !important;
@@ -1292,7 +1290,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/change-alert.js?v=20260814s');
     addScript(root + '/holiday-ticker.js?v=20260814r');
     addScript(root + '/feature-update-badge.js?v=20260814k');
-    addScript(root + '/training-new-badge.js?v=20260729h');
+    addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }
@@ -1331,7 +1329,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/change-alert.js?v=20260814s');
     addScript(root + '/holiday-ticker.js?v=20260814r');
     addScript(root + '/feature-update-badge.js?v=20260814k');
-    addScript(root + '/training-new-badge.js?v=20260729h');
+    addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-changer.js?v=' + ver);
   }

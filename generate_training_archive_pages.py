@@ -5,7 +5,7 @@ import argparse
 import html as html_module
 import json
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
@@ -2186,7 +2186,7 @@ def render_month_page(data: dict, selected: str, in_archive: bool) -> str:
 </div>
 <script>{PAGE_JS}</script>
 <script defer src="{share_script_src(in_archive)}"></script>
-<script defer src="{'../../training-new-badge.js?v=20260729h' if in_archive else '../training-new-badge.js?v=20260729h'}"></script>
+<script defer src="{'../../training-new-badge.js?v=20260819n' if in_archive else '../training-new-badge.js?v=20260819n'}"></script>
 </body>
 </html>
 '''
@@ -2468,6 +2468,32 @@ def render_cup_of_book_page() -> str:
 </html>'''
 
 
+def update_new_list_stamp(out_dir: Path, latest: str) -> None:
+    """Record when a new monthly list appears so the home Training chip can show New for 3 days."""
+    stamp_path = out_dir / "new-list.json"
+    prev: dict = {}
+    if stamp_path.exists():
+        try:
+            loaded = json.loads(stamp_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                prev = loaded
+        except Exception:
+            prev = {}
+    if prev.get("month_id") == latest and prev.get("published"):
+        payload = {
+            "month_id": latest,
+            "published": prev["published"],
+            "days": 3,
+        }
+    else:
+        payload = {
+            "month_id": latest,
+            "published": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "days": 3,
+        }
+    stamp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def build_site(data: dict, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     archive = out_dir / "archive"
@@ -2481,8 +2507,7 @@ def build_site(data: dict, out_dir: Path) -> None:
     cup_dir = out_dir / "a-cup-of-book"
     cup_dir.mkdir(parents=True, exist_ok=True)
     (cup_dir / "index.html").write_text(render_cup_of_book_page(), encoding="utf-8")
-    # silence unused if needed
-    _ = latest
+    update_new_list_stamp(out_dir, latest)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate archive pages site")

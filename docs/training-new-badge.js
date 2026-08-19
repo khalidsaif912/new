@@ -1,22 +1,18 @@
 /**
- * Small "New" badge on homepage Training chip until 1 Aug 2026.
- * Blink is driven by JS (not CSS keyframes) so page CSS cannot kill it.
+ * "New" / "جديد" on the Training chip for 3 days after a new monthly list.
+ * Stamp: /training/new-list.json  (written by generate_training_archive_pages.py)
  */
 (function () {
   'use strict';
 
-  var HIDE_FROM = 20260801;
   var PILL_ID = 'trainingNewPillForce';
   var DATE_ID = 'dateTagNewForce';
   var STYLE_ID = 'trainingNewPillForceCss';
   var BLINK_MS = 500;
   var blinkOn = true;
   var blinkTimer = null;
-
-  function stampNow() {
-    var d = new Date();
-    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  }
+  var stampCache = null;
+  var fetchStarted = false;
 
   function isAr() {
     try {
@@ -25,6 +21,33 @@
     } catch (e) {}
     return (document.documentElement.lang || '').toLowerCase().indexOf('ar') === 0 ||
       document.body.classList.contains('ar');
+  }
+
+  function stampUrl() {
+    if (typeof getSiteRootUrl === 'function') {
+      return getSiteRootUrl() + '/training/new-list.json';
+    }
+    var path = location.pathname || '';
+    if (/\/training\/archive(\/|$)/i.test(path)) return '../../training/new-list.json';
+    if (/\/training(\/|$)/i.test(path)) return 'new-list.json';
+    return 'training/new-list.json';
+  }
+
+  function parsePublished(raw) {
+    if (!raw) return NaN;
+    var s = String(raw).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) s += 'T00:00:00';
+    var t = Date.parse(s);
+    return t;
+  }
+
+  function isFresh(stamp) {
+    if (!stamp || !stamp.published) return false;
+    var start = parsePublished(stamp.published);
+    if (!isFinite(start)) return false;
+    var days = Number(stamp.days);
+    if (!isFinite(days) || days <= 0) days = 3;
+    return Date.now() < start + days * 24 * 60 * 60 * 1000;
   }
 
   function unwrapSlot() {
@@ -41,37 +64,20 @@
     s.id = STYLE_ID;
     s.textContent = [
       '.summaryBar{overflow:visible!important;}',
-      '#trainingBtn.summaryChip{',
-      'position:relative!important;overflow:visible!important;',
-      '}',
+      '#trainingBtn.summaryChip{position:relative!important;overflow:visible!important;}',
       '#' + PILL_ID + '{',
-      'position:absolute!important;',
-      'top:-7px!important;',
-      'inset-inline-end:-6px!important;',
-      'left:auto!important;right:auto!important;',
-      'z-index:20!important;',
-      'display:inline-flex!important;',
-      'align-items:center!important;',
-      'justify-content:center!important;',
-      'visibility:visible!important;',
-      'min-width:0!important;',
-      'height:auto!important;',
-      'padding:2px 6px!important;',
-      'border-radius:999px!important;',
-      'background:linear-gradient(135deg,#fb923c,#ea580c)!important;',
-      'color:#fff!important;',
-      'font-size:8px!important;',
-      'font-weight:900!important;',
-      'line-height:1.1!important;',
-      'letter-spacing:.02em!important;',
-      'white-space:nowrap!important;',
-      'text-transform:none!important;',
-      'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;',
-      'pointer-events:none!important;',
+      'position:absolute!important;top:-7px!important;inset-inline-end:-6px!important;',
+      'left:auto!important;right:auto!important;z-index:40!important;',
+      'display:inline-flex!important;align-items:center!important;justify-content:center!important;',
+      'visibility:visible!important;min-width:0!important;height:auto!important;',
+      'padding:2px 6px!important;border-radius:999px!important;',
+      'background:linear-gradient(135deg,#fb923c,#ea580c)!important;color:#fff!important;',
+      'font-size:8px!important;font-weight:900!important;line-height:1.1!important;',
+      'letter-spacing:.02em!important;white-space:nowrap!important;text-transform:none!important;',
+      'box-shadow:0 2px 6px rgba(234,88,12,.35)!important;pointer-events:none!important;',
       '}',
       'html[dir="rtl"] #' + PILL_ID + ',body.ar #' + PILL_ID + '{',
-      'inset-inline-end:auto!important;',
-      'inset-inline-start:-6px!important;',
+      'inset-inline-end:auto!important;inset-inline-start:-6px!important;',
       '}',
       '#trainingBtn .trainingNewPill{display:none!important}',
       '#trainingChipSlot{display:contents!important}',
@@ -109,16 +115,20 @@
     }
   }
 
+  function hideBadges() {
+    stopBlink();
+    var pill = document.getElementById(PILL_ID);
+    if (pill) pill.remove();
+    var dateBadge = document.getElementById(DATE_ID);
+    if (dateBadge) dateBadge.remove();
+    var btn = document.getElementById('trainingBtn');
+    if (btn) btn.classList.add('is-new-off');
+  }
+
   function paintHomeBadge() {
     var btn = document.getElementById('trainingBtn');
     if (!btn) return;
     unwrapSlot();
-    if (stampNow() >= HIDE_FROM) {
-      var old = document.getElementById(PILL_ID);
-      if (old) old.remove();
-      btn.classList.add('is-new-off');
-      return;
-    }
     injectCss();
     btn.classList.remove('is-new-off');
     var pill = document.getElementById(PILL_ID);
@@ -137,7 +147,7 @@
       var rtl = isAr() || (document.documentElement.dir || '') === 'rtl';
       pill.setAttribute(
         'style',
-        'position:absolute!important;top:-7px!important;z-index:20!important;' +
+        'position:absolute!important;top:-7px!important;z-index:40!important;' +
           (rtl ? 'left:-6px!important;right:auto!important;' : 'right:-6px!important;left:auto!important;') +
           'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
           'visibility:visible!important;padding:2px 6px!important;border-radius:999px!important;' +
@@ -154,15 +164,9 @@
   function paintTrainingDateBadge() {
     var dateTag = document.querySelector('.dateTag');
     if (!dateTag) return;
-    if (stampNow() >= HIDE_FROM) {
-      var gone = document.getElementById(DATE_ID);
-      if (gone) gone.remove();
-      return;
-    }
-    injectCss();
     var onTraining = /\/training(\/|$)/i.test(location.pathname || '');
     if (!onTraining) return;
-
+    injectCss();
     var badge = document.getElementById(DATE_ID);
     var created = false;
     if (!badge) {
@@ -197,16 +201,48 @@
     ensureBlink();
   }
 
+  function applyStamp(stamp) {
+    stampCache = stamp;
+    if (!isFresh(stamp)) {
+      hideBadges();
+      return;
+    }
+    paintHomeBadge();
+    paintTrainingDateBadge();
+  }
+
+  function loadStamp(cb) {
+    if (stampCache) {
+      cb(stampCache);
+      return;
+    }
+    if (fetchStarted) return;
+    fetchStarted = true;
+    var url = stampUrl() + (stampUrl().indexOf('?') >= 0 ? '&' : '?') + 'ts=' + Date.now();
+    fetch(url, { cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('stamp ' + res.status);
+        return res.json();
+      })
+      .then(function (j) {
+        fetchStarted = false;
+        cb(j || {});
+      })
+      .catch(function () {
+        fetchStarted = false;
+        cb(null);
+      });
+  }
+
   function run() {
     try {
-      if (stampNow() >= HIDE_FROM) {
-        stopBlink();
-        paintHomeBadge();
-        paintTrainingDateBadge();
-        return;
-      }
-      paintHomeBadge();
-      paintTrainingDateBadge();
+      loadStamp(function (stamp) {
+        if (!stamp) {
+          hideBadges();
+          return;
+        }
+        applyStamp(stamp);
+      });
     } catch (e) {}
   }
 
@@ -218,7 +254,7 @@
   setTimeout(run, 200);
   setTimeout(run, 800);
   setTimeout(run, 2000);
-  setInterval(run, 5000);
+  setInterval(run, 60000);
   window.addEventListener('storage', function (e) {
     if (!e || e.key === 'rosterLang') run();
   });

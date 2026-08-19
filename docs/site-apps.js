@@ -1209,7 +1209,7 @@
       if (document.querySelector('script[data-training-new-badge="1"]')) return;
       var root = typeof getSiteRootUrl === 'function' ? getSiteRootUrl() : '';
       var s = document.createElement('script');
-      s.src = root + '/training-new-badge.js?v=20260729h';
+      s.src = root + '/training-new-badge.js?v=20260819n';
       s.defer = true;
       s.setAttribute('data-training-new-badge', '1');
       document.head.appendChild(s);
