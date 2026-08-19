@@ -1,311 +1,248 @@
 {
   "kind": "export",
   "month": "2026-08",
-  "generated_at": "2026-08-11T06:31:35.217891Z",
-  "old_file": "Operation Roster August 2026 Version 2.xlsx",
-  "new_file": "Operation Roster August 2026 Version 3.xlsx",
-  "total_changes": 43,
+  "generated_at": "2026-08-19T08:28:41.314639Z",
+  "old_file": "Operation Roster August 2026 Version 3.xlsx",
+  "new_file": "Operation Roster August 2026 Version 4.xlsx",
+  "total_changes": 34,
   "changes": [
     {
-      "emp_id": "name:Abdullah Al Shukeili - 82645",
-      "name": "Abdullah Al Shukeili - 82645",
-      "day": 21,
-      "v1": "AE14",
-      "v2": "ME06"
+      "emp_id": "name:Ahmed Al Bakari - 81832",
+      "name": "Ahmed Al Bakari - 81832",
+      "day": 22,
+      "v1": "ME06",
+      "v2": "NE22"
     },
     {
-      "emp_id": "name:Ahmed Al Balushi - 82415",
-      "name": "Ahmed Al Balushi - 82415",
-      "day": 17,
+      "emp_id": "name:Ali Yousuf Al Balushi - 990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
+      "day": 12,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
+      "emp_id": "name:Ali Yousuf Al Balushi - 990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
+      "day": 13,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Bushra Al Wahiebi - 82657",
+      "name": "Bushra Al Wahiebi - 82657",
+      "day": 21,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Bushra Al Wahiebi - 82657",
+      "name": "Bushra Al Wahiebi - 82657",
+      "day": 22,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Dawood Al Siyabi - 82672",
+      "name": "Dawood Al Siyabi - 82672",
+      "day": 22,
+      "v1": "AE14",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Ghaith al Habsi - 82439",
+      "name": "Ghaith al Habsi - 82439",
+      "day": 19,
+      "v1": "ME06",
+      "v2": "AE14"
+    },
+    {
+      "emp_id": "name:Ghaith al Habsi - 82439",
+      "name": "Ghaith al Habsi - 82439",
+      "day": 28,
+      "v1": "ME06",
+      "v2": "NE22"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 18,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 19,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 20,
+      "v1": "ME06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 21,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 22,
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 23,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 24,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
+      "day": 25,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
       "day": 26,
       "v1": "AE14",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
       "day": 27,
-      "v1": "AE14",
+      "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
+      "emp_id": "name:Hosni Al Sulti - 80695",
+      "name": "Hosni Al Sulti - 80695",
       "day": 28,
       "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
-      "day": 29,
+      "emp_id": "name:Khalid Al Raqadi - 8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 18,
+      "v1": "ME06",
+      "v2": "AE14"
+    },
+    {
+      "emp_id": "name:Khalid Al Raqadi - 8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 20,
+      "v1": "NE22",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Marlon Esmilla - 80270",
+      "name": "Marlon Esmilla - 80270",
+      "day": 27,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Hashmi - 82616",
-      "name": "Ahmed Al Hashmi - 82616",
-      "day": 30,
+      "emp_id": "name:Marlon Esmilla - 80270",
+      "name": "Marlon Esmilla - 80270",
+      "day": 28,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Ahmed Al Mawali - 82283",
-      "name": "Ahmed Al Mawali - 82283",
-      "day": 22,
-      "v1": "ME06",
-      "v2": "NE22"
-    },
-    {
-      "emp_id": "name:Ali Al Mamari - 82574",
-      "name": "Ali Al Mamari - 82574",
-      "day": 21,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Ali Al Mamari - 82574",
-      "name": "Ali Al Mamari - 82574",
-      "day": 22,
+      "emp_id": "name:Mohamed Al Falahi - 8762",
+      "name": "Mohamed Al Falahi - 8762",
+      "day": 25,
       "v1": "NE22",
-      "v2": "LV"
+      "v2": "ME06"
     },
     {
-      "emp_id": "name:Ali Al Marjubi - 82577",
-      "name": "Ali Al Marjubi - 82577",
-      "day": 30,
-      "v1": "ME06",
-      "v2": "NE22"
-    },
-    {
-      "emp_id": "name:Badar Al Fulaiti - 82468",
-      "name": "Badar Al Fulaiti - 82468",
+      "emp_id": "name:Mohamed Al Mamari - 82674",
+      "name": "Mohamed Al Mamari - 82674",
       "day": 25,
       "v1": "ME06",
       "v2": "AE14"
     },
     {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
+      "emp_id": "name:Mohamed Al Maskari - 82661",
+      "name": "Mohamed Al Maskari - 82661",
+      "day": 18,
+      "v1": "NE22",
+      "v2": "ME06"
+    },
+    {
+      "emp_id": "name:Muadh Al Qasim - 82534",
+      "name": "Muadh Al Qasim - 82534",
+      "day": 23,
+      "v1": "AE14",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Muadh Al Qasim - 82534",
+      "name": "Muadh Al Qasim - 82534",
       "day": 24,
-      "v1": "AE14",
+      "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
+      "emp_id": "name:Muadh Al Qasim - 82534",
+      "name": "Muadh Al Qasim - 82534",
       "day": 25,
-      "v1": "AE14",
+      "v1": "ME06",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
+      "emp_id": "name:Muadh Al Qasim - 82534",
+      "name": "Muadh Al Qasim - 82534",
       "day": 26,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
-      "day": 27,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
-      "day": 28,
       "v1": "NE22",
       "v2": "LV"
     },
     {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
-      "day": 29,
-      "v1": "OFF",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
-      "day": 30,
-      "v1": "OFF",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Badar Al Hamadani - 81307",
-      "name": "Badar Al Hamadani - 81307",
-      "day": 31,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Habib Al Balushi - 82600",
-      "name": "Habib Al Balushi - 82600",
-      "day": 24,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Jaafar Al Balushi - 81258",
-      "name": "Jaafar Al Balushi - 81258",
-      "day": 24,
-      "v1": "ME06",
-      "v2": "NE22"
-    },
-    {
-      "emp_id": "name:Jay Macalino - 80250",
-      "name": "Jay Macalino - 80250",
-      "day": 26,
-      "v1": "AN13",
-      "v2": "MN06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 15,
-      "v1": "AN13",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 22,
-      "v1": "AN13",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 23,
-      "v1": "AN13",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 24,
-      "v1": "MN06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 25,
-      "v1": "MN06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Amri - 81404",
-      "name": "Mohamed Al Amri - 81404",
-      "day": 26,
-      "v1": "NN21",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
-      "day": 13,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
-      "day": 14,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
-      "day": 20,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
-      "day": 21,
-      "v1": "AE14",
-      "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "emp_id": "name:Muadh Al Qasim - 82534",
+      "name": "Muadh Al Qasim - 82534",
       "day": 27,
-      "v1": "AE14",
+      "v1": "NE22",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "name:Riyadh Al Sulti - 82424",
+      "name": "Riyadh Al Sulti - 82424",
+      "day": 19,
+      "v1": "NE22",
       "v2": "ME06"
     },
     {
-      "emp_id": "name:Mohamed Al Subhi - 82592 (Inventory)",
-      "name": "Mohamed Al Subhi - 82592 (Inventory)",
+      "emp_id": "name:Saif Al Mahrizi - 82649",
+      "name": "Saif Al Mahrizi - 82649",
       "day": 28,
       "v1": "AE14",
       "v2": "ME06"
-    },
-    {
-      "emp_id": "name:Salim Al Masroori - 8926",
-      "name": "Salim Al Masroori - 8926",
-      "day": 11,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Salim Al Masroori - 8926",
-      "name": "Salim Al Masroori - 8926",
-      "day": 12,
-      "v1": "ME06",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Salim Al Masroori - 8926",
-      "name": "Salim Al Masroori - 8926",
-      "day": 13,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Salim Al Masroori - 8926",
-      "name": "Salim Al Masroori - 8926",
-      "day": 14,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Salim Al Masroori - 8926",
-      "name": "Salim Al Masroori - 8926",
-      "day": 15,
-      "v1": "AE14",
-      "v2": "LV"
-    },
-    {
-      "emp_id": "name:Talal Al Balushi - 81300",
-      "name": "Talal Al Balushi - 81300",
-      "day": 25,
-      "v1": "AN13",
-      "v2": "MN06"
-    },
-    {
-      "emp_id": "name:Talal Al Balushi - 81300",
-      "name": "Talal Al Balushi - 81300",
-      "day": 26,
-      "v1": "MN06",
-      "v2": "NN21"
     },
     {
       "emp_id": "name:Yousuf Al Balushi - 82587",
       "name": "Yousuf Al Balushi - 82587",
-      "day": 26,
-      "v1": "ME06",
-      "v2": "AE14"
+      "day": 28,
+      "v1": "NE22",
+      "v2": "ME06"
     }
   ]
 }

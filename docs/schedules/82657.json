@@ -2111,18 +2111,18 @@
         "day": 21,
         "day_name_ar": "الجمعة",
         "day_name_en": "Friday",
-        "shift_code": "NE22",
-        "shift_label": "🌙 Night (NE22)",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-08-22",
         "day": 22,
         "day_name_ar": "السبت",
         "day_name_en": "Saturday",
-        "shift_code": "NE22",
-        "shift_label": "🌙 Night (NE22)",
-        "shift_group": "Night"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-08-23",

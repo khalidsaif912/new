@@ -2084,9 +2084,9 @@
         "day": 18,
         "day_name_ar": "الثلاثاء",
         "day_name_en": "Tuesday",
-        "shift_code": "ME06",
-        "shift_label": "🌅 Morning (ME06)",
-        "shift_group": "Morning"
+        "shift_code": "AE14",
+        "shift_label": "🌆 Afternoon (AE14)",
+        "shift_group": "Afternoon"
       },
       {
         "date": "2026-08-19",
@@ -2102,9 +2102,9 @@
         "day": 20,
         "day_name_ar": "الخميس",
         "day_name_en": "Thursday",
-        "shift_code": "NE22",
-        "shift_label": "🌙 Night (NE22)",
-        "shift_group": "Night"
+        "shift_code": "ME06",
+        "shift_label": "🌅 Morning (ME06)",
+        "shift_group": "Morning"
       },
       {
         "date": "2026-08-21",
