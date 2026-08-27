@@ -251,6 +251,192 @@ def _norm_cell(val: Any) -> str:
     return str(val or "").strip()
 
 
+WEEKDAY_NAMES: Dict[str, Tuple[str, ...]] = {
+    "SUN": ("SUN", "SUNDAY"),
+    "MON": ("MON", "MONDAY"),
+    "TUE": ("TUE", "TUESDAY"),
+    "WED": ("WED", "WEDNESDAY"),
+    "THU": ("THU", "THURSDAY"),
+    "FRI": ("FRI", "FRIDAY"),
+    "SAT": ("SAT", "SATURDAY"),
+}
+MIN_DATE_COLUMNS_DETECTED = 5
+
+
+def _is_missing_cell(val: Any) -> bool:
+    if val is None:
+        return True
+    try:
+        return bool(pd.isna(val))
+    except (TypeError, ValueError):
+        return False
+
+
+def _day_number_from_cell(val: Any) -> int | None:
+    """Accept day headers written as numbers, numeric text, or real Excel dates."""
+    if _is_missing_cell(val) or isinstance(val, bool):
+        return None
+
+    if isinstance(val, pd.Timestamp):
+        if pd.isna(val):
+            return None
+        return val.day if 1 <= val.day <= 31 else None
+    if isinstance(val, dt.datetime):
+        return val.day if 1 <= val.day <= 31 else None
+    if isinstance(val, dt.date):
+        return val.day if 1 <= val.day <= 31 else None
+
+    if isinstance(val, (int, float)):
+        num = float(val)
+        if num.is_integer():
+            day = int(num)
+            if 1 <= day <= 31:
+                return day
+        return None
+
+    text = str(val).strip().strip("'\"")
+    if not text or text.lower() == "nan":
+        return None
+
+    if re.fullmatch(r"0?([1-9]|[12]\d|3[01])(?:\.0+)?", text):
+        return int(float(text))
+
+    # Date-like strings occasionally survive as text even when authored as dates.
+    month_words = (
+        "jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|"
+        "january|february|march|april|june|july|august|"
+        "september|october|november|december"
+    )
+    looks_date_like = (
+        bool(re.search(r"\d{1,4}[-/]\d{1,2}[-/]\d{1,4}", text))
+        or bool(re.search(rf"\b(?:{month_words})\b", text, flags=re.IGNORECASE))
+    )
+    if looks_date_like:
+        parsed = pd.to_datetime(text, errors="coerce")
+        if not pd.isna(parsed):
+            day = int(parsed.day)
+            if 1 <= day <= 31:
+                return day
+
+    return None
+
+
+def _weekday_tokens_in_row(values: List[Any]) -> set[str]:
+    found: set[str] = set()
+    for val in values:
+        if _is_missing_cell(val):
+            continue
+        words = re.findall(r"[A-Z]+", str(val).upper())
+        for token, names in WEEKDAY_NAMES.items():
+            if any(word in names for word in words):
+                found.add(token)
+    return found
+
+
+def _date_cols_for_row(df: pd.DataFrame, row_idx: int) -> Dict[int, int]:
+    date_cols: Dict[int, int] = {}
+    for c in range(df.shape[1]):
+        day = _day_number_from_cell(df.iloc[row_idx, c])
+        if day is not None and day not in date_cols:
+            date_cols[day] = c
+    return date_cols
+
+
+def _preview_cell(val: Any) -> str:
+    if _is_missing_cell(val):
+        return ""
+    if isinstance(val, pd.Timestamp):
+        return val.date().isoformat()
+    if isinstance(val, dt.datetime):
+        return val.date().isoformat()
+    if isinstance(val, dt.date):
+        return val.isoformat()
+    return str(val).strip()
+
+
+def _row_preview(df: pd.DataFrame, row_idx: int, max_cells: int = 12) -> str:
+    vals = [_preview_cell(df.iloc[row_idx, c]) for c in range(df.shape[1])]
+    vals = [v for v in vals if v and v.lower() != "nan"]
+    if len(vals) > max_cells:
+        vals = vals[:max_cells] + ["..."]
+    return "[" + ", ".join(repr(v) for v in vals) + "]"
+
+
+def _find_weekday_row(df: pd.DataFrame, sheet_name: str) -> int:
+    candidates: List[Tuple[int, int, set[str]]] = []
+    for i in range(min(60, len(df))):
+        tokens = _weekday_tokens_in_row(df.iloc[i].tolist())
+        if tokens:
+            candidates.append((i, len(tokens), tokens))
+
+    strong = [candidate for candidate in candidates if candidate[1] >= 3]
+    if strong:
+        return max(strong, key=lambda item: (item[1], -item[0]))[0]
+
+    detail = "; ".join(
+        f"row {idx + 1}: {count} weekday tokens {sorted(tokens)} preview={_row_preview(df, idx)}"
+        for idx, count, tokens in candidates[:5]
+    )
+    if not detail:
+        detail = "no weekday-like cells found in the first 60 rows"
+    raise ValueError(
+        f"Could not find weekday header row (SUN/MON/.../SAT) in sheet {sheet_name!r}; {detail}."
+    )
+
+
+def _find_best_date_row(
+    df: pd.DataFrame,
+    sheet_name: str,
+    weekday_row: int,
+) -> Tuple[int, Dict[int, int]]:
+    start = max(0, weekday_row - 3)
+    end = min(len(df) - 1, weekday_row + 8)
+    stats: List[Tuple[int, int, List[int], str]] = []
+    best_row = None
+    best_cols: Dict[int, int] = {}
+
+    for r in range(start, end + 1):
+        cols = _date_cols_for_row(df, r)
+        days = sorted(cols.keys())
+        stats.append((r, len(days), days, _row_preview(df, r)))
+        if best_row is None or (
+            len(days),
+            -abs(r - weekday_row),
+            r,
+        ) > (
+            len(best_cols),
+            -abs(best_row - weekday_row),
+            best_row,
+        ):
+            best_row = r
+            best_cols = cols
+
+    if best_row is not None and len(best_cols) >= MIN_DATE_COLUMNS_DETECTED:
+        return best_row, best_cols
+
+    best_detail = sorted(stats, key=lambda item: item[1], reverse=True)[:6]
+    detail = "; ".join(
+        f"row {idx + 1}: {count} day-like cells days={days[:10]} preview={preview}"
+        for idx, count, days, preview in best_detail
+    )
+    raise ValueError(
+        f"Could not detect date columns (1..31) in sheet {sheet_name!r}. "
+        f"Weekday row: {weekday_row + 1}. Scanned rows {start + 1}..{end + 1} around it. "
+        f"Expected at least {MIN_DATE_COLUMNS_DETECTED} recognizable day cells "
+        f"(numbers, text like '01'/'1', or Excel date cells). Candidates: {detail}."
+    )
+
+
+def _find_jd_header(df: pd.DataFrame, weekday_row: int, date_row: int) -> Tuple[int | None, int | None]:
+    start = max(0, min(weekday_row, date_row) - 3)
+    end = min(len(df) - 1, max(weekday_row, date_row) + 8)
+    for r in range(start, end + 1):
+        for c in range(df.shape[1]):
+            if str(df.iloc[r, c]).strip().upper() == "JD":
+                return r, c
+    return None, None
+
+
 CAPTURE_DOM_HTML = """
 <div id="captureBusy" class="captureBusy">Preparing image...</div>
 <div id="captureSheet" class="captureSheet" aria-hidden="true">
@@ -273,47 +459,22 @@ CAPTURE_DOM_HTML = """
 def parse_month_sheet(xlsx_path: str, sheet_name: str) -> Dict[str, Any]:
     df = pd.read_excel(xlsx_path, sheet_name=sheet_name, header=None)
 
-    # Find day header row
-    day_row = None
-    for i in range(min(60, len(df))):
-        row = df.iloc[i].astype(str).str.upper().tolist()
-        if any("SUN" == str(c).strip() for c in row) and any("MON" == str(c).strip() for c in row) and any("SAT" == str(c).strip() for c in row):
-            day_row = i
-            break
-    if day_row is None:
-        raise ValueError("Could not find day header row (SUN/MON/..).")
+    weekday_row = _find_weekday_row(df, sheet_name)
+    date_row, date_cols = _find_best_date_row(df, sheet_name, weekday_row)
 
-    # Find JD header row and column dynamically (JD col may not be col 0)
-    header_row = day_row + 1
-    jd_col = None
-    for j in range(day_row, min(day_row + 6, len(df))):
-        for c in range(df.shape[1]):
-            if str(df.iloc[j, c]).strip().upper() == "JD":
-                header_row = j
-                jd_col = c
-                break
-        if jd_col is not None:
-            break
-    if jd_col is None:
+    # Find JD header row and column dynamically; it may be above or below the date row.
+    header_row, jd_col = _find_jd_header(df, weekday_row, date_row)
+    if header_row is None or jd_col is None:
+        header_row = date_row
         jd_col = 0  # fallback
 
     name_col = jd_col + 1
     sn_col = jd_col + 2
 
-    # Detect date columns (ints 1..31)
-    date_cols: Dict[int, int] = {}
-    for c in range(df.shape[1]):
-        v = df.iloc[header_row, c]
-        if isinstance(v, (int, float)) and not pd.isna(v) and float(v).is_integer():
-            day = int(v)
-            if 1 <= day <= 31:
-                date_cols[day] = c
-    if not date_cols:
-        raise ValueError("Could not detect date columns (1..31).")
-
-    # Employees start after header_row
+    # Employees start after both structural rows, even when dates and JD/Name/SN are separate.
+    employee_start_row = max(date_row, header_row) + 1
     employees: List[Dict[str, Any]] = []
-    for r in range(header_row + 1, len(df)):
+    for r in range(employee_start_row, len(df)):
         dept = df.iloc[r, jd_col]
         name = df.iloc[r, name_col] if df.shape[1] > name_col else None
         sn = df.iloc[r, sn_col] if df.shape[1] > sn_col else None
