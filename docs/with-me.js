@@ -343,6 +343,59 @@
     return location.origin + getSiteRootPath();
   }
 
+  var SHARED_BANNER_KEY = 'roster_banner_choice';
+  var SHARED_BANNER_RE = /^banner\d+\.jpg$/i;
+  var SHARED_BANNER_LAYOUT = {
+    'banner28.jpg': '50% 48%',
+    'banner30.jpg': '50% 45%',
+    'banner31.jpg': '50% 48%',
+    'banner32.jpg': '50% 50%',
+    'banner33.jpg': '50% 50%',
+    'banner34.jpg': '50% 50%',
+    'banner35.jpg': '50% 50%',
+    'banner36.jpg': '50% 50%'
+  };
+
+  function sharedBannerPosition(name) {
+    return SHARED_BANNER_LAYOUT[name] || '62% center';
+  }
+
+  function readSharedBannerChoice() {
+    try {
+      var name = localStorage.getItem(SHARED_BANNER_KEY) || '';
+      return SHARED_BANNER_RE.test(name) ? name : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function syncSharedBanner() {
+    var header = document.querySelector('.header');
+    if (!header) return;
+    var name = readSharedBannerChoice();
+    var style = document.getElementById('with-me-banner-style');
+    if (!name) {
+      if (style) style.remove();
+      header.classList.remove('has-custom-banner');
+      header.removeAttribute('data-banner');
+      document.documentElement.classList.remove('roster-banner-early');
+      return;
+    }
+    var url = rootUrl() + '/assets/banners/' + name;
+    var pos = sharedBannerPosition(name);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'with-me-banner-style';
+      document.head.appendChild(style);
+    }
+    style.textContent =
+      '.header{background-image:url("' + url.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + pos + '!important;background-repeat:no-repeat!important}' +
+      '.header::before,.header::after{content:none!important;opacity:0!important;display:none!important}';
+    header.classList.add('has-custom-banner');
+    header.setAttribute('data-banner', name);
+    document.documentElement.classList.add('roster-banner-early');
+  }
+
   function pad2(n) {
     return (n < 10 ? '0' : '') + n;
   }
@@ -1332,6 +1385,7 @@
   }
 
   function init() {
+    syncSharedBanner();
     loadNamesAr();
     state.lang = readLang();
     applyLang(state.lang);
@@ -1369,6 +1423,12 @@
       if (e.key === 'ArrowLeft') go(state.lang === 'ar' ? 1 : -1);
       if (e.key === 'ArrowRight') go(state.lang === 'ar' ? -1 : 1);
       if (e.key === 'Escape') closePicker();
+    });
+    window.addEventListener('storage', function (e) {
+      if (e.key === SHARED_BANNER_KEY) syncSharedBanner();
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) syncSharedBanner();
     });
     bindSwipe(document.getElementById('pageWrap') || document.body);
 

@@ -122,6 +122,10 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
+    assert "with-me.js?v=20260830wm56" in html
+    assert "roster_banner_choice" in html
+    assert "with-me-banner-style" in html
+    assert "/assets/banners/" in html
     assert "empNameHeader" in html
     assert "deptHead" in html
     assert "crewSummary" in html
@@ -158,6 +162,9 @@ def test_with_me_page_exists():
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
+    assert "syncSharedBanner" in src
+    assert "SHARED_BANNER_KEY = 'roster_banner_choice'" in src
+    assert "visibilitychange" in src
     assert "bindSwipe" in src
     assert "REST_QUOTES" in src
     assert "pickRestQuote" in src

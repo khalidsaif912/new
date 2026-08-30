@@ -10,6 +10,29 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script defer src="../ios-tap-fix.js?v=20260830wm"></script>
   <script src="../emp-id-gate.js?v=20260730a"></script>
+  <script>
+    (function () {
+      try {
+        var name = localStorage.getItem('roster_banner_choice');
+        if (!name || !/^banner\d+\.jpg$/i.test(name)) return;
+        var path = location.pathname || '/';
+        var root = '';
+        if (path.indexOf('/roster-site/') !== -1) root = '/roster-site';
+        else if (location.hostname && location.hostname.endsWith('github.io')) {
+          var segs = path.split('/').filter(Boolean);
+          root = segs.length ? '/' + segs[0] : '';
+        }
+        var url = (location.origin || '') + root + '/assets/banners/' + name;
+        var style = document.createElement('style');
+        style.id = 'with-me-banner-style';
+        style.textContent =
+          '.header{background-image:url("' + url.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}' +
+          '.header::before,.header::after{content:none!important;opacity:0!important;display:none!important}';
+        document.head.appendChild(style);
+        document.documentElement.classList.add('roster-banner-early');
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
@@ -1069,6 +1092,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm55"></script>
+  <script src="../with-me.js?v=20260830wm56"></script>
 </body>
 </html>
