@@ -1115,10 +1115,10 @@ def build_duty_html(
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
     }}
     .summaryBar .summaryChip .chipVal {{
-      height: 26px;
+      height: var(--chip-val-h);
       display: flex;
       align-items: center;
       justify-content: center;
