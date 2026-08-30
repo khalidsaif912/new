@@ -692,13 +692,11 @@
     var today = muscatToday();
     var html = '';
     rows.forEach(function (item) {
-      var meta = SHIFT_META[item.group] || SHIFT_META.Other;
       var cls = 'shiftDay ' + shiftCssClass(item.group);
       if (item.iso === today) cls += ' is-today';
       html += '<button type="button" class="' + cls + '" role="listitem"';
       html += ' data-date="' + escapeHtml(item.iso) + '"';
       html += ' aria-label="' + escapeHtml(formatDate(item.iso) + ' · ' + shiftLabel(item.group)) + '">';
-      html += '<span class="shiftDayIcon" aria-hidden="true">' + meta.icon + '</span>';
       html += '<span class="shiftDayNum">' + escapeHtml(dayNum(item.iso)) + '</span>';
       html += '<span class="shiftDayWeek">' + escapeHtml(weekdayShort(item.iso)) + '</span>';
       html += '<span class="shiftDayCode">' + escapeHtml(shiftCodeLabel(item.row)) + '</span>';
