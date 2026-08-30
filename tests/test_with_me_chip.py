@@ -127,12 +127,15 @@ def test_with_me_page_exists():
     assert "empDept" in src
     assert 'class="deptCard withMeCard"' in src
     assert "t('titleMain')" in src
+    assert "deptSplitBar" in src
+    assert "DEPT_META" in src
     flatten = src[src.find("function flattenPeople") : src.find("function renderGroups")]
     assert "dept: g.dept" in flatten
     assert "status" not in flatten
     render = src[src.find("function renderGroups") : src.find("function renderDay")]
     assert render.count("deptCard") == 1
     assert "empStatus" not in render
+    assert ".deptSplitBar" in html
     assert ".empDept" in html
 
 

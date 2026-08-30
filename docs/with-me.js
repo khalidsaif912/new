@@ -13,6 +13,13 @@
   var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
   var DEPT_ORDER = ['Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators'];
+  var DEPT_META = {
+    Officers: { base: '#2563eb', light: '#2563eb15', grad: '#2563eb', gradTo: '#2563ebcc' },
+    Supervisors: { base: '#0891b2', light: '#0891b215', grad: '#0891b2', gradTo: '#0891b2cc' },
+    'Load Control': { base: '#059669', light: '#05966915', grad: '#059669', gradTo: '#059669cc' },
+    'Export Checker': { base: '#dc2626', light: '#dc262615', grad: '#dc2626', gradTo: '#dc2626cc' },
+    'Export Operators': { base: '#7c3aed', light: '#7c3aed15', grad: '#7c3aed', gradTo: '#7c3aedcc' }
+  };
   var SHIFT_META = {
     Morning: { icon: '☀️', color: '#92400e', bg: '#fef3c7', border: '#f59e0b44' },
     Afternoon: { icon: '🌆', color: '#9a3412', bg: '#ffedd5', border: '#f9731644' },
@@ -361,6 +368,10 @@
     return key ? t(key) : name;
   }
 
+  function deptMeta(name) {
+    return DEPT_META[name] || { base: '#6b7280', light: '#6b728015', grad: '#6b7280', gradTo: '#6b7280cc' };
+  }
+
   function shiftLabel(name) {
     var key = SHIFT_I18N[name];
     return key ? t(key) : name;
@@ -442,15 +453,21 @@
     html += '<span>' + escapeHtml(t('total')) + '</span><strong>' + people.length + '</strong>';
     html += '</div></div>';
     html += '<div class="empList">';
-    people.forEach(function (p, i) {
-      var isSelf = p.id && p.id === selfId;
-      var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
-      html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
-      html += '<span class="empName">' + escapeHtml(display) + '</span>';
-      html += '<span class="empMeta">';
-      if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-      html += '<span class="empDept">' + escapeHtml(deptLabel(p.dept)) + '</span>';
-      html += '</span></div>';
+    (groups || []).forEach(function (g) {
+      var colors = deptMeta(g.dept);
+      html += '<div class="deptBlock">';
+      html += '<div class="deptSplitBar" style="background:linear-gradient(to right,' + colors.grad + ',' + colors.gradTo + ')"></div>';
+      (g.people || []).forEach(function (p, i) {
+        var isSelf = p.id && p.id === selfId;
+        var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
+        html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
+        html += '<span class="empName">' + escapeHtml(display) + '</span>';
+        html += '<span class="empMeta">';
+        if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
+        html += '<span class="empDept" style="color:' + colors.base + ';background:' + colors.light + '">' + escapeHtml(deptLabel(g.dept)) + '</span>';
+        html += '</span></div>';
+      });
+      html += '</div>';
     });
     html += '</div></div>';
     return html;
