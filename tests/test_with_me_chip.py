@@ -174,6 +174,11 @@ def test_with_me_page_exists():
     assert "grid-template-columns: max-content" in html
     assert "personLabel" in src
     assert re.search(
+        r"body\.ar \.empList,\s*html\[lang=\"ar\"\] \.empList\s*\{[^}]*direction: rtl;[^}]*margin-inline-start: 0;[^}]*margin-inline-end: auto;",
+        html,
+        re.S,
+    )
+    assert re.search(
         r"body\.ar \.empName,\s*html\[lang=\"ar\"\] \.empName\s*\{[^}]*direction: rtl;[^}]*unicode-bidi: plaintext;[^}]*text-align: right;",
         html,
         re.S,
