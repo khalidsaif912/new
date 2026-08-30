@@ -142,14 +142,14 @@ def test_with_me_page_exists():
         re.S,
     )
     assert re.search(
-        r"\.dateTagSide\s*\{[^}]*position: absolute;[^}]*inset-inline-start: calc\(50% \+ min\(8vw, 30px\)\);[^}]*inset-inline-end: 0;",
+        r"\.dateTagSide\s*\{[^}]*background: rgba\(255, 255, 255, \.07\);[^}]*left: calc\(50% \+ min\(7vw, 24px\)\);[^}]*max-width: min\(42%, 174px\);",
         html,
         re.S,
     )
-    assert "inset-inline-end: calc(50% + min(8vw, 30px))" in html
-    assert "font-size: clamp(26px, 8vw, 38px)" in html
-    assert "rgba(255, 255, 255, .3)" in html
-    assert "rgba(255, 255, 255, .28)" in html
+    assert "right: calc(50% + min(7vw, 24px))" in html
+    assert "font-size: clamp(24px, 7vw, 34px)" in html
+    assert "rgba(255, 255, 255, .46)" in html
+    assert "rgba(255, 255, 255, .42)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src

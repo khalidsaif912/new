@@ -293,26 +293,31 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      justify-content: flex-end;
-      gap: .14em;
+      justify-content: center;
+      gap: 2px;
       line-height: 1;
-      padding-bottom: .08em;
+      padding: 7px 10px 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .1);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .1);
       flex: 0 0 auto;
       direction: ltr;
       unicode-bidi: isolate;
       position: absolute;
-      inset-inline-start: calc(50% + min(8vw, 30px));
-      inset-inline-end: 0;
+      left: calc(50% + min(7vw, 24px));
+      right: auto;
       top: 50%;
       transform: translateY(-48%);
       min-width: 0;
-      width: auto;
+      width: max-content;
+      max-width: min(42%, 174px);
     }
     body.ar .dateTagSide,
     html[lang="ar"] .dateTagSide {
       align-items: flex-end;
-      inset-inline-start: 0;
-      inset-inline-end: calc(50% + min(8vw, 30px));
+      left: auto;
+      right: calc(50% + min(7vw, 24px));
     }
     .dateTagWeek {
       display: block;
@@ -320,7 +325,7 @@
       font-weight: 700;
       letter-spacing: -.01em;
       line-height: 1.05;
-      color: rgba(255, 255, 255, .3);
+      color: rgba(255, 255, 255, .46);
       text-align: left;
       white-space: nowrap;
       width: 100%;
@@ -353,11 +358,11 @@
     }
     .dateTagMonth {
       display: block;
-      font-size: clamp(26px, 8vw, 38px);
+      font-size: clamp(24px, 7vw, 34px);
       font-weight: 700;
       letter-spacing: -.03em;
       line-height: 1;
-      color: rgba(255, 255, 255, .28);
+      color: rgba(255, 255, 255, .42);
       text-transform: none;
       text-align: left;
       white-space: nowrap;
