@@ -163,18 +163,19 @@
     var body = document.body;
     var html = document.documentElement;
     if (!body) return;
-    var bgImage = slug ? 'url("' + patternUrl(slug) + '")' : '';
+    var bgImage = slug ? 'url("' + patternUrl(slug) + '")' : 'none';
     html.classList.add('roster-bg-textured');
     body.classList.add('roster-bg-textured');
-    html.style.backgroundColor = color;
-    body.style.backgroundColor = color;
-    html.style.backgroundImage = bgImage;
-    body.style.backgroundImage = bgImage;
-    html.style.backgroundRepeat = 'repeat';
-    body.style.backgroundRepeat = 'repeat';
+    // Use !important so early boot styles (e.g. with-me) cannot block live updates.
+    html.style.setProperty('background-color', color, 'important');
+    body.style.setProperty('background-color', color, 'important');
+    html.style.setProperty('background-image', bgImage, 'important');
+    body.style.setProperty('background-image', bgImage, 'important');
+    html.style.setProperty('background-repeat', 'repeat', 'important');
+    body.style.setProperty('background-repeat', 'repeat', 'important');
     var attachment = isIOSDevice() ? 'scroll' : 'fixed';
-    html.style.backgroundAttachment = attachment;
-    body.style.backgroundAttachment = attachment;
+    html.style.setProperty('background-attachment', attachment, 'important');
+    body.style.setProperty('background-attachment', attachment, 'important');
     try {
       localStorage.setItem(
         STORAGE_KEY,

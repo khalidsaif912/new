@@ -417,6 +417,9 @@
     var pattern = page.pattern || '';
     saveBannerTexture(color, pattern);
     applyBannerTexture(color, pattern);
+    // Drop early boot CSS so it cannot keep the previous page background locked.
+    var early = document.getElementById('with-me-bg-early');
+    if (early) early.remove();
   }
 
   function pad2(n) {
