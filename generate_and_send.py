@@ -997,7 +997,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .summaryBar {{ 
       display:flex; 
       justify-content:center; 
-      align-items:stretch;
+      align-items:center;
       gap:12px; 
       margin-top:14px;
       flex-wrap:wrap;
@@ -1137,14 +1137,20 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       min-width: var(--chip-size);
       max-width: var(--chip-size);
       height: var(--chip-size);
+      min-height: var(--chip-size);
+      max-height: var(--chip-size);
+      aspect-ratio: 1 / 1;
       padding: var(--chip-pad);
       border-radius: var(--chip-radius);
       box-sizing: border-box;
       justify-content: center;
+      overflow: hidden;
     }}
     .summaryBar .summaryChip .chipVal {{
       font-size: var(--chip-val);
       height: var(--chip-val-h);
+      min-height: var(--chip-val-h);
+      flex-shrink: 0;
     }}
     .summaryBar .summaryChip .chipVal .chip-icon {{
       width: var(--chip-icon);
@@ -1152,8 +1158,14 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     }}
     .summaryBar .summaryChip .chipLabel {{
       font-size: var(--chip-label);
-      margin-top: 4px;
+      margin-top: 2px;
       letter-spacing: .2px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.05;
+      flex-shrink: 1;
+      min-height: 0;
     }}
 
     @media (max-width:900px){{
