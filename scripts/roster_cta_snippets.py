@@ -324,11 +324,10 @@ IOS_TOUCH_CSS = r"""    .header::before,
     }
 """
 
-CHIP_ICON_CSS = r"""    .summaryBar .summaryChip .chipVal .chip-icon,
-    .summaryBar .summaryChip .chipVal .chip-icon svg {
+CHIP_ICON_CSS = r"""    .summaryChip .chipVal .chip-icon {
       display: block;
-      width: var(--chip-icon);
-      height: var(--chip-icon);
+      width: 22px;
+      height: 22px;
       margin: 0 auto;
       flex-shrink: 0;
     }

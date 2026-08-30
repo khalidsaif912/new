@@ -344,11 +344,10 @@
       justify-content:flex-start;
     }
     .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-    .summaryBar .summaryChip .chipVal .chip-icon,
-    .summaryBar .summaryChip .chipVal .chip-icon svg {
+    .summaryChip .chipVal .chip-icon {
       display: block;
-      width: var(--chip-icon);
-      height: var(--chip-icon);
+      width: 22px;
+      height: 22px;
       margin: 0 auto;
       flex-shrink: 0;
     }
@@ -434,126 +433,43 @@
     button.shiftFilterBtn.all .chipVal { color:#1e40af; }
     button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
     
-                    /* Summary chips: compact squares — icon-led, minimal inner margin */
-    .summaryBar {
-      --chip-size: 68px;
-      --chip-pad: 2px;
-      --chip-gap: 8px;
-      --chip-val: 22px;
-      --chip-val-h: 22px;
-      --chip-icon: 24px;
-      --chip-label: 9px;
-      --chip-radius: 12px;
-      gap: var(--chip-gap);
-    }
-    .summaryBar > a.summaryChip,
-    .summaryBar > #summarySwitchChip,
-    .summaryBar > button.shiftFilterBtn {
-      flex: 0 0 var(--chip-size);
-      width: var(--chip-size);
-      min-width: var(--chip-size);
-      max-width: var(--chip-size);
-      height: var(--chip-size);
-      min-height: var(--chip-size);
-      max-height: var(--chip-size);
-      aspect-ratio: 1 / 1;
-      padding: var(--chip-pad);
-      border-radius: var(--chip-radius);
-      box-sizing: border-box;
-      justify-content: center;
-      align-items: center;
-      gap: 1px;
-      overflow: hidden;
-    }
-    .summaryBar .summaryChip {
-      padding: var(--chip-pad);
-      min-width: 0;
-      justify-content: center;
-    }
-    .summaryBar .summaryChip .chipVal {
-      font-size: var(--chip-val);
-      height: var(--chip-val-h);
-      min-height: 0;
-      flex-shrink: 0;
-      margin: 0;
-      line-height: 1;
-    }
-    .summaryBar .summaryChip .chipVal .chip-icon,
-    .summaryBar .summaryChip .chipVal .chip-icon svg {
-      width: var(--chip-icon);
-      height: var(--chip-icon);
-    }
-    .summaryBar .summaryChip .chipLabel {
-      font-size: var(--chip-label);
-      margin: 0;
-      padding: 0;
-      letter-spacing: 0;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1;
-      flex-shrink: 1;
-      min-height: 0;
-    }
-
+                        /* موبايل: صف واحد — الشكل الأصلي المتوازن بدون فرض مربع */
     @media (max-width:900px){
-      .summaryBar {
-        flex-wrap: wrap;
-        justify-content: center;
-        --chip-size: 64px;
-        --chip-icon: 22px;
-        --chip-val: 20px;
-        --chip-val-h: 20px;
-        --chip-label: 8.5px;
-      }
+      .summaryBar { flex-wrap: wrap; justify-content: center; }
     }
 
     @media (max-width:600px){
       .summaryBar {
+        gap: 6px;
         flex-wrap: nowrap;
-        --chip-size: 56px;
-        --chip-gap: 6px;
-        --chip-icon: 21px;
-        --chip-val: 19px;
-        --chip-val-h: 19px;
-        --chip-label: 8px;
+        justify-content: center;
       }
       .summaryBar:has(button.shiftFilterBtn) {
         flex-wrap: wrap;
       }
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip,
+      .summaryBar > button.shiftFilterBtn {
+        flex: 0 0 auto;
+        min-width: 60px;
+        padding: 8px 8px;
+      }
+      .summaryChip .chipVal { font-size: 18px; }
+      .summaryChip .chipVal .chip-icon { width: 20px; height: 20px; }
+      .summaryChip .chipLabel { font-size: 8.5px; letter-spacing: .2px; }
     }
 
     @media (max-width:480px){
-      .summaryBar {
-        --chip-size: 54px;
-        --chip-icon: 20px;
-        --chip-val: 18px;
-        --chip-val-h: 18px;
-        --chip-label: 7.5px;
+      .summaryBar { gap: 5px; }
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip,
+      .summaryBar > button.shiftFilterBtn {
+        min-width: 56px;
+        padding: 8px 6px;
       }
     }
 
-    @media (max-width:430px){
-      .summaryBar {
-        --chip-size: 52px;
-        --chip-gap: 5px;
-        --chip-icon: 19px;
-        --chip-val: 17px;
-        --chip-val-h: 17px;
-        --chip-label: 7.5px;
-      }
-    }
-
-    @media (max-width:390px){
-      .summaryBar {
-        --chip-size: 48px;
-        --chip-gap: 4px;
-        --chip-icon: 18px;
-        --chip-val: 16px;
-        --chip-val-h: 16px;
-        --chip-label: 7px;
-      }
-    }
+}
 
 }
 

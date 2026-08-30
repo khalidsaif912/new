@@ -1118,7 +1118,7 @@ def build_duty_html(
       justify-content: center;
     }}
     .summaryBar .summaryChip .chipVal {{
-      height: var(--chip-val-h);
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
