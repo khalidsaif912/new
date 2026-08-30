@@ -1117,16 +1117,16 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     button.shiftFilterBtn.all .chipVal {{ color:#1e40af; }}
     button.shiftFilterBtn.all .chipLabel {{ color:#1e40af; }}
     
-    /* Summary chips: square cards scaled by viewport (~6.1" → 6.8" → tablet) */
+    /* Summary chips: compact squares — icon-led, minimal inner margin */
     .summaryBar {{
-      --chip-size: 76px;
-      --chip-pad: 5px;
-      --chip-gap: 10px;
+      --chip-size: 68px;
+      --chip-pad: 2px;
+      --chip-gap: 8px;
       --chip-val: 22px;
       --chip-val-h: 22px;
-      --chip-icon: 22px;
-      --chip-label: 9.5px;
-      --chip-radius: 14px;
+      --chip-icon: 24px;
+      --chip-label: 9px;
+      --chip-radius: 12px;
       gap: var(--chip-gap);
     }}
     .summaryBar > a.summaryChip,
@@ -1145,8 +1145,13 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       box-sizing: border-box;
       justify-content: center;
       align-items: center;
-      gap: 2px;
+      gap: 1px;
       overflow: hidden;
+    }}
+    .summaryBar .summaryChip {{
+      padding: var(--chip-pad);
+      min-width: 0;
+      justify-content: center;
     }}
     .summaryBar .summaryChip .chipVal {{
       font-size: var(--chip-val);
@@ -1154,8 +1159,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       min-height: 0;
       flex-shrink: 0;
       margin: 0;
+      line-height: 1;
     }}
-    .summaryBar .summaryChip .chipVal .chip-icon {{
+    .summaryBar .summaryChip .chipVal .chip-icon,
+    .summaryBar .summaryChip .chipVal .chip-icon svg {{
       width: var(--chip-icon);
       height: var(--chip-icon);
     }}
@@ -1163,7 +1170,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       font-size: var(--chip-label);
       margin: 0;
       padding: 0;
-      letter-spacing: .15px;
+      letter-spacing: 0;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1176,26 +1183,23 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .summaryBar {{
         flex-wrap: wrap;
         justify-content: center;
-        --chip-size: 72px;
-        --chip-pad: 5px;
-        --chip-gap: 8px;
+        --chip-size: 64px;
+        --chip-icon: 22px;
         --chip-val: 20px;
         --chip-val-h: 20px;
-        --chip-icon: 20px;
-        --chip-label: 9px;
+        --chip-label: 8.5px;
       }}
     }}
 
     @media (max-width:600px){{
       .summaryBar {{
         flex-wrap: nowrap;
-        --chip-size: 68px;
-        --chip-pad: 4px;
+        --chip-size: 56px;
         --chip-gap: 6px;
-        --chip-val: 18px;
-        --chip-val-h: 18px;
-        --chip-icon: 18px;
-        --chip-label: 8.5px;
+        --chip-icon: 21px;
+        --chip-val: 19px;
+        --chip-val-h: 19px;
+        --chip-label: 8px;
       }}
       .summaryBar:has(button.shiftFilterBtn) {{
         flex-wrap: wrap;
@@ -1204,35 +1208,32 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
     @media (max-width:480px){{
       .summaryBar {{
-        --chip-size: 64px;
-        --chip-pad: 4px;
-        --chip-val: 17px;
-        --chip-val-h: 17px;
-        --chip-icon: 17px;
-        --chip-label: 8px;
+        --chip-size: 54px;
+        --chip-icon: 20px;
+        --chip-val: 18px;
+        --chip-val-h: 18px;
+        --chip-label: 7.5px;
       }}
     }}
 
     @media (max-width:430px){{
       .summaryBar {{
-        --chip-size: 60px;
-        --chip-pad: 3px;
+        --chip-size: 52px;
         --chip-gap: 5px;
-        --chip-val: 16px;
-        --chip-val-h: 16px;
-        --chip-icon: 16px;
+        --chip-icon: 19px;
+        --chip-val: 17px;
+        --chip-val-h: 17px;
         --chip-label: 7.5px;
       }}
     }}
 
     @media (max-width:390px){{
       .summaryBar {{
-        --chip-size: 52px;
-        --chip-pad: 3px;
+        --chip-size: 48px;
         --chip-gap: 4px;
-        --chip-val: 15px;
-        --chip-val-h: 15px;
-        --chip-icon: 15px;
+        --chip-icon: 18px;
+        --chip-val: 16px;
+        --chip-val-h: 16px;
         --chip-label: 7px;
       }}
     }}
