@@ -96,13 +96,29 @@
 
     .headerTop {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: var(--space-sm);
-      margin-block-end: var(--space-md);
       position: relative;
       z-index: 2;
       direction: ltr;
+    }
+
+    .headerIdentity {
+      position: relative;
+      z-index: 2;
+      padding: 4px 0 10px;
+      width: max-content;
+      max-width: min(72%, 280px);
+      text-align: left;
+      margin-right: auto;
+      margin-left: 0;
+    }
+    body.ar .headerIdentity,
+    html[lang="ar"] .headerIdentity {
+      text-align: right;
+      margin-left: auto;
+      margin-right: 0;
     }
 
     .backBtn {
@@ -190,91 +206,151 @@
 
     .headerBody {
       position: relative;
-      z-index: 2;
-      text-align: center;
-      padding-inline: 4px;
+      z-index: 1;
+      padding: 4px 4px 10px;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .empNameHeader {
       margin: 0;
-      font-size: clamp(22px, 5.5vw, 26px);
+      font-size: clamp(18px, 4.8vw, 22px);
       font-weight: 800;
       line-height: 1.2;
       letter-spacing: -.01em;
       color: #fff;
       word-break: break-word;
+      text-shadow: 0 1px 10px rgba(15, 23, 42, .28);
     }
     body.ar .empNameHeader { letter-spacing: 0; }
 
     .pageSubtitle {
-      margin: 4px 0 0;
-      font-size: 13px;
+      margin: 3px 0 0;
+      font-size: 12px;
       font-weight: 600;
-      color: rgba(255, 255, 255, .78);
+      color: rgba(255, 255, 255, .9);
       line-height: 1.3;
+      text-shadow: 0 1px 8px rgba(15, 23, 42, .25);
     }
 
     .dateNav {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: var(--space-xs);
-      margin-block-start: var(--space-md);
-      position: relative;
-      z-index: 2;
+      z-index: 1;
+      pointer-events: none;
     }
-
-    .dayBtn {
-      width: 38px;
-      height: 38px;
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, .24);
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, .14);
-      color: #fff;
-      font-size: 0;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    .dayBtn::before {
-      content: '';
-      display: block;
-      width: 8px;
-      height: 8px;
-      border-inline-end: 2px solid #fff;
-      border-block-end: 2px solid #fff;
-      transform: rotate(135deg);
-    }
-    .dayBtn.next::before { transform: rotate(-45deg); }
-    html[dir="rtl"] .dayBtn.prev::before { transform: rotate(-45deg); }
-    html[dir="rtl"] .dayBtn.next::before { transform: rotate(135deg); }
 
     .datePickerWrapper {
       position: relative;
-      flex: 1;
-      min-width: 0;
-      max-width: 280px;
+      width: 100%;
+      max-width: 100%;
+      pointer-events: auto;
     }
     .dateTag {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 38px;
-      padding: 6px 14px;
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, .16);
-      border: 1px solid rgba(255, 255, 255, .22);
+      min-height: 100%;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
       color: #fff;
-      font-size: 13px;
-      font-weight: 600;
       cursor: pointer;
       user-select: none;
       text-align: center;
-      line-height: 1.35;
+      line-height: 1;
+    }
+    .dateTagMain {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: .2em;
+      pointer-events: none;
+      padding-bottom: .55em;
+      direction: ltr;
+      width: max-content;
+      max-width: 100%;
+      margin-inline: auto;
+    }
+    body.ar .dateTagMain,
+    html[lang="ar"] .dateTagMain {
+      direction: rtl;
+    }
+    .dateTagSide {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: .14em;
+      line-height: 1;
+      padding-bottom: .08em;
+      flex: 0 0 auto;
+      width: max-content;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    body.ar .dateTagSide,
+    html[lang="ar"] .dateTagSide {
+      align-items: flex-end;
+    }
+    .dateTagWeek {
+      display: block;
+      font-size: clamp(14px, 4.2vw, 18px);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.05;
+      color: rgba(255, 255, 255, .14);
+      text-align: left;
+      white-space: nowrap;
+      width: 100%;
+    }
+    body.ar .dateTagWeek {
+      letter-spacing: 0;
+      text-align: right;
+    }
+    .dateTagDay {
+      display: block;
+      font-size: clamp(72px, 26vw, 112px);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: .9;
+      color: rgba(255, 255, 255, .16);
+      font-variant-numeric: tabular-nums;
+      flex: 0 0 auto;
+    }
+    body.ar .dateTagDay { letter-spacing: 0; }
+    .dateTagMonthWrap {
+      display: block;
+      line-height: 1;
+      text-align: left;
+      width: 100%;
+      -webkit-box-reflect: below 1px linear-gradient(to bottom, transparent 35%, rgba(255, 255, 255, .28));
+    }
+    body.ar .dateTagMonthWrap,
+    html[lang="ar"] .dateTagMonthWrap {
+      text-align: right;
+    }
+    .dateTagMonth {
+      display: block;
+      font-size: clamp(28px, 10vw, 42px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1;
+      color: rgba(255, 255, 255, .14);
+      text-transform: none;
+      text-align: left;
+      white-space: nowrap;
+    }
+    body.ar .dateTagMonth {
+      letter-spacing: 0;
+      text-align: right;
     }
     .datePickerWrapper #datePicker {
       position: absolute;
@@ -305,6 +381,13 @@
       scrollbar-width: none;
       -ms-overflow-style: none;
       touch-action: pan-x;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .shiftStrip.is-dragging {
+      cursor: grabbing;
+      scroll-snap-type: none;
     }
     .shiftStrip::-webkit-scrollbar { display: none; }
 
@@ -322,10 +405,10 @@
       align-items: center;
       justify-content: center;
       gap: 2px;
-      cursor: pointer;
+      cursor: inherit;
       scroll-snap-align: center;
       -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      touch-action: pan-x;
       transition:
         transform .22s ease,
         border-color .22s ease,
@@ -488,31 +571,63 @@
       box-shadow: var(--shadow-card);
       overflow: hidden;
     }
+    body.ar .crewCard,
+    html[lang="ar"] .crewCard {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
 
+    /* One shared grid: name column + fixed ID column (IDs stack perfectly). */
     .empList {
       margin: 0;
       padding: 2px 0 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+      display: grid;
+      grid-template-columns: max-content 7.25ch;
+      column-gap: 6px;
+      row-gap: 0;
+      align-items: center;
+      justify-content: start;
+      width: max-content;
+      max-width: 100%;
     }
-
-    .deptGroup {
-      padding-block-end: 2px;
+    body.ar .empList,
+    html[lang="ar"] .empList {
+      direction: rtl;
+      /* Physical margins: push the whole block to the RIGHT edge. */
+      margin-left: auto !important;
+      margin-right: 0 !important;
     }
-    .deptGroup + .deptGroup {
-      border-block-start: 1px solid var(--border);
-    }
-    .deptGroup:nth-child(odd) { background: var(--surface); }
-    .deptGroup:nth-child(even) { background: var(--surface-muted); }
 
     .deptHead {
       display: flex;
       align-items: center;
       gap: 6px;
+      grid-column: 1 / -1;
       padding: 7px 14px 3px;
       min-height: 0;
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
     }
+    body.ar .deptHead,
+    html[lang="ar"] .deptHead {
+      direction: rtl;
+      justify-content: flex-start;
+      text-align: right;
+    }
+    .empList > .deptHead:not(:first-child) {
+      border-block-start: 1px solid var(--border);
+      margin-block-start: 2px;
+      padding-block-start: 9px;
+    }
+    .deptHead.tone-a,
+    .empMain.tone-a,
+    .empId.tone-a { background: var(--surface); }
+    .deptHead.tone-b,
+    .empMain.tone-b,
+    .empId.tone-b { background: var(--surface-muted); }
+
     .deptHeadLabel {
       font-size: 11px;
       font-weight: 700;
@@ -530,68 +645,101 @@
       flex-shrink: 0;
       background: var(--dept-default);
     }
-    .deptGroup[data-dept="Officers"] .roleDot { background: var(--dept-officers); }
-    .deptGroup[data-dept="Supervisors"] .roleDot { background: var(--dept-supervisors); }
-    .deptGroup[data-dept="Load Control"] .roleDot { background: var(--dept-load); }
-    .deptGroup[data-dept="Export Checker"] .roleDot { background: var(--dept-checker); }
-    .deptGroup[data-dept="Export Operators"] .roleDot { background: var(--dept-ops); }
-    .deptGroup[data-dept="Flight Dispatch"] .roleDot,
-    .deptGroup[data-dept="Flight Dispatch (Export)"] .roleDot,
-    .deptGroup[data-dept="Flight Dispatch (Import)"] .roleDot { background: var(--dept-flight); }
-    .deptGroup[data-dept="FLTA"] .roleDot { background: var(--dept-flta); }
-    .deptGroup[data-dept="Documentation"] .roleDot { background: #64748b; }
-    .deptGroup[data-dept="Import Checkers"] .roleDot { background: #6366f1; }
-    .deptGroup[data-dept="Import Operators"] .roleDot { background: #7c3aed; }
-    .deptGroup[data-dept="Release Control"] .roleDot { background: #0891b2; }
-
-    .empRow {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      padding: 6px 14px 6px 14px;
-      border: none;
-      background: transparent;
-      border-inline-start: 3px solid transparent;
-    }
+    .deptHead[data-dept="Officers"] .roleDot { background: var(--dept-officers); }
+    .deptHead[data-dept="Supervisors"] .roleDot { background: var(--dept-supervisors); }
+    .deptHead[data-dept="Load Control"] .roleDot { background: var(--dept-load); }
+    .deptHead[data-dept="Export Checker"] .roleDot { background: var(--dept-checker); }
+    .deptHead[data-dept="Export Operators"] .roleDot { background: var(--dept-ops); }
+    .deptHead[data-dept="Flight Dispatch"] .roleDot,
+    .deptHead[data-dept="Flight Dispatch (Export)"] .roleDot,
+    .deptHead[data-dept="Flight Dispatch (Import)"] .roleDot { background: var(--dept-flight); }
+    .deptHead[data-dept="FLTA"] .roleDot { background: var(--dept-flta); }
+    .deptHead[data-dept="Documentation"] .roleDot { background: #64748b; }
+    .deptHead[data-dept="Import Checkers"] .roleDot { background: #6366f1; }
+    .deptHead[data-dept="Import Operators"] .roleDot { background: #7c3aed; }
+    .deptHead[data-dept="Release Control"] .roleDot { background: #0891b2; }
 
     .empMain {
+      grid-column: 1;
       min-width: 0;
-      flex: 1;
       display: flex;
       align-items: center;
       gap: 6px;
       flex-wrap: nowrap;
+      padding: 6px 0 6px 14px;
+      border-inline-start: 3px solid transparent;
+    }
+    body.ar .empMain,
+    html[lang="ar"] .empMain {
+      justify-content: flex-start;
+      padding: 6px 14px 6px 0;
+      border-inline-start: none;
+      border-inline-end: 3px solid transparent;
     }
     .empName {
       font-size: 13px;
       font-weight: 650;
       color: var(--text);
       line-height: 1.25;
-      direction: ltr;
-      unicode-bidi: embed;
       text-align: start;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      min-width: 0;
     }
-    body.ar .empName {
-      font-family: 'Segoe UI', 'Segoe UI Arabic', Tahoma, Arial, sans-serif;
+    body.ar .empName,
+    html[lang="ar"] .empName {
+      font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
+      direction: rtl;
+      text-align: right;
     }
+    .empId {
+      grid-column: 2;
+      box-sizing: border-box;
+      width: 7.25ch;
+      min-width: 7.25ch;
+      padding: 6px 14px 6px 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      line-height: 1.2;
+      text-align: end;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    body.ar .empId,
+    html[lang="ar"] .empId {
+      padding: 6px 0 6px 6px;
+      text-align: start;
+    }
+
+    .empMain.is-self,
+    .empId.is-self {
+      background: var(--brand-soft) !important;
+    }
+    .empMain.is-self {
+      border-inline-start-color: var(--brand);
+    }
+    body.ar .empMain.is-self,
+    html[lang="ar"] .empMain.is-self {
+      border-inline-start-color: transparent;
+      border-inline-end-color: var(--brand);
+    }
+
     .youPill {
       flex-shrink: 0;
       font-size: 9px;
       font-weight: 800;
       color: var(--brand);
-      background: var(--brand-soft);
+      background: rgba(255, 255, 255, .72);
       border: 1px solid rgba(30, 64, 175, .18);
       border-radius: var(--radius-pill);
       padding: 1px 6px;
       line-height: 1.3;
-    }
-
-    .empRow.is-self {
-      background: var(--brand-soft);
-      border-inline-start: 3px solid var(--brand);
     }
 
     /* ── Rest / empty state ── */
@@ -794,19 +942,27 @@
           <span class="langToggle-label" id="langToggleLabel">ع</span>
         </button>
       </div>
-      <div class="headerBody">
+      <div class="headerIdentity">
         <h1 class="empNameHeader" id="empNameHeader">—</h1>
         <p class="pageSubtitle" id="pageTitleMain">With me</p>
       </div>
-      <div class="dateNav">
-        <button type="button" class="dayBtn prev" id="prevDayBtn" aria-label="Previous day"></button>
-        <div class="datePickerWrapper">
-          <label class="dateTag" for="datePicker">
-            <span class="dateTag-label" id="dateTagLabel">—</span>
-          </label>
-          <input id="datePicker" type="date" aria-label="Select date">
+      <div class="headerBody">
+        <div class="dateNav">
+          <div class="datePickerWrapper">
+            <label class="dateTag" for="datePicker">
+              <span class="dateTagMain">
+                <span class="dateTagDay" id="dateTagDay">—</span>
+                <span class="dateTagSide">
+                  <span class="dateTagWeek" id="dateTagWeek"></span>
+                  <span class="dateTagMonthWrap">
+                    <span class="dateTagMonth" id="dateTagMonth"></span>
+                  </span>
+                </span>
+              </span>
+            </label>
+            <input id="datePicker" type="date" aria-label="Select date">
+          </div>
         </div>
-        <button type="button" class="dayBtn next" id="nextDayBtn" aria-label="Next day"></button>
       </div>
     </header>
 
@@ -830,6 +986,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm24"></script>
+  <script src="../with-me.js?v=20260830wm47"></script>
 </body>
 </html>

@@ -212,6 +212,7 @@
     lang: 'en',
     empId: '',
     empName: '',
+    empNameAr: '',
     empDept: '',
     schedule: null,
     date: '',
@@ -221,8 +222,57 @@
     index: null,
     anim: '',
     rosterKind: 'export',
-    stripBuiltFor: ''
+    stripBuiltFor: '',
+    namesArData: null
   };
+
+  var namesArPromise = null;
+
+  function loadNamesAr() {
+    if (namesArPromise) return namesArPromise;
+    namesArPromise = fetch(rootUrl() + '/roster-diff/names-ar.json', { credentials: 'same-origin' })
+      .then(function (r) {
+        if (!r.ok) return { export: { byId: {}, byEn: {} }, import: { byId: {}, byEn: {} } };
+        return r.json();
+      })
+      .catch(function () {
+        return { export: { byId: {}, byEn: {} }, import: { byId: {}, byEn: {} } };
+      })
+      .then(function (data) {
+        state.namesArData = data;
+        return data;
+      });
+    return namesArPromise;
+  }
+
+  function lookupNameArFromIndex(data, empId, enName) {
+    if (!data) return '';
+    var id = String(empId || '').trim();
+    if (id) {
+      var fromExport = data.export && data.export.byId && data.export.byId[id];
+      if (fromExport) return String(fromExport).trim();
+      var fromImport = data.import && data.import.byId && data.import.byId[id];
+      if (fromImport) return String(fromImport).trim();
+    }
+    var en = displayName(enName || '').toLowerCase();
+    if (en) {
+      var byEnExport = data.export && data.export.byEn && data.export.byEn[en];
+      if (byEnExport) return String(byEnExport).trim();
+      var byEnImport = data.import && data.import.byEn && data.import.byEn[en];
+      if (byEnImport) return String(byEnImport).trim();
+    }
+    return '';
+  }
+
+  function syncEmpNameAr() {
+    if (!state.empId) {
+      state.empNameAr = '';
+      return '';
+    }
+    var hit = lookupNameArFromIndex(state.namesArData, state.empId, state.empName);
+    if (hit) state.empNameAr = hit;
+    return state.empNameAr;
+  }
 
   function t(key) {
     var pack = I18N[state.lang] || I18N.en;
@@ -407,7 +457,20 @@
     if (changeEmp) changeEmp.textContent = t('changeEmp');
     var pickClose = document.getElementById('pickCloseBtn');
     if (pickClose) pickClose.textContent = t('close');
+    var subtitle = document.getElementById('pageTitleMain');
+    if (subtitle) subtitle.textContent = t('titleMain');
+    if (state.lang === 'ar' && state.empId && !state.empNameAr) {
+      syncEmpNameAr();
+    }
     paintChrome();
+    if (state.lang === 'ar' && state.empId && !state.empNameAr) {
+      resolveEmpNameAr(state.empId, state.date).then(function (nameAr) {
+        if (nameAr && nameAr !== state.empNameAr) {
+          state.empNameAr = nameAr;
+          paintChrome();
+        }
+      });
+    }
     if (state.date) renderDay(state.date, '');
   }
 
@@ -623,7 +686,41 @@
   }
 
   function displayName(raw) {
-    return String(raw || '').replace(/\s*-\s*\d+\s*$/, '').trim();
+    return String(raw || '')
+      .replace(/\s*-\s*[\d*][\d\s()A-Za-z\u0600-\u06FF]*$/, '')
+      .trim();
+  }
+
+  function headerEmpLabel() {
+    if (!state.empName && !state.empId) return t('titleEyebrow');
+    if (state.lang === 'ar' && state.empNameAr) return displayName(state.empNameAr);
+    return displayName(state.empName || state.empId);
+  }
+
+  function findNameArInHtml(html, empId) {
+    if (!html || !empId) return '';
+    var safeId = String(empId).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var re = new RegExp('data-name-ar="([^"]*?' + safeId + '[^"]*)"', 'i');
+    var m = html.match(re);
+    return m ? String(m[1]).trim() : '';
+  }
+
+  function resolveEmpNameAr(empId, iso) {
+    return loadNamesAr().then(function (data) {
+      var hit = lookupNameArFromIndex(data, empId, state.empName);
+      if (hit) return hit;
+      if (!iso) return '';
+      return loadRoster(iso).then(function (pack) {
+        if (!pack.ok) return '';
+        for (var i = 0; i < pack.htmls.length; i++) {
+          var htmlHit = findNameArInHtml(pack.htmls[i], empId);
+          if (htmlHit) return htmlHit;
+        }
+        return '';
+      });
+    }).catch(function () {
+      return '';
+    });
   }
 
   function shiftLabel(name) {
@@ -709,6 +806,79 @@
     syncShiftStrip(state.date, false);
   }
 
+  function bindShiftStripDrag(strip) {
+    if (!strip || strip._dragBound) return;
+    strip._dragBound = true;
+
+    var active = false;
+    var dragging = false;
+    var startX = 0;
+    var startScroll = 0;
+    var pointerId = null;
+    var moved = 0;
+
+    function endDrag(e) {
+      if (!active) return;
+      active = false;
+      strip.classList.remove('is-dragging');
+      try {
+        if (pointerId != null && strip.hasPointerCapture(pointerId)) {
+          strip.releasePointerCapture(pointerId);
+        }
+      } catch (err) {}
+      pointerId = null;
+      if (dragging) {
+        // Swallow the click that follows a drag.
+        var blockClick = function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          strip.removeEventListener('click', blockClick, true);
+        };
+        strip.addEventListener('click', blockClick, true);
+        setTimeout(function () {
+          strip.removeEventListener('click', blockClick, true);
+        }, 0);
+      }
+      dragging = false;
+      moved = 0;
+      if (e) e.preventDefault();
+    }
+
+    strip.addEventListener('pointerdown', function (e) {
+      if (e.button != null && e.button !== 0) return;
+      active = true;
+      dragging = false;
+      moved = 0;
+      startX = e.clientX;
+      startScroll = strip.scrollLeft;
+      pointerId = e.pointerId;
+      try { strip.setPointerCapture(pointerId); } catch (err) {}
+    });
+
+    strip.addEventListener('pointermove', function (e) {
+      if (!active || (pointerId != null && e.pointerId !== pointerId)) return;
+      var dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      if (moved < 6) return;
+      if (!dragging) {
+        dragging = true;
+        strip.classList.add('is-dragging');
+      }
+      strip.scrollLeft = startScroll - dx;
+      e.preventDefault();
+    });
+
+    strip.addEventListener('pointerup', endDrag);
+    strip.addEventListener('pointercancel', endDrag);
+    strip.addEventListener('lostpointercapture', function () {
+      if (active) {
+        active = false;
+        dragging = false;
+        strip.classList.remove('is-dragging');
+      }
+    });
+  }
+
   function syncShiftStrip(iso, smooth) {
     var strip = document.getElementById('shiftStrip');
     if (!strip) return;
@@ -734,18 +904,28 @@
     }
   }
 
+  function monthName(iso) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return '';
+    var mo = parseInt(p[1], 10);
+    var months = state.lang === 'ar' ? MONTHS_AR : MONTHS_EN;
+    return months[mo - 1] || '';
+  }
+
   function paintChrome() {
     var empHeader = document.getElementById('empNameHeader');
     var subtitle = document.getElementById('pageTitleMain');
     if (subtitle) subtitle.textContent = t('titleMain');
     if (empHeader) {
-      empHeader.textContent = state.empName
-        ? displayName(state.empName)
-        : t('titleEyebrow');
+      empHeader.textContent = headerEmpLabel();
     }
-    var dateLbl = document.getElementById('dateTagLabel');
-    if (dateLbl && state.date) {
-      dateLbl.textContent = weekday(state.date) + ' · ' + formatDate(state.date);
+    var dateWeek = document.getElementById('dateTagWeek');
+    var dateDay = document.getElementById('dateTagDay');
+    var dateMonth = document.getElementById('dateTagMonth');
+    if (state.date) {
+      if (dateWeek) dateWeek.textContent = weekday(state.date);
+      if (dateDay) dateDay.textContent = dayNum(state.date);
+      if (dateMonth) dateMonth.textContent = monthName(state.date);
     }
     var picker = document.getElementById('datePicker');
     if (picker) {
@@ -817,6 +997,15 @@
     return String(p.name || p.id || '').trim();
   }
 
+  function personDisplayName(p) {
+    return displayName(personLabel(p));
+  }
+
+  function personDisplayId(p) {
+    var id = String(p.id || empIdFromLabel(p.name) || empIdFromLabel(p.nameAr) || '').trim();
+    return id;
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var meta = SHIFT_META[shiftKey] || SHIFT_META.Other;
     var people = flattenPeople(groups);
@@ -829,26 +1018,28 @@
     html += '<span class="crewCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
     html += '</div>';
     html += '<div class="crewCard"><div class="empList">';
+    var deptIndex = 0;
     (groups || []).forEach(function (g) {
       var list = (g.people || []).slice();
       if (!list.length) return;
       list.sort(function (a, b) {
-        return personLabel(a).localeCompare(personLabel(b), undefined, { sensitivity: 'base' });
+        return personDisplayName(a).localeCompare(personDisplayName(b), undefined, { sensitivity: 'base' });
       });
-      html += '<section class="deptGroup" data-dept="' + escapeHtml(g.dept) + '">';
-      html += '<div class="deptHead">';
+      var tone = (deptIndex % 2 === 0) ? 'tone-a' : 'tone-b';
+      deptIndex += 1;
+      html += '<div class="deptHead ' + tone + '" data-dept="' + escapeHtml(g.dept) + '">';
       html += '<span class="roleDot" aria-hidden="true"></span>';
       html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
       html += '</div>';
       list.forEach(function (p) {
         var isSelf = p.id && p.id === selfId;
-        html += '<div class="empRow' + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
-        html += '<span class="empMain">';
-        html += '<span class="empName">' + escapeHtml(personLabel(p)) + '</span>';
+        var selfCls = isSelf ? ' is-self' : '';
+        html += '<span class="empMain ' + tone + selfCls + '" data-emp-id="' + escapeHtml(p.id) + '">';
+        html += '<span class="empName">' + escapeHtml(personDisplayName(p)) + '</span>';
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-        html += '</span></div>';
+        html += '</span>';
+        html += '<span class="empId ' + tone + selfCls + '">' + escapeHtml(personDisplayId(p) || '') + '</span>';
       });
-      html += '</section>';
     });
     html += '</div></div>';
     return html;
@@ -905,6 +1096,11 @@
       if (!groups.length) {
         finish('<div class="restCard"><p>' + escapeHtml(t('noRoster')) + '</p></div>');
         return;
+      }
+      var nameAr = findNameArInHtml(pack.htmls[0], state.empId) || findNameArInHtml(pack.htmls[1], state.empId);
+      if (nameAr) {
+        state.empNameAr = nameAr;
+        paintChrome();
       }
       finish(renderGroups(groups, shiftKey, state.empId));
     });
@@ -1109,6 +1305,7 @@
     loadSchedule(empId).then(function (json) {
       state.schedule = json;
       state.empName = json.name ? (json.name + ' - ' + empId) : empId;
+      state.empNameAr = '';
       state.empDept = json.department || '';
       var dates = collectDates(json);
       state.minDate = dates[0] || '';
@@ -1117,7 +1314,16 @@
       var wanted = (q.get('date') || '').trim() || muscatToday();
       if (state.minDate && wanted < state.minDate) wanted = state.minDate;
       if (state.maxDate && wanted > state.maxDate) wanted = state.maxDate;
+      syncEmpNameAr();
       paintChrome();
+      if (!state.empNameAr) {
+        resolveEmpNameAr(empId, wanted).then(function (nameAr) {
+          if (nameAr) {
+            state.empNameAr = nameAr;
+            paintChrome();
+          }
+        });
+      }
       closePicker();
       buildShiftStrip();
       renderDay(wanted, '');
@@ -1128,6 +1334,7 @@
   }
 
   function init() {
+    loadNamesAr();
     state.lang = readLang();
     applyLang(state.lang);
     var home = document.getElementById('backBtn');
@@ -1150,6 +1357,7 @@
       var anim = iso > state.date ? 'slide-left' : 'slide-right';
       renderDay(iso, anim);
     });
+    bindShiftStripDrag(document.getElementById('shiftStrip'));
     document.getElementById('pickSheet')?.addEventListener('click', function (e) {
       if (e.target === e.currentTarget) closePicker();
     });

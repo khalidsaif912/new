@@ -128,7 +128,8 @@ def test_with_me_page_exists():
     assert "changeEmp" in html
     assert "border-inline-start" in html
     assert "inset-inline" in html
-    assert 'html[dir="rtl"]' in html
+    assert "dateTagDay" in html
+    assert "IBM Plex Sans" in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "bindSwipe" in src
@@ -140,6 +141,7 @@ def test_with_me_page_exists():
     assert "passive: false" in src
     assert "buildShiftStrip" in src
     assert "syncShiftStrip" in src
+    assert "bindShiftStripDrag" in src
     assert "shiftDay" in src
     assert "sg-morning" in src
     assert "flattenPeople" in src
@@ -154,14 +156,20 @@ def test_with_me_page_exists():
     assert "crewCard" in render
     assert "crewSummary" in render
     assert "deptHead" in render
-    assert "deptGroup" in render
+    assert "empMain" in render
+    assert "empId" in render
+    assert "tone-a" in render
+    assert "deptGroup" not in render
+    assert "empRow" not in render
     assert "roleBadge" not in render
     assert "empStatus" not in render
     assert "deptSplitBar" not in html
     assert "swipeHint" not in html
     assert ".deptHead" in html
-    assert "personLabel" in src
-    assert "unicode-bidi: embed" in html
+    assert "personDisplayId" in src
+    assert "empId" in html
+    assert "font-variant-numeric: tabular-nums" in html
+    assert "grid-template-columns: max-content" in html
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():
