@@ -273,10 +273,10 @@
       line-height: 1;
     }
     .dateTagMain {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      align-items: flex-end;
-      justify-content: stretch;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: .2em;
       pointer-events: none;
       padding-bottom: 0;
@@ -301,14 +301,16 @@
       width: max-content;
       direction: ltr;
       unicode-bidi: isolate;
-      grid-column: 3;
-      justify-self: start;
+      position: absolute;
+      inset-inline-start: calc(50% + min(15vw, 58px));
+      top: 50%;
+      transform: translateY(-48%);
     }
     body.ar .dateTagSide,
     html[lang="ar"] .dateTagSide {
       align-items: flex-end;
-      grid-column: 1;
-      justify-self: end;
+      inset-inline-start: auto;
+      inset-inline-end: calc(50% + min(15vw, 58px));
     }
     .dateTagWeek {
       display: block;
@@ -316,7 +318,7 @@
       font-weight: 700;
       letter-spacing: -.01em;
       line-height: 1.05;
-      color: rgba(255, 255, 255, .14);
+      color: rgba(255, 255, 255, .3);
       text-align: left;
       white-space: nowrap;
       width: 100%;
@@ -334,8 +336,6 @@
       color: rgba(255, 255, 255, .16);
       font-variant-numeric: tabular-nums;
       flex: 0 0 auto;
-      grid-column: 2;
-      justify-self: center;
     }
     body.ar .dateTagDay { letter-spacing: 0; }
     .dateTagMonthWrap {
@@ -354,7 +354,7 @@
       font-weight: 700;
       letter-spacing: -.02em;
       line-height: 1;
-      color: rgba(255, 255, 255, .14);
+      color: rgba(255, 255, 255, .28);
       text-transform: none;
       text-align: left;
       white-space: nowrap;

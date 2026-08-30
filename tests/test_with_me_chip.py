@@ -136,12 +136,15 @@ def test_with_me_page_exists():
         html,
         re.S,
     )
-    assert "grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)" in html
     assert re.search(
-        r"\.dateTagDay\s*\{[^}]*grid-column: 2;[^}]*justify-self: center;",
+        r"\.dateTagMain\s*\{[^}]*position: relative;[^}]*display: flex;[^}]*justify-content: center;",
         html,
         re.S,
     )
+    assert "inset-inline-start: calc(50% + min(15vw, 58px))" in html
+    assert "inset-inline-end: calc(50% + min(15vw, 58px))" in html
+    assert "rgba(255, 255, 255, .3)" in html
+    assert "rgba(255, 255, 255, .28)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
