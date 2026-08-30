@@ -132,7 +132,7 @@ def test_with_me_page_exists():
     assert "IBM Plex Sans" in html
     assert "min-height: 166px" in html
     assert re.search(
-        r"\.headerBody\s*\{[^}]*position: absolute;[^}]*inset-block: 44px 8px;",
+        r"\.headerBody\s*\{[^}]*position: absolute;[^}]*inset-block: 8px;",
         html,
         re.S,
     )
@@ -141,10 +141,14 @@ def test_with_me_page_exists():
         html,
         re.S,
     )
-    assert "inset-inline-start: calc(50% + min(15vw, 58px))" in html
-    assert "inset-inline-end: 0" in html
-    assert "inset-inline-start: 0" in html
-    assert "inset-inline-end: calc(50% + min(15vw, 58px))" in html
+    assert re.search(
+        r"\.dateTagSide\s*\{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;",
+        html,
+        re.S,
+    )
+    assert "top: 22%" in html
+    assert "top: 56%" in html
+    assert "text-align: center" in html
     assert "rgba(255, 255, 255, .3)" in html
     assert "rgba(255, 255, 255, .28)" in html
     assert "-webkit-box-reflect" not in html
