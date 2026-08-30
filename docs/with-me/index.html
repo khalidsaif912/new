@@ -277,13 +277,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: .2em;
+      gap: min(2.4vw, 12px);
       pointer-events: none;
       padding-bottom: 0;
       direction: ltr;
-      width: 100%;
+      width: max-content;
       max-width: 100%;
-      margin-inline: 0;
+      margin-inline: auto;
     }
     body.ar .dateTagMain,
     html[lang="ar"] .dateTagMain {
@@ -294,30 +294,26 @@
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
-      gap: 2px;
+      gap: 3px;
       line-height: 1;
-      padding: 7px 10px 8px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, .07);
-      border: 1px solid rgba(255, 255, 255, .1);
-      box-shadow: 0 8px 18px rgba(15, 23, 42, .1);
+      padding-inline-start: min(1.8vw, 10px);
+      border-inline-start: 1px solid rgba(255, 255, 255, .13);
       flex: 0 0 auto;
       direction: ltr;
       unicode-bidi: isolate;
-      position: absolute;
-      left: calc(50% + min(7vw, 24px));
-      right: auto;
-      top: 50%;
-      transform: translateY(-48%);
+      position: static;
+      transform: none;
       min-width: 0;
       width: max-content;
-      max-width: min(42%, 174px);
+      max-width: none;
     }
     body.ar .dateTagSide,
     html[lang="ar"] .dateTagSide {
       align-items: flex-end;
-      left: auto;
-      right: calc(50% + min(7vw, 24px));
+      padding-inline-start: 0;
+      padding-inline-end: min(1.8vw, 10px);
+      border-inline-start: none;
+      border-inline-end: 1px solid rgba(255, 255, 255, .13);
     }
     .dateTagWeek {
       display: block;
@@ -325,7 +321,7 @@
       font-weight: 700;
       letter-spacing: -.01em;
       line-height: 1.05;
-      color: rgba(255, 255, 255, .46);
+      color: rgba(255, 255, 255, .16);
       text-align: left;
       white-space: nowrap;
       width: 100%;
@@ -358,11 +354,11 @@
     }
     .dateTagMonth {
       display: block;
-      font-size: clamp(24px, 7vw, 34px);
+      font-size: clamp(28px, 10vw, 42px);
       font-weight: 700;
-      letter-spacing: -.03em;
+      letter-spacing: -.02em;
       line-height: 1;
-      color: rgba(255, 255, 255, .42);
+      color: rgba(255, 255, 255, .16);
       text-transform: none;
       text-align: left;
       white-space: nowrap;
