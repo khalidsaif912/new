@@ -127,15 +127,18 @@ def test_with_me_page_exists():
     assert "empDept" in src
     assert 'class="deptCard withMeCard"' in src
     assert "t('titleMain')" in src
-    assert "deptSplitBar" in src
+    assert "deptSplitBar" not in src
+    assert "swipeHint" not in src
     assert "DEPT_META" in src
+    assert "wash" in src
     flatten = src[src.find("function flattenPeople") : src.find("function renderGroups")]
     assert "dept: g.dept" in flatten
     assert "status" not in flatten
     render = src[src.find("function renderGroups") : src.find("function renderDay")]
     assert render.count("deptCard") == 1
     assert "empStatus" not in render
-    assert ".deptSplitBar" in html
+    assert "deptSplitBar" not in html
+    assert "swipeHint" not in html
     assert ".empDept" in html
     assert "body.ar .backBtn" not in html
     assert "body.ar .langToggle" not in html

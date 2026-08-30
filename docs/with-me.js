@@ -14,11 +14,11 @@
 
   var DEPT_ORDER = ['Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators'];
   var DEPT_META = {
-    Officers: { base: '#2563eb', light: '#2563eb15', grad: '#2563eb', gradTo: '#2563ebcc' },
-    Supervisors: { base: '#0891b2', light: '#0891b215', grad: '#0891b2', gradTo: '#0891b2cc' },
-    'Load Control': { base: '#059669', light: '#05966915', grad: '#059669', gradTo: '#059669cc' },
-    'Export Checker': { base: '#dc2626', light: '#dc262615', grad: '#dc2626', gradTo: '#dc2626cc' },
-    'Export Operators': { base: '#7c3aed', light: '#7c3aed15', grad: '#7c3aed', gradTo: '#7c3aedcc' }
+    Officers: { base: '#2563eb', wash: '#dbeafe', self: '#bfdbfe' },
+    Supervisors: { base: '#0891b2', wash: '#cffafe', self: '#a5f3fc' },
+    'Load Control': { base: '#059669', wash: '#d1fae5', self: '#a7f3d0' },
+    'Export Checker': { base: '#dc2626', wash: '#fee2e2', self: '#fecaca' },
+    'Export Operators': { base: '#7c3aed', wash: '#ede9fe', self: '#ddd6fe' }
   };
   var SHIFT_META = {
     Morning: { icon: '☀️', color: '#92400e', bg: '#fef3c7', border: '#f59e0b44' },
@@ -38,7 +38,6 @@
       titleMain: 'With me',
       titleEyebrow: 'My shift',
       back: 'Back',
-      swipeHint: 'Swipe left or right to change the day',
       pickTitle: 'Choose your name',
       pickHint: 'So we can show who is on shift with you',
       pickSearch: 'Search name or ID',
@@ -73,7 +72,6 @@
       titleMain: 'معي',
       titleEyebrow: 'مناوبتي',
       back: 'رجوع',
-      swipeHint: 'مرّر يميناً أو يساراً لتغيير اليوم',
       pickTitle: 'اختر اسمك',
       pickHint: 'حتى نعرض من سيكون معك في المناوبة',
       pickSearch: 'ابحث بالاسم أو الرقم',
@@ -255,8 +253,6 @@
     if (lbl) lbl.textContent = state.lang === 'ar' ? 'EN' : 'ع';
     var back = document.getElementById('backBtn');
     if (back) back.textContent = t('back');
-    var hint = document.getElementById('swipeHint');
-    if (hint) hint.textContent = t('swipeHint');
     var pickTitle = document.getElementById('pickTitle');
     if (pickTitle) pickTitle.textContent = t('pickTitle');
     var pickHint = document.getElementById('pickHint');
@@ -369,7 +365,7 @@
   }
 
   function deptMeta(name) {
-    return DEPT_META[name] || { base: '#6b7280', light: '#6b728015', grad: '#6b7280', gradTo: '#6b7280cc' };
+    return DEPT_META[name] || { base: '#6b7280', wash: '#f3f4f6', self: '#e5e7eb' };
   }
 
   function shiftLabel(name) {
@@ -387,7 +383,9 @@
         : t('titleEyebrow');
     }
     var dateLbl = document.getElementById('dateTagLabel');
-    if (dateLbl && state.date) dateLbl.textContent = formatDate(state.date);
+    if (dateLbl && state.date) {
+      dateLbl.textContent = weekday(state.date) + ' · ' + formatDate(state.date);
+    }
     var picker = document.getElementById('datePicker');
     if (picker) {
       picker.value = state.date || '';
@@ -395,7 +393,7 @@
       if (state.maxDate) picker.max = state.maxDate;
     }
     var weekdayEl = document.getElementById('weekdayLabel');
-    if (weekdayEl) weekdayEl.textContent = weekday(state.date);
+    if (weekdayEl) weekdayEl.hidden = true;
   }
 
   function setLoading(on) {
@@ -443,11 +441,7 @@
     html += '<span class="shiftBannerCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
     html += '</div>';
     html += '<div class="deptCard withMeCard">';
-    html += '<div class="deptBar"></div>';
     html += '<div class="deptHead">';
-    html += '<div class="deptIcon">';
-    html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-    html += '</div>';
     html += '<div class="deptTitle">' + escapeHtml(t('titleMain')) + '</div>';
     html += '<div class="deptBadge">';
     html += '<span>' + escapeHtml(t('total')) + '</span><strong>' + people.length + '</strong>';
@@ -455,16 +449,18 @@
     html += '<div class="empList">';
     (groups || []).forEach(function (g) {
       var colors = deptMeta(g.dept);
-      html += '<div class="deptBlock">';
-      html += '<div class="deptSplitBar" style="background:linear-gradient(to right,' + colors.grad + ',' + colors.gradTo + ')"></div>';
-      (g.people || []).forEach(function (p, i) {
+      html += '<div class="deptBlock" style="background:' + colors.wash + '">';
+      (g.people || []).forEach(function (p) {
         var isSelf = p.id && p.id === selfId;
         var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
-        html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
+        var rowStyle = isSelf
+          ? 'background:' + colors.self + ';--dept-accent:' + colors.base
+          : '';
+        html += '<div class="empRow' + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '"' + (rowStyle ? ' style="' + rowStyle + '"' : '') + '>';
         html += '<span class="empName">' + escapeHtml(display) + '</span>';
         html += '<span class="empMeta">';
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-        html += '<span class="empDept" style="color:' + colors.base + ';background:' + colors.light + '">' + escapeHtml(deptLabel(g.dept)) + '</span>';
+        html += '<span class="empDept" style="color:' + colors.base + '">' + escapeHtml(deptLabel(g.dept)) + '</span>';
         html += '</span></div>';
       });
       html += '</div>';

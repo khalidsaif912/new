@@ -28,16 +28,16 @@
     .wrap {
       max-width: 680px;
       margin: 0 auto;
-      padding: calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+      padding: calc(8px + var(--safe-top)) 10px calc(10px + var(--safe-bottom));
     }
 
     .header {
       background: linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
       color: #fff;
-      padding: 26px 18px 22px;
-      border-radius: 20px;
+      padding: 8px 12px 10px;
+      border-radius: 14px;
       text-align: center;
-      box-shadow: 0 4px 16px rgba(30, 64, 175, .14);
+      box-shadow: 0 3px 12px rgba(30, 64, 175, .12);
       position: relative;
       overflow: hidden;
       direction: ltr;
@@ -48,53 +48,50 @@
       border-radius: 50%;
       pointer-events: none;
     }
-    .header::before { top: -30px; right: -40px; width: 140px; height: 140px; background: rgba(255,255,255,.08); }
-    .header::after { bottom: -50px; left: -30px; width: 160px; height: 160px; background: rgba(255,255,255,.06); }
-    .bannerTitle { margin: 0; position: relative; z-index: 1; line-height: 1.1; color: #fff; }
+    .header::before { top: -40px; right: -50px; width: 100px; height: 100px; background: rgba(255,255,255,.08); }
+    .header::after { bottom: -40px; left: -40px; width: 110px; height: 110px; background: rgba(255,255,255,.06); }
+    .bannerTitle { margin: 0; position: relative; z-index: 1; line-height: 1.1; color: #fff; padding: 0 48px; }
     .bannerTitleEyebrow {
-      display: block; font-size: 11px; font-weight: 700; letter-spacing: .18em;
-      text-transform: uppercase; opacity: .88; margin-bottom: 5px;
+      display: block; font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; opacity: .88; margin-bottom: 1px;
     }
-    body.ar .bannerTitleEyebrow { letter-spacing: .04em; text-transform: none; font-size: 12px; }
-    .bannerTitleMain { display: block; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
-    body.ar .bannerTitleMain { font-size: 26px; letter-spacing: 0; }
-    .weekdayLabel {
-      margin-top: 8px; font-size: 12px; font-weight: 700; opacity: .9;
-      position: relative; z-index: 1;
-    }
+    body.ar .bannerTitleEyebrow { letter-spacing: .02em; text-transform: none; font-size: 11px; }
+    .bannerTitleMain { display: block; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+    body.ar .bannerTitleMain { font-size: 19px; letter-spacing: 0; }
+    .weekdayLabel { display: none; }
 
     .backBtn, .langToggle {
-      position: absolute; top: 12px; z-index: 30;
+      position: absolute; top: 8px; z-index: 30;
       background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
       border-radius: 999px; color: #fff; cursor: pointer;
       -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     .backBtn {
-      left: 12px; text-decoration: none; font-size: 12px; font-weight: 800;
-      padding: 6px 12px;
+      left: 10px; text-decoration: none; font-size: 11px; font-weight: 800;
+      padding: 5px 10px;
     }
     .langToggle {
-      right: 12px; min-width: 40px; height: 40px; padding: 4px 8px;
+      right: 10px; min-width: 34px; height: 34px; padding: 2px 6px;
       display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 2px; font-size: 0; box-shadow: none;
     }
-    .langToggle-label { font-size: 11px; font-weight: 800; line-height: 1; }
+    .langToggle-label { font-size: 10px; font-weight: 800; line-height: 1; }
 
     .dateNav {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      margin-top: 14px; position: relative; z-index: 4;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 6px; position: relative; z-index: 4;
     }
     .dayBtn {
-      width: 40px; height: 40px; border: none; border-radius: 999px;
-      background: rgba(255,255,255,.18); color: #fff; font-size: 22px; line-height: 1;
+      width: 32px; height: 32px; border: none; border-radius: 999px;
+      background: rgba(255,255,255,.18); color: #fff; font-size: 18px; line-height: 1;
       cursor: pointer; flex-shrink: 0;
       -webkit-tap-highlight-color: transparent;
     }
-    .datePickerWrapper { position: relative; min-height: 44px; min-width: min(100%, 210px); }
+    .datePickerWrapper { position: relative; min-height: 32px; min-width: min(100%, 230px); }
     .dateTag {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.18); padding: 8px 16px; border-radius: 10px;
-      font-size: 13px; font-weight: 600; border: 2px solid rgba(255,255,255,.2);
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.18); padding: 5px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.2);
       color: #fff; cursor: pointer; user-select: none;
     }
     .datePickerWrapper #datePicker {
@@ -102,16 +99,12 @@
       cursor: pointer; font-size: 16px; border: none;
     }
 
-    .swipeHint {
-      text-align: center; color: #64748b; font-size: 12px; font-weight: 600;
-      margin: 12px 0 4px; letter-spacing: .01em;
-    }
     .crewStatus, .crewEmpty {
-      text-align: center; color: #475569; font-size: 14px; font-weight: 600;
-      margin: 18px 8px;
+      text-align: center; color: #475569; font-size: 13px; font-weight: 600;
+      margin: 8px;
     }
 
-    .crewTrack { min-height: 40vh; }
+    .crewTrack { min-height: 0; }
     .crewTrack.slide-left { animation: slideLeft .28s ease; }
     .crewTrack.slide-right { animation: slideRight .28s ease; }
     @keyframes slideLeft {
@@ -123,81 +116,66 @@
       to { opacity: 1; transform: none; }
     }
     .shiftBanner {
-      margin-top: 8px; border-radius: 14px; border: 1px solid;
-      padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-weight: 800;
+      margin-top: 6px; border-radius: 10px; border: 1px solid;
+      padding: 5px 12px; display: flex; align-items: center; gap: 8px; font-weight: 800;
     }
-    .shiftBannerIcon { font-size: 20px; }
-    .shiftBannerName { flex: 1; font-size: 16px; }
-    .shiftBannerCount { font-size: 12px; opacity: .85; }
+    .shiftBannerIcon { font-size: 15px; }
+    .shiftBannerName { flex: 1; font-size: 13px; }
+    .shiftBannerCount { font-size: 11px; opacity: .85; }
 
     .deptCard {
-      margin-top: 14px; background: #fff; border-radius: 18px; overflow: hidden;
-      border: 1px solid rgba(15,23,42,.07); box-shadow: 0 4px 18px rgba(15,23,42,.08);
+      margin-top: 6px; background: #fff; border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(15,23,42,.07); box-shadow: 0 3px 12px rgba(15,23,42,.06);
     }
-    .deptBar { height: 5px; background: linear-gradient(to right, #4f46e5, #818cf8); }
     .deptHead {
-      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-      border-bottom: 2px solid #e0e7ff;
+      display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .deptIcon {
-      width: 40px; height: 40px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      background: #eef2ff; color: #4f46e5;
-    }
-    .deptTitle { font-size: 17px; font-weight: 800; color: #1e293b; flex: 1; }
+    .deptTitle { font-size: 14px; font-weight: 800; color: #1e293b; flex: 1; }
     .deptBadge {
-      min-width: 48px; padding: 6px 10px; border-radius: 12px; text-align: center;
+      min-width: 36px; padding: 2px 8px; border-radius: 8px; text-align: center;
       background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe;
     }
-    .deptBadge span { display: block; font-size: 10px; opacity: .7; text-transform: uppercase; letter-spacing: .4px; }
+    .deptBadge span { display: block; font-size: 9px; opacity: .7; text-transform: uppercase; letter-spacing: .3px; }
     body.ar .deptBadge span { text-transform: none; letter-spacing: 0; }
-    .deptBadge strong { font-size: 17px; font-weight: 900; }
+    .deptBadge strong { font-size: 13px; font-weight: 900; }
 
-    .empList {
-      margin: 0 10px 10px; display: flex; flex-direction: column; gap: 10px;
-      background: transparent;
-    }
-    .deptBlock {
-      border-radius: 14px; overflow: hidden; background: #f8fafc;
-      box-shadow: 0 2px 10px rgba(15,23,42,.06);
-    }
-    .deptSplitBar { height: 5px; }
+    .empList { margin: 0; display: flex; flex-direction: column; gap: 0; }
+    .deptBlock { overflow: hidden; }
     .empRow {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 14px; border-top: 1px solid rgba(15,23,42,.06); gap: 10px;
+      padding: 4px 10px; gap: 6px;
     }
-    .empRow:first-child, .deptSplitBar + .empRow { border-top: none; }
-    .empRowAlt { background: rgba(15,23,42,.03); }
-    .empRow.is-self { box-shadow: inset 3px 0 0 #4f46e5; background: #eef2ff; }
-    html[dir="rtl"] .empRow.is-self { box-shadow: inset -3px 0 0 #4f46e5; }
+    .empRow.is-self { box-shadow: inset 3px 0 0 var(--dept-accent, #4f46e5); }
+    html[dir="rtl"] .empRow.is-self { box-shadow: inset -3px 0 0 var(--dept-accent, #4f46e5); }
     .empName {
-      font-size: 15px; font-weight: 700; color: #1e293b; min-width: 0;
-      text-align: start;
+      font-size: 13px; font-weight: 700; color: #1e293b; min-width: 0;
+      text-align: start; line-height: 1.25;
     }
-    .empMeta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .empMeta { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
     .empDept {
-      font-size: 12px; font-weight: 800; color: #4f46e5;
-      background: #eef2ff; border-radius: 999px; padding: 4px 8px; white-space: nowrap;
+      font-size: 10px; font-weight: 800; background: rgba(255,255,255,.72);
+      border-radius: 999px; padding: 2px 6px; white-space: nowrap;
     }
     .youPill {
-      font-size: 10px; font-weight: 800; background: #4f46e5; color: #fff;
-      border-radius: 999px; padding: 3px 8px; letter-spacing: .02em;
+      font-size: 9px; font-weight: 800; background: #4f46e5; color: #fff;
+      border-radius: 999px; padding: 2px 6px; letter-spacing: .02em;
     }
 
     .restCard {
-      margin-top: 16px; background: #fff; border: 1px solid #e2e8f0;
-      border-radius: 18px; padding: 28px 18px; text-align: center;
-      box-shadow: 0 4px 18px rgba(15,23,42,.06);
+      margin-top: 10px; background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 14px; padding: 20px 16px; text-align: center;
+      box-shadow: 0 3px 12px rgba(15,23,42,.06);
     }
-    .restIcon { font-size: 36px; margin-bottom: 8px; }
-    .restCard h2 { margin: 0 0 6px; font-size: 20px; }
-    .restCard p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.5; }
-    .restShift { font-weight: 800 !important; margin: 0 0 8px !important; }
+    .restIcon { font-size: 28px; margin-bottom: 6px; }
+    .restCard h2 { margin: 0 0 4px; font-size: 18px; }
+    .restCard p { margin: 0; color: #64748b; font-size: 13px; line-height: 1.4; }
+    .restShift { font-weight: 800 !important; margin: 0 0 6px !important; }
 
     .changeEmp {
-      display: block; margin: 18px auto 0; background: none; border: none;
-      color: #2563eb; font-size: 13px; font-weight: 800; cursor: pointer;
-      padding: 8px;
+      display: block; margin: 6px auto 0; background: none; border: none;
+      color: #2563eb; font-size: 12px; font-weight: 800; cursor: pointer;
+      padding: 4px;
     }
 
     .pickSheet {
@@ -232,9 +210,8 @@
     }
 
     @media (max-width: 420px) {
-      .bannerTitleMain { font-size: 24px; }
-      .empName { font-size: 14px; }
-      .dayBtn, .langToggle { width: 44px; height: 44px; }
+      .bannerTitleMain { font-size: 18px; }
+      .empName { font-size: 12.5px; }
     }
   </style>
 </head>
@@ -249,7 +226,6 @@
         <span class="bannerTitleEyebrow" id="pageTitleEyebrow">My shift</span>
         <span class="bannerTitleMain" id="pageTitleMain">With me</span>
       </h1>
-      <div class="weekdayLabel" id="weekdayLabel"></div>
       <div class="dateNav">
         <button type="button" class="dayBtn" id="prevDayBtn" aria-label="Previous day">‹</button>
         <div class="datePickerWrapper">
@@ -262,7 +238,6 @@
       </div>
     </div>
 
-    <p class="swipeHint" id="swipeHint">Swipe left or right to change the day</p>
     <p class="crewStatus" id="crewStatus" hidden>Loading the roster…</p>
     <p class="crewEmpty" id="crewEmpty" hidden></p>
     <div class="crewTrack" id="crewTrack"></div>
@@ -279,6 +254,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm5"></script>
+  <script src="../with-me.js?v=20260830wm6"></script>
 </body>
 </html>
