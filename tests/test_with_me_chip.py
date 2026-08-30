@@ -134,6 +134,8 @@ def test_with_me_page_exists():
     assert "pickRestQuote" in src
     assert "restSubtitle" in src
     assert "اختيار موظف آخر" in src
+    assert "touch-action: pan-y" in src or "touchmove" in src
+    assert "passive: false" in src
     assert "flattenPeople" in src
     assert "t('titleMain')" in src
     assert "deptSplitBar" not in src

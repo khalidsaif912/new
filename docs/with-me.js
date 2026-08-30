@@ -800,57 +800,107 @@
   }
 
   function bindSwipe(el) {
+    if (!el) return;
+
     var startX = 0;
     var startY = 0;
     var tracking = false;
+    var axis = ''; // '' | 'h' | 'v'
+    var pointerId = null;
+
+    function sheetOpen() {
+      var sheet = document.getElementById('pickSheet');
+      return !!(sheet && sheet.classList.contains('open'));
+    }
 
     function ignoreTarget(target) {
-      return target && target.closest(
-        'a, button, input, select, textarea, label[for="datePicker"], .pickSheet, .changeEmp'
-      );
+      return !!(target && target.closest && target.closest(
+        'a, button, input, select, textarea, .datePickerWrapper, .pickSheet'
+      ));
     }
 
-    function onStart(clientX, clientY, target) {
-      if (ignoreTarget(target)) return;
-      startX = clientX;
-      startY = clientY;
-      tracking = true;
-    }
-
-    function onEnd(clientX, clientY) {
-      if (!tracking) return;
+    function reset() {
       tracking = false;
-      var sheet = document.getElementById('pickSheet');
-      if (sheet && sheet.classList.contains('open')) return;
-      var dx = clientX - startX;
-      var dy = clientY - startY;
-      if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
+      axis = '';
+      pointerId = null;
+    }
+
+    function finish(dx, dy) {
+      if (!tracking) return;
+      reset();
+      if (sheetOpen()) return;
+      if (axis === 'v') return;
+      if (Math.abs(dx) < 36) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.05) return;
+      // Swipe left → next day, swipe right → previous day (same in AR/EN)
       go(dx < 0 ? 1 : -1);
     }
 
     el.addEventListener('touchstart', function (e) {
-      if (e.touches.length !== 1) return;
-      onStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
+      if (sheetOpen() || e.touches.length !== 1 || ignoreTarget(e.target)) {
+        reset();
+        return;
+      }
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+      axis = '';
+      pointerId = null;
     }, { passive: true });
+
+    el.addEventListener('touchmove', function (e) {
+      if (!tracking || e.touches.length !== 1) return;
+      var dx = e.touches[0].clientX - startX;
+      var dy = e.touches[0].clientY - startY;
+      if (!axis) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        axis = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
+      }
+      // Claim horizontal swipes so the browser does not steal them for scroll.
+      if (axis === 'h' && e.cancelable) e.preventDefault();
+    }, { passive: false });
 
     el.addEventListener('touchend', function (e) {
       if (!tracking || !e.changedTouches.length) return;
-      onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      var t = e.changedTouches[0];
+      finish(t.clientX - startX, t.clientY - startY);
     }, { passive: true });
 
-    el.addEventListener('touchcancel', function () { tracking = false; }, { passive: true });
+    el.addEventListener('touchcancel', function () { reset(); }, { passive: true });
 
+    // Mouse / pen only — avoid double-handling with touch pointers on phones.
     el.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      onStart(e.clientX, e.clientY, e.target);
+      if (e.pointerType === 'touch') return;
+      if (e.button !== 0 || sheetOpen() || ignoreTarget(e.target)) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      tracking = true;
+      axis = '';
+      pointerId = e.pointerId;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
     });
 
-    window.addEventListener('pointerup', function (e) {
-      if (!tracking) return;
-      onEnd(e.clientX, e.clientY);
+    el.addEventListener('pointermove', function (e) {
+      if (!tracking || e.pointerType === 'touch') return;
+      if (pointerId != null && e.pointerId !== pointerId) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (!axis) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        axis = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
+      }
     });
 
-    window.addEventListener('pointercancel', function () { tracking = false; });
+    el.addEventListener('pointerup', function (e) {
+      if (!tracking || e.pointerType === 'touch') return;
+      if (pointerId != null && e.pointerId !== pointerId) return;
+      finish(e.clientX - startX, e.clientY - startY);
+    });
+
+    el.addEventListener('pointercancel', function (e) {
+      if (e.pointerType === 'touch') return;
+      reset();
+    });
   }
 
   function loadIndex() {
@@ -988,7 +1038,7 @@
       if (e.key === 'ArrowRight') go(state.lang === 'ar' ? -1 : 1);
       if (e.key === 'Escape') closePicker();
     });
-    bindSwipe(document.body);
+    bindSwipe(document.getElementById('pageWrap') || document.body);
 
     var empId = readSavedEmp();
     if (!empId) {

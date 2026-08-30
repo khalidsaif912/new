@@ -48,7 +48,6 @@
       font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       -webkit-font-smoothing: antialiased;
-      touch-action: manipulation;
     }
     * { box-sizing: border-box; }
     body.ar {
@@ -58,10 +57,13 @@
     .wrap {
       max-width: 680px;
       margin: 0 auto;
+      min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
       padding:
         calc(var(--space-sm) + var(--safe-top))
         var(--space-md)
         calc(var(--space-lg) + var(--safe-bottom));
+      /* Vertical scroll stays with the browser; horizontal swipe is ours. */
+      touch-action: pan-y;
     }
 
     /* ── Header ── */
@@ -291,7 +293,7 @@
     /* ── Crew track ── */
     .crewTrack {
       min-height: min(52vh, 420px);
-      touch-action: manipulation;
+      touch-action: pan-y;
     }
     .crewTrack.slide-left { animation: slideLeft .28s ease; }
     .crewTrack.slide-right { animation: slideRight .28s ease; }
@@ -468,6 +470,7 @@
       padding: var(--space-lg) var(--space-md);
       text-align: center;
       box-shadow: var(--shadow-card);
+      touch-action: pan-y;
     }
     .restIcon { font-size: 36px; margin-block-end: var(--space-sm); line-height: 1; }
     .restCard h2 {
@@ -685,6 +688,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm19"></script>
+  <script src="../with-me.js?v=20260830wm20"></script>
 </body>
 </html>
