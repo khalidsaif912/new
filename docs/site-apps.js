@@ -269,7 +269,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
-    ensureReadSignSummaryChip();
+    ensureWithMeChip();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
     if (spotlight && spotlight.classList.contains('open')) {
@@ -289,7 +289,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
-    ensureReadSignSummaryChip();
+    ensureWithMeChip();
     organizeAppsGrid();
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -346,6 +346,11 @@
   function readSignPageUrl() {
     if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/read-and-sign/';
     return 'https://khalidsaif912.github.io/roster-site/read-and-sign/';
+  }
+
+  function withMePageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/with-me/';
+    return 'https://khalidsaif912.github.io/roster-site/with-me/';
   }
 
   function spotlightItems() {
@@ -637,9 +642,9 @@
         t('readSignSub') +
         '</span>' +
         '</span>';
-      var ideas = grid.querySelector('[data-app-id="ideas"]');
-      if (ideas && ideas.nextSibling) grid.insertBefore(card, ideas.nextSibling);
-      else if (ideas) grid.appendChild(card);
+      var wa = grid.querySelector('[data-app-id="wa"]');
+      if (wa && wa.nextSibling) grid.insertBefore(card, wa.nextSibling);
+      else if (wa) grid.appendChild(card);
       else {
         var games = grid.querySelector('[data-app-id="games"]');
         if (games) grid.insertBefore(card, games);
@@ -659,32 +664,46 @@
     if (ico) ico.innerHTML = iconForApp('readSign');
   }
 
-  function ensureReadSignSummaryChip() {
+  function withMeChipHtml() {
+    return (
+      '<div class="chipVal">' +
+      '<svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>' +
+      '<circle cx="9" cy="7" r="4"/>' +
+      '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>' +
+      '<path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' +
+      '</div>' +
+      '<div class="chipLabel" data-key="withMePage">' +
+      (lang() === 'ar' ? 'معي' : 'With me') +
+      '</div>'
+    );
+  }
+
+  function ensureWithMeChip() {
     if (/\/import(\/|$)/.test(location.pathname || '')) return;
+    if (/\/with-me(\/|$)/.test(location.pathname || '')) return;
     var bar = document.querySelector('.summaryBar');
     if (!bar) return;
-    var href = readSignPageUrl();
-    var existing = document.getElementById('readSignChipBtn');
+    var href = withMePageUrl();
+    var existing = document.getElementById('withMeChipBtn') || document.getElementById('readSignChipBtn');
     if (!existing) {
       existing = document.createElement('a');
-      existing.id = 'readSignChipBtn';
-      existing.className = 'summaryChip readSignChip';
+      existing.id = 'withMeChipBtn';
+      existing.className = 'summaryChip withMeChip';
       existing.style.textDecoration = 'none';
       existing.setAttribute('data-open-same', '1');
-      existing.innerHTML =
-        '<div class="chipVal">' +
-        '<svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
-        '<path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>' +
-        '</div>' +
-        '<div class="chipLabel" data-key="readSignPage">' +
-        (lang() === 'ar' ? 'إقرار' : 'Read&Sign') +
-        '</div>';
+      existing.innerHTML = withMeChipHtml();
       bar.insertBefore(existing, bar.firstChild);
+    } else {
+      existing.id = 'withMeChipBtn';
+      existing.className = 'summaryChip withMeChip';
+      existing.style.textDecoration = 'none';
+      existing.setAttribute('data-open-same', '1');
+      existing.removeAttribute('target');
+      existing.removeAttribute('rel');
+      existing.innerHTML = withMeChipHtml();
     }
     existing.href = href;
-    var label = existing.querySelector('.chipLabel');
-    if (label) label.textContent = lang() === 'ar' ? 'إقرار' : 'Read&Sign';
   }
 
   function removeFlightsAppLink() {
@@ -710,7 +729,7 @@
       );
     }
 
-    var order = ['wa', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'readSign', 'store', 'games'];
+    var order = ['wa', 'readSign', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -789,7 +808,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
-    ensureReadSignSummaryChip();
+    ensureWithMeChip();
     organizeAppsGrid();
     grid.addEventListener('click', function (e) {
       if (e.target.closest('a.siteAppsLink--calc')) {
@@ -869,6 +888,10 @@
       '.siteAppsLink--wa .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
       '.siteAppsLink--wa .siteAppsLink-title,.siteAppsLink--wa .siteAppsLink-sub{text-align:start!important;}',
       '.siteAppsLink--wa::after{content:none!important;display:none!important;}',
+      '.siteAppsLink--readSign{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:64px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#ccfbf1 100%)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;flex-shrink:0!important;}',
+      '.siteAppsLink--readSign .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
+      '.siteAppsLink--readSign .siteAppsLink-title,.siteAppsLink--readSign .siteAppsLink-sub{text-align:start!important;}',
       '.siteAppsLink--games{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-height:64px!important;padding:10px 14px!important;gap:12px!important;background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;flex-shrink:0!important;}',
       '.siteAppsLink--games .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
@@ -892,6 +915,11 @@
       '.spotlightActions,.spotlightCloseWrap{display:none!important;}',
       '.siteAppsSheet{padding:12px!important;overscroll-behavior:none;background:rgba(15,23,42,.5)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100130!important;}',
       '.siteAppsCard{width:min(100%,400px)!important;max-height:calc(100vh - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px 14px 12px!important;border-radius:22px!important;border:1px solid rgba(148,163,184,.22)!important;background:linear-gradient(180deg,#ffffff 0%,#f5f9ff 100%)!important;box-shadow:0 28px 70px rgba(15,23,42,.28)!important;-webkit-overflow-scrolling:auto!important;}',
+      '@media (max-width:720px){',
+      '.siteAppsSheet{align-items:flex-end!important;padding:0!important;padding-top:8px!important;}',
+      '.siteAppsCard{width:100%!important;max-width:100%!important;border-radius:22px 22px 0 0!important;max-height:min(92dvh, 760px)!important;padding:14px 14px max(12px, env(safe-area-inset-bottom, 0px))!important;}',
+      '.siteAppsGrid{overflow:auto!important;-webkit-overflow-scrolling:touch!important;}',
+      '}',
       '.siteAppsTitle{font-size:17px!important;margin:0 0 2px!important;flex-shrink:0;letter-spacing:-.01em;}',
       '.siteAppsHint{font-size:12px!important;margin:0 0 12px!important;line-height:1.4!important;flex-shrink:0;color:#64748b!important;}',
       '.siteAppsGrid{gap:10px!important;margin-bottom:10px!important;min-height:0;flex:1 1 auto;align-content:start;}',
@@ -908,6 +936,7 @@
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      'a.summaryChip.withMeChip .chipVal{color:#4f46e5;}',
       'a.summaryChip.readSignChip .chipVal{color:#0f766e;}',
       '.siteAppsCloseWrap{margin-top:4px!important;flex-shrink:0;}',
       '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:42px;padding-top:9px;padding-bottom:9px;border-radius:14px!important;}',
@@ -921,7 +950,7 @@
       '.siteAppsLink-icon svg,.siteAppsFlatSvg,.siteAppsFlatImg{width:26px!important;height:26px!important;}',
       '.siteAppsLink-title{font-size:11px!important;}',
       '.siteAppsLink-sub{display:none!important;}',
-      '.siteAppsLink--wa,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
+      '.siteAppsLink--wa,.siteAppsLink--readSign,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
       '.siteAppsTitle{font-size:15px!important;}',
       '}',
       '@media (max-height:560px){',
@@ -1182,7 +1211,7 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
-    ensureReadSignSummaryChip();
+    ensureWithMeChip();
     organizeAppsGrid();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {

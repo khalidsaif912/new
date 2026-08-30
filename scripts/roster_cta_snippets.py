@@ -112,6 +112,13 @@ SVG_APP_STORE = (
     '<rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/>'
     '</svg>'
 )
+SVG_APP_READ_SIGN = (
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>'
+    '<path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/>'
+    '<path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+    '</svg>'
+)
 
 
 def _chip_svg(paths: str, *, size: int = 22, stroke: str = "#1e40af") -> str:
@@ -186,6 +193,13 @@ SVG_CHIP_READ_SIGN = _chip_svg(
     '<path d="M9 15l2 2 4-4"/>',
     stroke="#0f766e",
 )
+SVG_CHIP_WITH_ME = _chip_svg(
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>'
+    '<circle cx="9" cy="7" r="4"/>'
+    '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>'
+    '<path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    stroke="#4f46e5",
+)
 
 CHIP_SCHEDULE_HTML = _chip_val(SVG_CHIP_SCHEDULE)
 CHIP_FLIGHT_HTML = _chip_val(SVG_CHIP_FLIGHT)
@@ -198,6 +212,7 @@ CHIP_AFTERNOON_HTML = _chip_val(SVG_CHIP_CLOUD_SUN)
 CHIP_NIGHT_HTML = _chip_val(SVG_CHIP_MOON)
 CHIP_ALL_HTML = _chip_val(SVG_CHIP_CLIPBOARD)
 CHIP_READ_SIGN_HTML = _chip_val(SVG_CHIP_READ_SIGN)
+CHIP_WITH_ME_HTML = _chip_val(SVG_CHIP_WITH_ME)
 
 SVG_LANG_GLOBE = (
     '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
@@ -811,6 +826,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-text">
           <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
           <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+        </span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
+        <span class="siteAppsLink-icon">{SVG_APP_READ_SIGN}</span>
+        <span class="siteAppsLink-text">
+          <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
+          <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
         </span>
       </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">

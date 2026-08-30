@@ -111,23 +111,36 @@ def ensure_css(text: str) -> tuple[str, bool]:
     marker = "    #summarySwitchChip .chipVal { transition:opacity .2s ease; }"
     if marker in text:
         return text.replace(marker, CSS_SNIPPET + "\n" + marker, 1), True
-    # Fallback: after readSignChip hover CSS
-    alt = "    a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }"
+    # Fallback: after withMe / readSign chip hover CSS
+    alt = "    a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }"
     if alt in text:
         return text.replace(alt, alt + "\n" + CSS_SNIPPET, 1), True
+    legacy = "    a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }"
+    if legacy in text:
+        return text.replace(legacy, legacy + "\n" + CSS_SNIPPET, 1), True
     return text, False
 
 
 def ensure_chip(text: str) -> tuple[str, bool]:
     if 'id="summarySwitchChip"' in text:
         return text, False
-    if 'id="readSignChipBtn"' not in text and 'id="myScheduleBtn"' not in text:
+    if 'id="readSignChipBtn"' not in text and 'id="withMeChipBtn"' not in text and 'id="myScheduleBtn"' not in text:
         return text, False
 
     emp = extract_emp_count(text)
     chip = CHIP_HTML.format(emp=emp)
 
-    # Prefer: right after Read&Sign chip
+    # Prefer: right after With me (or legacy Read&Sign) chip
+    if 'id="withMeChipBtn"' in text:
+        text2, n = re.subn(
+            r'(<a\b[^>]*\bid="withMeChipBtn"[^>]*>[\s\S]*?</a>\s*)',
+            r"\1" + chip,
+            text,
+            count=1,
+        )
+        if n:
+            return text2, True
+
     if 'id="readSignChipBtn"' in text:
         text2, n = re.subn(
             r'(<a\b[^>]*\bid="readSignChipBtn"[^>]*>[\s\S]*?</a>\s*)',

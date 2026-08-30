@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e40af">
+  <title>With me</title>
+  <script defer src="../ios-tap-fix.js?v=20260830wm"></script>
+  <script src="../emp-id-gate.js?v=20260730a"></script>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+      touch-action: pan-y;
+    }
+    * { box-sizing: border-box; }
+    body.ar { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+      color: #fff;
+      padding: 26px 18px 22px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(30, 64, 175, .14);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before, .header::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .header::before { top: -30px; right: -40px; width: 140px; height: 140px; background: rgba(255,255,255,.08); }
+    .header::after { bottom: -50px; left: -30px; width: 160px; height: 160px; background: rgba(255,255,255,.06); }
+    .bannerTitle { margin: 0; position: relative; z-index: 1; line-height: 1.1; color: #fff; }
+    .bannerTitleEyebrow {
+      display: block; font-size: 11px; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; opacity: .88; margin-bottom: 5px;
+    }
+    body.ar .bannerTitleEyebrow { letter-spacing: .04em; text-transform: none; font-size: 12px; }
+    .bannerTitleMain { display: block; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
+    body.ar .bannerTitleMain { font-size: 26px; letter-spacing: 0; }
+    .weekdayLabel {
+      margin-top: 8px; font-size: 12px; font-weight: 700; opacity: .9;
+      position: relative; z-index: 1;
+    }
+
+    .backBtn, .langToggle {
+      position: absolute; top: 12px; z-index: 30;
+      background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px; color: #fff; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .backBtn {
+      left: 12px; text-decoration: none; font-size: 12px; font-weight: 800;
+      padding: 6px 12px;
+    }
+    body.ar .backBtn { left: auto; right: 12px; }
+    .langToggle {
+      right: 12px; min-width: 40px; height: 40px; padding: 4px 8px;
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; font-size: 0; box-shadow: none;
+    }
+    body.ar .langToggle { right: auto; left: 12px; }
+    .langToggle-label { font-size: 11px; font-weight: 800; line-height: 1; }
+
+    .dateNav {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 14px; position: relative; z-index: 4;
+    }
+    .dayBtn {
+      width: 40px; height: 40px; border: none; border-radius: 999px;
+      background: rgba(255,255,255,.18); color: #fff; font-size: 22px; line-height: 1;
+      cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .datePickerWrapper { position: relative; min-height: 44px; min-width: min(100%, 210px); }
+    .dateTag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.18); padding: 8px 16px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; border: 2px solid rgba(255,255,255,.2);
+      color: #fff; cursor: pointer; user-select: none;
+    }
+    .datePickerWrapper #datePicker {
+      position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0;
+      cursor: pointer; font-size: 16px; border: none;
+    }
+
+    .swipeHint {
+      text-align: center; color: #64748b; font-size: 12px; font-weight: 600;
+      margin: 12px 0 4px; letter-spacing: .01em;
+    }
+    .crewStatus, .crewEmpty {
+      text-align: center; color: #475569; font-size: 14px; font-weight: 600;
+      margin: 18px 8px;
+    }
+
+    .crewTrack { min-height: 40vh; }
+    .crewTrack.slide-left { animation: slideLeft .28s ease; }
+    .crewTrack.slide-right { animation: slideRight .28s ease; }
+    @keyframes slideLeft {
+      from { opacity: .35; transform: translateX(28px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes slideRight {
+      from { opacity: .35; transform: translateX(-28px); }
+      to { opacity: 1; transform: none; }
+    }
+    .shiftBanner {
+      margin-top: 8px; border-radius: 14px; border: 1px solid;
+      padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-weight: 800;
+    }
+    .shiftBannerIcon { font-size: 20px; }
+    .shiftBannerName { flex: 1; font-size: 16px; }
+    .shiftBannerCount { font-size: 12px; opacity: .85; }
+
+    .deptCard {
+      margin-top: 14px; background: #fff; border-radius: 18px; overflow: hidden;
+      border: 1px solid rgba(15,23,42,.07); box-shadow: 0 4px 18px rgba(15,23,42,.08);
+    }
+    .deptBar { height: 5px; }
+    .deptHead { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+    .deptIcon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .deptTitle { font-size: 17px; font-weight: 800; color: #1e293b; flex: 1; }
+    .deptBadge { min-width: 48px; padding: 6px 10px; border-radius: 12px; text-align: center; }
+    .deptBadge span { display: block; font-size: 10px; opacity: .7; text-transform: uppercase; letter-spacing: .4px; }
+    body.ar .deptBadge span { text-transform: none; letter-spacing: 0; }
+    .deptBadge strong { font-size: 17px; font-weight: 900; }
+
+    .empList { margin: 0 10px 10px; border-radius: 14px; overflow: hidden; }
+    .empRow, .empName, .empStatus { direction: ltr; unicode-bidi: embed; text-align: left; }
+    .empRow {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; border-top: 1px solid rgba(15,23,42,.06); gap: 10px;
+    }
+    .empRow:first-child { border-top: none; }
+    .empRowAlt { background: rgba(15,23,42,.03); }
+    .empRow.is-self { box-shadow: inset 3px 0 0 #4f46e5; }
+    .empName { font-size: 15px; font-weight: 700; color: #1e293b; }
+    .empMeta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .empStatus { font-size: 12px; font-weight: 700; }
+    .youPill {
+      font-size: 10px; font-weight: 800; background: #4f46e5; color: #fff;
+      border-radius: 999px; padding: 3px 8px; letter-spacing: .02em;
+    }
+
+    .restCard {
+      margin-top: 16px; background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 18px; padding: 28px 18px; text-align: center;
+      box-shadow: 0 4px 18px rgba(15,23,42,.06);
+    }
+    .restIcon { font-size: 36px; margin-bottom: 8px; }
+    .restCard h2 { margin: 0 0 6px; font-size: 20px; }
+    .restCard p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.5; }
+    .restShift { font-weight: 800 !important; margin: 0 0 8px !important; }
+
+    .changeEmp {
+      display: block; margin: 18px auto 0; background: none; border: none;
+      color: #2563eb; font-size: 13px; font-weight: 800; cursor: pointer;
+      padding: 8px;
+    }
+
+    .pickSheet {
+      position: fixed; inset: 0; display: none; align-items: flex-end; justify-content: center;
+      background: rgba(15,23,42,.5); z-index: 80; padding: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .pickSheet.open { display: flex; }
+    .pickCard {
+      width: min(100%, 680px); max-height: min(88dvh, 720px);
+      background: #fff; border-radius: 22px 22px 0 0; padding: 16px 14px 18px;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .pickCard h2 { margin: 0 0 4px; font-size: 18px; }
+    .pickCard .pickHint { margin: 0 0 12px; color: #64748b; font-size: 13px; }
+    #pickSearch {
+      width: 100%; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 12px 14px; font-size: 16px; margin-bottom: 10px;
+    }
+    #pickList { overflow: auto; -webkit-overflow-scrolling: touch; min-height: 0; flex: 1; }
+    .pickRow {
+      width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 11px 12px; margin-bottom: 8px; cursor: pointer; text-align: start;
+    }
+    .pickName { font-size: 14px; font-weight: 800; color: #0f172a; }
+    .pickDept { font-size: 12px; color: #64748b; font-weight: 600; }
+    .pickEmpty { text-align: center; color: #64748b; }
+    .pickClose {
+      margin-top: 10px; width: 100%; border: none; border-radius: 14px;
+      background: #e2e8f0; color: #0f172a; font-weight: 800; padding: 12px; cursor: pointer;
+    }
+
+    @media (max-width: 420px) {
+      .bannerTitleMain { font-size: 24px; }
+      .empName { font-size: 14px; }
+      .dayBtn, .langToggle { width: 44px; height: 44px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="pageWrap">
+    <div class="header">
+      <a class="backBtn" id="backBtn" href="../">Back</a>
+      <button type="button" class="langToggle" id="langToggle" title="Switch language">
+        <span class="langToggle-label" id="langToggleLabel">ع</span>
+      </button>
+      <h1 class="bannerTitle">
+        <span class="bannerTitleEyebrow" id="pageTitleEyebrow">My shift</span>
+        <span class="bannerTitleMain" id="pageTitleMain">With me</span>
+      </h1>
+      <div class="weekdayLabel" id="weekdayLabel"></div>
+      <div class="dateNav">
+        <button type="button" class="dayBtn" id="prevDayBtn" aria-label="Previous day">‹</button>
+        <div class="datePickerWrapper">
+          <label class="dateTag" for="datePicker">
+            <span class="dateTag-label" id="dateTagLabel">—</span>
+          </label>
+          <input id="datePicker" type="date" aria-label="Select date">
+        </div>
+        <button type="button" class="dayBtn" id="nextDayBtn" aria-label="Next day">›</button>
+      </div>
+    </div>
+
+    <p class="swipeHint" id="swipeHint">Swipe left or right to change the day</p>
+    <p class="crewStatus" id="crewStatus" hidden>Loading the roster…</p>
+    <p class="crewEmpty" id="crewEmpty" hidden></p>
+    <div class="crewTrack" id="crewTrack"></div>
+    <button type="button" class="changeEmp" id="changeEmpBtn">Change person</button>
+  </div>
+
+  <div class="pickSheet" id="pickSheet" aria-hidden="true">
+    <div class="pickCard" role="dialog" aria-labelledby="pickTitle">
+      <h2 id="pickTitle">Choose your name</h2>
+      <p class="pickHint" id="pickHint">So we can show who is on shift with you</p>
+      <input id="pickSearch" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search name or ID">
+      <div id="pickList"></div>
+      <button type="button" class="pickClose" id="pickCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <script src="../with-me.js?v=20260830wm"></script>
+</body>
+</html>

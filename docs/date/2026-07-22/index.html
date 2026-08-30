@@ -295,6 +295,9 @@
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     a.summaryChip.readSignChip .chipVal { color:#0f766e; }
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
+    a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
+    a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
+
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -1059,11 +1062,11 @@
 
   <!-- ════ SUMMARY CHIPS ════ -->
   <div class="summaryBar">
-    <a href="https://khalidsaif912.github.io/roster-site/read-and-sign/" id="readSignChipBtn" class="summaryChip readSignChip" style="text-decoration:none;">
-      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg></div>
-      <div class="chipLabel" data-key="readSignPage">Read&amp;Sign</div>
+        <a href="https://khalidsaif912.github.io/roster-site/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
-    <div class="summaryChip" id="summarySwitchChip">
+<div class="summaryChip" id="summarySwitchChip">
       <div class="chipVal" id="summarySwitchVal">72</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
@@ -2785,7 +2788,7 @@ var T = {
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
@@ -2798,7 +2801,7 @@ var T = {
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
 };
@@ -2855,6 +2858,7 @@ function applyLang(lang) {
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
+    else if(k==='withMePage') el.textContent=t.withMePage;
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
@@ -2938,6 +2942,9 @@ function setSummaryChipHrefs() {
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
   var readSign = document.getElementById('readSignChipBtn');
+    var withMe = document.getElementById('withMeChipBtn');
+  if (withMe) withMe.href = (typeof root !== 'undefined' && root ? root : (typeof base !== 'undefined' && base ? base : getSiteRootUrl())) + '/with-me/';
+
   var welcome = document.getElementById('welcomeChip');
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
@@ -3267,7 +3274,7 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260830wm');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

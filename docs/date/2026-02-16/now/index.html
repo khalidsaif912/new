@@ -1990,6 +1990,9 @@ function setSummaryChipHrefs() {
   var exp = document.getElementById('exportBtn');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
+    var withMe = document.getElementById('withMeChipBtn');
+  if (withMe) withMe.href = (typeof root !== 'undefined' && root ? root : (typeof base !== 'undefined' && base ? base : getSiteRootUrl())) + '/with-me/';
+
   var welcome = document.getElementById('welcomeChip');
   if (my) {
     my.href = (location.pathname || '').indexOf('/import/') >= 0
