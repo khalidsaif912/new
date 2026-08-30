@@ -136,6 +136,12 @@ def test_with_me_page_exists():
         html,
         re.S,
     )
+    assert "grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)" in html
+    assert re.search(
+        r"\.dateTagDay\s*\{[^}]*grid-column: 2;[^}]*justify-self: center;",
+        html,
+        re.S,
+    )
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
