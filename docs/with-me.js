@@ -1006,8 +1006,9 @@
   function renderGroups(groups, shiftKey, selfId) {
     var people = flattenPeople(groups);
     var html = '';
-    html += '<div class="crewCard">';
-    html += '<div class="crewSummary ' + shiftCssClass(shiftKey) + '" data-shift="' + escapeHtml(shiftKey) + '">';
+    var shiftClass = shiftCssClass(shiftKey);
+    html += '<div class="crewCard ' + shiftClass + '">';
+    html += '<div class="crewSummary ' + shiftClass + '" data-shift="' + escapeHtml(shiftKey) + '">';
     html += '<div class="shiftChip">';
     html += '<span class="shiftDot" aria-hidden="true"></span>';
     html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';

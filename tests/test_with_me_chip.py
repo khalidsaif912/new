@@ -183,6 +183,7 @@ def test_with_me_page_exists():
     assert "crewSummary" in render
     assert "shiftDot" in render
     assert "shiftCssClass(shiftKey)" in render
+    assert 'class="crewCard \' + shiftClass + \'"' in render
     assert "deptHead" in render
     assert "empMain" in render
     assert "empId" in render
@@ -198,6 +199,8 @@ def test_with_me_page_exists():
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html
     assert "grid-template-columns: max-content" in html
+    assert "border-inline-start-width: 3px" in html
+    assert ".crewCard.sg-afternoon" in html
     assert "personLabel" in src
     assert re.search(
         r"body\.ar \.empList,\s*html\[lang=\"ar\"\] \.empList\s*\{[^}]*direction: rtl;[^}]*margin-inline-start: 0;[^}]*margin-inline-end: auto;",

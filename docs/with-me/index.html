@@ -556,7 +556,6 @@
       padding: 10px 14px;
       border: none;
       border-bottom: 1px solid var(--border);
-      border-inline-start: 3px solid var(--shift-accent, var(--border));
       border-radius: 0;
       background: var(--surface);
       box-shadow: none;
@@ -593,28 +592,49 @@
       white-space: nowrap;
     }
 
+    .crewCard.sg-morning,
     .crewSummary.sg-morning {
       --shift-accent: #f59e0b;
+    }
+    .crewSummary.sg-morning {
       background: #fffdf8;
     }
+    .crewCard.sg-afternoon,
     .crewSummary.sg-afternoon {
       --shift-accent: #f97316;
+    }
+    .crewSummary.sg-afternoon {
       background: #fffaf7;
     }
+    .crewCard.sg-night,
     .crewSummary.sg-night {
       --shift-accent: #6366f1;
+    }
+    .crewSummary.sg-night {
       background: #f8f9ff;
     }
+    .crewCard.sg-off,
+    .crewCard.sg-leave,
+    .crewCard.sg-sick,
     .crewSummary.sg-off,
     .crewSummary.sg-leave,
     .crewSummary.sg-sick {
       --shift-accent: #94a3b8;
+    }
+    .crewSummary.sg-off,
+    .crewSummary.sg-leave,
+    .crewSummary.sg-sick {
       background: #f8fafc;
     }
+    .crewCard.sg-training,
     .crewSummary.sg-training {
       --shift-accent: #0ea5e9;
+    }
+    .crewSummary.sg-training {
       background: #f8fcff;
     }
+    .crewCard.sg-standby,
+    .crewCard.sg-other,
     .crewSummary.sg-standby,
     .crewSummary.sg-other {
       --shift-accent: #64748b;
@@ -631,6 +651,8 @@
       background: var(--surface);
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
+      border-inline-start-width: 3px;
+      border-inline-start-color: var(--shift-accent, var(--border));
       box-shadow: var(--shadow-card);
       overflow: hidden;
     }
