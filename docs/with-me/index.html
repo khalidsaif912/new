@@ -298,18 +298,20 @@
       line-height: 1;
       padding-bottom: .08em;
       flex: 0 0 auto;
-      width: max-content;
       direction: ltr;
       unicode-bidi: isolate;
       position: absolute;
       inset-inline-start: calc(50% + min(15vw, 58px));
+      inset-inline-end: 0;
       top: 50%;
       transform: translateY(-48%);
+      min-width: 0;
+      width: auto;
     }
     body.ar .dateTagSide,
     html[lang="ar"] .dateTagSide {
       align-items: flex-end;
-      inset-inline-start: auto;
+      inset-inline-start: 0;
       inset-inline-end: calc(50% + min(15vw, 58px));
     }
     .dateTagWeek {
@@ -322,6 +324,7 @@
       text-align: left;
       white-space: nowrap;
       width: 100%;
+      overflow: visible;
     }
     body.ar .dateTagWeek {
       letter-spacing: 0;
@@ -358,6 +361,8 @@
       text-transform: none;
       text-align: left;
       white-space: nowrap;
+      max-width: 100%;
+      overflow: visible;
     }
     body.ar .dateTagMonth {
       letter-spacing: 0;

@@ -142,6 +142,8 @@ def test_with_me_page_exists():
         re.S,
     )
     assert "inset-inline-start: calc(50% + min(15vw, 58px))" in html
+    assert "inset-inline-end: 0" in html
+    assert "inset-inline-start: 0" in html
     assert "inset-inline-end: calc(50% + min(15vw, 58px))" in html
     assert "rgba(255, 255, 255, .3)" in html
     assert "rgba(255, 255, 255, .28)" in html
