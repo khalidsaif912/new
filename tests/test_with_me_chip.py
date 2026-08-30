@@ -172,6 +172,12 @@ def test_with_me_page_exists():
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html
     assert "grid-template-columns: max-content" in html
+    assert "personLabel" in src
+    assert re.search(
+        r"body\.ar \.empName,\s*html\[lang=\"ar\"\] \.empName\s*\{[^}]*direction: rtl;[^}]*unicode-bidi: plaintext;[^}]*text-align: right;",
+        html,
+        re.S,
+    )
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():
