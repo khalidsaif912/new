@@ -130,6 +130,13 @@ def test_with_me_page_exists():
     assert "inset-inline" in html
     assert "dateTagDay" in html
     assert "IBM Plex Sans" in html
+    assert "min-height: 166px" in html
+    assert re.search(
+        r"\.headerBody\s*\{[^}]*position: absolute;[^}]*inset-block: 44px 8px;",
+        html,
+        re.S,
+    )
+    assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "bindSwipe" in src
