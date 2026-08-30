@@ -527,39 +527,84 @@
       to { opacity: 1; transform: none; }
     }
 
-    /* ── Merged shift + count bar ── */
+    /* ── Merged shift + count bar (light) ── */
     .crewSummary {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: var(--space-sm);
-      flex-wrap: wrap;
-      margin-block-start: var(--space-md);
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-md);
+      flex-wrap: nowrap;
+      margin: 0;
+      padding: 10px 14px;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-inline-start: 3px solid var(--shift-accent, var(--border));
+      border-radius: 0;
       background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-card);
+      box-shadow: none;
+      animation: shiftFadeIn .32s ease both;
     }
     .shiftChip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      min-width: 0;
+    }
+    .shiftDot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--shift-accent, var(--text-muted));
+    }
+    .shiftChipLabel {
       font-size: 13px;
       font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.2;
       color: var(--text);
     }
-    .shiftChipIcon { font-size: 16px; line-height: 1; }
-    .shiftChipLabel { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .crewCount {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--brand);
-      background: var(--brand-soft);
-      border: 1px solid rgba(30, 64, 175, .14);
+      color: var(--text-muted);
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
       border-radius: var(--radius-pill);
-      padding: 5px 12px;
+      padding: 4px 10px;
       white-space: nowrap;
+    }
+
+    .crewSummary.sg-morning {
+      --shift-accent: #f59e0b;
+      background: #fffdf8;
+    }
+    .crewSummary.sg-afternoon {
+      --shift-accent: #f97316;
+      background: #fffaf7;
+    }
+    .crewSummary.sg-night {
+      --shift-accent: #6366f1;
+      background: #f8f9ff;
+    }
+    .crewSummary.sg-off,
+    .crewSummary.sg-leave,
+    .crewSummary.sg-sick {
+      --shift-accent: #94a3b8;
+      background: #f8fafc;
+    }
+    .crewSummary.sg-training {
+      --shift-accent: #0ea5e9;
+      background: #f8fcff;
+    }
+    .crewSummary.sg-standby,
+    .crewSummary.sg-other {
+      --shift-accent: #64748b;
+    }
+
+    @keyframes shiftFadeIn {
+      from { opacity: .55; }
+      to { opacity: 1; }
     }
 
     /* ── Colleague list card ── */
@@ -570,6 +615,10 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow-card);
       overflow: hidden;
+    }
+    .crewCard > .crewSummary:first-child {
+      border-start-start-radius: calc(var(--radius-md) - 1px);
+      border-start-end-radius: calc(var(--radius-md) - 1px);
     }
     body.ar .crewCard,
     html[lang="ar"] .crewCard {
@@ -986,6 +1035,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm47"></script>
+  <script src="../with-me.js?v=20260830wm51"></script>
 </body>
 </html>

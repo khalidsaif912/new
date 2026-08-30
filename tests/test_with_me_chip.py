@@ -155,6 +155,8 @@ def test_with_me_page_exists():
     render = src[src.find("function renderGroups") : src.find("function renderDay")]
     assert "crewCard" in render
     assert "crewSummary" in render
+    assert "shiftDot" in render
+    assert "shiftCssClass(shiftKey)" in render
     assert "deptHead" in render
     assert "empMain" in render
     assert "empId" in render

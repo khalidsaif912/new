@@ -815,67 +815,64 @@
     var startX = 0;
     var startScroll = 0;
     var pointerId = null;
-    var moved = 0;
+    var DRAG_THRESHOLD = 8;
 
-    function endDrag(e) {
-      if (!active) return;
+    function reset() {
       active = false;
+      dragging = false;
+      pointerId = null;
       strip.classList.remove('is-dragging');
+    }
+
+    strip.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      active = true;
+      dragging = false;
+      startX = e.clientX;
+      startScroll = strip.scrollLeft;
+      pointerId = e.pointerId;
+    });
+
+    strip.addEventListener('pointermove', function (e) {
+      if (!active || e.pointerId !== pointerId) return;
+      var dx = e.clientX - startX;
+      if (!dragging) {
+        if (Math.abs(dx) < DRAG_THRESHOLD) return;
+        dragging = true;
+        strip.classList.add('is-dragging');
+        try { strip.setPointerCapture(pointerId); } catch (err) {}
+      }
+      strip.scrollLeft = startScroll - dx;
+      if (e.cancelable) e.preventDefault();
+    });
+
+    strip.addEventListener('pointerup', function (e) {
+      if (!active || e.pointerId !== pointerId) return;
+      if (dragging) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+      } else {
+        var btn = e.target.closest('.shiftDay');
+        if (btn) {
+          var iso = btn.getAttribute('data-date');
+          if (iso && iso !== state.date) {
+            renderDay(iso, iso > state.date ? 'slide-left' : 'slide-right');
+          }
+        }
+      }
+      try {
+        if (strip.hasPointerCapture(pointerId)) strip.releasePointerCapture(pointerId);
+      } catch (err) {}
+      reset();
+    });
+
+    strip.addEventListener('pointercancel', function () {
       try {
         if (pointerId != null && strip.hasPointerCapture(pointerId)) {
           strip.releasePointerCapture(pointerId);
         }
       } catch (err) {}
-      pointerId = null;
-      if (dragging) {
-        // Swallow the click that follows a drag.
-        var blockClick = function (ev) {
-          ev.preventDefault();
-          ev.stopPropagation();
-          strip.removeEventListener('click', blockClick, true);
-        };
-        strip.addEventListener('click', blockClick, true);
-        setTimeout(function () {
-          strip.removeEventListener('click', blockClick, true);
-        }, 0);
-      }
-      dragging = false;
-      moved = 0;
-      if (e) e.preventDefault();
-    }
-
-    strip.addEventListener('pointerdown', function (e) {
-      if (e.button != null && e.button !== 0) return;
-      active = true;
-      dragging = false;
-      moved = 0;
-      startX = e.clientX;
-      startScroll = strip.scrollLeft;
-      pointerId = e.pointerId;
-      try { strip.setPointerCapture(pointerId); } catch (err) {}
-    });
-
-    strip.addEventListener('pointermove', function (e) {
-      if (!active || (pointerId != null && e.pointerId !== pointerId)) return;
-      var dx = e.clientX - startX;
-      moved = Math.max(moved, Math.abs(dx));
-      if (moved < 6) return;
-      if (!dragging) {
-        dragging = true;
-        strip.classList.add('is-dragging');
-      }
-      strip.scrollLeft = startScroll - dx;
-      e.preventDefault();
-    });
-
-    strip.addEventListener('pointerup', endDrag);
-    strip.addEventListener('pointercancel', endDrag);
-    strip.addEventListener('lostpointercapture', function () {
-      if (active) {
-        active = false;
-        dragging = false;
-        strip.classList.remove('is-dragging');
-      }
+      reset();
     });
   }
 
@@ -1007,17 +1004,17 @@
   }
 
   function renderGroups(groups, shiftKey, selfId) {
-    var meta = SHIFT_META[shiftKey] || SHIFT_META.Other;
     var people = flattenPeople(groups);
     var html = '';
-    html += '<div class="crewSummary">';
+    html += '<div class="crewCard">';
+    html += '<div class="crewSummary ' + shiftCssClass(shiftKey) + '" data-shift="' + escapeHtml(shiftKey) + '">';
     html += '<div class="shiftChip">';
-    html += '<span class="shiftChipIcon">' + meta.icon + '</span>';
+    html += '<span class="shiftDot" aria-hidden="true"></span>';
     html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
     html += '</div>';
     html += '<span class="crewCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
     html += '</div>';
-    html += '<div class="crewCard"><div class="empList">';
+    html += '<div class="empList">';
     var deptIndex = 0;
     (groups || []).forEach(function (g) {
       var list = (g.people || []).slice();
@@ -1349,14 +1346,6 @@
     });
     document.getElementById('changeEmpBtn')?.addEventListener('click', openPicker);
     document.getElementById('pickCloseBtn')?.addEventListener('click', closePicker);
-    document.getElementById('shiftStrip')?.addEventListener('click', function (e) {
-      var btn = e.target.closest('.shiftDay');
-      if (!btn) return;
-      var iso = btn.getAttribute('data-date');
-      if (!iso || iso === state.date) return;
-      var anim = iso > state.date ? 'slide-left' : 'slide-right';
-      renderDay(iso, anim);
-    });
     bindShiftStripDrag(document.getElementById('shiftStrip'));
     document.getElementById('pickSheet')?.addEventListener('click', function (e) {
       if (e.target === e.currentTarget) closePicker();
