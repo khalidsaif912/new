@@ -12,24 +12,32 @@
   var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
-  var DEPT_ORDER = ['Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators'];
-  var DEPT_META = {
-    Officers: { base: '#2563eb', wash: '#dbeafe', self: '#bfdbfe' },
-    Supervisors: { base: '#0891b2', wash: '#cffafe', self: '#a5f3fc' },
-    'Load Control': { base: '#059669', wash: '#d1fae5', self: '#a7f3d0' },
-    'Export Checker': { base: '#dc2626', wash: '#fee2e2', self: '#fecaca' },
-    'Export Operators': { base: '#7c3aed', wash: '#ede9fe', self: '#ddd6fe' }
+  var DEPT_ORDER = [
+    'Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators',
+    'Documentation', 'Import Checkers', 'Release Control', 'Import Operators',
+    'Flight Dispatch', 'Flight Dispatch (Export)', 'Flight Dispatch (Import)', 'FLTA'
+  ];
+  var IMPORT_WITH_ME_DEPTS = { FLTA: 1 };
+  var IMPORT_ROSTER_DEPTS = {
+    FLTA: 1,
+    'Flight Dispatch': 1,
+    'Flight Dispatch (Export)': 1,
+    'Flight Dispatch (Import)': 1,
+    Documentation: 1,
+    'Import Checkers': 1,
+    'Import Operators': 1,
+    'Release Control': 1
   };
   var SHIFT_META = {
-    Morning: { icon: '☀️', color: '#92400e', bg: '#fef3c7', border: '#f59e0b44' },
-    Afternoon: { icon: '🌆', color: '#9a3412', bg: '#ffedd5', border: '#f9731644' },
-    Night: { icon: '🌙', color: '#5b21b6', bg: '#ede9fe', border: '#8b5cf644' },
-    Standby: { icon: '📞', color: '#0f766e', bg: '#ccfbf1', border: '#14b8a644' },
-    Training: { icon: '📘', color: '#6d28d9', bg: '#f3e8ff', border: '#a78bfa44' },
-    'Off Day': { icon: '🛋️', color: '#3730a3', bg: '#e0e7ff', border: '#6366f144' },
-    'Annual Leave': { icon: '✈️', color: '#065f46', bg: '#d1fae5', border: '#10b98144' },
-    'Sick Leave': { icon: '🤒', color: '#9f1239', bg: '#ffe4e6', border: '#fb718544' },
-    Other: { icon: '•', color: '#334155', bg: '#f1f5f9', border: '#94a3b844' }
+    Morning: { icon: '☀️' },
+    Afternoon: { icon: '🌆' },
+    Night: { icon: '🌙' },
+    Standby: { icon: '📞' },
+    Training: { icon: '📘' },
+    'Off Day': { icon: '🛋️' },
+    'Annual Leave': { icon: '✈️' },
+    'Sick Leave': { icon: '🤒' },
+    Other: { icon: '•' }
   };
   var REST_GROUPS = { 'Off Day': 1, 'Annual Leave': 1, 'Sick Leave': 1 };
 
@@ -57,6 +65,14 @@
       loadControl: 'Load Control',
       exportChecker: 'Export Checker',
       exportOps: 'Export Operators',
+      flightDispatch: 'Flight Dispatch',
+      flightDispatchExport: 'Flight Dispatch (Export)',
+      flightDispatchImport: 'Flight Dispatch (Import)',
+      flta: 'FLTA',
+      documentation: 'Documentation',
+      importCheckers: 'Import Checkers',
+      importOperators: 'Import Operators',
+      releaseControl: 'Release Control',
       unassigned: 'Unassigned',
       morning: 'Morning',
       afternoon: 'Afternoon',
@@ -91,6 +107,14 @@
       loadControl: 'مراقبة الحمولة',
       exportChecker: 'مدقق الصادرات',
       exportOps: 'مشغلو الصادرات',
+      flightDispatch: 'تجهيز الرحلات',
+      flightDispatchExport: 'تجهيز الرحلات (الصادر)',
+      flightDispatchImport: 'تجهيز الرحلات (الوارد)',
+      flta: 'FLTA',
+      documentation: 'المستندات',
+      importCheckers: 'مدققو الواردات',
+      importOperators: 'مشغلو الواردات',
+      releaseControl: 'مراقبة الإفراج',
       unassigned: 'غير مُعيَّن',
       morning: 'صباح',
       afternoon: 'ظهر',
@@ -110,6 +134,14 @@
     'Load Control': 'loadControl',
     'Export Checker': 'exportChecker',
     'Export Operators': 'exportOps',
+    'Flight Dispatch': 'flightDispatch',
+    'Flight Dispatch (Export)': 'flightDispatchExport',
+    'Flight Dispatch (Import)': 'flightDispatchImport',
+    FLTA: 'flta',
+    Documentation: 'documentation',
+    'Import Checkers': 'importCheckers',
+    'Import Operators': 'importOperators',
+    'Release Control': 'releaseControl',
     Unassigned: 'unassigned'
   };
   var SHIFT_I18N = {
@@ -135,7 +167,8 @@
     maxDate: '',
     rosterCache: {},
     index: null,
-    anim: ''
+    anim: '',
+    rosterKind: 'export'
   };
 
   function t(key) {
@@ -153,6 +186,54 @@
       return segs.length ? '/' + segs[0] : '';
     }
     return '';
+  }
+
+  function usesImportRoster(dept) {
+    return !!IMPORT_ROSTER_DEPTS[String(dept || '').trim()];
+  }
+
+  function rosterPrefix() {
+    return state.rosterKind === 'import' ? '/import' : '';
+  }
+
+  function setRosterKind(kind) {
+    var next = kind === 'import' ? 'import' : 'export';
+    if (state.rosterKind !== next) {
+      state.rosterKind = next;
+      state.rosterCache = {};
+    }
+  }
+
+  function fetchScheduleJson(path) {
+    return fetch(rootUrl() + path, { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) throw new Error('missing');
+      return r.json();
+    });
+  }
+
+  function resolveSchedule(empId) {
+    return Promise.all([
+      fetchScheduleJson('/schedules/' + encodeURIComponent(empId) + '.json').catch(function () { return null; }),
+      fetchScheduleJson('/import/schedules/' + encodeURIComponent(empId) + '.json').catch(function () { return null; })
+    ]).then(function (results) {
+      var exportSch = results[0];
+      var importSch = results[1];
+      var wantsImport = (importSch && usesImportRoster(importSch.department)) ||
+        (exportSch && usesImportRoster(exportSch.department));
+      if (importSch && (wantsImport || !exportSch)) {
+        setRosterKind('import');
+        return importSch;
+      }
+      if (exportSch) {
+        setRosterKind('export');
+        return exportSch;
+      }
+      if (importSch) {
+        setRosterKind('import');
+        return importSch;
+      }
+      throw new Error('no schedule');
+    });
   }
 
   function rootUrl() {
@@ -215,6 +296,7 @@
       if (qid) return qid;
       return (
         localStorage.getItem('exportSavedEmpId') ||
+        localStorage.getItem('importSavedEmpId') ||
         localStorage.getItem('savedEmpId') ||
         ''
       ).trim();
@@ -223,13 +305,18 @@
     }
   }
 
-  function saveEmp(id, name) {
+  function saveEmp(id, name, dept) {
     try {
-      localStorage.setItem('exportSavedEmpId', id);
       localStorage.setItem('savedEmpId', id);
-      if (name) {
-        localStorage.setItem('exportSavedEmpName', name);
-        localStorage.setItem('savedEmpName', name);
+      if (usesImportRoster(dept)) {
+        localStorage.setItem('importSavedEmpId', id);
+        if (name) localStorage.setItem('importSavedEmpName', name);
+      } else {
+        localStorage.setItem('exportSavedEmpId', id);
+        if (name) {
+          localStorage.setItem('exportSavedEmpName', name);
+          localStorage.setItem('savedEmpName', name);
+        }
       }
     } catch (e) {}
   }
@@ -251,8 +338,8 @@
     document.body.classList.toggle('ar', state.lang === 'ar');
     var lbl = document.getElementById('langToggleLabel');
     if (lbl) lbl.textContent = state.lang === 'ar' ? 'EN' : 'ع';
-    var back = document.getElementById('backBtn');
-    if (back) back.textContent = t('back');
+    var backLbl = document.getElementById('backBtnLabel');
+    if (backLbl) backLbl.textContent = t('back');
     var pickTitle = document.getElementById('pickTitle');
     if (pickTitle) pickTitle.textContent = t('pickTitle');
     var pickHint = document.getElementById('pickHint');
@@ -267,13 +354,25 @@
     if (state.date) renderDay(state.date, '');
   }
 
+  function rowIsoDate(month, row) {
+    if (!row) return '';
+    if (row.date) return String(row.date);
+    var day = parseInt(row.day, 10);
+    if (!month || !day || day < 1 || day > 31) return '';
+    return month + '-' + pad2(day);
+  }
+
   function dayFromSchedule(iso) {
     var sch = state.schedule;
     if (!sch || !sch.schedules) return null;
     var month = iso.slice(0, 7);
+    var dayNum = parseInt(iso.slice(8, 10), 10);
     var rows = sch.schedules[month] || [];
     for (var i = 0; i < rows.length; i++) {
-      if (rows[i] && rows[i].date === iso) return rows[i];
+      var row = rows[i];
+      if (!row) continue;
+      if (row.date === iso) return row;
+      if (!row.date && parseInt(row.day, 10) === dayNum) return row;
     }
     return null;
   }
@@ -283,14 +382,27 @@
     if (!sch || !sch.schedules) return out;
     Object.keys(sch.schedules).sort().forEach(function (month) {
       (sch.schedules[month] || []).forEach(function (row) {
-        if (row && row.date) out.push(row.date);
+        var iso = rowIsoDate(month, row);
+        if (iso) out.push(iso);
       });
     });
     out.sort();
     return out;
   }
 
-  function parseRosterHtml(html, shiftKey) {
+  function sortGroups(groups) {
+    return (groups || []).slice().sort(function (a, b) {
+      var ia = DEPT_ORDER.indexOf(a.dept);
+      var ib = DEPT_ORDER.indexOf(b.dept);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  }
+
+  function looksLikeRosterHtml(html) {
+    return !!(html && html.indexOf('deptCard') !== -1 && html.indexOf('shiftCard') !== -1);
+  }
+
+  function parseRosterHtmlDom(html, shiftKey) {
     var doc;
     try {
       doc = new DOMParser().parseFromString(html, 'text/html');
@@ -325,31 +437,120 @@
       });
       if (people.length) groups.push({ dept: dept, people: people });
     });
-    groups.sort(function (a, b) {
-      var ia = DEPT_ORDER.indexOf(a.dept);
-      var ib = DEPT_ORDER.indexOf(b.dept);
-      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-    });
+    return sortGroups(groups);
+  }
+
+  function parseRosterHtmlRegex(html, shiftKey) {
+    var groups = [];
+    var safeShift = shiftKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var cardRe = /<div class="deptCard">([\s\S]*?)(?=<div class="deptCard">|\Z)/g;
+    var cardMatch;
+    while ((cardMatch = cardRe.exec(html))) {
+      var block = cardMatch[1];
+      var titleMatch = block.match(/<div class="deptTitle"[^>]*>([^<]+)<\/div>/);
+      if (!titleMatch) continue;
+      var dept = titleMatch[1].trim();
+      var shiftRe = new RegExp('<details class="shiftCard" data-shift="' + safeShift + '"[\\s\\S]*?</details>');
+      var shiftMatch = block.match(shiftRe);
+      if (!shiftMatch) continue;
+      var people = [];
+      var rowRe = /data-emp-name="([^"]+)"/g;
+      var nameMatch;
+      while ((nameMatch = rowRe.exec(shiftMatch[0]))) {
+        var label = nameMatch[1].trim();
+        if (!label) continue;
+        var arMatch = shiftMatch[0].slice(nameMatch.index).match(new RegExp(
+          'data-emp-name="' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"[\\s\\S]*?data-name-ar="([^"]*)"'
+        ));
+        people.push({
+          name: label,
+          nameAr: arMatch ? arMatch[1] : '',
+          id: empIdFromLabel(label),
+          status: ''
+        });
+      }
+      if (people.length) groups.push({ dept: dept, people: people });
+    }
+    return sortGroups(groups);
+  }
+
+  function parseRosterHtml(html, shiftKey) {
+    if (!looksLikeRosterHtml(html)) return [];
+    var groups = parseRosterHtmlDom(html, shiftKey);
+    if (!groups.length) groups = parseRosterHtmlRegex(html, shiftKey);
     return groups;
   }
 
-  function loadRoster(iso) {
-    if (state.rosterCache[iso]) return state.rosterCache[iso];
-    var url = rootUrl() + '/date/' + encodeURIComponent(iso) + '/index.html';
-    var p = fetch(url, { credentials: 'same-origin' }).then(function (res) {
-      if (!res.ok) {
-        return fetch(rootUrl() + '/date/' + encodeURIComponent(iso) + '/', { credentials: 'same-origin' }).then(function (res2) {
-          if (!res2.ok) throw new Error('missing');
-          return res2.text();
-        });
-      }
-      return res.text();
-    }).then(function (html) {
-      return { html: html, ok: true };
-    }).catch(function () {
-      return { html: '', ok: false };
+  function fetchText(urls) {
+    var i = 0;
+    function tryNext() {
+      if (i >= urls.length) return Promise.resolve('');
+      var url = urls[i++];
+      return fetch(url, { credentials: 'same-origin', cache: 'no-store' }).then(function (res) {
+        if (!res.ok) return tryNext();
+        return res.text();
+      }).catch(function () {
+        return tryNext();
+      });
+    }
+    return tryNext();
+  }
+
+  function rosterUrls(prefix, iso) {
+    var base = rootUrl() + (prefix || '');
+    return [
+      base + '/date/' + encodeURIComponent(iso) + '/index.html',
+      base + '/date/' + encodeURIComponent(iso) + '/',
+      base + '/' + encodeURIComponent(iso) + '/index.html',
+      base + '/' + encodeURIComponent(iso) + '/'
+    ];
+  }
+
+  function fetchRosterHtml(prefix, iso) {
+    return fetchText(rosterUrls(prefix, iso));
+  }
+
+  function filterImportGroupsForWithMe(groups) {
+    return (groups || []).filter(function (g) {
+      return g && g.dept && IMPORT_WITH_ME_DEPTS[g.dept];
     });
-    state.rosterCache[iso] = p;
+  }
+
+  function mergeGroups() {
+    var map = {};
+    for (var i = 0; i < arguments.length; i++) {
+      (arguments[i] || []).forEach(function (g) {
+        if (!g || !g.dept) return;
+        if (!map[g.dept]) map[g.dept] = { dept: g.dept, people: [] };
+        var seen = {};
+        map[g.dept].people.forEach(function (p) {
+          if (p.id) seen[p.id] = 1;
+        });
+        (g.people || []).forEach(function (p) {
+          if (!p || !p.name) return;
+          if (p.id && seen[p.id]) return;
+          map[g.dept].people.push(p);
+          if (p.id) seen[p.id] = 1;
+        });
+      });
+    }
+    return sortGroups(Object.keys(map).map(function (k) { return map[k]; }).filter(function (g) {
+      return g.people.length;
+    }));
+  }
+
+  function loadRoster(iso) {
+    var cacheKey = 'both:' + iso;
+    if (state.rosterCache[cacheKey]) return state.rosterCache[cacheKey];
+    var p = Promise.all([
+      fetchRosterHtml('', iso).catch(function () { return ''; }),
+      fetchRosterHtml('/import', iso).catch(function () { return ''; })
+    ]).then(function (results) {
+      return { htmls: results, ok: !!(results[0] || results[1]) };
+    }).catch(function () {
+      return { htmls: ['', ''], ok: false };
+    });
+    state.rosterCache[cacheKey] = p;
     return p;
   }
 
@@ -364,8 +565,8 @@
     return key ? t(key) : name;
   }
 
-  function deptMeta(name) {
-    return DEPT_META[name] || { base: '#6b7280', wash: '#f3f4f6', self: '#e5e7eb' };
+  function displayName(raw) {
+    return String(raw || '').replace(/\s*-\s*\d+\s*$/, '').trim();
   }
 
   function shiftLabel(name) {
@@ -374,12 +575,12 @@
   }
 
   function paintChrome() {
-    var eyebrow = document.getElementById('pageTitleEyebrow');
-    var main = document.getElementById('pageTitleMain');
-    if (main) main.textContent = t('titleMain');
-    if (eyebrow) {
-      eyebrow.textContent = state.empName
-        ? state.empName.replace(/\s*-\s*\d+\s*$/, '').trim()
+    var empHeader = document.getElementById('empNameHeader');
+    var subtitle = document.getElementById('pageTitleMain');
+    if (subtitle) subtitle.textContent = t('titleMain');
+    if (empHeader) {
+      empHeader.textContent = state.empName
+        ? displayName(state.empName)
         : t('titleEyebrow');
     }
     var dateLbl = document.getElementById('dateTagLabel');
@@ -392,8 +593,6 @@
       if (state.minDate) picker.min = state.minDate;
       if (state.maxDate) picker.max = state.maxDate;
     }
-    var weekdayEl = document.getElementById('weekdayLabel');
-    if (weekdayEl) weekdayEl.hidden = true;
   }
 
   function setLoading(on) {
@@ -407,10 +606,10 @@
     var group = (row && row.shift_group) || 'Off Day';
     var meta = SHIFT_META[group] || SHIFT_META.Other;
     return (
-      '<div class="restCard" style="background:' + meta.bg + ';border-color:' + meta.border + '">' +
+      '<div class="restCard">' +
       '<div class="restIcon">' + meta.icon + '</div>' +
       '<h2>' + escapeHtml(t('restTitle')) + '</h2>' +
-      '<p class="restShift" style="color:' + meta.color + '">' + escapeHtml(shiftLabel(group)) + '</p>' +
+      '<p class="restShift">' + escapeHtml(shiftLabel(group)) + '</p>' +
       '<p>' + escapeHtml(t('restBody')) + '</p>' +
       '</div>'
     );
@@ -431,39 +630,43 @@
     return out;
   }
 
+  function personLabel(p) {
+    if (state.lang === 'ar' && p.nameAr) return String(p.nameAr).trim();
+    return String(p.name || p.id || '').trim();
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var meta = SHIFT_META[shiftKey] || SHIFT_META.Other;
     var people = flattenPeople(groups);
     var html = '';
-    html += '<div class="shiftBanner" style="background:' + meta.bg + ';border-color:' + meta.border + ';color:' + meta.color + '">';
-    html += '<span class="shiftBannerIcon">' + meta.icon + '</span>';
-    html += '<span class="shiftBannerName">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
-    html += '<span class="shiftBannerCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
+    html += '<div class="crewSummary">';
+    html += '<div class="shiftChip">';
+    html += '<span class="shiftChipIcon">' + meta.icon + '</span>';
+    html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
     html += '</div>';
-    html += '<div class="deptCard withMeCard">';
-    html += '<div class="deptHead">';
-    html += '<div class="deptTitle">' + escapeHtml(t('titleMain')) + '</div>';
-    html += '<div class="deptBadge">';
-    html += '<span>' + escapeHtml(t('total')) + '</span><strong>' + people.length + '</strong>';
-    html += '</div></div>';
-    html += '<div class="empList">';
+    html += '<span class="crewCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
+    html += '</div>';
+    html += '<div class="crewCard"><div class="empList">';
     (groups || []).forEach(function (g) {
-      var colors = deptMeta(g.dept);
-      html += '<div class="deptBlock" style="background:' + colors.wash + '">';
-      (g.people || []).forEach(function (p) {
+      var list = (g.people || []).slice();
+      if (!list.length) return;
+      list.sort(function (a, b) {
+        return personLabel(a).localeCompare(personLabel(b), undefined, { sensitivity: 'base' });
+      });
+      html += '<section class="deptGroup" data-dept="' + escapeHtml(g.dept) + '">';
+      html += '<div class="deptHead">';
+      html += '<span class="roleDot" aria-hidden="true"></span>';
+      html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
+      html += '</div>';
+      list.forEach(function (p) {
         var isSelf = p.id && p.id === selfId;
-        var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
-        var rowStyle = isSelf
-          ? 'background:' + colors.self + ';--dept-accent:' + colors.base
-          : '';
-        html += '<div class="empRow' + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '"' + (rowStyle ? ' style="' + rowStyle + '"' : '') + '>';
-        html += '<span class="empName">' + escapeHtml(display) + '</span>';
-        html += '<span class="empMeta">';
+        html += '<div class="empRow' + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
+        html += '<span class="empMain">';
+        html += '<span class="empName">' + escapeHtml(personLabel(p)) + '</span>';
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-        html += '<span class="empDept" style="color:' + colors.base + '">' + escapeHtml(deptLabel(g.dept)) + '</span>';
         html += '</span></div>';
       });
-      html += '</div>';
+      html += '</section>';
     });
     html += '</div></div>';
     return html;
@@ -511,7 +714,11 @@
         finish('<div class="restCard"><p>' + escapeHtml(t('noRoster')) + '</p></div>');
         return;
       }
-      var groups = parseRosterHtml(pack.html, shiftKey);
+      var exportGroups = pack.htmls[0] ? parseRosterHtml(pack.htmls[0], shiftKey) : [];
+      var importGroups = pack.htmls[1]
+        ? filterImportGroupsForWithMe(parseRosterHtml(pack.htmls[1], shiftKey))
+        : [];
+      var groups = mergeGroups(exportGroups, importGroups);
       if (!groups.length) {
         finish('<div class="restCard"><p>' + escapeHtml(t('noRoster')) + '</p></div>');
         return;
@@ -559,20 +766,40 @@
 
   function loadIndex() {
     if (state.index) return Promise.resolve(state.index);
-    return fetch(rootUrl() + '/schedules/index.json', { credentials: 'same-origin' })
-      .then(function (r) { return r.json(); })
-      .then(function (json) {
-        state.index = json;
-        return json;
+    function readIndex(path) {
+      return fetch(rootUrl() + path, { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : { employees: [] }; })
+        .catch(function () { return { employees: [] }; });
+    }
+    return Promise.all([
+      readIndex('/schedules/index.json'),
+      readIndex('/import/schedules/index.json')
+    ]).then(function (results) {
+      var byId = {};
+      var exportEmps = (results[0] && results[0].employees) || [];
+      var importEmps = (results[1] && results[1].employees) || [];
+      exportEmps.forEach(function (emp) {
+        if (!emp || !emp.id) return;
+        byId[emp.id] = emp;
       });
+      importEmps.forEach(function (emp) {
+        if (!emp || !emp.id) return;
+        var prev = byId[emp.id];
+        if (!prev || usesImportRoster(emp.department) || !prev.department) {
+          byId[emp.id] = emp;
+        }
+      });
+      var employees = Object.keys(byId).map(function (id) { return byId[id]; });
+      employees.sort(function (a, b) {
+        return String(a.name || a.id).localeCompare(String(b.name || b.id), undefined, { sensitivity: 'base' });
+      });
+      state.index = { employees: employees };
+      return state.index;
+    });
   }
 
   function loadSchedule(empId) {
-    return fetch(rootUrl() + '/schedules/' + encodeURIComponent(empId) + '.json', { credentials: 'same-origin' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('no schedule');
-        return r.json();
-      });
+    return resolveSchedule(empId);
   }
 
   function openPicker() {
@@ -603,7 +830,7 @@
     list.forEach(function (emp) {
       var hay = ((emp.name || '') + ' ' + (emp.id || '') + ' ' + (emp.department || '')).toLowerCase();
       if (q && hay.indexOf(q) === -1) return;
-      html += '<button type="button" class="pickRow" data-id="' + escapeHtml(emp.id) + '" data-name="' + escapeHtml(emp.name || '') + '">';
+      html += '<button type="button" class="pickRow" data-id="' + escapeHtml(emp.id) + '" data-name="' + escapeHtml(emp.name || '') + '" data-dept="' + escapeHtml(emp.department || '') + '">';
       html += '<span class="pickName">' + escapeHtml(emp.name || emp.id) + ' · ' + escapeHtml(emp.id) + '</span>';
       html += '<span class="pickDept">' + escapeHtml(deptLabel(emp.department || '')) + '</span>';
       html += '</button>';
@@ -613,6 +840,7 @@
 
   function startForEmployee(empId) {
     state.empId = empId;
+    state.index = null;
     setLoading(true);
     loadSchedule(empId).then(function (json) {
       state.schedule = json;
@@ -661,8 +889,9 @@
       if (!row) return;
       var id = row.getAttribute('data-id');
       var name = row.getAttribute('data-name') || '';
+      var dept = row.getAttribute('data-dept') || '';
       if (!id) return;
-      saveEmp(id, name);
+      saveEmp(id, name, dept);
       startForEmployee(id);
     });
     document.addEventListener('keydown', function (e) {
@@ -694,7 +923,9 @@
 
   window.rosterWithMe = {
     parseRosterHtml: parseRosterHtml,
+    mergeGroups: mergeGroups,
     empIdFromLabel: empIdFromLabel,
-    addDays: addDays
+    addDays: addDays,
+    rowIsoDate: rowIsoDate
   };
 })();

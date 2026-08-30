@@ -1117,17 +1117,54 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     button.shiftFilterBtn.all .chipVal {{ color:#1e40af; }}
     button.shiftFilterBtn.all .chipLabel {{ color:#1e40af; }}
     
-    /* للشاشات المتوسطة */
+    /* للشاشات المتوسطة والموبايل: شرائح الملخص في صف واحد */
     @media (max-width:900px){{
-      .summaryBar {{ flex-wrap:wrap; }} /* السماح بالانتقال للصف الثاني */
+      .summaryBar {{
+        flex-wrap:wrap;
+        gap:5px;
+        justify-content:stretch;
+      }}
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip {{
+        flex:1 1 calc((100% - 25px) / 6);
+        min-width:0;
+        max-width:none;
+        padding:7px 4px;
+      }}
+      .summaryBar > button.shiftFilterBtn {{
+        flex:1 1 calc((100% - 15px) / 4);
+        min-width:0;
+        padding:7px 4px;
+      }}
+      .summaryChip .chipVal {{ font-size:16px; height:22px; }}
+      .summaryChip .chipVal .chip-icon {{ width:18px; height:18px; }}
+      .summaryChip .chipLabel {{
+        font-size:8px;
+        letter-spacing:.1px;
+        margin-top:3px;
+        max-width:100%;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }}
     }}
     
-    /* للموبايل */
+    /* للموبايل (يشمل شاشات ~6.1 إنش) */
     @media (max-width:600px){{
-      .summaryBar {{ gap:6px; }}
-      .summaryChip {{ padding:8px 8px; min-width:60px; }}
-      .summaryChip .chipVal {{ font-size:18px; }}
-      .summaryChip .chipLabel {{ font-size:8.5px; letter-spacing:.2px; }}
+      .summaryBar {{ gap:4px; }}
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip {{
+        flex-basis:calc((100% - 20px) / 6);
+        padding:6px 2px;
+        border-radius:12px;
+      }}
+      .summaryBar > button.shiftFilterBtn {{
+        flex-basis:calc((100% - 12px) / 4);
+        padding:6px 2px;
+        border-radius:12px;
+      }}
+      .summaryChip .chipVal {{ font-size:15px; height:20px; }}
+      .summaryChip .chipVal .chip-icon {{ width:17px; height:17px; }}
+      .summaryChip .chipLabel {{ font-size:7.5px; letter-spacing:0; }}
     }}
 
 
@@ -1574,14 +1611,19 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){{
-      .wrap            {{ padding:12px 10px 22px; }}
+      .wrap            {{ padding:12px 8px 22px; }}
       .deptTitle       {{ font-size:16px; }}
       .empName         {{ font-size:14px; }}
       .empStatus       {{ font-size:12px; }}
       .shiftLabel      {{ font-size:14px; }}
-      .summaryBar      {{ gap:8px; }}
-      .summaryChip     {{ padding:8px 14px; }}
-      .summaryChip .chipVal {{ font-size:19px; }}
+      .summaryBar      {{ gap:3px; }}
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip,
+      .summaryBar > button.shiftFilterBtn {{
+        padding:6px 1px;
+      }}
+      .summaryChip .chipVal {{ font-size:15px; }}
+      .summaryChip .chipLabel {{ font-size:7px; }}
     }}
 
   </style>{ROSTER_PWA_HEAD_SNIPPET}
@@ -2582,7 +2624,8 @@ var T = {{
     from:'FROM', to:'TO',
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
-    exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
+    exportChecker:'Export Checker', exportOps:'Export Operators',
+    flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
@@ -2595,7 +2638,8 @@ var T = {{
     from:'من', to:'إلى',
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
-    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات',
+    flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }}
@@ -2655,7 +2699,9 @@ function applyLang(lang) {{
   }});
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) {{ el.textContent=t.total; }});
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
-    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned}};
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,
+    'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
+    'Unassigned':t.unassigned}};
   document.querySelectorAll('.deptTitle').forEach(function(el) {{
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];

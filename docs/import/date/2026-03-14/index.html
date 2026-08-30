@@ -429,33 +429,54 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     button.shiftFilterBtn.all .chipVal { color:#1e40af; }
     button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
     
-    /* للشاشات المتوسطة */
+        /* للشاشات المتوسطة والموبايل: شرائح الملخص في صف واحد */
     @media (max-width:900px){
-      .summaryBar { flex-wrap:wrap; } /* السماح بالانتقال للصف الثاني */
+      .summaryBar {
+        flex-wrap:wrap;
+        gap:5px;
+        justify-content:stretch;
+      }
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip {
+        flex:1 1 calc((100% - 25px) / 6);
+        min-width:0;
+        max-width:none;
+        padding:7px 4px;
+      }
+      .summaryBar > button.shiftFilterBtn {
+        flex:1 1 calc((100% - 15px) / 4);
+        min-width:0;
+        padding:7px 4px;
+      }
+      .summaryChip .chipVal { font-size:16px; height:22px; }
+      .summaryChip .chipVal .chip-icon { width:18px; height:18px; }
+      .summaryChip .chipLabel {
+        font-size:8px;
+        letter-spacing:.1px;
+        margin-top:3px;
+        max-width:100%;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
     }
     
-    /* للموبايل */
+    /* للموبايل (يشمل شاشات ~6.1 إنش) */
     @media (max-width:600px){
-      .summaryBar { gap:6px; }
-      .summaryChip { padding:8px 8px; min-width:60px; }
-      .summaryChip .chipVal .chip-icon {
-      display: block;
-      width: 22px;
-      height: 22px;
-      margin: 0 auto;
-      flex-shrink: 0;
-    }
-    .summaryChip .chipVal .waveHand {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-    }
-    .summaryChip .chipVal .waveHand .chip-icon {
-      margin: 0;
-    }
-    .summaryChip .chipVal { font-size:18px; }
-      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
+      .summaryBar { gap:4px; }
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip {
+        flex-basis:calc((100% - 20px) / 6);
+        padding:6px 2px;
+        border-radius:12px;
+      }
+      .summaryBar > button.shiftFilterBtn {
+        flex-basis:calc((100% - 12px) / 4);
+        padding:6px 2px;
+        border-radius:12px;
+      }
+      .summaryChip .chipVal { font-size:15px; height:20px; }
+      .summaryChip .chipVal .chip-icon { width:17px; height:17px; }
+      .summaryChip .chipLabel { font-size:7.5px; letter-spacing:0; }
     }
 
 
@@ -1090,14 +1111,19 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
       .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
-      .wrap            { padding:12px 10px 22px; }
+      .wrap            { padding:12px 8px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
-      .summaryBar      { gap:8px; }
-      .summaryChip     { padding:8px 14px; }
-      .summaryChip .chipVal { font-size:19px; }
+      .summaryBar      { gap:3px; }
+      .summaryBar > a.summaryChip,
+      .summaryBar > #summarySwitchChip,
+      .summaryBar > button.shiftFilterBtn {
+        padding:6px 1px;
+      }
+      .summaryChip .chipVal { font-size:15px; }
+      .summaryChip .chipLabel { font-size:7px; }
     }
 
       .empStatus .shiftRange {

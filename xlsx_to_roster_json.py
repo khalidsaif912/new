@@ -49,6 +49,8 @@ DEPARTMENTS = [
     "Load Control",
     "Export Checker",
     "Export Operators",
+    "Flight Dispatch",
+    "FLTA",
     "Unassigned",
 ]
 

@@ -120,30 +120,36 @@ def test_with_me_page_exists():
     html = page.read_text(encoding="utf-8")
     assert "crewTrack" in html
     assert "with-me.js" in html
+    assert "empNameHeader" in html
+    assert "deptHead" in html
+    assert "crewSummary" in html
+    assert "changeEmp" in html
+    assert "border-inline-start" in html
+    assert "inset-inline" in html
+    assert 'html[dir="rtl"]' in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "bindSwipe" in src
     assert "flattenPeople" in src
-    assert "empDept" in src
-    assert 'class="deptCard withMeCard"' in src
     assert "t('titleMain')" in src
     assert "deptSplitBar" not in src
     assert "swipeHint" not in src
-    assert "DEPT_META" in src
-    assert "wash" in src
+    assert "DEPT_META" not in src
     flatten = src[src.find("function flattenPeople") : src.find("function renderGroups")]
     assert "dept: g.dept" in flatten
     assert "status" not in flatten
     render = src[src.find("function renderGroups") : src.find("function renderDay")]
-    assert render.count("deptCard") == 1
+    assert "crewCard" in render
+    assert "crewSummary" in render
+    assert "deptHead" in render
+    assert "deptGroup" in render
+    assert "roleBadge" not in render
     assert "empStatus" not in render
     assert "deptSplitBar" not in html
     assert "swipeHint" not in html
-    assert ".empDept" in html
-    assert "body.ar .backBtn" not in html
-    assert "body.ar .langToggle" not in html
-    assert "direction: ltr" not in html.split(".empRow")[1].split(".empMeta")[0]
-    assert ".header" in html and "direction: ltr" in html
+    assert ".deptHead" in html
+    assert "personLabel" in src
+    assert "unicode-bidi: embed" in html
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():

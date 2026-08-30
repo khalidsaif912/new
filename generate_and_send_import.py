@@ -176,7 +176,8 @@ MUSCAT_UTC_OFFSET_HOURS = 4
 DEPT_FULL: Dict[str, str] = {
     "SUPV": "Supervisors",
     "FLTI": "Flight Dispatch (Import)",
-    "FLTE": "Flight Dispatch (Export)",
+    "FLTE": "Flight Dispatch",
+    "FLTA": "FLTA",
     "CHKR": "Import Checkers",
     "OPTR": "Import Operators",
     "DOCS": "Documentation",
@@ -1411,6 +1412,7 @@ def build_employee_json(
         legacy_days.append({"day": d, "weekday": wd, "code": code})
         schedule_rows.append(
             {
+                "date": f"{year}-{month:02d}-{d:02d}",
                 "day": d,
                 "shift_code": code,
                 "shift_group": shift_bucket(code)[0],
@@ -1654,6 +1656,26 @@ def main() -> None:
                 existing = None
         payload = build_employee_json(parsed, emp, existing)
         sched_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    # Employee index for With-me / pickers (export + import merge on the client)
+    index_emps = []
+    for p in sorted(sched_dir.glob("*.json")):
+        if p.name == "index.json":
+            continue
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        index_emps.append({
+            "id": str(data.get("id") or p.stem),
+            "name": data.get("name") or "",
+            "department": data.get("department") or "",
+        })
+    index_emps.sort(key=lambda e: (e.get("name") or e.get("id") or "").lower())
+    (sched_dir / "index.json").write_text(
+        json.dumps({"employees": index_emps}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     # Generate My Schedule page
     my_dir = out_root / "my-schedules"

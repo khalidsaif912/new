@@ -1,0 +1,409 @@
+{
+  "employees": [
+    {
+      "id": "82428",
+      "name": "ABDULLAH AL MAHARBI",
+      "department": "Flight Dispatch (Import)"
+    },
+    {
+      "id": "82663",
+      "name": "ABDULLAH AL SINAWI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82457",
+      "name": "ADIL AL BULUSHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "81080",
+      "name": "AHMED AL AMRI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82456",
+      "name": "AHMED AL FARSI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82654",
+      "name": "AHMED AL HADI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82455",
+      "name": "AHMED AL HUSAINI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82427",
+      "name": "AHMED AL ORAIMI",
+      "department": "Flight Dispatch (Export)"
+    },
+    {
+      "id": "82476",
+      "name": "AHMED AL RUJAIBI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82415",
+      "name": "AHMED ALBALUSHI",
+      "department": "Flight Dispatch (Export)"
+    },
+    {
+      "id": "82473",
+      "name": "ALA AL WAHAIBI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82459",
+      "name": "ALI AL RIYAMI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82425",
+      "name": "ALI AL SHAMSI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82496",
+      "name": "ANWAR AL HABSI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82566",
+      "name": "ANWAR ALAMRI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82423",
+      "name": "BADAR AL BURTAMANI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82414",
+      "name": "BADAR AL BUSAIDI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82559",
+      "name": "BADAR AL BUSAIDI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "8608",
+      "name": "BADAR AL REZAIQI",
+      "department": "Release Control"
+    },
+    {
+      "id": "82583",
+      "name": "BADAR AL SHEHHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "80478",
+      "name": "FARIS AL BALUSHI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "80269",
+      "name": "FRITZ",
+      "department": "Supervisors"
+    },
+    {
+      "id": "80535",
+      "name": "FROILAN",
+      "department": "Supervisors"
+    },
+    {
+      "id": "80215",
+      "name": "GLENDO",
+      "department": "Documentation"
+    },
+    {
+      "id": "82664",
+      "name": "HAIFA AL BALUSHI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82419",
+      "name": "HAITHAM AL BALUSHI",
+      "department": "FLTA"
+    },
+    {
+      "id": "8836",
+      "name": "HAMED AL FAKHRI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "81991",
+      "name": "HILAL AL SHAMAKHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82454",
+      "name": "HISHAM AL MAHARBI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82434",
+      "name": "HISHAM AL SIYABI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82668",
+      "name": "IBRAHIM AL HADHRAMI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "81351",
+      "name": "IBRAHIM AL QUTAITI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82331",
+      "name": "ISMAIL AL MAHARBI",
+      "department": "FLTA"
+    },
+    {
+      "id": "81983",
+      "name": "JABER AL JULANDANI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "81399",
+      "name": "JAMAL AL SINANI",
+      "department": "Documentation"
+    },
+    {
+      "id": "81151",
+      "name": "JUMA AL HABSI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "8336",
+      "name": "KHALID AL BALUSHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82458",
+      "name": "KHALID AL ZADJALI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82537",
+      "name": "KHALIFA AL SAADI",
+      "department": "Flight Dispatch (Export)"
+    },
+    {
+      "id": "990751",
+      "name": "KHAMIS AL KASBI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82460",
+      "name": "MAHAMAD AL MAHARBI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82665",
+      "name": "MAHANAD AL HADI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82422",
+      "name": "MAHIR AL BALUSHI",
+      "department": "Release Control"
+    },
+    {
+      "id": "82431",
+      "name": "MAHMOOD AL BALUSHI",
+      "department": "Flight Dispatch (Export)"
+    },
+    {
+      "id": "82452",
+      "name": "MAHMOOD AL HADIDI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82286",
+      "name": "MAHMOOD AL SHAMSI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82049",
+      "name": "MAJID AL GHAFRI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82535",
+      "name": "MOHAMED AL MAAWALI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82330",
+      "name": "MOHAMMED AL BALUCHI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "81079",
+      "name": "MOHAMMED AL KULAIBI",
+      "department": "Release Control"
+    },
+    {
+      "id": "82614",
+      "name": "MOHAMMED AL MAWALI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82420",
+      "name": "MOHAMMED AL SAADI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82541",
+      "name": "MOHAMMED AL WAHAIBI",
+      "department": "Documentation"
+    },
+    {
+      "id": "82444",
+      "name": "MOHAMMED AL YAARUBI",
+      "department": "Documentation"
+    },
+    {
+      "id": "81032",
+      "name": "MOHAMMED SAID",
+      "department": "Supervisors"
+    },
+    {
+      "id": "990895",
+      "name": "MOHD AL HADDABI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82667",
+      "name": "MOOSA AL BALUSHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82536",
+      "name": "MOOSA AL HADI",
+      "department": "Release Control"
+    },
+    {
+      "id": "82590",
+      "name": "NASSER AL MAMARI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82416",
+      "name": "NASSER AL OMAIRI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82107",
+      "name": "OMAR AL FUTAISI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82435",
+      "name": "QAIS AL MUKHAINI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "82409",
+      "name": "QAIS AL RASHDI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82412",
+      "name": "QASIM AL GHARIBI",
+      "department": "Release Control"
+    },
+    {
+      "id": "80834",
+      "name": "SAID AL AMRI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "81152",
+      "name": "SAID AL HADI",
+      "department": "Release Control"
+    },
+    {
+      "id": "82410",
+      "name": "SAID AL SADI",
+      "department": "FLTA"
+    },
+    {
+      "id": "80481",
+      "name": "SALIM AL MAAWALI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "990896",
+      "name": "SAMEER MAHMOOD",
+      "department": "Supervisors"
+    },
+    {
+      "id": "80479",
+      "name": "SAMI AL HADABI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82642",
+      "name": "SANAD AL HARTHI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "80833",
+      "name": "SULEIMAN AL MAHARBI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82417",
+      "name": "TALAL AL HUSEINI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82675",
+      "name": "TARIQ AL BARWANI",
+      "department": "Documentation"
+    },
+    {
+      "id": "8901",
+      "name": "UDUGAMA",
+      "department": "Supervisors"
+    },
+    {
+      "id": "81021",
+      "name": "WAFAA SALIM",
+      "department": "Documentation"
+    },
+    {
+      "id": "82470",
+      "name": "WAHEB AL BARAIDAI",
+      "department": "Import Checkers"
+    },
+    {
+      "id": "82571",
+      "name": "YAARAB AL RAQADI",
+      "department": "FLTA"
+    },
+    {
+      "id": "990786",
+      "name": "YASIR AL GHARABI",
+      "department": "Import Operators"
+    },
+    {
+      "id": "80480",
+      "name": "YOUNIS AL SIYABI",
+      "department": "FLTA"
+    },
+    {
+      "id": "82100",
+      "name": "YOUSUF AL WAHEEDI",
+      "department": "Documentation"
+    }
+  ]
+}

@@ -43,6 +43,8 @@ DEPARTMENTS = [
     ("Load Control", "Load Control"),
     ("Export Checker", "Export Checker"),
     ("Export Operators", "Export Operators"),
+    ("Flight Dispatch", "Flight Dispatch"),
+    ("FLTA", "FLTA"),
     ("Unassigned", "Unassigned"),
 ]
 
