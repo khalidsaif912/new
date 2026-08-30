@@ -343,57 +343,137 @@
     return location.origin + getSiteRootPath();
   }
 
-  var SHARED_BANNER_KEY = 'roster_banner_choice';
-  var SHARED_BANNER_RE = /^banner\d+\.jpg$/i;
-  var SHARED_BANNER_LAYOUT = {
-    'banner28.jpg': '50% 48%',
-    'banner30.jpg': '50% 45%',
-    'banner31.jpg': '50% 48%',
-    'banner32.jpg': '50% 50%',
-    'banner33.jpg': '50% 50%',
-    'banner34.jpg': '50% 50%',
-    'banner35.jpg': '50% 50%',
-    'banner36.jpg': '50% 50%'
-  };
+  var PAGE_TX_KEY = 'rosterBgTextureV1';
+  var BANNER_TX_KEY = 'rosterWithMeBannerTextureV1';
+  var PATTERN_BASE = 'https://www.transparenttextures.com/patterns/';
+  var BANNER_FALLBACK_PATTERNS = [
+    'cubes',
+    'diagmonds-light',
+    'carbon-fibre',
+    'groovepaper',
+    'hexellence',
+    'subtle-grey',
+    'white-wall',
+    'arabesque',
+    'always-grey',
+    'black-linen',
+    'dark-denim',
+    'dark-mosaic'
+  ];
+  var bannerPatternsCache = null;
+  var bannerPatternsPromise = null;
 
-  function sharedBannerPosition(name) {
-    return SHARED_BANNER_LAYOUT[name] || '62% center';
+  function patternUrl(slug) {
+    return PATTERN_BASE + String(slug || '').replace(/[^a-z0-9_-]/gi, '') + '.png';
   }
 
-  function readSharedBannerChoice() {
+  function readPageTexture() {
     try {
-      var name = localStorage.getItem(SHARED_BANNER_KEY) || '';
-      return SHARED_BANNER_RE.test(name) ? name : '';
+      var raw = localStorage.getItem(PAGE_TX_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      return data && data.color ? data : null;
     } catch (e) {
-      return '';
+      return null;
     }
   }
 
-  function syncSharedBanner() {
+  function readBannerTexture() {
+    try {
+      var raw = localStorage.getItem(BANNER_TX_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      return data && data.color ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveBannerTexture(color, pattern) {
+    try {
+      localStorage.setItem(
+        BANNER_TX_KEY,
+        JSON.stringify({ color: color, pattern: pattern || '' })
+      );
+    } catch (e) {}
+  }
+
+  function darkBannerColor() {
+    var hues = [205, 215, 225, 235, 245, 255, 195, 265];
+    var h = hues[Math.floor(Math.random() * hues.length)];
+    var s = 42 + Math.floor(Math.random() * 28);
+    var l = 26 + Math.floor(Math.random() * 14);
+    return 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
+  }
+
+  function loadBannerPatterns() {
+    if (bannerPatternsCache) return Promise.resolve(bannerPatternsCache);
+    if (bannerPatternsPromise) return bannerPatternsPromise;
+    var url = rootUrl() + '/bg-texture-patterns.json?v=20260524a';
+    bannerPatternsPromise = fetch(url)
+      .then(function (r) {
+        if (!r.ok) throw new Error('patterns');
+        return r.json();
+      })
+      .then(function (list) {
+        bannerPatternsCache = Array.isArray(list) && list.length ? list : BANNER_FALLBACK_PATTERNS.slice();
+        return bannerPatternsCache;
+      })
+      .catch(function () {
+        bannerPatternsCache = BANNER_FALLBACK_PATTERNS.slice();
+        return bannerPatternsCache;
+      });
+    return bannerPatternsPromise;
+  }
+
+  function pickBannerPattern(list, avoid) {
+    var pool = (list || []).filter(function (p) {
+      return p && p !== avoid;
+    });
+    if (!pool.length) pool = BANNER_FALLBACK_PATTERNS.filter(function (p) {
+      return p !== avoid;
+    });
+    if (!pool.length) return 'cubes';
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function applyBannerTexture(color, slug) {
     var header = document.querySelector('.header');
     if (!header) return;
-    var name = readSharedBannerChoice();
     var style = document.getElementById('with-me-banner-style');
-    if (!name) {
-      if (style) style.remove();
-      header.classList.remove('has-custom-banner');
-      header.removeAttribute('data-banner');
-      document.documentElement.classList.remove('roster-banner-early');
-      return;
-    }
-    var url = rootUrl() + '/assets/banners/' + name;
-    var pos = sharedBannerPosition(name);
     if (!style) {
       style = document.createElement('style');
       style.id = 'with-me-banner-style';
       document.head.appendChild(style);
     }
+    var img = slug ? 'url("' + patternUrl(slug) + '")' : 'none';
     style.textContent =
-      '.header{background-image:url("' + url.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + pos + '!important;background-repeat:no-repeat!important;background-color:transparent!important}' +
+      '.header{background-color:' + color + '!important;' +
+      'background-image:' + img + '!important;' +
+      'background-size:auto!important;background-repeat:repeat!important;background-position:0 0!important}' +
       '.header::before,.header::after{content:none!important;opacity:0!important;display:none!important}';
-    header.classList.add('has-custom-banner');
-    header.setAttribute('data-banner', name);
-    document.documentElement.classList.add('roster-banner-early');
+    header.classList.add('has-texture-banner');
+    header.removeAttribute('data-banner');
+    document.documentElement.classList.remove('roster-banner-early');
+  }
+
+  function syncBannerTexture(forceNew) {
+    return loadBannerPatterns().then(function (list) {
+      var page = readPageTexture();
+      var avoid = page && page.pattern ? page.pattern : '';
+      var saved = forceNew ? null : readBannerTexture();
+      var color;
+      var pattern;
+      if (saved && saved.pattern && saved.pattern !== avoid) {
+        color = saved.color;
+        pattern = saved.pattern;
+      } else {
+        color = darkBannerColor();
+        pattern = pickBannerPattern(list, avoid);
+        saveBannerTexture(color, pattern);
+      }
+      applyBannerTexture(color, pattern);
+    });
   }
 
   function pad2(n) {
@@ -1385,7 +1465,7 @@
   }
 
   function init() {
-    syncSharedBanner();
+    syncBannerTexture(false);
     loadNamesAr();
     state.lang = readLang();
     applyLang(state.lang);
@@ -1425,11 +1505,18 @@
       if (e.key === 'Escape') closePicker();
     });
     window.addEventListener('storage', function (e) {
-      if (e.key === SHARED_BANNER_KEY) syncSharedBanner();
+      if (e.key === PAGE_TX_KEY || e.key === BANNER_TX_KEY) syncBannerTexture(false);
     });
     document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) syncSharedBanner();
+      if (!document.hidden) syncBannerTexture(false);
     });
+    var headerEl = document.querySelector('.header');
+    if (headerEl) {
+      headerEl.addEventListener('dblclick', function (e) {
+        if (e.target.closest('a, button, input, label')) return;
+        syncBannerTexture(true);
+      });
+    }
     bindSwipe(document.getElementById('pageWrap') || document.body);
 
     var empId = readSavedEmp();

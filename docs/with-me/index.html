@@ -11,22 +11,30 @@
   <script defer src="../ios-tap-fix.js?v=20260830wm"></script>
   <script src="../emp-id-gate.js?v=20260730a"></script>
   <script>
-    /* Early restore: page texture + optional home banner photo. */
+    /* Early restore: page texture + With me banner texture (not photos). */
     (function () {
+      function safeColor(c) {
+        return String(c || '').replace(/[^-a-z0-9%,.()# ]/gi, '');
+      }
+      function safeSlug(s) {
+        return String(s || '').replace(/[^a-z0-9_-]/gi, '');
+      }
+      function patternCss(slug) {
+        var s = safeSlug(slug);
+        return s
+          ? 'url("https://www.transparenttextures.com/patterns/' + s + '.png")'
+          : 'none';
+      }
       try {
         var raw = localStorage.getItem('rosterBgTextureV1');
         if (raw) {
           var data = JSON.parse(raw);
           if (data && data.color) {
-            var slug = data.pattern || '';
-            var img = slug
-              ? 'url("https://www.transparenttextures.com/patterns/' + String(slug).replace(/[^a-z0-9_-]/gi, '') + '.png")'
-              : 'none';
             var st = document.createElement('style');
             st.id = 'with-me-bg-early';
             st.textContent =
-              'html,body{background-color:' + String(data.color).replace(/[^-a-z0-9%,.()# ]/gi, '') + '!important;' +
-              'background-image:' + img + '!important;background-repeat:repeat!important}' +
+              'html,body{background-color:' + safeColor(data.color) + '!important;' +
+              'background-image:' + patternCss(data.pattern) + '!important;background-repeat:repeat!important}' +
               '.wrap{background:transparent!important}';
             document.documentElement.classList.add('roster-bg-textured');
             document.head.appendChild(st);
@@ -34,23 +42,18 @@
         }
       } catch (e) {}
       try {
-        var name = localStorage.getItem('roster_banner_choice');
-        if (!name || !/^banner\d+\.jpg$/i.test(name)) return;
-        var path = location.pathname || '/';
-        var root = '';
-        if (path.indexOf('/roster-site/') !== -1) root = '/roster-site';
-        else if (location.hostname && location.hostname.endsWith('github.io')) {
-          var segs = path.split('/').filter(Boolean);
-          root = segs.length ? '/' + segs[0] : '';
-        }
-        var url = (location.origin || '') + root + '/assets/banners/' + name;
+        var braw = localStorage.getItem('rosterWithMeBannerTextureV1');
+        if (!braw) return;
+        var bdata = JSON.parse(braw);
+        if (!bdata || !bdata.color) return;
         var bs = document.createElement('style');
         bs.id = 'with-me-banner-style';
         bs.textContent =
-          '.header{background-image:url("' + url.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important;background-color:transparent!important}' +
+          '.header{background-color:' + safeColor(bdata.color) + '!important;' +
+          'background-image:' + patternCss(bdata.pattern) + '!important;' +
+          'background-size:auto!important;background-repeat:repeat!important;background-position:0 0!important}' +
           '.header::before,.header::after{content:none!important;opacity:0!important;display:none!important}';
         document.head.appendChild(bs);
-        document.documentElement.classList.add('roster-banner-early');
       } catch (e2) {}
     })();
   </script>
@@ -358,7 +361,7 @@
       font-weight: 700;
       letter-spacing: -.01em;
       line-height: 1.05;
-      color: rgba(255, 255, 255, .16);
+      color: rgba(255, 255, 255, .28);
       text-align: left;
       white-space: nowrap;
       width: 100%;
@@ -374,7 +377,7 @@
       font-weight: 800;
       letter-spacing: -.04em;
       line-height: .9;
-      color: rgba(255, 255, 255, .16);
+      color: rgba(255, 255, 255, .28);
       font-variant-numeric: tabular-nums;
       flex: 0 0 auto;
     }
@@ -395,7 +398,7 @@
       font-weight: 700;
       letter-spacing: -.02em;
       line-height: 1;
-      color: rgba(255, 255, 255, .16);
+      color: rgba(255, 255, 255, .28);
       text-transform: none;
       text-align: left;
       white-space: nowrap;
@@ -1112,7 +1115,7 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm60"></script>
-  <script defer src="../bg-texture-shuffle.js?v=20260830wm60"></script>
+  <script src="../with-me.js?v=20260830wm61"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260830wm61"></script>
 </body>
 </html>

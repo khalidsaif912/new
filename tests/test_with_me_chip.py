@@ -122,12 +122,15 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm60" in html
+    assert "with-me.js?v=20260830wm61" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
-    assert "roster_banner_choice" in html
+    assert "rosterWithMeBannerTextureV1" in html
+    assert "transparenttextures.com/patterns/" in html
     assert "with-me-banner-style" in html
     assert "data-bg-texture-mount" in html
+    assert "roster_banner_choice" not in html
+    assert "/assets/banners/" not in html
     assert "empNameHeader" in html
     assert "deptHead" in html
     assert "crewSummary" in html
@@ -161,12 +164,14 @@ def test_with_me_page_exists():
     assert "background:" not in date_side_css.group(0)
     assert "border-inline-end: 1px solid rgba(255, 255, 255, .13)" in html
     assert "font-size: clamp(28px, 10vw, 42px)" in html
-    assert "rgba(255, 255, 255, .16)" in html
+    assert "rgba(255, 255, 255, .28)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
-    assert "syncSharedBanner" in src
-    assert "SHARED_BANNER_KEY = 'roster_banner_choice'" in src
+    assert "syncBannerTexture" in src
+    assert "BANNER_TX_KEY = 'rosterWithMeBannerTextureV1'" in src
+    assert "transparenttextures.com/patterns/" in src
+    assert "syncSharedBanner" not in src
     assert "visibilitychange" in src
     assert "bindSwipe" in src
     assert "REST_QUOTES" in src
