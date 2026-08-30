@@ -371,8 +371,9 @@
     }
     .shiftStrip {
       display: flex;
+      align-items: center;
       gap: 8px;
-      padding: 0;
+      padding: 8px 2px;
       overflow-x: auto;
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
@@ -488,11 +489,11 @@
     .shiftDay.sg-other .shiftDayCode { color: var(--text-muted); }
 
     .shiftDay.is-active {
-      transform: translateY(-2px) scale(1.06);
+      transform: scale(1.04);
       border-color: var(--brand);
       box-shadow:
         0 0 0 2px rgba(30, 64, 175, .18),
-        0 8px 18px rgba(30, 64, 175, .16);
+        0 4px 12px rgba(30, 64, 175, .14);
       z-index: 1;
     }
     .shiftDay.is-active .shiftDayNum { color: var(--brand); }
@@ -1026,6 +1027,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm52"></script>
+  <script src="../with-me.js?v=20260830wm53"></script>
 </body>
 </html>
