@@ -192,6 +192,21 @@
     Other: 'other'
   };
 
+  var SHIFT_CLASS = {
+    Morning: 'sg-morning',
+    Afternoon: 'sg-afternoon',
+    Night: 'sg-night',
+    'Off Day': 'sg-off',
+    'Annual Leave': 'sg-leave',
+    'Sick Leave': 'sg-sick',
+    Training: 'sg-training',
+    Standby: 'sg-standby',
+    Other: 'sg-other'
+  };
+
+  var DAYS_SHORT_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var DAYS_SHORT_AR = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+
   var state = {
     lang: 'en',
     empId: '',
@@ -204,7 +219,8 @@
     rosterCache: {},
     index: null,
     anim: '',
-    rosterKind: 'export'
+    rosterKind: 'export',
+    stripBuiltFor: ''
   };
 
   function t(key) {
@@ -614,6 +630,111 @@
     return key ? t(key) : name;
   }
 
+  function weekdayShort(iso) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return '';
+    var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+    var names = state.lang === 'ar' ? DAYS_SHORT_AR : DAYS_SHORT_EN;
+    return names[d.getUTCDay()] || '';
+  }
+
+  function dayNum(iso) {
+    var p = (iso || '').split('-');
+    return p.length === 3 ? String(parseInt(p[2], 10)) : '';
+  }
+
+  function shiftCssClass(group) {
+    return SHIFT_CLASS[group] || SHIFT_CLASS.Other;
+  }
+
+  function shiftCodeLabel(row) {
+    if (!row) return '—';
+    var code = String(row.shift_code || '').trim();
+    if (code) return code;
+    var group = row.shift_group || 'Other';
+    if (group === 'Off Day') return state.lang === 'ar' ? 'إجازة' : 'OFF';
+    if (group === 'Annual Leave') return state.lang === 'ar' ? 'سنوية' : 'LV';
+    if (group === 'Sick Leave') return state.lang === 'ar' ? 'مرضية' : 'SL';
+    return shiftLabel(group);
+  }
+
+  function scheduleRowsFlat() {
+    var sch = state.schedule;
+    var out = [];
+    if (!sch || !sch.schedules) return out;
+    Object.keys(sch.schedules).sort().forEach(function (month) {
+      (sch.schedules[month] || []).forEach(function (row) {
+        var iso = rowIsoDate(month, row);
+        if (!iso) return;
+        out.push({
+          iso: iso,
+          group: (row && row.shift_group) || 'Other',
+          code: row.shift_code || '',
+          row: row
+        });
+      });
+    });
+    out.sort(function (a, b) { return a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0; });
+    return out;
+  }
+
+  function buildShiftStrip() {
+    var wrap = document.getElementById('shiftStripWrap');
+    var strip = document.getElementById('shiftStrip');
+    if (!wrap || !strip) return;
+    var rows = scheduleRowsFlat();
+    if (!rows.length) {
+      wrap.hidden = true;
+      strip.innerHTML = '';
+      state.stripBuiltFor = '';
+      return;
+    }
+    var today = muscatToday();
+    var html = '';
+    rows.forEach(function (item) {
+      var meta = SHIFT_META[item.group] || SHIFT_META.Other;
+      var cls = 'shiftDay ' + shiftCssClass(item.group);
+      if (item.iso === today) cls += ' is-today';
+      html += '<button type="button" class="' + cls + '" role="listitem"';
+      html += ' data-date="' + escapeHtml(item.iso) + '"';
+      html += ' aria-label="' + escapeHtml(formatDate(item.iso) + ' · ' + shiftLabel(item.group)) + '">';
+      html += '<span class="shiftDayIcon" aria-hidden="true">' + meta.icon + '</span>';
+      html += '<span class="shiftDayNum">' + escapeHtml(dayNum(item.iso)) + '</span>';
+      html += '<span class="shiftDayWeek">' + escapeHtml(weekdayShort(item.iso)) + '</span>';
+      html += '<span class="shiftDayCode">' + escapeHtml(shiftCodeLabel(item.row)) + '</span>';
+      html += '</button>';
+    });
+    strip.innerHTML = html;
+    wrap.hidden = false;
+    state.stripBuiltFor = (state.empId || '') + '|' + (state.lang || '') + '|' + rows.length;
+    syncShiftStrip(state.date, false);
+  }
+
+  function syncShiftStrip(iso, smooth) {
+    var strip = document.getElementById('shiftStrip');
+    if (!strip) return;
+    var active = null;
+    Array.prototype.forEach.call(strip.querySelectorAll('.shiftDay'), function (btn) {
+      var on = btn.getAttribute('data-date') === iso;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-current', on ? 'date' : 'false');
+      if (on) active = btn;
+    });
+    if (!active) return;
+    try {
+      active.scrollIntoView({
+        behavior: smooth === false ? 'auto' : 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    } catch (e) {
+      try {
+        var left = active.offsetLeft - (strip.clientWidth / 2) + (active.offsetWidth / 2);
+        strip.scrollTo({ left: Math.max(0, left), behavior: smooth === false ? 'auto' : 'smooth' });
+      } catch (e2) {}
+    }
+  }
+
   function paintChrome() {
     var empHeader = document.getElementById('empNameHeader');
     var subtitle = document.getElementById('pageTitleMain');
@@ -632,6 +753,10 @@
       picker.value = state.date || '';
       if (state.minDate) picker.min = state.minDate;
       if (state.maxDate) picker.max = state.maxDate;
+    }
+    var stripKey = (state.empId || '') + '|' + (state.lang || '');
+    if (state.schedule && state.stripBuiltFor.indexOf(stripKey) !== 0) {
+      buildShiftStrip();
     }
   }
 
@@ -733,6 +858,7 @@
   function renderDay(iso, anim) {
     state.date = iso;
     paintChrome();
+    syncShiftStrip(iso, anim !== '');
     var track = document.getElementById('crewTrack');
     if (!track) return;
     var row = dayFromSchedule(iso);
@@ -815,7 +941,7 @@
 
     function ignoreTarget(target) {
       return !!(target && target.closest && target.closest(
-        'a, button, input, select, textarea, .datePickerWrapper, .pickSheet'
+        'a, button, input, select, textarea, .datePickerWrapper, .pickSheet, .shiftStripWrap'
       ));
     }
 
@@ -994,6 +1120,7 @@
       if (state.maxDate && wanted > state.maxDate) wanted = state.maxDate;
       paintChrome();
       closePicker();
+      buildShiftStrip();
       renderDay(wanted, '');
     }).catch(function () {
       setLoading(false);
@@ -1016,6 +1143,14 @@
     });
     document.getElementById('changeEmpBtn')?.addEventListener('click', openPicker);
     document.getElementById('pickCloseBtn')?.addEventListener('click', closePicker);
+    document.getElementById('shiftStrip')?.addEventListener('click', function (e) {
+      var btn = e.target.closest('.shiftDay');
+      if (!btn) return;
+      var iso = btn.getAttribute('data-date');
+      if (!iso || iso === state.date) return;
+      var anim = iso > state.date ? 'slide-left' : 'slide-right';
+      renderDay(iso, anim);
+    });
     document.getElementById('pickSheet')?.addEventListener('click', function (e) {
       if (e.target === e.currentTarget) closePicker();
     });

@@ -119,6 +119,8 @@ def test_with_me_page_exists():
     assert js.is_file()
     html = page.read_text(encoding="utf-8")
     assert "crewTrack" in html
+    assert "shiftStrip" in html
+    assert "shiftStripWrap" in html
     assert "with-me.js" in html
     assert "empNameHeader" in html
     assert "deptHead" in html
@@ -136,6 +138,10 @@ def test_with_me_page_exists():
     assert "اختيار موظف آخر" in src
     assert "touch-action: pan-y" in src or "touchmove" in src
     assert "passive: false" in src
+    assert "buildShiftStrip" in src
+    assert "syncShiftStrip" in src
+    assert "shiftDay" in src
+    assert "sg-morning" in src
     assert "flattenPeople" in src
     assert "t('titleMain')" in src
     assert "deptSplitBar" not in src

@@ -281,6 +281,142 @@
       border: none;
     }
 
+    /* ── Shift strip under banner ── */
+    .shiftStripWrap {
+      margin-block-start: var(--space-sm);
+      margin-inline: calc(var(--space-md) * -1);
+      padding-block: 2px 4px;
+      touch-action: pan-x;
+      -webkit-overflow-scrolling: touch;
+    }
+    .shiftStrip {
+      display: flex;
+      gap: 8px;
+      padding: 4px var(--space-md) 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      touch-action: pan-x;
+    }
+    .shiftStrip::-webkit-scrollbar { display: none; }
+
+    .shiftDay {
+      flex: 0 0 auto;
+      width: 58px;
+      min-height: 72px;
+      padding: 8px 4px 7px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      scroll-snap-align: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition:
+        transform .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease,
+        background .22s ease;
+    }
+    .shiftDay:active { transform: scale(.96); }
+    .shiftDayIcon {
+      font-size: 14px;
+      line-height: 1;
+    }
+    .shiftDayNum {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .shiftDayWeek {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      line-height: 1;
+    }
+    .shiftDayCode {
+      margin-block-start: 2px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      line-height: 1;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .shiftDay.sg-morning {
+      background: linear-gradient(180deg, #fffbeb 0%, #fff 70%);
+      border-color: #fde68a;
+    }
+    .shiftDay.sg-morning .shiftDayCode { color: #b45309; }
+    .shiftDay.sg-afternoon {
+      background: linear-gradient(180deg, #fff7ed 0%, #fff 70%);
+      border-color: #fed7aa;
+    }
+    .shiftDay.sg-afternoon .shiftDayCode { color: #c2410c; }
+    .shiftDay.sg-night {
+      background: linear-gradient(180deg, #f5f3ff 0%, #fff 70%);
+      border-color: #ddd6fe;
+    }
+    .shiftDay.sg-night .shiftDayCode { color: #6d28d9; }
+    .shiftDay.sg-off {
+      background: linear-gradient(180deg, #f8fafc 0%, #fff 70%);
+      border-color: #e2e8f0;
+    }
+    .shiftDay.sg-off .shiftDayCode { color: #64748b; }
+    .shiftDay.sg-leave {
+      background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%);
+      border-color: #a7f3d0;
+    }
+    .shiftDay.sg-leave .shiftDayCode { color: #047857; }
+    .shiftDay.sg-sick {
+      background: linear-gradient(180deg, #fff1f2 0%, #fff 70%);
+      border-color: #fecdd3;
+    }
+    .shiftDay.sg-sick .shiftDayCode { color: #be123c; }
+    .shiftDay.sg-training {
+      background: linear-gradient(180deg, #eff6ff 0%, #fff 70%);
+      border-color: #bfdbfe;
+    }
+    .shiftDay.sg-training .shiftDayCode { color: #1d4ed8; }
+    .shiftDay.sg-standby {
+      background: linear-gradient(180deg, #fff1f2 0%, #fff 70%);
+      border-color: #fecaca;
+    }
+    .shiftDay.sg-standby .shiftDayCode { color: #be185d; }
+    .shiftDay.sg-other {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .shiftDay.sg-other .shiftDayCode { color: var(--text-muted); }
+
+    .shiftDay.is-active {
+      transform: translateY(-2px) scale(1.06);
+      border-color: var(--brand);
+      box-shadow:
+        0 0 0 2px rgba(30, 64, 175, .18),
+        0 8px 18px rgba(30, 64, 175, .16);
+      z-index: 1;
+    }
+    .shiftDay.is-active .shiftDayNum { color: var(--brand); }
+    .shiftDay.is-today:not(.is-active) {
+      box-shadow: inset 0 0 0 1.5px rgba(30, 64, 175, .35);
+    }
+
     /* ── Status / empty ── */
     .crewStatus, .crewEmpty {
       text-align: center;
@@ -672,6 +808,10 @@
       </div>
     </header>
 
+    <div class="shiftStripWrap" id="shiftStripWrap" hidden>
+      <div class="shiftStrip" id="shiftStrip" role="list" aria-label="Shift strip"></div>
+    </div>
+
     <p class="crewStatus" id="crewStatus" hidden>Loading the roster…</p>
     <p class="crewEmpty" id="crewEmpty" hidden></p>
     <div class="crewTrack" id="crewTrack"></div>
@@ -688,6 +828,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm20"></script>
+  <script src="../with-me.js?v=20260830wm21"></script>
 </body>
 </html>
