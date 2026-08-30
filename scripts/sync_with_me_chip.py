@@ -12,6 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
+REQUIRED_ASSETS = (
+    DOCS / "with-me" / "index.html",
+    DOCS / "with-me.js",
+    DOCS / "site-apps.js",
+)
 
 CHIP_HTML = """    <a href="{BASE}/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
@@ -208,7 +213,15 @@ def patch_file(path: Path, *, chips: bool) -> bool:
     return True
 
 
+def ensure_assets() -> None:
+    """Fail if a roster rebuild dropped the With me page or Apps script."""
+    missing = [str(p.relative_to(ROOT)) for p in REQUIRED_ASSETS if not p.is_file()]
+    if missing:
+        raise FileNotFoundError("With me files missing: " + ", ".join(missing))
+
+
 def main() -> int:
+    ensure_assets()
     updated = 0
     chip_paths = {p.resolve() for p in iter_html()}
     for path in iter_all_site_html():

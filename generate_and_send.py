@@ -3921,6 +3921,14 @@ def main():
     except Exception as e:
         print(f"WARNING: could not write name translations: {e}")
 
+    # New date pages come from this template; keep the With me chip + static page.
+    try:
+        from sync_with_me_chip import ensure_assets, main as sync_with_me
+        ensure_assets()
+        sync_with_me()
+    except Exception as e:
+        raise RuntimeError(f"With me must remain after roster generate: {e}") from e
+
     if source_name:
         try:
             with open("last_filename.txt", "w", encoding="utf-8") as f:

@@ -87,6 +87,10 @@ jobs:
           python generate_and_send.py $EXTRA
           echo "Done!"
 
+      - name: Keep With me chip and page on generated HTML
+        if: steps.check_changes.outputs.should_process == 'true'
+        run: python scripts/sync_with_me_chip.py
+
       - name: Generate employee schedules
         if: steps.check_changes.outputs.should_process == 'true'
         env:

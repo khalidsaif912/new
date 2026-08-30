@@ -157,6 +157,9 @@ def test_generator_uses_with_me_chip():
     assert 'id="withMeChipBtn"' in src
     assert 'id="readSignChipBtn"' not in src
     assert "withMePage:'معي'" in src
+    assert "sync_with_me_chip" in src
+    wf = (ROOT / ".github" / "workflows" / "roster.yml").read_text(encoding="utf-8")
+    assert "sync_with_me_chip.py" in wf
 
 
 def test_roster_fragment_morning_only():
