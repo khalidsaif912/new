@@ -137,6 +137,10 @@ def test_with_me_page_exists():
     assert "empStatus" not in render
     assert ".deptSplitBar" in html
     assert ".empDept" in html
+    assert "body.ar .backBtn" not in html
+    assert "body.ar .langToggle" not in html
+    assert "direction: ltr" not in html.split(".empRow")[1].split(".empMeta")[0]
+    assert ".header" in html and "direction: ltr" in html
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():

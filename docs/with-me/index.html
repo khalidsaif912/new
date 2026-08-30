@@ -40,6 +40,7 @@
       box-shadow: 0 4px 16px rgba(30, 64, 175, .14);
       position: relative;
       overflow: hidden;
+      direction: ltr;
     }
     .header::before, .header::after {
       content: '';
@@ -72,13 +73,11 @@
       left: 12px; text-decoration: none; font-size: 12px; font-weight: 800;
       padding: 6px 12px;
     }
-    body.ar .backBtn { left: auto; right: 12px; }
     .langToggle {
       right: 12px; min-width: 40px; height: 40px; padding: 4px 8px;
       display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 2px; font-size: 0; box-shadow: none;
     }
-    body.ar .langToggle { right: auto; left: 12px; }
     .langToggle-label { font-size: 11px; font-weight: 800; line-height: 1; }
 
     .dateNav {
@@ -163,8 +162,6 @@
       box-shadow: 0 2px 10px rgba(15,23,42,.06);
     }
     .deptSplitBar { height: 5px; }
-    .empRow { direction: ltr; unicode-bidi: embed; }
-    .empName { direction: ltr; unicode-bidi: embed; text-align: left; }
     .empRow {
       display: flex; align-items: center; justify-content: space-between;
       padding: 11px 14px; border-top: 1px solid rgba(15,23,42,.06); gap: 10px;
@@ -172,7 +169,11 @@
     .empRow:first-child, .deptSplitBar + .empRow { border-top: none; }
     .empRowAlt { background: rgba(15,23,42,.03); }
     .empRow.is-self { box-shadow: inset 3px 0 0 #4f46e5; background: #eef2ff; }
-    .empName { font-size: 15px; font-weight: 700; color: #1e293b; min-width: 0; }
+    html[dir="rtl"] .empRow.is-self { box-shadow: inset -3px 0 0 #4f46e5; }
+    .empName {
+      font-size: 15px; font-weight: 700; color: #1e293b; min-width: 0;
+      text-align: start;
+    }
     .empMeta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .empDept {
       font-size: 12px; font-weight: 800; color: #4f46e5;
@@ -278,6 +279,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm4"></script>
+  <script src="../with-me.js?v=20260830wm5"></script>
 </body>
 </html>
