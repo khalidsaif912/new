@@ -442,10 +442,10 @@
         var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
         html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
         html += '<span class="empName">' + escapeHtml(display) + '</span>';
-        html += '<span class="empMeta">';
-        if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-        if (p.status) html += '<span class="empStatus" style="color:' + meta.color + '">' + escapeHtml(p.status) + '</span>';
-        html += '</span></div>';
+        if (isSelf) {
+          html += '<span class="empMeta"><span class="youPill">' + escapeHtml(t('you')) + '</span></span>';
+        }
+        html += '</div>';
       });
       html += '</div></div>';
     });
