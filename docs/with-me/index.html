@@ -207,7 +207,7 @@
 
     .headerBody {
       position: absolute;
-      inset-block: 8px;
+      inset-block: 44px 8px;
       inset-inline: 12px;
       z-index: 1;
       padding: 0;
@@ -283,7 +283,6 @@
       direction: ltr;
       width: 100%;
       max-width: 100%;
-      height: 100%;
       margin-inline: 0;
     }
     body.ar .dateTagMain,
@@ -291,41 +290,45 @@
       direction: rtl;
     }
     .dateTagSide {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
       gap: .14em;
       line-height: 1;
-      padding-bottom: 0;
+      padding-bottom: .08em;
       flex: 0 0 auto;
       direction: ltr;
       unicode-bidi: isolate;
       position: absolute;
-      inset: 0;
-      transform: none;
+      inset-inline-start: calc(50% + min(8vw, 30px));
+      inset-inline-end: 0;
+      top: 50%;
+      transform: translateY(-48%);
       min-width: 0;
-      width: 100%;
+      width: auto;
     }
     body.ar .dateTagSide,
     html[lang="ar"] .dateTagSide {
-      direction: rtl;
+      align-items: flex-end;
+      inset-inline-start: 0;
+      inset-inline-end: calc(50% + min(8vw, 30px));
     }
     .dateTagWeek {
       display: block;
-      position: absolute;
-      inset-inline: 0;
-      top: 22%;
       font-size: clamp(14px, 4.2vw, 18px);
       font-weight: 700;
       letter-spacing: -.01em;
       line-height: 1.05;
       color: rgba(255, 255, 255, .3);
-      text-align: center;
+      text-align: left;
       white-space: nowrap;
       width: 100%;
       overflow: visible;
     }
     body.ar .dateTagWeek {
       letter-spacing: 0;
-      text-align: center;
+      text-align: right;
     }
     .dateTagDay {
       display: block;
@@ -340,33 +343,30 @@
     body.ar .dateTagDay { letter-spacing: 0; }
     .dateTagMonthWrap {
       display: block;
-      position: absolute;
-      inset-inline: 0;
-      top: 56%;
       line-height: 1;
-      text-align: center;
+      text-align: left;
       width: 100%;
     }
     body.ar .dateTagMonthWrap,
     html[lang="ar"] .dateTagMonthWrap {
-      text-align: center;
+      text-align: right;
     }
     .dateTagMonth {
       display: block;
-      font-size: clamp(28px, 10vw, 42px);
+      font-size: clamp(26px, 8vw, 38px);
       font-weight: 700;
-      letter-spacing: -.02em;
+      letter-spacing: -.03em;
       line-height: 1;
       color: rgba(255, 255, 255, .28);
       text-transform: none;
-      text-align: center;
+      text-align: left;
       white-space: nowrap;
       max-width: 100%;
       overflow: visible;
     }
     body.ar .dateTagMonth {
       letter-spacing: 0;
-      text-align: center;
+      text-align: right;
     }
     .datePickerWrapper #datePicker {
       position: absolute;
