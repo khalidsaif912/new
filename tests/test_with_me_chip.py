@@ -171,7 +171,7 @@ def test_with_me_page_exists():
     assert "personDisplayId" in src
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html
-    assert "grid-template-columns: minmax(0, 1fr)" in html
+    assert "grid-template-columns: max-content" in html
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():

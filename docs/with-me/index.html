@@ -627,17 +627,19 @@
       margin: 0;
       padding: 2px 0 4px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 7.25ch;
+      grid-template-columns: max-content 7.25ch;
       column-gap: 6px;
       row-gap: 0;
       align-items: center;
-      width: 100%;
+      width: max-content;
       max-width: 100%;
       box-sizing: border-box;
     }
     body.ar .empList,
     html[lang="ar"] .empList {
       direction: rtl;
+      margin-inline-start: auto;
+      margin-inline-end: 0;
     }
 
     .deptHead {
@@ -712,7 +714,7 @@
     }
     body.ar .empMain,
     html[lang="ar"] .empMain {
-      justify-content: flex-end;
+      justify-content: flex-start;
       padding: 6px 14px 6px 8px;
       border-inline-start: none;
       border-inline-end: 3px solid transparent;
@@ -1027,6 +1029,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm53"></script>
+  <script src="../with-me.js?v=20260830wm54"></script>
 </body>
 </html>
