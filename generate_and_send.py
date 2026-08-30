@@ -997,7 +997,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .summaryBar {{ 
       display:flex; 
       justify-content:center; 
-      align-items:center;
+      align-items:stretch;
       gap:12px; 
       margin-top:14px;
       flex-wrap:wrap;
@@ -1131,26 +1131,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .summaryBar:has(button.shiftFilterBtn) {{
         flex-wrap: wrap;
       }}
-      .summaryBar > a.summaryChip,
-      .summaryBar > #summarySwitchChip,
-      .summaryBar > button.shiftFilterBtn {{
-        flex: 0 0 auto;
-        min-width: 60px;
-        padding: 8px 8px;
-      }}
+      .summaryChip {{ padding: 8px 8px; min-width: 60px; }}
       .summaryChip .chipVal {{ font-size: 18px; }}
       .summaryChip .chipVal .chip-icon {{ width: 20px; height: 20px; }}
       .summaryChip .chipLabel {{ font-size: 8.5px; letter-spacing: .2px; }}
-    }}
-
-    @media (max-width:480px){{
-      .summaryBar {{ gap: 5px; }}
-      .summaryBar > a.summaryChip,
-      .summaryBar > #summarySwitchChip,
-      .summaryBar > button.shiftFilterBtn {{
-        min-width: 56px;
-        padding: 8px 6px;
-      }}
     }}
 
 
@@ -1602,6 +1586,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       .empName         {{ font-size:14px; }}
       .empStatus       {{ font-size:12px; }}
       .shiftLabel      {{ font-size:14px; }}
+      .summaryBar      {{ gap:8px; }}
+      .summaryChip     {{ padding:8px 14px; }}
+      .summaryChip .chipVal {{ font-size:19px; }}
     }}
 
   </style>{ROSTER_PWA_HEAD_SNIPPET}
