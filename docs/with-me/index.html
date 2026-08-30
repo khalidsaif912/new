@@ -365,16 +365,14 @@
 
     /* ── Shift strip under banner ── */
     .shiftStripWrap {
-      margin-block-start: var(--space-sm);
-      margin-inline: calc(var(--space-md) * -1);
-      padding-block: 2px 4px;
+      margin-block: var(--space-sm) 0;
       touch-action: pan-x;
       -webkit-overflow-scrolling: touch;
     }
     .shiftStrip {
       display: flex;
       gap: 8px;
-      padding: 4px var(--space-md) 8px;
+      padding: 0;
       overflow-x: auto;
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
@@ -534,6 +532,8 @@
       justify-content: space-between;
       gap: var(--space-sm);
       flex-wrap: nowrap;
+      width: 100%;
+      box-sizing: border-box;
       margin: 0;
       padding: 10px 14px;
       border: none;
@@ -620,32 +620,23 @@
       border-start-start-radius: calc(var(--radius-md) - 1px);
       border-start-end-radius: calc(var(--radius-md) - 1px);
     }
-    body.ar .crewCard,
-    html[lang="ar"] .crewCard {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
 
     /* One shared grid: name column + fixed ID column (IDs stack perfectly). */
     .empList {
       margin: 0;
       padding: 2px 0 4px;
       display: grid;
-      grid-template-columns: max-content 7.25ch;
+      grid-template-columns: minmax(0, 1fr) 7.25ch;
       column-gap: 6px;
       row-gap: 0;
       align-items: center;
-      justify-content: start;
-      width: max-content;
+      width: 100%;
       max-width: 100%;
+      box-sizing: border-box;
     }
     body.ar .empList,
     html[lang="ar"] .empList {
       direction: rtl;
-      /* Physical margins: push the whole block to the RIGHT edge. */
-      margin-left: auto !important;
-      margin-right: 0 !important;
     }
 
     .deptHead {
@@ -715,13 +706,13 @@
       align-items: center;
       gap: 6px;
       flex-wrap: nowrap;
-      padding: 6px 0 6px 14px;
+      padding: 6px 8px 6px 14px;
       border-inline-start: 3px solid transparent;
     }
     body.ar .empMain,
     html[lang="ar"] .empMain {
-      justify-content: flex-start;
-      padding: 6px 14px 6px 0;
+      justify-content: flex-end;
+      padding: 6px 14px 6px 8px;
       border-inline-start: none;
       border-inline-end: 3px solid transparent;
     }
@@ -762,7 +753,7 @@
     }
     body.ar .empId,
     html[lang="ar"] .empId {
-      padding: 6px 0 6px 6px;
+      padding: 6px 14px 6px 8px;
       text-align: start;
     }
 
@@ -1035,6 +1026,6 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm51"></script>
+  <script src="../with-me.js?v=20260830wm52"></script>
 </body>
 </html>
