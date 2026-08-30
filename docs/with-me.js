@@ -346,22 +346,6 @@
   var PAGE_TX_KEY = 'rosterBgTextureV1';
   var BANNER_TX_KEY = 'rosterWithMeBannerTextureV1';
   var PATTERN_BASE = 'https://www.transparenttextures.com/patterns/';
-  var BANNER_FALLBACK_PATTERNS = [
-    'cubes',
-    'diagmonds-light',
-    'carbon-fibre',
-    'groovepaper',
-    'hexellence',
-    'subtle-grey',
-    'white-wall',
-    'arabesque',
-    'always-grey',
-    'black-linen',
-    'dark-denim',
-    'dark-mosaic'
-  ];
-  var bannerPatternsCache = null;
-  var bannerPatternsPromise = null;
 
   function patternUrl(slug) {
     return PATTERN_BASE + String(slug || '').replace(/[^a-z0-9_-]/gi, '') + '.png';
@@ -370,17 +354,6 @@
   function readPageTexture() {
     try {
       var raw = localStorage.getItem(PAGE_TX_KEY);
-      if (!raw) return null;
-      var data = JSON.parse(raw);
-      return data && data.color ? data : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function readBannerTexture() {
-    try {
-      var raw = localStorage.getItem(BANNER_TX_KEY);
       if (!raw) return null;
       var data = JSON.parse(raw);
       return data && data.color ? data : null;
@@ -398,43 +371,20 @@
     } catch (e) {}
   }
 
-  function darkBannerColor() {
-    var hues = [205, 215, 225, 235, 245, 255, 195, 265];
-    var h = hues[Math.floor(Math.random() * hues.length)];
-    var s = 42 + Math.floor(Math.random() * 28);
-    var l = 26 + Math.floor(Math.random() * 14);
-    return 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
-  }
-
-  function loadBannerPatterns() {
-    if (bannerPatternsCache) return Promise.resolve(bannerPatternsCache);
-    if (bannerPatternsPromise) return bannerPatternsPromise;
-    var url = rootUrl() + '/bg-texture-patterns.json?v=20260524a';
-    bannerPatternsPromise = fetch(url)
-      .then(function (r) {
-        if (!r.ok) throw new Error('patterns');
-        return r.json();
-      })
-      .then(function (list) {
-        bannerPatternsCache = Array.isArray(list) && list.length ? list : BANNER_FALLBACK_PATTERNS.slice();
-        return bannerPatternsCache;
-      })
-      .catch(function () {
-        bannerPatternsCache = BANNER_FALLBACK_PATTERNS.slice();
-        return bannerPatternsCache;
-      });
-    return bannerPatternsPromise;
-  }
-
-  function pickBannerPattern(list, avoid) {
-    var pool = (list || []).filter(function (p) {
-      return p && p !== avoid;
-    });
-    if (!pool.length) pool = BANNER_FALLBACK_PATTERNS.filter(function (p) {
-      return p !== avoid;
-    });
-    if (!pool.length) return 'cubes';
-    return pool[Math.floor(Math.random() * pool.length)];
+  /** Same hue as the page color, but darker so white date text stays readable. */
+  function darkenPageColor(color) {
+    var hsl = String(color || '').match(
+      /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)\s*%\s*,\s*([\d.]+)\s*%\s*\)/i
+    );
+    if (hsl) {
+      var h = parseFloat(hsl[1]);
+      var s = Math.min(72, Math.max(38, parseFloat(hsl[2]) + 8));
+      var pageL = parseFloat(hsl[3]);
+      var l = Math.max(22, Math.min(38, pageL * 0.38));
+      if (pageL < 50) l = Math.max(18, pageL - 18);
+      return 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
+    }
+    return 'hsl(220, 55%, 30%)';
   }
 
   function applyBannerTexture(color, slug) {
@@ -457,23 +407,16 @@
     document.documentElement.classList.remove('roster-banner-early');
   }
 
-  function syncBannerTexture(forceNew) {
-    return loadBannerPatterns().then(function (list) {
-      var page = readPageTexture();
-      var avoid = page && page.pattern ? page.pattern : '';
-      var saved = forceNew ? null : readBannerTexture();
-      var color;
-      var pattern;
-      if (saved && saved.pattern && saved.pattern !== avoid) {
-        color = saved.color;
-        pattern = saved.pattern;
-      } else {
-        color = darkBannerColor();
-        pattern = pickBannerPattern(list, avoid);
-        saveBannerTexture(color, pattern);
-      }
-      applyBannerTexture(color, pattern);
-    });
+  function syncBannerTexture(pageData) {
+    var page = pageData || readPageTexture();
+    if (!page || !page.color) {
+      applyBannerTexture('hsl(220, 55%, 30%)', '');
+      return;
+    }
+    var color = darkenPageColor(page.color);
+    var pattern = page.pattern || '';
+    saveBannerTexture(color, pattern);
+    applyBannerTexture(color, pattern);
   }
 
   function pad2(n) {
@@ -1465,7 +1408,7 @@
   }
 
   function init() {
-    syncBannerTexture(false);
+    syncBannerTexture();
     loadNamesAr();
     state.lang = readLang();
     applyLang(state.lang);
@@ -1504,19 +1447,15 @@
       if (e.key === 'ArrowRight') go(state.lang === 'ar' ? -1 : 1);
       if (e.key === 'Escape') closePicker();
     });
+    document.addEventListener('rosterBgTextureChange', function (e) {
+      syncBannerTexture(e && e.detail ? e.detail : null);
+    });
     window.addEventListener('storage', function (e) {
-      if (e.key === PAGE_TX_KEY || e.key === BANNER_TX_KEY) syncBannerTexture(false);
+      if (e.key === PAGE_TX_KEY) syncBannerTexture();
     });
     document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) syncBannerTexture(false);
+      if (!document.hidden) syncBannerTexture();
     });
-    var headerEl = document.querySelector('.header');
-    if (headerEl) {
-      headerEl.addEventListener('dblclick', function (e) {
-        if (e.target.closest('a, button, input, label')) return;
-        syncBannerTexture(true);
-      });
-    }
     bindSwipe(document.getElementById('pageWrap') || document.body);
 
     var empId = readSavedEmp();

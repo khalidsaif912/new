@@ -122,12 +122,11 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm61" in html
+    assert "with-me.js?v=20260830wm62" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
     assert "transparenttextures.com/patterns/" in html
-    assert "with-me-banner-style" in html
     assert "data-bg-texture-mount" in html
     assert "roster_banner_choice" not in html
     assert "/assets/banners/" not in html
@@ -169,11 +168,15 @@ def test_with_me_page_exists():
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "syncBannerTexture" in src
+    assert "darkenPageColor" in src
+    assert "rosterBgTextureChange" in src
     assert "BANNER_TX_KEY = 'rosterWithMeBannerTextureV1'" in src
     assert "transparenttextures.com/patterns/" in src
     assert "syncSharedBanner" not in src
     assert "visibilitychange" in src
     assert "bindSwipe" in src
+    shuffle = (ROOT / "docs" / "bg-texture-shuffle.js").read_text(encoding="utf-8")
+    assert "rosterBgTextureChange" in shuffle
     assert "REST_QUOTES" in src
     assert "pickRestQuote" in src
     assert "restSubtitle" in src

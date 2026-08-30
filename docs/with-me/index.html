@@ -11,7 +11,7 @@
   <script defer src="../ios-tap-fix.js?v=20260830wm"></script>
   <script src="../emp-id-gate.js?v=20260730a"></script>
   <script>
-    /* Early restore: page texture + With me banner texture (not photos). */
+    /* Early restore: page texture + darker same-pattern banner. */
     (function () {
       function safeColor(c) {
         return String(c || '').replace(/[^-a-z0-9%,.()# ]/gi, '');
@@ -25,36 +25,45 @@
           ? 'url("https://www.transparenttextures.com/patterns/' + s + '.png")'
           : 'none';
       }
+      function darken(color) {
+        var hsl = String(color || '').match(
+          /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)\s*%\s*,\s*([\d.]+)\s*%\s*\)/i
+        );
+        if (!hsl) return 'hsl(220, 55%, 30%)';
+        var h = parseFloat(hsl[1]);
+        var s = Math.min(72, Math.max(38, parseFloat(hsl[2]) + 8));
+        var pageL = parseFloat(hsl[3]);
+        var l = Math.max(22, Math.min(38, pageL * 0.38));
+        if (pageL < 50) l = Math.max(18, pageL - 18);
+        return 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
+      }
       try {
         var raw = localStorage.getItem('rosterBgTextureV1');
-        if (raw) {
-          var data = JSON.parse(raw);
-          if (data && data.color) {
-            var st = document.createElement('style');
-            st.id = 'with-me-bg-early';
-            st.textContent =
-              'html,body{background-color:' + safeColor(data.color) + '!important;' +
-              'background-image:' + patternCss(data.pattern) + '!important;background-repeat:repeat!important}' +
-              '.wrap{background:transparent!important}';
-            document.documentElement.classList.add('roster-bg-textured');
-            document.head.appendChild(st);
-          }
-        }
-      } catch (e) {}
-      try {
-        var braw = localStorage.getItem('rosterWithMeBannerTextureV1');
-        if (!braw) return;
-        var bdata = JSON.parse(braw);
-        if (!bdata || !bdata.color) return;
-        var bs = document.createElement('style');
-        bs.id = 'with-me-banner-style';
-        bs.textContent =
-          '.header{background-color:' + safeColor(bdata.color) + '!important;' +
-          'background-image:' + patternCss(bdata.pattern) + '!important;' +
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        if (!data || !data.color) return;
+        var pageColor = safeColor(data.color);
+        var pattern = data.pattern || '';
+        var bannerColor = darken(data.color);
+        var st = document.createElement('style');
+        st.id = 'with-me-bg-early';
+        st.textContent =
+          'html,body{background-color:' + pageColor + '!important;' +
+          'background-image:' + patternCss(pattern) + '!important;background-repeat:repeat!important}' +
+          '.wrap{background:transparent!important}' +
+          '.header{background-color:' + safeColor(bannerColor) + '!important;' +
+          'background-image:' + patternCss(pattern) + '!important;' +
           'background-size:auto!important;background-repeat:repeat!important;background-position:0 0!important}' +
           '.header::before,.header::after{content:none!important;opacity:0!important;display:none!important}';
-        document.head.appendChild(bs);
-      } catch (e2) {}
+        document.documentElement.classList.add('roster-bg-textured');
+        document.head.appendChild(st);
+        try {
+          localStorage.setItem(
+            'rosterWithMeBannerTextureV1',
+            JSON.stringify({ color: bannerColor, pattern: pattern })
+          );
+        } catch (eSave) {}
+      } catch (e) {}
     })();
   </script>
   <style>
@@ -1115,7 +1124,7 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm61"></script>
-  <script defer src="../bg-texture-shuffle.js?v=20260830wm61"></script>
+  <script src="../with-me.js?v=20260830wm62"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260830wm62"></script>
 </body>
 </html>

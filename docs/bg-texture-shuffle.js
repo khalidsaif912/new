@@ -181,6 +181,13 @@
         JSON.stringify({ color: color, pattern: slug || '' })
       );
     } catch (e) {}
+    try {
+      document.dispatchEvent(
+        new CustomEvent('rosterBgTextureChange', {
+          detail: { color: color, pattern: slug || '' },
+        })
+      );
+    } catch (e2) {}
   }
 
   function shuffle() {
