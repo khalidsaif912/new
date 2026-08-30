@@ -162,6 +162,11 @@ def test_with_me_page_exists():
     assert ".deptHead" in html
     assert "personLabel" in src
     assert "unicode-bidi: embed" in html
+    assert re.search(
+        r"body\.ar \.empName\s*\{[^}]*direction: rtl;[^}]*unicode-bidi: plaintext;[^}]*text-align: right;",
+        html,
+        re.S,
+    )
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():
