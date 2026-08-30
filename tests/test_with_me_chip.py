@@ -122,16 +122,19 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm59" in html
+    assert "with-me.js?v=20260830wm60" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
+    assert "roster_banner_choice" in html
+    assert "with-me-banner-style" in html
     assert "data-bg-texture-mount" in html
     assert "empNameHeader" in html
     assert "deptHead" in html
     assert "crewSummary" in html
     assert "changeEmp" in html
     assert "border-inline-start" in html
-    assert "background: transparent" in html
+    assert "grid-template-columns: minmax(0, 1fr)" in html
+    assert "column-gap: 0" in html
     header_top = html[html.find('<div class="headerTop">') : html.find('<div class="headerBody">')]
     assert header_top.find('id="backBtn"') < header_top.find('class="headerIdentity"') < header_top.find('id="langToggle"')
     assert "align-items: center" in html
@@ -150,20 +153,21 @@ def test_with_me_page_exists():
         re.S,
     )
     date_side_css = re.search(
-        r"\.dateTagSide\s*\{[^}]*padding-inline-start: min\(1\.8vw, 10px\);[^}]*border-inline-start: 1px solid rgba\(30, 64, 175, \.14\);[^}]*position: static;",
+        r"\.dateTagSide\s*\{[^}]*padding-inline-start: min\(1\.8vw, 10px\);[^}]*border-inline-start: 1px solid rgba\(255, 255, 255, \.13\);[^}]*position: static;",
         html,
         re.S,
     )
     assert date_side_css
     assert "background:" not in date_side_css.group(0)
-    assert "border-inline-end: 1px solid rgba(30, 64, 175, .14)" in html
+    assert "border-inline-end: 1px solid rgba(255, 255, 255, .13)" in html
     assert "font-size: clamp(28px, 10vw, 42px)" in html
-    assert "rgba(30, 64, 175, .16)" in html
+    assert "rgba(255, 255, 255, .16)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
-    assert "syncSharedBanner" not in src
-    assert "roster_banner_choice" not in src
+    assert "syncSharedBanner" in src
+    assert "SHARED_BANNER_KEY = 'roster_banner_choice'" in src
+    assert "visibilitychange" in src
     assert "bindSwipe" in src
     assert "REST_QUOTES" in src
     assert "pickRestQuote" in src
@@ -204,12 +208,12 @@ def test_with_me_page_exists():
     assert "personDisplayId" in src
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html
-    assert "grid-template-columns: max-content" in html
+    assert "grid-template-columns: minmax(0, 1fr)" in html
     assert "border-inline-start-width: 3px" in html
     assert ".crewCard.sg-afternoon" in html
     assert "personLabel" in src
     assert re.search(
-        r"body\.ar \.empList,\s*html\[lang=\"ar\"\] \.empList\s*\{[^}]*direction: rtl;[^}]*margin-inline-start: 0;[^}]*margin-inline-end: auto;",
+        r"body\.ar \.empList,\s*html\[lang=\"ar\"\] \.empList\s*\{[^}]*direction: rtl;",
         html,
         re.S,
     )
