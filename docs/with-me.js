@@ -13,13 +13,6 @@
   var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
   var DEPT_ORDER = ['Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators'];
-  var DEPT_META = {
-    Officers: { base: '#2563eb', light: '#2563eb15', border: '#2563eb18', grad: '#2563eb' },
-    Supervisors: { base: '#0891b2', light: '#0891b215', border: '#0891b218', grad: '#0891b2' },
-    'Load Control': { base: '#059669', light: '#05966915', border: '#05966918', grad: '#059669' },
-    'Export Checker': { base: '#dc2626', light: '#dc262615', border: '#dc262618', grad: '#dc2626' },
-    'Export Operators': { base: '#7c3aed', light: '#7c3aed15', border: '#7c3aed18', grad: '#7c3aed' }
-  };
   var SHIFT_META = {
     Morning: { icon: '☀️', color: '#92400e', bg: '#fef3c7', border: '#f59e0b44' },
     Afternoon: { icon: '🌆', color: '#9a3412', bg: '#ffedd5', border: '#f9731644' },
@@ -414,41 +407,52 @@
     );
   }
 
+  function flattenPeople(groups) {
+    var out = [];
+    (groups || []).forEach(function (g) {
+      (g.people || []).forEach(function (p) {
+        out.push({
+          name: p.name,
+          nameAr: p.nameAr,
+          id: p.id,
+          dept: g.dept
+        });
+      });
+    });
+    return out;
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var meta = SHIFT_META[shiftKey] || SHIFT_META.Other;
-    var total = 0;
-    groups.forEach(function (g) { total += g.people.length; });
+    var people = flattenPeople(groups);
     var html = '';
     html += '<div class="shiftBanner" style="background:' + meta.bg + ';border-color:' + meta.border + ';color:' + meta.color + '">';
     html += '<span class="shiftBannerIcon">' + meta.icon + '</span>';
     html += '<span class="shiftBannerName">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
-    html += '<span class="shiftBannerCount">' + total + ' ' + escapeHtml(t('people')) + '</span>';
+    html += '<span class="shiftBannerCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
     html += '</div>';
-    groups.forEach(function (g) {
-      var colors = DEPT_META[g.dept] || DEPT_META.Officers;
-      html += '<div class="deptCard">';
-      html += '<div class="deptBar" style="background:linear-gradient(to right,' + colors.grad + ',' + colors.grad + 'cc)"></div>';
-      html += '<div class="deptHead" style="border-bottom:2px solid ' + colors.border + '">';
-      html += '<div class="deptIcon" style="background:' + colors.light + ';color:' + colors.base + '">';
-      html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/><rect x="9" y="14" width="2" height="3"/><rect x="13" y="14" width="2" height="3"/></svg>';
-      html += '</div>';
-      html += '<div class="deptTitle">' + escapeHtml(deptLabel(g.dept)) + '</div>';
-      html += '<div class="deptBadge" style="background:' + colors.light + ';color:' + colors.base + ';border:1px solid ' + colors.border + '">';
-      html += '<span>' + escapeHtml(t('total')) + '</span><strong>' + g.people.length + '</strong>';
-      html += '</div></div>';
-      html += '<div class="empList" style="border:1px solid ' + meta.border + ';background:' + meta.bg + '">';
-      g.people.forEach(function (p, i) {
-        var isSelf = p.id && p.id === selfId;
-        var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
-        html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
-        html += '<span class="empName">' + escapeHtml(display) + '</span>';
-        if (isSelf) {
-          html += '<span class="empMeta"><span class="youPill">' + escapeHtml(t('you')) + '</span></span>';
-        }
-        html += '</div>';
-      });
-      html += '</div></div>';
+    html += '<div class="deptCard withMeCard">';
+    html += '<div class="deptBar"></div>';
+    html += '<div class="deptHead">';
+    html += '<div class="deptIcon">';
+    html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    html += '</div>';
+    html += '<div class="deptTitle">' + escapeHtml(t('titleMain')) + '</div>';
+    html += '<div class="deptBadge">';
+    html += '<span>' + escapeHtml(t('total')) + '</span><strong>' + people.length + '</strong>';
+    html += '</div></div>';
+    html += '<div class="empList">';
+    people.forEach(function (p, i) {
+      var isSelf = p.id && p.id === selfId;
+      var display = state.lang === 'ar' && p.nameAr ? p.nameAr : p.name;
+      html += '<div class="empRow' + (i % 2 ? ' empRowAlt' : '') + (isSelf ? ' is-self' : '') + '" data-emp-id="' + escapeHtml(p.id) + '">';
+      html += '<span class="empName">' + escapeHtml(display) + '</span>';
+      html += '<span class="empMeta">';
+      if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
+      html += '<span class="empDept">' + escapeHtml(deptLabel(p.dept)) + '</span>';
+      html += '</span></div>';
     });
+    html += '</div></div>';
     return html;
   }
 

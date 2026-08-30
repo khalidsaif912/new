@@ -123,6 +123,17 @@ def test_with_me_page_exists():
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "bindSwipe" in src
+    assert "flattenPeople" in src
+    assert "empDept" in src
+    assert 'class="deptCard withMeCard"' in src
+    assert "t('titleMain')" in src
+    flatten = src[src.find("function flattenPeople") : src.find("function renderGroups")]
+    assert "dept: g.dept" in flatten
+    assert "status" not in flatten
+    render = src[src.find("function renderGroups") : src.find("function renderDay")]
+    assert render.count("deptCard") == 1
+    assert "empStatus" not in render
+    assert ".empDept" in html
 
 
 def test_site_apps_keeps_read_sign_in_window_not_banner():
@@ -161,6 +172,27 @@ def test_roster_fragment_morning_only():
         "Mohamed Al Kalbani - 82593",
     ]
     assert "Someone Else - 11111" not in people
+    # Combined With-me list: department on the right, not shift code.
+    depts = []
+    for card in re.finditer(
+        r'<div class="deptTitle">([^<]+)</div>([\s\S]*?)(?=<div class="deptCard">|\Z)',
+        ROSTER_FRAGMENT,
+    ):
+        dept = card.group(1).strip()
+        block = card.group(2)
+        morning = re.search(
+            r'<details class="shiftCard" data-shift="Morning">([\s\S]*?)</details>',
+            block,
+        )
+        if not morning:
+            continue
+        for name in re.findall(r'data-emp-name="([^"]+)"', morning.group(1)):
+            depts.append((name, dept))
+    assert depts == [
+        ("Rodolfo Magcaling - 80235", "Officers"),
+        ("Adil Al Balushi - 81392", "Officers"),
+        ("Mohamed Al Kalbani - 82593", "Supervisors"),
+    ]
 
 
 if __name__ == "__main__":
