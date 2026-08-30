@@ -97,7 +97,7 @@
 
     .headerTop {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: var(--space-sm);
       position: relative;
@@ -108,9 +108,9 @@
     .headerIdentity {
       position: relative;
       z-index: 2;
-      padding: 4px 0 10px;
+      padding: 0;
       width: max-content;
-      max-width: min(72%, 280px);
+      max-width: min(54%, 280px);
       text-align: left;
       margin-right: auto;
       margin-left: 0;
@@ -991,6 +991,10 @@
           </svg>
           <span class="backBtnLabel" id="backBtnLabel">Back</span>
         </a>
+        <div class="headerIdentity">
+          <h1 class="empNameHeader" id="empNameHeader">—</h1>
+          <p class="pageSubtitle" id="pageTitleMain">With me</p>
+        </div>
         <button type="button" class="langToggle" id="langToggle" title="Switch language">
           <span class="langToggle-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -1002,10 +1006,6 @@
           </span>
           <span class="langToggle-label" id="langToggleLabel">ع</span>
         </button>
-      </div>
-      <div class="headerIdentity">
-        <h1 class="empNameHeader" id="empNameHeader">—</h1>
-        <p class="pageSubtitle" id="pageTitleMain">With me</p>
       </div>
       <div class="headerBody">
         <div class="dateNav">

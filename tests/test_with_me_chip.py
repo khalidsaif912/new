@@ -128,6 +128,10 @@ def test_with_me_page_exists():
     assert "changeEmp" in html
     assert "border-inline-start" in html
     assert "inset-inline" in html
+    header_top = html[html.find('<div class="headerTop">') : html.find('<div class="headerBody">')]
+    assert header_top.find('id="backBtn"') < header_top.find('class="headerIdentity"') < header_top.find('id="langToggle"')
+    assert "align-items: center" in html
+    assert "max-width: min(54%, 280px)" in html
     assert "dateTagDay" in html
     assert "IBM Plex Sans" in html
     assert "min-height: 166px" in html
