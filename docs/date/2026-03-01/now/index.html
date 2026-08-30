@@ -423,58 +423,47 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     button.shiftFilterBtn.all .chipVal { color:#1e40af; }
     button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
     
-        /* للشاشات المتوسطة والموبايل: شرائح الملخص في صف واحد */
+            /* للشاشات المتوسطة والموبايل: صف واحد بدون تمديد شكل البطاقة */
     @media (max-width:900px){
       .summaryBar {
         flex-wrap:wrap;
-        gap:5px;
-        justify-content:stretch;
+        gap:6px;
+        justify-content:center;
       }
       .summaryBar > a.summaryChip,
-      .summaryBar > #summarySwitchChip {
-        flex:1 1 calc((100% - 25px) / 6);
-        min-width:0;
-        max-width:none;
-        padding:7px 4px;
-      }
+      .summaryBar > #summarySwitchChip,
       .summaryBar > button.shiftFilterBtn {
-        flex:1 1 calc((100% - 15px) / 4);
-        min-width:0;
-        padding:7px 4px;
-      }
-      .summaryChip .chipVal { font-size:16px; height:22px; }
-      .summaryChip .chipVal .chip-icon { width:18px; height:18px; }
-      .summaryChip .chipLabel {
-        font-size:8px;
-        letter-spacing:.1px;
-        margin-top:3px;
-        max-width:100%;
-        overflow:hidden;
-        text-overflow:ellipsis;
+        flex:0 0 auto;
+        min-width:64px;
+        max-width:none;
+        width:auto;
+        padding:8px 10px;
       }
     }
     
-    /* للموبايل (يشمل شاشات ~6.1 إنش) */
+    /* للموبايل (يشمل شاشات ~6.1 إنش): نفس شكل البطاقة السابق */
     @media (max-width:600px){
-      .summaryBar { gap:4px; }
+      .summaryBar {
+        gap:6px;
+        flex-wrap:nowrap;
+        justify-content:center;
+      }
+      .summaryBar:has(button.shiftFilterBtn) {
+        flex-wrap:wrap;
+      }
       .summaryBar > a.summaryChip,
-      .summaryBar > #summarySwitchChip {
-        flex-basis:calc((100% - 20px) / 6);
-        padding:6px 2px;
-        border-radius:12px;
-      }
+      .summaryBar > #summarySwitchChip,
       .summaryBar > button.shiftFilterBtn {
-        flex-basis:calc((100% - 12px) / 4);
-        padding:6px 2px;
-        border-radius:12px;
+        flex:0 1 auto;
+        min-width:56px;
+        padding:8px 8px;
+        border-radius:14px;
       }
-      .summaryChip .chipVal { font-size:15px; height:20px; }
-      .summaryChip .chipVal .chip-icon { width:17px; height:17px; }
-      .summaryChip .chipLabel { font-size:7.5px; letter-spacing:0; }
+      .summaryChip .chipVal { font-size:18px; height:24px; }
+      .summaryChip .chipVal .chip-icon { width:20px; height:20px; }
+      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; margin-top:4px; }
     }
-
-
-    /* ═══════ DEPARTMENT CARD ═══════ */    .deptCard {
+      /* ═══════ DEPARTMENT CARD ═══════ */    .deptCard {
       content-visibility: auto;
       contain-intrinsic-size: auto 180px;
     }
@@ -957,19 +946,28 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
       .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
-      .wrap            { padding:12px 8px 22px; }
+      .wrap            { padding:12px 10px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
-      .summaryBar      { gap:3px; }
+      .summaryBar {
+        gap:5px;
+        flex-wrap:nowrap;
+        justify-content:center;
+      }
+      .summaryBar:has(button.shiftFilterBtn) {
+        flex-wrap:wrap;
+      }
       .summaryBar > a.summaryChip,
       .summaryBar > #summarySwitchChip,
       .summaryBar > button.shiftFilterBtn {
-        padding:6px 1px;
+        flex:0 1 auto;
+        min-width:52px;
+        padding:8px 7px;
       }
-      .summaryChip .chipVal { font-size:15px; }
-      .summaryChip .chipLabel { font-size:7px; }
+      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipLabel { font-size:8px; }
     }
 
   </style>
