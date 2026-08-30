@@ -130,6 +130,10 @@ def test_with_me_page_exists():
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
     assert "bindSwipe" in src
+    assert "REST_QUOTES" in src
+    assert "pickRestQuote" in src
+    assert "restSubtitle" in src
+    assert "اختيار موظف آخر" in src
     assert "flattenPeople" in src
     assert "t('titleMain')" in src
     assert "deptSplitBar" not in src

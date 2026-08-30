@@ -53,12 +53,12 @@
       loading: 'Loading the roster…',
       missingEmp: 'Select your name to see who is with you.',
       noRoster: 'No roster for this date.',
-      restTitle: 'You are off',
-      restBody: 'Nobody is rostered with you on this day.',
+      restTitle: 'You are on leave 🌿',
+      restSubtitle: 'Your day',
       you: 'You',
       total: 'Total',
       people: 'colleagues',
-      changeEmp: 'Change person',
+      changeEmp: 'Choose another employee',
       close: 'Close',
       officers: 'Officers',
       supervisors: 'Supervisors',
@@ -95,12 +95,12 @@
       loading: 'جاري تحميل الجدول…',
       missingEmp: 'اختر اسمك لمعرفة من معك.',
       noRoster: 'لا يوجد جدول لهذا التاريخ.',
-      restTitle: 'أنت في إجازة',
-      restBody: 'لا يوجد أحد معك في هذا اليوم.',
+      restTitle: 'أنت في إجازة 🌿',
+      restSubtitle: 'يومك لك',
       you: 'أنت',
       total: 'المجموع',
       people: 'زملاء',
-      changeEmp: 'تغيير الشخص',
+      changeEmp: 'اختيار موظف آخر',
       close: 'إغلاق',
       officers: 'الضباط',
       supervisors: 'المشرفون',
@@ -126,6 +126,42 @@
       standby: 'احتياط',
       other: 'أخرى'
     }
+  };
+
+  var REST_QUOTES = {
+    en: [
+      { lead: 'Today is yours ❤️', body: 'Step away from work and enjoy time with the people you love.' },
+      { lead: 'A break you deserve 🌿', body: 'Take a deep breath — today is not for work.' },
+      { lead: 'Leave is best with loved ones ❤️', body: 'Enjoy your day and make a beautiful memory.' },
+      { lead: 'Today is for life, not work ☀️', body: 'Enjoy your time and give your family your best moments.' },
+      { lead: 'Close the work door, open happiness 😊', body: 'A happy day to you and your family.' },
+      { lead: 'Take your time 🌿', body: 'Life is not all work — rest well and recharge for brighter days.' },
+      { lead: 'Today your appointment is rest ❤️', body: 'Enjoy your leave and step back from work pressure.' },
+      { lead: 'The best part of leave is time for those we love.', body: 'Enjoy your day with your family.' },
+      { lead: 'Today is yours — no alarm, no pressure, no shift 😌', body: 'Just rest and good time.' },
+      { lead: 'Make today a memory worth keeping ❤️', body: 'Happy leave to you and those you love.' },
+      { lead: 'Your day… enjoy it your way ❤️', body: 'Work can wait — beautiful moments do not.' },
+      { lead: 'Give yourself and your family a day of rest and joy 🌸', body: 'A calm heart and precious time together.' },
+      { lead: 'A beautiful break… calm hearts… time with loved ones ❤️', body: 'Enjoy your leave and breathe easy.' },
+      { lead: 'A lovely day away from work 🌿', body: 'Enjoy your leave and make happy memories with your family ❤️' }
+    ],
+    ar: [
+      { lead: 'اليوم لك ولعائلتك ❤️', body: 'اترك العمل جانبًا واستمتع بمن تحب.' },
+      { lead: 'استراحة تستحقها 🌿', body: 'خذ نفسًا عميقًا… اليوم لا مكان للعمل.' },
+      { lead: 'الإجازة أجمل حين تُقضى مع من نحب ❤️', body: 'استمتع بيومك واصنع ذكرى جميلة.' },
+      { lead: 'اليوم ليس للعمل… اليوم للحياة ☀️', body: 'استمتع بوقتك، وامنح عائلتك أجمل لحظاتك.' },
+      { lead: 'أغلق باب العمل وافتح باب السعادة 😊', body: 'يوم سعيد لك ولعائلتك.' },
+      { lead: 'خذ وقتك… فالحياة ليست كلها عملًا 🌿', body: 'استمتع براحتك واستعد لأيام أجمل.' },
+      { lead: 'موعدك اليوم مع الراحة ❤️', body: 'استمتع بإجازتك وابتعد قليلًا عن ضغط العمل.' },
+      { lead: 'أجمل ما في الإجازة أن نملك وقتًا لمن نحب.', body: 'استمتع بيومك مع عائلتك.' },
+      { lead: 'اليوم لك… بلا منبه، بلا ضغط، بلا دوام 😌', body: 'فقط راحة ووقت جميل.' },
+      { lead: 'اصنع اليوم ذكرى تستحق أن تتذكرها ❤️', body: 'إجازة سعيدة لك ولمن تحب.' },
+      { lead: 'اليوم لك… استمتع به كما تحب ❤️', body: 'خذ قسطًا من الراحة، واستمتع بوقتك مع من تحب.' },
+      { lead: 'العمل ينتظر، أما اللحظات الجميلة فلا تنتظر.', body: 'استمتع بإجازتك.' },
+      { lead: 'امنح نفسك وعائلتك يومًا من الراحة والفرح 🌸', body: 'استراحة جميلة ووقت ثمين مع من تحب.' },
+      { lead: 'استراحة جميلة… وقلوب مطمئنة… ووقت ثمين مع من تحب ❤️', body: 'استمتع بإجازتك واصنع ذكريات جميلة.' },
+      { lead: 'يوم جميل بعيدًا عن العمل 🌿', body: 'لا يوجد دوام اليوم، فخذ قسطًا من الراحة واستمتع بوقتك مع من تحب.' }
+    ]
   };
 
   var DEPT_I18N = {
@@ -338,8 +374,12 @@
     document.body.classList.toggle('ar', state.lang === 'ar');
     var lbl = document.getElementById('langToggleLabel');
     if (lbl) lbl.textContent = state.lang === 'ar' ? 'EN' : 'ع';
+    var langBtn = document.getElementById('langToggle');
+    if (langBtn) langBtn.title = state.lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية';
     var backLbl = document.getElementById('backBtnLabel');
     if (backLbl) backLbl.textContent = t('back');
+    var backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.setAttribute('aria-label', t('back'));
     var pickTitle = document.getElementById('pickTitle');
     if (pickTitle) pickTitle.textContent = t('pickTitle');
     var pickHint = document.getElementById('pickHint');
@@ -602,15 +642,33 @@
     if (on) el.textContent = t('loading');
   }
 
-  function renderRest(row) {
+  function restQuoteIndex(iso, count) {
+    var seed = 0;
+    var s = String(iso || '') + '|' + String(state.empId || '');
+    for (var i = 0; i < s.length; i++) {
+      seed = ((seed << 5) - seed + s.charCodeAt(i)) | 0;
+    }
+    return Math.abs(seed) % count;
+  }
+
+  function pickRestQuote(iso) {
+    var quotes = REST_QUOTES[state.lang] || REST_QUOTES.en;
+    if (!quotes.length) return { lead: '', body: '' };
+    return quotes[restQuoteIndex(iso, quotes.length)];
+  }
+
+  function renderRest(row, iso) {
     var group = (row && row.shift_group) || 'Off Day';
     var meta = SHIFT_META[group] || SHIFT_META.Other;
+    var quote = pickRestQuote(iso || state.date);
     return (
       '<div class="restCard">' +
       '<div class="restIcon">' + meta.icon + '</div>' +
       '<h2>' + escapeHtml(t('restTitle')) + '</h2>' +
+      '<p class="restSubtitle">' + escapeHtml(t('restSubtitle')) + '</p>' +
       '<p class="restShift">' + escapeHtml(shiftLabel(group)) + '</p>' +
-      '<p>' + escapeHtml(t('restBody')) + '</p>' +
+      '<p class="restLead">' + escapeHtml(quote.lead) + '</p>' +
+      '<p class="restBody">' + escapeHtml(quote.body) + '</p>' +
       '</div>'
     );
   }
@@ -704,7 +762,7 @@
       return;
     }
     if (REST_GROUPS[shiftKey]) {
-      finish(renderRest(row));
+      finish(renderRest(row, iso));
       return;
     }
 
@@ -745,22 +803,53 @@
     var startX = 0;
     var startY = 0;
     var tracking = false;
-    el.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (e.target.closest('a, button, input, select, .datePickerWrapper, .pickSheet')) return;
-      startX = e.clientX;
-      startY = e.clientY;
+
+    function ignoreTarget(target) {
+      return target && target.closest(
+        'a, button, input, select, textarea, label[for="datePicker"], .pickSheet, .changeEmp'
+      );
+    }
+
+    function onStart(clientX, clientY, target) {
+      if (ignoreTarget(target)) return;
+      startX = clientX;
+      startY = clientY;
       tracking = true;
-    });
-    window.addEventListener('pointerup', function (e) {
+    }
+
+    function onEnd(clientX, clientY) {
       if (!tracking) return;
       tracking = false;
-      if (document.getElementById('pickSheet') && document.getElementById('pickSheet').classList.contains('open')) return;
-      var dx = e.clientX - startX;
-      var dy = e.clientY - startY;
+      var sheet = document.getElementById('pickSheet');
+      if (sheet && sheet.classList.contains('open')) return;
+      var dx = clientX - startX;
+      var dy = clientY - startY;
       if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
       go(dx < 0 ? 1 : -1);
+    }
+
+    el.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      onStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }, { passive: true });
+
+    el.addEventListener('touchend', function (e) {
+      if (!tracking || !e.changedTouches.length) return;
+      onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }, { passive: true });
+
+    el.addEventListener('touchcancel', function () { tracking = false; }, { passive: true });
+
+    el.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      onStart(e.clientX, e.clientY, e.target);
     });
+
+    window.addEventListener('pointerup', function (e) {
+      if (!tracking) return;
+      onEnd(e.clientX, e.clientY);
+    });
+
     window.addEventListener('pointercancel', function () { tracking = false; });
   }
 
@@ -899,7 +988,7 @@
       if (e.key === 'ArrowRight') go(state.lang === 'ar' ? -1 : 1);
       if (e.key === 'Escape') closePicker();
     });
-    bindSwipe(document.getElementById('pageWrap') || document.body);
+    bindSwipe(document.body);
 
     var empId = readSavedEmp();
     if (!empId) {
