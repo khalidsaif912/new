@@ -13,9 +13,10 @@
   var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
   var DEPT_ORDER = [
-    'Officers', 'Supervisors', 'Load Control', 'Export Checker', 'Export Operators',
+    'Supervisors', 'Load Control', 'Export Checker', 'Export Operators',
     'Documentation', 'Import Checkers', 'Release Control', 'Import Operators',
-    'Flight Dispatch', 'Flight Dispatch (Export)', 'Flight Dispatch (Import)', 'FLTA'
+    'Flight Dispatch', 'Flight Dispatch (Export)', 'Flight Dispatch (Import)', 'FLTA',
+    'Officers'
   ];
   var IMPORT_WITH_ME_DEPTS = { FLTA: 1 };
   var IMPORT_ROSTER_DEPTS = {
