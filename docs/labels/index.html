@@ -2841,6 +2841,30 @@ function fillAirlineModal(){
       return { dest, origin, pcs: pcsRaw, weight };
     }
 
+    function parseSmartKargoText(text){
+      const htmlParsed = parseSmartKargoHtml(text);
+      if (htmlParsed.dest || htmlParsed.origin || htmlParsed.pcs || htmlParsed.weight) return htmlParsed;
+      const t = String(text || "");
+      const row = t.match(/\|\s*([A-Z]{3})\s*\|\s*([A-Z]{3})\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*Kgs/i);
+      if (row) {
+        const wtNum = parseFloat(row[4]);
+        return {
+          origin: row[1],
+          dest: row[2],
+          pcs: row[3],
+          weight: isFinite(wtNum) ? String(Math.round(wtNum)) : ""
+        };
+      }
+      const pcsWt = t.match(/(\d+)\s*P\s*\/\s*([\d.]+)\s*Kgs/i);
+      const airports = t.match(/\b([A-Z]{3})\b[^\n]{0,40}\b([A-Z]{3})\b/);
+      return {
+        origin: airports ? airports[1] : "",
+        dest: airports ? airports[2] : "",
+        pcs: pcsWt ? pcsWt[1] : "",
+        weight: pcsWt ? String(Math.round(parseFloat(pcsWt[2]))) : ""
+      };
+    }
+
     function applyAwbShipment(data){
       if (!data) return false;
       if (!data.dest && !data.pcs && !data.weight && !data.origin) return false;
@@ -2856,29 +2880,32 @@ function fillAirlineModal(){
       return digitsOnlySafe((document.getElementById("ship_awb") || {}).innerText || "").slice(0, 11);
     }
 
-    function awbApiUrls(digits){
-      const prefix = digits.slice(0, 3);
-      const serial = digits.slice(3);
-      const qAwb = "awb=" + encodeURIComponent(digits);
-      const qTrack = "AWBPrefix=" + encodeURIComponent(prefix) + "&AWBno=" + encodeURIComponent(serial);
-      const urls = [
-        "/api/awb?" + qAwb,
-        "/api/track?" + qTrack
-      ];
-      try {
-        if (location.hostname && location.hostname !== "lbit.netlify.app") {
-          urls.push("https://lbit.netlify.app/api/awb?" + qAwb);
-          urls.push("https://lbit.netlify.app/api/track?" + qTrack);
-        }
-      } catch (e) {}
-      return urls;
+    function smartKargoTrackUrl(digits){
+      return "https://omanair.smartkargo.com/FrmAWBTracking.aspx?AWBPrefix="
+        + encodeURIComponent(digits.slice(0, 3))
+        + "&AWBno=" + encodeURIComponent(digits.slice(3));
     }
 
-    async function fetchWithTimeout(url, ms){
+    function awbApiUrls(digits){
+      const qAwb = "awb=" + encodeURIComponent(digits);
+      const qTrack = "AWBPrefix=" + encodeURIComponent(digits.slice(0, 3))
+        + "&AWBno=" + encodeURIComponent(digits.slice(3));
+      const sk = smartKargoTrackUrl(digits);
+      return [
+        { url: "/api/awb?" + qAwb, simple: false },
+        { url: "/api/track?" + qTrack, simple: false },
+        { url: "https://proxy.cors.sh/" + sk, simple: true },
+        { url: "https://r.jina.ai/" + sk, simple: true }
+      ];
+    }
+
+    async function fetchWithTimeout(url, ms, simple){
       const ctrl = (typeof AbortController === "function") ? new AbortController() : null;
       const timer = setTimeout(()=>{ try{ ctrl && ctrl.abort(); }catch(e){} }, ms || 15000);
+      const opts = { signal: ctrl ? ctrl.signal : undefined, credentials: "omit", mode: "cors" };
+      if (!simple) opts.cache = "no-store";
       try{
-        return await fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined });
+        return await fetch(url, opts);
       } finally {
         clearTimeout(timer);
       }
@@ -2903,9 +2930,10 @@ function fillAirlineModal(){
       try{
         const urls = awbApiUrls(digits);
         for (let i = 0; i < urls.length; i++){
-          const url = urls[i];
+          const item = urls[i];
+          const url = item.url || item;
           try{
-            const res = await fetchWithTimeout(url, 15000);
+            const res = await fetchWithTimeout(url, 15000, !!item.simple);
             if (!res) continue;
             const json = await readAwbJson(res);
             if (json) {
@@ -2918,19 +2946,16 @@ function fillAirlineModal(){
               }
               continue;
             }
-            const ctype = (res.headers.get("content-type") || "").toLowerCase();
-            if (res.ok && ctype.indexOf("html") !== -1) {
-              const html = await res.text();
-              const parsed = parseSmartKargoHtml(html);
-              if (html.indexOf("lblDestination") !== -1 || html.indexOf("FrmAWBTracking") !== -1) {
-                sawTrackBackend = true;
-              }
-              if (applyAwbShipment(parsed)) {
-                awbLastTracked = digits;
-                setAwbTrackHint("تم التعبئة", "ok");
-                showToast("تم تعبئة الوجهة والقطع والوزن");
-                return;
-              }
+            if (!res.ok) continue;
+            const body = await res.text();
+            if (body.indexOf("lblDestination") !== -1 || body.indexOf("FrmAWBTracking") !== -1 || body.indexOf("SmartKargo") !== -1) {
+              sawTrackBackend = true;
+            }
+            if (applyAwbShipment(parseSmartKargoText(body))) {
+              awbLastTracked = digits;
+              setAwbTrackHint("تم التعبئة", "ok");
+              showToast("تم تعبئة الوجهة والقطع والوزن");
+              return;
             }
           }catch(e){}
         }
