@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm64" in html
+    assert "with-me.js?v=20260830wm65" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -192,6 +192,10 @@ def test_with_me_page_exists():
     assert "preventScroll: true" in src
     assert "scrollIntoView" not in src
     assert "shift-strip-dragging" in src
+    assert "renderDay(iso, '')" in src
+    assert "track.innerHTML" in src[src.find("function setLoading") : src.find("function restQuoteIndex")]
+    assert "min-height: calc(var(--day-active-h) + 12px)" in html
+    assert "touch-action: none" in html
     assert "shiftDay" in src
     assert "--day-w: 40px" in html
     assert "--day-active-w: 74px" in html
