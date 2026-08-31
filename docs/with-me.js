@@ -933,7 +933,6 @@
         try { strip.setPointerCapture(pointerId); } catch (err) {}
       }
       strip.scrollLeft = startScroll - dx;
-      if (dragging) paintShiftPin(nearestShiftDay(strip));
       if (e.cancelable) e.preventDefault();
     });
 
@@ -978,24 +977,6 @@
       if (e.cancelable) e.preventDefault();
       strip.scrollLeft += e.deltaX || e.deltaY;
     }, { passive: false });
-  }
-
-  function paintShiftPin(btn) {
-    var pin = document.getElementById('shiftDayPin');
-    if (!pin) return;
-    if (!btn) {
-      pin.hidden = true;
-      pin.innerHTML = '';
-      pin.className = 'shiftDayPin';
-      return;
-    }
-    var extra = '';
-    Array.prototype.forEach.call(btn.classList, function (c) {
-      if (c.indexOf('sg-') === 0) extra += ' ' + c;
-    });
-    pin.className = 'shiftDayPin' + extra;
-    pin.innerHTML = btn.innerHTML;
-    pin.hidden = false;
   }
 
   function nearestShiftDay(strip) {
@@ -1043,11 +1024,7 @@
       btn.setAttribute('aria-current', on ? 'date' : 'false');
       if (on) active = btn;
     });
-    if (!active) {
-      paintShiftPin(null);
-      return;
-    }
-    paintShiftPin(active);
+    if (!active) return;
     centerShiftDay(strip, active, smooth);
   }
 
