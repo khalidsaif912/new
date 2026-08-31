@@ -759,15 +759,12 @@
       border-start-end-radius: calc(var(--radius-md) - 1px);
     }
 
-    /* One shared grid: full-width rows so tone shading is continuous. */
+    /* Full-width colleague rows; together-bar spans name → ID. */
     .empList {
       margin: 0;
       padding: 2px 0 4px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 7.25ch;
-      column-gap: 0;
-      row-gap: 0;
-      align-items: stretch;
+      display: flex;
+      flex-direction: column;
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
@@ -781,7 +778,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      grid-column: 1 / -1;
       padding: 7px 14px 3px;
       min-height: 0;
       width: 100%;
@@ -800,11 +796,9 @@
       padding-block-start: 9px;
     }
     .deptHead.tone-a,
-    .empMain.tone-a,
-    .empId.tone-a { background: var(--surface); }
+    .empRow.tone-a { background: var(--surface); }
     .deptHead.tone-b,
-    .empMain.tone-b,
-    .empId.tone-b { background: var(--surface-muted); }
+    .empRow.tone-b { background: var(--surface-muted); }
 
     .deptHeadLabel {
       font-size: 11px;
@@ -837,22 +831,24 @@
     .deptHead[data-dept="Import Operators"] .roleDot { background: #7c3aed; }
     .deptHead[data-dept="Release Control"] .roleDot { background: #0891b2; }
 
-    .empMain {
-      grid-column: 1;
-      min-width: 0;
+    .empRow {
+      --together: 0;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 5px 0 4px;
+      border-inline-start: 3px solid transparent;
+    }
+    body.ar .empRow,
+    html[lang="ar"] .empRow {
+      border-inline-start: none;
+      border-inline-end: 3px solid transparent;
+    }
+    .empRowTop {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: nowrap;
-      padding: 6px 10px 6px 14px;
-      border-inline-start: 3px solid transparent;
-    }
-    body.ar .empMain,
-    html[lang="ar"] .empMain {
-      justify-content: flex-start;
-      padding: 6px 14px 6px 10px;
-      border-inline-start: none;
-      border-inline-end: 3px solid transparent;
+      min-width: 0;
+      padding: 0 14px;
     }
     .empName {
       font-size: 13px;
@@ -864,6 +860,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
+      flex: 1 1 auto;
     }
     body.ar .empName,
     html[lang="ar"] .empName {
@@ -873,14 +870,10 @@
       text-align: right;
     }
     .empId {
-      grid-column: 2;
+      flex: 0 0 auto;
+      margin-inline-start: auto;
       box-sizing: border-box;
-      width: auto;
       min-width: 7.25ch;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 6px 14px 6px 4px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-muted);
@@ -895,22 +888,39 @@
     }
     body.ar .empId,
     html[lang="ar"] .empId {
-      justify-content: flex-start;
-      padding: 6px 4px 6px 14px;
       text-align: start;
     }
 
-    .empMain.is-self,
-    .empId.is-self {
-      background: var(--brand-soft) !important;
+    .empTogetherTrack {
+      height: 3px;
+      margin: 3px 14px 0;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.07);
+      overflow: hidden;
     }
-    .empMain.is-self {
+    .empTogetherFill {
+      display: block;
+      height: 100%;
+      width: calc(var(--together, 0) * 100%);
+      max-width: 100%;
+      border-radius: inherit;
+      background: color-mix(in srgb, var(--shift-accent, #2563eb) 62%, #94a3b8 18%);
+      opacity: 0.85;
+      transition: width .45s ease;
+    }
+
+    .empRow.is-self {
+      background: var(--brand-soft) !important;
       border-inline-start-color: var(--brand);
     }
-    body.ar .empMain.is-self,
-    html[lang="ar"] .empMain.is-self {
+    body.ar .empRow.is-self,
+    html[lang="ar"] .empRow.is-self {
       border-inline-start-color: transparent;
       border-inline-end-color: var(--brand);
+    }
+    .empRow.is-self .empTogetherFill {
+      background: color-mix(in srgb, var(--brand, #2563eb) 70%, #93c5fd);
+      opacity: 1;
     }
 
     .youPill {
@@ -1195,7 +1205,7 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260831lock"></script>
+  <script src="../with-me.js?v=20260831together"></script>
   <script defer src="../bg-texture-shuffle.js?v=20260830wm64"></script>
 </body>
 </html>

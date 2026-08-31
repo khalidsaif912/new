@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260831lock" in html
+    assert "with-me.js?v=20260831together" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -135,8 +135,11 @@ def test_with_me_page_exists():
     assert "crewSummary" in html
     assert "changeEmp" in html
     assert "border-inline-start" in html
-    assert "grid-template-columns: minmax(0, 1fr)" in html
-    assert "column-gap: 0" in html
+    assert "empTogetherTrack" in html
+    assert "empTogetherFill" in html
+    assert "--together" in html
+    assert "empRow" in html
+    assert "grid-template-columns: minmax(0, 1fr)" not in html
     header_top = html[html.find('<div class="headerTop">') : html.find('<div class="headerBody">')]
     assert header_top.find('id="backBtn"') < header_top.find('class="headerIdentity"') < header_top.find('id="langToggle"')
     assert "align-items: center" in html
@@ -167,6 +170,9 @@ def test_with_me_page_exists():
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
     assert "parseRosterHtml" in src
+    assert "ensureCoShiftStats" in src
+    assert "togetherRatio" in src
+    assert "empTogetherTrack" in src
     assert "syncBannerTexture" in src
     assert "darkenPageColor" in src
     assert "rosterBgTextureChange" in src
@@ -231,21 +237,24 @@ def test_with_me_page_exists():
     assert "shiftCssClass(shiftKey)" in render
     assert 'class="crewCard \' + shiftClass + \'"' in render
     assert "deptHead" in render
-    assert "empMain" in render
+    assert "empRow" in render
+    assert "empTogetherTrack" in render
+    assert "togetherRatio" in render or "togetherRatio" in src
     assert "empId" in render
     assert "tone-a" in render
     assert "deptGroup" not in render
-    assert "empRow" not in render
+    assert "empMain" not in render
     assert "roleBadge" not in render
     assert "empStatus" not in render
     assert "deptSplitBar" not in html
     assert "swipeHint" not in html
     assert ".deptHead" in html
+    assert ".empRow" in html
+    assert ".empTogetherFill" in html
     assert "personDisplayId" in src
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html
-    assert "grid-template-columns: minmax(0, 1fr)" in html
-    assert "border-inline-start-width: 3px" in html
+    assert "border-inline-start: 3px solid" in html
     assert ".crewCard.sg-afternoon" in html
     assert "personLabel" in src
     assert re.search(

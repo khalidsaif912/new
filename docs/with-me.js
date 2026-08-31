@@ -227,7 +227,14 @@
     anim: '',
     rosterKind: 'export',
     stripBuiltFor: '',
-    namesArData: null
+    namesArData: null,
+    coShift: {
+      token: '',
+      workDays: 0,
+      counts: Object.create(null),
+      ready: false,
+      promise: null
+    }
   };
 
   var namesArPromise = null;
@@ -1161,6 +1168,118 @@
     return id;
   }
 
+  function peopleIdsForShift(pack, shiftKey) {
+    var ids = Object.create(null);
+    if (!pack || !pack.ok || !shiftKey) return ids;
+    var exportGroups = pack.htmls[0] ? parseRosterHtml(pack.htmls[0], shiftKey) : [];
+    var importGroups = pack.htmls[1]
+      ? filterImportGroupsForWithMe(parseRosterHtml(pack.htmls[1], shiftKey))
+      : [];
+    flattenPeople(mergeGroups(exportGroups, importGroups)).forEach(function (p) {
+      var id = String(p.id || empIdFromLabel(p.name) || '').trim();
+      if (id) ids[id] = 1;
+    });
+    return ids;
+  }
+
+  function workDaysInMonth(monthYm) {
+    var out = [];
+    var sch = state.schedule;
+    if (!sch || !sch.schedules || !monthYm) return out;
+    (sch.schedules[monthYm] || []).forEach(function (row) {
+      var iso = rowIsoDate(monthYm, row);
+      var shift = row && row.shift_group ? String(row.shift_group) : '';
+      if (!iso || !shift || REST_GROUPS[shift]) return;
+      out.push({ iso: iso, shift: shift });
+    });
+    return out;
+  }
+
+  function togetherRatio(empId) {
+    var id = String(empId || '').trim();
+    if (!id) return 0;
+    if (id === String(state.empId || '').trim()) return 1;
+    var workDays = Number(state.coShift && state.coShift.workDays) || 0;
+    if (!workDays) return 0;
+    var n = Number(state.coShift.counts[id]) || 0;
+    return Math.max(0, Math.min(1, n / workDays));
+  }
+
+  function paintTogetherBars() {
+    var root = document.getElementById('crewTrack');
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('.empRow[data-emp-id]'), function (row) {
+      var id = row.getAttribute('data-emp-id') || '';
+      row.style.setProperty('--together', String(togetherRatio(id)));
+      var fill = row.querySelector('.empTogetherFill');
+      if (fill) {
+        var pct = Math.round(togetherRatio(id) * 100);
+        fill.setAttribute('title', pct + '%');
+      }
+    });
+  }
+
+  function ensureCoShiftStats(monthYm) {
+    var empId = String(state.empId || '').trim();
+    var token = empId + '|' + String(monthYm || '');
+    if (!empId || !monthYm) {
+      return Promise.resolve(state.coShift);
+    }
+    if (state.coShift.token === token && state.coShift.ready) {
+      paintTogetherBars();
+      return Promise.resolve(state.coShift);
+    }
+    if (state.coShift.token === token && state.coShift.promise) {
+      return state.coShift.promise;
+    }
+
+    var days = workDaysInMonth(monthYm);
+    var counts = Object.create(null);
+    state.coShift = {
+      token: token,
+      workDays: days.length,
+      counts: counts,
+      ready: false,
+      promise: null
+    };
+
+    if (!days.length) {
+      state.coShift.ready = true;
+      paintTogetherBars();
+      return Promise.resolve(state.coShift);
+    }
+
+    var idx = 0;
+    function worker() {
+      if (state.coShift.token !== token) return Promise.resolve();
+      if (idx >= days.length) return Promise.resolve();
+      var item = days[idx++];
+      return loadRoster(item.iso)
+        .then(function (pack) {
+          if (state.coShift.token !== token) return;
+          var ids = peopleIdsForShift(pack, item.shift);
+          Object.keys(ids).forEach(function (id) {
+            counts[id] = (counts[id] || 0) + 1;
+          });
+        })
+        .catch(function () {})
+        .then(worker);
+    }
+
+    var workers = [];
+    var conc = Math.min(4, days.length);
+    for (var w = 0; w < conc; w++) workers.push(worker());
+    state.coShift.promise = Promise.all(workers).then(function () {
+      if (state.coShift.token !== token) return state.coShift;
+      state.coShift.counts = counts;
+      state.coShift.ready = true;
+      state.coShift.promise = null;
+      paintTogetherBars();
+      return state.coShift;
+    });
+    return state.coShift.promise;
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var people = flattenPeople(groups);
     var html = '';
@@ -1188,13 +1307,18 @@
       html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
       html += '</div>';
       list.forEach(function (p) {
-        var isSelf = p.id && p.id === selfId;
+        var id = personDisplayId(p);
+        var isSelf = id && id === selfId;
         var selfCls = isSelf ? ' is-self' : '';
-        html += '<span class="empMain ' + tone + selfCls + '" data-emp-id="' + escapeHtml(p.id) + '">';
+        var ratio = togetherRatio(id);
+        html += '<div class="empRow ' + tone + selfCls + '" data-emp-id="' + escapeHtml(id) + '" style="--together:' + ratio + '">';
+        html += '<div class="empRowTop">';
         html += '<span class="empName">' + escapeHtml(personDisplayName(p)) + '</span>';
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
-        html += '</span>';
-        html += '<span class="empId ' + tone + selfCls + '">' + escapeHtml(personDisplayId(p) || '') + '</span>';
+        html += '<span class="empId">' + escapeHtml(id || '') + '</span>';
+        html += '</div>';
+        html += '<div class="empTogetherTrack" aria-hidden="true"><span class="empTogetherFill"></span></div>';
+        html += '</div>';
       });
     });
     html += '</div></div>';
@@ -1259,6 +1383,7 @@
         paintChrome();
       }
       finish(renderGroups(groups, shiftKey, state.empId));
+      ensureCoShiftStats(iso.slice(0, 7));
     });
   }
 
@@ -1456,6 +1581,13 @@
   function startForEmployee(empId) {
     state.empId = empId;
     state.index = null;
+    state.coShift = {
+      token: '',
+      workDays: 0,
+      counts: Object.create(null),
+      ready: false,
+      promise: null
+    };
     setLoading(true);
     loadSchedule(empId).then(function (json) {
       state.schedule = json;
