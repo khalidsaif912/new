@@ -629,7 +629,8 @@
   }
 
   function injectBannerPickerStyles() {
-    if (document.getElementById('banner-picker-layout-css')) return;
+    var node = document.getElementById('banner-picker-layout-css');
+    if (node) node.remove();
     const style = document.createElement('style');
     style.id = 'banner-picker-layout-css';
     style.textContent = [
@@ -637,21 +638,98 @@
       'display:flex!important;',
       'align-items:center!important;',
       'justify-content:center!important;',
-      'padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))!important;',
+      'padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important;',
       'box-sizing:border-box!important;',
       '}',
       '#banner-picker-sheet{',
       'width:100%!important;',
-      'max-width:480px!important;',
-      'max-height:min(74vh,660px)!important;',
+      'max-width:520px!important;',
+      'max-height:min(92vh,920px)!important;',
       'margin:0 auto!important;',
-      'border-radius:20px!important;',
+      'border-radius:18px!important;',
       'overflow-y:auto!important;',
       '-webkit-overflow-scrolling:touch!important;',
       'box-shadow:0 18px 48px rgba(0,0,0,.45)!important;',
+      'touch-action:pan-y!important;',
       '}',
+      '#bannerGrid{',
+      'display:grid!important;',
+      'grid-template-columns:repeat(4,minmax(0,1fr))!important;',
+      'gap:6px!important;',
+      '}',
+      '@media (max-width:359px){#bannerGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}',
+      '#bannerGrid .banner-picker-item{',
+      'touch-action:pan-y!important;',
+      '-webkit-user-select:none!important;',
+      'user-select:none!important;',
+      '}',
+      '#bannerGrid .banner-picker-item img{',
+      'height:52px!important;',
+      'pointer-events:none!important;',
+      '}',
+      '#bannerChromeFadeSettings{',
+      'grid-column:1/-1!important;',
+      'min-height:0!important;',
+      'padding:7px 9px!important;',
+      'gap:4px 8px!important;',
+      'flex-direction:row!important;',
+      'flex-wrap:wrap!important;',
+      'align-items:center!important;',
+      '}',
+      '#bannerChromeFadeSettings > div:first-child{',
+      'margin:0 6px 0 0!important;',
+      'font-size:10px!important;',
+      'white-space:nowrap!important;',
+      '}',
+      '#bannerChromeFadeSettings label{font-size:9px!important;gap:3px!important;}',
     ].join('');
     document.head.appendChild(style);
+  }
+
+  function createBannerPickerGestureGuard(sheet) {
+    var state = { moved: false, startX: 0, startY: 0, startScroll: 0 };
+    sheet.addEventListener(
+      'touchstart',
+      function (e) {
+        var t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        state.moved = false;
+        state.startX = t.clientX;
+        state.startY = t.clientY;
+        state.startScroll = sheet.scrollTop;
+      },
+      { passive: true }
+    );
+    sheet.addEventListener(
+      'touchmove',
+      function (e) {
+        var t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        if (Math.abs(t.clientX - state.startX) > 10 || Math.abs(t.clientY - state.startY) > 10) {
+          state.moved = true;
+        }
+        if (Math.abs(sheet.scrollTop - state.startScroll) > 2) {
+          state.moved = true;
+        }
+      },
+      { passive: true }
+    );
+    sheet.addEventListener(
+      'scroll',
+      function () {
+        state.moved = true;
+      },
+      { passive: true }
+    );
+    return {
+      shouldPick: function () {
+        if (state.moved) {
+          state.moved = false;
+          return false;
+        }
+        return true;
+      },
+    };
   }
 
   function openBannerPickerSheet() {
@@ -669,7 +747,7 @@
       'display:flex',
       'align-items:center',
       'justify-content:center',
-      'padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))',
+      'padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))',
       'box-sizing:border-box',
       'font-family:system-ui,-apple-system,sans-serif'
     ].join(';');
@@ -678,27 +756,29 @@
     sheet.id = 'banner-picker-sheet';
     sheet.style.cssText = [
       'background:#17181d',
-      'border-radius:20px',
-      'padding:18px 16px 22px',
+      'border-radius:18px',
+      'padding:14px 12px 16px',
       'width:100%',
-      'max-width:480px',
-      'max-height:min(74vh,660px)',
+      'max-width:520px',
+      'max-height:min(92vh,920px)',
       'margin:0 auto',
       'overflow-y:auto',
       '-webkit-overflow-scrolling:touch',
       'direction:rtl',
+      'touch-action:pan-y',
       'box-shadow:0 18px 48px rgba(0,0,0,.45)'
     ].join(';');
 
     const current = getSavedBanner();
+    const gesture = createBannerPickerGestureGuard(sheet);
 
     sheet.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">' +
-        '<span style="color:#f5ead8;font-size:15px;font-weight:700;">اختر خلفية الهيدر</span>' +
-        '<button id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;">✕</button>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<span style="color:#f5ead8;font-size:14px;font-weight:700;">اختر خلفية الهيدر</span>' +
+        '<button type="button" id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;">✕</button>' +
       '</div>' +
-      '<div id="bannerGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>' +
-      '<button id="resetBanner" style="margin-top:12px;width:100%;border:none;border-radius:12px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;color:#b8a57a;background:rgba(255,255,255,0.05);">إعادة الخلفية الافتراضية</button>';
+      '<div id="bannerGrid"></div>' +
+      '<button type="button" id="resetBanner" style="margin-top:10px;width:100%;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;color:#b8a57a;background:rgba(255,255,255,0.05);">إعادة الخلفية الافتراضية</button>';
 
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
@@ -711,14 +791,15 @@
     availableBanners.forEach(function (name) {
       const num = bannerNumberLabel(name);
       const wrap = document.createElement('div');
+      wrap.className = 'banner-picker-item';
       wrap.style.cssText =
-        'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid ' +
+        'position:relative;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid ' +
         (name === current ? '#e0bd63' : 'transparent') +
         ';transition:border .15s;';
       const img = document.createElement('img');
       img.alt = num ? ('بانر ' + num) : '';
       img.dataset.bannerName = name;
-      img.style.cssText = 'width:100%;height:70px;object-fit:cover;display:block;background:#2a2b31;';
+      img.style.cssText = 'width:100%;height:52px;object-fit:cover;display:block;background:#2a2b31;';
       img.onerror = function () {
         wrap.style.display = 'none';
       };
@@ -752,10 +833,8 @@
       grid.appendChild(wrap);
       lazyImgs.push(img);
       (function (bannerName) {
-        var picked = false;
         function pick(e) {
-          if (picked) return;
-          picked = true;
+          if (!gesture.shouldPick()) return;
           if (e && e.preventDefault) e.preventDefault();
           if (e && e.stopPropagation) e.stopPropagation();
           chooseBanner(bannerName, overlay);
@@ -763,10 +842,9 @@
         wrap.setAttribute('role', 'button');
         wrap.setAttribute('tabindex', '0');
         wrap.setAttribute('aria-label', num ? ('بانر رقم ' + num) : 'بانر');
-        wrap.style.touchAction = 'manipulation';
+        wrap.style.touchAction = 'pan-y';
         wrap.style.webkitTapHighlightColor = 'transparent';
         wrap.addEventListener('click', pick);
-        wrap.addEventListener('touchend', pick, { passive: false });
       })(name);
     });
 
@@ -774,22 +852,17 @@
       loadPickerThumb(img, img.dataset.bannerName);
     });
 
-    document.getElementById('resetBanner').onclick = function () {
+    document.getElementById('resetBanner').onclick = function (e) {
+      if (!gesture.shouldPick()) return;
       localStorage.removeItem(BANNER_KEY);
       clearBanner();
       overlay.remove();
     };
-
-    document.getElementById('resetBanner').addEventListener('touchend', function (e) {
-      e.preventDefault();
-      localStorage.removeItem(BANNER_KEY);
-      clearBanner();
-      overlay.remove();
-    }, { passive: false });
 
     document.getElementById('closePicker').onclick = function () {
       overlay.remove();
     };
+    document.getElementById('closePicker').setAttribute('type', 'button');
     overlay.onclick = function (e) {
       if (e.target === overlay) overlay.remove();
     };
@@ -963,19 +1036,20 @@
     var cell = document.createElement('div');
     cell.id = 'bannerChromeFadeSettings';
     cell.style.cssText = [
+      'grid-column:1/-1',
       'border-radius:10px',
       'border:1.5px dashed rgba(224,189,99,.45)',
       'background:rgba(255,255,255,.04)',
-      'padding:8px 7px',
+      'padding:7px 9px',
       'display:flex',
-      'flex-direction:column',
-      'justify-content:center',
-      'gap:5px',
-      'min-height:70px',
+      'flex-direction:row',
+      'flex-wrap:wrap',
+      'align-items:center',
+      'gap:4px 8px',
       'box-sizing:border-box'
     ].join(';');
     cell.innerHTML =
-      '<div style="color:#f5ead8;font-size:11px;font-weight:800;line-height:1.2;margin-bottom:2px;">إخفاء العناصر</div>' +
+      '<div style="color:#f5ead8;font-size:10px;font-weight:800;line-height:1.2;">إخفاء العناصر</div>' +
       '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
       '<input type="radio" name="bannerChromeFade" value="off" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">بدون إخفاء</label>' +
       '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
