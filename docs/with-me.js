@@ -901,6 +901,11 @@
       dragging = false;
       pointerId = null;
       strip.classList.remove('is-dragging');
+      lockPageScroll(false);
+    }
+
+    function lockPageScroll(on) {
+      document.documentElement.classList.toggle('shift-strip-dragging', !!on);
     }
 
     strip.addEventListener('pointerdown', function (e) {
@@ -910,6 +915,10 @@
       startX = e.clientX;
       startScroll = strip.scrollLeft;
       pointerId = e.pointerId;
+      var btn = e.target && e.target.closest ? e.target.closest('.shiftDay') : null;
+      if (btn && typeof btn.focus === 'function') {
+        try { btn.focus({ preventScroll: true }); } catch (err) {}
+      }
     });
 
     strip.addEventListener('pointermove', function (e) {
@@ -919,6 +928,7 @@
         if (Math.abs(dx) < DRAG_THRESHOLD) return;
         dragging = true;
         strip.classList.add('is-dragging');
+        lockPageScroll(true);
         try { strip.setPointerCapture(pointerId); } catch (err) {}
       }
       strip.scrollLeft = startScroll - dx;
@@ -953,6 +963,28 @@
       } catch (err) {}
       reset();
     });
+
+    strip.addEventListener('touchmove', function (e) {
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+  }
+
+  function centerShiftDay(strip, btn, smooth) {
+    if (!strip || !btn) return;
+    var sRect = strip.getBoundingClientRect();
+    var bRect = btn.getBoundingClientRect();
+    var delta = (bRect.left + bRect.width / 2) - (sRect.left + sRect.width / 2);
+    if (Math.abs(delta) < 1) return;
+    var next = strip.scrollLeft + delta;
+    if (smooth === false) {
+      strip.scrollLeft = next;
+      return;
+    }
+    try {
+      strip.scrollTo({ left: next, behavior: 'smooth' });
+    } catch (err) {
+      strip.scrollLeft = next;
+    }
   }
 
   function syncShiftStrip(iso, smooth) {
@@ -966,18 +998,7 @@
       if (on) active = btn;
     });
     if (!active) return;
-    try {
-      active.scrollIntoView({
-        behavior: smooth === false ? 'auto' : 'smooth',
-        inline: 'center',
-        block: 'nearest'
-      });
-    } catch (e) {
-      try {
-        var left = active.offsetLeft - (strip.clientWidth / 2) + (active.offsetWidth / 2);
-        strip.scrollTo({ left: Math.max(0, left), behavior: smooth === false ? 'auto' : 'smooth' });
-      } catch (e2) {}
-    }
+    centerShiftDay(strip, active, smooth);
   }
 
   function monthName(iso) {

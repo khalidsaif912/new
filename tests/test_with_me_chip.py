@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm63" in html
+    assert "with-me.js?v=20260830wm64" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -188,10 +188,18 @@ def test_with_me_page_exists():
     assert "buildShiftStrip" in src
     assert "syncShiftStrip" in src
     assert "bindShiftStripDrag" in src
+    assert "centerShiftDay" in src
+    assert "preventScroll: true" in src
+    assert "scrollIntoView" not in src
+    assert "shift-strip-dragging" in src
     assert "shiftDay" in src
     assert "--day-w: 40px" in html
     assert "--day-active-w: 74px" in html
     assert "--day-active-h: 88px" in html
+    assert "margin-block: -16px -24px" in html
+    assert "html.shift-strip-dragging" in html
+    assert "overscroll-behavior: contain" in html
+    assert "padding-block-start: 6px" in html
     assert "--day-w: 36px" in html
     assert "--day-active-w: 68px" in html
     assert "width: var(--day-w)" in html

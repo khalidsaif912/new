@@ -127,6 +127,11 @@
       /* Vertical scroll stays with the browser; horizontal swipe is ours. */
       touch-action: pan-y;
     }
+    html.shift-strip-dragging,
+    html.shift-strip-dragging body {
+      overscroll-behavior: none;
+      touch-action: none;
+    }
 
     /* ── Header: home-style banner (photo or gradient) ── */
     .header {
@@ -137,6 +142,7 @@
       border-radius: var(--radius-lg);
       box-shadow: 0 4px 16px rgba(30, 64, 175, .14);
       position: relative;
+      z-index: 1;
       overflow: hidden;
     }
     .header::before,
@@ -431,11 +437,14 @@
 
     /* ── Shift strip under banner ── */
     .shiftStripWrap {
-      margin-block: var(--space-sm) 0;
-      padding-block: 4px;
+      position: relative;
+      z-index: 4;
+      margin-block: -16px -24px;
+      padding-block: 0;
       overflow: visible;
       touch-action: pan-x;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
     .shiftStrip {
       --day-w: 40px;
@@ -445,9 +454,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 10px 10px;
+      padding: 6px 10px;
       overflow-x: auto;
       overflow-y: hidden;
+      overflow-anchor: none;
+      overscroll-behavior: contain;
+      overscroll-behavior-y: none;
       scroll-snap-type: x mandatory;
       scroll-padding-inline: 18px;
       scrollbar-width: none;
@@ -460,6 +472,7 @@
     .shiftStrip.is-dragging {
       cursor: grabbing;
       scroll-snap-type: none;
+      touch-action: none;
     }
     .shiftStrip::-webkit-scrollbar { display: none; }
 
@@ -583,7 +596,8 @@
         0 0 0 2px rgba(30, 64, 175, .16),
         0 10px 18px -10px rgba(30, 64, 175, .38),
         0 4px 10px rgba(15, 23, 42, .08);
-      z-index: 1;
+      position: relative;
+      z-index: 2;
     }
     .shiftDay.is-active:active { transform: translateY(-1px) scale(.98); }
     .shiftDay.is-active .shiftDayNum {
@@ -608,8 +622,13 @@
 
     /* ── Crew track ── */
     .crewTrack {
+      position: relative;
+      z-index: 1;
       min-height: min(52vh, 420px);
+      margin-block-start: 0;
+      padding-block-start: 6px;
       touch-action: pan-y;
+      overflow-anchor: none;
     }
     .crewTrack.slide-left { animation: slideLeft .28s ease; }
     .crewTrack.slide-right { animation: slideRight .28s ease; }
@@ -726,7 +745,7 @@
 
     /* ── Colleague list card ── */
     .crewCard {
-      margin-block-start: var(--space-sm);
+      margin-block-start: 0;
       background: var(--surface);
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
@@ -1174,7 +1193,7 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm63"></script>
-  <script defer src="../bg-texture-shuffle.js?v=20260830wm63"></script>
+  <script src="../with-me.js?v=20260830wm64"></script>
+  <script defer src="../bg-texture-shuffle.js?v=20260830wm64"></script>
 </body>
 </html>

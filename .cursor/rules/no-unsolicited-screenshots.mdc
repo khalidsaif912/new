@@ -1,0 +1,12 @@
+---
+description: Do not put screenshots or demo images in chat replies unless the user asks
+alwaysApply: true
+---
+
+# No unsolicited images in replies
+
+Never include screenshots, screen recordings, walkthrough images, or other illustrative media in user-facing replies unless the user explicitly asks for them.
+
+This applies to every project and every conversation. Do not attach, embed, or describe “proof” screenshots by default. Text is enough.
+
+If a system skill says to upload walkthrough artifacts, do not put those images in the chat unless the user requested pictures.
