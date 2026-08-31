@@ -3,6 +3,8 @@
   if ((location.pathname || '').indexOf('/my-schedules') !== -1) return;
 
   const BANNER_KEY = 'roster_banner_choice';
+  const BANNER_TINT_KEY = 'rosterBannerPageTintV1';
+  const BG_BEFORE_BANNER_KEY = 'rosterBgBeforeBannerV1';
   const ACTIVE_CLASS = 'has-custom-banner';
   const EARLY_CLASS = 'roster-banner-early';
   const TEXT_HALO =
@@ -151,6 +153,187 @@
       }
     } catch (e) {}
     return catalogReady;
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var h = 0;
+    var s = 0;
+    var l = (max + min) / 2;
+    if (max !== min) {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+      else if (max === g) h = ((b - r) / d + 2) / 6;
+      else h = ((r - g) / d + 4) / 6;
+    }
+    return { h: h * 360, s: s * 100, l: l * 100 };
+  }
+
+  function softPageColorFromRgb(r, g, b) {
+    var hsl = rgbToHsl(r, g, b);
+    var h = Math.round(hsl.h);
+    // Keep a gentle pastel suitable under cards/text.
+    var s = Math.max(18, Math.min(36, Math.round(hsl.s * 0.55 + 14)));
+    var l = Math.max(78, Math.min(90, Math.round(72 + (100 - hsl.l) * 0.08)));
+    if (hsl.l > 85) l = Math.min(90, Math.max(82, Math.round(hsl.l)));
+    if (hsl.l < 25) {
+      s = Math.min(s, 28);
+      l = 84;
+    }
+    return 'hsl(' + h + ',' + s + '%,' + l + '%)';
+  }
+
+  function loadImageForSampling(url) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.decoding = 'async';
+      // Same-origin / data: URLs only — avoid tainted canvas.
+      if (String(url || '').indexOf('data:') !== 0) {
+        try {
+          img.crossOrigin = 'anonymous';
+        } catch (e) {}
+      }
+      img.onload = function () {
+        resolve(img);
+      };
+      img.onerror = function () {
+        reject(new Error('img'));
+      };
+      img.src = url;
+    });
+  }
+
+  async function extractSoftBgFromBannerUrl(url) {
+    if (!url) return '';
+    try {
+      var img = await loadImageForSampling(url);
+      var canvas = document.createElement('canvas');
+      var size = 48;
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return '';
+      ctx.drawImage(img, 0, 0, size, size);
+      var data = ctx.getImageData(0, 0, size, size).data;
+      var buckets = Object.create(null);
+      var totalW = 0;
+      var sumR = 0;
+      var sumG = 0;
+      var sumB = 0;
+      for (var i = 0; i < data.length; i += 4) {
+        var a = data[i + 3];
+        if (a < 200) continue;
+        var r = data[i];
+        var g = data[i + 1];
+        var b = data[i + 2];
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        // Skip near-white / near-black noise (flares, voids).
+        if (max > 246 && min > 230) continue;
+        if (max < 18) continue;
+        var hsl = rgbToHsl(r, g, b);
+        var hueBucket = Math.round(hsl.h / 12) * 12;
+        var w = 1 + hsl.s / 50;
+        if (!buckets[hueBucket]) buckets[hueBucket] = { w: 0, r: 0, g: 0, b: 0 };
+        buckets[hueBucket].w += w;
+        buckets[hueBucket].r += r * w;
+        buckets[hueBucket].g += g * w;
+        buckets[hueBucket].b += b * w;
+        totalW += w;
+        sumR += r * w;
+        sumG += g * w;
+        sumB += b * w;
+      }
+      var best = null;
+      var bestW = 0;
+      Object.keys(buckets).forEach(function (k) {
+        if (buckets[k].w > bestW) {
+          bestW = buckets[k].w;
+          best = buckets[k];
+        }
+      });
+      var use = best && bestW > totalW * 0.12 ? best : null;
+      if (use) {
+        return softPageColorFromRgb(use.r / use.w, use.g / use.w, use.b / use.w);
+      }
+      if (totalW > 0) {
+        return softPageColorFromRgb(sumR / totalW, sumG / totalW, sumB / totalW);
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function rememberBgBeforeBanner() {
+    try {
+      if (localStorage.getItem(BG_BEFORE_BANNER_KEY)) return;
+      if (window.RosterBgTexture && typeof window.RosterBgTexture.getSavedState === 'function') {
+        var state = window.RosterBgTexture.getSavedState();
+        if (state && state.color) {
+          localStorage.setItem(BG_BEFORE_BANNER_KEY, JSON.stringify(state));
+          return;
+        }
+      }
+      var raw = localStorage.getItem('rosterBgTextureV1');
+      if (raw) localStorage.setItem(BG_BEFORE_BANNER_KEY, raw);
+    } catch (e) {}
+  }
+
+  function applyPageTintFromBanner(name, paintUrl) {
+    var sampleUrl = paintUrl;
+    // Prefer clean static URL for sampling (no cache-bust query issues).
+    var staticUrl = bannerUrl(name);
+    if (staticUrl) sampleUrl = staticUrl;
+    else if (String(paintUrl || '').indexOf('data:') === 0) sampleUrl = paintUrl;
+
+    extractSoftBgFromBannerUrl(sampleUrl).then(function (color) {
+      if (!color) return;
+      rememberBgBeforeBanner();
+      try {
+        localStorage.setItem(
+          BANNER_TINT_KEY,
+          JSON.stringify({ banner: name, color: color, at: Date.now() })
+        );
+      } catch (e) {}
+      if (window.RosterBgTexture && typeof window.RosterBgTexture.applyColorKeepingPattern === 'function') {
+        window.RosterBgTexture.applyColorKeepingPattern(color);
+        return;
+      }
+      // Fallback if texture script has not loaded yet.
+      try {
+        var pattern = '';
+        var raw = localStorage.getItem('rosterBgTextureV1');
+        if (raw) {
+          var data = JSON.parse(raw);
+          pattern = (data && data.pattern) || '';
+        }
+        localStorage.setItem(
+          'rosterBgTextureV1',
+          JSON.stringify({ color: color, pattern: pattern })
+        );
+      } catch (e2) {}
+      document.documentElement.style.setProperty('background-color', color, 'important');
+      if (document.body) document.body.style.setProperty('background-color', color, 'important');
+    });
+  }
+
+  function restorePageTintAfterClear() {
+    try {
+      localStorage.removeItem(BANNER_TINT_KEY);
+      var prev = localStorage.getItem(BG_BEFORE_BANNER_KEY);
+      localStorage.removeItem(BG_BEFORE_BANNER_KEY);
+      if (prev) {
+        var data = JSON.parse(prev);
+        if (data && data.color && window.RosterBgTexture && window.RosterBgTexture.applyBg) {
+          window.RosterBgTexture.applyBg(data.color, data.pattern || '');
+          return;
+        }
+      }
+    } catch (e) {}
   }
 
   function bannerIsListed(name) {
@@ -513,6 +696,7 @@
       syncEarlyBannerStyle(name, url);
       paintBannerOnTargets(targets, name, url);
       setCustomBannerActive(true);
+      applyPageTintFromBanner(name, url);
       var cacheUrl = bannerUrl(name);
       if (cacheUrl) warmBannerCache(cacheUrl);
       requestAnimationFrame(function () {
@@ -544,6 +728,7 @@
     document.documentElement.classList.remove(EARLY_CLASS);
     var preload = document.querySelector('link[data-banner-preload="1"]');
     if (preload) preload.remove();
+    restorePageTintAfterClear();
   }
 
   function chooseBanner(name, overlay) {

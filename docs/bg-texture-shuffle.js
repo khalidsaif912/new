@@ -368,11 +368,36 @@
     });
   }
 
+  function getSavedState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      if (data && data.color) return { color: data.color, pattern: data.pattern || '' };
+    } catch (e) {}
+    return null;
+  }
+
+  function applyColorKeepingPattern(color) {
+    if (!color) return;
+    var state = getSavedState();
+    var pattern = state && state.pattern ? state.pattern : '';
+    applyBg(color, pattern);
+  }
+
   function init() {
     injectStyles();
     injectButton();
     restore();
   }
+
+  window.RosterBgTexture = {
+    applyBg: applyBg,
+    applyColorKeepingPattern: applyColorKeepingPattern,
+    getSavedState: getSavedState,
+    shuffle: shuffle,
+    restore: restore,
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
