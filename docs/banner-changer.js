@@ -628,8 +628,36 @@
     });
   }
 
+  function injectBannerPickerStyles() {
+    if (document.getElementById('banner-picker-layout-css')) return;
+    const style = document.createElement('style');
+    style.id = 'banner-picker-layout-css';
+    style.textContent = [
+      '#banner-picker{',
+      'display:flex!important;',
+      'align-items:center!important;',
+      'justify-content:center!important;',
+      'padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))!important;',
+      'box-sizing:border-box!important;',
+      '}',
+      '#banner-picker-sheet{',
+      'width:100%!important;',
+      'max-width:480px!important;',
+      'max-height:min(74vh,660px)!important;',
+      'margin:0 auto!important;',
+      'border-radius:20px!important;',
+      'overflow-y:auto!important;',
+      '-webkit-overflow-scrolling:touch!important;',
+      'box-shadow:0 18px 48px rgba(0,0,0,.45)!important;',
+      '}',
+    ].join('');
+    document.head.appendChild(style);
+  }
+
   function openBannerPickerSheet() {
     if (document.getElementById('banner-picker')) return;
+
+    injectBannerPickerStyles();
 
     const overlay = document.createElement('div');
     overlay.id = 'banner-picker';
@@ -639,23 +667,27 @@
       'background:rgba(0,0,0,0.65)',
       'z-index:10000',
       'display:flex',
-      'align-items:flex-end',
+      'align-items:center',
       'justify-content:center',
+      'padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))',
+      'box-sizing:border-box',
       'font-family:system-ui,-apple-system,sans-serif'
     ].join(';');
 
     const sheet = document.createElement('div');
+    sheet.id = 'banner-picker-sheet';
     sheet.style.cssText = [
       'background:#17181d',
-      'border-top-left-radius:20px',
-      'border-top-right-radius:20px',
-      'padding:18px 16px 28px',
+      'border-radius:20px',
+      'padding:18px 16px 22px',
       'width:100%',
       'max-width:480px',
-      'max-height:min(88vh,720px)',
+      'max-height:min(74vh,660px)',
+      'margin:0 auto',
       'overflow-y:auto',
       '-webkit-overflow-scrolling:touch',
-      'direction:rtl'
+      'direction:rtl',
+      'box-shadow:0 18px 48px rgba(0,0,0,.45)'
     ].join(';');
 
     const current = getSavedBanner();
