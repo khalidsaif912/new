@@ -31,7 +31,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260831c';
+  const BANNER_STORE_VER = '20260831g';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -654,10 +654,9 @@
       '}',
       '#bannerGrid{',
       'display:grid!important;',
-      'grid-template-columns:repeat(4,minmax(0,1fr))!important;',
+      'grid-template-columns:repeat(3,minmax(0,1fr))!important;',
       'gap:6px!important;',
       '}',
-      '@media (max-width:359px){#bannerGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}',
       '#bannerGrid .banner-picker-item{',
       'touch-action:pan-y!important;',
       '-webkit-user-select:none!important;',

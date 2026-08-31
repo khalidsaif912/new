@@ -500,21 +500,97 @@
       margin-bottom: 12px;
       align-items: center;
     }
+    .bannerUploadCard {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed #3b82f6aa;
+      background: linear-gradient(165deg, #1e3a8a33, #0f172aee);
+    }
+    .bannerUploadTitle {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #dbeafe;
+    }
+    .bannerUploadHint {
+      margin: 0;
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    .bannerUploadActions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
     .bannerAddLabel {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
+      min-height: 40px;
       padding: 0 14px;
       border-radius: 12px;
       background: #2563eb;
       color: #fff;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
       border: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bannerAddLabel.secondary {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #dbeafe;
     }
     .bannerAddLabel input { display: none; }
+    .bannerUploadPreview {
+      display: none;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      background: #0f172a;
+    }
+    .bannerUploadPreview.show { display: block; }
+    .bannerUploadPreview img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      display: block;
+    }
+    .bannerUploadConfirm {
+      border: 0;
+      border-radius: 12px;
+      min-height: 40px;
+      padding: 0 16px;
+      background: #16a34a;
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .bannerUploadConfirm:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .bannerUploadCancel {
+      border: 0;
+      border-radius: 12px;
+      min-height: 40px;
+      padding: 0 14px;
+      background: #334155;
+      color: #e2e8f0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
     .bannerAdminGrid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -695,20 +771,35 @@
       </div>
     </div>
     <div id="bannersPanel" hidden>
-      <p class="bannerAdminIntro">إدارة صور بنر الهيدر — الحذف نهائي ويختفي البنر من قائمة اختيار الخلفية لجميع الزوار.</p>
-      <div class="bannerStatus" id="bannerAdminStatus"></div>
-      <div class="bannerAdminToolbar">
-        <label class="bannerAddLabel">
-          <input type="file" id="bannerAddInput" accept="image/jpeg,image/png,image/webp">
-          + إضافة بنر
-        </label>
-        <button type="button" class="chip" id="refreshBannersBtn">تحديث</button>
+      <p class="bannerAdminIntro">إدارة صور بنر الهيدر — ارفع صورة جديدة أو احذف بنراً. الحذف نهائي ويختفي من قائمة اختيار الخلفية لجميع الزوار.</p>
+      <div class="bannerUploadCard">
+        <p class="bannerUploadTitle">رفع صورة بنر</p>
+        <p class="bannerUploadHint">اختر صورة من الجهاز أو الكاميرا (JPG / PNG / WebP). تُضغط تلقائياً قبل الرفع.</p>
+        <div class="bannerUploadActions">
+          <label class="bannerAddLabel">
+            <input type="file" id="bannerAddInput" accept="image/jpeg,image/png,image/webp,image/*">
+            📁 اختيار صورة
+          </label>
+          <label class="bannerAddLabel secondary">
+            <input type="file" id="bannerCameraInput" accept="image/*" capture="environment">
+            📷 كاميرا
+          </label>
+          <button type="button" class="chip" id="refreshBannersBtn">تحديث القائمة</button>
+        </div>
+        <div class="bannerUploadPreview" id="bannerUploadPreview">
+          <img id="bannerUploadPreviewImg" alt="معاينة البنر">
+        </div>
+        <div class="bannerUploadActions" id="bannerUploadConfirmRow" hidden>
+          <button type="button" class="bannerUploadConfirm" id="bannerUploadConfirm">رفع البنر</button>
+          <button type="button" class="bannerUploadCancel" id="bannerUploadCancel">إلغاء</button>
+        </div>
       </div>
+      <div class="bannerStatus" id="bannerAdminStatus"></div>
       <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20260831c"></script>
+  <script src="../banner-store.js?v=20260831g"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1812,22 +1903,77 @@
       document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
       document.getElementById('refreshGapsBtn').addEventListener('click', loadGaps);
       document.getElementById('refreshBannersBtn').addEventListener('click', loadBanners);
-      const bannerAddInput = document.getElementById('bannerAddInput');
-      if (bannerAddInput) {
-        bannerAddInput.addEventListener('change', async function () {
-          const file = bannerAddInput.files && bannerAddInput.files[0];
-          bannerAddInput.value = '';
-          if (!file || !window.RosterBannerStore) return;
-          setBannerStatus('جاري الرفع…');
-          try {
-            await RosterBannerStore.addCustomBanner(file);
-            setBannerStatus('تمت إضافة البنر');
-            renderBanners();
-          } catch (e) {
-            setBannerStatus(e && e.message === 'large' ? 'الصورة كبيرة جداً — جرّب صورة أصغر' : 'تعذر إضافة البنر', true);
-          }
+
+      var pendingBannerFile = null;
+
+      function clearBannerUploadPreview() {
+        pendingBannerFile = null;
+        var preview = document.getElementById('bannerUploadPreview');
+        var img = document.getElementById('bannerUploadPreviewImg');
+        var row = document.getElementById('bannerUploadConfirmRow');
+        if (preview) preview.classList.remove('show');
+        if (img) img.removeAttribute('src');
+        if (row) row.hidden = true;
+        var confirmBtn = document.getElementById('bannerUploadConfirm');
+        if (confirmBtn) confirmBtn.disabled = false;
+      }
+
+      function stageBannerFile(file) {
+        if (!file) return;
+        if (!/^image\//i.test(file.type || '') && !/\.(jpe?g|png|webp)$/i.test(file.name || '')) {
+          setBannerStatus('الملف ليس صورة صالحة', true);
+          return;
+        }
+        pendingBannerFile = file;
+        var preview = document.getElementById('bannerUploadPreview');
+        var img = document.getElementById('bannerUploadPreviewImg');
+        var row = document.getElementById('bannerUploadConfirmRow');
+        if (img) img.src = URL.createObjectURL(file);
+        if (preview) preview.classList.add('show');
+        if (row) row.hidden = false;
+        setBannerStatus('معاينة جاهزة — اضغط «رفع البنر» للتأكيد');
+      }
+
+      async function uploadPendingBanner() {
+        if (!pendingBannerFile || !window.RosterBannerStore) return;
+        var confirmBtn = document.getElementById('bannerUploadConfirm');
+        if (confirmBtn) confirmBtn.disabled = true;
+        setBannerStatus('جاري ضغط الصورة ورفعها…');
+        try {
+          await RosterBannerStore.addCustomBanner(pendingBannerFile);
+          clearBannerUploadPreview();
+          setBannerStatus('تم رفع البنر بنجاح');
+          renderBanners();
+        } catch (e) {
+          var msg = 'تعذر رفع البنر';
+          if (e && e.message === 'large') msg = 'الصورة كبيرة جداً حتى بعد الضغط — جرّب صورة أبسط أو أصغر';
+          else if (e && e.message === 'imgwrite') msg = 'فشل حفظ الصورة على السيرفر';
+          else if (e && e.message === 'save') msg = 'فشل حفظ قائمة البنرات';
+          setBannerStatus(msg, true);
+        } finally {
+          if (confirmBtn) confirmBtn.disabled = false;
+        }
+      }
+
+      function bindBannerFileInput(id) {
+        var input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener('change', function () {
+          var file = input.files && input.files[0];
+          input.value = '';
+          stageBannerFile(file);
         });
       }
+      bindBannerFileInput('bannerAddInput');
+      bindBannerFileInput('bannerCameraInput');
+
+      var confirmUploadBtn = document.getElementById('bannerUploadConfirm');
+      if (confirmUploadBtn) confirmUploadBtn.addEventListener('click', uploadPendingBanner);
+      var cancelUploadBtn = document.getElementById('bannerUploadCancel');
+      if (cancelUploadBtn) cancelUploadBtn.addEventListener('click', function () {
+        clearBannerUploadPreview();
+        setBannerStatus('');
+      });
       document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
         c.addEventListener('click', () => {
           gapFilter = c.getAttribute('data-gap') || 'noPhone';

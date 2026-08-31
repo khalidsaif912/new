@@ -308,33 +308,41 @@
   }
 
   function compressImageFile(file, maxW, quality, maxBytes) {
-    maxW = maxW || 1200;
-    quality = quality == null ? 0.82 : quality;
-    maxBytes = maxBytes || 48000;
+    maxW = maxW || 1400;
+    quality = quality == null ? 0.8 : quality;
+    maxBytes = maxBytes || 52000;
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
       reader.onload = function () {
         var img = new Image();
         img.onload = function () {
-          var scale = Math.min(1, maxW / (img.width || maxW));
-          var w = Math.max(1, Math.round((img.width || maxW) * scale));
-          var h = Math.max(1, Math.round((img.height || maxW * 0.28) * scale));
-          var canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          var q = quality;
-          var dataUrl = canvas.toDataURL('image/jpeg', q);
-          while (dataUrl.length > maxBytes && q > 0.45) {
-            q -= 0.06;
-            dataUrl = canvas.toDataURL('image/jpeg', q);
+          var tryEncode = function (widthCap, q) {
+            var scale = Math.min(1, widthCap / (img.width || widthCap));
+            var w = Math.max(1, Math.round((img.width || widthCap) * scale));
+            var h = Math.max(1, Math.round((img.height || Math.round(widthCap * 0.3)) * scale));
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            var dataUrl = canvas.toDataURL('image/jpeg', q);
+            while (dataUrl.length > maxBytes && q > 0.42) {
+              q -= 0.07;
+              dataUrl = canvas.toDataURL('image/jpeg', q);
+            }
+            return dataUrl;
+          };
+
+          var caps = [maxW, 1100, 900, 720, 560];
+          var dataUrl = '';
+          for (var i = 0; i < caps.length; i++) {
+            dataUrl = tryEncode(caps[i], quality);
+            if (dataUrl.length <= maxBytes) {
+              resolve(dataUrl);
+              return;
+            }
           }
-          if (dataUrl.length > maxBytes) {
-            reject(new Error('large'));
-            return;
-          }
-          resolve(dataUrl);
+          reject(new Error('large'));
         };
         img.onerror = function () { reject(new Error('img')); };
         img.src = reader.result;

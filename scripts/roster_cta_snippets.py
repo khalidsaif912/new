@@ -1314,8 +1314,8 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-store.js?v=20260831c');
-    addScript(root + '/banner-changer.js?v=20260831e');
+    addScript(root + '/banner-store.js?v=20260831g');
+    addScript(root + '/banner-changer.js?v=20260831f');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
@@ -1354,8 +1354,8 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-store.js?v=20260831c');
-    addScript(root + '/banner-changer.js?v=20260831e');
+    addScript(root + '/banner-store.js?v=20260831g');
+    addScript(root + '/banner-changer.js?v=20260831f');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
