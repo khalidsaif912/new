@@ -55,6 +55,7 @@ _COMMON_TOKENS: Dict[str, str] = {
     "ABDULMALIK": "عبدالمالك",
     "ABDULHAKIM": "عبدالحكيم",
     "ABDULQADIR": "عبدالقادر",
+    "ABID": "عابد",
     "AHMED": "أحمد",
     "AHMAD": "أحمد",
     "AKRAM": "أكرم",
