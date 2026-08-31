@@ -7,6 +7,8 @@
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   var MANTLE_IMG_NS = 'https://mantledb.sh/v2/roster-site-visits/banner-img-';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  var BANNER_CHOICE_KEY = 'roster_banner_choice';
+  var CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
   var STATIC_NAME_RE = /^banner\d+\.jpg$/i;
   var CUSTOM_NAME_RE = /^custom:([a-z0-9]{8,32})$/i;
   var CUSTOM_ID_RE = /^b[a-z0-9]{7,31}$/i;
@@ -177,6 +179,7 @@
     });
     if (!res.ok) throw new Error('save');
     mergeCatalog();
+    bumpCatalogVersion();
     return merged;
   }
 
@@ -237,6 +240,7 @@
       if (!res.ok) return '';
       var json = await res.json();
       var safe = safeImageData(json && json.d);
+      if (json && json.deleted) return '';
       if (safe) customUrlCache[id] = safe;
       return safe;
     } catch (e) {
@@ -267,6 +271,33 @@
     });
     if (!res.ok) throw new Error('imgwrite');
     customUrlCache[id] = safe;
+  }
+
+  async function deleteCustomImage(id) {
+    id = String(id || '').trim();
+    if (!CUSTOM_ID_RE.test(id)) return;
+    delete customUrlCache[id];
+    try {
+      await fetch(MANTLE_IMG_NS + encodeURIComponent(id), {
+        method: 'POST',
+        headers: mantleHeaders(true),
+        body: JSON.stringify({ d: '', deleted: true, at: Date.now() }),
+      });
+    } catch (e) {}
+  }
+
+  function clearSavedBannerChoice(name) {
+    try {
+      if (localStorage.getItem(BANNER_CHOICE_KEY) === name) {
+        localStorage.removeItem(BANNER_CHOICE_KEY);
+      }
+    } catch (e) {}
+  }
+
+  function bumpCatalogVersion() {
+    try {
+      localStorage.setItem(CATALOG_BUMP_KEY, String(Date.now()));
+    } catch (e) {}
   }
 
   function newCustomId() {
@@ -334,22 +365,14 @@
     name = String(name || '').trim();
     if (!isBannerName(name)) throw new Error('name');
     await loadCatalog(true);
+    clearSavedBannerChoice(name);
     if (isStaticName(name)) {
       if (overlay.removed.indexOf(name) === -1) overlay.removed.push(name);
     } else {
       var id = customIdFromName(name);
       overlay.custom = overlay.custom.filter(function (c) { return c.id !== id; });
-      delete customUrlCache[id];
+      await deleteCustomImage(id);
     }
-    await saveOverlay(overlay);
-    return merged;
-  }
-
-  async function restoreBanner(name) {
-    name = String(name || '').trim();
-    if (!isStaticName(name)) throw new Error('name');
-    await loadCatalog(true);
-    overlay.removed = overlay.removed.filter(function (n) { return n !== name; });
     await saveOverlay(overlay);
     return merged;
   }
@@ -373,9 +396,9 @@
     staticBannerUrl: staticBannerUrl,
     addCustomBanner: addCustomBanner,
     removeBanner: removeBanner,
-    restoreBanner: restoreBanner,
     compressImageFile: compressImageFile,
     invalidateCache: invalidateCache,
     bannersAssetPath: bannersAssetPath,
+    CATALOG_BUMP_KEY: CATALOG_BUMP_KEY,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

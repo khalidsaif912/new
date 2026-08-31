@@ -567,15 +567,6 @@
       background: #7f1d1d;
       color: #fecaca;
     }
-    .bannerRestoreBtn {
-      background: #14532d;
-      color: #bbf7d0;
-    }
-    .bannerRemovedSection {
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px dashed #334155;
-    }
     .bannerStatus {
       min-height: 20px;
       font-size: 12px;
@@ -704,7 +695,7 @@
       </div>
     </div>
     <div id="bannersPanel" hidden>
-      <p class="bannerAdminIntro">إدارة صور بنر الهيدر في الصفحة الرئيسية — الإضافة والحذف تظهر فوراً لجميع الزوار.</p>
+      <p class="bannerAdminIntro">إدارة صور بنر الهيدر — الحذف نهائي ويختفي البنر من قائمة اختيار الخلفية لجميع الزوار.</p>
       <div class="bannerStatus" id="bannerAdminStatus"></div>
       <div class="bannerAdminToolbar">
         <label class="bannerAddLabel">
@@ -714,16 +705,10 @@
         <button type="button" class="chip" id="refreshBannersBtn">تحديث</button>
       </div>
       <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
-      <div class="bannerRemovedSection" id="bannerRemovedSection" hidden>
-        <div class="listHead">
-          <h2>بنرات مخفية</h2>
-        </div>
-        <div class="bannerAdminGrid" id="bannerRemovedGrid"></div>
-      </div>
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20260831b"></script>
+  <script src="../banner-store.js?v=20260831c"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1192,14 +1177,11 @@
 
       async function loadBanners() {
         const grid = document.getElementById('bannerAdminGrid');
-        const removedGrid = document.getElementById('bannerRemovedGrid');
-        const removedSection = document.getElementById('bannerRemovedSection');
         if (!grid || !window.RosterBannerStore) {
           if (grid) grid.innerHTML = '<div class="error">تعذر تحميل مدير البنرات</div>';
           return;
         }
         grid.innerHTML = '<div class="empty">جاري التحميل…</div>';
-        if (removedGrid) removedGrid.innerHTML = '';
         setBannerStatus('');
         try {
           RosterBannerStore.invalidateCache();
@@ -1214,48 +1196,30 @@
       function renderBanners() {
         const store = window.RosterBannerStore;
         const grid = document.getElementById('bannerAdminGrid');
-        const removedGrid = document.getElementById('bannerRemovedGrid');
-        const removedSection = document.getElementById('bannerRemovedSection');
         if (!store || !grid) return;
 
         const active = store.getBanners();
         if (!active.length) {
-          grid.innerHTML = '<div class="empty">لا توجد بنرات نشطة.</div>';
+          grid.innerHTML = '<div class="empty">لا توجد بنرات.</div>';
         } else {
           grid.innerHTML = active.map(function (name) {
-            return bannerAdminCardHtml(name, false);
+            return bannerAdminCardHtml(name);
           }).join('');
-        }
-
-        const removed = store.getOverlayState().removed || [];
-        if (removedSection && removedGrid) {
-          if (!removed.length) {
-            removedSection.hidden = true;
-            removedGrid.innerHTML = '';
-          } else {
-            removedSection.hidden = false;
-            removedGrid.innerHTML = removed.map(function (name) {
-              return bannerAdminCardHtml(name, true);
-            }).join('');
-          }
         }
 
         bindBannerAdminActions();
       }
 
-      function bannerAdminCardHtml(name, removed) {
+      function bannerAdminCardHtml(name) {
         const store = window.RosterBannerStore;
         const label = store ? store.bannerLabel(name) : name;
         const kind = store && store.isCustomName(name) ? 'مخصص' : 'افتراضي';
-        const btn = removed
-          ? '<button type="button" class="bannerRestoreBtn" data-restore-banner="' + escapeHtml(name) + '">إظهار</button>'
-          : '<button type="button" class="bannerDelBtn" data-del-banner="' + escapeHtml(name) + '">حذف</button>';
         return (
           '<article class="bannerAdminCard" data-banner-name="' + escapeHtml(name) + '">' +
             '<img alt="" data-banner-thumb="' + escapeHtml(name) + '">' +
             '<div class="bannerAdminMeta">' +
               '<div><b>' + escapeHtml(label) + '</b><br><span>' + escapeHtml(kind) + '</span></div>' +
-              btn +
+              '<button type="button" class="bannerDelBtn" data-del-banner="' + escapeHtml(name) + '">حذف</button>' +
             '</div>' +
           '</article>'
         );
@@ -1272,28 +1236,14 @@
         document.querySelectorAll('[data-del-banner]').forEach(function (btn) {
           btn.onclick = async function () {
             const name = btn.getAttribute('data-del-banner');
-            if (!name || !confirm('حذف هذا البنر من القائمة؟')) return;
+            if (!name || !confirm('حذف هذا البنر نهائياً؟')) return;
             setBannerStatus('جاري الحذف…');
             try {
               await RosterBannerStore.removeBanner(name);
-              setBannerStatus('تم الحذف');
+              setBannerStatus('تم الحذف نهائياً');
               renderBanners();
             } catch (e) {
               setBannerStatus('تعذر الحذف', true);
-            }
-          };
-        });
-        document.querySelectorAll('[data-restore-banner]').forEach(function (btn) {
-          btn.onclick = async function () {
-            const name = btn.getAttribute('data-restore-banner');
-            if (!name) return;
-            setBannerStatus('جاري الإظهار…');
-            try {
-              await RosterBannerStore.restoreBanner(name);
-              setBannerStatus('تمت الاستعادة');
-              renderBanners();
-            } catch (e) {
-              setBannerStatus('تعذر الاستعادة', true);
             }
           };
         });

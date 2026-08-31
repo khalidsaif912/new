@@ -31,6 +31,10 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
+  const BANNER_STORE_VER = '20260831c';
+  const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
+  const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
 
   let availableBanners = [];
   let BANNER_LAYOUT = Object.create(null);
@@ -38,6 +42,65 @@
 
   function getStore() {
     return typeof window !== 'undefined' ? window.RosterBannerStore : null;
+  }
+
+  function loadBannerStoreScript() {
+    return new Promise(function (resolve) {
+      if (getStore()) return resolve(true);
+      var root = getSiteRootPath();
+      var src = (location.origin || '') + root + '/banner-store.js?v=' + BANNER_STORE_VER;
+      if (document.querySelector('script[data-banner-store="1"]')) {
+        var tries = 0;
+        var timer = setInterval(function () {
+          tries += 1;
+          if (getStore() || tries > 50) {
+            clearInterval(timer);
+            resolve(!!getStore());
+          }
+        }, 40);
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-banner-store', '1');
+      s.onload = function () { resolve(!!getStore()); };
+      s.onerror = function () { resolve(false); };
+      document.head.appendChild(s);
+    });
+  }
+
+  async function fetchOverlayDirect() {
+    try {
+      var res = await fetch(MANTLE_BANNERS_URL + '?ts=' + Date.now(), {
+        headers: { Accept: 'application/json', 'X-Mantle-Key': MANTLE_BANNERS_KEY },
+        cache: 'no-store',
+      });
+      if (res.status === 404) return { removed: [], custom: [] };
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applyOverlayToManifest(manifest, overlayRaw) {
+    var manifestBanners = Array.isArray(manifest && manifest.banners) ? manifest.banners.slice() : [];
+    var layouts = manifest && manifest.layouts && typeof manifest.layouts === 'object' ? manifest.layouts : {};
+    var removed = overlayRaw && Array.isArray(overlayRaw.removed) ? overlayRaw.removed : [];
+    var custom = overlayRaw && Array.isArray(overlayRaw.custom) ? overlayRaw.custom : [];
+    var banners = manifestBanners.filter(function (name) {
+      return removed.indexOf(name) === -1;
+    });
+    custom.forEach(function (item) {
+      if (!item || typeof item !== 'object') return;
+      var id = String(item.id || '').trim();
+      if (!id) return;
+      var key = item.key || ('custom:' + id);
+      if (banners.indexOf(key) === -1) banners.push(key);
+      if (item.layout) layouts[key] = item.layout;
+    });
+    return { banners: banners, layouts: layouts };
   }
 
   function syncCatalogFromStore() {
@@ -49,12 +112,28 @@
     return true;
   }
 
-  async function ensureCatalog() {
+  function purgeSavedBannerIfRemoved() {
+    var saved = null;
+    try {
+      saved = localStorage.getItem(BANNER_KEY);
+    } catch (e) {}
+    if (saved && !bannerIsListed(saved)) {
+      try {
+        localStorage.removeItem(BANNER_KEY);
+      } catch (e) {}
+      clearBanner();
+    }
+  }
+
+  async function ensureCatalog(force) {
+    if (getStore() && force) getStore().invalidateCache();
+    await loadBannerStoreScript();
     const store = getStore();
     if (store) {
       try {
-        await store.loadCatalog();
+        await store.loadCatalog(!!force);
         syncCatalogFromStore();
+        purgeSavedBannerIfRemoved();
         return true;
       } catch (e) {}
     }
@@ -62,9 +141,12 @@
       const res = await fetch(BANNERS_PATH + 'manifest.json?ts=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        availableBanners = Array.isArray(json.banners) ? json.banners.slice() : [];
-        BANNER_LAYOUT = json.layouts && typeof json.layouts === 'object' ? json.layouts : {};
+        const overlayRaw = await fetchOverlayDirect();
+        const merged = applyOverlayToManifest(json, overlayRaw);
+        availableBanners = merged.banners;
+        BANNER_LAYOUT = merged.layouts;
         catalogReady = true;
+        purgeSavedBannerIfRemoved();
         return true;
       }
     } catch (e) {}
@@ -541,7 +623,7 @@
   function showBannerPicker() {
     if (document.getElementById('banner-picker')) return;
 
-    ensureCatalog().finally(function () {
+    ensureCatalog(true).finally(function () {
       openBannerPickerSheet();
     });
   }
@@ -886,7 +968,7 @@
 
   function init() {
     injectReadabilityStyles();
-    ensureCatalog().then(function () {
+    ensureCatalog(true).then(function () {
       injectReadabilityStyles();
       const saved = getSavedBanner();
       if (saved) {
@@ -900,6 +982,16 @@
     });
     createChangerBtn();
     bindHeaderChromeFade();
+    try {
+      window.addEventListener('storage', function (e) {
+        if (!e || e.key !== CATALOG_BUMP_KEY) return;
+        ensureCatalog(true).then(function () {
+          injectReadabilityStyles();
+          var active = getSavedBanner();
+          if (active) applyBanner(active);
+        });
+      });
+    } catch (e) {}
     var resizeTimer;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
