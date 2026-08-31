@@ -53,7 +53,9 @@
     'banner33.jpg',
     'banner34.jpg',
     'banner35.jpg',
-    'banner36.jpg'
+    'banner36.jpg',
+    'banner37.jpg',
+    'banner38.jpg'
   ];
 
   /** Per-banner crop/scrim tuning (logo-left layouts, etc.). */
@@ -96,6 +98,20 @@
     'banner36.jpg': {
       position: '50% 50%',
       positionMobile: '50% 50%',
+    },
+    // Earth sunrise — bright sun left; keep horizon centered
+    'banner37.jpg': {
+      position: '50% 55%',
+      positionMobile: '50% 52%',
+      scrim:
+        'linear-gradient(to right,rgba(8,16,40,.55) 0%,rgba(8,16,40,.22) 45%,rgba(8,16,40,.35) 100%)',
+    },
+    // Blue geometric — dark left area for logo/text
+    'banner38.jpg': {
+      position: 'left center',
+      positionMobile: '20% center',
+      scrim:
+        'linear-gradient(to right,rgba(8,16,40,.35) 0%,rgba(8,16,40,.12) 42%,rgba(8,16,40,.25) 100%)',
     },
   };
 
@@ -563,6 +579,9 @@
       'padding:18px 16px 28px',
       'width:100%',
       'max-width:480px',
+      'max-height:min(88vh,720px)',
+      'overflow-y:auto',
+      '-webkit-overflow-scrolling:touch',
       'direction:rtl'
     ].join(';');
 
@@ -646,26 +665,9 @@
       })(name);
     });
 
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            const el = entry.target;
-            loadPickerThumb(el, el.dataset.src);
-            io.unobserve(el);
-          });
-        },
-        { root: sheet, rootMargin: '80px', threshold: 0.01 }
-      );
-      lazyImgs.forEach(function (img) {
-        io.observe(img);
-      });
-    } else {
-      lazyImgs.forEach(function (img) {
-        loadPickerThumb(img, img.dataset.src);
-      });
-    }
+    lazyImgs.forEach(function (img) {
+      loadPickerThumb(img, img.dataset.src);
+    });
 
     document.getElementById('resetBanner').onclick = function () {
       localStorage.removeItem(BANNER_KEY);
