@@ -223,8 +223,7 @@
     anim: '',
     rosterKind: 'export',
     stripBuiltFor: '',
-    namesArData: null,
-    stripLockY: 0
+    namesArData: null
   };
 
   var namesArPromise = null;
@@ -906,18 +905,7 @@
     }
 
     function lockPageScroll(on) {
-      var root = document.documentElement;
-      if (on) {
-        if (!root.classList.contains('shift-strip-dragging')) {
-          state.stripLockY = window.scrollY || 0;
-        }
-        root.classList.add('shift-strip-dragging');
-      } else {
-        root.classList.remove('shift-strip-dragging');
-        if (typeof state.stripLockY === 'number') {
-          window.scrollTo(0, state.stripLockY);
-        }
-      }
+      document.documentElement.classList.toggle('shift-strip-dragging', !!on);
     }
 
     strip.addEventListener('pointerdown', function (e) {
@@ -945,6 +933,7 @@
         try { strip.setPointerCapture(pointerId); } catch (err) {}
       }
       strip.scrollLeft = startScroll - dx;
+      if (dragging) paintShiftPin(nearestShiftDay(strip));
       if (e.cancelable) e.preventDefault();
     });
 
@@ -953,6 +942,10 @@
       if (dragging) {
         if (e.cancelable) e.preventDefault();
         e.stopPropagation();
+        var near = nearestShiftDay(strip);
+        var iso = near && near.getAttribute('data-date');
+        if (iso && iso !== state.date) renderDay(iso, '');
+        else syncShiftStrip(state.date, false);
       } else {
         var btn = e.target.closest('.shiftDay');
         if (btn) {
@@ -987,6 +980,41 @@
     }, { passive: false });
   }
 
+  function paintShiftPin(btn) {
+    var pin = document.getElementById('shiftDayPin');
+    if (!pin) return;
+    if (!btn) {
+      pin.hidden = true;
+      pin.innerHTML = '';
+      pin.className = 'shiftDayPin';
+      return;
+    }
+    var extra = '';
+    Array.prototype.forEach.call(btn.classList, function (c) {
+      if (c.indexOf('sg-') === 0) extra += ' ' + c;
+    });
+    pin.className = 'shiftDayPin' + extra;
+    pin.innerHTML = btn.innerHTML;
+    pin.hidden = false;
+  }
+
+  function nearestShiftDay(strip) {
+    if (!strip) return null;
+    var sRect = strip.getBoundingClientRect();
+    var mid = sRect.left + sRect.width / 2;
+    var best = null;
+    var bestDist = Infinity;
+    Array.prototype.forEach.call(strip.querySelectorAll('.shiftDay'), function (btn) {
+      var r = btn.getBoundingClientRect();
+      var d = Math.abs(r.left + r.width / 2 - mid);
+      if (d < bestDist) {
+        bestDist = d;
+        best = btn;
+      }
+    });
+    return best;
+  }
+
   function centerShiftDay(strip, btn, smooth) {
     if (!strip || !btn) return;
     var sRect = strip.getBoundingClientRect();
@@ -1015,7 +1043,11 @@
       btn.setAttribute('aria-current', on ? 'date' : 'false');
       if (on) active = btn;
     });
-    if (!active) return;
+    if (!active) {
+      paintShiftPin(null);
+      return;
+    }
+    paintShiftPin(active);
     centerShiftDay(strip, active, smooth);
   }
 
@@ -1238,8 +1270,7 @@
 
   function go(delta) {
     if (!canGo(delta)) return;
-    var anim = delta > 0 ? 'slide-left' : 'slide-right';
-    renderDay(addDays(state.date, delta), anim);
+    renderDay(addDays(state.date, delta), '');
   }
 
   function bindSwipe(el) {
