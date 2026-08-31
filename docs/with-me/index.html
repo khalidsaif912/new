@@ -129,6 +129,7 @@
     }
     html.shift-strip-dragging,
     html.shift-strip-dragging body {
+      overflow: hidden;
       overscroll-behavior: none;
       touch-action: none;
     }
@@ -442,8 +443,8 @@
       margin-block: -16px -24px;
       padding-block: 0;
       overflow: visible;
-      touch-action: pan-x;
-      -webkit-overflow-scrolling: touch;
+      contain: layout;
+      touch-action: none;
       overscroll-behavior: contain;
     }
     .shiftStrip {
@@ -455,23 +456,24 @@
       align-items: center;
       gap: 6px;
       padding: 6px 10px;
+      box-sizing: border-box;
+      height: calc(var(--day-active-h) + 12px);
+      min-height: calc(var(--day-active-h) + 12px);
       overflow-x: auto;
       overflow-y: hidden;
       overflow-anchor: none;
       overscroll-behavior: contain;
       overscroll-behavior-y: none;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: 18px;
+      scroll-snap-type: none;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      touch-action: pan-x;
+      touch-action: none;
       cursor: grab;
       user-select: none;
       -webkit-user-select: none;
     }
     .shiftStrip.is-dragging {
       cursor: grabbing;
-      scroll-snap-type: none;
       touch-action: none;
     }
     .shiftStrip::-webkit-scrollbar { display: none; }
@@ -491,14 +493,12 @@
       justify-content: center;
       gap: 1px;
       cursor: inherit;
-      scroll-snap-align: center;
       -webkit-tap-highlight-color: transparent;
-      touch-action: pan-x;
+      touch-action: none;
       opacity: .78;
       transform-origin: center center;
       transition:
         width .28s cubic-bezier(.22, 1, .36, 1),
-        min-height .28s cubic-bezier(.22, 1, .36, 1),
         padding .28s ease,
         border-radius .28s ease,
         transform .22s ease,
@@ -617,8 +617,10 @@
       color: var(--text-secondary);
       font-size: 14px;
       font-weight: 600;
-      margin: var(--space-md) var(--space-xs);
+      margin: 0;
+      min-height: 0;
     }
+    .crewStatus[hidden], .crewEmpty[hidden] { display: none; }
 
     /* ── Crew track ── */
     .crewTrack {
@@ -629,6 +631,7 @@
       padding-block-start: 6px;
       touch-action: pan-y;
       overflow-anchor: none;
+      contain: layout;
     }
     .crewTrack.slide-left { animation: slideLeft .28s ease; }
     .crewTrack.slide-right { animation: slideRight .28s ease; }
@@ -1193,7 +1196,7 @@
     </div>
   </div>
 
-  <script src="../with-me.js?v=20260830wm64"></script>
+  <script src="../with-me.js?v=20260830wm65"></script>
   <script defer src="../bg-texture-shuffle.js?v=20260830wm64"></script>
 </body>
 </html>

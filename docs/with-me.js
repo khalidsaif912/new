@@ -223,7 +223,8 @@
     anim: '',
     rosterKind: 'export',
     stripBuiltFor: '',
-    namesArData: null
+    namesArData: null,
+    stripLockY: 0
   };
 
   var namesArPromise = null;
@@ -905,7 +906,18 @@
     }
 
     function lockPageScroll(on) {
-      document.documentElement.classList.toggle('shift-strip-dragging', !!on);
+      var root = document.documentElement;
+      if (on) {
+        if (!root.classList.contains('shift-strip-dragging')) {
+          state.stripLockY = window.scrollY || 0;
+        }
+        root.classList.add('shift-strip-dragging');
+      } else {
+        root.classList.remove('shift-strip-dragging');
+        if (typeof state.stripLockY === 'number') {
+          window.scrollTo(0, state.stripLockY);
+        }
+      }
     }
 
     strip.addEventListener('pointerdown', function (e) {
@@ -915,6 +927,8 @@
       startX = e.clientX;
       startScroll = strip.scrollLeft;
       pointerId = e.pointerId;
+      lockPageScroll(true);
+      if (e.pointerType === 'touch' && e.cancelable) e.preventDefault();
       var btn = e.target && e.target.closest ? e.target.closest('.shiftDay') : null;
       if (btn && typeof btn.focus === 'function') {
         try { btn.focus({ preventScroll: true }); } catch (err) {}
@@ -928,7 +942,6 @@
         if (Math.abs(dx) < DRAG_THRESHOLD) return;
         dragging = true;
         strip.classList.add('is-dragging');
-        lockPageScroll(true);
         try { strip.setPointerCapture(pointerId); } catch (err) {}
       }
       strip.scrollLeft = startScroll - dx;
@@ -945,7 +958,7 @@
         if (btn) {
           var iso = btn.getAttribute('data-date');
           if (iso && iso !== state.date) {
-            renderDay(iso, iso > state.date ? 'slide-left' : 'slide-right');
+            renderDay(iso, '');
           }
         }
       }
@@ -966,6 +979,11 @@
 
     strip.addEventListener('touchmove', function (e) {
       if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+
+    strip.addEventListener('wheel', function (e) {
+      if (e.cancelable) e.preventDefault();
+      strip.scrollLeft += e.deltaX || e.deltaY;
     }, { passive: false });
   }
 
@@ -1038,7 +1056,13 @@
 
   function setLoading(on) {
     var el = document.getElementById('crewStatus');
+    var track = document.getElementById('crewTrack');
     if (!el) return;
+    // Keep the names card in place while a day is already on screen.
+    if (on && track && track.innerHTML) {
+      el.hidden = true;
+      return;
+    }
     el.hidden = !on;
     if (on) el.textContent = t('loading');
   }
