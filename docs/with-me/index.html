@@ -432,17 +432,24 @@
     /* ── Shift strip under banner ── */
     .shiftStripWrap {
       margin-block: var(--space-sm) 0;
+      padding-block: 4px;
+      overflow: visible;
       touch-action: pan-x;
       -webkit-overflow-scrolling: touch;
     }
     .shiftStrip {
+      --day-w: 40px;
+      --day-h: 50px;
+      --day-active-w: 74px;
+      --day-active-h: 88px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 2px;
+      gap: 6px;
+      padding: 10px 10px;
       overflow-x: auto;
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
+      scroll-padding-inline: 18px;
       scrollbar-width: none;
       -ms-overflow-style: none;
       touch-action: pan-x;
@@ -458,47 +465,56 @@
 
     .shiftDay {
       flex: 0 0 auto;
-      width: 54px;
-      min-height: 64px;
-      padding: 8px 4px 7px;
+      width: var(--day-w);
+      min-height: var(--day-h);
+      padding: 6px 2px 5px;
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 13px;
       background: var(--surface);
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 1px;
       cursor: inherit;
       scroll-snap-align: center;
       -webkit-tap-highlight-color: transparent;
       touch-action: pan-x;
+      opacity: .78;
+      transform-origin: center center;
       transition:
+        width .28s cubic-bezier(.22, 1, .36, 1),
+        min-height .28s cubic-bezier(.22, 1, .36, 1),
+        padding .28s ease,
+        border-radius .28s ease,
         transform .22s ease,
         border-color .22s ease,
         box-shadow .22s ease,
-        background .22s ease;
+        background .22s ease,
+        opacity .22s ease;
     }
     .shiftDay:active { transform: scale(.96); }
     .shiftDayNum {
-      font-size: 17px;
+      font-size: 13px;
       font-weight: 800;
       line-height: 1.1;
       color: var(--text);
       font-variant-numeric: tabular-nums;
+      transition: font-size .28s cubic-bezier(.22, 1, .36, 1);
     }
     .shiftDayWeek {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 700;
       letter-spacing: .02em;
       text-transform: uppercase;
       color: var(--text-muted);
       line-height: 1;
+      transition: font-size .28s ease;
     }
     .shiftDayCode {
-      margin-block-start: 2px;
-      font-size: 9px;
+      margin-block-start: 1px;
+      font-size: 8px;
       font-weight: 800;
       letter-spacing: .02em;
       line-height: 1;
@@ -506,6 +522,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      transition: font-size .28s ease;
     }
 
     .shiftDay.sg-morning {
@@ -555,15 +572,28 @@
     .shiftDay.sg-other .shiftDayCode { color: var(--text-muted); }
 
     .shiftDay.is-active {
-      transform: scale(1.04);
+      width: var(--day-active-w);
+      min-height: var(--day-active-h);
+      padding: 10px 6px 9px;
+      border-radius: 20px;
+      opacity: 1;
+      transform: translateY(-2px);
       border-color: var(--brand);
       box-shadow:
-        0 0 0 2px rgba(30, 64, 175, .18),
-        0 4px 12px rgba(30, 64, 175, .14);
+        0 0 0 2px rgba(30, 64, 175, .16),
+        0 10px 18px -10px rgba(30, 64, 175, .38),
+        0 4px 10px rgba(15, 23, 42, .08);
       z-index: 1;
     }
-    .shiftDay.is-active .shiftDayNum { color: var(--brand); }
+    .shiftDay.is-active:active { transform: translateY(-1px) scale(.98); }
+    .shiftDay.is-active .shiftDayNum {
+      font-size: 24px;
+      color: var(--brand);
+    }
+    .shiftDay.is-active .shiftDayWeek { font-size: 10px; }
+    .shiftDay.is-active .shiftDayCode { font-size: 10px; margin-block-start: 3px; }
     .shiftDay.is-today:not(.is-active) {
+      opacity: .9;
       box-shadow: inset 0 0 0 1.5px rgba(30, 64, 175, .35);
     }
 
@@ -1038,6 +1068,17 @@
       cursor: pointer;
     }
 
+    @media (min-width: 540px) {
+      .shiftStrip {
+        --day-w: 44px;
+        --day-h: 54px;
+        --day-active-w: 82px;
+        --day-active-h: 94px;
+        gap: 8px;
+      }
+      .shiftDay.is-active .shiftDayNum { font-size: 26px; }
+    }
+
     @media (max-width: 420px) {
       .empName { font-size: 13px; }
       .deptHeadLabel { font-size: 10px; }
@@ -1054,6 +1095,15 @@
       }
       .langToggle-icon svg { width: 20px; height: 20px; }
       .langToggle-label { font-size: 11px; }
+      .shiftStrip {
+        --day-w: 36px;
+        --day-h: 46px;
+        --day-active-w: 68px;
+        --day-active-h: 82px;
+        gap: 5px;
+        padding-inline: 8px;
+      }
+      .shiftDay.is-active .shiftDayNum { font-size: 22px; }
     }
   </style>
 </head>

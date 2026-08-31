@@ -189,6 +189,17 @@ def test_with_me_page_exists():
     assert "syncShiftStrip" in src
     assert "bindShiftStripDrag" in src
     assert "shiftDay" in src
+    assert "--day-w: 40px" in html
+    assert "--day-active-w: 74px" in html
+    assert "--day-active-h: 88px" in html
+    assert "--day-w: 36px" in html
+    assert "--day-active-w: 68px" in html
+    assert "width: var(--day-w)" in html
+    assert "width: var(--day-active-w)" in html
+    assert ".shiftDay.is-active .shiftDayNum" in html
+    assert "font-size: 24px" in html
+    assert "font-size: 13px" in html
+    assert "opacity: .78" in html
     assert "sg-morning" in src
     assert "flattenPeople" in src
     assert "t('titleMain')" in src
