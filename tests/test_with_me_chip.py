@@ -196,10 +196,10 @@ def test_with_me_page_exists():
     assert "--day-w: 40px" in html
     assert "--day-active-w: 74px" in html
     assert "--day-active-h: 88px" in html
-    assert "margin-block: -14px -16px" in html
+    assert "margin-block: -16px -24px" in html
     assert "html.shift-strip-dragging" in html
     assert "overscroll-behavior: contain" in html
-    assert "padding-block-start: 12px" in html
+    assert "padding-block-start: 6px" in html
     assert "--day-w: 36px" in html
     assert "--day-active-w: 68px" in html
     assert "width: var(--day-w)" in html
