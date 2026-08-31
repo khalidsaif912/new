@@ -1,0 +1,632 @@
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1">
+    <script src="JScript/jquery-1.10.2.js" type="text/javascript"></script>
+    <script src="JScript/jquery-ui.js" type="text/javascript"></script>
+    <link rel="Stylesheet" href="style/style.css" type="text/css" /><link rel="Stylesheet" href="style/tracking.css" type="text/css" /><title>
+	SmartKargo - AWB Tracking
+</title>
+    <script language="javascript" type="text/javascript">
+        function Download(count) {
+            window.open('Download.aspx?Mode=D', 'Download', 'left=100,top=100,width=800,height=420,toolbar=0,resizable=1');
+        }
+
+        function ViewPanel() {
+            document.getElementById('light').style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+        }
+
+        function HidePanel() {
+            document.getElementById('light').style.display = 'none';
+            document.getElementById('fade').style.display = 'none';
+        }
+
+        function ViewPanelSplit() {
+            document.getElementById('Lightsplit').style.display = 'block';
+            document.getElementById('fadesplit').style.display = 'block';
+        }
+
+        function HidePanelSplit() {
+            document.getElementById('Lightsplit').style.display = 'none';
+            document.getElementById('fadesplit').style.display = 'none';
+        }
+
+        function ShowULDNos(hidId) {
+            var label = hidId.replace("HidULDNo", "lblULDNo");
+            var uldNos = document.getElementById(hidId).value.split(',');
+
+            if (uldNos.length > 1) {
+                document.getElementById(label).innerHTML = uldNos[0] + ", " + uldNos[1] + "...";
+                document.getElementById(hidId.replace("HidULDNo", "imgShowAllUld")).style.display = "block";
+            } else {
+                document.getElementById(label).innerHTML = document.getElementById(hidId).value;
+                document.getElementById(hidId.replace("HidULDNo", "imgShowAllUld")).style.display = "none";
+            }
+        }
+
+        function ShowAllULDNos(buttonId) {
+            var hidId = buttonId.replace("imgShowAllUld", "HidULDNo");
+            var uldNos = document.getElementById(hidId).value;
+            document.getElementById('uldNos').innerHTML = uldNos;
+
+            // Set ULD popup position
+            var objPos = GetScreenCordinates(document.getElementById(buttonId));
+            document.getElementById('uldlistpopup').style.left = (objPos.x - 200) + 'px';
+            document.getElementById('uldlistpopup').style.top = objPos.y + 'px';
+
+            // Show ULD popup
+            document.getElementById('uldlistpopup').style.display = "block";
+        }
+
+        function CloseULDPopup() {
+            document.getElementById('uldlistpopup').style.display = "none";
+        }
+
+        function GetScreenCordinates(obj) {
+            var p = {};
+            p.x = obj.offsetLeft;
+            p.y = obj.offsetTop;
+
+            while (obj.offsetParent) {
+                p.x = p.x + obj.offsetParent.offsetLeft;
+                p.y = p.y + obj.offsetParent.offsetTop;
+
+                if (obj == document.getElementsByTagName("body")[0]) {
+                    break;
+                }
+                else {
+                    obj = obj.offsetParent;
+                }
+            }
+            return p;
+        }
+    </script>
+
+    <style type="text/css">
+        .black_overlay {
+            display: none;
+            position: absolute;
+            top: 0%;
+            left: 0%;
+            width: 100%;
+            height: 1000px;
+            background-color: black;
+            z-index: 1001;
+            -moz-opacity: 0.8;
+            opacity: 0.8;
+            filter: alpha(opacity=80);
+        }
+
+        .white_content {
+            margin: 0 auto;
+            display: none;
+            position: absolute;
+            top: 30%;
+            left: 35%;
+            width: 60%;
+            height: 45%;
+            padding: 16px;
+            border: 16px solid #ccdce3;
+            background-color: white;
+            z-index: 1002;
+            overflow: auto;
+        }
+
+        .black_overlaymsg {
+            display: none;
+            position: fixed;
+            top: 0%;
+            left: 0%;
+            width: 100%;
+            height: 100%;
+            background-color: White;
+            z-index: 1001;
+            -moz-opacity: 0.8;
+            opacity: .80;
+            filter: alpha(opacity=80);
+        }
+
+        .white_contentmsg {
+            display: none;
+            position: fixed;
+            top: 45%;
+            left: 45%;
+            width: 5%;
+            height: 5%;
+            padding: 16px;
+            background-color: Transparent;
+            z-index: 1002;
+        }
+
+
+
+        /*for browser*/
+        @media only screen and (min-width : 375px) and (max-width : 667px) {
+
+            .col-12 {
+                width: 80% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+        /*iPhone 6 in landscape*/
+        @media only screen and (min-width : 375px) and (max-width : 667px) and (orientation : landscape) {
+            .col-12 {
+                width: 80% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+        /*iPhone 6 in portrait*/
+        @media only screen and (min-width : 375px) and (max-width : 667px) and (orientation : portrait) {
+            .col-12 {
+                width: 80% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        /*iPhone 6 Plus in portrait & landscape*/
+        @media only screen and (min-width : 414px) and (max-width : 736px) {
+            .col-12 {
+                width: 80% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        @media only screen and (min-width : 414px) and (max-width : 736px) and (orientation : landscape) {
+            .col-12 {
+                width: 80% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media only screen and (min-width : 414px) and (max-width : 736px) and (orientation : portrait) {
+            .col-12 {
+                width: 8% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        @media only screen and (min-width : 320px) and (max-width : 568px) {
+            .col-12 {
+                width: 60% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media only screen and (min-width : 320px) and (max-width : 568px) and (orientation : landscape) {
+            .col-12 {
+                width: 60% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        @media only screen and (min-width : 320px) and (max-width : 568px) and (orientation : portrait) {
+            .col-12 {
+                width: 100% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        @media only screen and (min-width : 768px) and (max-width : 1024px) {
+            .col-12 {
+                width: 100% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+                margin-bottom: 20px;
+            }
+
+            .scrollbar {
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+        }
+
+        @media only screen and (min-width : 375px) and (max-device-width : 667px) {
+            .col-12 {
+                width: 100% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+            }
+        }
+
+        @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+            .col-12 {
+                width: 100% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+            }
+        }
+
+        @media only screen and (min-device-width : 375px) and (max-device-width : 667px) {
+            .col-12 {
+                width: 100% !important;
+                overflow-y: hidden;
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+
+<body style="background: #fff;">
+    <form name="FrmAWBTracking" method="post" action="./FrmAWBTracking.aspx?AWBPrefix=910&amp;AWBno=17328684" id="FrmAWBTracking">
+<div>
+<input type="hidden" name="ToolkitScriptManager1_HiddenField" id="ToolkitScriptManager1_HiddenField" value="" />
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['FrmAWBTracking'];
+if (!theForm) {
+    theForm = document.FrmAWBTracking;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="https://ajax.aspnetcdn.com/ajax/4.6/1/WebForms.js" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+window.WebForm_PostBackOptions||document.write('<script type="text/javascript" src="/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZLjmCXVSQ3oixuO2jVuOB6hWmdecTI6JXh04FxIxTgj4DMWXEA2&amp;t=639190743605538696"><\/script>');//]]>
+</script>
+
+
+
+<script src="/ScriptResource.axd?d=yeSNAJTOPtPimTGCAo3LlcSBwA_vehus1Zw6RkSALXdZ0sfffmkj7F4dILqfXdOWSgZ0Fz0edAS2fbd-bwkICfS5GsllSDjJq6pcyu8Tdys8SXPH0&amp;t=5f8643ea" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+(window.Sys && Sys._Application && Sys.Observer)||document.write('<script type="text/javascript" src="/ScriptResource.axd?d=yeSNAJTOPtPimTGCAo3LlcSBwA_vehus1Zw6RkSALXdZ0sfffmkj7F4dILqfXdOWSgZ0Fz0edAS2fbd-bwkICfS5GsllSDjJq6pcyu8Tdys8SXPH0&t=5f8643ea"><\/script>');//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/ScriptResource.axd?d=DT3YJR8QaqV61-teuz0hgoK6bn5ZpCAD7_E6rpubc4JtYHBIuZSVrROAEsPR-FQcN-IQYo5hqGFtox64f286qutr0r_1OrfOfsVfdLzJFk56Y32mqPQcJrt9bEmaqQQ_QmJEyQ2&amp;t=5f8643ea" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+(window.Sys && Sys.WebForms)||document.write('<script type="text/javascript" src="/ScriptResource.axd?d=DT3YJR8QaqV61-teuz0hgoK6bn5ZpCAD7_E6rpubc4JtYHBIuZSVrROAEsPR-FQcN-IQYo5hqGFtox64f286qutr0r_1OrfOfsVfdLzJFk56Y32mqPQcJrt9bEmaqQQ_QmJEyQ2&t=5f8643ea"><\/script>');//]]>
+</script>
+
+<script src="/FrmAWBTracking.aspx?_TSM_HiddenField_=ToolkitScriptManager1_HiddenField&amp;_TSM_CombinedScripts_=%3b%3bAjaxControlToolkit%2c+Version%3d3.5.40412.0%2c+Culture%3dneutral%2c+PublicKeyToken%3d28f01b0e84b6d53e%3aen-US%3a065e08c0-e2d1-42ff-9483-e5c14441b311%3a475a4ef5%3aeffe2a26%3a3ac3e789" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="518255C7" />
+	<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+</div>
+        <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ToolkitScriptManager1', 'FrmAWBTracking', [], [], [], 90, '');
+//]]>
+</script>
+
+
+        <!-- Multiple AWBs [Begin] -->
+        <div id="pnlMultipleAWBs" class="multiple-awb-wrapper" style="top: 80px !important; overflow: scroll;">
+	
+            
+                    <div class="awb-list-wrapper">
+                        <div class="awb-number-wrapper">
+                            <input type="submit" name="rptTrackAWBs$ctl00$btnAWBNumber" value="910-17328684" id="rptTrackAWBs_ctl00_btnAWBNumber" class="awb-number-2" style="color:#075A7F;" />
+                        </div>
+                        <div class="lastest-activity-wrapper">
+                            <span id="rptTrackAWBs_ctl00_lblLatestActivity" class="latest-activity" style="color:#075A7F;">Delivered at SVO</span>
+                        </div>
+                    </div>
+                
+        
+</div>
+        <!-- Multiple AWBs [End] -->
+
+        <div id="contentarea_responsive" style="width: 99% !important; padding-top: 5px !important;">
+            <!-- Track AWBs [Begin] -->
+            <div class="msg">
+                <span id="LabelStatus" style="color:Red;"></span>
+            </div>
+            <h1 class="responsive">Track Air Waybill
+            </h1>
+
+            <div class="botline_responsive" style="background-color: #cfdded;">
+                <table>
+                    <tr>
+                        <td valign="top">Prefix</td>
+                        <td valign="top">
+                            <input name="txtPrefix" type="text" value="910" maxlength="4" id="txtPrefix" title="Enter AWB Prefix ex: " class="inputbg60" style="width:50px;" />
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td valign="top">AWB No's
+                        </td>
+                        <td valign="top">
+                            <textarea name="TextBoxAWBno" rows="2" cols="20" maxlength="179" id="TextBoxAWBno" title="Enter AWB no(S). If multiple AWBs, enter comma separated. eg:98989898,98989899" style="height:30px;width:250px;">
+17328684</textarea>
+                            
+                        </td>
+                        <td valign="top">
+                            <input type="submit" name="ButtonGO" value="Track" id="ButtonGO" class="button" style="width:60px;" />
+                        </td>
+                        <td style="vertical-align: top; color: black; padding-left: 15px;"><b>NOTE:</b> To track multiple AWB Numbers, you can enter up to <span id="AWBMaxLimit">10</span>AWB Numbers separated by comma.</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Track AWBs [End] -->
+
+            <div id="contentarea_tracking" style="float: left; width: 80%">
+                <div id="pnlShowData" style="width:100%;">
+	
+                    <div style="overflow-y: hidden; overflow-x: auto;">
+                        <table class="table no-bg" width="100%"><tr><td align="center" style="height:77.7778px"><table class="table" width="100%"><tr><th colspan="3">MCT</th></tr><tr><td colspan="3"><strong>Muscat International Airport</strong></td></tr><tr><td colspan="3">&nbsp;</td></tr>
+      <tr><td align="center"><table class="table"><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="valign-top">
+          <img src="Images/Tracking/icon-accepted-green.png" />
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="flt-info">
+          11/01/2026 14:27
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td><strong>
+            1 P / 24.00 Kgs
+          </strong></td><td>&nbsp;&nbsp;&nbsp;</td></tr></table></td><td align="center"></td><td align="center"><table class="table"><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="valign-top">
+          <img src="Images/Tracking/icon-dep-green.png" />
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="flt-info">
+          WY183 / 12/01/2026 15:35
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td><strong>
+            1 P / 24.00 Kgs
+          </strong></td><td>&nbsp;&nbsp;&nbsp;</td></tr></table></td></tr>
+      <tr><td colspan="3">&nbsp;</td></tr></table></td><td align="center" class="con-width-2"><table class="separator" width="100%"><tr><th>&nbsp;</th></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr>
+      <tr><td class="valign-top"><table width="100%"><tr><td align="center" style="background:url(Images/Tracking/dot.png) scroll center left repeat-x; height:77.7778px">
+              <img src="Images/Tracking/icon-aircraft.png" />
+            </td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr></table></td></tr>
+      <tr><td>&nbsp;</td></tr></table></td><td align="center" style="height:77.7778px"><table class="table" width="100%"><tr><th colspan="3">SVO</th></tr><tr><td colspan="3"><strong>Sheremetyevo International Airport</strong></td></tr><tr><td colspan="3">&nbsp;</td></tr>
+      <tr><td align="center"><table class="table"><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="valign-top">
+          <img src="Images/Tracking/icon-arr-green.png" />
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="flt-info">
+          WY183 / 12/01/2026 21:10
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td><strong>
+            1 P / 24.00 Kgs
+          </strong></td><td>&nbsp;&nbsp;&nbsp;</td></tr></table></td><td align="center"></td><td align="center"><table class="table"><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="valign-top">
+          <img src="Images/Tracking/icon-dlv-green.png" />
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td class="flt-info">
+          WY183 / 12/01/2026 21:10
+        </td><td>&nbsp;&nbsp;&nbsp;</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td><strong>
+            1 P / 24.00 Kgs
+          </strong></td><td>&nbsp;&nbsp;&nbsp;</td></tr></table></td></tr>
+      <tr><td colspan="3">&nbsp;</td></tr></table></td></tr></table>
+                    </div>
+                    <br />
+                    <!-- AWB Details [Begin] -->
+                    <div class="scrollbar">
+
+                        <div class="awb-status">
+                            <div class="awb-info">
+                                <table width="100%" cellpadding="3" cellspacing="6">
+                                    <tr style="border-bottom: 1px solid #ccc;">
+                                        <td>AWB :</td>
+                                        <td style="border-bottom: 1px dotted #dedede;">
+                                            <span id="lblAWBNo" class="awb-number">910-17328684</span>
+                                            &nbsp;
+                                        <strong>(<span id="lblOrigin">MCT</span>-<span id="lblDestination">SVO</span>)
+                                        </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td id="tdPcsGrossWt">
+                                            <strong>
+                                                <span id="lblPcs">1 P</span>&nbsp;/&nbsp;<span id="lblGrossWt">24.00 Kgs</span>
+                                            </strong>
+                                        </td>
+	
+                                    </tr>
+                                    <tr>
+                                        <td>&nbsp;
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="last-activity">
+                                <table width="100%">
+                                    <tr>
+                                        <td><strong>Last Activity</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="highlight-last-activity">
+                                                <img src="Images/Tracking/last-activity.png" width="25" height="20" style="margin-right: 12px;" />
+                                                <span id="lblLatestActivity">Delivered at SVO</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right">
+                                            <span id="lblLastActivityDescription">1 P / 24.00 Kgs</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AWB Details [End] -->
+                    <br />
+                    <!-- Booking and Acceptance Info [Begin] -->
+                    <div style="float: left; margin-top: 18px; width: 34%;" class="col-12">
+                        <strong>Booking and Acceptance Information</strong>
+                        <div style="margin-top: 10px;">
+                            <div>
+		<table class="newstyle" cellspacing="0" rules="all" border="1" id="gvBkAcInfo" style="width:99%;border-collapse:collapse;">
+			<tr class="titlecolr" align="center">
+				<th scope="col">Status</th><th scope="col">Station</th><th scope="col">Dest</th><th scope="col">Pcs</th><th scope="col">Weight</th><th scope="col">Flight#</th><th scope="col">Event Date-Time</th>
+			</tr><tr class="newstyle-tr" align="center">
+				<td>Booked [C]</td><td>MCT</td><td>SVO</td><td>1</td><td>24.00 Kgs</td><td>WY183 12/01/2026</td><td>08/01/2026 14:19</td>
+			</tr><tr class="newstyle-tr" align="center">
+				<td>Accepted</td><td>MCT</td><td>SVO</td><td>1</td><td>24.00 Kgs</td><td>&nbsp;</td><td>11/01/2026 14:27</td>
+			</tr><tr class="newstyle-tr" align="center">
+				<td>Delivered</td><td>MCT</td><td>SVO</td><td>1</td><td>24.00 Kgs</td><td>WY183 12/01/2026</td><td>15/01/2026 08:20</td>
+			</tr>
+		</table>
+	</div>
+                            <br />
+                            
+                        </div>
+                    </div>
+                    <!-- Booking and Acceptance Info [End] -->
+                    <br />
+                    <!-- Status History [Begin] -->
+                    <div style="float: left; margin-top: 18px; width: 65%; border-left: 1px dotted; padding-left: 3px;" class="col-12">
+                        <strong>Status History</strong>
+                        
+                        <div style="margin-top: 10px;">
+                            <div>
+		<table class="newstyle" cellspacing="0" rules="all" border="1" id="GridViewAwbTracking" style="width:100%;border-collapse:collapse;">
+			<tr class="titlecolr" align="center">
+				<th scope="col">Station</th><th scope="col">Milestone</th><th scope="col">Pcs</th><th scope="col">Weight</th><th scope="col">Flight#</th><th scope="col">Flight Date</th><th scope="col">Org</th><th scope="col">Dest</th><th scope="col">ULD</th>
+			</tr><tr class="newstyle-tr" align="center" valign="middle">
+				<td align="center">
+                                            <span id="GridViewAwbTracking_ctl02_lblStation" style="color:Brown;">MCT</span>
+                                        </td><td align="center">Departed</td><td>
+                                            <span id="GridViewAwbTracking_ctl02_lblPcs">1</span>
+                                        </td><td>24.00 Kgs</td><td align="center">WY183</td><td>
+                                            <span id="GridViewAwbTracking_ctl02_lblFltDate">12/01/2026 15:35</span>
+                                        </td><td align="center">MCT</td><td align="center">SVO</td><td align="center">
+                                            <span id="GridViewAwbTracking_ctl02_lblULDNo"></span>
+                                            <input name="GridViewAwbTracking$ctl02$HidULDNo" type="text" id="GridViewAwbTracking_ctl02_HidULDNo" style="display: none" />
+                                            
+                                        </td>
+			</tr><tr class="newstyle-tr" align="center" valign="middle">
+				<td align="center">
+                                            <span id="GridViewAwbTracking_ctl03_lblStation" style="color:Brown;">SVO</span>
+                                        </td><td align="center">Arrived</td><td>
+                                            <span id="GridViewAwbTracking_ctl03_lblPcs">1</span>
+                                        </td><td>24.00 Kgs</td><td align="center">WY183</td><td>
+                                            <span id="GridViewAwbTracking_ctl03_lblFltDate">12/01/2026 21:10</span>
+                                        </td><td align="center">MCT</td><td align="center">SVO</td><td align="center">
+                                            <span id="GridViewAwbTracking_ctl03_lblULDNo"> AWB received from a given flight (1)</span>
+                                            <input name="GridViewAwbTracking$ctl03$HidULDNo" type="text" value=" AWB received from a given flight (1)" id="GridViewAwbTracking_ctl03_HidULDNo" style="display: none" />
+                                            
+                                        </td>
+			</tr><tr class="newstyle-tr" align="center" valign="middle">
+				<td align="center">
+                                            <span id="GridViewAwbTracking_ctl04_lblStation" style="color:Brown;">SVO</span>
+                                        </td><td align="center">Delivered</td><td>
+                                            <span id="GridViewAwbTracking_ctl04_lblPcs">1</span>
+                                        </td><td>24.00 Kgs</td><td align="center">WY183</td><td>
+                                            <span id="GridViewAwbTracking_ctl04_lblFltDate">12/01/2026 21:10</span>
+                                        </td><td align="center">MCT</td><td align="center">SVO</td><td align="center">
+                                            <span id="GridViewAwbTracking_ctl04_lblULDNo"></span>
+                                            <input name="GridViewAwbTracking$ctl04$HidULDNo" type="text" id="GridViewAwbTracking_ctl04_HidULDNo" style="display: none" />
+                                            
+                                        </td>
+			</tr>
+		</table>
+	</div>
+                        </div>
+                    </div>
+                    <!-- Status History [End] -->
+                    <br />
+                    <!-- Delivery Orders [Begin] -->
+                    <div style="float: left; margin-top: 18px; width: 99%; padding-left: 3px;">
+                        <strong>
+                            <span id="lblDeliveryOrders">Delivery Orders</span></strong>
+                        <div style="margin-top: 10px;">
+                            <div>
+		<table class="newstyle" cellspacing="0" rules="all" border="1" id="gvDeliveryOrders" style="width:100%;border-collapse:collapse;">
+			<tr class="titlecolr" align="center">
+				<th scope="col">DO #</th><th scope="col">AWB #</th><th scope="col">Pieces</th><th scope="col">Weight</th><th scope="col">Flight Details</th><th scope="col">ULD #</th><th scope="col">HAWB #</th><th scope="col">Issued To</th>
+			</tr><tr class="newstyle-tr" align="center" valign="middle">
+				<td>
+                                            <a id="gvDeliveryOrders_ctl02_hlDONumber" target="_blank">DO-SVO-148154</a>
+                                        </td><td align="center">910-17328684</td><td align="center">1</td><td align="center">24 Kgs</td><td align="center">WY183 / 12/01/2026</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+                        </div>
+                    </div>
+                
+</div>
+            </div>
+        </div>
+        <input type="hidden" name="hdnIsAlaska" id="hdnIsAlaska" value="false" />
+        <div id="uldlistpopup" class="uldlistpopup">
+            <span onclick="CloseULDPopup();" class="uldlistpopupclose">
+                <img src="Images/Tracking/closepopup.png" width="13" height="13" align="right" style="margin: 3px;" /></span>
+            <div class="uldpopupinfo"><span id="uldNos"></span></div>
+        </div>
+        <div class="msg">
+            <span>
+                <span style="margin-top: 5px;"><b>Powered By</b></span>
+                <img src="Images/smartcargo_logoLogin.png" style="vertical-align: middle; margin-top: -4px;" alt="SmartKargo Logo" height="20px" />
+            </span>
+        </div>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+(function() {var fn = function() {$get('ToolkitScriptManager1_HiddenField').value = '';Sys.Application.remove_init(fn);};Sys.Application.add_init(fn);})();Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.FilteredTextBoxBehavior, {"FilterType":3,"ValidChars":",","id":"FTBEAwbNo"}, null, null, $get("TextBoxAWBno"));
+});
+//]]>
+</script>
+</form>
+</body>
+</html>

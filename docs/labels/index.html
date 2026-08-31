@@ -1,0 +1,3068 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>SATS Cargo - Labels</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- ✅ ملف بيانات شركات الطيران (ضعه بجانب ملف الـ HTML) -->
+  <script src="airlines-data.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Roboto+Mono:wght@700&display=swap');
+
+    :root{
+      --label-w: 101mm;
+      --label-h: 130mm;
+      --b3: 3px;
+      --b15: 1.5px;
+      --bg: #eef2f5;
+      --ink: #000;
+      --muted: #9a9a9a;
+      --tools-h: 54px;
+      --bottom-h: 0px;
+      --note-line: 30px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background:var(--bg);
+      height:100dvh;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      color:var(--ink);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .notes-tools{
+      display:none;
+      min-height: var(--tools-h);
+      background:#fff;
+      border-bottom:1px solid #ddd;
+      padding:7px 10px;
+      align-items:center;
+      justify-content:center;
+      overflow-x:auto;
+      white-space:nowrap;
+    }
+    .notes-tools.active{display:flex}
+
+    .uld-cont-wrap{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding-right:4px !important;
+      min-width:0;
+    }
+    #u_cont{
+      flex:1;
+      min-width:0;
+      outline:none;
+    }
+    .uld-plus{
+      position:relative;
+      flex:0 0 20px;
+      width:20px;
+      height:20px;
+      border:1.5px solid #111;
+      background:#fff;
+      border-radius:4px;
+      font-size:15px;
+      font-weight:900;
+      line-height:1;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+      color:#111;
+    }
+    .uld-plus.has-many{border-color:#0056b3;color:#0056b3}
+    .uld-plus-badge{
+      position:absolute;
+      top:-7px;
+      right:-7px;
+      min-width:14px;
+      height:14px;
+      padding:0 3px;
+      background:#0056b3;
+      color:#fff;
+      border-radius:8px;
+      font-size:9px;
+      font-weight:900;
+      line-height:14px;
+    }
+    .uld-list-ta{
+      width:100%;
+      min-height:160px;
+      resize:vertical;
+      font-family:"Roboto Mono", monospace;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:0.3px;
+      text-transform:uppercase;
+      direction:ltr;
+      text-align:left;
+      border:1px solid #d5dee6;
+      border-radius:12px;
+      padding:10px 12px;
+      line-height:1.5;
+      outline:none;
+    }
+    .uld-list-ta:focus{
+      border-color:#0056b3;
+      box-shadow:0 0 0 3px rgba(0,86,179,.12);
+    }
+
+    .sign-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:4px;
+    }
+    .sign-head-btns{
+      display:flex;
+      align-items:center;
+      gap:3px;
+    }
+    .sign-add{
+      border:1px solid #111;
+      background:#fff;
+      width:16px;
+      height:16px;
+      border-radius:3px;
+      font-size:11px;
+      line-height:1;
+      padding:0;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .sign-pad-card{
+      width:min(720px, 96vw) !important;
+    }
+    .sign-pad-body{
+      padding:12px 14px 8px !important;
+      direction:ltr;
+    }
+    .sign-pad-stage{
+      position:relative;
+      width:100%;
+      background:
+        linear-gradient(180deg, #fbfcfe 0%, #ffffff 40%);
+      border:1px solid #d5dee6;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    #signPad{
+      display:block;
+      width:100%;
+      height:42vh;
+      min-height:180px;
+      max-height:320px;
+      touch-action:none;
+      cursor:crosshair;
+    }
+    .sign-pad-line{
+      position:absolute;
+      left:10%;
+      right:10%;
+      bottom:22%;
+      border-bottom:1.5px dotted #9aa8b5;
+      pointer-events:none;
+    }
+    .sign-pad-hint{
+      position:absolute;
+      left:0;
+      right:0;
+      top:10px;
+      text-align:center;
+      font-size:12px;
+      font-weight:700;
+      color:#8a97a6;
+      pointer-events:none;
+      letter-spacing:.2px;
+    }
+    .sign-pad-stage.is-dirty .sign-pad-hint{opacity:0}
+    .sign-box{
+      position:relative;
+      flex:1;
+      min-height:0;
+      overflow:visible;
+      padding-bottom:0;
+    }
+    .sign-img-wrap{
+      position:absolute;
+      left:8px;
+      top:2px;
+      cursor:grab;
+      touch-action:none;
+      z-index:20;
+    }
+    .sign-img-wrap:active{cursor:grabbing}
+    .sign-img-wrap img{
+      display:block;
+      width:100px;
+      height:auto;
+      object-fit:contain;
+      pointer-events:none;
+      user-select:none;
+      filter: drop-shadow(0 0 0.4px #000);
+    }
+    .sign-img-x{
+      position:absolute;
+      top:-7px;
+      right:-7px;
+      width:16px;
+      height:16px;
+      border:none;
+      border-radius:50%;
+      background:#111;
+      color:#fff;
+      font-size:11px;
+      line-height:16px;
+      padding:0;
+      cursor:pointer;
+      z-index:2;
+    }
+    .sign-img-resize{
+      position:absolute;
+      right:-6px;
+      bottom:-6px;
+      width:14px;
+      height:14px;
+      background:#0056b3;
+      border:2px solid #fff;
+      border-radius:3px;
+      box-shadow:0 0 0 1px #111;
+      cursor:nwse-resize;
+      z-index:2;
+      touch-action:none;
+    }
+    .sign-meta{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:flex-start;
+      gap:0;
+      z-index:1;
+      white-space:nowrap;
+      overflow:hidden;
+      padding:0 1px;
+      line-height:1.05;
+    }
+    .sign-name, .sign-id{
+      display:block;
+      width:100%;
+      color:#000;
+      min-width:0;
+      font-family: "Segoe Script", "Brush Script MT", "Apple Chancery", "Comic Sans MS", cursive;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      line-height: 1.08;
+      text-align:left;
+    }
+    .sign-name{overflow:hidden}
+    .sign-name.placeholder{color: var(--muted)}
+    .sign-name.user, .sign-name.changed{color:#000}
+    .sign-id{
+      min-height:1em;
+    }
+    .notes-tools .row{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tgroup{
+      display:inline-flex;
+      align-items:center;
+      gap:3px;
+      padding:3px 4px;
+      background:#f3f6f8;
+      border:1px solid #e3e8ed;
+      border-radius:10px;
+    }
+    .tbtn{
+      width:32px;height:32px;
+      border:none;
+      background:transparent;
+      border-radius:8px;
+      color:#111;
+      font-size:14px;
+      font-weight:900;
+      font-family:Inter, system-ui, sans-serif;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tbtn svg{width:16px;height:16px;display:block}
+    .tbtn:hover{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+    .tbtn:active{transform:scale(0.96);background:#e8eef4}
+    .tbtn.danger{color:#b00020}
+
+    .viewport{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      padding: 10px;
+      position:relative;
+      direction:ltr;
+    }
+    .scaler{
+      transform-origin:center center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .page{
+      width: var(--label-w);
+      height: var(--label-h);
+      background:#fff;
+      border: var(--b3) solid #000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+      display:none !important;
+      flex-direction:column;
+      direction:ltr;
+      overflow:hidden;
+    }
+    .page.active{display:flex !important}
+    .page.uld-print-clone{display:none !important}
+    .uld-print-sheet{display:none !important}
+
+    [contenteditable="true"]{outline:none}
+
+    #page_uld [contenteditable="true"]:empty::before{
+      content:".....";
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    #page_ship [contenteditable="true"]:empty::before{
+      content:" ";
+      display:block;
+      height:1em;
+    }
+
+    .ship-head{
+      background:#000;color:#fff;
+      height:44px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 14px;
+    }
+    .ship-carrier{font-weight:900;font-size:18px}
+
+    /* ✅ كود شركة الطيران + زر الأيقونة */
+    .ship-code-wrap{display:flex;align-items:center;gap:8px}
+    .ship-code{font-weight:900;font-size:26px}
+    
+    .airline-info-btn{
+      width:28px;height:28px;
+      border:2px solid #fff;
+      background:transparent;
+      border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      padding:0;
+    }
+    .airline-info-btn svg{width:18px;height:18px;fill:#fff}
+    .airline-info-btn:active{transform:scale(0.98)}
+
+
+
+.airline-info-btn{
+  transition: all 0.25s ease;
+}
+
+.airline-info-btn{
+  --airline-color: #ffffff; /* لون افتراضي */
+  transition: all 0.25s ease;
+  border-color: var(--airline-color);
+}
+
+.airline-info-btn svg{
+  fill: var(--airline-color);
+}
+
+.airline-info-btn:hover{
+  background: #fff;
+  box-shadow: 0 0 14px var(--airline-color);
+  transform: scale(1.08);
+}
+
+.airline-info-btn:hover svg{
+  fill: var(--airline-color);
+}
+
+
+
+
+
+
+
+    .barcode-box{
+      flex:1;
+      border-bottom:var(--b3) solid #000;
+      display:flex;align-items:center;justify-content:center;
+      padding:6px 10px;
+    }
+    #ship_barcode{width:100%;height:100%}
+    .awb-box{
+      padding:8px 14px;
+      border-bottom:var(--b3) solid #000;
+    }
+    .awb-box small{display:block;font-size:10px;font-weight:900;letter-spacing:0.3px}
+    .awb{
+      font-family:"Roboto Mono", monospace;
+      font-size:30px;
+      font-weight:900;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .ship-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      flex:1.2;
+    }
+    .cell{
+      border-bottom:var(--b3) solid #000;
+      border-right:var(--b3) solid #000;
+      padding:8px 14px;
+    }
+    .cell:nth-child(2n){border-right:none}
+    .cell.no-bottom{border-bottom:none}
+    .cell small{display:block;font-size:10px;font-weight:900}
+    .cell strong{display:block;font-weight:900;line-height:1}
+    #ship_dest{font-size:56px}
+    #ship_pcs{font-size:44px}
+    #ship_origin{font-size:30px}
+    #ship_wt{font-size:44px}
+
+    .uld-title{
+      text-align:center;
+      padding:4px 0;
+      font-size:17px;
+      font-weight:900;
+      letter-spacing:1px;
+      position:relative;
+      min-height:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .uld-title-nav{
+      display:none;
+      position:absolute;
+      right:6px;
+      top:50%;
+      transform:translateY(-50%);
+      align-items:center;
+      gap:4px;
+      z-index:8;
+    }
+    #page_uld.has-uld-nav .uld-title-nav{display:flex}
+    .uld-title-nav button{
+      width:26px;
+      height:22px;
+      border:none;
+      background:#0056b3;
+      color:#fff;
+      border-radius:4px;
+      font-size:18px;
+      font-weight:900;
+      line-height:1;
+      cursor:pointer;
+      padding:0 0 2px;
+    }
+    .uld-title-nav button:disabled{opacity:.32; cursor:default}
+    .uld-title-nav span{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.3px;
+      min-width:28px;
+    }
+    .uld-table{border-top:var(--b3) solid #000}
+    .uld-row{
+      display:grid;
+      grid-template-columns:180px 1fr;
+      height:28px;
+      border-bottom:var(--b15) solid #000;
+    }
+    .uld-label{
+      border-right:var(--b15) solid #000;
+      padding:0 8px;
+      font-size:9px;
+      font-weight:800;
+      display:flex;align-items:center;
+      text-transform:uppercase;
+    }
+    .uld-val{
+      padding:0 12px;
+      display:flex;align-items:center;
+      font-family:"Roboto Mono", monospace;
+      font-size:16px;
+      font-weight:800;
+      gap:8px;
+    }
+    .uld-dest{
+      display:grid;
+      grid-template-columns:160px 1fr;
+      height:50px;
+      align-items:center;
+      border-bottom:var(--b3) solid #000;
+    }
+    .uld-dest .left{padding-left:15px;font-size:17px;font-weight:900}
+    .uld-dest .right{text-align:center;font-size:46px;font-weight:900;line-height:1}
+
+    .spine{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      flex:1;
+      width:100%;
+      overflow:visible;
+    }
+    .col{display:flex;flex-direction:column; overflow:visible}
+    .col.l{border-right:var(--b15) solid #000; position:relative; z-index:6; overflow:visible}
+    .block{
+      border-bottom:var(--b15) solid #000;
+      padding:2px 8px;
+      display:flex;
+      flex-direction:column;
+    }
+    .block:last-child{border-bottom:none}
+    .hrow{height:42px; flex:0 0 42px}
+    .hawb{
+      flex:1 1 auto;
+      min-height:76px;
+      height:auto;
+    }
+    .hfoot{
+      flex:0 0 58px;
+      height:58px;
+      min-height:58px;
+      max-height:58px;
+      overflow:visible;
+      position:relative;
+      z-index:8;
+    }
+    .nest{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      height:100%;
+      margin:-2px -8px;
+    }
+    .nest > div{padding:2px 8px;border-right:var(--b15) solid #000}
+    .nest > div:last-child{border-right:none}
+    .cl{font-size:7.5px;font-weight:900;text-transform:uppercase}
+    #u_awb, .awb-multi{
+      font-family:"Roboto Mono", monospace;
+      font-weight:900;
+      font-size:12px;
+      line-height:1.28;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+      text-align:left;
+    }
+    .remarks-val{
+      display:block;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+      font-size:9px;
+      line-height:1.2;
+      font-weight:700;
+    }
+    .cv{font-size:14px;font-weight:900;text-align:center}
+
+    .name-field{
+      font-family: "Segoe Script", "Brush Script MT", "Apple Chancery", "Comic Sans MS", cursive;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      padding: 6px 10px;
+      min-height: 30px;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: text;
+    }
+    .name-field.placeholder{color: var(--muted);}
+    .name-field.editing{color: #fff;background: #ececec;border-radius: 4px;}
+    .name-field.user{color: #000;}
+    .name-field.changed{color: #000;}
+
+    .notes{
+      padding:0 15px;
+      background-image: linear-gradient(#d1d1d1 1px, transparent 1px);
+      background-size: 100% var(--note-line);
+      background-position: 0 29px;
+      line-height: var(--note-line);
+      font-size: 20px;
+      text-align:left;
+      overflow:auto;
+      flex:1;
+    }
+
+    .bottom{
+      position:sticky;
+      bottom:0;
+      z-index:60;
+      background:#fff;
+      border-top:1px solid #ddd;
+      padding: 8px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .ibtn{
+      width:46px;height:46px;
+      border:none;
+      border-radius:50%;
+      color:#fff;
+      font-size:22px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.14);
+      flex:0 0 auto;
+    }
+    .ibtn:active{transform:scale(0.98)}
+    .pbtn{
+      height:46px;
+      min-width:54px;
+      padding:0 12px;
+      border:none;
+      border-radius:23px;
+      color:#fff;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:0.3px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.14);
+      background:#8aa0b8;
+      flex:0 0 auto;
+    }
+    .pbtn.active{background:#0056b3}
+    .pbtn:active{transform:scale(0.98)}
+    .b-print{background:#000}
+    .b-save{background:#444}
+
+    .system-head{
+      position:sticky;
+      top:0;
+      z-index:70;
+      background:#fff;
+      border-bottom:1px solid #ddd;
+      padding: 8px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .top-title{
+      width:100%;
+      text-align:center;
+      font-weight:900;
+      letter-spacing:1.2px;
+      font-size:18px;
+      color:#0b4f8a;
+      user-select:none;
+    }
+
+    .signature{
+      text-align:center;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:1px;
+      color: var(--muted);
+      padding:6px 0;
+      user-select:none;
+    }
+
+    #page_ship [contenteditable="true"],
+    #page_uld [contenteditable="true"]{ text-transform: uppercase; }
+
+    #ship_dest, #ship_origin, #ship_srv, #ship_awb,
+    #u_dest, #u_origin, #u_awb, #u_imp, #u_flight, #u_cont, #u_dt, #u_staff{
+      direction: ltr;
+      unicode-bidi: plaintext;
+    }
+    #ship_dest, #u_dest{ text-align:center; }
+
+    #awbTrackHint{
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:0.3px;
+      color:#0056b3;
+      margin-inline-start:6px;
+    }
+    #awbTrackHint.err{ color:#b00020; }
+    #awbTrackHint.ok{ color:#0a7a32; }
+
+    #ship_pcs:focus, #ship_wt:focus,
+    #u_gross:focus, #u_tare:focus, #u_net:focus{
+      outline: 2px solid #000;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ============ ✅ Modal (نافذة منبثقة) ============ */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal-backdrop.show{display:flex;}
+    .modal-card{
+      width:min(560px, 94vw);
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25);
+      overflow:hidden;
+      direction:rtl;
+    }
+    .modal-accent{height:6px;background:#0056b3}
+    .modal-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      border-bottom:1px solid #eee;
+    }
+    .modal-title{font-weight:900;font-size:18px;color:#0b4f8a;}
+    .modal-sub{font-size:12px;color:#777;margin-top:4px}
+    .modal-x{
+      border:none;
+      background:#f2f2f2;
+      width:36px;height:36px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+    }
+    .modal-body{
+      padding:14px 16px;
+      direction:ltr;
+      max-height:55vh;
+      overflow:auto;
+    }
+    .info-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px 14px;
+    }
+    .info-card{
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:10px 12px;
+      background:#fafafa;
+    }
+    .k{color:#666;font-size:12px;margin-bottom:6px}
+    .v{font-family:"Roboto Mono", monospace;font-weight:900;font-size:14px;word-break:break-word}
+    .v a{color:#0056b3;text-decoration:none}
+    .v a:hover{text-decoration:underline}
+    .modal-foot{
+      padding:12px 16px;
+      border-top:1px solid #eee;
+      display:flex;
+      gap:10px;
+      justify-content:flex-start;
+      flex-wrap:wrap;
+    }
+    .modal-btn{
+      border:none;
+      background:#0056b3;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .modal-btn.secondary{
+      background:#444;
+    }
+    .print-choice{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      direction:rtl;
+    }
+    .print-choice-btn{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:4px;
+      width:100%;
+      border:2px solid #dbe7f3;
+      background:#f7fbff;
+      color:#0b4f8a;
+      padding:14px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      text-align:right;
+    }
+    .print-choice-btn:hover,
+    .print-choice-btn.active{
+      border-color:#0056b3;
+      background:#eef6ff;
+    }
+    .print-choice-btn b{
+      font-size:16px;
+      font-weight:900;
+    }
+    .print-choice-btn span{
+      font-size:12px;
+      color:#5a6b7b;
+      font-weight:700;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:16px;
+      background:#111;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:800;
+      display:none;
+      z-index:10000;
+    }
+    .toast.show{display:block}
+
+    @media print{
+      @page{ size: 101mm 130mm; margin:0 !important; }
+      html, body{
+        width:101mm !important;
+        height:130mm !important;
+        margin:0 !important;
+        padding:0 !important;
+        overflow:hidden !important;
+        background:#fff !important;
+      }
+      html.uld-multi-print, html.uld-multi-print body,
+      html.uld-single-print, html.uld-single-print body{
+        width:auto !important;
+        height:auto !important;
+        overflow:visible !important;
+        background:#fff !important;
+      }
+      .bottom, .notes-tools, .system-head, .no-print{display:none !important}
+      .uld-plus, .sign-add, .sign-img-x, .sign-img-resize, .sign-head-btns, .uld-title-nav{display:none !important}
+      .viewport{padding:0 !important; margin:0 !important; overflow:hidden !important; background:#fff !important;}
+      html.uld-multi-print .viewport,
+      html.uld-single-print .viewport{
+        display:block !important;
+        overflow:visible !important;
+        height:auto !important;
+        width:auto !important;
+      }
+      .scaler{transform:none !important}
+      html.uld-multi-print .scaler,
+      html.uld-single-print .scaler{display:block !important; transform:none !important;}
+      .page{display:none !important; box-shadow:none !important}
+      .page.active, .page.uld-print-clone{
+        display:flex !important;
+        width:101mm !important;
+        height:130mm !important;
+        margin:0 !important;
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      html.uld-multi-print .page,
+      html.uld-multi-print .page.active,
+      html.uld-single-print .page,
+      html.uld-single-print .page.active{
+        display:none !important;
+      }
+      html.uld-single-print .page.uld-print-clone{
+        display:flex !important;
+        width:101mm !important;
+        height:130mm !important;
+        margin:0 !important;
+        box-shadow:none !important;
+        transform:none !important;
+        page-break-after:always;
+        break-after:page;
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      html.uld-single-print .page.uld-print-clone:last-child{
+        page-break-after:auto;
+        break-after:auto;
+      }
+      html.uld-multi-print .uld-print-sheet{
+        display:grid !important;
+        grid-template-columns:1fr 1fr;
+        gap:8mm;
+        box-sizing:border-box;
+        width:297mm;
+        height:210mm;
+        padding:5mm;
+        margin:0;
+        position:relative;
+        overflow:hidden;
+        page-break-after:always;
+        break-after:page;
+        break-inside:avoid;
+      }
+      html.uld-multi-print .uld-print-sheet::after{
+        content:"";
+        position:absolute;
+        top:5mm;
+        bottom:5mm;
+        left:50%;
+        border-left:0.6pt dashed #777;
+        pointer-events:none;
+        z-index:5;
+      }
+      html.uld-multi-print .uld-print-sheet:last-child{
+        page-break-after:auto;
+        break-after:auto;
+      }
+      html.uld-multi-print .uld-print-cell{
+        display:flex !important;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        height:100%;
+        overflow:hidden;
+      }
+      html.uld-multi-print .uld-print-sheet .page.uld-print-clone{
+        display:flex !important;
+        width:101mm !important;
+        height:130mm !important;
+        margin:0 !important;
+        box-shadow:none !important;
+        transform:scale(1.3812, 1.5385) !important;
+        transform-origin:center center !important;
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+        page-break-after:auto !important;
+        break-after:auto !important;
+      }
+      .sign-name, .sign-id{color:#000 !important}
+      .notes{background:none !important; background-image:none !important}
+    }
+
+
+
+
+
+
+
+/* ❌ لا نطبع كلمة "غير معروف" */
+@media print {
+  #ship_carrier {
+    visibility: hidden;
+  }
+
+  /* ✅ لكن إذا كان الاسم حقيقي نُظهره */
+  #ship_carrier:not(:empty):not([data-unknown="1"]) {
+    visibility: visible;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+  </style>
+</head>
+
+<body>
+  <header class="system-head no-print">
+    <div class="top-title">ADD &amp; PRINT</div>
+  </header>
+
+  <div class="notes-tools no-print" id="notesTools">
+    <div class="row" onmousedown="event.preventDefault()">
+      <div class="tgroup">
+        <button class="tbtn" type="button" title="عريض" onclick="fmt('bold')"><b>B</b></button>
+        <button class="tbtn" type="button" title="مائل" onclick="fmt('italic')"><i>I</i></button>
+        <button class="tbtn" type="button" title="تسطير" onclick="fmt('underline')"><u>U</u></button>
+      </div>
+      <div class="tgroup">
+        <button class="tbtn" type="button" title="تكبير الخط" onclick="selFont(2)">＋</button>
+        <button class="tbtn" type="button" title="تصغير الخط" onclick="selFont(-2)">－</button>
+      </div>
+      <div class="tgroup">
+        <button class="tbtn" type="button" title="أسود" onclick="fmt('foreColor','black')">⬛</button>
+        <button class="tbtn" type="button" title="رمادي" onclick="fmt('foreColor','grey')">⬜</button>
+      </div>
+      <div class="tgroup">
+        <button class="tbtn" type="button" title="محاذاة لليمين" onclick="fmt('justifyRight')">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2.5h12v1.4H2zm4 3.2h8v1.4H6zm-4 3.2h12v1.4H2zm4 3.2h8v1.4H6z"/></svg>
+        </button>
+        <button class="tbtn" type="button" title="توسيط" onclick="fmt('justifyCenter')">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2.5h12v1.4H2zm3 3.2h6v1.4H5zm-3 3.2h12v1.4H2zm3 3.2h6v1.4H5z"/></svg>
+        </button>
+        <button class="tbtn" type="button" title="محاذاة لليسار" onclick="fmt('justifyLeft')">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2.5h12v1.4H2zm0 3.2h8v1.4H2zm0 3.2h12v1.4H2zm0 3.2h8v1.4H2z"/></svg>
+        </button>
+      </div>
+      <div class="tgroup">
+        <button class="tbtn danger" type="button" title="مسح التنسيق" onclick="fmt('removeFormat')">✖</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="viewport" id="viewport">
+    <div class="scaler" id="scaler">
+      <section class="page active" id="page_ship">
+        <div class="ship-head">
+          <span class="ship-carrier" id="ship_carrier" contenteditable="true">OMAN AIR</span>
+
+          <span class="ship-code-wrap">
+            <span class="ship-code" id="ship_srv" contenteditable="true">WY</span>
+
+            <!-- ✅ أيقونة الطائرة -->
+            <button class="airline-info-btn no-print" type="button" title="معلومات شركة الطيران"
+                    onclick="openAirlineModal()">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9L2 14v2l8-2.5V19l-2 1.5V22l3-1 3 1v-1.5L13 19v-5.5L21 16z"/>
+              </svg>
+            </button>
+          </span>
+        </div>
+
+        <div class="barcode-box">
+          <svg id="ship_barcode"></svg>
+        </div>
+        <div class="awb-box">
+          <small>AIR WAYBILL NO. <span id="awbTrackHint" class="no-print"></span></small>
+          <div class="awb" id="ship_awb" contenteditable="true" inputmode="numeric">910-1732 8684</div>
+        </div>
+        <div class="ship-grid">
+          <div class="cell"><small>DESTINATION</small><strong id="ship_dest" contenteditable="true">LHR</strong></div>
+          <div class="cell"><small>TOTAL PCS</small><strong id="ship_pcs" contenteditable="true" inputmode="numeric">1</strong></div>
+          <div class="cell no-bottom"><small>ORIGIN</small><strong id="ship_origin" contenteditable="true">MCT</strong></div>
+          <div class="cell no-bottom"><small>WEIGHT</small><strong id="ship_wt" contenteditable="true" inputmode="numeric">24</strong></div>
+        </div>
+      </section>
+
+      <section class="page" id="page_uld">
+        <div class="uld-title">
+          ULD/BT TAG
+          <span class="uld-title-nav no-print" id="uldTitleNav">
+            <button type="button" id="uldPrev" title="السابق" aria-label="السابق">‹</button>
+            <span id="uldNavInd">1/1</span>
+            <button type="button" id="uldNext" title="التالي" aria-label="التالي">›</button>
+          </span>
+        </div>
+        <div class="uld-table">
+          <div class="uld-row">
+            <div class="uld-label">CONTAINER / BT NUMBER</div>
+            <div class="uld-val uld-cont-wrap">
+              <div id="u_cont" data-uld-cont contenteditable="true"></div>
+              <button type="button" class="uld-plus no-print" id="uldPlusBtn" title="أرقام الحاويات" aria-label="أرقام الحاويات">
+                +
+                <span class="uld-plus-badge" id="uldPlusCount" hidden></span>
+              </button>
+            </div>
+          </div>
+          <div class="uld-row">
+            <div class="uld-label">GROSS WEIGHT (KG)</div>
+            <div class="uld-val"><span class="num" id="u_gross" contenteditable="true" inputmode="numeric"></span><span style="font-size:12px">kg</span></div>
+          </div>
+          <div class="uld-row">
+            <div class="uld-label">TARE WEIGHT (KG)</div>
+            <div class="uld-val"><span class="num" id="u_tare" contenteditable="true" inputmode="numeric"></span><span style="font-size:12px">kg</span></div>
+          </div>
+          <div class="uld-row">
+            <div class="uld-label">NET WEIGHT (KG)</div>
+            <div class="uld-val"><span class="num" id="u_net" contenteditable="true" inputmode="numeric"></span><span style="font-size:12px">kg</span></div>
+          </div>
+          <div class="uld-row">
+            <div class="uld-label">DATE / TIME</div>
+            <div class="uld-val" id="u_dt" contenteditable="true"></div>
+          </div>
+        </div>
+        <div class="uld-dest">
+          <div class="left">DESTINATION</div>
+          <div class="right" id="u_dest" contenteditable="true"></div>
+        </div>
+        <div class="spine">
+          <div class="col l">
+            <div class="block hrow">
+              <div class="nest">
+                <div><div class="cl">LOADED AT</div><div class="cv" id="u_origin" contenteditable="true"></div></div>
+                <div><div class="cl">POSITION</div><div class="cv" contenteditable="true"></div></div>
+              </div>
+            </div>
+            <div class="block hrow">
+              <div class="nest">
+                <div><div class="cl">TRANSFER AT</div><div class="cv" contenteditable="true"></div></div>
+                <div><div class="cl">POSITION</div><div class="cv" contenteditable="true"></div></div>
+              </div>
+            </div>
+            <div class="block hawb">
+              <div class="cl">AWB NUMBER</div>
+              <div id="u_awb" class="awb-multi" data-uld-awb contenteditable="true"></div>
+            </div>
+            <div class="block hfoot">
+              <div class="cl sign-head">
+                <span>NAME/ID</span>
+                <span class="sign-head-btns no-print">
+                  <button type="button" class="sign-add" id="signDrawBtn" title="التوقيع باليد">✎</button>
+                  <button type="button" class="sign-add" id="signAddBtn" title="إضافة صورة التوقيع">+</button>
+                </span>
+              </div>
+              <div class="sign-box" id="u_sign_box">
+                <div class="sign-img-wrap" id="u_sign_img_wrap" hidden>
+                  <img id="u_sign_img" alt="signature">
+                  <button type="button" class="sign-img-x no-print" id="signImgClear" title="حذف الصورة">×</button>
+                  <span class="sign-img-resize no-print" id="signImgResize" title="تكبير / تصغير"></span>
+                </div>
+                <div class="sign-meta">
+                  <span class="sign-name" id="u_name" contenteditable="true" data-default="KHALID">KHALID</span>
+                  <span class="sign-id" id="u_staff" contenteditable="true"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="block hrow"><div class="cl">FLIGHT / DATE</div><div class="cv" id="u_flight" contenteditable="true"></div></div>
+            <div class="block hrow"><div class="cl">FLIGHT / DATE</div><div class="cv" contenteditable="true"></div></div>
+            <div class="block hawb" style="text-align:center;">
+              <div class="cl">CARGO IMP CODE</div>
+              <div style="font-family:'Roboto Mono',monospace;font-weight:900;font-size:18px" id="u_imp" contenteditable="true"></div>
+            </div>
+            <div class="block hfoot">
+              <div class="cl">REMARKS</div>
+              <div class="remarks-val" id="u_remarks" contenteditable="true"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page_notes">
+        <div class="notes" id="notesBox" contenteditable="true">
+          <div>اكتب ملاحظاتك هنا…</div>
+          <div>ظلّل النص ثم استخدم الأيقونات بالأعلى.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="signature no-print">DESIGNED BY KHALID ALRAQADI</div>
+
+  <footer class="bottom">
+    <button class="pbtn b-page" data-page="ship" title="ملصق AWB" onclick="showPage('ship')">AWB</button>
+    <button class="pbtn b-page" data-page="uld" title="بطاقة ULD" onclick="showPage('uld')">ULD</button>
+    <button class="pbtn b-page" data-page="notes" title="دفتر الشحن" onclick="showPage('notes')">دفتر</button>
+    <button class="ibtn b-print" title="طباعة" onclick="printLabel()">🖨️</button>
+    <button class="ibtn b-save" title="حفظ صورة" onclick="saveImage()">💾</button>
+  </footer>
+
+  <!-- ✅ Toast صغير -->
+  <div class="toast no-print" id="toast">تم النسخ ✅</div>
+
+  <!-- ✅ Airline Modal -->
+  <div class="modal-backdrop no-print" id="airlineModal" aria-hidden="true" onclick="closeAirlineModal(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="airlineModalTitle" onclick="event.stopPropagation()">
+      <div class="modal-accent" id="airlineModalAccent"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="airlineModalTitle">معلومات شركة الطيران</div>
+          <div class="modal-sub" id="airlineModalSub">—</div>
+        </div>
+        <button class="modal-x" type="button" aria-label="إغلاق" onclick="closeAirlineModal()">✕</button>
+      </div>
+
+<div class="modal-body">
+  <div class="info-grid">
+    <div class="info-card"><div class="k">AWB Prefix / بادئة البوليصة</div><div class="v" id="m_prefix">—</div></div>
+    <div class="info-card"><div class="k">AWB / رقم البوليصة</div><div class="v" id="m_awb">—</div></div>
+
+    <div class="info-card"><div class="k">Airline (EN)</div><div class="v" id="m_name">—</div></div>
+    <div class="info-card"><div class="k">الشركة (AR)</div><div class="v" id="m_nameAr">—</div></div>
+
+    <div class="info-card"><div class="k">IATA</div><div class="v" id="m_iata">—</div></div>
+    <div class="info-card"><div class="k">ICAO</div><div class="v" id="m_icao">—</div></div>
+
+    <div class="info-card"><div class="k">Callsign / النداء</div><div class="v" id="m_callsign">—</div></div>
+
+    <div class="info-card">
+      <div class="k">Country / الدولة</div>
+      <div class="v">
+        <span id="m_flag" style="font-size:20px;margin-right:6px">—</span>
+        <span id="m_country">—</span>
+      </div>
+    </div>
+
+    <div class="info-card"><div class="k">Hub / المحور</div><div class="v" id="m_hub">—</div></div>
+    <div class="info-card"><div class="k">Alliance / التحالف</div><div class="v" id="m_alliance">—</div></div>
+
+    <div class="info-card"><div class="k">Cargo / الشحن</div><div class="v" id="m_cargo">—</div></div>
+    <div class="info-card"><div class="k">Phone / الهاتف</div><div class="v" id="m_phone">—</div></div>
+
+    <div class="info-card" style="grid-column:1/-1;">
+      <div class="k">Hub Coordinates / إحداثيات المحور</div>
+      <div class="v" id="m_coords">—</div>
+    </div>
+
+    <div class="info-card" style="grid-column:1/-1;">
+      <div class="k">Google Maps</div>
+      <div class="v" id="m_map">—</div>
+    </div>
+
+    <div class="info-card" style="grid-column:1/-1;">
+      <div class="k">Website / الموقع</div>
+      <div class="v" id="m_website">—</div>
+    </div>
+
+    <div class="info-card" style="grid-column:1/-1;">
+      <div class="k">Notes / ملاحظات</div>
+      <div class="v" id="m_notes">—</div>
+    </div>
+  </div>
+</div>
+
+
+      <div class="modal-foot">
+        <button class="modal-btn" type="button" onclick="copyAirlineInfo()">نسخ المعلومات</button>
+        <button class="modal-btn secondary" type="button" onclick="closeAirlineModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop no-print" id="uldListModal" aria-hidden="true" onclick="closeUldListModal(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="uldListTitle" onclick="event.stopPropagation()">
+      <div class="modal-accent"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="uldListTitle">أرقام الحاويات</div>
+          <div class="modal-sub" id="uldListCount">بطاقة واحدة</div>
+        </div>
+        <button class="modal-x" type="button" aria-label="إغلاق" onclick="closeUldListModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="u_cont_list" class="uld-list-ta" rows="8" dir="ltr" spellcheck="false" placeholder="AKE12345OM&#10;PMC77821WY&#10;AKE99012OM"></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn" type="button" onclick="saveUldListModal()">حفظ</button>
+        <button class="modal-btn secondary" type="button" onclick="closeUldListModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop no-print" id="uldPrintModal" aria-hidden="true" onclick="closeUldPrintModal(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="uldPrintTitle" onclick="event.stopPropagation()">
+      <div class="modal-accent"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="uldPrintTitle">طباعة بطاقة ULD</div>
+          <div class="modal-sub">اختر مقاس الورقة</div>
+        </div>
+        <button class="modal-x" type="button" aria-label="إغلاق" onclick="closeUldPrintModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="print-choice">
+          <button class="print-choice-btn" type="button" id="uldPrintA4" onclick="printUldPaper('a4')">
+            <b>A4 — بطاقتان في الورقة</b>
+            <span>كل تاج في نصف الورقة مع خط قص في الوسط. اختر A4 أفقي في نافذة الطباعة.</span>
+          </button>
+          <button class="print-choice-btn" type="button" id="uldPrintSmall" onclick="printUldPaper('small')">
+            <b>ورقة صغيرة — بطاقة واحدة</b>
+            <span>تاج واحد في كل ورقة بمقاس الملصق. اختر المقاس الصغير في نافذة الطباعة.</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="u_sign_file" class="no-print" accept="image/*" hidden>
+
+  <div class="modal-backdrop no-print" id="signPadModal" aria-hidden="true" onclick="closeSignPad(event)">
+    <div class="modal-card sign-pad-card" role="dialog" aria-modal="true" aria-labelledby="signPadTitle" onclick="event.stopPropagation()">
+      <div class="modal-accent"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="signPadTitle">التوقيع باليد</div>
+          <div class="modal-sub">وقّع بإصبعك أو بقلم الشاشة</div>
+        </div>
+        <button class="modal-x" type="button" aria-label="إغلاق" onclick="closeSignPad()">✕</button>
+      </div>
+      <div class="modal-body sign-pad-body">
+        <div class="sign-pad-stage" id="signPadStage">
+          <canvas id="signPad"></canvas>
+          <div class="sign-pad-hint" id="signPadHint">ارسم التوقيع هنا</div>
+          <div class="sign-pad-line"></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn" type="button" onclick="saveSignPad()">حفظ التوقيع</button>
+        <button class="modal-btn secondary" type="button" onclick="clearSignPad()">مسح</button>
+        <button class="modal-btn secondary" type="button" onclick="closeSignPad()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pages = ["ship","uld","notes"];
+    let idx = 0;
+
+    // ✅ قاعدة البيانات من الملف الخارجي
+    const AIRLINE_DB = window.AIRLINE_DB || {};
+
+    // ✅ تحويل الأرقام العربية/الفارسية إلى 0-9 (لحل مشكلة عدم التعرف على أرقام البوليصة)
+    function toLatinDigits(x){
+      return String(x || "")
+        .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
+        .replace(/[۰-۹]/g, d => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+    }
+    function digitsOnlySafe(x){
+      return toLatinDigits(x).replace(/[^0-9]/g, "");
+    }
+
+    function activePageId(){ return "page_" + pages[idx]; }
+
+    function pageFromHash(){
+      const h = (location.hash || "").replace(/^#/, "").toLowerCase();
+      return pages.indexOf(h) >= 0 ? h : pages[0];
+    }
+
+    function showPage(name, updateHash){
+      const i = pages.indexOf(name);
+      if (i < 0) return;
+      idx = i;
+      pages.forEach(p => document.getElementById("page_"+p).classList.remove("active"));
+      document.getElementById(activePageId()).classList.add("active");
+      syncChromeForPage();
+      if (updateHash !== false) {
+        const hash = "#" + pages[idx];
+        if (location.hash !== hash) history.replaceState(null, "", hash);
+      }
+    }
+
+    function syncChromeForPage(){
+      const notesTools = document.getElementById("notesTools");
+      if (notesTools) notesTools.classList.toggle("active", pages[idx] === "notes");
+      document.querySelectorAll(".b-page").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-page") === pages[idx]);
+      });
+      updateUldNav();
+      autoScale();
+    }
+
+    function autoScale(){
+      const scaler = document.getElementById("scaler");
+      const vp = document.querySelector(".viewport");
+      if (!scaler || !vp) return;
+      const pad = 10;
+      const w = Math.max(80, vp.clientWidth - pad*2);
+      const h = Math.max(80, vp.clientHeight - pad*2);
+      const pxW = 101 * 3.78;
+      const pxH = 130 * 3.78;
+      const r = Math.min(w/pxW, h/pxH);
+      scaler.style.transform = "scale(" + r + ")";
+    }
+
+    function normalizeAwb(s){ return toLatinDigits(s).replace(/[\s-]/g,""); }
+
+    function digitsOnly(s){ return (s||"").replace(/[^\d]/g,""); }
+
+function getAirlineInfoFromAwb(awbText){
+  const awb = (awbText || "").trim();
+  const awbDigits = digitsOnlySafe(awb);
+  const prefix = awbDigits.slice(0,3);
+  const rec = AIRLINE_DB[prefix];
+
+  const safeDash = (v)=> (v && String(v).trim()) ? String(v).trim() : "—";
+
+  if(!rec){
+    return {
+      prefix, awb,
+      name: "UNKNOWN",
+      nameAr: "غير معروف",
+      iata: "—",
+      icao: "—",
+      callsign: "—",
+      country: "—",
+      hub: "—",
+      alliance: "—",
+      cargo: "—",
+      website: "—",
+      phone: "—",
+      notes: "لا توجد بيانات لهذا الـ Prefix داخل ملف airlines-data.js",
+
+      // ✅ إضافات
+      flag: "—",
+      hubLat: null,
+      hubLng: null,
+      hubMap: "",
+      color: ""     // مهم لتصفير لون زر الطائرة
+    };
+  }
+
+  return {
+    prefix, awb,
+    name: safeDash(rec.name),
+    nameAr: safeDash(rec.nameAr),
+    iata: safeDash(rec.iata),
+    icao: safeDash(rec.icao),
+    callsign: safeDash(rec.callsign),
+    country: safeDash(rec.country),
+    hub: safeDash(rec.hub),
+    alliance: safeDash(rec.alliance),
+    cargo: safeDash(rec.cargo),
+    website: safeDash(rec.website),
+    phone: safeDash(rec.phone),
+    notes: safeDash(rec.notes),
+
+    // ✅ إضافات
+    flag: safeDash(rec.flag),
+    hubLat: (rec.hubLat != null && rec.hubLat !== "") ? Number(rec.hubLat) : null,
+    hubLng: (rec.hubLng != null && rec.hubLng !== "") ? Number(rec.hubLng) : null,
+    hubMap: (rec.hubMap && String(rec.hubMap).trim()) ? String(rec.hubMap).trim() : "",
+    color: (rec.color && String(rec.color).trim()) ? String(rec.color).trim() : ""
+  };
+}
+
+
+
+
+function syncFromShipping(){
+  const awb = document.getElementById("ship_awb").innerText.trim();
+  const info = getAirlineInfoFromAwb(awb);
+
+  const carrierEl = document.getElementById("ship_carrier");
+  const codeEl    = document.getElementById("ship_srv");
+  const btn       = document.querySelector(".airline-info-btn");
+
+  // ✅ إذا Prefix غير موجود: صفّر الاسم والكود ولا تترك بيانات سابقة
+  if (!info || info.name === "UNKNOWN") {
+  if (carrierEl){
+    carrierEl.innerText = "غير معروف";
+    carrierEl.setAttribute("data-unknown", "1"); // ⭐ مهم
+  }
+
+    if (codeEl)    codeEl.innerText = "—";
+    if (btn)       btn.style.setProperty("--airline-color", "#ffffff");
+  } else {
+    if (carrierEl){
+    carrierEl.innerText = info.name || "—";
+    carrierEl.removeAttribute("data-unknown"); // ⭐ مهم
+  }
+
+    if (codeEl)    codeEl.innerText = info.iata || "—";
+    if (btn)       btn.style.setProperty("--airline-color", info.color || "#ffffff");
+  }
+
+  // الباركود وبقية التزامن كما هو
+  try{
+    JsBarcode("#ship_barcode", normalizeAwb(awb), {
+      format:"CODE128",
+      width:2.8,
+      height:70,
+      displayValue:true,
+      fontSize:18,
+      fontOptions:"bold",
+      font:"Roboto Mono",
+      margin:0
+    });
+  }catch(e){}
+
+  document.getElementById("u_dest").innerText = document.getElementById("ship_dest").innerText.trim();
+  document.getElementById("u_origin").innerText = document.getElementById("ship_origin").innerText.trim();
+
+  const uAwb = document.getElementById("u_awb");
+  if (uAwb){
+    const lines = (uAwb.innerText || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    if (lines.length <= 1 && uldItems.length <= 1) {
+      uAwb.innerText = awb;
+      saveCurrentUldItem();
+    }
+  }
+
+  // ✅ لو المودال مفتوح حدّثه مباشرة
+  const m = document.getElementById("airlineModal");
+  if (m && m.classList.contains("show")) fillAirlineModal();
+}
+
+
+    function fmt(cmd, val=null){
+      const notes = document.getElementById("notesBox");
+      if (!notes) return;
+      notes.focus();
+      const sel = window.getSelection();
+      if (!sel) return;
+      if (!sel.rangeCount){
+        const r = document.createRange();
+        r.selectNodeContents(notes);
+        r.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+      const range = sel.getRangeAt(0);
+      const node = range.commonAncestorContainer;
+      if (!(notes === node || notes.contains(node))) return;
+      document.execCommand(cmd, false, val);
+    }
+
+    function selFont(delta){
+      const notes = document.getElementById("notesBox");
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      if (range.collapsed) return;
+      const node = range.commonAncestorContainer;
+      if (!(notes === node || notes.contains(node))) return;
+      let baseEl = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+      if (!baseEl) baseEl = notes;
+      const cur = parseFloat(getComputedStyle(baseEl).fontSize) || 20;
+      const next = Math.max(10, Math.min(60, cur + delta));
+      const span = document.createElement("span");
+      span.style.fontSize = next + "px";
+      span.style.lineHeight = "var(--note-line)";
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      sel.removeAllRanges();
+      const r2 = document.createRange();
+      r2.selectNodeContents(span);
+      sel.addRange(r2);
+    }
+
+    let lastBase = "gross";
+
+    function numOf(id){
+      const el = document.getElementById(id);
+      const v = (el?.innerText || "").replace(/[^\d]/g,"");
+      return parseFloat(v) || 0;
+    }
+    function setNum(id,val){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.innerText = String(Math.max(0, Math.round(val)));
+    }
+    function sanitizeDigits(el){
+      const clean = (el.innerText||"").replace(/[^\d]/g,"");
+      if (el.innerText !== clean) el.innerText = clean;
+    }
+    function calcWeights(){
+      const tare = numOf("u_tare");
+      if (lastBase === "net"){
+        const net = numOf("u_net");
+        setNum("u_gross", net + tare);
+      }else{
+        const gross = numOf("u_gross");
+        setNum("u_net", gross - tare);
+      }
+    }
+
+    function initNameFieldSignature(el){
+      if(!el) return;
+      const def = (el.dataset && el.dataset.default) ? el.dataset.default : "KHALID";
+      let isPlaceholder = true;
+      if (!el.innerText || !el.innerText.trim()){
+        el.innerText = def;
+        el.classList.add("placeholder");
+        el.classList.remove("changed");
+      } else {
+        el.classList.remove("placeholder");
+        el.classList.add("changed");
+        isPlaceholder = false;
+      }
+
+      el.addEventListener("mouseenter", function(){
+        if (isPlaceholder && !el.classList.contains("editing")){
+          el.innerText = "";
+          el.classList.remove("placeholder");
+        }
+      });
+      el.addEventListener("mouseleave", function(){
+        if (!el.classList.contains("editing") && (el.innerText || "").trim() === ""){
+          el.innerText = def;
+          el.classList.add("placeholder");
+          isPlaceholder = true;
+        }
+      });
+
+      el.addEventListener("focus", function(){
+        if (el.innerText.trim() === def && isPlaceholder){
+          el.innerText = "";
+          el.classList.remove("placeholder");
+        }
+        el.classList.add("editing");
+        el.classList.add("user");
+      });
+      el.addEventListener("input", function(){
+        const t = (el.innerText || "").trim();
+        isPlaceholder = (t === "");
+        if (t){
+          el.classList.add("changed");
+          el.classList.add("user");
+          el.classList.remove("placeholder");
+        } else {
+          el.classList.remove("changed");
+          el.classList.remove("user");
+          el.classList.add("placeholder");
+        }
+      });
+      el.addEventListener("blur", function(){
+        el.classList.remove("editing");
+        const t = (el.innerText || "").trim();
+        if (!t){
+          el.innerText = def;
+          el.classList.add("placeholder");
+          el.classList.remove("changed");
+          el.classList.remove("user");
+          isPlaceholder = true;
+        } else {
+          el.classList.add("changed");
+          el.classList.add("user");
+          el.classList.remove("placeholder");
+          isPlaceholder = false;
+        }
+      });
+    }
+
+    function bindName(){}
+
+    function saveImage(){
+      const active = document.querySelector(".page.active");
+      html2canvas(active, {scale:3}).then(c=>{
+        const a = document.createElement("a");
+        a.download = "label.png";
+        a.href = c.toDataURL("image/png");
+        a.click();
+      });
+    }
+
+    function bindULD(){
+      ["u_gross","u_net"].forEach(id=>{
+        const el = document.getElementById(id);
+        el.addEventListener("focus", ()=>{ lastBase = (id==="u_net") ? "net":"gross"; });
+      });
+      ["u_gross","u_tare","u_net"].forEach(id=>{
+        const el = document.getElementById(id);
+        el.addEventListener("keydown",(e)=>{
+          if (e.key === "Enter"){ e.preventDefault(); el.blur(); }
+        });
+        el.addEventListener("input", ()=>{
+          sanitizeDigits(el);
+          calcWeights();
+        });
+      });
+      bindUldNumberList();
+      bindUldAwbs();
+    }
+
+    function fitAwbNums(){
+      const el = document.getElementById("u_awb");
+      if (!el) return;
+      el.style.fontSize = "";
+      let size = 12;
+      while (size > 8 && el.scrollHeight > el.clientHeight + 1){
+        size -= 0.5;
+        el.style.fontSize = size + "px";
+      }
+    }
+
+    function bindUldAwbs(){
+      const el = document.getElementById("u_awb");
+      if (!el) return;
+      el.addEventListener("paste", (e)=>{
+        const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+        if (!text) return;
+        e.preventDefault();
+        const parts = text.split(/[\n\r,;]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+        document.execCommand("insertText", false, parts.join("\n"));
+        fitAwbNums();
+        scheduleSave();
+      });
+      el.addEventListener("input", ()=>{
+        fitAwbNums();
+        saveCurrentUldItem();
+        scheduleSave();
+      });
+      fitAwbNums();
+    }
+
+    function parseUldNumbers(text){
+      return String(text || "")
+        .split(/[\r\n,;]+/)
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+    }
+
+    function uldCountLabel(n){
+      if (n <= 0) return "لا يوجد رقم";
+      if (n === 1) return "بطاقة واحدة";
+      if (n === 2) return "بطاقتان";
+      if (n >= 3 && n <= 10) return n + " بطاقات";
+      return n + " بطاقة";
+    }
+
+    let uldItems = [{ cont:"", awb:"" }];
+    let uldCur = 0;
+    let uldLoading = false;
+
+    function getAwbText(){
+      return ((document.getElementById("u_awb") || {}).innerText || "");
+    }
+    function getContText(){
+      return ((document.getElementById("u_cont") || {}).innerText || "").trim().toUpperCase();
+    }
+
+    function saveCurrentUldItem(){
+      if (uldLoading) return;
+      if (!uldItems.length) uldItems = [{ cont:"", awb:"" }];
+      if (uldCur < 0) uldCur = 0;
+      if (uldCur >= uldItems.length) uldCur = uldItems.length - 1;
+      uldItems[uldCur] = {
+        cont: getContText(),
+        awb: getAwbText()
+      };
+      const ta = document.getElementById("u_cont_list");
+      if (ta) ta.value = uldItems.map(x => x.cont || "").join("\n").replace(/\n+$/,"");
+    }
+
+    function loadUldItem(){
+      if (!uldItems.length) uldItems = [{ cont:"", awb:"" }];
+      if (uldCur < 0) uldCur = 0;
+      if (uldCur >= uldItems.length) uldCur = uldItems.length - 1;
+      const item = uldItems[uldCur] || { cont:"", awb:"" };
+      uldLoading = true;
+      const cont = document.getElementById("u_cont");
+      const awb = document.getElementById("u_awb");
+      if (cont) cont.innerText = item.cont || "";
+      if (awb) awb.innerText = item.awb || "";
+      uldLoading = false;
+      fitAwbNums();
+      updateUldCount();
+      updateUldNav();
+    }
+
+    function rebuildUldItemsFromList(){
+      const ta = document.getElementById("u_cont_list");
+      const nums = parseUldNumbers(ta && ta.value);
+      const list = nums.length ? nums : [getContText() || ""];
+      if (!uldLoading && uldItems[uldCur]) {
+        uldItems[uldCur].awb = getAwbText();
+      }
+      const sharedAwb = getAwbText();
+      uldItems = list.map((cont, i) => ({
+        cont,
+        awb: (uldItems[i] && uldItems[i].awb) || sharedAwb || ""
+      }));
+      if (uldCur >= uldItems.length) uldCur = Math.max(0, uldItems.length - 1);
+      loadUldItem();
+    }
+
+    function stepUld(dir){
+      saveCurrentUldItem();
+      const next = uldCur + dir;
+      if (next < 0 || next >= uldItems.length) return;
+      uldCur = next;
+      loadUldItem();
+      scheduleSave();
+    }
+
+    function updateUldNav(){
+      const page = document.getElementById("page_uld");
+      const ta = document.getElementById("u_cont_list");
+      const listed = parseUldNumbers(ta && ta.value);
+      if (listed.length > uldItems.length){
+        rebuildUldItemsFromList();
+        return;
+      }
+      const n = Math.max(1, uldItems.length);
+      const onUld = !!(page && page.classList.contains("active"));
+      const show = onUld && n > 1;
+      if (page) page.classList.toggle("has-uld-nav", show);
+      const prev = document.getElementById("uldPrev");
+      const next = document.getElementById("uldNext");
+      const ind = document.getElementById("uldNavInd");
+      if (prev) prev.disabled = uldCur <= 0;
+      if (next) next.disabled = uldCur >= n - 1;
+      if (ind) ind.textContent = (uldCur + 1) + "/" + n;
+    }
+
+    function getUldPrintNumbers(){
+      saveCurrentUldItem();
+      const nums = uldItems.map(x => (x && x.cont) || "").filter(Boolean);
+      if (nums.length) return nums;
+      const one = getContText();
+      return one ? [one] : [""];
+    }
+
+    function getUldPrintItems(){
+      saveCurrentUldItem();
+      const filled = uldItems.filter(x => x && String(x.cont || "").trim());
+      if (filled.length) return filled;
+      return [{ cont: getContText(), awb: getAwbText() }];
+    }
+
+    function updateUldCount(){
+      const n = Math.max(1, uldItems.length);
+      const filled = uldItems.filter(x => x && x.cont).length;
+      const badge = document.getElementById("uldPlusCount");
+      const btn = document.getElementById("uldPlusBtn");
+      if (badge){
+        if (filled > 1 || n > 1){
+          badge.hidden = false;
+          badge.textContent = String(n);
+          btn && btn.classList.add("has-many");
+        } else {
+          badge.hidden = true;
+          badge.textContent = "";
+          btn && btn.classList.remove("has-many");
+        }
+      }
+      const sub = document.getElementById("uldListCount");
+      if (sub) sub.textContent = uldCountLabel(n);
+      updateUldNav();
+    }
+
+    function syncUldPreviewFromList(){
+      rebuildUldItemsFromList();
+    }
+
+    function syncUldListFromPreview(){
+      saveCurrentUldItem();
+      updateUldCount();
+    }
+
+    function openUldListModal(){
+      saveCurrentUldItem();
+      const modal = document.getElementById("uldListModal");
+      const ta = document.getElementById("u_cont_list");
+      if (ta){
+        const lines = uldItems.map(x => x.cont || "").join("\n").replace(/\n+$/,"");
+        if (lines) ta.value = lines;
+        else {
+          const one = getContText();
+          if (one) ta.value = one;
+        }
+      }
+      updateUldCount();
+      if (modal){
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+      }
+      setTimeout(()=>{ ta && ta.focus(); }, 50);
+      window.addEventListener("keydown", escCloseUldList);
+    }
+
+    function escCloseUldList(ev){
+      if(ev.key === "Escape") closeUldListModal();
+    }
+
+    function closeUldListModal(e){
+      if(e && e.target && e.target.id !== "uldListModal") return;
+      const modal = document.getElementById("uldListModal");
+      if (!modal) return;
+      const ta = document.getElementById("u_cont_list");
+      if (ta) ta.value = parseUldNumbers(ta.value).join("\n");
+      syncUldPreviewFromList();
+      scheduleSave();
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+      window.removeEventListener("keydown", escCloseUldList);
+    }
+
+    function saveUldListModal(){
+      closeUldListModal();
+    }
+
+    function bindUldNumberList(){
+      const ta = document.getElementById("u_cont_list");
+      const cont = document.getElementById("u_cont");
+      const plus = document.getElementById("uldPlusBtn");
+      if (plus){
+        plus.addEventListener("mousedown", (e)=> e.preventDefault());
+        plus.addEventListener("click", (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          openUldListModal();
+        });
+      }
+      if (ta){
+        ta.addEventListener("input", ()=>{
+          updateUldCount();
+        });
+      }
+      if (cont){
+        cont.addEventListener("input", ()=>{
+          syncUldListFromPreview();
+        });
+        cont.addEventListener("blur", ()=>{
+          forceUppercaseCE(cont);
+          syncUldListFromPreview();
+        });
+      }
+      const prev = document.getElementById("uldPrev");
+      const next = document.getElementById("uldNext");
+      if (prev){
+        prev.addEventListener("mousedown", (e)=> e.preventDefault());
+        prev.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); stepUld(-1); });
+      }
+      if (next){
+        next.addEventListener("mousedown", (e)=> e.preventDefault());
+        next.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); stepUld(1); });
+      }
+      document.addEventListener("keydown", (e)=>{
+        if (pages[idx] !== "uld") return;
+        if (e.target && (e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName))) return;
+        if (e.key === "ArrowLeft") { e.preventDefault(); stepUld(-1); }
+        if (e.key === "ArrowRight") { e.preventDefault(); stepUld(1); }
+      });
+      updateUldCount();
+    }
+
+    function fitSignMeta(){
+      const row = document.querySelector("#page_uld .sign-meta");
+      if (!row) return;
+      const name = document.getElementById("u_name");
+      const id = document.getElementById("u_staff");
+      if (name) name.style.fontSize = "";
+      if (id) id.style.fontSize = "";
+      let size = 17;
+      while (size > 11 && (row.scrollWidth > row.clientWidth + 1 || row.scrollHeight > row.clientHeight + 1)){
+        size -= 0.5;
+        if (name) name.style.fontSize = size + "px";
+        if (id) id.style.fontSize = size + "px";
+      }
+    }
+
+    function signWidth(){
+      const img = document.getElementById("u_sign_img");
+      const n = parseFloat(img && img.style.width);
+      return isNaN(n) ? 100 : n;
+    }
+
+    function applySignSize(w){
+      const img = document.getElementById("u_sign_img");
+      if (!img) return;
+      const size = Math.max(32, Math.min(240, w));
+      img.style.width = size + "px";
+      img.style.maxWidth = "none";
+      img.style.maxHeight = "none";
+      img.style.height = "auto";
+    }
+
+    function setSignImage(src, x, y, w){
+      const wrap = document.getElementById("u_sign_img_wrap");
+      const img = document.getElementById("u_sign_img");
+      if (!wrap || !img) return;
+      if (!src){
+        img.removeAttribute("src");
+        wrap.hidden = true;
+        wrap.style.left = "8px";
+        wrap.style.top = "2px";
+        applySignSize(100);
+        return;
+      }
+      img.src = src;
+      wrap.hidden = false;
+      wrap.style.left = (x != null && x !== "") ? x : "8px";
+      wrap.style.top = (y != null && y !== "") ? y : "2px";
+      const width = parseFloat(w);
+      applySignSize(isNaN(width) ? (signWidth() || 100) : width);
+    }
+
+    function compressSignImage(file, cb){
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = ()=>{
+        const maxW = 360;
+        const scale = Math.min(1, maxW / Math.max(1, img.width));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        let out = c.toDataURL("image/png");
+        if (out.length > 450000) out = c.toDataURL("image/jpeg", 0.82);
+        cb(out);
+      };
+      img.onerror = ()=> URL.revokeObjectURL(url);
+      img.src = url;
+    }
+
+    function bindSignImage(){
+      const addBtn = document.getElementById("signAddBtn");
+      const file = document.getElementById("u_sign_file");
+      const wrap = document.getElementById("u_sign_img_wrap");
+      const box = document.getElementById("u_sign_box");
+      const clear = document.getElementById("signImgClear");
+      const name = document.getElementById("u_name");
+      const staff = document.getElementById("u_staff");
+
+      function pick(){ file && file.click(); }
+
+      if (addBtn){
+        addBtn.addEventListener("mousedown", (e)=> e.preventDefault());
+        addBtn.addEventListener("click", (e)=>{ e.preventDefault(); pick(); });
+      }
+      const drawBtn = document.getElementById("signDrawBtn");
+      if (drawBtn){
+        drawBtn.addEventListener("mousedown", (e)=> e.preventDefault());
+        drawBtn.addEventListener("click", (e)=>{ e.preventDefault(); openSignPad(); });
+      }
+      if (file){
+        file.addEventListener("change", ()=>{
+          const f = file.files && file.files[0];
+          file.value = "";
+          if (!f) return;
+          compressSignImage(f, (src)=>{
+            setSignImage(src, "8px", "0px", 110);
+            scheduleSave();
+          });
+        });
+      }
+      if (clear){
+        clear.addEventListener("click", (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          setSignImage("");
+          scheduleSave();
+        });
+      }
+      if (box){
+        box.addEventListener("paste", (e)=>{
+          const item = [...(e.clipboardData?.items || [])].find(it => it.type.indexOf("image") === 0);
+          if (!item) return;
+          const f = item.getAsFile();
+          if (!f) return;
+          e.preventDefault();
+          compressSignImage(f, (src)=>{
+            setSignImage(src, "8px", "0px", 110);
+            scheduleSave();
+          });
+        });
+      }
+
+      if (wrap && box){
+        const page = document.getElementById("page_uld");
+        let mode = "";
+        let startX = 0, startY = 0, origL = 0, origT = 0, origW = 100;
+        const pointers = new Map();
+        let pinchStartDist = 0, pinchStartW = 100;
+
+        function uiScale(){
+          return Math.max(0.01, box.getBoundingClientRect().width / Math.max(1, box.offsetWidth));
+        }
+        function dist(a, b){
+          const dx = a.x - b.x, dy = a.y - b.y;
+          return Math.sqrt(dx*dx + dy*dy);
+        }
+
+        wrap.addEventListener("pointerdown", (e)=>{
+          if (e.target && e.target.id === "signImgClear") return;
+          wrap.setPointerCapture(e.pointerId);
+          pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+          if (pointers.size === 2){
+            const pts = [...pointers.values()];
+            pinchStartDist = dist(pts[0], pts[1]);
+            pinchStartW = signWidth();
+            mode = "pinch";
+            e.preventDefault();
+            return;
+          }
+          mode = (e.target && e.target.id === "signImgResize") ? "resize" : "move";
+          startX = e.clientX;
+          startY = e.clientY;
+          origL = wrap.offsetLeft;
+          origT = wrap.offsetTop;
+          origW = signWidth();
+          e.preventDefault();
+        });
+        wrap.addEventListener("pointermove", (e)=>{
+          if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+          const s = uiScale();
+          if (mode === "pinch" && pointers.size === 2){
+            const pts = [...pointers.values()];
+            const d = dist(pts[0], pts[1]);
+            if (pinchStartDist > 4) applySignSize(pinchStartW * (d / pinchStartDist));
+            return;
+          }
+          if (mode === "resize"){
+            applySignSize(origW + (e.clientX - startX) / s);
+            return;
+          }
+          if (mode !== "move") return;
+          let left = origL + (e.clientX - startX) / s;
+          let top = origT + (e.clientY - startY) / s;
+          const maxL = (page ? page.clientWidth : 220) * 0.55;
+          left = Math.max(-40, Math.min(maxL, left));
+          top = Math.max(-90, Math.min(70, top));
+          wrap.style.left = left + "px";
+          wrap.style.top = top + "px";
+        });
+        function endDrag(e){
+          if (e && e.pointerId != null) pointers.delete(e.pointerId);
+          if (pointers.size === 0){
+            if (mode) scheduleSave();
+            mode = "";
+          }
+        }
+        wrap.addEventListener("pointerup", endDrag);
+        wrap.addEventListener("pointercancel", endDrag);
+        wrap.addEventListener("wheel", (e)=>{
+          e.preventDefault();
+          applySignSize(signWidth() * (e.deltaY < 0 ? 1.08 : 0.92));
+          scheduleSave();
+        }, { passive:false });
+      }
+
+      [name, staff].forEach(el=>{
+        if (!el) return;
+        el.addEventListener("input", ()=>{ fitSignMeta(); scheduleSave(); });
+        el.addEventListener("blur", ()=>{ fitSignMeta(); });
+      });
+      fitSignMeta();
+    }
+
+    const signPadState = { drawing:false, last:null, dirty:false, dpr:1 };
+
+    function padPoint(e){
+      const canvas = document.getElementById("signPad");
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    function sizeSignPad(){
+      const canvas = document.getElementById("signPad");
+      const stage = document.getElementById("signPadStage");
+      if (!canvas || !stage) return;
+      const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+      const w = Math.max(280, stage.clientWidth);
+      const h = Math.max(180, Math.min(Math.round(window.innerHeight * 0.42), 320));
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 2.8;
+      signPadState.dpr = dpr;
+      signPadState.dirty = false;
+      const hint = document.getElementById("signPadHint");
+      const st = document.getElementById("signPadStage");
+      if (hint) hint.style.opacity = "";
+      if (st) st.classList.remove("is-dirty");
+    }
+
+    function markSignPadDirty(){
+      signPadState.dirty = true;
+      const st = document.getElementById("signPadStage");
+      if (st) st.classList.add("is-dirty");
+    }
+
+    function clearSignPad(){
+      const canvas = document.getElementById("signPad");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      ctx.save();
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.restore();
+      signPadState.dirty = false;
+      const st = document.getElementById("signPadStage");
+      if (st) st.classList.remove("is-dirty");
+    }
+
+    function cropSignPad(canvas){
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      const data = ctx.getImageData(0,0,w,h).data;
+      let minX=w, minY=h, maxX=-1, maxY=-1;
+      for (let y=0; y<h; y++){
+        for (let x=0; x<w; x++){
+          if (data[(y*w+x)*4+3] > 18){
+            if (x<minX) minX=x;
+            if (y<minY) minY=y;
+            if (x>maxX) maxX=x;
+            if (y>maxY) maxY=y;
+          }
+        }
+      }
+      if (maxX < 0) return "";
+      const pad = Math.round(10 * signPadState.dpr);
+      minX = Math.max(0, minX-pad);
+      minY = Math.max(0, minY-pad);
+      maxX = Math.min(w-1, maxX+pad);
+      maxY = Math.min(h-1, maxY+pad);
+      const cw = maxX-minX+1, ch = maxY-minY+1;
+      const out = document.createElement("canvas");
+      out.width = cw;
+      out.height = ch;
+      out.getContext("2d").drawImage(canvas, minX, minY, cw, ch, 0, 0, cw, ch);
+      return out.toDataURL("image/png");
+    }
+
+    function openSignPad(){
+      const modal = document.getElementById("signPadModal");
+      if (!modal) return;
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+      requestAnimationFrame(()=>{
+        sizeSignPad();
+        bindSignPadOnce();
+      });
+      window.addEventListener("keydown", escCloseSignPad);
+    }
+
+    function closeSignPad(e){
+      if (e && e.target && e.target.id !== "signPadModal") return;
+      const modal = document.getElementById("signPadModal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", escCloseSignPad);
+    }
+
+    function escCloseSignPad(ev){
+      if (ev.key === "Escape") closeSignPad();
+    }
+
+    function saveSignPad(){
+      const canvas = document.getElementById("signPad");
+      if (!canvas) return;
+      if (!signPadState.dirty){
+        showToast("ارسم التوقيع أولاً");
+        return;
+      }
+      const src = cropSignPad(canvas);
+      if (!src){
+        showToast("ارسم التوقيع أولاً");
+        return;
+      }
+      setSignImage(src, "8px", "0px", 120);
+      scheduleSave();
+      closeSignPad();
+      showToast("تم حفظ التوقيع");
+    }
+
+    let signPadBound = false;
+    function bindSignPadOnce(){
+      if (signPadBound) return;
+      const canvas = document.getElementById("signPad");
+      if (!canvas) return;
+      signPadBound = true;
+      canvas.addEventListener("pointerdown", (e)=>{
+        e.preventDefault();
+        canvas.setPointerCapture(e.pointerId);
+        signPadState.drawing = true;
+        signPadState.last = padPoint(e);
+      });
+      canvas.addEventListener("pointermove", (e)=>{
+        if (!signPadState.drawing) return;
+        e.preventDefault();
+        const p = padPoint(e);
+        const last = signPadState.last;
+        const ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        signPadState.last = p;
+        markSignPadDirty();
+      });
+      const end = ()=>{
+        signPadState.drawing = false;
+        signPadState.last = null;
+      };
+      canvas.addEventListener("pointerup", end);
+      canvas.addEventListener("pointercancel", end);
+      window.addEventListener("resize", ()=>{
+        const modal = document.getElementById("signPadModal");
+        if (modal && modal.classList.contains("show")) sizeSignPad();
+      });
+    }
+
+    const ULD_PRINT_KEY = "uld_print_paper";
+
+    function cleanupUldPrintClones(){
+      document.querySelectorAll(".uld-print-sheet, .uld-print-clone").forEach(el => el.remove());
+      document.documentElement.classList.remove("uld-multi-print", "uld-single-print");
+      const pageStyle = document.getElementById("uldPrintPage");
+      if (pageStyle) pageStyle.remove();
+    }
+
+    let uldPrintCleanup = null;
+    function finishUldPrint(){
+      if (!uldPrintCleanup) return;
+      const fn = uldPrintCleanup;
+      uldPrintCleanup = null;
+      fn();
+    }
+
+    function fillUldPrintClone(clone, item){
+      clone.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
+      clone.querySelectorAll(".uld-title-nav, .uld-plus, .sign-head-btns, .sign-img-x, .sign-img-resize").forEach(el => el.remove());
+      const labelCell = clone.querySelector("[data-uld-cont]");
+      if (labelCell) labelCell.textContent = (item && item.cont) || "";
+      const awbCell = clone.querySelector("[data-uld-awb]");
+      if (awbCell) awbCell.innerText = (item && item.awb) || "";
+    }
+
+    function armUldPrintCleanup(){
+      uldPrintCleanup = ()=> cleanupUldPrintClones();
+      window.addEventListener("afterprint", finishUldPrint, { once: true });
+      if (window.matchMedia){
+        const mq = window.matchMedia("print");
+        const onChange = (e)=>{
+          if (!e.matches){
+            mq.removeEventListener?.("change", onChange);
+            finishUldPrint();
+          }
+        };
+        if (mq.addEventListener) mq.addEventListener("change", onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+      }
+    }
+
+    function getUldPrintPaper(){
+      try { return localStorage.getItem(ULD_PRINT_KEY) || "a4"; }
+      catch(e){ return "a4"; }
+    }
+
+    function openUldPrintModal(){
+      const modal = document.getElementById("uldPrintModal");
+      if (!modal){
+        printUldPaper(getUldPrintPaper());
+        return;
+      }
+      const last = getUldPrintPaper();
+      document.getElementById("uldPrintA4")?.classList.toggle("active", last === "a4");
+      document.getElementById("uldPrintSmall")?.classList.toggle("active", last === "small");
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      window.addEventListener("keydown", escCloseUldPrint);
+    }
+
+    function escCloseUldPrint(ev){
+      if (ev.key === "Escape") closeUldPrintModal();
+    }
+
+    function closeUldPrintModal(e){
+      if (e && e.target && e.target.id !== "uldPrintModal") return;
+      const modal = document.getElementById("uldPrintModal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+      window.removeEventListener("keydown", escCloseUldPrint);
+    }
+
+    function printUldPaper(mode){
+      closeUldPrintModal();
+      const paper = (mode === "small") ? "small" : "a4";
+      try { localStorage.setItem(ULD_PRINT_KEY, paper); } catch(e){}
+      cleanupUldPrintClones();
+      const original = document.getElementById("page_uld");
+      const scaler = document.getElementById("scaler");
+      if (!original || !scaler){
+        window.print();
+        return;
+      }
+
+      let pageStyle = document.getElementById("uldPrintPage");
+      if (!pageStyle){
+        pageStyle = document.createElement("style");
+        pageStyle.id = "uldPrintPage";
+        document.head.appendChild(pageStyle);
+      }
+
+      const items = getUldPrintItems();
+      if (paper === "small"){
+        document.documentElement.classList.add("uld-single-print");
+        pageStyle.textContent = "@media print{@page{size:101mm 130mm;margin:0 !important}}";
+        items.forEach((item, i)=>{
+          const clone = original.cloneNode(true);
+          clone.id = "page_uld_print_" + i;
+          clone.classList.add("uld-print-clone", "active");
+          fillUldPrintClone(clone, item);
+          scaler.appendChild(clone);
+        });
+      } else {
+        document.documentElement.classList.add("uld-multi-print");
+        pageStyle.textContent = "@media print{@page{size:A4 landscape;margin:0 !important}}";
+        let sheet = null;
+        items.forEach((item, i)=>{
+          if (i % 2 === 0){
+            sheet = document.createElement("div");
+            sheet.className = "uld-print-sheet";
+            scaler.appendChild(sheet);
+          }
+          const clone = original.cloneNode(true);
+          clone.id = "page_uld_print_" + i;
+          clone.classList.add("uld-print-clone", "active");
+          fillUldPrintClone(clone, item);
+          const cell = document.createElement("div");
+          cell.className = "uld-print-cell";
+          cell.appendChild(clone);
+          sheet.appendChild(cell);
+        });
+      }
+
+      armUldPrintCleanup();
+      window.print();
+    }
+
+    function printLabel(){
+      if (pages[idx] !== "uld"){
+        window.print();
+        return;
+      }
+      openUldPrintModal();
+    }
+
+    function bindShipping(){
+      ["ship_dest","ship_origin"].forEach(id=>{
+        const el = document.getElementById(id);
+        el.addEventListener("input", syncFromShipping);
+      });
+
+      const awbEl = document.getElementById("ship_awb");
+
+      function awbDigitsFromText(t){
+        return digitsOnlySafe(t).slice(0, 11);
+      }
+
+      function formatAwb3_4_4(digits){
+        const d = awbDigitsFromText(digits);
+        if (d.length <= 3) return d;
+        if (d.length <= 7) return d.slice(0,3) + "-" + d.slice(3);
+        return d.slice(0,3) + "-" + d.slice(3,7) + " " + d.slice(7);
+      }
+
+      function getCaretCharOffset(el){
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return 0;
+        const range = sel.getRangeAt(0);
+        if (!el.contains(range.startContainer)) return 0;
+        const pre = range.cloneRange();
+        pre.selectNodeContents(el);
+        pre.setEnd(range.startContainer, range.startOffset);
+        return pre.toString().length;
+      }
+
+      function countDigitsBefore(text){
+        return (toLatinDigits(String(text || "")) .match(/\d/g) || []).length;
+      }
+
+      function caretCharPosFromDigitIndex(formattedText, digitIndex){
+        const t = String(formattedText || "");
+        let di = 0;
+        for (let i = 0; i < t.length; i++){
+          if (/\d/.test(t[i])){
+            if (di === digitIndex) return i;
+            di++;
+          }
+        }
+        return t.length;
+      }
+
+      function setCaretAtCharPos(el, charPos){
+        const text = el.textContent || "";
+        el.textContent = text;
+
+        if (!el.firstChild) el.appendChild(document.createTextNode(""));
+        const node = el.firstChild;
+        const safePos = Math.max(0, Math.min(charPos, node.textContent.length));
+
+        const range = document.createRange();
+        range.setStart(node, safePos);
+        range.collapse(true);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      if (awbEl){
+        awbEl.addEventListener("keydown",(e)=>{
+          if (e.key === "Enter"){ e.preventDefault(); awbEl.blur(); }
+        });
+
+        awbEl.addEventListener("input", ()=>{
+          const caretChar = getCaretCharOffset(awbEl);
+          const beforeCaret = (awbEl.textContent || "").slice(0, caretChar);
+          const digitIndex = countDigitsBefore(beforeCaret);
+
+          const digits = awbDigitsFromText(awbEl.textContent);
+          const formatted = formatAwb3_4_4(digits);
+          awbEl.textContent = formatted;
+
+          const targetDigitIndex = Math.min(digitIndex, digits.length);
+          const charPos = caretCharPosFromDigitIndex(formatted, targetDigitIndex);
+          setCaretAtCharPos(awbEl, charPos);
+
+          syncFromShipping();
+          scheduleOmanAirFill(digits);
+        });
+
+        awbEl.addEventListener("paste",(e)=>{
+          e.preventDefault();
+          const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+          const digits = awbDigitsFromText(text);
+          const formatted = formatAwb3_4_4(digits);
+          awbEl.textContent = formatted;
+
+          setCaretAtCharPos(awbEl, formatted.length);
+          syncFromShipping();
+          scheduleOmanAirFill(digits);
+        });
+      }
+
+      ["ship_pcs","ship_wt"].forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        el.addEventListener("keydown",(e)=>{
+          if (e.key === "Enter"){ e.preventDefault(); el.blur(); }
+        });
+
+        el.addEventListener("input", ()=>{
+          sanitizeDigitsText(el);
+        });
+
+        el.addEventListener("paste",(e)=>{
+          e.preventDefault();
+          const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+          const clean = text.replace(/[^\d]/g,"");
+          document.execCommand("insertText", false, clean);
+          sanitizeDigitsText(el);
+        });
+      });
+    }
+
+    function sanitizeDigitsText(el){
+      const clean = (el.innerText||"").replace(/[^\d]/g,"");
+      if (el.innerText !== clean) el.innerText = clean;
+    }
+
+    function forceUppercaseCE(el){
+      if(!el) return;
+      const v = el.innerText || "";
+      const up = v.toUpperCase();
+      if (up !== v) el.innerText = up;
+    }
+    function bindUppercaseCE(){
+      const ids = ["ship_carrier","ship_srv","ship_awb","ship_dest","ship_origin",
+                   "u_cont","u_dt","u_dest","u_origin","u_awb","u_flight","u_imp","u_staff"];
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener("blur", ()=>forceUppercaseCE(el));
+      });
+    }
+
+    // ================== ✅ حفظ البيانات (LocalStorage) ==================
+    const LABEL_STATE_KEY = "label_state_v2";
+
+    function getFieldValue(el){
+      if(!el) return "";
+      if ("value" in el) return (el.value || "");
+      return (el.innerText || "");
+    }
+    function setFieldValue(el, val){
+      if(!el) return;
+      if ("value" in el) el.value = (val ?? "");
+      else el.innerText = (val ?? "");
+    }
+
+    function collectState(){
+      const ids = [
+        "ship_carrier","ship_srv","ship_awb","ship_dest","ship_origin","ship_pcs","ship_wt",
+        "u_cont","u_cont_list","u_gross","u_tare","u_net","u_dt","u_dest","u_origin","u_awb","u_name","u_staff","u_flight","u_imp","u_remarks",
+        "notesBox"
+      ];
+      const data = {};
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        data[id] = getFieldValue(el);
+      });
+      data.__tab = idx;
+      const wrap = document.getElementById("u_sign_img_wrap");
+      const img = document.getElementById("u_sign_img");
+      data.u_sign_img = (img && img.getAttribute("src")) || "";
+      data.u_sign_x = (wrap && wrap.style.left) || "";
+      data.u_sign_y = (wrap && wrap.style.top) || "";
+      data.u_sign_w = signWidth();
+      saveCurrentUldItem();
+      data.uldItems = uldItems;
+      data.uldCur = uldCur;
+      return data;
+    }
+
+    function applyState(data){
+      if(!data) return;
+
+      Object.keys(data).forEach(id=>{
+        if(id === "__tab" || id === "u_sign_img" || id === "u_sign_x" || id === "u_sign_y" || id === "u_sign_w" || id === "uldItems" || id === "uldCur") return;
+        const el = document.getElementById(id);
+        if(!el) return;
+        if (data[id] !== undefined) setFieldValue(el, data[id]);
+      });
+
+      if (typeof data.__tab === "number" && data.__tab >= 0 && data.__tab < pages.length){
+        idx = data.__tab;
+        pages.forEach(p => document.getElementById("page_"+p).classList.remove("active"));
+        document.getElementById(activePageId()).classList.add("active");
+      }
+      syncChromeForPage();
+
+      if (Array.isArray(data.uldItems) && data.uldItems.length){
+        uldItems = data.uldItems.map(x => ({ cont: (x && x.cont) || "", awb: (x && x.awb) || "" }));
+        uldCur = Math.max(0, Math.min(parseInt(data.uldCur, 10) || 0, uldItems.length - 1));
+        loadUldItem();
+      } else {
+        const ta = document.getElementById("u_cont_list");
+        const listVal = (data.u_cont_list || "").trim();
+        if (ta && !listVal){
+          const one = (data.u_cont || "").trim();
+          if (one) ta.value = one;
+        }
+        if (listVal) rebuildUldItemsFromList();
+        else updateUldCount();
+      }
+
+      setSignImage(data.u_sign_img || "", data.u_sign_x, data.u_sign_y, data.u_sign_w);
+      fitSignMeta();
+      fitAwbNums();
+
+      syncFromShipping();
+    }
+
+    let saveTimer = null;
+    function scheduleSave(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=>{
+        try{
+          localStorage.setItem(LABEL_STATE_KEY, JSON.stringify(collectState()));
+        }catch(e){}
+      }, 250);
+    }
+
+    function bindPersistence(){
+      const ids = [
+        "ship_carrier","ship_srv","ship_awb","ship_dest","ship_origin","ship_pcs","ship_wt",
+        "u_cont","u_cont_list","u_gross","u_tare","u_net","u_dt","u_dest","u_origin","u_awb","u_name","u_staff","u_flight","u_imp","u_remarks",
+        "notesBox"
+      ];
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener("input", scheduleSave);
+        el.addEventListener("blur", scheduleSave);
+      });
+
+      window.addEventListener("beforeunload", ()=>{
+        try{ localStorage.setItem(LABEL_STATE_KEY, JSON.stringify(collectState())); }catch(e){}
+      });
+    }
+
+    // ============ ✅ Modal functions ============
+function setModalText(id, value){
+  const el = document.getElementById(id);
+  if (el) el.innerText = (value && String(value).trim()) ? String(value).trim() : "—";
+}
+
+function setModalLink(id, value, type){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = "";
+  const v = (value && String(value).trim()) ? String(value).trim() : "";
+  if (!v || v === "—") { el.textContent = "—"; return; }
+  const a = document.createElement("a");
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  if (type === "url" && /^https?:\/\//i.test(v)) {
+    a.href = v;
+    a.textContent = v.replace(/^https?:\/\//i, "");
+    el.appendChild(a);
+    return;
+  }
+  if (type === "tel") {
+    a.href = "tel:" + v.replace(/[^\d+]/g, "");
+    a.textContent = v;
+    el.appendChild(a);
+    return;
+  }
+  if (type === "map" && /^https?:\/\//i.test(v)) {
+    a.href = v;
+    a.textContent = "فتح موقع المطار على خرائط Google";
+    el.appendChild(a);
+    return;
+  }
+  el.textContent = v;
+}
+
+function fillAirlineModal(){
+  const awb = document.getElementById("ship_awb")?.innerText || "";
+  const info = getAirlineInfoFromAwb(awb);
+  const known = info && info.name !== "UNKNOWN";
+  const flag = (info.flag && info.flag !== "—") ? info.flag + " " : "";
+
+  setModalText("m_prefix", info.prefix);
+  setModalText("m_awb", info.awb);
+  setModalText("m_name", info.name);
+  setModalText("m_nameAr", info.nameAr);
+  setModalText("m_iata", info.iata);
+  setModalText("m_icao", info.icao);
+  setModalText("m_callsign", info.callsign);
+  setModalText("m_country", info.country);
+  setModalText("m_hub", info.hub);
+  setModalText("m_alliance", info.alliance);
+  setModalText("m_cargo", info.cargo);
+  setModalText("m_notes", info.notes);
+  setModalLink("m_phone", info.phone, "tel");
+  setModalLink("m_website", info.website, "url");
+  setModalLink("m_map", info.hubMap, "map");
+
+  const flagEl = document.getElementById("m_flag");
+  if (flagEl) flagEl.innerText = (info.flag && info.flag !== "—") ? info.flag : "";
+
+  const coordsEl = document.getElementById("m_coords");
+  if (coordsEl) {
+    coordsEl.innerText =
+      (info.hubLat != null && info.hubLng != null)
+        ? `${info.hubLat}, ${info.hubLng}`
+        : "غير متوفر";
+  }
+
+  document.getElementById("airlineModalTitle").innerText =
+    flag + "معلومات شركة الطيران";
+
+  document.getElementById("airlineModalSub").innerText = known
+    ? `${info.nameAr && info.nameAr !== "—" ? info.nameAr + "  •  " : ""}${info.name}  •  ${info.iata}`
+    : "لا توجد بيانات لهذا الـ Prefix";
+
+  const accent = document.getElementById("airlineModalAccent");
+  if (accent) accent.style.background = info.color || "#0056b3";
+
+  applyAirlineButtonColor(info);
+}
+
+
+
+
+    function openAirlineModal(){
+      fillAirlineModal();
+      const m = document.getElementById("airlineModal");
+      m.classList.add("show");
+      m.setAttribute("aria-hidden","false");
+      window.addEventListener("keydown", escCloseAirlineModalOnce);
+    }
+
+    function closeAirlineModal(e){
+      if(e && e.target && e.target.id !== "airlineModal") return;
+      const m = document.getElementById("airlineModal");
+      m.classList.remove("show");
+      m.setAttribute("aria-hidden","true");
+      window.removeEventListener("keydown", escCloseAirlineModalOnce);
+    }
+
+    function escCloseAirlineModalOnce(ev){
+      if(ev.key === "Escape") closeAirlineModal();
+    }
+
+    let awbFillTimer = null;
+    let awbLastTracked = "";
+    let awbFillBusy = false;
+
+    function setAwbTrackHint(msg, kind){
+      const el = document.getElementById("awbTrackHint");
+      if (!el) return;
+      el.textContent = msg || "";
+      el.classList.remove("err", "ok");
+      if (kind) el.classList.add(kind);
+    }
+
+    function scheduleOmanAirFill(digits){
+      scheduleAwbFill(digits);
+    }
+
+    function scheduleAwbFill(digits, opts){
+      clearTimeout(awbFillTimer);
+      if (!digits || digits.length !== 11){
+        setAwbTrackHint("");
+        return;
+      }
+      const force = !!(opts && opts.force);
+      if (!force && digits === awbLastTracked) return;
+      const delay = (opts && typeof opts.delay === "number") ? opts.delay : 450;
+      awbFillTimer = setTimeout(()=> fillFromAwbTracking(digits), delay);
+    }
+
+    function parseSmartKargoHtml(html){
+      const grab = (id)=>{
+        const re = new RegExp('id="' + id + '"[^>]*>([^<]*)', "i");
+        const m = String(html || "").match(re);
+        return m ? String(m[1]).trim() : "";
+      };
+      const dest = grab("lblDestination").toUpperCase();
+      const origin = grab("lblOrigin").toUpperCase();
+      const pcsRaw = grab("lblPcs").replace(/[^\d]/g, "");
+      const wtMatch = grab("lblGrossWt").replace(/,/g, "").match(/[\d.]+/);
+      const wtNum = wtMatch ? parseFloat(wtMatch[0]) : NaN;
+      const weight = isFinite(wtNum) ? String(Math.round(wtNum)) : "";
+      return { dest, origin, pcs: pcsRaw, weight };
+    }
+
+    function applyAwbShipment(data){
+      if (!data) return false;
+      if (!data.dest && !data.pcs && !data.weight && !data.origin) return false;
+      if (data.dest) document.getElementById("ship_dest").innerText = data.dest;
+      if (data.origin) document.getElementById("ship_origin").innerText = data.origin;
+      if (data.pcs) document.getElementById("ship_pcs").innerText = data.pcs;
+      if (data.weight) document.getElementById("ship_wt").innerText = String(data.weight).replace(/[^\d]/g,"");
+      syncFromShipping();
+      return true;
+    }
+
+    function currentAwbDigits(){
+      return digitsOnlySafe((document.getElementById("ship_awb") || {}).innerText || "").slice(0, 11);
+    }
+
+    function awbApiUrls(digits){
+      const prefix = digits.slice(0, 3);
+      const serial = digits.slice(3);
+      const qAwb = "awb=" + encodeURIComponent(digits);
+      const qTrack = "AWBPrefix=" + encodeURIComponent(prefix) + "&AWBno=" + encodeURIComponent(serial);
+      const urls = [
+        "/api/awb?" + qAwb,
+        "/api/track?" + qTrack
+      ];
+      try {
+        if (location.hostname && location.hostname !== "lbit.netlify.app") {
+          urls.push("https://lbit.netlify.app/api/awb?" + qAwb);
+          urls.push("https://lbit.netlify.app/api/track?" + qTrack);
+        }
+      } catch (e) {}
+      return urls;
+    }
+
+    async function fetchWithTimeout(url, ms){
+      const ctrl = (typeof AbortController === "function") ? new AbortController() : null;
+      const timer = setTimeout(()=>{ try{ ctrl && ctrl.abort(); }catch(e){} }, ms || 15000);
+      try{
+        return await fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function readAwbJson(res){
+      if (!res) return null;
+      const ctype = (res.headers.get("content-type") || "").toLowerCase();
+      if (ctype.indexOf("json") === -1) return null;
+      try { return await res.json(); }
+      catch (e) { return null; }
+    }
+
+    async function fillFromAwbTracking(digits){
+      if (awbFillBusy || !digits || digits.length !== 11) return;
+      awbFillBusy = true;
+      const prefix = digits.slice(0, 3);
+      const rec = (window.AIRLINE_DB && window.AIRLINE_DB[prefix]) || {};
+      const label = rec.iata ? ("تتبع " + rec.iata + "…") : "تتبع…";
+      setAwbTrackHint(label);
+      let sawTrackBackend = false;
+      try{
+        const urls = awbApiUrls(digits);
+        for (let i = 0; i < urls.length; i++){
+          const url = urls[i];
+          try{
+            const res = await fetchWithTimeout(url, 15000);
+            if (!res) continue;
+            const json = await readAwbJson(res);
+            if (json) {
+              sawTrackBackend = true;
+              if (json.ok && applyAwbShipment(json)) {
+                awbLastTracked = digits;
+                setAwbTrackHint("تم التعبئة", "ok");
+                showToast("تم تعبئة الوجهة والقطع والوزن");
+                return;
+              }
+              continue;
+            }
+            const ctype = (res.headers.get("content-type") || "").toLowerCase();
+            if (res.ok && ctype.indexOf("html") !== -1) {
+              const html = await res.text();
+              const parsed = parseSmartKargoHtml(html);
+              if (html.indexOf("lblDestination") !== -1 || html.indexOf("FrmAWBTracking") !== -1) {
+                sawTrackBackend = true;
+              }
+              if (applyAwbShipment(parsed)) {
+                awbLastTracked = digits;
+                setAwbTrackHint("تم التعبئة", "ok");
+                showToast("تم تعبئة الوجهة والقطع والوزن");
+                return;
+              }
+            }
+          }catch(e){}
+        }
+        setAwbTrackHint(sawTrackBackend ? "غير موجودة" : "تعذر التتبع", "err");
+        showToast(sawTrackBackend ? "لم يُعثر على بيانات الشحنة" : "تعذر الربط مع تتبع الشحن");
+      }catch(e){
+        setAwbTrackHint("تعذر التتبع", "err");
+        showToast("تعذر الربط مع تتبع الشحن");
+      }finally{
+        awbFillBusy = false;
+      }
+    }
+
+    async function fillFromOmanAir(digits){
+      return fillFromAwbTracking(digits);
+    }
+
+    function showToast(msg){
+      const t = document.getElementById("toast");
+      if(!t) return;
+      t.innerText = msg || "تم ✅";
+      t.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>t.classList.remove("show"), 1400);
+    }
+
+    function copyAirlineInfo(){
+      const awb = document.getElementById("ship_awb")?.innerText || "";
+      const info = getAirlineInfoFromAwb(awb);
+
+      const lines = [
+        `AWB: ${info.awb}`,
+        `Prefix: ${info.prefix}`,
+        `Name (EN): ${info.name}`,
+        `Name (AR): ${info.nameAr}`,
+        `IATA: ${info.iata}`,
+        `ICAO: ${info.icao}`,
+        `Callsign: ${info.callsign}`,
+        `Country: ${info.country}`,
+        `Hub: ${info.hub}`,
+        `Alliance: ${info.alliance}`,
+        `Cargo: ${info.cargo}`,
+        `Website: ${info.website}`,
+        `Phone: ${info.phone}`,
+        `Notes: ${info.notes}`
+      ].join("\n");
+
+      (navigator.clipboard?.writeText(lines) ? navigator.clipboard.writeText(lines) : Promise.reject())
+        .then(()=>showToast("تم النسخ ✅"))
+        .catch(()=>{
+          // fallback قديم
+          try{
+            const ta = document.createElement("textarea");
+            ta.value = lines;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            showToast("تم النسخ ✅");
+          }catch(e){
+            showToast("تعذر النسخ");
+          }
+        });
+    }
+
+    // Init
+    window.addEventListener("load", ()=>{
+      bindShipping();
+      bindULD();
+      bindName();
+      bindSignImage();
+      bindUppercaseCE();
+      syncFromShipping();
+
+      try{
+        const saved = localStorage.getItem(LABEL_STATE_KEY);
+        if(saved) applyState(JSON.parse(saved));
+      }catch(e){}
+
+      initNameFieldSignature(uName);
+      fitSignMeta();
+      fitAwbNums();
+
+      bindPersistence();
+      showPage(pageFromHash(), false);
+      autoScale();
+      const awbDigits = currentAwbDigits();
+      if (awbDigits.length === 11) scheduleAwbFill(awbDigits, { force: true, delay: 200 });
+    });
+    window.addEventListener("hashchange", ()=> showPage(pageFromHash(), false));
+    window.addEventListener("resize", autoScale);
+
+
+
+function applyAirlineButtonColor(info){
+  const btn = document.querySelector(".airline-info-btn");
+  if (!btn || !info) return;
+
+  const color = info.color || "#888";
+  btn.style.setProperty("--airline-color", color);
+}
+
+
+
+
+function updateAirlineUIFromAwb(){
+  const awb = (document.getElementById("ship_awb")?.innerText || "").trim();
+  const info = getAirlineInfoFromAwb(awb);
+
+  /* كود شركة الطيران (WY / TK ...) */
+  const codeEl = document.getElementById("ship_code");
+  if (codeEl) {
+    codeEl.innerText = (info.name !== "UNKNOWN") ? (info.iata || "—") : "—";
+  }
+
+  /* اسم شركة الطيران */
+  const nameEl = document.getElementById("ship_airline_name");
+  if (nameEl) {
+    nameEl.innerText = (info.name !== "UNKNOWN") ? info.name : "غير معروف";
+  }
+
+  /* تلوين زر الطائرة */
+  const btn = document.querySelector(".airline-info-btn");
+  if (btn) {
+    btn.style.setProperty("--airline-color", info.color || "#ffffff");
+  }
+}
+
+
+
+
+
+  </script>
+</body>
+</html>
