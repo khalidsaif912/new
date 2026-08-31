@@ -283,6 +283,7 @@
     closeShareIfOpen();
     applyI18n();
     upgradeAppIcons();
+    patchLabelsLink();
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
@@ -310,6 +311,11 @@
       if (/\/calculator(\/|$)/.test(path)) return;
       sessionStorage.setItem('calcReturnUrl', location.href);
     } catch (e) {}
+  }
+
+  function labelsPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/labels/';
+    return 'https://khalidsaif912.github.io/new/docs/labels/';
   }
 
   function calcPageUrl() {
@@ -368,8 +374,8 @@
         id: 'labels',
         title: t('labels'),
         sub: t('labelsSub'),
-        href: 'https://lbit.netlify.app/',
-        external: true,
+        href: labelsPageUrl(),
+        external: false,
         classes: 'roster-cta-btn--texture',
         icon: iconForApp('labels')
       },
@@ -478,6 +484,15 @@
   function randomSpotlight(excludeId) {
     var items = spotlightItems().filter(function (item) { return item.id !== excludeId; });
     return items[Math.floor(Math.random() * items.length)];
+  }
+
+  function patchLabelsLink() {
+    var link = document.querySelector('.siteAppsLink--labels, a.siteAppsLink[data-app-id="labels"]');
+    if (!link) return;
+    link.href = labelsPageUrl();
+    link.setAttribute('data-open-same', '1');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
   }
 
   function patchCalcLink() {
@@ -802,6 +817,7 @@
   function bindExternalAppLinks() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
+    patchLabelsLink();
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
@@ -1205,6 +1221,7 @@
     applyI18n();
     ensureAlumniButton();
     ensureSpotlightButton();
+    patchLabelsLink();
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
