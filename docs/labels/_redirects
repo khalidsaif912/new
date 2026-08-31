@@ -1,0 +1,2 @@
+/api/awb    /.netlify/functions/awb  200
+/api/track  https://omanair.smartkargo.com/FrmAWBTracking.aspx  200
