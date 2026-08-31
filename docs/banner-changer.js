@@ -115,16 +115,32 @@
   }
 
   function purgeSavedBannerIfRemoved() {
+    if (!catalogReady) return;
     var saved = null;
     try {
       saved = localStorage.getItem(BANNER_KEY);
     } catch (e) {}
-    if (saved && !bannerIsListed(saved)) {
-      try {
-        localStorage.removeItem(BANNER_KEY);
-      } catch (e) {}
-      clearBanner();
+    if (!saved || !BANNER_NAME_RE.test(saved)) return;
+    if (bannerIsListed(saved)) return;
+
+    var store = getStore();
+    var intentionallyGone = false;
+    if (store) {
+      var ov = store.getOverlayState ? store.getOverlayState() : { removed: [], custom: [] };
+      if (store.isStaticName && store.isStaticName(saved)) {
+        intentionallyGone = !!(ov.removed && ov.removed.indexOf(saved) >= 0);
+      } else if (store.isCustomName && store.isCustomName(saved)) {
+        intentionallyGone = true; // custom and not in active catalog
+      }
+    } else if (availableBanners.length) {
+      intentionallyGone = true;
     }
+
+    if (!intentionallyGone) return;
+    try {
+      localStorage.removeItem(BANNER_KEY);
+    } catch (e2) {}
+    clearBanner();
   }
 
   async function ensureCatalog(force) {
@@ -534,14 +550,14 @@
   function getSavedBanner() {
     const name = localStorage.getItem(BANNER_KEY) || null;
     if (!name || !BANNER_NAME_RE.test(name)) return null;
-    // Drop deleted/missing choices so iOS doesn't keep requesting a 404 image.
-    if (!bannerIsListed(name)) {
-      try {
-        localStorage.removeItem(BANNER_KEY);
-      } catch (_) {}
-      return null;
-    }
-    return name;
+    // Before the catalog is ready, trust the saved value so we never wipe it
+    // during early style injection / first paint.
+    if (!catalogReady) return name;
+    if (bannerIsListed(name)) return name;
+    // Catalog loaded but this banner is not active — keep the key only if the
+    // catalog looks broken (empty). Otherwise treat as intentionally removed.
+    if (!availableBanners.length) return name;
+    return null;
   }
 
   function saveBannerChoice(name) {
@@ -1257,9 +1273,18 @@
   }
 
   function init() {
+    // Restore from localStorage immediately (before catalog) so a refresh
+    // never flashes the default header while the catalog loads.
+    try {
+      var earlySaved = localStorage.getItem(BANNER_KEY);
+      if (earlySaved && BANNER_NAME_RE.test(earlySaved)) {
+        applyBanner(earlySaved);
+      }
+    } catch (e) {}
     injectReadabilityStyles();
     ensureCatalog(true).then(function () {
       injectReadabilityStyles();
+      purgeSavedBannerIfRemoved();
       const saved = getSavedBanner();
       if (saved) {
         applyBanner(saved);
