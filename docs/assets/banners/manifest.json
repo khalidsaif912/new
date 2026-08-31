@@ -1,0 +1,59 @@
+{
+  "banners": [
+    "banner2.jpg",
+    "banner6.jpg",
+    "banner7.jpg",
+    "banner8.jpg",
+    "banner9.jpg",
+    "banner11.jpg",
+    "banner12.jpg",
+    "banner14.jpg",
+    "banner15.jpg",
+    "banner16.jpg",
+    "banner17.jpg",
+    "banner19.jpg",
+    "banner28.jpg",
+    "banner29.jpg",
+    "banner30.jpg",
+    "banner31.jpg",
+    "banner32.jpg",
+    "banner33.jpg",
+    "banner34.jpg",
+    "banner35.jpg",
+    "banner36.jpg",
+    "banner37.jpg",
+    "banner38.jpg"
+  ],
+  "layouts": {
+    "banner28.jpg": {
+      "position": "50% 48%",
+      "positionMobile": "68% center",
+      "scrim": "linear-gradient(105deg,rgba(8,16,40,.1) 0%,rgba(8,16,40,.35) 42%,rgba(8,16,40,.52) 100%)"
+    },
+    "banner30.jpg": {
+      "position": "50% 45%",
+      "positionMobile": "50% 42%",
+      "scrim": "linear-gradient(to right,rgba(8,16,40,.42) 0%,rgba(8,16,40,.18) 48%,rgba(8,16,40,.28) 100%)"
+    },
+    "banner31.jpg": {
+      "position": "50% 48%",
+      "positionMobile": "50% 45%",
+      "scrim": "linear-gradient(to right,rgba(20,8,12,.45) 0%,rgba(20,8,12,.2) 50%,rgba(20,8,12,.32) 100%)"
+    },
+    "banner32.jpg": { "position": "50% 50%", "positionMobile": "50% 50%" },
+    "banner33.jpg": { "position": "50% 50%", "positionMobile": "50% 50%" },
+    "banner34.jpg": { "position": "50% 50%", "positionMobile": "50% 50%" },
+    "banner35.jpg": { "position": "50% 50%", "positionMobile": "50% 50%" },
+    "banner36.jpg": { "position": "50% 50%", "positionMobile": "50% 50%" },
+    "banner37.jpg": {
+      "position": "50% 55%",
+      "positionMobile": "50% 52%",
+      "scrim": "linear-gradient(to right,rgba(8,16,40,.55) 0%,rgba(8,16,40,.22) 45%,rgba(8,16,40,.35) 100%)"
+    },
+    "banner38.jpg": {
+      "position": "left center",
+      "positionMobile": "20% center",
+      "scrim": "linear-gradient(to right,rgba(8,16,40,.35) 0%,rgba(8,16,40,.12) 42%,rgba(8,16,40,.25) 100%)"
+    }
+  }
+}

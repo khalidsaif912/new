@@ -379,7 +379,7 @@
     }
     @media (min-width: 640px) {
       .toolbar.mainTabs {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
       }
     }
     .toolsIntro {
@@ -486,6 +486,104 @@
     .gapBadge.phone { color: #fca5a5; border-color: #7f1d1d; background: #450a0a55; }
     .gapBadge.visit { color: #fde68a; border-color: #854d0e; background: #713f1255; }
     .gapBadge.both { color: #fda4af; border-color: #9f1239; background: #4c051955; }
+    .bannerAdminIntro {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .bannerAdminToolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .bannerAddLabel {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 12px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 0;
+    }
+    .bannerAddLabel input { display: none; }
+    .bannerAdminGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (min-width: 560px) {
+      .bannerAdminGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .bannerAdminCard {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      background: #0f172a;
+    }
+    .bannerAdminCard img {
+      width: 100%;
+      height: 88px;
+      object-fit: cover;
+      display: block;
+      background: #1e293b;
+    }
+    .bannerAdminMeta {
+      padding: 8px 10px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .bannerAdminMeta b {
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+    .bannerAdminMeta span {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .bannerDelBtn, .bannerRestoreBtn {
+      border: 0;
+      border-radius: 10px;
+      min-height: 32px;
+      padding: 0 10px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .bannerDelBtn {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+    .bannerRestoreBtn {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+    .bannerRemovedSection {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed #334155;
+    }
+    .bannerStatus {
+      min-height: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #93c5fd;
+      margin-bottom: 8px;
+    }
+    .bannerStatus.err { color: #fca5a5; }
     @media (max-width: 520px) {
       .toolbar.mainTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .toolCard { grid-template-columns: 1fr; }
@@ -526,6 +624,7 @@
       <button type="button" class="chip" data-view="phones" id="tabPhones">الهواتف</button>
       <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
       <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
+      <button type="button" class="chip" data-view="banners" id="tabBanners">بنرات</button>
     </div>
     <div id="visitsChrome">
       <div class="toolbar">
@@ -604,8 +703,27 @@
         <div class="empty">جاري تحميل الأدوات...</div>
       </div>
     </div>
+    <div id="bannersPanel" hidden>
+      <p class="bannerAdminIntro">إدارة صور بنر الهيدر في الصفحة الرئيسية — الإضافة والحذف تظهر فوراً لجميع الزوار.</p>
+      <div class="bannerStatus" id="bannerAdminStatus"></div>
+      <div class="bannerAdminToolbar">
+        <label class="bannerAddLabel">
+          <input type="file" id="bannerAddInput" accept="image/jpeg,image/png,image/webp">
+          + إضافة بنر
+        </label>
+        <button type="button" class="chip" id="refreshBannersBtn">تحديث</button>
+      </div>
+      <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
+      <div class="bannerRemovedSection" id="bannerRemovedSection" hidden>
+        <div class="listHead">
+          <h2>بنرات مخفية</h2>
+        </div>
+        <div class="bannerAdminGrid" id="bannerRemovedGrid"></div>
+      </div>
+    </div>
   </div>
 
+  <script src="../banner-store.js?v=20260831b"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1043,7 +1161,7 @@
       }
 
       function setView(next) {
-        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1 };
+        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1, banners: 1 };
         view = allowed[next] ? next : 'visits';
         const visitRelated = view === 'visits' || view === 'devices' || view === 'pages';
         const chrome = document.getElementById('visitsChrome');
@@ -1054,13 +1172,131 @@
         document.getElementById('phonesPanel').hidden = view !== 'phones';
         document.getElementById('gapsPanel').hidden = view !== 'gaps';
         document.getElementById('toolsPanel').hidden = view !== 'tools';
+        document.getElementById('bannersPanel').hidden = view !== 'banners';
         document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-view') === view);
         });
         if (view === 'phones') loadPhones();
         else if (view === 'tools') loadTools();
         else if (view === 'gaps') loadGaps();
+        else if (view === 'banners') loadBanners();
         else loadLog();
+      }
+
+      function setBannerStatus(text, isErr) {
+        const el = document.getElementById('bannerAdminStatus');
+        if (!el) return;
+        el.textContent = text || '';
+        el.classList.toggle('err', !!isErr);
+      }
+
+      async function loadBanners() {
+        const grid = document.getElementById('bannerAdminGrid');
+        const removedGrid = document.getElementById('bannerRemovedGrid');
+        const removedSection = document.getElementById('bannerRemovedSection');
+        if (!grid || !window.RosterBannerStore) {
+          if (grid) grid.innerHTML = '<div class="error">تعذر تحميل مدير البنرات</div>';
+          return;
+        }
+        grid.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        if (removedGrid) removedGrid.innerHTML = '';
+        setBannerStatus('');
+        try {
+          RosterBannerStore.invalidateCache();
+          await RosterBannerStore.loadCatalog(true);
+          renderBanners();
+        } catch (e) {
+          grid.innerHTML = '<div class="error">تعذر تحميل البنرات</div>';
+          setBannerStatus('حدث خطأ أثناء التحميل', true);
+        }
+      }
+
+      function renderBanners() {
+        const store = window.RosterBannerStore;
+        const grid = document.getElementById('bannerAdminGrid');
+        const removedGrid = document.getElementById('bannerRemovedGrid');
+        const removedSection = document.getElementById('bannerRemovedSection');
+        if (!store || !grid) return;
+
+        const active = store.getBanners();
+        if (!active.length) {
+          grid.innerHTML = '<div class="empty">لا توجد بنرات نشطة.</div>';
+        } else {
+          grid.innerHTML = active.map(function (name) {
+            return bannerAdminCardHtml(name, false);
+          }).join('');
+        }
+
+        const removed = store.getOverlayState().removed || [];
+        if (removedSection && removedGrid) {
+          if (!removed.length) {
+            removedSection.hidden = true;
+            removedGrid.innerHTML = '';
+          } else {
+            removedSection.hidden = false;
+            removedGrid.innerHTML = removed.map(function (name) {
+              return bannerAdminCardHtml(name, true);
+            }).join('');
+          }
+        }
+
+        bindBannerAdminActions();
+      }
+
+      function bannerAdminCardHtml(name, removed) {
+        const store = window.RosterBannerStore;
+        const label = store ? store.bannerLabel(name) : name;
+        const kind = store && store.isCustomName(name) ? 'مخصص' : 'افتراضي';
+        const btn = removed
+          ? '<button type="button" class="bannerRestoreBtn" data-restore-banner="' + escapeHtml(name) + '">إظهار</button>'
+          : '<button type="button" class="bannerDelBtn" data-del-banner="' + escapeHtml(name) + '">حذف</button>';
+        return (
+          '<article class="bannerAdminCard" data-banner-name="' + escapeHtml(name) + '">' +
+            '<img alt="" data-banner-thumb="' + escapeHtml(name) + '">' +
+            '<div class="bannerAdminMeta">' +
+              '<div><b>' + escapeHtml(label) + '</b><br><span>' + escapeHtml(kind) + '</span></div>' +
+              btn +
+            '</div>' +
+          '</article>'
+        );
+      }
+
+      function bindBannerAdminActions() {
+        document.querySelectorAll('[data-banner-thumb]').forEach(function (img) {
+          const name = img.getAttribute('data-banner-thumb');
+          if (!name || !window.RosterBannerStore) return;
+          RosterBannerStore.resolveBannerUrl(name).then(function (url) {
+            if (url) img.src = url;
+          });
+        });
+        document.querySelectorAll('[data-del-banner]').forEach(function (btn) {
+          btn.onclick = async function () {
+            const name = btn.getAttribute('data-del-banner');
+            if (!name || !confirm('حذف هذا البنر من القائمة؟')) return;
+            setBannerStatus('جاري الحذف…');
+            try {
+              await RosterBannerStore.removeBanner(name);
+              setBannerStatus('تم الحذف');
+              renderBanners();
+            } catch (e) {
+              setBannerStatus('تعذر الحذف', true);
+            }
+          };
+        });
+        document.querySelectorAll('[data-restore-banner]').forEach(function (btn) {
+          btn.onclick = async function () {
+            const name = btn.getAttribute('data-restore-banner');
+            if (!name) return;
+            setBannerStatus('جاري الإظهار…');
+            try {
+              await RosterBannerStore.restoreBanner(name);
+              setBannerStatus('تمت الاستعادة');
+              renderBanners();
+            } catch (e) {
+              setBannerStatus('تعذر الاستعادة', true);
+            }
+          };
+        });
       }
 
       function toolHref(href) {
@@ -1625,6 +1861,23 @@
       document.getElementById('refreshBtn').addEventListener('click', loadLog);
       document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
       document.getElementById('refreshGapsBtn').addEventListener('click', loadGaps);
+      document.getElementById('refreshBannersBtn').addEventListener('click', loadBanners);
+      const bannerAddInput = document.getElementById('bannerAddInput');
+      if (bannerAddInput) {
+        bannerAddInput.addEventListener('change', async function () {
+          const file = bannerAddInput.files && bannerAddInput.files[0];
+          bannerAddInput.value = '';
+          if (!file || !window.RosterBannerStore) return;
+          setBannerStatus('جاري الرفع…');
+          try {
+            await RosterBannerStore.addCustomBanner(file);
+            setBannerStatus('تمت إضافة البنر');
+            renderBanners();
+          } catch (e) {
+            setBannerStatus(e && e.message === 'large' ? 'الصورة كبيرة جداً — جرّب صورة أصغر' : 'تعذر إضافة البنر', true);
+          }
+        });
+      }
       document.querySelectorAll('#gapsFilters .chip[data-gap]').forEach((c) => {
         c.addEventListener('click', () => {
           gapFilter = c.getAttribute('data-gap') || 'noPhone';

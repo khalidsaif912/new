@@ -11,7 +11,7 @@
     '0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5)';
   const DATE_TAG_ICON_FILTER =
     'drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45))';
-  const BANNER_NAME_RE = /^banner\d+\.jpg$/i;
+  const BANNER_NAME_RE = /^(banner\d+\.jpg|custom:[a-z0-9]{8,32})$/i;
 
   function isIOSDevice() {
     return (
@@ -32,88 +32,48 @@
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
 
-  const availableBanners = [
-    'banner2.jpg',
-    'banner6.jpg',
-    'banner7.jpg',
-    'banner8.jpg',
-    'banner9.jpg',
-    'banner11.jpg',
-    'banner12.jpg',
-    'banner14.jpg',
-    'banner15.jpg',
-    'banner16.jpg',
-    'banner17.jpg',
-    'banner19.jpg',
-    'banner28.jpg',
-    'banner29.jpg',
-    'banner30.jpg',
-    'banner31.jpg',
-    'banner32.jpg',
-    'banner33.jpg',
-    'banner34.jpg',
-    'banner35.jpg',
-    'banner36.jpg',
-    'banner37.jpg',
-    'banner38.jpg'
-  ];
+  let availableBanners = [];
+  let BANNER_LAYOUT = Object.create(null);
+  let catalogReady = false;
 
-  /** Per-banner crop/scrim tuning (logo-left layouts, etc.). */
-  const BANNER_LAYOUT = {
-    'banner28.jpg': {
-      position: '50% 48%',
-      positionMobile: '68% center',
-      scrim:
-        'linear-gradient(105deg,rgba(8,16,40,.1) 0%,rgba(8,16,40,.35) 42%,rgba(8,16,40,.52) 100%)',
-    },
-    'banner30.jpg': {
-      position: '50% 45%',
-      positionMobile: '50% 42%',
-      scrim:
-        'linear-gradient(to right,rgba(8,16,40,.42) 0%,rgba(8,16,40,.18) 48%,rgba(8,16,40,.28) 100%)',
-    },
-    'banner31.jpg': {
-      position: '50% 48%',
-      positionMobile: '50% 45%',
-      scrim:
-        'linear-gradient(to right,rgba(20,8,12,.45) 0%,rgba(20,8,12,.2) 50%,rgba(20,8,12,.32) 100%)',
-    },
-    // Arabic calligraphy — centered; no scrim (avoids leftover ::before square on light banners)
-    'banner32.jpg': {
-      position: '50% 50%',
-      positionMobile: '50% 50%',
-    },
-    'banner33.jpg': {
-      position: '50% 50%',
-      positionMobile: '50% 50%',
-    },
-    'banner34.jpg': {
-      position: '50% 50%',
-      positionMobile: '50% 50%',
-    },
-    'banner35.jpg': {
-      position: '50% 50%',
-      positionMobile: '50% 50%',
-    },
-    'banner36.jpg': {
-      position: '50% 50%',
-      positionMobile: '50% 50%',
-    },
-    // Earth sunrise — bright sun left; keep horizon centered
-    'banner37.jpg': {
-      position: '50% 55%',
-      positionMobile: '50% 52%',
-      scrim:
-        'linear-gradient(to right,rgba(8,16,40,.55) 0%,rgba(8,16,40,.22) 45%,rgba(8,16,40,.35) 100%)',
-    },
-    // Blue geometric — dark left area for logo/text
-    'banner38.jpg': {
-      position: 'left center',
-      positionMobile: '20% center',
-      scrim:
-        'linear-gradient(to right,rgba(8,16,40,.35) 0%,rgba(8,16,40,.12) 42%,rgba(8,16,40,.25) 100%)',
-    },
-  };
+  function getStore() {
+    return typeof window !== 'undefined' ? window.RosterBannerStore : null;
+  }
+
+  function syncCatalogFromStore() {
+    const store = getStore();
+    if (!store) return false;
+    availableBanners = store.getBanners();
+    BANNER_LAYOUT = store.getLayouts();
+    catalogReady = true;
+    return true;
+  }
+
+  async function ensureCatalog() {
+    const store = getStore();
+    if (store) {
+      try {
+        await store.loadCatalog();
+        syncCatalogFromStore();
+        return true;
+      } catch (e) {}
+    }
+    try {
+      const res = await fetch(BANNERS_PATH + 'manifest.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        availableBanners = Array.isArray(json.banners) ? json.banners.slice() : [];
+        BANNER_LAYOUT = json.layouts && typeof json.layouts === 'object' ? json.layouts : {};
+        catalogReady = true;
+        return true;
+      }
+    } catch (e) {}
+    return catalogReady;
+  }
+
+  function bannerIsListed(name) {
+    return availableBanners.indexOf(name) !== -1;
+  }
 
   function getBannerPosition(name) {
     const layout = BANNER_LAYOUT[name];
@@ -127,7 +87,27 @@
   }
 
   function bannerUrl(name) {
+    const store = getStore();
+    if (store && store.isCustomName && store.isCustomName(name)) return '';
     return BANNERS_PATH + name;
+  }
+
+  async function resolveBannerPaintUrl(name) {
+    const store = getStore();
+    if (store) {
+      const url = await store.resolveBannerUrl(name);
+      if (url) return withLiveQuery(url, name);
+    }
+    return withLiveQuery(BANNERS_PATH + name, name);
+  }
+
+  function withLiveQuery(url, name) {
+    if (!url || String(url).indexOf('data:') === 0) return url;
+    if (isIOSDevice()) return url;
+    var token = String(name || '')
+      .replace(/\.jpg$/i, '')
+      .replace(/[^a-z0-9-]+/gi, '-');
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'live=' + encodeURIComponent(token);
   }
 
   function warmBannerCache(url) {
@@ -290,7 +270,7 @@
     const name = localStorage.getItem(BANNER_KEY) || null;
     if (!name || !BANNER_NAME_RE.test(name)) return null;
     // Drop deleted/missing choices so iOS doesn't keep requesting a 404 image.
-    if (availableBanners.indexOf(name) === -1) {
+    if (!bannerIsListed(name)) {
       try {
         localStorage.removeItem(BANNER_KEY);
       } catch (_) {}
@@ -308,14 +288,13 @@
     return Array.from(document.querySelectorAll('.header, .topbar'));
   }
 
-  function bannerLiveUrl(name) {
-    return bannerUrl(name) + '?live=' + encodeURIComponent(name.replace(/\.jpg$/i, ''));
+  function bannerLiveUrl(name, resolvedUrl) {
+    var base = resolvedUrl || bannerUrl(name);
+    return withLiveQuery(base, name);
   }
 
-  function bannerPaintUrl(name) {
-    // Avoid cache-busting query on iOS — it often breaks CSS background paint/cache.
-    if (isIOSDevice()) return bannerUrl(name);
-    return bannerLiveUrl(name);
+  function bannerPaintUrl(name, resolvedUrl) {
+    return bannerLiveUrl(name, resolvedUrl);
   }
 
   function forceBannerRepaint(targets) {
@@ -387,9 +366,8 @@
     return img;
   }
 
-  function syncEarlyBannerStyle(name) {
-    if (!name) return;
-    const url = bannerPaintUrl(name);
+  function syncEarlyBannerStyle(name, url) {
+    if (!name || !url) return;
     const pos = getBannerPosition(name);
     const prev = document.getElementById('banner-early-style');
     if (prev) prev.remove();
@@ -424,8 +402,7 @@
     if (preload) preload.href = url;
   }
 
-  function paintBannerOnTargets(targets, name) {
-    const url = bannerPaintUrl(name);
+  function paintBannerOnTargets(targets, name, url) {
     const pos = getBannerPosition(name);
     const ios = isIOSDevice();
     targets.forEach(function (el) {
@@ -449,19 +426,21 @@
   function applyBanner(name) {
     const targets = getBannerTargets();
     if (!targets.length) return;
-    const url = bannerUrl(name);
-    syncEarlyBannerStyle(name);
-    paintBannerOnTargets(targets, name);
-    setCustomBannerActive(true);
-    warmBannerCache(url);
-    requestAnimationFrame(function () {
-      forceBannerRepaint(targets);
-      // iOS sometimes paints blank until a second pass after layout.
-      if (isIOSDevice()) {
-        setTimeout(function () {
-          paintBannerOnTargets(targets, name);
-        }, 120);
-      }
+    resolveBannerPaintUrl(name).then(function (url) {
+      if (!url) return;
+      syncEarlyBannerStyle(name, url);
+      paintBannerOnTargets(targets, name, url);
+      setCustomBannerActive(true);
+      var cacheUrl = bannerUrl(name);
+      if (cacheUrl) warmBannerCache(cacheUrl);
+      requestAnimationFrame(function () {
+        forceBannerRepaint(targets);
+        if (isIOSDevice()) {
+          setTimeout(function () {
+            paintBannerOnTargets(targets, name, url);
+          }, 120);
+        }
+      });
     });
   }
 
@@ -544,18 +523,30 @@
     };
   }
 
-  function loadPickerThumb(img, src) {
+  function loadPickerThumb(img, name) {
     if (img.dataset.loaded === '1') return;
     img.dataset.loaded = '1';
-    img.src = src;
+    resolveBannerPaintUrl(name).then(function (src) {
+      if (src) img.src = src;
+    });
   }
 
   function bannerNumberLabel(name) {
+    const store = getStore();
+    if (store) return store.bannerLabel(name);
     const m = String(name || '').match(/banner(\d+)\.jpg/i);
     return m ? m[1] : '';
   }
 
   function showBannerPicker() {
+    if (document.getElementById('banner-picker')) return;
+
+    ensureCatalog().finally(function () {
+      openBannerPickerSheet();
+    });
+  }
+
+  function openBannerPickerSheet() {
     if (document.getElementById('banner-picker')) return;
 
     const overlay = document.createElement('div');
@@ -612,7 +603,7 @@
         ';transition:border .15s;';
       const img = document.createElement('img');
       img.alt = num ? ('بانر ' + num) : '';
-      img.dataset.src = bannerUrl(name);
+      img.dataset.bannerName = name;
       img.style.cssText = 'width:100%;height:70px;object-fit:cover;display:block;background:#2a2b31;';
       img.onerror = function () {
         wrap.style.display = 'none';
@@ -666,7 +657,7 @@
     });
 
     lazyImgs.forEach(function (img) {
-      loadPickerThumb(img, img.dataset.src);
+      loadPickerThumb(img, img.dataset.bannerName);
     });
 
     document.getElementById('resetBanner').onclick = function () {
@@ -895,16 +886,18 @@
 
   function init() {
     injectReadabilityStyles();
-    const saved = getSavedBanner();
-    if (saved) {
-      applyBanner(saved);
-    } else {
-      // Remove early paint if choice was deleted or invalid (common iOS blank banner).
-      const early = document.getElementById('banner-early-style');
-      if (early) early.remove();
-      document.documentElement.classList.remove(EARLY_CLASS);
-      getBannerTargets().forEach(removeIosBannerLayers);
-    }
+    ensureCatalog().then(function () {
+      injectReadabilityStyles();
+      const saved = getSavedBanner();
+      if (saved) {
+        applyBanner(saved);
+      } else {
+        const early = document.getElementById('banner-early-style');
+        if (early) early.remove();
+        document.documentElement.classList.remove(EARLY_CLASS);
+        getBannerTargets().forEach(removeIosBannerLayers);
+      }
+    });
     createChangerBtn();
     bindHeaderChromeFade();
     var resizeTimer;
