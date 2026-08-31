@@ -655,7 +655,7 @@
       '#bannerGrid{',
       'display:grid!important;',
       'grid-template-columns:repeat(3,minmax(0,1fr))!important;',
-      'gap:6px!important;',
+      'gap:8px!important;',
       '}',
       '#bannerGrid .banner-picker-item{',
       'touch-action:pan-y!important;',
@@ -663,7 +663,7 @@
       'user-select:none!important;',
       '}',
       '#bannerGrid .banner-picker-item img{',
-      'height:52px!important;',
+      'height:78px!important;',
       'pointer-events:none!important;',
       '}',
       '#bannerChromeFadeSettings{',
@@ -776,7 +776,7 @@
         '<span style="color:#f5ead8;font-size:14px;font-weight:700;">اختر خلفية الهيدر</span>' +
         '<button type="button" id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;">✕</button>' +
       '</div>' +
-      '<div id="bannerGrid"></div>' +
+      '<div id="bannerGrid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;"></div>' +
       '<button type="button" id="resetBanner" style="margin-top:10px;width:100%;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;color:#b8a57a;background:rgba(255,255,255,0.05);">إعادة الخلفية الافتراضية</button>';
 
     overlay.appendChild(sheet);
@@ -798,7 +798,7 @@
       const img = document.createElement('img');
       img.alt = num ? ('بانر ' + num) : '';
       img.dataset.bannerName = name;
-      img.style.cssText = 'width:100%;height:52px;object-fit:cover;display:block;background:#2a2b31;';
+      img.style.cssText = 'width:100%;height:78px;object-fit:cover;display:block;background:#2a2b31;';
       img.onerror = function () {
         wrap.style.display = 'none';
       };
