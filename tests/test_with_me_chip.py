@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260830wm67" in html
+    assert "with-me.js?v=20260830wm68" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -194,10 +194,10 @@ def test_with_me_page_exists():
     assert "shift-strip-dragging" in src
     assert "renderDay(iso, '')" in src
     assert "track.innerHTML" in src[src.find("function setLoading") : src.find("function restQuoteIndex")]
-    assert "paintShiftPin" in src
     assert "nearestShiftDay" in src
-    assert "shiftDayPin" in html
-    assert "height: calc(var(--day-h) + 12px)" in html
+    assert "shiftDayPin" not in html
+    assert "paintShiftPin" not in src
+    assert "height: calc(var(--day-active-h) + 12px)" in html
     assert "touch-action: none" in html
     assert "shiftDay" in src
     assert "--day-w: 40px" in html
@@ -211,7 +211,7 @@ def test_with_me_page_exists():
     assert "--day-active-w: 68px" in html
     assert "width: var(--day-w)" in html
     assert "width: var(--day-active-w)" in html
-    assert ".shiftDayPin .shiftDayNum" in html
+    assert ".shiftDay.is-active .shiftDayNum" in html
     assert "font-size: 24px" in html
     assert "font-size: 13px" in html
     assert "opacity: .78" in html
