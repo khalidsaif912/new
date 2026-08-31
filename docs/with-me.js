@@ -83,7 +83,9 @@
       sickLeave: 'Sick Leave',
       training: 'Training',
       standby: 'Standby',
-      other: 'Other'
+      other: 'Other',
+      secretPrompt: 'This account is protected. Enter the secret PIN to continue:',
+      secretBad: 'Incorrect secret PIN.'
     },
     ar: {
       titleMain: 'معي',
@@ -125,7 +127,9 @@
       sickLeave: 'إجازة مرضية',
       training: 'تدريب',
       standby: 'احتياط',
-      other: 'أخرى'
+      other: 'أخرى',
+      secretPrompt: 'هذا الحساب محمي. أدخل الرقم السري للمتابعة:',
+      secretBad: 'الرقم السري غير صحيح.'
     }
   };
 
@@ -487,7 +491,27 @@
     }
   }
 
+  function isProtectedEmpId(id) {
+    return !!(window.rosterEmpIdGate && window.rosterEmpIdGate.isProtectedEmpId
+      && window.rosterEmpIdGate.isProtectedEmpId(id));
+  }
+
+  function confirmProtectedSave(id) {
+    if (!isProtectedEmpId(id)) return true;
+    var secret = window.prompt(t('secretPrompt'));
+    if (secret == null) return false;
+    var ok = window.rosterEmpIdGate && window.rosterEmpIdGate.checkEmpSecret
+      ? window.rosterEmpIdGate.checkEmpSecret(secret)
+      : false;
+    if (!ok) {
+      window.alert(t('secretBad'));
+      return false;
+    }
+    return true;
+  }
+
   function saveEmp(id, name, dept) {
+    if (!confirmProtectedSave(id)) return false;
     try {
       localStorage.setItem('savedEmpId', id);
       if (usesImportRoster(dept)) {
@@ -501,6 +525,7 @@
         }
       }
     } catch (e) {}
+    return true;
   }
 
   function readLang() {
@@ -1495,7 +1520,7 @@
       var name = row.getAttribute('data-name') || '';
       var dept = row.getAttribute('data-dept') || '';
       if (!id) return;
-      saveEmp(id, name, dept);
+      if (!saveEmp(id, name, dept)) return;
       startForEmployee(id);
     });
     document.addEventListener('keydown', function (e) {

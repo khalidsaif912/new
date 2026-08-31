@@ -1300,7 +1300,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/emp-contact.js?v=20260730b');
-  addScript(root + '/emp-id-gate.js?v=20260730a');
+  addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
@@ -1336,7 +1336,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     document.body.appendChild(s);
   }
   addScript(root + '/emp-contact.js?v=20260730b');
-  addScript(root + '/emp-id-gate.js?v=20260730a');
+  addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
