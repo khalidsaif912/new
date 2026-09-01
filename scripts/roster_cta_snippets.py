@@ -1251,6 +1251,8 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/emp-contact.js?v=20260730b');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
+  addScript(root + '/banner-store.js?v=20260831g');
+  addScript(root + '/banner-changer.js?v=20260901f');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -1263,8 +1265,6 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-store.js?v=20260831g');
-    addScript(root + '/banner-changer.js?v=20260831j');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });

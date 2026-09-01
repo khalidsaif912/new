@@ -5,6 +5,7 @@
   const BANNER_KEY = 'roster_banner_choice';
   const BANNER_TINT_KEY = 'rosterBannerPageTintV1';
   const BG_BEFORE_BANNER_KEY = 'rosterBgBeforeBannerV1';
+  const PAINT_CACHE_KEY = 'roster_banner_paint_cache';
   const ACTIVE_CLASS = 'has-custom-banner';
   const EARLY_CLASS = 'roster-banner-early';
   const TEXT_HALO =
@@ -41,6 +42,30 @@
   let availableBanners = [];
   let BANNER_LAYOUT = Object.create(null);
   let catalogReady = false;
+  let lastPainted = { name: '', url: '' };
+
+  function savePaintCache(name, url, pos) {
+    if (!name || !url) return;
+    try {
+      sessionStorage.setItem(
+        PAINT_CACHE_KEY,
+        JSON.stringify({ name: name, url: url, pos: pos || getBannerPosition(name) })
+      );
+    } catch (_) {}
+  }
+
+  function readPaintCache() {
+    try {
+      return JSON.parse(sessionStorage.getItem(PAINT_CACHE_KEY) || 'null');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function urlsMatch(a, b) {
+    if (!a || !b) return false;
+    return String(a).replace(/\?.*$/, '') === String(b).replace(/\?.*$/, '');
+  }
 
   function getStore() {
     return typeof window !== 'undefined' ? window.RosterBannerStore : null;
@@ -526,9 +551,15 @@
       '.' + ACTIVE_CLASS + ' .dateTag-icon svg{',
       'filter:' + DATE_TAG_ICON_FILTER + '!important;',
       '}',
+      '.header.homeDateSplit.' + ACTIVE_CLASS + '{',
+      'padding:26px 18px 52px!important;',
+      '}',
       '@media (max-width:480px){',
-      '.header.' + ACTIVE_CLASS + ',.topbar.' + ACTIVE_CLASS + '{',
+      '.header.' + ACTIVE_CLASS + ':not(.homeDateSplit),.topbar.' + ACTIVE_CLASS + '{',
       'padding:26px 18px 24px!important;',
+      '}',
+      '.header.homeDateSplit.' + ACTIVE_CLASS + '{',
+      'padding:26px 18px 52px!important;',
       '}',
       '.' + ACTIVE_CLASS + ' .bannerTitleMain{',
       'font-size:28px!important;',
@@ -686,9 +717,19 @@
     if (!name || !url) return;
     const pos = getBannerPosition(name);
     const prev = document.getElementById('banner-early-style');
+    if (
+      prev &&
+      prev.getAttribute('data-banner-url') === url &&
+      prev.getAttribute('data-banner-pos') === pos
+    ) {
+      document.documentElement.classList.add(EARLY_CLASS);
+      return;
+    }
     if (prev) prev.remove();
     const early = document.createElement('style');
     early.id = 'banner-early-style';
+    early.setAttribute('data-banner-url', url);
+    early.setAttribute('data-banner-pos', pos);
     early.textContent =
       'html.' +
       EARLY_CLASS +
@@ -708,6 +749,9 @@
       ' .header::after,html.' +
       EARLY_CLASS +
       ' .topbar::after{content:none!important;opacity:0!important;display:none!important}' +
+      'html.' +
+      EARLY_CLASS +
+      ' .header.homeDateSplit{padding:26px 18px 52px!important}' +
       '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit;opacity:0}' +
       '.roster-banner-ios-img.is-ready{opacity:1}' +
       '.header.has-custom-banner > :not(.roster-banner-ios-img),' +
@@ -739,25 +783,41 @@
     });
   }
 
-  function applyBanner(name) {
+  function applyBanner(name, opts) {
+    opts = opts || {};
     const targets = getBannerTargets();
     if (!targets.length) return;
-    resolveBannerPaintUrl(name).then(function (url) {
+
+    function commitPaint(url, allowSkip) {
       if (!url) return;
+      const alreadyPainted =
+        lastPainted.name === name && urlsMatch(lastPainted.url, url);
+      if (allowSkip && alreadyPainted) return;
+
       syncEarlyBannerStyle(name, url);
-      paintBannerOnTargets(targets, name, url);
+      if (!alreadyPainted) {
+        paintBannerOnTargets(targets, name, url);
+      }
       setCustomBannerActive(true);
       applyPageTintFromBanner(name, url);
+      savePaintCache(name, url, getBannerPosition(name));
+      lastPainted = { name: name, url: url };
       var cacheUrl = bannerUrl(name);
       if (cacheUrl) warmBannerCache(cacheUrl);
-      requestAnimationFrame(function () {
-        forceBannerRepaint(targets);
-        if (isIOSDevice()) {
-          setTimeout(function () {
-            paintBannerOnTargets(targets, name, url);
-          }, 120);
-        }
-      });
+      if (!alreadyPainted && isIOSDevice()) {
+        setTimeout(function () {
+          paintBannerOnTargets(targets, name, url);
+        }, 120);
+      }
+    }
+
+    const cached = readPaintCache();
+    if (cached && cached.name === name && cached.url) {
+      commitPaint(cached.url, false);
+    }
+
+    resolveBannerPaintUrl(name).then(function (url) {
+      commitPaint(url, true);
     });
   }
 
@@ -1309,21 +1369,28 @@
   }
 
   function init() {
+    injectReadabilityStyles();
     // Restore from localStorage immediately (before catalog) so a refresh
     // never flashes the default header while the catalog loads.
     try {
       var earlySaved = localStorage.getItem(BANNER_KEY);
       if (earlySaved && BANNER_NAME_RE.test(earlySaved)) {
+        if (document.documentElement.classList.contains(EARLY_CLASS)) {
+          setCustomBannerActive(true);
+          var paintCache = readPaintCache();
+          if (paintCache && paintCache.name === earlySaved && paintCache.url) {
+            lastPainted = { name: earlySaved, url: paintCache.url };
+          }
+        }
         applyBanner(earlySaved);
       }
     } catch (e) {}
-    injectReadabilityStyles();
     ensureCatalog(true).then(function () {
       injectReadabilityStyles();
       purgeSavedBannerIfRemoved();
       const saved = getSavedBanner();
       if (saved) {
-        applyBanner(saved);
+        applyBanner(saved, { fromCatalog: true });
       } else {
         const early = document.getElementById('banner-early-style');
         if (early) early.remove();

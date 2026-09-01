@@ -179,6 +179,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     /* Date — with-me split layout (homepage trial) */
     .header.homeDateSplit {
       padding-bottom:52px;
+      min-height:168px;
     }
     .header.homeDateSplit .datePickerWrapper {
       position:relative;
@@ -2608,7 +2609,7 @@ function goToRosterDiff(event) {
     addScript(root + '/holiday-ticker.js?v=20260803k');
     addScript(root + '/feature-update-badge.js?v=20260726d');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=20260901d');
+    addScript(root + '/banner-changer.js?v=20260901f');
 }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });

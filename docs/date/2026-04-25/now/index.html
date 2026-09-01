@@ -183,6 +183,7 @@
     /* Date — with-me split layout (homepage trial) */
     .header.homeDateSplit {
       padding-bottom:52px;
+      min-height:168px;
     }
     .header.homeDateSplit .datePickerWrapper {
       position:relative;
@@ -1442,25 +1443,40 @@
     } catch (swIosErr) {}
     try {{
       var bn = localStorage.getItem('roster_banner_choice');
-      if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
-        var bUrl = base + 'assets/banners/' + bn;
-        if (!document.getElementById('banner-early-style')) {{
-          var bes = document.createElement('style');
-          bes.id = 'banner-early-style';
-          bes.textContent =
-            'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
-            'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
-          document.head.appendChild(bes);
+      var paintRe = /^(banner\d+\.jpg|custom:[a-z0-9]{{8,32}})$/i;
+      if (bn && paintRe.test(bn)) {{
+        var bUrl = '';
+        var bPos = '62% center';
+        try {{
+          var cached = JSON.parse(sessionStorage.getItem('roster_banner_paint_cache') || 'null');
+          if (cached && cached.name === bn && cached.url) {{
+            bUrl = cached.url;
+            if (cached.pos) bPos = cached.pos;
+          }}
+        }} catch (cacheErr) {{}}
+        if (!bUrl && /^banner\d+\.jpg$/i.test(bn)) {{
+          bUrl = base + 'assets/banners/' + bn;
         }}
-        if (!document.querySelector('link[data-banner-preload="1"]')) {{
-          var bp = document.createElement('link');
-          bp.rel = 'preload';
-          bp.as = 'image';
-          bp.href = bUrl;
-          bp.setAttribute('data-banner-preload', '1');
-          document.head.appendChild(bp);
+        if (bUrl) {{
+          if (!document.getElementById('banner-early-style')) {{
+            var bes = document.createElement('style');
+            bes.id = 'banner-early-style';
+            bes.textContent =
+              'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + bPos + '!important;background-repeat:no-repeat!important}}' +
+              'html.roster-banner-early .header::before,html.roster-banner-early .header::after,html.roster-banner-early .topbar::before,html.roster-banner-early .topbar::after{{content:none!important;opacity:0!important;display:none!important}}' +
+              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 52px!important}}';
+            document.head.appendChild(bes);
+          }}
+          if (!document.querySelector('link[data-banner-preload="1"]')) {{
+            var bp = document.createElement('link');
+            bp.rel = 'preload';
+            bp.as = 'image';
+            bp.href = bUrl;
+            bp.setAttribute('data-banner-preload', '1');
+            document.head.appendChild(bp);
+          }}
+          document.documentElement.classList.add('roster-banner-early');
         }}
-        document.documentElement.classList.add('roster-banner-early');
       }}
     }} catch (bannerEarlyErr) {{}}
   }})();
@@ -3680,7 +3696,7 @@ function goToRosterDiff(event) {
     addScript(root + '/holiday-ticker.js?v=20260803k');
     addScript(root + '/feature-update-badge.js?v=20260726d');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=20260901d');
+    addScript(root + '/banner-changer.js?v=20260901f');
 }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
