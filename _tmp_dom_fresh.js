@@ -1,0 +1,11 @@
+const fs = require('fs');
+const path = process.env.TEMP + '/dom-fresh.html';
+const d = fs.readFileSync(path, 'utf8');
+console.log('len', d.length);
+const i = d.indexOf('<body');
+console.log(d.slice(i, i + 300));
+console.log('is-open el', /id="ideasPromptSheetInline" class="is-open"/.test(d));
+console.log('ideas idx', d.indexOf('ideasPromptSheetInline'));
+console.log('visitsFloat', d.includes('visitsFloatDock'));
+console.log('chg-card', d.includes('chg-card'));
+console.log('V6 source', d.includes('rosterIdeasDoneV6'));

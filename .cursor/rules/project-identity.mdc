@@ -1,0 +1,18 @@
+---
+description: roster-site identity — do not rediscover this project from scratch
+alwaysApply: true
+---
+
+# roster-site
+
+This workspace is **roster-site**: a Python 3.10+ local roster generator and static site publisher. The site lives in `docs/`.
+
+- Export (الصادر): `generate_and_send.py` → `docs/`
+- Import (الوارد): `generate_and_send_import.py` → `docs/import/`
+- Local preview: `powershell -ExecutionPolicy Bypass -File .\scripts\serve_docs.ps1` (port 8011)
+- Open: http://127.0.0.1:8011/
+- Longer notes: `README.md`, `PROJECT_CONTEXT.md`, `docs/PROJECT_LAYOUT.md`
+
+When asked to open the site locally: reuse port 8011 if it already serves `docs/`; otherwise start `scripts/serve_docs.ps1`, then open the URL.
+
+Do not push unless explicitly asked. Prefer archive over delete for legacy files.

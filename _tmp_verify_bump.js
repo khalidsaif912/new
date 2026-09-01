@@ -1,0 +1,10 @@
+const fs = require('fs');
+const h = fs.readFileSync('docs/home.html', 'utf8');
+const m = h.match(/<title>[^<]+/);
+console.log('title', JSON.stringify(m && m[0]));
+const s = fs.readFileSync('docs/site-visits.js', 'utf8');
+console.log('ensureIdeas', s.includes('ensureIdeasPrompt'));
+const im = s.match(/ideas-prompt\.js\?v=[^'"]+/);
+console.log('ideas ref', im && im[0]);
+const date = fs.readFileSync('docs/date/2026-08-07/index.html', 'utf8');
+console.log('date site-visits', (date.match(/site-visits\.js\?v=[^'"]+/) || [])[0]);

@@ -447,7 +447,7 @@
       '}',
       '.' + ACTIVE_CLASS + ' .langToggle,',
       '.' + ACTIVE_CLASS + ' #langToggle{',
-      'position:absolute!important;top:12px!important;right:12px!important;left:auto!important;',
+      'position:absolute!important;bottom:12px!important;top:auto!important;right:12px!important;left:auto!important;',
       'width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;',
       'padding:4px!important;font-size:0!important;line-height:1!important;z-index:30!important;',
       'color:#fff!important;background:transparent!important;border:none!important;',
@@ -464,7 +464,7 @@
       'body.ar .' + ACTIVE_CLASS + ' .langToggle,',
       'body.ar .' + ACTIVE_CLASS + ' #langToggle{right:12px!important;left:auto!important;}',
       '#banner-changer-btn{',
-      'position:absolute!important;top:12px!important;left:12px!important;right:auto!important;z-index:30!important;',
+      'position:absolute!important;bottom:12px!important;top:auto!important;left:12px!important;right:auto!important;z-index:30!important;',
       'min-width:0!important;min-height:0!important;padding:4px!important;',
       'background:transparent!important;border:none!important;border-radius:0!important;',
       'box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;',
@@ -773,7 +773,8 @@
       '</svg></span>';
     btn.style.cssText = [
       'position:absolute',
-      'top:12px',
+      'bottom:12px',
+      'top:auto',
       'left:12px',
       'z-index:80',
       'background:transparent',

@@ -231,7 +231,7 @@ LANG_TOGGLE_HTML = (
     '</button>'
 )
 LANG_TOGGLE_CSS = r"""    .langToggle {
-      position:absolute; top:12px; right:12px; z-index:30;
+      position:absolute; bottom:12px; top:auto; right:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
       min-width:auto; height:auto; padding:4px;
       display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
@@ -253,7 +253,7 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
       text-shadow:0 1px 3px rgba(0,0,0,.65);
     }
     #banner-changer-btn {
-      position:absolute; top:12px; left:12px; z-index:30;
+      position:absolute; bottom:12px; top:auto; left:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
       min-width:auto; min-height:auto; padding:4px;
       color:#fff; cursor:pointer; line-height:0;
@@ -269,10 +269,10 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
     }
     body.ar #banner-changer-btn { left:12px; right:auto; }
     @media (max-width:720px) {
-      .langToggle { padding:6px; }
+      .langToggle { padding:6px; min-width:44px; min-height:44px; }
       .langToggle-icon svg { width:20px; height:20px; }
       .langToggle-label { font-size:11px; }
-      #banner-changer-btn { padding:6px; }
+      #banner-changer-btn { padding:6px; min-width:44px; min-height:44px; }
       #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
     }
 """

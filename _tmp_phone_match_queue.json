@@ -1,0 +1,2327 @@
+{
+  "summary": {
+    "contacts_total": 1388,
+    "named_contacts": 1087,
+    "employees": 81,
+    "with_ar_name": 79,
+    "mantle_phones": 0,
+    "candidate_matches": 73,
+    "new": 73,
+    "already_same": 0,
+    "already_other": 0
+  },
+  "queue": [
+    {
+      "contact": {
+        "row": 206,
+        "raw_name": "⭐ علي الفارسي B && @",
+        "name": "علي الفارسي B && @",
+        "phone": "96899433081",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.76",
+        "tokens:الفارسي,علي"
+      ],
+      "emp": {
+        "id": "81393",
+        "en": "Ali Al Farsi",
+        "ar": "علي الفارسي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "990465",
+          "en": "Abdulfatah Al Shukeili",
+          "ar": "عبدالفتاح الشكيلي"
+        },
+        {
+          "score": 0.9,
+          "id": "82645",
+          "en": "Abdullah Al Shukeili",
+          "ar": "عبدالله الشكيلي"
+        },
+        {
+          "score": 0.9,
+          "id": "81832",
+          "en": "Ahmed Al Bakari",
+          "ar": "أحمد البكري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 232,
+        "raw_name": "🌹محمد العامري❤️",
+        "name": "محمد العامري❤",
+        "phone": "96897799179",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.96",
+        "tokens:العامري,محمد"
+      ],
+      "emp": {
+        "id": "81224",
+        "en": "Mohamed Al Amri",
+        "ar": "محمد العامري",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 1.05,
+          "id": "81404",
+          "en": "Mohamed Al Amri",
+          "ar": "محمد العامري"
+        },
+        {
+          "score": 0.88,
+          "id": "82674",
+          "en": "Mohamed Al Mamari",
+          "ar": "محمد المعمري"
+        },
+        {
+          "score": 0.875,
+          "id": "990737",
+          "en": "Said Al Amri",
+          "ar": "سعيد العامري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 567,
+        "raw_name": "أحمد الهاشمي",
+        "name": "أحمد الهاشمي",
+        "phone": "96896665900",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:احمد,الهاشمي"
+      ],
+      "emp": {
+        "id": "82616",
+        "en": "Ahmed Al Hashmi",
+        "ar": "أحمد الهاشمي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "82659",
+          "en": "Ammar Al Hashmi",
+          "ar": "عمار الهاشمي"
+        },
+        {
+          "score": 0.75,
+          "id": "82283",
+          "en": "Ahmed Al Mawali",
+          "ar": "أحمد المعولي"
+        },
+        {
+          "score": 0.75,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 726,
+        "raw_name": "سالم المسروري",
+        "name": "سالم المسروري",
+        "phone": "96899468152",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:المسروري,سالم"
+      ],
+      "emp": {
+        "id": "8926",
+        "en": "Salim Al Masroori",
+        "ar": "سالم المسروري",
+        "dept": "Officers"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "8542",
+          "en": "Salim Harrasi",
+          "ar": "سالم الحراصي"
+        },
+        {
+          "score": 0.725,
+          "id": "8722",
+          "en": "Salim Sulieman",
+          "ar": "سالم سليمان"
+        },
+        {
+          "score": 0.72,
+          "id": "82464",
+          "en": "Wissam Al Kharusi",
+          "ar": "وسام الخروصي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 884,
+        "raw_name": "رعد الفارسي",
+        "name": "رعد الفارسي",
+        "phone": "96899017045",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الفارسي,رعد"
+      ],
+      "emp": {
+        "id": "82578",
+        "en": "Raad Al Farsi",
+        "ar": "رعد الفارسي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "81393",
+          "en": "Ali Al Farsi",
+          "ar": "علي الفارسي"
+        },
+        {
+          "score": 0.875,
+          "id": "82615",
+          "en": "Rashid Al Farsi",
+          "ar": "راشد الفارسي"
+        },
+        {
+          "score": 0.783,
+          "id": "8744",
+          "en": "Said Al Fahkri",
+          "ar": "سعيد الفاخري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 892,
+        "raw_name": "رياض الجابري",
+        "name": "رياض الجابري",
+        "phone": "96899105040",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الجابري,رياض"
+      ],
+      "emp": {
+        "id": "82555",
+        "en": "Riyahd Al Jabri",
+        "ar": "رياض الجابري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "82424",
+          "en": "Riyadh Al Sulti",
+          "ar": "رياض الصلتي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 910,
+        "raw_name": "سالم سليمان",
+        "name": "سالم سليمان",
+        "phone": "96892245548",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:سالم,سليمان"
+      ],
+      "emp": {
+        "id": "8722",
+        "en": "Salim Sulieman",
+        "ar": "سالم سليمان",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "8542",
+          "en": "Salim Harrasi",
+          "ar": "سالم الحراصي"
+        },
+        {
+          "score": 0.725,
+          "id": "8926",
+          "en": "Salim Al Masroori",
+          "ar": "سالم المسروري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 998,
+        "raw_name": "طلال البلوشي",
+        "name": "طلال البلوشي",
+        "phone": "96892613336",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:البلوشي,طلال"
+      ],
+      "emp": {
+        "id": "81300",
+        "en": "Talal Al Balushi",
+        "ar": "طلال البلوشي",
+        "dept": "Supervisors"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1011,
+        "raw_name": "عادل العريمي",
+        "name": "عادل العريمي",
+        "phone": "96899618585",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:العريمي,عادل"
+      ],
+      "emp": {
+        "id": "8941",
+        "en": "Adil Al Oraimi",
+        "ar": "عادل العريمي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "8584",
+          "en": "Adil Al Zadjali",
+          "ar": "عادل الزدجالي"
+        },
+        {
+          "score": 0.725,
+          "id": "81392",
+          "en": "Adil Al Balushi",
+          "ar": "عادل البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1070,
+        "raw_name": "علي بن يوسف البلوشي",
+        "name": "علي بن يوسف البلوشي",
+        "phone": "96898997288",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-fuzzy:0.91",
+        "tokens:البلوشي,علي,يوسف"
+      ],
+      "emp": {
+        "id": "990752",
+        "en": "Ali Yousuf Al Balushi",
+        "ar": "علي يوسف البلوشي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.933,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82656",
+          "en": "Faisal Al Balushi",
+          "ar": "فيصل البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1088,
+        "raw_name": "عيسى الضوياني",
+        "name": "عيسى الضوياني",
+        "phone": "96892675996",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الضوياني,عيسي"
+      ],
+      "emp": {
+        "id": "8647",
+        "en": "Issa Al Douyani",
+        "ar": "عيسى الضوياني",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1097,
+        "raw_name": "غيث الحبسي",
+        "name": "غيث الحبسي",
+        "phone": "96899494329",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الحبسي,غيث"
+      ],
+      "emp": {
+        "id": "82439",
+        "en": "Ghaith al Habsi",
+        "ar": "غيث الحبسي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1114,
+        "raw_name": "فيصل البلوشي",
+        "name": "فيصل البلوشي",
+        "phone": "96899279696",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:البلوشي,فيصل"
+      ],
+      "emp": {
+        "id": "82656",
+        "en": "Faisal Al Balushi",
+        "ar": "فيصل البلوشي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1123,
+        "raw_name": "قاسم المقبالي",
+        "name": "قاسم المقبالي",
+        "phone": "96893616400",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:المقبالي,قاسم"
+      ],
+      "emp": {
+        "id": "81409",
+        "en": "Qasim Al Maqbali",
+        "ar": "قاسم المقبالي",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "82673",
+          "en": "Khalifa Al Maqbali",
+          "ar": "خليفة المقبالي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1161,
+        "raw_name": "مازن الحجري",
+        "name": "مازن الحجري",
+        "phone": "96894020668",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الحجري,مازن"
+      ],
+      "emp": {
+        "id": "82547",
+        "en": "Mazin Al Hajri",
+        "ar": "مازن الحجري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "82441",
+          "en": "Mudathir Al Hajri",
+          "ar": "مدثر الحجري"
+        },
+        {
+          "score": 0.725,
+          "id": "81223",
+          "en": "Mazin Al Siyabi",
+          "ar": "مازن السيابي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1201,
+        "raw_name": "محمد الفلاحي",
+        "name": "محمد الفلاحي",
+        "phone": "96899353584",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:الفلاحي,محمد"
+      ],
+      "emp": {
+        "id": "8762",
+        "en": "Mohamed Al Falahi",
+        "ar": "محمد الفلاحي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.8,
+          "id": "82593",
+          "en": "Mohamed Al Kalbani",
+          "ar": "محمد الكلباني"
+        },
+        {
+          "score": 0.783,
+          "id": "82596",
+          "en": "Hamed Al Fulaiti",
+          "ar": "حمد الفليتي"
+        },
+        {
+          "score": 0.75,
+          "id": "81224",
+          "en": "Mohamed Al Amri",
+          "ar": "محمد العامري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1335,
+        "raw_name": "وليد السيابي",
+        "name": "وليد السيابي",
+        "phone": "96892902100",
+        "name_is_phone": false
+      },
+      "score": 1.05,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:1.00",
+        "tokens:السيابي,وليد"
+      ],
+      "emp": {
+        "id": "8611",
+        "en": "Waleed Al Siyabi",
+        "ar": "وليد السيابي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "82672",
+          "en": "Dawood Al Siyabi",
+          "ar": "داود السيابي"
+        },
+        {
+          "score": 0.875,
+          "id": "81223",
+          "en": "Mazin Al Siyabi",
+          "ar": "مازن السيابي"
+        },
+        {
+          "score": 0.875,
+          "id": "81402",
+          "en": "Mohamed Al Siyabi",
+          "ar": "محمد السيابي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 548,
+        "raw_name": "أحمد البكاري",
+        "name": "أحمد البكاري",
+        "phone": "96895779220",
+        "name_is_phone": false
+      },
+      "score": 0.957,
+      "why": [
+        "ar-fuzzy:0.96"
+      ],
+      "emp": {
+        "id": "81832",
+        "en": "Ahmed Al Bakari",
+        "ar": "أحمد البكري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.75,
+          "id": "82616",
+          "en": "Ahmed Al Hashmi",
+          "ar": "أحمد الهاشمي"
+        },
+        {
+          "score": 0.75,
+          "id": "82666",
+          "en": "Mohamed Al Maskari",
+          "ar": "محمد المسكري"
+        },
+        {
+          "score": 0.75,
+          "id": "82661",
+          "en": "Mohamed Al Maskari",
+          "ar": "محمد المسكري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 367,
+        "raw_name": "Dawood Al Siyabi العمل",
+        "name": "Dawood Al Siyabi العمل",
+        "phone": "96891251212",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "en",
+        "tokens:dawood,siyabi"
+      ],
+      "emp": {
+        "id": "82672",
+        "en": "Dawood Al Siyabi",
+        "ar": "داود السيابي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "8611",
+          "en": "Waleed Al Siyabi",
+          "ar": "وليد السيابي"
+        },
+        {
+          "score": 0.817,
+          "id": "81223",
+          "en": "Mazin Al Siyabi",
+          "ar": "مازن السيابي"
+        },
+        {
+          "score": 0.817,
+          "id": "81402",
+          "en": "Mohamed Al Siyabi",
+          "ar": "محمد السيابي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 553,
+        "raw_name": "أحمد الخروصي شفت D",
+        "name": "أحمد الخروصي شفت D",
+        "phone": "96899685443",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "en",
+        "tokens:احمد,الخروصي"
+      ],
+      "emp": {
+        "id": "82575",
+        "en": "Ahmed Al Kharusi",
+        "ar": "أحمد الخروصي",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "990465",
+          "en": "Abdulfatah Al Shukeili",
+          "ar": "عبدالفتاح الشكيلي"
+        },
+        {
+          "score": 0.9,
+          "id": "82645",
+          "en": "Abdullah Al Shukeili",
+          "ar": "عبدالله الشكيلي"
+        },
+        {
+          "score": 0.9,
+          "id": "8584",
+          "en": "Adil Al Zadjali",
+          "ar": "عادل الزدجالي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 558,
+        "raw_name": "أحمد السابعي العمل",
+        "name": "أحمد السابعي العمل",
+        "phone": "96899785321",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:احمد,السابعي"
+      ],
+      "emp": {
+        "id": "82653",
+        "en": "Ahmed Al Sabii",
+        "ar": "أحمد السابعي",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 565,
+        "raw_name": "أحمد المعولي ACP",
+        "name": "أحمد المعولي ACP",
+        "phone": "96898887656",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.86",
+        "tokens:احمد,المعولي"
+      ],
+      "emp": {
+        "id": "82283",
+        "en": "Ahmed Al Mawali",
+        "ar": "أحمد المعولي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 585,
+        "raw_name": "أسعد سعيد العميري",
+        "name": "أسعد سعيد العميري",
+        "phone": "96893652229",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-fuzzy:0.83",
+        "tokens:اسعد,العميري"
+      ],
+      "emp": {
+        "id": "81348",
+        "en": "Assad Al Omairi",
+        "ar": "أسعد العميري",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.759,
+          "id": "990737",
+          "en": "Said Al Amri",
+          "ar": "سعيد العامري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 797,
+        "raw_name": "حبيب البلوشي العمل",
+        "name": "حبيب البلوشي العمل",
+        "phone": "96895894473",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:البلوشي,حبيب"
+      ],
+      "emp": {
+        "id": "82600",
+        "en": "Habib Al Balushi",
+        "ar": "حبيب البلوشي",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 817,
+        "raw_name": "حمد الفليتي العمل",
+        "name": "حمد الفليتي العمل",
+        "phone": "96896223351",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.79",
+        "tokens:الفليتي,حمد"
+      ],
+      "emp": {
+        "id": "82596",
+        "en": "Hamed Al Fulaiti",
+        "ar": "حمد الفليتي",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82468",
+          "en": "Badar Al Fulaiti",
+          "ar": "بدر الفليتي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 871,
+        "raw_name": "خميس الهنائي العمل",
+        "name": "خميس الهنائي العمل",
+        "phone": "96896067273",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:الهنائي,خميس"
+      ],
+      "emp": {
+        "id": "82467",
+        "en": "Khamis Al Hinai",
+        "ar": "خميس الهنائي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82671",
+          "en": "Khalil Al Hinai",
+          "ar": "خليل الهنائي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 980,
+        "raw_name": "صالح العوفي الصادر",
+        "name": "صالح العوفي الصادر",
+        "phone": "96899784050",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.76",
+        "tokens:العوفي,صالح"
+      ],
+      "emp": {
+        "id": "82550",
+        "en": "Saleh Al Aufi",
+        "ar": "صالح العوفي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1009,
+        "raw_name": "عادل البلوشي العمل",
+        "name": "عادل البلوشي العمل",
+        "phone": "96896617055",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:البلوشي,عادل"
+      ],
+      "emp": {
+        "id": "81392",
+        "en": "Adil Al Balushi",
+        "ar": "عادل البلوشي",
+        "dept": "Officers"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.817,
+          "id": "82415",
+          "en": "Ahmed Al Balushi",
+          "ar": "أحمد البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1010,
+        "raw_name": "عادل الزدجالي العمل",
+        "name": "عادل الزدجالي العمل",
+        "phone": "96892500588",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.81",
+        "tokens:الزدجالي,عادل"
+      ],
+      "emp": {
+        "id": "8584",
+        "en": "Adil Al Zadjali",
+        "ar": "عادل الزدجالي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1040,
+        "raw_name": "عبدالله الشكيلي العمل",
+        "name": "عبدالله الشكيلي العمل",
+        "phone": "96877286616",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.83",
+        "tokens:الشكيلي,عبدالله"
+      ],
+      "emp": {
+        "id": "82645",
+        "en": "Abdullah Al Shukeili",
+        "ar": "عبدالله الشكيلي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "990465",
+          "en": "Abdulfatah Al Shukeili",
+          "ar": "عبدالفتاح الشكيلي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1066,
+        "raw_name": "علي المرجبي العمل",
+        "name": "علي المرجبي العمل",
+        "phone": "96895030327",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.79",
+        "tokens:المرجبي,علي"
+      ],
+      "emp": {
+        "id": "82577",
+        "en": "Ali Al Marjubi",
+        "ar": "علي المرجبي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1067,
+        "raw_name": "علي المعمري العمل",
+        "name": "علي المعمري العمل",
+        "phone": "96896384000",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.79",
+        "tokens:المعمري,علي"
+      ],
+      "emp": {
+        "id": "82574",
+        "en": "Ali Al Mamari",
+        "ar": "علي المعمري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82674",
+          "en": "Mohamed Al Mamari",
+          "ar": "محمد المعمري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1163,
+        "raw_name": "مازن السيابي العمل",
+        "name": "مازن السيابي العمل",
+        "phone": "96892335564",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:السيابي,مازن"
+      ],
+      "emp": {
+        "id": "81223",
+        "en": "Mazin Al Siyabi",
+        "ar": "مازن السيابي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82672",
+          "en": "Dawood Al Siyabi",
+          "ar": "داود السيابي"
+        },
+        {
+          "score": 0.817,
+          "id": "8611",
+          "en": "Waleed Al Siyabi",
+          "ar": "وليد السيابي"
+        },
+        {
+          "score": 0.817,
+          "id": "81402",
+          "en": "Mohamed Al Siyabi",
+          "ar": "محمد السيابي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1247,
+        "raw_name": "مروان بن خلفان الدفاعي",
+        "name": "مروان بن خلفان الدفاعي",
+        "phone": "96896384707",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-fuzzy:0.74",
+        "tokens:الدفاعي,مروان"
+      ],
+      "emp": {
+        "id": "82437",
+        "en": "Marwan Al Difai",
+        "ar": "مروان الدفاعي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1333,
+        "raw_name": "وسام الخروصي العمل",
+        "name": "وسام الخروصي العمل",
+        "phone": "96896961195",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.80",
+        "tokens:الخروصي,وسام"
+      ],
+      "emp": {
+        "id": "82464",
+        "en": "Wissam Al Kharusi",
+        "ar": "وسام الخروصي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82575",
+          "en": "Ahmed Al Kharusi",
+          "ar": "أحمد الخروصي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1341,
+        "raw_name": "وليد ياسر الهدابي",
+        "name": "وليد ياسر الهدابي",
+        "phone": "96899055267",
+        "name_is_phone": false
+      },
+      "score": 0.933,
+      "why": [
+        "ar-fuzzy:0.83",
+        "tokens:الهدابي,وليد"
+      ],
+      "emp": {
+        "id": "80482",
+        "en": "Waleed Al Hadabi",
+        "ar": "وليد الهدابي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 749,
+        "raw_name": "بدر الحكماني",
+        "name": "بدر الحكماني",
+        "phone": "96899038344",
+        "name_is_phone": false
+      },
+      "score": 0.917,
+      "why": [
+        "ar-fuzzy:0.92"
+      ],
+      "emp": {
+        "id": "81307",
+        "en": "Badar Al Hamadani",
+        "ar": "بدر الحمداني",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "82468",
+          "en": "Badar Al Fulaiti",
+          "ar": "بدر الفليتي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1186,
+        "raw_name": "محمد البلوشي",
+        "name": "محمد البلوشي",
+        "phone": "96899283418",
+        "name_is_phone": false
+      },
+      "score": 0.917,
+      "why": [
+        "ar-fuzzy:0.92"
+      ],
+      "emp": {
+        "id": "82415",
+        "en": "Ahmed Al Balushi",
+        "ar": "أحمد البلوشي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        },
+        {
+          "score": 0.875,
+          "id": "82656",
+          "en": "Faisal Al Balushi",
+          "ar": "فيصل البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 181,
+        "raw_name": "⭐ أبو شهاب E",
+        "name": "أبو شهاب E",
+        "phone": "96899200361",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "990465",
+        "en": "Abdulfatah Al Shukeili",
+        "ar": "عبدالفتاح الشكيلي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "82645",
+          "en": "Abdullah Al Shukeili",
+          "ar": "عبدالله الشكيلي"
+        },
+        {
+          "score": 0.9,
+          "id": "81832",
+          "en": "Ahmed Al Bakari",
+          "ar": "أحمد البكري"
+        },
+        {
+          "score": 0.9,
+          "id": "82616",
+          "en": "Ahmed Al Hashmi",
+          "ar": "أحمد الهاشمي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 332,
+        "raw_name": "Al-Kalbani",
+        "name": "Al-Kalbani",
+        "phone": "96876880893",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82593",
+        "en": "Mohamed Al Kalbani",
+        "ar": "محمد الكلباني",
+        "dept": "Supervisors"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 348,
+        "raw_name": "Ammar",
+        "name": "Ammar",
+        "phone": "96891221121",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82659",
+        "en": "Ammar Al Hashmi",
+        "ar": "عمار الهاشمي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 353,
+        "raw_name": "Badar",
+        "name": "Badar",
+        "phone": "96892355646",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82468",
+        "en": "Badar Al Fulaiti",
+        "ar": "بدر الفليتي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "81307",
+          "en": "Badar Al Hamadani",
+          "ar": "بدر الحمداني"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 386,
+        "raw_name": "HAMED ✅",
+        "name": "HAMED",
+        "phone": "96898559985",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82674",
+        "en": "Mohamed Al Mamari",
+        "ar": "محمد المعمري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "82666",
+          "en": "Mohamed Al Maskari",
+          "ar": "محمد المسكري"
+        },
+        {
+          "score": 0.9,
+          "id": "82661",
+          "en": "Mohamed Al Maskari",
+          "ar": "محمد المسكري"
+        },
+        {
+          "score": 0.9,
+          "id": "82658",
+          "en": "Mohamed Al Mazroie",
+          "ar": "محمد المزروعي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 402,
+        "raw_name": "JAA",
+        "name": "JAA",
+        "phone": "96895629605",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "81258",
+        "en": "Jaafar Al Balushi",
+        "ar": "جعفر البلوشي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 410,
+        "raw_name": "Khalid",
+        "name": "Khalid",
+        "phone": "96899209080",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "8715",
+        "en": "Khalid Al Raqadi",
+        "ar": "خالد الرقادي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 458,
+        "raw_name": "Rashid🌹",
+        "name": "Rashid🌹",
+        "phone": "96895645178",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82615",
+        "en": "Rashid Al Farsi",
+        "ar": "راشد الفارسي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 610,
+        "raw_name": "ابراهيم E & B",
+        "name": "ابراهيم E & B",
+        "phone": "96898171771",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82657",
+        "en": "Bushra Al Wahiebi",
+        "ar": "بشرى الوهيبي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 860,
+        "raw_name": "خليفة الريامي HR",
+        "name": "خليفة الريامي HR",
+        "phone": "96892660630",
+        "name_is_phone": false
+      },
+      "score": 0.9,
+      "why": [
+        "en"
+      ],
+      "emp": {
+        "id": "82649",
+        "en": "Saif Al Mahrizi",
+        "ar": "سيف المحرزي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.9,
+          "id": "82657",
+          "en": "Bushra Al Wahiebi",
+          "ar": "بشرى الوهيبي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 49,
+        "raw_name": "~موسى الهادي~",
+        "name": "موسى الهادي",
+        "phone": "96895595856",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-fuzzy:0.73",
+        "tokens:الهادي"
+      ],
+      "emp": {
+        "id": "82565",
+        "en": "Jamal Al Hadi",
+        "ar": "جمال الهادي",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 61,
+        "raw_name": "✅ Sultan Al_Hinai",
+        "name": "Sultan Al Hinai",
+        "phone": "96896568408",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "tokens:hinai"
+      ],
+      "emp": {
+        "id": "82671",
+        "en": "Khalil Al Hinai",
+        "ar": "خليل الهنائي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.875,
+          "id": "82467",
+          "en": "Khamis Al Hinai",
+          "ar": "خميس الهنائي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 90,
+        "raw_name": "✅ سميح المزروعي",
+        "name": "سميح المزروعي",
+        "phone": "96896746272",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-fuzzy:0.85",
+        "tokens:المزروعي"
+      ],
+      "emp": {
+        "id": "82658",
+        "en": "Mohamed Al Mazroie",
+        "ar": "محمد المزروعي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 183,
+        "raw_name": "⭐ أحمد الحراصي",
+        "name": "أحمد الحراصي",
+        "phone": "96892263188",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-fuzzy:0.83",
+        "tokens:الحراصي"
+      ],
+      "emp": {
+        "id": "8542",
+        "en": "Salim Harrasi",
+        "ar": "سالم الحراصي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.833,
+          "id": "82575",
+          "en": "Ahmed Al Kharusi",
+          "ar": "أحمد الخروصي"
+        },
+        {
+          "score": 0.783,
+          "id": "81832",
+          "en": "Ahmed Al Bakari",
+          "ar": "أحمد البكري"
+        },
+        {
+          "score": 0.75,
+          "id": "82616",
+          "en": "Ahmed Al Hashmi",
+          "ar": "أحمد الهاشمي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 552,
+        "raw_name": "أحمد الحسني",
+        "name": "أحمد الحسني",
+        "phone": "96899079294",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-fuzzy:0.73",
+        "tokens:الحسني"
+      ],
+      "emp": {
+        "id": "8930",
+        "en": "Fahim Al Hashni",
+        "ar": "فهيم الحسني",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.783,
+          "id": "82653",
+          "en": "Ahmed Al Sabii",
+          "ar": "أحمد السابعي"
+        },
+        {
+          "score": 0.783,
+          "id": "82548",
+          "en": "Ahmed Al Muqaini",
+          "ar": "أحمد المقيني"
+        },
+        {
+          "score": 0.727,
+          "id": "81832",
+          "en": "Ahmed Al Bakari",
+          "ar": "أحمد البكري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 711,
+        "raw_name": "الفاخري",
+        "name": "الفاخري",
+        "phone": "96892799028",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-substring",
+        "ar-fuzzy:0.74",
+        "tokens:الفاخري"
+      ],
+      "emp": {
+        "id": "8744",
+        "en": "Said Al Fahkri",
+        "ar": "سعيد الفاخري",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 982,
+        "raw_name": "صالح حمد الراشدي الشحن",
+        "name": "صالح حمد الراشدي الشحن",
+        "phone": "96894947994",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "tokens:الراشدي,صالح"
+      ],
+      "emp": {
+        "id": "82546",
+        "en": "Saleh Al Rashdi",
+        "ar": "صالح الراشدي",
+        "dept": "Supervisors"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 987,
+        "raw_name": "صلاح الصبحي",
+        "name": "صلاح الصبحي",
+        "phone": "96899525696",
+        "name_is_phone": false
+      },
+      "score": 0.875,
+      "why": [
+        "ar-fuzzy:0.73",
+        "tokens:الصبحي"
+      ],
+      "emp": {
+        "id": "8714",
+        "en": "Mohana Al Subhi",
+        "ar": "مهنا الصبحي",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 859,
+        "raw_name": "خليفة",
+        "name": "خليفة",
+        "phone": "96899797235",
+        "name_is_phone": false
+      },
+      "score": 0.85,
+      "why": [
+        "ar-substring"
+      ],
+      "emp": {
+        "id": "82673",
+        "en": "Khalifa Al Maqbali",
+        "ar": "خليفة المقبالي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1159,
+        "raw_name": "مارلون",
+        "name": "مارلون",
+        "phone": "96895615957",
+        "name_is_phone": false
+      },
+      "score": 0.85,
+      "why": [
+        "ar-substring"
+      ],
+      "emp": {
+        "id": "80270",
+        "en": "Marlon Esmilla",
+        "ar": "مارلون إسميلا",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1171,
+        "raw_name": "مبارك",
+        "name": "مبارك",
+        "phone": "96899765247",
+        "name_is_phone": false
+      },
+      "score": 0.85,
+      "why": [
+        "ar-substring"
+      ],
+      "emp": {
+        "id": "82114",
+        "en": "Mubarak Al Nofli",
+        "ar": "مبارك النوفلي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1258,
+        "raw_name": "معاذ",
+        "name": "معاذ",
+        "phone": "96871185614",
+        "name_is_phone": false
+      },
+      "score": 0.85,
+      "why": [
+        "ar-substring"
+      ],
+      "emp": {
+        "id": "82534",
+        "en": "Muadh Al Qasim",
+        "ar": "معاذ القاسم",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 209,
+        "raw_name": "⭐ محمد القصابي",
+        "name": "محمد القصابي",
+        "phone": "96898928628",
+        "name_is_phone": false
+      },
+      "score": 0.833,
+      "why": [
+        "ar-fuzzy:0.83"
+      ],
+      "emp": {
+        "id": "81402",
+        "en": "Mohamed Al Siyabi",
+        "ar": "محمد السيابي",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.75,
+          "id": "82653",
+          "en": "Ahmed Al Sabii",
+          "ar": "أحمد السابعي"
+        },
+        {
+          "score": 0.75,
+          "id": "81224",
+          "en": "Mohamed Al Amri",
+          "ar": "محمد العامري"
+        },
+        {
+          "score": 0.75,
+          "id": "8762",
+          "en": "Mohamed Al Falahi",
+          "ar": "محمد الفلاحي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1358,
+        "raw_name": "يعقوب الصلتي ✅ FF T",
+        "name": "يعقوب الصلتي FF T",
+        "phone": "96892565512",
+        "name_is_phone": false
+      },
+      "score": 0.817,
+      "why": [
+        "tokens:الصلتي"
+      ],
+      "emp": {
+        "id": "80695",
+        "en": "Hosni Al Sulti",
+        "ar": "حسني الصلتي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.817,
+          "id": "82424",
+          "en": "Riyadh Al Sulti",
+          "ar": "رياض الصلتي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 240,
+        "raw_name": "💦 احمد النعماني",
+        "name": "احمد النعماني",
+        "phone": "96892331451",
+        "name_is_phone": false
+      },
+      "score": 0.8,
+      "why": [
+        "ar-fuzzy:0.80"
+      ],
+      "emp": {
+        "id": "82548",
+        "en": "Ahmed Al Muqaini",
+        "ar": "أحمد المقيني",
+        "dept": "Load Control"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "81832",
+          "en": "Ahmed Al Bakari",
+          "ar": "أحمد البكري"
+        },
+        {
+          "score": 0.725,
+          "id": "82616",
+          "en": "Ahmed Al Hashmi",
+          "ar": "أحمد الهاشمي"
+        },
+        {
+          "score": 0.725,
+          "id": "82283",
+          "en": "Ahmed Al Mawali",
+          "ar": "أحمد المعولي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 638,
+        "raw_name": "ابوحمزه فرج صالح المسكري",
+        "name": "ابوحمزه فرج صالح المسكري",
+        "phone": "96895464336",
+        "name_is_phone": false
+      },
+      "score": 0.788,
+      "why": [
+        "tokens:المسكري"
+      ],
+      "emp": {
+        "id": "82666",
+        "en": "Mohamed Al Maskari",
+        "ar": "محمد المسكري",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.788,
+          "id": "82661",
+          "en": "Mohamed Al Maskari",
+          "ar": "محمد المسكري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 710,
+        "raw_name": "عمر العيناوي",
+        "name": "عمر العيناوي",
+        "phone": "96899549047",
+        "name_is_phone": false
+      },
+      "score": 0.783,
+      "why": [
+        "ar-fuzzy:0.78"
+      ],
+      "emp": {
+        "id": "82551",
+        "en": "Omar Al Obaidi",
+        "ar": "عمر العبيدي",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 928,
+        "raw_name": "سعيد السعدي",
+        "name": "سعيد السعدي",
+        "phone": "96899812177",
+        "name_is_phone": false
+      },
+      "score": 0.783,
+      "why": [
+        "ar-fuzzy:0.78"
+      ],
+      "emp": {
+        "id": "990737",
+        "en": "Said Al Amri",
+        "ar": "سعيد العامري",
+        "dept": "Supervisors"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "8744",
+          "en": "Said Al Fahkri",
+          "ar": "سعيد الفاخري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 130,
+        "raw_name": "✅ يوسف الجلنداني",
+        "name": "يوسف الجلنداني",
+        "phone": "96899484843",
+        "name_is_phone": false
+      },
+      "score": 0.769,
+      "why": [
+        "ar-fuzzy:0.77"
+      ],
+      "emp": {
+        "id": "8646",
+        "en": "Yousuf Al Jaradi",
+        "ar": "يوسف الجرادي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        },
+        {
+          "score": 0.725,
+          "id": "82587",
+          "en": "Yousuf Al Balushi",
+          "ar": "يوسف البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 901,
+        "raw_name": "سالم البطاشي",
+        "name": "سالم البطاشي",
+        "phone": "96899779468",
+        "name_is_phone": false
+      },
+      "score": 0.75,
+      "why": [
+        "ar-fuzzy:0.75"
+      ],
+      "emp": {
+        "id": "82588",
+        "en": "Ghassan Al Tarsi",
+        "ar": "غسان الطارشي",
+        "dept": "Export Operators"
+      },
+      "alts": [
+        {
+          "score": 0.75,
+          "id": "8542",
+          "en": "Salim Harrasi",
+          "ar": "سالم الحراصي"
+        },
+        {
+          "score": 0.725,
+          "id": "8722",
+          "en": "Salim Sulieman",
+          "ar": "سالم سليمان"
+        },
+        {
+          "score": 0.725,
+          "id": "8926",
+          "en": "Salim Al Masroori",
+          "ar": "سالم المسروري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 1367,
+        "raw_name": "يوسف الوحيدي",
+        "name": "يوسف الوحيدي",
+        "phone": "96896004214",
+        "name_is_phone": false
+      },
+      "score": 0.75,
+      "why": [
+        "ar-fuzzy:0.75"
+      ],
+      "emp": {
+        "id": "82587",
+        "en": "Yousuf Al Balushi",
+        "ar": "يوسف البلوشي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.75,
+          "id": "8646",
+          "en": "Yousuf Al Jaradi",
+          "ar": "يوسف الجرادي"
+        },
+        {
+          "score": 0.725,
+          "id": "990752",
+          "en": "Ali Yousuf Al Balushi",
+          "ar": "علي يوسف البلوشي"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 895,
+        "raw_name": "زكريا النبهاني",
+        "name": "زكريا النبهاني",
+        "phone": "96896767278",
+        "name_is_phone": false
+      },
+      "score": 0.741,
+      "why": [
+        "ar-fuzzy:0.74"
+      ],
+      "emp": {
+        "id": "82429",
+        "en": "Zakariya Al Balushi",
+        "ar": "زكريا البلوشي",
+        "dept": "Export Operators"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 436,
+        "raw_name": "Muthana EXP",
+        "name": "Muthana EXP",
+        "phone": "96894562121",
+        "name_is_phone": false
+      },
+      "score": 0.725,
+      "why": [
+        "tokens:muthana"
+      ],
+      "emp": {
+        "id": "82445",
+        "en": "Al Muthana Al Shamfari",
+        "ar": "المثنى الشنفري",
+        "dept": "Load Control"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 515,
+        "raw_name": "أبو رياض",
+        "name": "أبو رياض",
+        "phone": "96899420403",
+        "name_is_phone": false
+      },
+      "score": 0.725,
+      "why": [
+        "tokens:رياض"
+      ],
+      "emp": {
+        "id": "82424",
+        "en": "Riyadh Al Sulti",
+        "ar": "رياض الصلتي",
+        "dept": "Export Checker"
+      },
+      "alts": [
+        {
+          "score": 0.725,
+          "id": "82555",
+          "en": "Riyahd Al Jabri",
+          "ar": "رياض الجابري"
+        }
+      ],
+      "already": null,
+      "status": "new"
+    },
+    {
+      "contact": {
+        "row": 849,
+        "raw_name": "خالي مرهون",
+        "name": "خالي مرهون",
+        "phone": "96894320841",
+        "name_is_phone": false
+      },
+      "score": 0.725,
+      "why": [
+        "tokens:مرهون"
+      ],
+      "emp": {
+        "id": "82545",
+        "en": "Marhoon Al Kiyumi",
+        "ar": "مرهون الكيومي",
+        "dept": "Export Checker"
+      },
+      "alts": [],
+      "already": null,
+      "status": "new"
+    }
+  ]
+}

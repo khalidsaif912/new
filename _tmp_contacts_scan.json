@@ -1,0 +1,159 @@
+{
+  "n_contacts": 1388,
+  "n_named": 1099,
+  "n_emps": 81,
+  "emp_sample": [
+    {
+      "id": "990465",
+      "name": "Abdulfatah Al Shukeili",
+      "department": "Export Checker",
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07"
+      ]
+    },
+    {
+      "id": "82645",
+      "name": "Abdullah Al Shukeili",
+      "department": "Export Checker",
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07"
+      ]
+    },
+    {
+      "id": "8584",
+      "name": "Adil Al Zadjali",
+      "department": "Export Checker",
+      "months": [
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07"
+      ]
+    }
+  ],
+  "idx_keys": [
+    "total",
+    "employees",
+    "last_updated"
+  ],
+  "ar_count": 5,
+  "named_sample": [
+    {
+      "row": 5,
+      "raw_name": "...",
+      "name": "",
+      "phone": "96872176802",
+      "name_is_phone": false
+    },
+    {
+      "row": 8,
+      "raw_name": "...",
+      "name": "",
+      "phone": "96898882948",
+      "name_is_phone": false
+    },
+    {
+      "row": 10,
+      "raw_name": ".....",
+      "name": "",
+      "phone": "96899624682",
+      "name_is_phone": false
+    },
+    {
+      "row": 12,
+      "raw_name": "....",
+      "name": "",
+      "phone": "96899183883",
+      "name_is_phone": false
+    },
+    {
+      "row": 13,
+      "raw_name": "...",
+      "name": "",
+      "phone": "96899058646",
+      "name_is_phone": false
+    },
+    {
+      "row": 22,
+      "raw_name": "..........",
+      "name": "",
+      "phone": "96877206018",
+      "name_is_phone": false
+    },
+    {
+      "row": 25,
+      "raw_name": ".✅ العامرات المطار",
+      "name": "العامرات المطار",
+      "phone": "96892040494",
+      "name_is_phone": false
+    },
+    {
+      "row": 31,
+      "raw_name": "أبن الأكابر ⭐",
+      "name": "أبن الأكابر",
+      "phone": "96899072464",
+      "name_is_phone": false
+    },
+    {
+      "row": 32,
+      "raw_name": "( أبو هود )",
+      "name": "( أبو هود )",
+      "phone": "96899850989",
+      "name_is_phone": false
+    },
+    {
+      "row": 35,
+      "raw_name": "༊෴✿يَۆسفَ✿〄࿐",
+      "name": "يَۆسفَ",
+      "phone": "96892948477",
+      "name_is_phone": false
+    },
+    {
+      "row": 49,
+      "raw_name": "~موسى الهادي~",
+      "name": "موسى الهادي",
+      "phone": "96895595856",
+      "name_is_phone": false
+    },
+    {
+      "row": 50,
+      "raw_name": "⌚محمد هلال الرستاق",
+      "name": "محمد هلال الرستاق",
+      "phone": "96892298931",
+      "name_is_phone": false
+    },
+    {
+      "row": 52,
+      "raw_name": "♾️ سلمان الدوشي",
+      "name": "سلمان الدوشي",
+      "phone": "96899590949",
+      "name_is_phone": false
+    },
+    {
+      "row": 53,
+      "raw_name": "♾️ سليمان العامري",
+      "name": "سليمان العامري",
+      "phone": "96899427949",
+      "name_is_phone": false
+    },
+    {
+      "row": 54,
+      "raw_name": "♾️ عمر جميل الدروشي",
+      "name": "عمر جميل الدروشي",
+      "phone": "96895531556",
+      "name_is_phone": false
+    }
+  ]
+}

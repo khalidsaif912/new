@@ -578,6 +578,10 @@ def patch_lang_toggle(html: str) -> str:
             or "background:transparent" not in html
             or "@media (max-width:720px)" not in html
             or ".langToggle      { min-width:44px" in html
+            or (
+                "position:absolute; top:12px; right:12px; z-index:30;" in html
+                and "bottom:12px; top:auto; right:12px" not in html
+            )
         )
         if needs_lang_css:
             if LANG_TOGGLE_BLOCK_RE.search(html):
