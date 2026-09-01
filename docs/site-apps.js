@@ -571,10 +571,8 @@
       card.setAttribute('data-open-same', '1');
       card.innerHTML =
         '<span class="siteAppsLink-icon">' + iconForApp('wa') + '</span>' +
-        '<span class="siteAppsLink-text">' +
         '<span class="siteAppsLink-title" data-i18n="wa"></span>' +
-        '<span class="siteAppsLink-sub" data-i18n-sub="wa"></span>' +
-        '</span>';
+        '<span class="siteAppsLink-sub" data-i18n-sub="wa"></span>';
       grid.insertBefore(card, grid.firstElementChild);
       existing = card;
     }
@@ -603,13 +601,11 @@
         '<span class="siteAppsLink-icon">' +
         iconForApp('ideas') +
         '</span>' +
-        '<span class="siteAppsLink-text">' +
         '<span class="siteAppsLink-title" data-i18n="ideas">' +
         t('ideas') +
         '</span>' +
         '<span class="siteAppsLink-sub" data-i18n-sub="ideas">' +
         t('ideasSub') +
-        '</span>' +
         '</span>';
       // Place after WhatsApp temporarily; organizeAppsGrid() sets final order.
       var wa = grid.querySelector('[data-app-id="wa"]');
@@ -649,13 +645,11 @@
         '<span class="siteAppsLink-icon">' +
         iconForApp('readSign') +
         '</span>' +
-        '<span class="siteAppsLink-text">' +
         '<span class="siteAppsLink-title" data-i18n="readSign">' +
         t('readSign') +
         '</span>' +
         '<span class="siteAppsLink-sub" data-i18n-sub="readSign">' +
         t('readSignSub') +
-        '</span>' +
         '</span>';
       var wa = grid.querySelector('[data-app-id="wa"]');
       if (wa && wa.nextSibling) grid.insertBefore(card, wa.nextSibling);
@@ -731,7 +725,15 @@
     });
   }
 
-  /** Stable, balanced layout: featured top/bottom + even 2-col pairs (no empty slots). */
+  function normalizeAppCardLayout(link) {
+    if (!link) return;
+    var text = link.querySelector('.siteAppsLink-text');
+    if (!text) return;
+    while (text.firstChild) link.insertBefore(text.firstChild, text);
+    text.parentNode.removeChild(text);
+  }
+
+  /** Stable grid: all tiles use the same centered card layout (like SATS Labels). */
   function organizeAppsGrid() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
@@ -750,11 +752,12 @@
       var el = findApp(id);
       if (!el) return;
       seen[id] = true;
+      normalizeAppCardLayout(el);
       grid.appendChild(el);
       if (!el.getAttribute('data-app-id')) el.setAttribute('data-app-id', id);
     });
 
-    // Keep any unexpected remaining links between store and games (or at end).
+    // Keep any unexpected remaining links before games (or at end).
     Array.prototype.slice.call(grid.querySelectorAll('a.siteAppsLink')).forEach(function (el) {
       var id = el.getAttribute('data-app-id') || '';
       if (seen[id]) return;
@@ -762,30 +765,11 @@
         el.parentNode && el.parentNode.removeChild(el);
         return;
       }
+      normalizeAppCardLayout(el);
       var games = findApp('games');
       if (games) grid.insertBefore(el, games);
       else grid.appendChild(el);
     });
-
-    // Store is a normal half tile (pair with ideas); games stays full-width banner.
-    var store = findApp('store');
-    if (store) {
-      var title = store.querySelector('.siteAppsLink-title');
-      var sub = store.querySelector('.siteAppsLink-sub');
-      var icon = store.querySelector('.siteAppsLink-icon');
-      var text = store.querySelector('.siteAppsLink-text');
-      if (title && sub && !text) {
-        text = document.createElement('span');
-        text.className = 'siteAppsLink-text';
-        title.parentNode.insertBefore(text, title);
-        text.appendChild(title);
-        text.appendChild(sub);
-      }
-      if (icon && text && icon.nextElementSibling !== text) {
-        store.insertBefore(icon, store.firstChild);
-        if (icon.nextSibling !== text) store.appendChild(text);
-      }
-    }
   }
 
   function openCalcFromPwa(e) {
@@ -862,7 +846,8 @@
   }
 
   function injectCompactStyles() {
-    if (document.getElementById('siteAppsCompactCss')) return;
+    var old = document.getElementById('siteAppsCompactCss');
+    if (old) old.remove();
     var style = document.createElement('style');
     style.id = 'siteAppsCompactCss';
     style.textContent = [
@@ -899,24 +884,14 @@
       '.spotlightPreviewTitle{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.25;}',
       '.spotlightPreviewSub{font-size:10.5px;font-weight:600;color:#64748b;line-height:1.35;margin-top:2px;}',
       '.spotlightPreviewGo{flex-shrink:0;font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:999px;padding:5px 8px;white-space:nowrap;}',
-      '.siteAppsLink--wa{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:64px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#dcfce7 100%)!important;border-color:#86efac!important;}',
-      '.siteAppsLink--wa .siteAppsLink-icon{background:#dcfce7!important;border-color:#86efac!important;flex-shrink:0!important;}',
-      '.siteAppsLink--wa .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
-      '.siteAppsLink--wa .siteAppsLink-title,.siteAppsLink--wa .siteAppsLink-sub{text-align:start!important;}',
-      '.siteAppsLink--wa::after{content:none!important;display:none!important;}',
-      '.siteAppsLink--readSign{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:64px!important;padding-inline:14px!important;background:linear-gradient(135deg,#ecfdf5 0%,#ccfbf1 100%)!important;border-color:#5eead4!important;}',
-      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;flex-shrink:0!important;}',
-      '.siteAppsLink--readSign .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
-      '.siteAppsLink--readSign .siteAppsLink-title,.siteAppsLink--readSign .siteAppsLink-sub{text-align:start!important;}',
-      '.siteAppsLink--games{grid-column:1 / -1!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-height:64px!important;padding:10px 14px!important;gap:12px!important;background:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 100%)!important;border-color:#f9a8d4!important;}',
-      '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;flex-shrink:0!important;}',
-      '.siteAppsLink--games .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;flex:1!important;}',
-      '.siteAppsLink--games .siteAppsLink-title,.siteAppsLink--games .siteAppsLink-sub{text-align:start!important;}',
-      '.siteAppsLink--store{grid-column:auto!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-height:0!important;padding:12px 8px!important;gap:8px!important;background:linear-gradient(160deg,#fff7ed 0%,#ffedd5 100%)!important;border-color:#fdba74!important;}',
+      '.siteAppsLink{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;grid-column:auto!important;min-height:0!important;padding:12px 8px!important;gap:8px!important;border-radius:16px!important;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 4px 14px rgba(15,23,42,.04)!important;}',
+      '.siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;min-width:0!important;width:100%!important;}',
+      '.siteAppsLink-title,.siteAppsLink-sub{text-align:center!important;}',
+      '.siteAppsLink--wa .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
+      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
-      '.siteAppsLink--store .siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;flex:0 1 auto!important;min-width:0!important;width:100%!important;}',
-      '.siteAppsLink--store .siteAppsLink-title,.siteAppsLink--store .siteAppsLink-sub{text-align:center!important;}',
-      '.siteAppsLink--ideas{background:linear-gradient(160deg,#fffbeb 0%,#fef3c7 100%)!important;border-color:#fcd34d!important;}',
+      '.siteAppsLink--flights .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
       '#spotlightEmojiBtn img{width:22px;height:22px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
@@ -938,8 +913,7 @@
       '}',
       '.siteAppsTitle{font-size:17px!important;margin:0 0 2px!important;flex-shrink:0;letter-spacing:-.01em;}',
       '.siteAppsHint{font-size:12px!important;margin:0 0 12px!important;line-height:1.4!important;flex-shrink:0;color:#64748b!important;}',
-      '.siteAppsGrid{gap:10px!important;margin-bottom:10px!important;min-height:0;flex:1 1 auto;align-content:start;}',
-      '.siteAppsLink{min-height:0!important;padding:12px 8px!important;gap:8px!important;border-radius:16px!important;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 4px 14px rgba(15,23,42,.04)!important;}',
+      '.siteAppsGrid{gap:10px!important;margin-bottom:10px!important;min-height:0;flex:1 1 auto;align-content:start;grid-template-columns:repeat(2,minmax(0,1fr))!important;}',
       '.siteAppsLink-icon{width:48px!important;height:48px!important;border-radius:16px!important;flex-shrink:0;box-shadow:0 6px 14px rgba(15,23,42,.08)!important;}',
       '.siteAppsLink-icon svg,.siteAppsFlatSvg{width:30px!important;height:30px!important;display:block;}',
       '.siteAppsFlatImg{width:30px!important;height:30px!important;object-fit:contain;display:block;filter:drop-shadow(0 2px 4px rgba(15,23,42,.12));}',
@@ -966,7 +940,6 @@
       '.siteAppsLink-icon svg,.siteAppsFlatSvg,.siteAppsFlatImg{width:26px!important;height:26px!important;}',
       '.siteAppsLink-title{font-size:11px!important;}',
       '.siteAppsLink-sub{display:none!important;}',
-      '.siteAppsLink--wa,.siteAppsLink--readSign,.siteAppsLink--games{min-height:52px!important;padding:8px 12px!important;}',
       '.siteAppsTitle{font-size:15px!important;}',
       '}',
       '@media (max-height:560px){',

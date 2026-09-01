@@ -529,7 +529,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .empName  { font-size:15px; font-weight:700; color:#1e293b; }
     .empStatus { font-size:13px; font-weight:600; }
 
-    /* ═══════ QUICK ACTIONS ═══════ */
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
@@ -674,7 +674,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     @media (hover: hover) {
       .roster-cta-btn--alumni:hover { background: #ccfbf1; }
     }
-    /* ═══════ SITE SHARE MODAL ═══════ */
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .siteShareSheet {
       position: fixed;
       inset: 0;
@@ -756,7 +756,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .siteShareCloseWrap .roster-cta-btn {
       width: 100%;
     }
-    /* ═══════ RELATED APPS MODAL ═══════ */
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .siteAppsSheet {
       position: fixed;
       inset: 0;
@@ -856,7 +856,12 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
     .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
+    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
+    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
     .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
       animation: siteAppsStorePulse 2.4s ease-in-out infinite;
       transform-origin: center;
@@ -864,41 +869,6 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     @keyframes siteAppsStorePulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.07); }
-    }
-    .siteAppsLink--store,
-    .siteAppsLink--games {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      min-height: 72px;
-      justify-content: flex-start;
-      padding-inline: 14px;
-      gap: 12px;
-    }
-    .siteAppsLink--store {
-      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
-      border-color: #fdba74;
-    }
-    .siteAppsLink--store .siteAppsLink-icon {
-      flex-shrink: 0;
-    }
-    .siteAppsLink--games .siteAppsLink-icon {
-      background: #fdf2f8;
-      border-color: #fbcfe8;
-      flex-shrink: 0;
-    }
-    .siteAppsLink--store .siteAppsLink-text,
-    .siteAppsLink--games .siteAppsLink-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      flex: 1;
-    }
-    .siteAppsLink--store .siteAppsLink-title,
-    .siteAppsLink--store .siteAppsLink-sub,
-    .siteAppsLink--games .siteAppsLink-title,
-    .siteAppsLink--games .siteAppsLink-sub {
-      text-align: start;
     }
     @media (hover: hover) {
       .siteAppsLink:hover {
@@ -2263,7 +2233,7 @@ function goToRosterDiff(event) {
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260830wm');
+    addScript(root + '/site-apps.js?v=20260901b');
     addScript(root + '/install-pwa.js?v=' + ver);
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/change-alert.js?v=' + ver);

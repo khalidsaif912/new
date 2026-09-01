@@ -744,6 +744,7 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
     .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
+    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
     .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
       animation: siteAppsStorePulse 2.4s ease-in-out infinite;
       transform-origin: center;
@@ -751,50 +752,6 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     @keyframes siteAppsStorePulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.07); }
-    }
-    .siteAppsLink--store,
-    .siteAppsLink--games,
-    .siteAppsLink--wa {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      min-height: 72px;
-      justify-content: flex-start;
-      padding-inline: 14px;
-      gap: 12px;
-    }
-    .siteAppsLink--wa {
-      background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
-      border-color: #86efac;
-    }
-    .siteAppsLink--store {
-      background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
-      border-color: #fdba74;
-    }
-    .siteAppsLink--store .siteAppsLink-icon,
-    .siteAppsLink--wa .siteAppsLink-icon {
-      flex-shrink: 0;
-    }
-    .siteAppsLink--games .siteAppsLink-icon {
-      background: #fdf2f8;
-      border-color: #fbcfe8;
-      flex-shrink: 0;
-    }
-    .siteAppsLink--store .siteAppsLink-text,
-    .siteAppsLink--games .siteAppsLink-text,
-    .siteAppsLink--wa .siteAppsLink-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      flex: 1;
-    }
-    .siteAppsLink--store .siteAppsLink-title,
-    .siteAppsLink--store .siteAppsLink-sub,
-    .siteAppsLink--wa .siteAppsLink-title,
-    .siteAppsLink--wa .siteAppsLink-sub,
-    .siteAppsLink--games .siteAppsLink-title,
-    .siteAppsLink--games .siteAppsLink-sub {
-      text-align: start;
     }
     @media (hover: hover) {
       .siteAppsLink:hover {
@@ -823,17 +780,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
     <div class="siteAppsGrid" id="siteAppsGrid">
       <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_READ_SIGN}</span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
       </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon">{SVG_APP_FLIGHT}</span>
@@ -862,17 +815,13 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon">{SVG_APP_STORE}</span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon">{SVG_APP_GAME}</span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
       </a>
     </div>
     <div class="siteAppsCloseWrap">
@@ -1282,7 +1231,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§Ã˜Âª'"
 
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
-IOS_PERF_VER = "20260819a"
+IOS_PERF_VER = "20260901b"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
