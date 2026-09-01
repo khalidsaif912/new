@@ -275,6 +275,22 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
       #banner-changer-btn { padding:6px; min-width:44px; min-height:44px; }
       #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
     }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
+    }
+    .header.homeDateSplit #banner-changer-btn { grid-column:1; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle { grid-column:3; grid-row:2; }
 """
 APPLY_LANG_LANG_BTN_OLD = (
     "  var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;\n"
@@ -1252,7 +1268,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901f');
+  addScript(root + '/banner-changer.js?v=20260901h');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);

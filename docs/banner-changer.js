@@ -470,8 +470,10 @@
       '-webkit-text-stroke:0.2px rgba(0,0,0,.22);',
       'paint-order:stroke fill;',
       '}',
-      '.' + ACTIVE_CLASS + ' .langToggle,',
-      '.' + ACTIVE_CLASS + ' #langToggle{',
+      '.header:not(.homeDateSplit).' + ACTIVE_CLASS + ' .langToggle,',
+      '.header:not(.homeDateSplit).' + ACTIVE_CLASS + ' #langToggle,',
+      '.topbar.' + ACTIVE_CLASS + ' .langToggle,',
+      '.topbar.' + ACTIVE_CLASS + ' #langToggle{',
       'position:absolute!important;bottom:12px!important;top:auto!important;right:12px!important;left:auto!important;',
       'width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;',
       'padding:4px!important;font-size:0!important;line-height:1!important;z-index:30!important;',
@@ -486,9 +488,11 @@
       'filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))!important;}',
       '.' + ACTIVE_CLASS + ' .langToggle-label{display:block!important;font-size:10px!important;font-weight:800!important;',
       'color:#fff!important;text-shadow:' + TEXT_HALO + ';letter-spacing:.02em;}',
-      'body.ar .' + ACTIVE_CLASS + ' .langToggle,',
-      'body.ar .' + ACTIVE_CLASS + ' #langToggle{right:12px!important;left:auto!important;}',
-      '#banner-changer-btn{',
+      'body.ar .header:not(.homeDateSplit).' + ACTIVE_CLASS + ' .langToggle,',
+      'body.ar .header:not(.homeDateSplit).' + ACTIVE_CLASS + ' #langToggle,',
+      'body.ar .topbar.' + ACTIVE_CLASS + ' .langToggle,',
+      'body.ar .topbar.' + ACTIVE_CLASS + ' #langToggle{right:12px!important;left:auto!important;}',
+      '.header:not(.homeDateSplit) #banner-changer-btn,.topbar #banner-changer-btn{',
       'position:absolute!important;bottom:12px!important;top:auto!important;left:12px!important;right:auto!important;z-index:30!important;',
       'min-width:0!important;min-height:0!important;padding:4px!important;',
       'background:transparent!important;border:none!important;border-radius:0!important;',
@@ -498,7 +502,36 @@
       '}',
       '#banner-changer-btn .banner-changer-icon svg{display:block;width:20px!important;height:20px!important;stroke:#fff!important;',
       'filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))!important;}',
-      'body.ar #banner-changer-btn{left:12px!important;right:auto!important;}',
+      'body.ar .header:not(.homeDateSplit) #banner-changer-btn,body.ar .topbar #banner-changer-btn{left:12px!important;right:auto!important;}',
+      '.header.homeDateSplit{',
+      'display:grid!important;',
+      'grid-template-columns:44px minmax(0,1fr) 44px!important;',
+      'grid-template-rows:auto auto!important;',
+      'align-items:center!important;',
+      'direction:ltr!important;',
+      'padding:26px 18px 12px!important;',
+      'min-height:0!important;',
+      '}',
+      '.header.homeDateSplit .bannerTitle,.header.homeDateSplit > h1{',
+      'grid-column:1/-1!important;grid-row:1!important;',
+      '}',
+      '.header.homeDateSplit .datePickerWrapper{',
+      'grid-column:2!important;grid-row:2!important;margin-top:0!important;',
+      '}',
+      '.header.homeDateSplit #banner-changer-btn{',
+      'grid-column:1!important;grid-row:2!important;',
+      '}',
+      '.header.homeDateSplit .langToggle,.header.homeDateSplit #langToggle{',
+      'grid-column:3!important;grid-row:2!important;',
+      '}',
+      '.header.homeDateSplit .langToggle,',
+      '.header.homeDateSplit #langToggle,',
+      '.header.homeDateSplit #banner-changer-btn{',
+      'position:relative!important;inset:auto!important;',
+      'bottom:auto!important;top:auto!important;',
+      'left:auto!important;right:auto!important;transform:none!important;',
+      'justify-self:center!important;align-self:center!important;',
+      '}',
       '.' + ACTIVE_CLASS + ' .dateTag:has(.dateTagMain){',
       'color:#fff!important;',
       'background:transparent!important;',
@@ -552,14 +585,14 @@
       'filter:' + DATE_TAG_ICON_FILTER + '!important;',
       '}',
       '.header.homeDateSplit.' + ACTIVE_CLASS + '{',
-      'padding:26px 18px 52px!important;',
+      'padding:26px 18px 12px!important;',
       '}',
       '@media (max-width:480px){',
       '.header.' + ACTIVE_CLASS + ':not(.homeDateSplit),.topbar.' + ACTIVE_CLASS + '{',
       'padding:26px 18px 24px!important;',
       '}',
       '.header.homeDateSplit.' + ACTIVE_CLASS + '{',
-      'padding:26px 18px 52px!important;',
+      'padding:26px 18px 12px!important;',
       '}',
       '.' + ACTIVE_CLASS + ' .bannerTitleMain{',
       'font-size:28px!important;',
@@ -751,7 +784,7 @@
       ' .topbar::after{content:none!important;opacity:0!important;display:none!important}' +
       'html.' +
       EARLY_CLASS +
-      ' .header.homeDateSplit{padding:26px 18px 52px!important}' +
+      ' .header.homeDateSplit{padding:26px 18px 12px!important}' +
       '.roster-banner-ios-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:inherit;opacity:0}' +
       '.roster-banner-ios-img.is-ready{opacity:1}' +
       '.header.has-custom-banner > :not(.roster-banner-ios-img),' +
@@ -866,12 +899,8 @@
       '<circle cx="8.5" cy="10" r="1.5" fill="currentColor" stroke="none"/>' +
       '<path d="M21 16l-4.5-4.5a2 2 0 0 0-3 0L3 17"/>' +
       '</svg></span>';
-    btn.style.cssText = [
-      'position:absolute',
-      'bottom:12px',
-      'top:auto',
-      'left:12px',
-      'z-index:80',
+    const homeDate = targetEl.classList.contains('homeDateSplit');
+    const sharedStyles = [
       'background:transparent',
       'border:none',
       'border-radius:0',
@@ -889,7 +918,20 @@
       'box-shadow:none',
       'pointer-events:auto',
       'transition:transform .2s ease, opacity .2s ease'
-    ].join(';');
+    ];
+    btn.style.cssText = homeDate
+      ? ['grid-column:1', 'grid-row:2', 'position:relative', 'inset:auto']
+          .concat(sharedStyles)
+          .join(';')
+      : [
+          'position:absolute',
+          'bottom:12px',
+          'top:auto',
+          'left:12px',
+          'z-index:80'
+        ]
+          .concat(sharedStyles)
+          .join(';');
 
     if (getComputedStyle(targetEl).position === 'static') {
       targetEl.style.position = 'relative';

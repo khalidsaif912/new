@@ -78,7 +78,7 @@ NEW_EARLY_DOUBLE = """    try {{
             bes.textContent =
               'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + bPos + '!important;background-repeat:no-repeat!important}}' +
               'html.roster-banner-early .header::before,html.roster-banner-early .header::after,html.roster-banner-early .topbar::before,html.roster-banner-early .topbar::after{{content:none!important;opacity:0!important;display:none!important}}' +
-              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 52px!important}}';
+              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 12px!important}}';
             document.head.appendChild(bes);
           }}
           if (!document.querySelector('link[data-banner-preload="1"]')) {{
@@ -117,7 +117,7 @@ NEW_EARLY_SINGLE = """    try {
             bes.textContent =
               'html.roster-banner-early .header,html.roster-banner-early .topbar{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + bPos + '!important;background-repeat:no-repeat!important}' +
               'html.roster-banner-early .header::before,html.roster-banner-early .header::after,html.roster-banner-early .topbar::before,html.roster-banner-early .topbar::after{content:none!important;opacity:0!important;display:none!important}' +
-              'html.roster-banner-early .header.homeDateSplit{padding:26px 18px 52px!important}';
+              'html.roster-banner-early .header.homeDateSplit{padding:26px 18px 12px!important}';
             document.head.appendChild(bes);
           }
           if (!document.querySelector('link[data-banner-preload="1"]')) {
@@ -141,8 +141,13 @@ HOME_DATE_SPLIT_OLD = """    .header.homeDateSplit {
     }"""
 
 HOME_DATE_SPLIT_NEW = """    .header.homeDateSplit {
-      padding-bottom:52px;
-      min-height:168px;
+      display:grid;
+      grid-template-columns:44px minmax(0,1fr) 44px;
+      grid-template-rows:auto auto;
+      align-items:center;
+      direction:ltr;
+      padding:26px 18px 12px;
+      min-height:0;
     }"""
 
 
@@ -155,12 +160,12 @@ def patch_file(path: Path) -> bool:
     elif OLD_EARLY_SINGLE in text:
         text = text.replace(OLD_EARLY_SINGLE, NEW_EARLY_SINGLE, 1)
 
-    if "banner-changer.js?v=20260901f" not in text and BANNER_IN_SECONDARY in text:
+    if "banner-changer.js?v=20260901h" not in text and BANNER_IN_SECONDARY in text:
         text = text.replace(
             "  addScript(root + '/wc-final-celebrate.js?v=' + ver);\n  function loadSecondary() {",
             "  addScript(root + '/wc-final-celebrate.js?v=' + ver);\n"
             "  addScript(root + '/banner-store.js?v=20260831g');\n"
-            "  addScript(root + '/banner-changer.js?v=20260901f');\n"
+            "  addScript(root + '/banner-changer.js?v=20260901h');\n"
             "  function loadSecondary() {",
             1,
         )
@@ -172,8 +177,10 @@ def patch_file(path: Path) -> bool:
                 if "banner-changer.js" in block:
                     text = text[:idx] + text[end + 1 :]
 
-    text = text.replace("banner-changer.js?v=20260901d", "banner-changer.js?v=20260901f")
-    text = text.replace("banner-changer.js?v=20260831j", "banner-changer.js?v=20260901f")
+    text = text.replace("banner-changer.js?v=20260901d", "banner-changer.js?v=20260901h")
+    text = text.replace("banner-changer.js?v=20260831j", "banner-changer.js?v=20260901h")
+    text = text.replace("banner-changer.js?v=20260901f", "banner-changer.js?v=20260901h")
+    text = text.replace("banner-changer.js?v=20260901g", "banner-changer.js?v=20260901h")
 
     if HOME_DATE_SPLIT_OLD in text and HOME_DATE_SPLIT_NEW not in text:
         text = text.replace(HOME_DATE_SPLIT_OLD, HOME_DATE_SPLIT_NEW, 1)
