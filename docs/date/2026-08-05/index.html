@@ -6,11 +6,16 @@
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260901b"></script>
   <title>Duty Roster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ═══════ RESET ═══════ */
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --date-font-en: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      --date-font-ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
     }
     html, body {
       width:100%;
@@ -173,84 +178,182 @@
       40% { transform:rotate(-6deg); }
     }
 
-    /* Date Picker Wrapper */
-    .datePickerWrapper {
+    /* Date — with-me split layout (homepage trial) */
+    .header.homeDateSplit {
+      padding-bottom:52px;
+    }
+    .header.homeDateSplit .datePickerWrapper {
       position:relative;
-      display:inline-block;
-      margin-top:14px;
+      display:block;
+      width:100%;
+      max-width:100%;
+      margin-top:10px;
       z-index:20;
-      min-height:44px;
-      min-width:min(100%, 220px);
+      min-height:72px;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-    .header .dateTag {
-      display:inline-flex;
+    .header.homeDateSplit .dateTag {
+      display:flex;
       align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,.18);
-      padding:5px 18px;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.3px;
+      justify-content:center;
+      min-height:72px;
+      padding:0;
+      border:none;
+      border-radius:0;
+      background:transparent;
+      color:#fff;
       cursor:pointer;
-      transition:all .3s;
-      border:2px solid rgba(255,255,255,.2);
-      -webkit-tap-highlight-color:transparent;
       user-select:none;
       -webkit-user-select:none;
-      direction:ltr;
+      text-align:center;
+      line-height:1;
       position:relative;
       z-index:3;
       pointer-events:auto;
-      color:#fff;
-      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
+      -webkit-tap-highlight-color:transparent;
     }
-    .dateTag-icon {
-      display:inline-flex;
+    .header.homeDateSplit .dateTagMain {
+      position:relative;
+      display:flex;
       align-items:center;
       justify-content:center;
-      flex-shrink:0;
-      line-height:0;
-      color:#fff;
+      gap:min(2.4vw, 12px);
       pointer-events:none;
+      padding-bottom:0;
+      direction:ltr;
+      width:max-content;
+      max-width:100%;
+      margin-inline:auto;
     }
-    .dateTag-icon svg {
+    body.ar .header.homeDateSplit .dateTagMain,
+    html[lang="ar"] .header.homeDateSplit .dateTagMain {
+      direction:rtl;
+    }
+    .header.homeDateSplit .dateTagDay,
+    .header.homeDateSplit .dateTagWeek,
+    .header.homeDateSplit .dateTagMonth {
+      font-family: var(--date-font-en);
+      color:rgba(255,255,255,.72);
+      text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 1px rgba(255,255,255,.45);
+      -webkit-text-stroke:0.15px rgba(0,0,0,.28);
+      paint-order:stroke fill;
+    }
+    body.ar .header.homeDateSplit .dateTagDay,
+    body.ar .header.homeDateSplit .dateTagWeek,
+    body.ar .header.homeDateSplit .dateTagMonth,
+    html[lang="ar"] .header.homeDateSplit .dateTagDay,
+    html[lang="ar"] .header.homeDateSplit .dateTagWeek,
+    html[lang="ar"] .header.homeDateSplit .dateTagMonth {
+      font-family: var(--date-font-ar);
+    }
+    .header.homeDateSplit .dateTagSide {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:3px;
+      line-height:1;
+      padding-inline-start:min(1.8vw, 10px);
+      border-inline-start:1px solid rgba(255,255,255,.35);
+      flex:0 0 auto;
+      direction:ltr;
+      unicode-bidi:isolate;
+      min-width:0;
+      width:max-content;
+      max-width:none;
+    }
+    body.ar .header.homeDateSplit .dateTagSide,
+    html[lang="ar"] .header.homeDateSplit .dateTagSide {
+      align-items:flex-end;
+      padding-inline-start:0;
+      padding-inline-end:min(1.8vw, 10px);
+      border-inline-start:none;
+      border-inline-end:1px solid rgba(255,255,255,.35);
+    }
+    .header.homeDateSplit .dateTagWeek {
       display:block;
-      width:16px;
-      height:16px;
+      font-size:clamp(13px, 3.8vw, 17px);
+      font-weight:700;
+      letter-spacing:-.01em;
+      line-height:1.05;
+      text-align:left;
+      white-space:nowrap;
+      width:100%;
+      overflow:visible;
       pointer-events:none;
-      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
     }
-    .dateTag-label {
-      line-height:1.2;
+    body.ar .header.homeDateSplit .dateTagWeek {
+      letter-spacing:0;
+      text-align:right;
+    }
+    .header.homeDateSplit .dateTagDay {
+      display:block;
+      font-size:clamp(56px, 18vw, 88px);
+      font-weight:800;
+      letter-spacing:-.04em;
+      line-height:.9;
+      font-variant-numeric:tabular-nums;
+      flex:0 0 auto;
       pointer-events:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
-    .header .dateTag:hover {
-      background:rgba(255,255,255,.25);
-      transform:translateY(-1px);
+    body.ar .header.homeDateSplit .dateTagDay { letter-spacing:0; }
+    .header.homeDateSplit .dateTagMonthWrap {
+      display:block;
+      line-height:1;
+      text-align:left;
+      width:100%;
     }
-    /* Transparent date input over #dateTag — native picker on iOS + desktop */
-    .datePickerWrapper #datePicker {
+    body.ar .header.homeDateSplit .dateTagMonthWrap,
+    html[lang="ar"] .header.homeDateSplit .dateTagMonthWrap {
+      text-align:right;
+    }
+    .header.homeDateSplit .dateTagMonth {
+      display:block;
+      font-size:clamp(22px, 7vw, 36px);
+      font-weight:700;
+      letter-spacing:-.02em;
+      line-height:1;
+      text-transform:none;
+      text-align:left;
+      white-space:nowrap;
+      max-width:100%;
+      overflow:visible;
+      pointer-events:none;
+    }
+    body.ar .header.homeDateSplit .dateTagMonth {
+      letter-spacing:0;
+      text-align:right;
+    }
+    .header.homeDateSplit .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
-      min-height:44px;
+      min-height:72px;
       margin:0;
       padding:0;
       opacity:0;
       cursor:pointer;
       font-size:16px;
-      line-height:44px;
       border:none;
       z-index:5;
       pointer-events:auto;
       color:transparent;
       background:transparent;
       touch-action:manipulation;
+    }
+    .header.homeDateSplit .datePickerWrapper #datePicker.datePicker-center-open {
+      position:fixed;
+      left:50%;
+      top:max(18vh, calc(env(safe-area-inset-top, 0px) + 72px));
+      right:auto;
+      bottom:auto;
+      width:1px;
+      height:1px;
+      min-height:0;
+      transform:translate(-50%, -50%);
+      z-index:10000;
     }
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
@@ -1347,14 +1450,24 @@
 <div class="wrap">
 
   <!-- ════ HEADER ════ -->
-  <div class="header">
+  <div class="header homeDateSplit">
     <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">Ã˜Â¹</span></button>
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">5 August 2026</span></label>
+      <label class="dateTag" id="dateTag" for="datePicker">
+        <span class="dateTagMain">
+          <span class="dateTagDay" id="dateTagDay"></span>
+          <span class="dateTagSide">
+            <span class="dateTagWeek" id="dateTagWeek"></span>
+            <span class="dateTagMonthWrap">
+              <span class="dateTagMonth" id="dateTagMonth"></span>
+            </span>
+          </span>
+        </span>
+      </label>
       <input id="datePicker" type="date" value="2026-08-05" min="2026-08-01" max="2026-10-31" aria-label="Select roster date" />
     </div>
   </div>
@@ -2472,7 +2585,7 @@ function buildBannerHeaderForSnapshot() {
   clone.style.backgroundPosition = bg.position;
   clone.style.backgroundRepeat = bg.repeat;
   if (bg.color) clone.style.backgroundColor = bg.color;
-  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label, .dateTagDay, .dateTagWeek, .dateTagMonth').forEach(function(el) {
     el.style.position = 'relative';
     el.style.zIndex = '2';
     el.style.color = '#fff';
@@ -2747,13 +2860,54 @@ function goToEmployeeSchedule(empName) {
       String(muscatTime.getDate()).padStart(2, '0');
   }
 
+  var MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
   function formatIsoLabel(iso) {
     var d = new Date(iso + 'T00:00:00');
     if (isNaN(d.getTime())) return iso;
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  function syncHeaderDate(iso) {
+  function weekdayLabel(iso, lang) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return '';
+    var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+    var names = lang === 'ar' ? DAYS_AR : DAYS_EN;
+    return names[d.getUTCDay()] || '';
+  }
+
+  function dayNumLabel(iso) {
+    var p = (iso || '').split('-');
+    return p.length === 3 ? String(parseInt(p[2], 10)) : '';
+  }
+
+  function monthNameLabel(iso, lang) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return '';
+    var mo = parseInt(p[1], 10);
+    var months = lang === 'ar' ? MONTHS_AR : MONTHS_EN;
+    return months[mo - 1] || '';
+  }
+
+  function syncHeaderDate(iso, langOverride) {
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var dateWeek = document.getElementById('dateTagWeek');
+    var dateDay = document.getElementById('dateTagDay');
+    var dateMonth = document.getElementById('dateTagMonth');
+    if (dateDay) {
+      if (dateWeek) dateWeek.textContent = weekdayLabel(iso, lang);
+      dateDay.textContent = dayNumLabel(iso);
+      if (dateMonth) dateMonth.textContent = monthNameLabel(iso, lang);
+      return;
+    }
     var tag = document.getElementById('dateTag');
     if (tag) {
       var dateLbl = document.getElementById('dateTagLabel');
@@ -2762,7 +2916,6 @@ function goToEmployeeSchedule(empName) {
       else tag.textContent = dateText;
     }
   }
-
   var path = window.location.pathname || '/';
   var pageDateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
   var effectiveIso = pageDateMatch
@@ -2949,6 +3102,17 @@ function goToEmployeeSchedule(empName) {
 
     window.location.href = target;
   });
+
+  (function loadDateBannerNav() {
+    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
+    if (!root) {
+      var p = location.pathname || '/';
+      root = p.replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/').replace(/\/now\/.*$/i, '/').replace(/\/+$/, '') || '';
+    }
+    var s = document.createElement('script');
+    s.src = (root || '') + '/date-banner-nav.js?v=20260901e';
+    document.head.appendChild(s);
+  })();
 
 })();
 
@@ -3237,6 +3401,15 @@ function applyLang(lang) {
   localStorage.setItem('rosterLang',lang);
   LANG=lang;
   updateSummarySwitchChip();
+  if (window.rosterSyncHeaderDate) {
+    var datePickerEl = document.getElementById('datePicker');
+    var iso = datePickerEl && datePickerEl.value;
+    if (!iso) {
+      var m = (window.location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+      if (m) iso = m[1];
+    }
+    if (iso) window.rosterSyncHeaderDate(iso, lang);
+  }
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 
@@ -3597,7 +3770,7 @@ function goToRosterDiff(event) {
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
     addScript(root + '/banner-store.js?v=20260831g');
-    addScript(root + '/banner-changer.js?v=20260901a');
+    addScript(root + '/banner-changer.js?v=20260901d');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
