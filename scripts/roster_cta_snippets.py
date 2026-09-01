@@ -233,9 +233,9 @@ LANG_TOGGLE_HTML = (
 LANG_TOGGLE_CSS = r"""    .langToggle {
       position:absolute; bottom:12px; top:auto; right:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
-      min-width:auto; height:auto; padding:4px;
+      min-width:auto; height:auto; padding:2px;
       display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      gap:1px; color:#fff; font-size:0; cursor:pointer;
       box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
       transition:transform .2s ease, opacity .2s ease;
       -webkit-tap-highlight-color:transparent;
@@ -245,17 +245,17 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
     .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
     .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
     .langToggle-icon svg {
-      display:block; width:18px; height:18px;
+      display:block; width:13px; height:13px;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
     }
     .langToggle-label {
-      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      font-size:8px; font-weight:800; line-height:1; letter-spacing:.02em;
       text-shadow:0 1px 3px rgba(0,0,0,.65);
     }
     #banner-changer-btn {
       position:absolute; bottom:12px; top:auto; left:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
-      min-width:auto; min-height:auto; padding:4px;
+      min-width:auto; min-height:auto; padding:2px;
       color:#fff; cursor:pointer; line-height:0;
       box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
       display:inline-flex; align-items:center; justify-content:center;
@@ -264,16 +264,16 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
     }
     #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
     #banner-changer-btn .banner-changer-icon svg {
-      display:block; width:20px; height:20px;
+      display:block; width:13px; height:13px;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
     }
     body.ar #banner-changer-btn { left:12px; right:auto; }
     @media (max-width:720px) {
-      .langToggle { padding:6px; min-width:44px; min-height:44px; }
-      .langToggle-icon svg { width:20px; height:20px; }
-      .langToggle-label { font-size:11px; }
-      #banner-changer-btn { padding:6px; min-width:44px; min-height:44px; }
-      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+      .langToggle { padding:2px; min-width:0; min-height:0; }
+      .langToggle-icon svg { width:13px; height:13px; }
+      .langToggle-label { font-size:8px; }
+      #banner-changer-btn { padding:2px; min-width:0; min-height:0; }
+      #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
     .header.homeDateSplit .langToggle,
     .header.homeDateSplit #langToggle,
@@ -291,6 +291,16 @@ LANG_TOGGLE_CSS = r"""    .langToggle {
     .header.homeDateSplit #banner-changer-btn { grid-column:1; grid-row:2; }
     .header.homeDateSplit .langToggle,
     .header.homeDateSplit #langToggle { grid-column:3; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px; height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
 """
 APPLY_LANG_LANG_BTN_OLD = (
     "  var btn=document.getElementById('langToggle'); if(btn) btn.textContent=t.langBtn;\n"
@@ -1268,7 +1278,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901h');
+  addScript(root + '/banner-changer.js?v=20260901i');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -1307,7 +1317,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901h');
+  addScript(root + '/banner-changer.js?v=20260901i');
   addScript(root + '/date-banner-nav.js?v=20260901e');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);

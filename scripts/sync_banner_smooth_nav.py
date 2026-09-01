@@ -142,7 +142,7 @@ HOME_DATE_SPLIT_OLD = """    .header.homeDateSplit {
 
 HOME_DATE_SPLIT_NEW = """    .header.homeDateSplit {
       display:grid;
-      grid-template-columns:44px minmax(0,1fr) 44px;
+      grid-template-columns:28px minmax(0,1fr) 28px;
       grid-template-rows:auto auto;
       align-items:center;
       direction:ltr;

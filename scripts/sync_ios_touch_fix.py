@@ -423,10 +423,10 @@ def patch_html(text: str, html_path: Path | None = None) -> tuple[str, list[str]
             )
         notes.append("lang-toggle")
 
-    if "@media (max-width:480px)" in text and ".langToggle      { width:44px" not in text:
+    if "@media (max-width:480px)" in text and ".langToggle      { width:" not in text:
         text = text.replace(
             "@media (max-width:480px){\n      .wrap",
-            "@media (max-width:480px){\n      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }\n      .wrap",
+            "@media (max-width:480px){\n      .langToggle      { width:auto; height:auto; min-width:0; min-height:0; font-size:8px; }\n      .wrap",
             1,
         )
         notes.append("lang-mobile")

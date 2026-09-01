@@ -112,9 +112,9 @@
     .langToggle {
       position:absolute; bottom:12px; top:auto; right:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
-      min-width:auto; height:auto; padding:4px;
+      min-width:auto; height:auto; padding:2px;
       display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:2px; color:#fff; font-size:0; cursor:pointer;
+      gap:1px; color:#fff; font-size:0; cursor:pointer;
       box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
       transition:transform .2s ease, opacity .2s ease;
       -webkit-tap-highlight-color:transparent;
@@ -124,17 +124,17 @@
     .langToggle:hover { background:transparent; transform:scale(1.08); opacity:.92; }
     .langToggle-icon { line-height:0; display:flex; align-items:center; justify-content:center; }
     .langToggle-icon svg {
-      display:block; width:18px; height:18px;
+      display:block; width:13px; height:13px;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
     }
     .langToggle-label {
-      font-size:10px; font-weight:800; line-height:1; letter-spacing:.02em;
+      font-size:8px; font-weight:800; line-height:1; letter-spacing:.02em;
       text-shadow:0 1px 3px rgba(0,0,0,.65);
     }
     #banner-changer-btn {
       position:absolute; bottom:12px; top:auto; left:12px; z-index:30;
       background:transparent; border:none; border-radius:0;
-      min-width:auto; min-height:auto; padding:4px;
+      min-width:auto; min-height:auto; padding:2px;
       color:#fff; cursor:pointer; line-height:0;
       box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
       display:inline-flex; align-items:center; justify-content:center;
@@ -143,23 +143,23 @@
     }
     #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
     #banner-changer-btn .banner-changer-icon svg {
-      display:block; width:20px; height:20px;
+      display:block; width:13px; height:13px;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
     }
     body.ar #banner-changer-btn { left:12px; right:auto; }
     @media (max-width:720px) {
-      .langToggle { padding:6px; min-width:44px; min-height:44px; }
-      .langToggle-icon svg { width:20px; height:20px; }
-      .langToggle-label { font-size:11px; }
-      #banner-changer-btn { padding:6px; min-width:44px; min-height:44px; }
-      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+      .langToggle { padding:2px; min-width:0; min-height:0; }
+      .langToggle-icon svg { width:13px; height:13px; }
+      .langToggle-label { font-size:8px; }
+      #banner-changer-btn { padding:2px; min-width:0; min-height:0; }
+      #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
 @media (max-width:720px) {
-      .langToggle { padding:6px; }
-      .langToggle-icon svg { width:20px; height:20px; }
-      .langToggle-label { font-size:11px; }
-      #banner-changer-btn { padding:6px; }
-      #banner-changer-btn .banner-changer-icon svg { width:22px; height:22px; }
+      .langToggle { padding:2px; }
+      .langToggle-icon svg { width:13px; height:13px; }
+      .langToggle-label { font-size:8px; }
+      #banner-changer-btn { padding:2px; }
+      #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
 
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
@@ -197,7 +197,7 @@
     /* Date — with-me split layout (homepage trial) */
     .header.homeDateSplit {
       display:grid;
-      grid-template-columns:44px minmax(0,1fr) 44px;
+      grid-template-columns:28px minmax(0,1fr) 28px;
       grid-template-rows:auto auto;
       align-items:center;
       direction:ltr;
@@ -253,6 +253,21 @@
       left:auto !important;
       right:auto !important;
     }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px;
+      min-width:0;
+      min-height:0;
+      width:auto;
+      height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px;
+      height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
     .header.homeDateSplit .datePickerWrapper {
       grid-column:2;
       grid-row:2;
@@ -1536,7 +1551,7 @@
 
     /* ═══════ MOBILE ═══════ */
     @media (max-width:480px){
-      .langToggle      { width:44px; height:44px; min-width:44px; min-height:44px; font-size:12px; }
+      .langToggle      { width:auto; height:auto; min-width:0; min-height:0; font-size:8px; }
       .wrap            { padding:12px 10px 22px; }
       .deptTitle       { font-size:16px; }
       .empName         { font-size:14px; }
@@ -4561,7 +4576,7 @@ setSummaryChipHrefs();
     addScript(root + '/feature-update-badge.js?v=20260803i');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=20260901a');
+    addScript(root + '/banner-changer.js?v=20260901i');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
