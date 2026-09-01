@@ -180,14 +180,15 @@
       '.empRowTrail{',
       'display:flex;align-items:center;justify-content:flex-end;gap:4px;',
       'flex-shrink:0;align-self:flex-start;pointer-events:auto;cursor:pointer;',
-      'padding:0 0 0 8px;margin:0;position:relative;z-index:2;',
-      '-webkit-tap-highlight-color:transparent;',
+      'padding:0;padding-inline-start:8px;margin:0;position:relative;z-index:2;',
+      'direction:ltr;-webkit-tap-highlight-color:transparent;',
       '}',
-      /* Invisible hit zone on the right of the name row only (not the open panel). */
+      /* Invisible hit zone on the code side of the name row only (not the open panel). */
       '.empTrailHit{',
       'position:absolute;top:0;right:0;height:40px;width:78px;z-index:1;',
       'cursor:pointer;-webkit-tap-highlight-color:transparent;',
       '}',
+      'body.ar .empTrailHit{right:auto;left:0}',
       '.empMain{min-width:0;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:0;position:relative}',
       '.empBlock{position:relative;background:transparent;display:flex;flex-direction:column}',
       '.empBlock > .empRow{align-items:center}',

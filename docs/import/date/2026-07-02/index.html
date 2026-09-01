@@ -158,7 +158,7 @@
     }
 
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
-    .empRow, .empName, .empStatus { direction:ltr !important; unicode-bidi:embed; text-align:left !important; }
+    .empStatus, .empStatusHit { direction:ltr; unicode-bidi:isolate; }
 
     .welcomeChip {
       display:none;
@@ -4311,7 +4311,7 @@ setSummaryChipHrefs();
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
-  addScript(root + '/emp-contact.js?v=20260730b');
+  addScript(root + '/emp-contact.js?v=20260901c');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260809a');

@@ -1264,7 +1264,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
-  addScript(root + '/emp-contact.js?v=20260730b');
+  addScript(root + '/emp-contact.js?v=20260901c');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=20260831g');
@@ -1301,7 +1301,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
-  addScript(root + '/emp-contact.js?v=20260730b');
+  addScript(root + '/emp-contact.js?v=20260901c');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');

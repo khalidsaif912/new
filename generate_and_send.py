@@ -887,7 +887,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     /* زر اللغة */
 {LANG_TOGGLE_CSS}
     body.ar {{ direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }}
-    .empRow, .empName, .empStatus {{ direction:ltr !important; unicode-bidi:embed; text-align:left !important; }}
+    .empStatus, .empStatusHit {{ direction:ltr; unicode-bidi:isolate; }}
 
     .welcomeChip {{
       display:none;
