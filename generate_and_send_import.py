@@ -1084,6 +1084,9 @@ def build_duty_html(
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="{ios_touch_src}"></script>
   <title>Import Duty Roster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   {LEGACY_ROSTER_SITE_IMPORT_REDIRECT}
   <style>{style}</style>
   <style>
@@ -1163,14 +1166,24 @@ def build_duty_html(
 <body>
 <div class="wrap">
 
-  <div class="header">
+  <div class="header homeDateSplit">
     {LANG_TOGGLE_HTML}
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Import</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true">{DATE_TAG_SVG}</span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></label>
+      <label class="dateTag" id="dateTag" for="datePicker">
+        <span class="dateTagMain">
+          <span class="dateTagDay" id="dateTagDay"></span>
+          <span class="dateTagSide">
+            <span class="dateTagWeek" id="dateTagWeek"></span>
+            <span class="dateTagMonthWrap">
+              <span class="dateTagMonth" id="dateTagMonth"></span>
+            </span>
+          </span>
+        </span>
+      </label>
       <input id="datePicker" type="date" value="{date_iso}" min="{min_date}" max="{max_date}" aria-label="Select roster date" title="Pick day" />
     </div>
   </div>

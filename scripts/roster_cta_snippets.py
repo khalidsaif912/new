@@ -1306,6 +1306,9 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
+  addScript(root + '/banner-store.js?v=20260831g');
+  addScript(root + '/banner-changer.js?v=20260901h');
+  addScript(root + '/date-banner-nav.js?v=20260901e');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
@@ -1319,8 +1322,6 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-store.js?v=20260831g');
-    addScript(root + '/banner-changer.js?v=20260831j');
   }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
