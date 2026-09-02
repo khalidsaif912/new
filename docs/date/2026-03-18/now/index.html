@@ -2294,7 +2294,7 @@ function goToEmployeeSchedule(empName) {
       root = p.replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/').replace(/\/now\/.*$/i, '/').replace(/\/+$/, '') || '';
     }
     var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260901e';
+    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
     document.head.appendChild(s);
   })();
 
@@ -2440,6 +2440,7 @@ function applyLang(lang) {
     }
     if (iso) window.rosterSyncHeaderDate(iso, lang);
   }
+  try { document.dispatchEvent(new CustomEvent('rosterLangChanged', { detail: { lang: lang } })); } catch (e) {}
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 
@@ -2692,7 +2693,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260811r1';
+  var ver = '20260901b';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -2703,21 +2704,26 @@ function goToRosterDiff(event) {
   }
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260809a');
+  addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/emp-contact.js?v=20260902c');
+  addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
+  addScript(root + '/banner-store.js?v=20260831g');
+  addScript(root + '/banner-changer.js?v=20260901i');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260830wm');
-    addScript(root + '/install-pwa.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/shift-copy.js?v=' + ver);
+    addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
-    addScript(root + '/change-alert.js?v=' + ver);
-    addScript(root + '/holiday-ticker.js?v=20260803k');
-    addScript(root + '/feature-update-badge.js?v=20260726d');
+    addScript(root + '/alert-sound.js?v=20260814t');
+    addScript(root + '/change-alert.js?v=20260814s');
+    addScript(root + '/holiday-ticker.js?v=20260814r');
+    addScript(root + '/feature-update-badge.js?v=20260814k');
+    addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
-    addScript(root + '/banner-changer.js?v=20260901i');
-}
+  }
   if (window.requestIdleCallback) {
     requestIdleCallback(loadSecondary, { timeout: 3000 });
   } else {

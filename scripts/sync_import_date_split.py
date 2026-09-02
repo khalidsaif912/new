@@ -84,7 +84,7 @@ LOADER = """
   (function loadDateBannerNav() {
     var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
     var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260901e';
+    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
     document.head.appendChild(s);
   })();
 """

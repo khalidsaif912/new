@@ -2255,21 +2255,58 @@ function goToEmployeeSchedule(empName) {{
       String(muscatTime.getDate()).padStart(2, '0');
   }}
 
-  function formatIsoLabel(iso) {{
-    var d = new Date(iso + 'T00:00:00');
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-GB', {{ day: 'numeric', month: 'long', year: 'numeric' }});
+  function formatIsoLabel(iso, langOverride) {{
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return iso;
+    var months = ar
+      ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var mo = parseInt(p[1], 10);
+    var day = String(parseInt(p[2], 10));
+    return day + ' ' + (months[mo - 1] || p[1]) + ' ' + p[0];
   }}
 
-  function syncHeaderDate(iso) {{
+  function syncHeaderDate(iso, langOverride) {{
+    if (window.rosterPaintHeaderDate) {{
+      window.rosterPaintHeaderDate(iso, langOverride);
+      return;
+    }}
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
+    var dateWeek = document.getElementById('dateTagWeek');
+    var dateDay = document.getElementById('dateTagDay');
+    var dateMonth = document.getElementById('dateTagMonth');
+    var p = String(iso || '').split('-');
+    if (dateDay && p.length === 3) {{
+      var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+      var days = ar
+        ? ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var months = ar
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      if (dateWeek) dateWeek.textContent = days[d.getUTCDay()] || '';
+      dateDay.textContent = String(parseInt(p[2], 10));
+      if (dateMonth) dateMonth.textContent = months[parseInt(p[1], 10) - 1] || '';
+      return;
+    }}
     var tag = document.getElementById('dateTag');
     if (tag) {{
       var dateLbl = document.getElementById('dateTagLabel');
-      var dateText = formatIsoLabel(iso);
+      var dateText = formatIsoLabel(iso, lang);
       if (dateLbl) dateLbl.textContent = dateText;
       else tag.textContent = dateText;
     }}
   }}
+  window.rosterSyncHeaderDate = syncHeaderDate;
 
   var path = window.location.pathname || '/';
   var pageDateMatch = path.match(/\/date\/(\d{{4}})-(\d{{2}})-(\d{{2}})\//);
@@ -2743,6 +2780,16 @@ function applyLang(lang) {{
   localStorage.setItem('rosterLang',lang);
   LANG=lang;
   updateSummarySwitchChip();
+  if (window.rosterSyncHeaderDate) {{
+    var datePickerEl = document.getElementById('datePicker');
+    var iso = datePickerEl && datePickerEl.value;
+    if (!iso) {{
+      var m = (window.location.pathname || '').match(/(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
+      if (m) iso = m[1];
+    }}
+    if (iso) window.rosterSyncHeaderDate(iso, lang);
+  }}
+  try {{ document.dispatchEvent(new CustomEvent('rosterLangChanged', {{ detail: {{ lang: lang }} }})); }} catch (e) {{}}
 }}
 function toggleLang() {{ applyLang(LANG==='en'?'ar':'en'); }}
 

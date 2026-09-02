@@ -2169,7 +2169,7 @@ body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
       root = p.replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/').replace(/\/now\/.*$/i, '/').replace(/\/+$/, '') || '';
     }
     var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260901e';
+    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
     document.head.appendChild(s);
   })();
 
@@ -2380,6 +2380,7 @@ var footer=document.querySelector('.footer');
     }
     if (iso) window.rosterSyncHeaderDate(iso, lang);
   }
+  try { document.dispatchEvent(new CustomEvent('rosterLangChanged', { detail: { lang: lang } })); } catch (e) {}
 }
 function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 applyLang(LANG);

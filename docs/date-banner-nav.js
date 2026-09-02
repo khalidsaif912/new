@@ -1,6 +1,24 @@
 (function () {
   'use strict';
 
+  (function loadDateBannerI18n() {
+    if (window.__rosterDateI18n) return;
+    if (document.querySelector('script[src*="date-banner-i18n.js"]')) return;
+    var src = '/date-banner-i18n.js?v=20260902a';
+    var cur = document.currentScript && document.currentScript.src;
+    if (cur && /date-banner-nav\.js/.test(cur)) {
+      src = cur.replace(/date-banner-nav\.js[^/]*$/, 'date-banner-i18n.js?v=20260902a');
+    } else if (typeof getSiteRootUrl === 'function') {
+      src = getSiteRootUrl() + '/date-banner-i18n.js?v=20260902a';
+    } else if (typeof getSiteRootPath === 'function') {
+      src = (getSiteRootPath() || '') + '/date-banner-i18n.js?v=20260902a';
+    }
+    var s = document.createElement('script');
+    s.src = src;
+    s.setAttribute('data-local-src', src);
+    document.head.appendChild(s);
+  })();
+
   function addDays(iso, delta) {
     var p = (iso || '').split('-');
     if (p.length !== 3) return '';
