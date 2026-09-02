@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260902kashida" in html
+    assert "with-me.js?v=20260902wash" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -135,9 +135,10 @@ def test_with_me_page_exists():
     assert "crewSummary" in html
     assert "changeEmp" in html
     assert "border-inline-start" in html
-    assert "empTogetherTrack" in html
-    assert "empTogetherFill" in html
+    assert "empTogetherTrack" not in html
+    assert "empTogetherFill" not in html
     assert "--together" in html
+    assert ".empRow::before" in html
     assert "empRow" in html
     assert "grid-template-columns: minmax(0, 1fr)" not in html
     header_top = html[html.find('<div class="headerTop">') : html.find('<div class="headerBody">')]
@@ -172,7 +173,8 @@ def test_with_me_page_exists():
     assert "parseRosterHtml" in src
     assert "ensureCoShiftStats" in src
     assert "togetherRatio" in src
-    assert "empTogetherTrack" in src
+    assert "togetherTitle" in src
+    assert "empTogetherTrack" not in src
     assert "syncBannerTexture" in src
     assert "darkenPageColor" in src
     assert "rosterBgTextureChange" in src
@@ -238,7 +240,7 @@ def test_with_me_page_exists():
     assert 'class="crewCard \' + shiftClass + \'"' in render
     assert "deptHead" in render
     assert "empRow" in render
-    assert "empTogetherTrack" in render
+    assert "empTogetherTrack" not in render
     assert "togetherRatio" in render or "togetherRatio" in src
     assert "empId" in render
     assert "tone-a" in render
@@ -250,7 +252,7 @@ def test_with_me_page_exists():
     assert "swipeHint" not in html
     assert ".deptHead" in html
     assert ".empRow" in html
-    assert ".empTogetherFill" in html
+    assert ".empRow::before" in html
     assert "personDisplayId" in src
     assert "empId" in html
     assert "font-variant-numeric: tabular-nums" in html

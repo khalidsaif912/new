@@ -85,7 +85,10 @@
       standby: 'Standby',
       other: 'Other',
       secretPrompt: 'This account is protected. Enter the secret PIN to continue:',
-      secretBad: 'Incorrect secret PIN.'
+      secretBad: 'Incorrect secret PIN.',
+      togetherYou: 'You — every day this month',
+      togetherOne: '1 day with you this month',
+      togetherMany: ' days with you this month'
     },
     ar: {
       titleMain: 'معي',
@@ -129,7 +132,10 @@
       standby: 'احتياط',
       other: 'أخرى',
       secretPrompt: 'هذا الحساب محمي. أدخل الرقم السري للمتابعة:',
-      secretBad: 'الرقم السري غير صحيح.'
+      secretBad: 'الرقم السري غير صحيح.',
+      togetherYou: 'أنت — طوال أيام الشهر',
+      togetherOne: 'يوم واحد معك هذا الشهر',
+      togetherMany: ' أيام معك هذا الشهر'
     }
   };
 
@@ -1205,17 +1211,21 @@
     return Math.max(0, Math.min(1, n / workDays));
   }
 
+  function togetherTitle(empId) {
+    var id = String(empId || '').trim();
+    if (id && id === String(state.empId || '').trim()) return t('togetherYou');
+    var n = Number(state.coShift && state.coShift.counts && state.coShift.counts[id]) || 0;
+    if (n === 1) return t('togetherOne');
+    return n + t('togetherMany');
+  }
+
   function paintTogetherBars() {
     var root = document.getElementById('crewTrack');
     if (!root) return;
     Array.prototype.forEach.call(root.querySelectorAll('.empRow[data-emp-id]'), function (row) {
       var id = row.getAttribute('data-emp-id') || '';
       row.style.setProperty('--together', String(togetherRatio(id)));
-      var fill = row.querySelector('.empTogetherFill');
-      if (fill) {
-        var pct = Math.round(togetherRatio(id) * 100);
-        fill.setAttribute('title', pct + '%');
-      }
+      row.setAttribute('title', togetherTitle(id));
     });
   }
 
@@ -1433,7 +1443,7 @@
         var isSelf = id && id === selfId;
         var selfCls = isSelf ? ' is-self' : '';
         var ratio = togetherRatio(id);
-        html += '<div class="empRow ' + tone + selfCls + '" data-emp-id="' + escapeHtml(id) + '" style="--together:' + ratio + '">';
+        html += '<div class="empRow ' + tone + selfCls + '" data-emp-id="' + escapeHtml(id) + '" style="--together:' + ratio + '" title="' + escapeHtml(togetherTitle(id)) + '">';
         html += '<div class="empRowTop">';
         var shown = personDisplayName(p);
         var arSrc = displayName(p.nameAr || '');
@@ -1444,7 +1454,6 @@
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
         html += '<span class="empId">' + escapeHtml(id || '') + '</span>';
         html += '</div>';
-        html += '<div class="empTogetherTrack" aria-hidden="true"><span class="empTogetherFill"></span></div>';
         html += '</div>';
       });
     });
@@ -1471,6 +1480,7 @@
         track.classList.add(anim);
       }
       track.innerHTML = html;
+      paintTogetherBars();
       if (typeof requestAnimationFrame === 'function') {
         requestAnimationFrame(function () { stretchArabicNames(); });
       } else {
