@@ -1183,7 +1183,7 @@
 
   var TATWEEL = '\u0640';
   var JOINING = /[\u0626\u0628\u062A\u062B\u062C\u062D\u062E\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063A\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u064A]/;
-  var kashidaProbe = null;
+  var kashidaCanvas = null;
 
   function splitNameSuffix(raw) {
     var m = String(raw || '').match(/^(.*?)(\s+-\s+\d+\s*)$/);
@@ -1229,20 +1229,23 @@
   }
 
   function measureName(text, sampleEl) {
-    if (!kashidaProbe) {
-      kashidaProbe = document.createElement('span');
-      kashidaProbe.setAttribute('aria-hidden', 'true');
-      kashidaProbe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;pointer-events:none;';
-      document.body.appendChild(kashidaProbe);
-    }
     var cs = window.getComputedStyle(sampleEl);
-    kashidaProbe.style.font = cs.font;
-    kashidaProbe.style.fontSize = cs.fontSize;
-    kashidaProbe.style.fontWeight = cs.fontWeight;
-    kashidaProbe.style.fontFamily = cs.fontFamily;
-    kashidaProbe.style.letterSpacing = cs.letterSpacing;
-    kashidaProbe.textContent = text;
-    return kashidaProbe.getBoundingClientRect().width;
+    var font = cs.font;
+    if (!font || font === 'inherit') {
+      font =
+        (cs.fontStyle || 'normal') +
+        ' ' +
+        (cs.fontWeight || '700') +
+        ' ' +
+        (cs.fontSize || '15px') +
+        ' ' +
+        (cs.fontFamily || 'sans-serif');
+    }
+    if (!kashidaCanvas) {
+      kashidaCanvas = document.createElement('canvas').getContext('2d');
+    }
+    kashidaCanvas.font = font;
+    return kashidaCanvas.measureText(text || '').width;
   }
 
   function stretchArabicNames() {
