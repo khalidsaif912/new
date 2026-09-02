@@ -1280,6 +1280,128 @@
     return state.coShift.promise;
   }
 
+  var TATWEEL = '\u0640';
+  var JOINING = /[\u0626\u0628\u062A\u062B\u062C\u062D\u062E\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063A\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u064A]/;
+  var kashidaCanvas = null;
+
+  function splitNameSuffix(raw) {
+    var m = String(raw || '').match(/^(.*?)(\s+-\s+\d+\s*)$/);
+    if (m) return { name: m[1].trim(), suffix: m[2] };
+    return { name: String(raw || '').trim(), suffix: '' };
+  }
+
+  function arabicNameSource(el) {
+    var ar = el.getAttribute('data-name-ar');
+    if (ar) return ar.trim();
+    return String(el.textContent || '').replace(new RegExp(TATWEEL, 'g'), '').trim();
+  }
+
+  function joinSlots(name) {
+    var slots = [];
+    for (var i = 0; i < name.length - 1; i++) {
+      var ch = name.charAt(i);
+      var nx = name.charAt(i + 1);
+      if (ch === TATWEEL || nx === TATWEEL || ch === ' ' || nx === ' ') continue;
+      if (JOINING.test(ch)) slots.push(i);
+    }
+    return slots;
+  }
+
+  function insertTatweel(name, extras) {
+    if (extras <= 0) return name;
+    var slots = joinSlots(name);
+    if (!slots.length) return name;
+    var counts = [];
+    for (var s = 0; s < slots.length; s++) counts[s] = 0;
+    var start = Math.floor(slots.length / 2);
+    for (var n = 0; n < extras; n++) counts[(start + n) % slots.length] += 1;
+    var out = '';
+    var slotAt = Object.create(null);
+    for (var i = 0; i < slots.length; i++) slotAt[slots[i]] = i;
+    for (var c = 0; c < name.length; c++) {
+      out += name.charAt(c);
+      if (slotAt[c] != null && counts[slotAt[c]]) {
+        out += TATWEEL.repeat(counts[slotAt[c]]);
+      }
+    }
+    return out;
+  }
+
+  function measureName(text, sampleEl) {
+    var cs = window.getComputedStyle(sampleEl);
+    var font = cs.font;
+    if (!font || font === 'inherit') {
+      font =
+        (cs.fontStyle || 'normal') +
+        ' ' +
+        (cs.fontWeight || '650') +
+        ' ' +
+        (cs.fontSize || '13px') +
+        ' ' +
+        (cs.fontFamily || 'sans-serif');
+    }
+    if (!kashidaCanvas) {
+      kashidaCanvas = document.createElement('canvas').getContext('2d');
+    }
+    kashidaCanvas.font = font;
+    return kashidaCanvas.measureText(text || '').width;
+  }
+
+  function stretchNameGroup(nodes) {
+    if (!nodes.length) return;
+    if (state.lang !== 'ar') {
+      nodes.forEach(function (el) {
+        var en = el.dataset.nameEn;
+        el.textContent = en !== undefined ? en : arabicNameSource(el);
+      });
+      return;
+    }
+    var originals = nodes.map(arabicNameSource);
+    var parts = originals.map(splitNameSuffix);
+    var maxW = 0;
+    nodes.forEach(function (el, i) {
+      var w = measureName(parts[i].name, el);
+      if (w > maxW) maxW = w;
+    });
+    nodes.forEach(function (el, i) {
+      var orig = parts[i].name;
+      var suffix = parts[i].suffix;
+      if (!/[\u0600-\u06FF]/.test(orig) || maxW <= 0) {
+        el.textContent = originals[i];
+        return;
+      }
+      var extra = 0;
+      var stretched = orig;
+      var guard = 0;
+      while (measureName(stretched, el) + 0.4 < maxW && guard < 28) {
+        extra += 1;
+        guard += 1;
+        var next = insertTatweel(orig, extra);
+        if (next === stretched) break;
+        stretched = next;
+      }
+      el.textContent = stretched + suffix;
+    });
+  }
+
+  function stretchArabicNames() {
+    document.querySelectorAll('#crewTrack .empList').forEach(function (list) {
+      var group = [];
+      function flush() {
+        if (group.length) stretchNameGroup(group);
+        group = [];
+      }
+      Array.prototype.forEach.call(list.children, function (child) {
+        if (child.classList.contains('deptHead')) flush();
+        else if (child.classList.contains('empRow')) {
+          var el = child.querySelector('.empName');
+          if (el) group.push(el);
+        }
+      });
+      flush();
+    });
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var people = flattenPeople(groups);
     var html = '';
@@ -1313,7 +1435,12 @@
         var ratio = togetherRatio(id);
         html += '<div class="empRow ' + tone + selfCls + '" data-emp-id="' + escapeHtml(id) + '" style="--together:' + ratio + '">';
         html += '<div class="empRowTop">';
-        html += '<span class="empName">' + escapeHtml(personDisplayName(p)) + '</span>';
+        var shown = personDisplayName(p);
+        var arSrc = displayName(p.nameAr || '');
+        var enSrc = displayName(p.name || p.id || '');
+        html += '<span class="empName"';
+        if (arSrc) html += ' data-name-ar="' + escapeHtml(arSrc) + '"';
+        html += ' data-name-en="' + escapeHtml(enSrc) + '">' + escapeHtml(shown) + '</span>';
         if (isSelf) html += '<span class="youPill">' + escapeHtml(t('you')) + '</span>';
         html += '<span class="empId">' + escapeHtml(id || '') + '</span>';
         html += '</div>';
@@ -1344,6 +1471,11 @@
         track.classList.add(anim);
       }
       track.innerHTML = html;
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(function () { stretchArabicNames(); });
+      } else {
+        stretchArabicNames();
+      }
       prefetch(iso);
       try {
         var url = new URL(location.href);
