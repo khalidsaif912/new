@@ -110,7 +110,11 @@
   };
 
   function lang() {
-    var l = localStorage.getItem('rosterLang') || document.documentElement.getAttribute('lang') || 'en';
+    var l = localStorage.getItem('rosterLang');
+    if (l !== 'ar' && l !== 'en') {
+      if (document.body && document.body.classList.contains('ar')) l = 'ar';
+      else l = document.documentElement.getAttribute('lang') || 'en';
+    }
     return l === 'ar' ? 'ar' : 'en';
   }
 
@@ -694,6 +698,7 @@
     var bar = document.querySelector('.summaryBar');
     if (!bar) return;
     var href = withMePageUrl();
+    var label = lang() === 'ar' ? 'معي' : 'With me';
     var existing = document.getElementById('withMeChipBtn') || document.getElementById('readSignChipBtn');
     if (!existing) {
       existing = document.createElement('a');
@@ -710,7 +715,13 @@
       existing.setAttribute('data-open-same', '1');
       existing.removeAttribute('target');
       existing.removeAttribute('rel');
-      existing.innerHTML = withMeChipHtml();
+      var lbl = existing.querySelector('.chipLabel');
+      if (lbl) {
+        lbl.setAttribute('data-key', 'withMePage');
+        lbl.textContent = label;
+      } else {
+        existing.innerHTML = withMeChipHtml();
+      }
     }
     existing.href = href;
   }

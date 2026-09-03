@@ -3646,21 +3646,47 @@ startSummarySwitchLoop();
     }
     return '';
   }
+  function firstNameFrom(full) {
+    full = String(full || '').replace(/\s*-\s*\d+\s*$/, '').trim();
+    if (!full) return '';
+    return full.split(/\s+/)[0];
+  }
+  function syncWelcomeName() {
+    var nameEl = document.getElementById('welcomeName');
+    if (!nameEl) return;
+    var isAr = (typeof LANG !== 'undefined' ? LANG : (localStorage.getItem('rosterLang') || 'en')) === 'ar';
+    var en = nameEl.getAttribute('data-name-en') || '';
+    var ar = nameEl.getAttribute('data-name-ar') || '';
+    var show = (isAr && ar) ? ar : (en || ar);
+    if (show) nameEl.textContent = show;
+  }
+  window.rosterSyncWelcomeName = syncWelcomeName;
+
   var empId = getExportEmpId();
   if (!empId) return;
   var chip = document.getElementById('welcomeChip');
   var nameEl = document.getElementById('welcomeName');
-  // استخدام مسار مطلق يعمل من أي صفحة
+  if (!chip || !nameEl) return;
+
+  var empNameEl = document.querySelector('.empRow[data-emp-name*="' + empId + '"] .empName');
+  if (empNameEl) {
+    var enFull = empNameEl.getAttribute('data-name-en') || empNameEl.dataset.nameEn || empNameEl.textContent || '';
+    var arFull = empNameEl.getAttribute('data-name-ar') || '';
+    nameEl.setAttribute('data-name-en', firstNameFrom(enFull));
+    if (arFull) nameEl.setAttribute('data-name-ar', firstNameFrom(arFull));
+    syncWelcomeName();
+    chip.classList.add('visible');
+  }
+
   var base = getSiteRootUrl() + '/';
   fetch(base + 'schedules/' + empId + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
       if (!d || !d.name) return;
-      var firstName = d.name.split(' ')[0];
-      if (chip && nameEl) {
-        nameEl.textContent = firstName;
-        chip.classList.add('visible');
-      }
+      nameEl.setAttribute('data-name-en', firstNameFrom(d.name));
+      if (d.name_ar) nameEl.setAttribute('data-name-ar', firstNameFrom(d.name_ar));
+      syncWelcomeName();
+      chip.classList.add('visible');
     }).catch(function() {});
 })();
 
@@ -3709,7 +3735,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260901b';
+  var ver = '20260903b';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');

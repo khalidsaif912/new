@@ -347,9 +347,9 @@
       display:flex;
       justify-content:center;
       align-items:center;
-      gap:12px;
+      gap:8px;
       margin-top:14px;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
     }
     a.summaryChip:hover {
       transform:translateY(-3px);
@@ -359,15 +359,18 @@
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
       border-radius:14px;
-      padding:10px 12px;
+      padding:10px 10px;
       text-align:center;
       box-shadow:0 2px 8px rgba(15,23,42,.06);
       transition:all .25s ease;
-      min-width:72px;
+      min-width:0;
+      flex:1 1 0;
+      max-width:84px;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:flex-start;
+      box-sizing:border-box;
     }
 .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
     .summaryChip .chip-icon { display:block; flex-shrink:0; }
@@ -518,7 +521,8 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      font-weight:900;
+      font-weight:800;
+      font-size:14px;
       color:#1f3b8f;
       gap:10px;
     }
@@ -533,34 +537,45 @@
     .empFold > summary {
       list-style:none;
       cursor:pointer;
-      padding:12px 14px;
+      padding:10px 12px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      font-weight:800;
+      font-weight:700;
+      font-size:13px;
+      line-height:1.35;
       color:#0f172a;
-      gap:10px;
+      gap:8px;
     }
     .empFold > summary::-webkit-details-marker { display:none; }
-    .empLeft { display:flex; align-items:center; gap:10px; min-width:0; }
-    .empArrow { color:#64748b; font-size:10px; transition:transform .2s ease; }
+    .empLeft { display:flex; align-items:center; gap:8px; min-width:0; }
+    .empArrow { color:#64748b; font-size:10px; transition:transform .2s ease; flex-shrink:0; }
     .empFold[open] .empArrow { transform:rotate(90deg); }
-    .empNameText { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .empNameText {
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:13px;
+      font-weight:700;
+      line-height:1.35;
+    }
     body.ar .empFold .empNameText,
     html[lang="ar"] .empFold .empNameText {
       font-family: var(--date-font-ar);
-      overflow:visible;
-      text-overflow:clip;
+      font-size:13px;
+      font-weight:700;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .empCount {
-      min-width:30px;
-      height:30px;
+      min-width:26px;
+      height:26px;
       border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:15px;
-      font-weight:900;
+      font-size:12px;
+      font-weight:800;
       border:1px solid #bfdbfe;
       color:#1d4ed8;
       background:#dbeafe;
@@ -661,11 +676,37 @@
       .langToggle-label { font-size:8px; }
       #banner-changer-btn { padding:2px; }
       #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
+      .summaryBar {
+        gap:5px;
+        flex-wrap:nowrap;
+        margin-top:12px;
+      }
+      .summaryChip {
+        padding:7px 4px;
+        min-width:0;
+        flex:1 1 0;
+        max-width:none;
+        border-radius:12px;
+      }
+      .summaryChip .chipVal { font-size:17px; height:22px; }
+      .summaryChip .chip-icon { width:18px; height:18px; }
+      .summaryChip .chipLabel { font-size:7.5px; letter-spacing:0; margin-top:3px; }
+      .waveHand img { width:22px; height:22px; margin:-2px 0; }
+      .welcomeChip .chipLabel { max-width:64px; }
+      .empFold > summary { padding:9px 10px; font-size:12.5px; }
+      .empNameText,
+      body.ar .empFold .empNameText,
+      html[lang="ar"] .empFold .empNameText { font-size:12.5px; }
+      .deptFold > summary { font-size:13px; padding:10px 12px; }
+      .empCount { min-width:24px; height:24px; font-size:11px; }
     }
     @media (max-width:480px){
       .langToggle      { width:auto; height:auto; min-width:0; min-height:0; font-size:8px; }
       .wrap { padding:12px 10px 22px; }
-      }
+      .summaryBar { gap:4px; }
+      .summaryChip { padding:6px 3px; border-radius:11px; }
+      .summaryChip .chipLabel { font-size:7px; }
+    }
   </style>
   <script src="../welcome-emoji-early.js?v=20260903a"></script>
 </head>
@@ -1452,6 +1493,14 @@
         const w = measureName(parts[i].name, el);
         if (w > maxW) maxW = w;
       });
+      // Never stretch wider than the row can show — keeps names readable on phones.
+      const avail = nodes.reduce((min, el) => {
+        const parent = el.closest('.empLeft') || el.parentElement;
+        const cw = parent ? parent.getBoundingClientRect().width : 0;
+        if (cw > 40 && cw < min) return cw;
+        return min;
+      }, Infinity);
+      if (Number.isFinite(avail)) maxW = Math.min(maxW, avail - 8);
       nodes.forEach((el, i) => {
         const orig = parts[i].name;
         const suffix = parts[i].suffix;
@@ -1462,7 +1511,7 @@
         let extra = 0;
         let stretched = orig;
         let guard = 0;
-        while (measureName(stretched, el) + 0.4 < maxW && guard < 28) {
+        while (measureName(stretched, el) + 0.4 < maxW && guard < 16) {
           extra += 1;
           guard += 1;
           const next = insertTatweel(orig, extra);

@@ -3863,10 +3863,15 @@ function applyLang(lang) {
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
+  // Persist language BEFORE secondary i18n hooks — site-apps reads localStorage
+  // when rebuilding the With me chip and would otherwise overwrite معي with With me.
+  localStorage.setItem('rosterLang',lang);
+  LANG=lang;
   if(window.rosterSiteShare && window.rosterSiteShare.setLang) window.rosterSiteShare.setLang();
   if(window.rosterSiteApps && window.rosterSiteApps.setLang) window.rosterSiteApps.setLang();
   if(window.rosterSiteShiftCopy && window.rosterSiteShiftCopy.setLang) window.rosterSiteShiftCopy.setLang();
   if(window.rosterSiteVisits && window.rosterSiteVisits.setLang) window.rosterSiteVisits.setLang();
+  if(window.rosterSyncWelcomeName) window.rosterSyncWelcomeName();
   var footer=document.querySelector('.footer');
   if(footer) {
     var dayEl=document.getElementById('siteVisitsDay');
@@ -3887,8 +3892,6 @@ function applyLang(lang) {
     if(dayEl) dayEl.textContent=dayN;
     if(monthEl) monthEl.textContent=monthN;
   }
-  localStorage.setItem('rosterLang',lang);
-  LANG=lang;
   updateSummarySwitchChip();
   if (window.rosterSyncHeaderDate) {
     var datePickerEl = document.getElementById('datePicker');
@@ -4571,7 +4574,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260901b';
+  var ver = '20260903b';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
