@@ -346,8 +346,8 @@
     .summaryBar {
       display:flex;
       justify-content:center;
-      align-items:center;
-      gap:8px;
+      align-items:stretch;
+      gap:12px;
       margin-top:14px;
       flex-wrap:nowrap;
     }
@@ -359,13 +359,11 @@
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
       border-radius:14px;
-      padding:10px 10px;
+      padding:10px 12px;
       text-align:center;
       box-shadow:0 2px 8px rgba(15,23,42,.06);
       transition:all .25s ease;
-      min-width:0;
-      flex:1 1 0;
-      max-width:84px;
+      min-width:72px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -373,7 +371,7 @@
       box-sizing:border-box;
     }
 .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
-    .summaryChip .chip-icon { display:block; flex-shrink:0; }
+    .summaryChip .chip-icon { display:block; flex-shrink:0; width:22px; height:22px; }
     a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
     a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
     a.summaryChip.importChip .chipVal { color:#0ea5e9; }
@@ -676,23 +674,6 @@
       .langToggle-label { font-size:8px; }
       #banner-changer-btn { padding:2px; }
       #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
-      .summaryBar {
-        gap:5px;
-        flex-wrap:nowrap;
-        margin-top:12px;
-      }
-      .summaryChip {
-        padding:7px 4px;
-        min-width:0;
-        flex:1 1 0;
-        max-width:none;
-        border-radius:12px;
-      }
-      .summaryChip .chipVal { font-size:17px; height:22px; }
-      .summaryChip .chip-icon { width:18px; height:18px; }
-      .summaryChip .chipLabel { font-size:7.5px; letter-spacing:0; margin-top:3px; }
-      .waveHand img { width:22px; height:22px; margin:-2px 0; }
-      .welcomeChip .chipLabel { max-width:64px; }
       .empFold > summary { padding:9px 10px; font-size:12.5px; }
       .empNameText,
       body.ar .empFold .empNameText,
@@ -700,12 +681,23 @@
       .deptFold > summary { font-size:13px; padding:10px 12px; }
       .empCount { min-width:24px; height:24px; font-size:11px; }
     }
+    @media (max-width:600px){
+      .summaryBar {
+        gap:6px;
+        flex-wrap:nowrap;
+        justify-content:center;
+        margin-top:12px;
+      }
+      .summaryChip { padding:8px 8px; min-width:60px; }
+      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chip-icon { width:20px; height:20px; }
+      .summaryChip .chipLabel { font-size:8.5px; letter-spacing:.2px; }
+      .waveHand img { width:26px; height:26px; margin:-2px 0; }
+      .welcomeChip .chipLabel { max-width:72px; }
+    }
     @media (max-width:480px){
       .langToggle      { width:auto; height:auto; min-width:0; min-height:0; font-size:8px; }
       .wrap { padding:12px 10px 22px; }
-      .summaryBar { gap:4px; }
-      .summaryChip { padding:6px 3px; border-radius:11px; }
-      .summaryChip .chipLabel { font-size:7px; }
     }
   </style>
   <script src="../welcome-emoji-early.js?v=20260903a"></script>
