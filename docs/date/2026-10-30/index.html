@@ -157,6 +157,9 @@
     .welcomeChip.visible {
       display:flex;
     }
+    .summaryBar #welcomeChip.welcomeChip.visible {
+      order:-1;
+    }
     .welcomeChip .chipLabel {
       max-width:88px;
       overflow:hidden;
@@ -169,6 +172,11 @@
       line-height:0;
       transform-origin:50% 88%;
       animation:waveHand 1.8s ease-in-out infinite;
+    }
+    /* Never flash the default waving-hand SVG before the chosen emoji paints. */
+    .waveHand > svg.chip-icon,
+    #welcomeChip .waveHand > svg {
+      display:none !important;
     }
     @keyframes waveHand {
       0%, 50%, 100% { transform:rotate(0deg); }
@@ -1499,6 +1507,9 @@
         var bPos = '62% center';
         try {{
           var cached = JSON.parse(sessionStorage.getItem('roster_banner_paint_cache') || 'null');
+          if (!(cached && cached.name === bn && cached.url)) {{
+            cached = JSON.parse(localStorage.getItem('roster_banner_paint_cache') || 'null');
+          }}
           if (cached && cached.name === bn && cached.url) {{
             bUrl = cached.url;
             if (cached.pos) bPos = cached.pos;
@@ -3244,6 +3255,7 @@ function goToRosterDiff(event) {
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/welcome-emoji-early.js?v=20260903a');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
@@ -3251,8 +3263,8 @@ function goToRosterDiff(event) {
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-  addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901i');
+  addScript(root + '/banner-store.js?v=20260903a');
+  addScript(root + '/banner-changer.js?v=20260903a');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);

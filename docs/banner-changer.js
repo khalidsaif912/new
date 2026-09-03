@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260831g';
+  const BANNER_STORE_VER = '20260903a';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -46,20 +46,39 @@
 
   function savePaintCache(name, url, pos) {
     if (!name || !url) return;
+    var payload = JSON.stringify({
+      name: name,
+      url: url,
+      pos: pos || getBannerPosition(name),
+    });
     try {
-      sessionStorage.setItem(
-        PAINT_CACHE_KEY,
-        JSON.stringify({ name: name, url: url, pos: pos || getBannerPosition(name) })
-      );
+      sessionStorage.setItem(PAINT_CACHE_KEY, payload);
+    } catch (_) {}
+    // Persist across tabs / cold starts so custom banners still early-paint.
+    try {
+      localStorage.setItem(PAINT_CACHE_KEY, payload);
     } catch (_) {}
   }
 
   function readPaintCache() {
     try {
-      return JSON.parse(sessionStorage.getItem(PAINT_CACHE_KEY) || 'null');
-    } catch (_) {
-      return null;
-    }
+      var s = sessionStorage.getItem(PAINT_CACHE_KEY);
+      if (s) return JSON.parse(s);
+    } catch (_) {}
+    try {
+      var l = localStorage.getItem(PAINT_CACHE_KEY);
+      if (l) return JSON.parse(l);
+    } catch (_) {}
+    return null;
+  }
+
+  function clearPaintCache() {
+    try {
+      sessionStorage.removeItem(PAINT_CACHE_KEY);
+    } catch (_) {}
+    try {
+      localStorage.removeItem(PAINT_CACHE_KEY);
+    } catch (_) {}
   }
 
   function urlsMatch(a, b) {
@@ -152,19 +171,23 @@
     var intentionallyGone = false;
     if (store) {
       var ov = store.getOverlayState ? store.getOverlayState() : { removed: [], custom: [] };
+      var overlayOk = !store.overlayLoadedSuccessfully || store.overlayLoadedSuccessfully();
       if (store.isStaticName && store.isStaticName(saved)) {
+        // Only drop static banners that desk-log explicitly removed.
         intentionallyGone = !!(ov.removed && ov.removed.indexOf(saved) >= 0);
       } else if (store.isCustomName && store.isCustomName(saved)) {
-        intentionallyGone = true; // custom and not in active catalog
+        // Custom missing from catalog: purge only when Mantle overlay loaded OK.
+        // A network blip must never wipe the user's choice / flash the default.
+        intentionallyGone = !!overlayOk;
       }
-    } else if (availableBanners.length) {
-      intentionallyGone = true;
     }
+    // Without a store, never purge — keep early paint and retry later.
 
     if (!intentionallyGone) return;
     try {
       localStorage.removeItem(BANNER_KEY);
     } catch (e2) {}
+    clearPaintCache();
     clearBanner();
   }
 
@@ -658,10 +681,9 @@
     // during early style injection / first paint.
     if (!catalogReady) return name;
     if (bannerIsListed(name)) return name;
-    // Catalog loaded but this banner is not active — keep the key only if the
-    // catalog looks broken (empty). Otherwise treat as intentionally removed.
-    if (!availableBanners.length) return name;
-    return null;
+    // Catalog loaded but banner not listed: still keep painting until purge
+    // confirms it was intentionally removed (keeps localStorage key until then).
+    return name;
   }
 
   function saveBannerChoice(name) {
@@ -1198,6 +1220,7 @@
     document.getElementById('resetBanner').onclick = function (e) {
       if (!gesture.shouldPick()) return;
       localStorage.removeItem(BANNER_KEY);
+      clearPaintCache();
       clearBanner();
       overlay.remove();
     };
@@ -1438,12 +1461,19 @@
       const saved = getSavedBanner();
       if (saved) {
         applyBanner(saved, { fromCatalog: true });
-      } else {
-        const early = document.getElementById('banner-early-style');
-        if (early) early.remove();
-        document.documentElement.classList.remove(EARLY_CLASS);
-        getBannerTargets().forEach(removeIosBannerLayers);
+        return;
       }
+      // Only strip early paint when the user has no saved choice left.
+      // Never flash the default header because the catalog was briefly incomplete.
+      var raw = null;
+      try {
+        raw = localStorage.getItem(BANNER_KEY);
+      } catch (e) {}
+      if (raw && BANNER_NAME_RE.test(raw)) {
+        applyBanner(raw);
+        return;
+      }
+      clearBanner();
     });
     createChangerBtn();
     bindHeaderChromeFade();

@@ -432,6 +432,9 @@
         var bPos = '62% center';
         try {{
           var cached = JSON.parse(sessionStorage.getItem('roster_banner_paint_cache') || 'null');
+          if (!(cached && cached.name === bn && cached.url)) {{
+            cached = JSON.parse(localStorage.getItem('roster_banner_paint_cache') || 'null');
+          }}
           if (cached && cached.name === bn && cached.url) {{
             bUrl = cached.url;
             if (cached.pos) bPos = cached.pos;

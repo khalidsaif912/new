@@ -136,6 +136,9 @@ ROSTER_PWA_HEAD_SNIPPET = """
         var bPos = '62% center';
         try {{
           var cached = JSON.parse(sessionStorage.getItem('roster_banner_paint_cache') || 'null');
+          if (!(cached && cached.name === bn && cached.url)) {{
+            cached = JSON.parse(localStorage.getItem('roster_banner_paint_cache') || 'null');
+          }}
           if (cached && cached.name === bn && cached.url) {{
             bUrl = cached.url;
             if (cached.pos) bPos = cached.pos;
@@ -897,6 +900,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .welcomeChip.visible {{
       display:flex;
     }}
+    .summaryBar #welcomeChip.welcomeChip.visible {{
+      order:-1;
+    }}
     .welcomeChip .chipLabel {{
       max-width:88px;
       overflow:hidden;
@@ -909,6 +915,11 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       line-height:0;
       transform-origin:50% 88%;
       animation:waveHand 1.8s ease-in-out infinite;
+    }}
+    /* Never flash the default waving-hand SVG before the chosen emoji paints. */
+    .waveHand > svg.chip-icon,
+    #welcomeChip .waveHand > svg {{
+      display:none !important;
     }}
     @keyframes waveHand {{
       0%, 50%, 100% {{ transform:rotate(0deg); }}

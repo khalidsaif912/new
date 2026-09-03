@@ -1271,19 +1271,19 @@
     if (!chip) return;
     var slot = chip.querySelector('.waveHand') || chip.querySelector('.chipVal');
     if (!slot || slot.getAttribute('data-custom-emoji') === cp) return;
+    // Remove waving-hand SVG immediately so it never flashes while the webp loads.
+    slot.style.animation = 'none';
+    var hand = slot.querySelector('svg');
+    if (hand) hand.remove();
     var img = document.createElement('img');
     img.alt = '';
     img.setAttribute('aria-hidden', 'true');
     img.decoding = 'async';
     img.style.cssText = 'display:block;width:30px;height:30px;margin:-3px 0;object-fit:contain;pointer-events:none;';
-    img.onload = function () {
-      slot.innerHTML = '';
-      slot.appendChild(img);
-      // the webp animates itself — stop the hand-wave rotation
-      slot.style.animation = 'none';
-      slot.setAttribute('data-custom-emoji', cp);
-    };
     img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+    slot.innerHTML = '';
+    slot.appendChild(img);
+    slot.setAttribute('data-custom-emoji', cp);
   }
 
   function applyWelcomeEmoji() {

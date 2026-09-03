@@ -18,6 +18,8 @@
   var merged = { banners: [], layouts: {} };
   var customUrlCache = Object.create(null);
   var loadPromise = null;
+  /** True only after a successful Mantle overlay response (incl. 404 empty). */
+  var overlayFetchOk = false;
 
   function siteRootPath() {
     var path = location.pathname || '/';
@@ -148,11 +150,15 @@
       });
       if (res.status === 404) {
         overlay = { removed: [], custom: [] };
+        overlayFetchOk = true;
         return;
       }
       if (!res.ok) throw new Error('overlay');
       overlay = normalizeOverlay(await res.json());
+      overlayFetchOk = true;
     } catch (e) {
+      // Keep prior overlay; do NOT claim a successful empty catalog.
+      overlayFetchOk = false;
       overlay = overlay || { removed: [], custom: [] };
     }
   }
@@ -396,6 +402,7 @@
     getLayouts: getLayouts,
     getLayout: getLayout,
     getOverlayState: getOverlayState,
+    overlayLoadedSuccessfully: function () { return !!overlayFetchOk; },
     bannerLabel: bannerLabel,
     isBannerName: isBannerName,
     isStaticName: isStaticName,

@@ -5,10 +5,15 @@
   <script defer src="../ios-tap-fix.js?v=20260803f"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Roster Versions Auto Diff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --date-font-en: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      --date-font-ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
     }
     html, body {
       width: 100%;
@@ -119,60 +124,224 @@
     }
     body.ar #banner-changer-btn { left:12px; right:auto; }
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
-    .datePickerWrapper {
+    /* Date — same split layout as homepage */
+    .header.homeDateSplit {
+      display:grid;
+      grid-template-columns:28px minmax(0,1fr) 28px;
+      grid-template-rows:auto auto;
+      align-items:center;
+      direction:ltr;
+      padding:26px 18px 12px;
+      min-height:0;
+    }
+    .header.homeDateSplit .bannerTitle,
+    .header.homeDateSplit > h1 {
+      grid-column:1 / -1;
+      grid-row:1;
+    }
+    .header.homeDateSplit #banner-changer-btn {
+      grid-column:1;
+      grid-row:2;
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
+      z-index:31;
+    }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle {
+      grid-column:3;
+      grid-row:2;
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
+      z-index:31;
+    }
+    .header.homeDateSplit .langToggle:hover,
+    .header.homeDateSplit #banner-changer-btn:hover {
+      transform:scale(1.08) !important;
+    }
+    body.ar .header.homeDateSplit .langToggle,
+    body.ar .header.homeDateSplit #langToggle {
+      grid-column:3;
+      right:auto !important;
+      left:auto !important;
+    }
+    body.ar .header.homeDateSplit #banner-changer-btn {
+      grid-column:1;
+      left:auto !important;
+      right:auto !important;
+    }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px;
+      min-width:0;
+      min-height:0;
+      width:auto;
+      height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px;
+      height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
+    .header.homeDateSplit .datePickerWrapper {
+      grid-column:2;
+      grid-row:2;
       position:relative;
-      display:inline-block;
-      margin-top:14px;
+      display:block;
+      width:100%;
+      max-width:100%;
+      margin-top:0;
       z-index:20;
-      min-height:44px;
-      min-width:min(100%, 220px);
+      min-height:56px;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-    .header .dateTag {
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,.18);
-      padding:5px 18px;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.3px;
-      cursor:pointer;
-      transition:all .3s;
-      border:2px solid rgba(255,255,255,.2);
-      -webkit-tap-highlight-color:transparent;
-      user-select:none;
-      -webkit-user-select:none;
-      direction:ltr;
-      pointer-events:none;
-      color:#fff;
-    
-      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
-    }
-    .dateTag-icon {
-      display:inline-flex;
+    .header.homeDateSplit .dateTag {
+      display:flex;
       align-items:center;
       justify-content:center;
-      flex-shrink:0;
-      line-height:0;
+      min-height:56px;
+      padding:0;
+      border:none;
+      border-radius:0;
+      background:transparent;
       color:#fff;
+      cursor:default;
+      user-select:none;
+      -webkit-user-select:none;
+      text-align:center;
+      line-height:1;
+      position:relative;
+      z-index:3;
+      pointer-events:none;
+      -webkit-tap-highlight-color:transparent;
     }
-    .dateTag-icon svg {
+    .header.homeDateSplit .dateTagMain {
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:min(2.4vw, 12px);
+      pointer-events:none;
+      padding-bottom:0;
+      direction:ltr;
+      width:max-content;
+      max-width:100%;
+      margin-inline:auto;
+    }
+    body.ar .header.homeDateSplit .dateTagMain,
+    html[lang="ar"] .header.homeDateSplit .dateTagMain {
+      direction:rtl;
+    }
+    .header.homeDateSplit .dateTagDay,
+    .header.homeDateSplit .dateTagWeek,
+    .header.homeDateSplit .dateTagMonth {
+      font-family: var(--date-font-en);
+      color:rgba(255,255,255,.72);
+      text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 1px rgba(255,255,255,.45);
+      -webkit-text-stroke:0.15px rgba(0,0,0,.28);
+      paint-order:stroke fill;
+    }
+    body.ar .header.homeDateSplit .dateTagDay,
+    body.ar .header.homeDateSplit .dateTagWeek,
+    body.ar .header.homeDateSplit .dateTagMonth,
+    html[lang="ar"] .header.homeDateSplit .dateTagDay,
+    html[lang="ar"] .header.homeDateSplit .dateTagWeek,
+    html[lang="ar"] .header.homeDateSplit .dateTagMonth {
+      font-family: var(--date-font-ar);
+    }
+    .header.homeDateSplit .dateTagSide {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:3px;
+      line-height:1;
+      padding-inline-start:min(1.8vw, 10px);
+      border-inline-start:1px solid rgba(255,255,255,.35);
+      flex:0 0 auto;
+      direction:ltr;
+      unicode-bidi:isolate;
+      min-width:0;
+      width:max-content;
+      max-width:none;
+    }
+    body.ar .header.homeDateSplit .dateTagSide,
+    html[lang="ar"] .header.homeDateSplit .dateTagSide {
+      align-items:flex-end;
+      padding-inline-start:0;
+      padding-inline-end:min(1.8vw, 10px);
+      border-inline-start:none;
+      border-inline-end:1px solid rgba(255,255,255,.35);
+    }
+    .header.homeDateSplit .dateTagWeek {
       display:block;
-      width:16px;
-      height:16px;
-          pointer-events:none;
-      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
-    }
-    .dateTag-label {
-      line-height:1.2;
+      font-size:clamp(13px, 3.8vw, 17px);
+      font-weight:700;
+      letter-spacing:-.01em;
+      line-height:1.05;
+      text-align:left;
+      white-space:nowrap;
+      width:100%;
+      overflow:visible;
       pointer-events:none;
-    text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
-    .dateTag-icon {
+    body.ar .header.homeDateSplit .dateTagWeek {
+      letter-spacing:0;
+      text-align:right;
+    }
+    .header.homeDateSplit .dateTagDay {
+      display:block;
+      font-size:clamp(56px, 18vw, 88px);
+      font-weight:800;
+      letter-spacing:-.04em;
+      line-height:.9;
+      font-variant-numeric:tabular-nums;
+      flex:0 0 auto;
       pointer-events:none;
+    }
+    body.ar .header.homeDateSplit .dateTagDay { letter-spacing:0; }
+    .header.homeDateSplit .dateTagMonthWrap {
+      display:block;
+      line-height:1;
+      text-align:left;
+      width:100%;
+    }
+    body.ar .header.homeDateSplit .dateTagMonthWrap,
+    html[lang="ar"] .header.homeDateSplit .dateTagMonthWrap {
+      text-align:right;
+    }
+    .header.homeDateSplit .dateTagMonth {
+      display:block;
+      font-size:clamp(22px, 7vw, 36px);
+      font-weight:700;
+      letter-spacing:-.02em;
+      line-height:1;
+      text-transform:none;
+      text-align:left;
+      white-space:nowrap;
+      max-width:100%;
+      overflow:visible;
+      pointer-events:none;
+    }
+    body.ar .header.homeDateSplit .dateTagMonth {
+      letter-spacing:0;
+      text-align:right;
     }
     .summaryBar {
       display:flex;
@@ -202,8 +371,10 @@
     }
 .summaryChip .chipVal { font-size:22px; font-weight:900; color:#1e40af; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
     .summaryChip .chip-icon { display:block; flex-shrink:0; }
-    a.summaryChip.readSignChip .chipVal { color:#0f766e; }
-    a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
+    a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
+    a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
+    a.summaryChip.importChip .chipVal { color:#0ea5e9; }
+    a.summaryChip.importChip:hover { box-shadow:0 8px 20px rgba(14,165,233,.18); }
     .summaryChip .chipLabel {
       font-size:9.5px;
       font-weight:600;
@@ -216,6 +387,9 @@
     }
     .welcomeChip { display:none; text-decoration:none; cursor:pointer; }
     .welcomeChip.visible { display:flex; }
+    .summaryBar #welcomeChip.welcomeChip.visible {
+      order:-1;
+    }
     .welcomeChip .chipLabel {
       max-width:96px;
       overflow:hidden;
@@ -226,6 +400,19 @@
       align-items:center;
       justify-content:center;
       line-height:0;
+    }
+    /* Never flash the default waving-hand SVG before the chosen emoji paints. */
+    .waveHand > svg.chip-icon,
+    #welcomeEmojiSlot > svg {
+      display:none !important;
+    }
+    .waveHand img {
+      display:block;
+      width:30px;
+      height:30px;
+      margin:-3px 0;
+      object-fit:contain;
+      pointer-events:none;
     }
     #myScheduleBtn.is-hidden { display:none !important; }
     .quickActions {
@@ -359,6 +546,12 @@
     .empArrow { color:#64748b; font-size:10px; transition:transform .2s ease; }
     .empFold[open] .empArrow { transform:rotate(90deg); }
     .empNameText { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    body.ar .empFold .empNameText,
+    html[lang="ar"] .empFold .empNameText {
+      font-family: var(--date-font-ar);
+      overflow:visible;
+      text-overflow:clip;
+    }
     .empCount {
       min-width:30px;
       height:30px;
@@ -474,10 +667,11 @@
       .wrap { padding:12px 10px 22px; }
       }
   </style>
+  <script src="../welcome-emoji-early.js?v=20260903a"></script>
 </head>
 <body>
   <div class="wrap">
-    <div class="header">
+    <div class="header homeDateSplit">
       <button class="langToggle" id="langToggle" type="button" title="Switch language" onclick="toggleLang()">
         <span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
         <span class="langToggle-label" id="langToggleLabel">ع</span>
@@ -487,7 +681,17 @@
         <span class="bannerTitleMain" id="pageTitleMain">Auto Diff</span>
       </h1>
       <div class="datePickerWrapper">
-        <div class="dateTag" id="dateTag"></div>
+        <div class="dateTag" id="dateTag">
+          <span class="dateTagMain">
+            <span class="dateTagDay" id="dateTagDay"></span>
+            <span class="dateTagSide">
+              <span class="dateTagWeek" id="dateTagWeek"></span>
+              <span class="dateTagMonthWrap">
+                <span class="dateTagMonth" id="dateTagMonth"></span>
+              </span>
+            </span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -496,25 +700,25 @@
         <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
         <div class="chipLabel">Export</div>
       </a>
+      <a href="#" id="importBtn" class="summaryChip importChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 12l-3.5-1.5L3 3l4 12 4-1 2.5 3.5 3.5 1.8 4.2z"/></svg></div>
+        <div class="chipLabel">Import</div>
+      </a>
       <a href="#" id="trainingBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
         <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
         <div class="chipLabel">Training</div>
       </a>
-      <a href="#" id="readSignChipBtn" class="summaryChip readSignChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg></div>
-        <div class="chipLabel" id="readSignChipLabel">Read&amp;Sign</div>
+      <a href="#" id="withMeChipBtn" class="summaryChip withMeChip" style="cursor:pointer;text-decoration:none;">
+        <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="chipLabel" id="withMeChipLabel">With me</div>
       </a>
       <a href="#" id="myScheduleBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
         <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
         <div class="chipLabel">My Schedule</div>
       </a>
       <a href="#" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
-        <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+        <div class="chipVal"><span class="waveHand" id="welcomeEmojiSlot" aria-hidden="true"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
         <div class="chipLabel" id="welcomeName"></div>
-      </a>
-      <a href="#" id="compareChipBtn" class="summaryChip" style="cursor:pointer;text-decoration:none;">
-        <div class="chipVal" id="compareChipIcon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
-        <div class="chipLabel" id="compareChipLabel">Diff</div>
       </a>
     </div>
     <div class="diffTabs">
@@ -558,9 +762,10 @@
         titleEyebrowImport: 'Import',
         titleMain: 'Auto Diff',
         chipExport: 'Export',
+        chipImport: 'Import',
         chipTraining: 'Training',
         chipMySchedule: 'My Schedule',
-        chipReadSign: 'Read&Sign',
+        chipWithMe: 'With me',
         welcomeTitle: 'Open my schedule',
         chipExpDiff: 'Exp Diff',
         chipImpDiff: 'Imp Diff',
@@ -607,9 +812,10 @@
         titleEyebrowImport: 'الوارد',
         titleMain: 'فروقات تلقائية',
         chipExport: 'الصادر',
+        chipImport: 'الوارد',
         chipTraining: 'التدريب',
         chipMySchedule: 'جدولي',
-        chipReadSign: 'إقرار',
+        chipWithMe: 'معي',
         welcomeTitle: 'افتح جدولي',
         chipExpDiff: 'فرق الصادر',
         chipImpDiff: 'فرق الوارد',
@@ -672,14 +878,29 @@
       summary.textContent = t('summaryStats', lastSummaryStats);
     }
 
+    const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+    const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
     function updateDateTag() {
       if (!latestIsoDate) return;
-      const dateTag = document.getElementById('dateTag');
-      if (!dateTag) return;
-      const dt = new Date(`${latestIsoDate}T00:00:00`);
-      const locale = currentLang === 'ar' ? 'ar' : 'en-GB';
-      const formatted = dt.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
-      dateTag.textContent = formatted;
+      const parts = String(latestIsoDate).split('-');
+      if (parts.length !== 3) return;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      const dt = new Date(Date.UTC(y, m - 1, d));
+      if (Number.isNaN(dt.getTime())) return;
+      const lang = currentLang === 'ar' ? 'ar' : 'en';
+      const weekEl = document.getElementById('dateTagWeek');
+      const dayEl = document.getElementById('dateTagDay');
+      const monthEl = document.getElementById('dateTagMonth');
+      if (dayEl) dayEl.textContent = String(d);
+      if (weekEl) weekEl.textContent = (lang === 'ar' ? DAYS_AR : DAYS_EN)[dt.getUTCDay()] || '';
+      if (monthEl) monthEl.textContent = (lang === 'ar' ? MONTHS_AR : MONTHS_EN)[m - 1] || '';
     }
 
     async function toggleLang() {
@@ -725,14 +946,16 @@
       const langLbl = document.getElementById('langToggleLabel');
       if (langLbl) langLbl.textContent = t('langBtn');
       const exportLbl = document.querySelector('#exportBtn .chipLabel');
+      const importLbl = document.querySelector('#importBtn .chipLabel');
       const trainingLbl = document.querySelector('#trainingBtn .chipLabel');
       const scheduleLbl = document.querySelector('#myScheduleBtn .chipLabel');
-      const readSignLbl = document.getElementById('readSignChipLabel');
+      const withMeLbl = document.getElementById('withMeChipLabel');
       const welcome = document.getElementById('welcomeChip');
       if (exportLbl) exportLbl.textContent = t('chipExport');
+      if (importLbl) importLbl.textContent = t('chipImport');
       if (trainingLbl) trainingLbl.textContent = t('chipTraining');
       if (scheduleLbl) scheduleLbl.textContent = t('chipMySchedule');
-      if (readSignLbl) readSignLbl.textContent = t('chipReadSign');
+      if (withMeLbl) withMeLbl.textContent = t('chipWithMe');
       if (welcome) welcome.title = t('welcomeTitle');
       updateSummaryText();
       updateDateTag();
@@ -752,12 +975,9 @@
 
     function applyDiffModeUi(kind) {
       currentDiffKind = kind === 'import' ? 'import' : 'export';
-      const nextKind = currentDiffKind === 'export' ? 'import' : 'export';
-      const compareChipLabel = document.getElementById('compareChipLabel');
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
       updateBannerTitle();
-      compareChipLabel.textContent = nextKind === 'export' ? t('chipExpDiff') : t('chipImpDiff');
       if (tabRosterDiff && tabAbsence) {
         tabRosterDiff.classList.toggle('active', currentPanel === 'diff');
         tabAbsence.classList.toggle('active', currentPanel === 'absence');
@@ -784,6 +1004,56 @@
       }
       const first = en.replace(/-\s*\d+\s*$/, '').trim().split(/\s+/)[0];
       nameEl.textContent = first || empId;
+    }
+
+    function emojiHash(s) {
+      let h = 0;
+      for (let i = 0; i < String(s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+      return h;
+    }
+
+    function setWelcomeEmoji(cp) {
+      cp = String(cp || '').trim().toLowerCase();
+      if (!/^[0-9a-f]{2,8}(_[0-9a-f]{2,8})*$/.test(cp)) return;
+      const slot = document.getElementById('welcomeEmojiSlot');
+      if (!slot || slot.getAttribute('data-custom-emoji') === cp) return;
+      // Remove waving-hand SVG immediately so it never flashes while the webp loads.
+      slot.style.animation = 'none';
+      const hand = slot.querySelector('svg');
+      if (hand) hand.remove();
+      const img = document.createElement('img');
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.decoding = 'async';
+      img.style.cssText = 'display:block;width:30px;height:30px;margin:-3px 0;object-fit:contain;pointer-events:none;';
+      img.src = 'https://fonts.gstatic.com/s/e/notoemoji/latest/' + cp + '/512.webp';
+      slot.innerHTML = '';
+      slot.appendChild(img);
+      slot.setAttribute('data-custom-emoji', cp);
+    }
+
+    function applyWelcomeEmoji(empId) {
+      let cp = '';
+      try {
+        const map = JSON.parse(localStorage.getItem('empEmojiChoiceMap') || '{}') || {};
+        const legacy = (localStorage.getItem('empEmojiChoice') || '').trim();
+        if (legacy && !map[empId || 'export']) cp = legacy;
+        else cp = map[empId || 'export'] || '';
+      } catch (e) {}
+      if (cp) {
+        setWelcomeEmoji(cp);
+        return;
+      }
+      if (!empId) return;
+      const root = getSiteRootPath();
+      fetch(`${root}/my-emoji/emojis.json`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((list) => {
+          if (!list || !list.length) return;
+          const item = list[emojiHash(empId) % list.length];
+          if (item && item.cp) setWelcomeEmoji(item.cp);
+        })
+        .catch(() => {});
     }
 
     function updateWelcomeChip(kind) {
@@ -815,6 +1085,7 @@
       welcome.href = `${scheduleBase}?emp=${encodeURIComponent(empId)}`;
       welcome.title = t('welcomeTitle');
       welcome.classList.add('visible');
+      applyWelcomeEmoji(empId);
 
       if (welcome.dataset.loadedEmp === empId && welcome.dataset.enName) {
         paintWelcomeName(kind, empId, welcome.dataset.enName);
@@ -873,25 +1144,17 @@
       const today = new Date();
       const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       latestIsoDate = isoDate;
-      const importEmpId = (localStorage.getItem('importSavedEmpId') || '').trim();
-      const exportEmpId = (localStorage.getItem('exportSavedEmpId') || '').trim();
-      const initialKind = importEmpId && !exportEmpId ? 'import' : 'export';
       document.getElementById('exportBtn').href = `${root}/date/${isoDate}/`;
+      const importBtn = document.getElementById('importBtn');
+      if (importBtn) importBtn.href = `${root}/import/`;
       document.getElementById('trainingBtn').href = `${root}/training/`;
       document.getElementById('myScheduleBtn').href = `${root}/my-schedules/`;
-      const readSignBtn = document.getElementById('readSignChipBtn');
-      if (readSignBtn) readSignBtn.href = `${root}/read-and-sign/`;
-      const compareBtn = document.getElementById('compareChipBtn');
+      const withMeBtn = document.getElementById('withMeChipBtn');
+      if (withMeBtn) withMeBtn.href = `${root}/with-me/`;
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
-      compareBtn.href = '#';
-      compareBtn.onclick = (e) => {
-        e.preventDefault();
-        loadDiff(currentDiffKind === 'export' ? 'import' : 'export');
-      };
-      applyDiffModeUi(initialKind);
-      updateWelcomeChip(initialKind);
-      compareBtn.title = t('switchDiff');
+      applyDiffModeUi('export');
+      updateWelcomeChip('export');
       tabRosterDiff.onclick = () => activatePanel('diff');
       tabAbsence.onclick = () => activatePanel('absence');
       applyLanguageUi();
@@ -1085,6 +1348,146 @@
       return enFull;
     }
 
+    function employeeNameAttrs(empId, employeeName, nameLookup) {
+      const enFull = String(employeeName || '-').trim();
+      const enName = enFull.replace(/-\s*\d+\s*$/, '').trim() || enFull;
+      const id = extractEmpId(empId) || extractEmpId(enFull);
+      const enShown = id && !/-\s*\d+\s*$/.test(enFull) ? `${enName} - ${id}` : enFull;
+      let arShown = '';
+      if (nameLookup) {
+        const ar =
+          (id && nameLookup.byId.get(id)) ||
+          nameLookup.byEn.get(normalizeName(enName));
+        if (ar) arShown = id ? `${ar} - ${id}` : ar;
+      }
+      const shown = currentLang === 'ar' && arShown ? arShown : enShown;
+      return { shown, en: enShown, ar: arShown || enShown };
+    }
+
+    function empNameSpanHtml(empId, employeeName, nameLookup) {
+      const parts = employeeNameAttrs(empId, employeeName, nameLookup);
+      return `<span class="empNameText" data-name-en="${escapeHtml(parts.en)}" data-name-ar="${escapeHtml(parts.ar)}">${escapeHtml(parts.shown)}</span>`;
+    }
+
+    const TATWEEL = '\u0640';
+    const JOINING = /[\u0626\u0628\u062A\u062B\u062C\u062D\u062E\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063A\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u064A]/;
+    let kashidaCanvas = null;
+
+    function splitNameSuffix(raw) {
+      const m = String(raw || '').match(/^(.*?)(\s+-\s+\d+\s*)$/);
+      if (m) return { name: m[1].trim(), suffix: m[2] };
+      return { name: String(raw || '').trim(), suffix: '' };
+    }
+
+    function arabicNameSource(el) {
+      const ar = el.getAttribute('data-name-ar');
+      if (ar) return ar.trim();
+      return String(el.textContent || '').replace(new RegExp(TATWEEL, 'g'), '').trim();
+    }
+
+    function joinSlots(name) {
+      const slots = [];
+      for (let i = 0; i < name.length - 1; i++) {
+        const ch = name.charAt(i);
+        const nx = name.charAt(i + 1);
+        if (ch === TATWEEL || nx === TATWEEL || ch === ' ' || nx === ' ') continue;
+        if (JOINING.test(ch)) slots.push(i);
+      }
+      return slots;
+    }
+
+    function insertTatweel(name, extras) {
+      if (extras <= 0) return name;
+      const slots = joinSlots(name);
+      if (!slots.length) return name;
+      const counts = [];
+      for (let s = 0; s < slots.length; s++) counts[s] = 0;
+      const start = Math.floor(slots.length / 2);
+      for (let n = 0; n < extras; n++) counts[(start + n) % slots.length] += 1;
+      let out = '';
+      const slotAt = Object.create(null);
+      for (let i = 0; i < slots.length; i++) slotAt[slots[i]] = i;
+      for (let c = 0; c < name.length; c++) {
+        out += name.charAt(c);
+        if (slotAt[c] != null && counts[slotAt[c]]) {
+          out += TATWEEL.repeat(counts[slotAt[c]]);
+        }
+      }
+      return out;
+    }
+
+    function measureName(text, sampleEl) {
+      const cs = window.getComputedStyle(sampleEl);
+      let font = cs.font;
+      if (!font || font === 'inherit') {
+        font =
+          (cs.fontStyle || 'normal') +
+          ' ' +
+          (cs.fontWeight || '800') +
+          ' ' +
+          (cs.fontSize || '14px') +
+          ' ' +
+          (cs.fontFamily || 'sans-serif');
+      }
+      if (!kashidaCanvas) {
+        kashidaCanvas = document.createElement('canvas').getContext('2d');
+      }
+      kashidaCanvas.font = font;
+      return kashidaCanvas.measureText(text || '').width;
+    }
+
+    function stretchNameGroup(nodes) {
+      if (!nodes.length) return;
+      if (currentLang !== 'ar') {
+        nodes.forEach((el) => {
+          const en = el.getAttribute('data-name-en');
+          el.textContent = en || arabicNameSource(el);
+        });
+        return;
+      }
+      const originals = nodes.map(arabicNameSource);
+      const parts = originals.map(splitNameSuffix);
+      let maxW = 0;
+      nodes.forEach((el, i) => {
+        const w = measureName(parts[i].name, el);
+        if (w > maxW) maxW = w;
+      });
+      nodes.forEach((el, i) => {
+        const orig = parts[i].name;
+        const suffix = parts[i].suffix;
+        if (!/[\u0600-\u06FF]/.test(orig) || maxW <= 0) {
+          el.textContent = originals[i];
+          return;
+        }
+        let extra = 0;
+        let stretched = orig;
+        let guard = 0;
+        while (measureName(stretched, el) + 0.4 < maxW && guard < 28) {
+          extra += 1;
+          guard += 1;
+          const next = insertTatweel(orig, extra);
+          if (next === stretched) break;
+          stretched = next;
+        }
+        el.textContent = stretched + suffix;
+      });
+    }
+
+    function stretchArabicNames() {
+      document.querySelectorAll('#diffList .deptRows').forEach((list) => {
+        const nodes = Array.from(list.querySelectorAll('.empFold > summary .empNameText'));
+        stretchNameGroup(nodes);
+      });
+    }
+
+    function scheduleStretchArabicNames() {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => stretchArabicNames());
+      } else {
+        stretchArabicNames();
+      }
+    }
+
     function escapeHtml(s) {
       return String(s || '')
         .replace(/&/g, '&amp;')
@@ -1208,18 +1611,18 @@
           const details = document.createElement('details');
           details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
           if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
-          const shownName = displayEmployeeName(g.empId, g.employeeName, nameLookup);
           const rowsHtml = g.changes
             .sort((a, b) => Number(a.day) - Number(b.day))
             .map((c) => `<div class="changeRow"><span class="changeDay">${c.day}</span><span class="changeDate">${formatDiffDate(c.day, data.month)}</span><span class="changeFlow"><span class="changeOld">${escapeHtml(translateShiftValue(c.v1))}</span> → <span class="changeNew">${escapeHtml(translateShiftValue(c.v2))}</span></span></div>`)
             .join('');
-          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+          details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span>${empNameSpanHtml(g.empId, g.employeeName, nameLookup)}</span><span class="empCount">${g.changes.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
           deptRows.appendChild(details);
         });
         deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalChanges}</span></summary>`;
         deptDetails.appendChild(deptRows);
         diffList.appendChild(deptDetails);
       });
+      scheduleStretchArabicNames();
     }
 
     function nameMatch(a, b) {
@@ -1361,7 +1764,6 @@
             const details = document.createElement('details');
             details.className = 'empFold' + (g.matchSaved ? ' empFoldMine' : '');
             if (g.matchSaved || (!savedEmpId && deptIdx === 0 && empIdx === 0)) details.open = true;
-            const shownName = displayEmployeeName(g.empId, g.empId ? `${g.employeeName} - ${g.empId}` : g.employeeName, nameLookup);
             const rowsHtml = g.dates
               .map((dateStr, i) => {
                 const dayNum = String(dateStr || '').match(/^\d{4}-\d{2}-(\d{2})$/);
@@ -1369,13 +1771,14 @@
                 return `<div class="changeRow"><span class="changeDay">${day}</span><span class="changeDate">${formatAbsenceDate(dateStr)}</span><span class="changeFlow"><span class="changeOld">${t('absent')}</span> → <span class="changeNew">${t('recorded')}</span></span></div>`;
               })
               .join('');
-            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(shownName)}</span></span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
+            details.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span>${empNameSpanHtml(g.empId, g.empId ? `${g.employeeName} - ${g.empId}` : g.employeeName, nameLookup)}</span><span class="empCount">${g.dates.length}</span></summary><div class="changeRows">${rowsHtml}</div>`;
             deptRows.appendChild(details);
           });
           deptDetails.innerHTML = `<summary><span class="empLeft"><span class="empArrow">▶</span><span class="empNameText">${escapeHtml(translateDepartment(d.department))}</span></span><span class="empCount">${d.totalDays}</span></summary>`;
           deptDetails.appendChild(deptRows);
           diffList.appendChild(deptDetails);
         });
+        scheduleStretchArabicNames();
       } catch (e) {
         err.textContent = e.message || String(e);
       }
@@ -1404,7 +1807,7 @@
     (function loadBannerChanger(){
       const root = getSiteRootPath();
       const s = document.createElement('script');
-      s.src = `${root}/banner-changer.js?v=20260521b`;
+      s.src = `${root}/banner-changer.js?v=20260903a`;
       s.defer = true;
       document.body.appendChild(s);
     })();

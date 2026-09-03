@@ -1271,6 +1271,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/welcome-emoji-early.js?v=20260903a');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
@@ -1278,8 +1279,8 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-  addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901i');
+  addScript(root + '/banner-store.js?v=20260903a');
+  addScript(root + '/banner-changer.js?v=20260903a');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -1312,14 +1313,15 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/welcome-emoji-early.js?v=20260903a');
   addScript(root + '/emp-contact.js?v=20260902c');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-  addScript(root + '/banner-store.js?v=20260831g');
-  addScript(root + '/banner-changer.js?v=20260901i');
+  addScript(root + '/banner-store.js?v=20260903a');
+  addScript(root + '/banner-changer.js?v=20260903a');
   addScript(root + '/date-banner-nav.js?v=20260902a');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
