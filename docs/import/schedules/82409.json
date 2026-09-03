@@ -162,151 +162,181 @@
     ],
     "2026-09": [
       {
+        "date": "2026-09-01",
         "day": 1,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-02",
         "day": 2,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-03",
         "day": 3,
         "shift_code": "LV",
         "shift_group": "Annual Leave"
       },
       {
+        "date": "2026-09-04",
         "day": 4,
         "shift_code": "LV",
         "shift_group": "Annual Leave"
       },
       {
+        "date": "2026-09-05",
         "day": 5,
         "shift_code": "LV",
         "shift_group": "Annual Leave"
       },
       {
+        "date": "2026-09-06",
         "day": 6,
         "shift_code": "LV",
         "shift_group": "Annual Leave"
       },
       {
+        "date": "2026-09-07",
         "day": 7,
         "shift_code": "LV",
         "shift_group": "Annual Leave"
       },
       {
+        "date": "2026-09-08",
         "day": 8,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-09",
         "day": 9,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-10",
         "day": 10,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-11",
         "day": 11,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-12",
         "day": 12,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-13",
         "day": 13,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-14",
         "day": 14,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-15",
         "day": 15,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-16",
         "day": 16,
         "shift_code": "MN06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-09-17",
         "day": 17,
         "shift_code": "MN06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-09-18",
         "day": 18,
         "shift_code": "AN13",
         "shift_group": "Afternoon"
       },
       {
+        "date": "2026-09-19",
         "day": 19,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-20",
         "day": 20,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-21",
         "day": 21,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-22",
         "day": 22,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-23",
         "day": 23,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-24",
         "day": 24,
         "shift_code": "TR",
         "shift_group": "Training"
       },
       {
+        "date": "2026-09-25",
         "day": 25,
         "shift_code": "MN06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-09-26",
         "day": 26,
         "shift_code": "AN13",
         "shift_group": "Afternoon"
       },
       {
+        "date": "2026-09-27",
         "day": 27,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-28",
         "day": 28,
         "shift_code": "NN21",
         "shift_group": "Night"
       },
       {
+        "date": "2026-09-29",
         "day": 29,
         "shift_code": "OFF",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-09-30",
         "day": 30,
         "shift_code": "OFF",
         "shift_group": "Off Day"
