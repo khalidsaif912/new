@@ -1676,13 +1676,13 @@ def main() -> None:
         if p.name == "index.json":
             continue
         try:
-            data = json.loads(p.read_text(encoding="utf-8"))
+            sched_data = json.loads(p.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
         index_emps.append({
-            "id": str(data.get("id") or p.stem),
-            "name": data.get("name") or "",
-            "department": data.get("department") or "",
+            "id": str(sched_data.get("id") or p.stem),
+            "name": sched_data.get("name") or "",
+            "department": sched_data.get("department") or "",
         })
     index_emps.sort(key=lambda e: (e.get("name") or e.get("id") or "").lower())
     (sched_dir / "index.json").write_text(
@@ -1705,7 +1705,7 @@ def main() -> None:
         "sheet": parsed["sheet"],
         "generated_for": str(today),
         "employees_total": len(parsed["employees"]),
-        "excel_sha256": hashlib.sha256(data).hexdigest(),
+        "excel_sha256": file_hash,
         "date_min": roster_catalog["date_min"],
         "date_max": roster_catalog["date_max"],
         "available_months": roster_catalog["available_months"],
