@@ -903,7 +903,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .summaryBar #welcomeChip.welcomeChip.visible {{
       order:-1;
     }}
-    /* Import sits at the row end: right in EN (LTR), left in AR (RTL). */
+    /* Import at the chip-group end: rightmost in EN, leftmost in AR. */
     .summaryBar #importBtn,
     .summaryBar a.summaryChip.importChip {{
       order:50;
