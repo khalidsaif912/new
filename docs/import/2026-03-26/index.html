@@ -4158,7 +4158,7 @@ function goToImport(event) {
 
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
-  var target = getSiteRootUrl() + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
   location.href = target;
 }
 
@@ -4509,7 +4509,7 @@ var welcome = document.getElementById('welcomeChip');
     exp.href = iso ? (root + '/date/' + iso + '/') : (root + '/');
   }
   if (trn) trn.href = root + '/training/';
-  if (diff) diff.href = root + '/roster-diff/index.html';
+  if (diff) diff.href = root + '/roster-diff/index.html?source=import';
   if (welcome) {
     var wid = localStorage.getItem('importSavedEmpId');
     welcome.href = wid ? importBase + '?emp=' + encodeURIComponent(wid) : importBase;
@@ -4594,7 +4594,7 @@ function goToExport(event) {
 
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
-  var target = getSiteRootUrl() + '/roster-diff/index.html';
+  var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
   location.href = target;
 }
 

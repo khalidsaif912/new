@@ -776,7 +776,7 @@
   </div>
 
   <script>
-    let currentDiffKind = 'export';
+    let currentDiffKind = new URLSearchParams(location.search).get('source') === 'import' ? 'import' : 'export';
     let currentPanel = 'diff';
     let lastDiffData = null;
     function readLang() {
@@ -1189,8 +1189,8 @@
       if (withMeBtn) withMeBtn.href = `${root}/with-me/`;
       const tabRosterDiff = document.getElementById('tabRosterDiff');
       const tabAbsence = document.getElementById('tabAbsence');
-      applyDiffModeUi('export');
-      updateWelcomeChip('export');
+      applyDiffModeUi(currentDiffKind);
+      updateWelcomeChip(currentDiffKind);
       tabRosterDiff.onclick = () => activatePanel('diff');
       tabAbsence.onclick = () => activatePanel('absence');
       applyLanguageUi();
@@ -1857,6 +1857,11 @@
     })();
 
     loadDiff(currentDiffKind);
+    if (currentDiffKind === 'import') {
+      const expBtn = document.getElementById('exportBtn');
+      const impBtn = document.getElementById('importBtn');
+      if (expBtn && impBtn) { expBtn.classList.add('importChip'); impBtn.classList.remove('importChip'); }
+    }
   </script>
 <script defer src="../site-visits.js?v=20260809a"></script>
 </body>
