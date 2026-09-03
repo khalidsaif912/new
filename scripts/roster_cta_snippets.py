@@ -1143,12 +1143,16 @@ def export_cta_html(
 
 
 def import_summary_bar_html(total_emp: int) -> str:
-    """Import duty-page summary chips (Emp/Depts → My Schedule → Export → …).
+    """Import duty-page summary chips (With me → Emp/Depts → My Schedule → Export → …).
 
     Read&Sign is export-only and must not appear here.
     """
     return f"""
   <div class="summaryBar">
+    <a href="{{{{BASE}}}}/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;">
+      {CHIP_WITH_ME_HTML}
+      <div class="chipLabel" data-key="withMePage">With me</div>
+    </a>
     <div class="summaryChip" id="summarySwitchChip">
       <div class="chipVal" id="summarySwitchVal">{total_emp}</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>

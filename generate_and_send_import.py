@@ -1139,6 +1139,8 @@ def build_duty_html(
     }}
     a.summaryChip.exportChip .chipVal {{ color:#059669; }}
     a.summaryChip.exportChip:hover {{ box-shadow:0 8px 20px rgba(5,150,105,.18); }}
+    a.summaryChip.withMeChip .chipVal {{ color:#4f46e5; }}
+    a.summaryChip.withMeChip:hover {{ box-shadow:0 8px 20px rgba(79,70,229,.18); }}
     .welcomeChip.visible {{
       display: flex;
     }}
