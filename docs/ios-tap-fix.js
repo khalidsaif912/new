@@ -77,7 +77,10 @@
     document.querySelectorAll('a[href]').forEach(function (a) {
       var h = a.getAttribute('href') || '';
       if (h.indexOf('{BASE}') === -1 && h.indexOf('{{BASE}}') === -1) return;
-      a.setAttribute('href', h.split('{{BASE}}').join(base).split('{BASE}').join(base));
+      var root = (isImport && /\/with-me(\/|$|\?)/.test(h) && h.indexOf('/import/with-me') === -1)
+        ? importRoot
+        : base;
+      a.setAttribute('href', h.split('{{BASE}}').join(root).split('{BASE}').join(root));
     });
     document.querySelectorAll('a[href="#"], a[href=""]').forEach(function (a) {
       if (!a.closest('.summaryBar, .quickActions, .topDock')) return;
@@ -98,7 +101,8 @@
         }
         a.setAttribute('href', iso ? base + '/date/' + iso + '/' : base + '/');
       } else if (id === 'trainingBtn') a.setAttribute('href', base + '/training/');
-      else if (id === 'diffChipBtn') a.setAttribute('href', base + '/roster-diff/index.html');
+      else if (id === 'diffChipBtn') a.setAttribute('href', base + '/roster-diff/index.html' + (isImport ? '?source=import' : ''));
+      else if (id === 'withMeChipBtn') a.setAttribute('href', (isImport ? importRoot : base) + '/with-me/');
     });
   }
 

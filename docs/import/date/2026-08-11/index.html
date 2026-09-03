@@ -1790,7 +1790,7 @@
 
   
   <div class="summaryBar">
-    <a href="{{BASE}}/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;">
+    <a href="{{BASE}}/import/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;" onclick="goToWithMe(event)">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
@@ -4240,6 +4240,10 @@ function goToImport(event) {
     });
 }
 
+function goToWithMe(event) {
+  if (event) event.preventDefault();
+  location.href = _importBase() + '/with-me/';
+}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
@@ -4641,6 +4645,10 @@ function goToExport(event) {
   location.href = root + '/date/' + iso + '/';
 }
 
+function goToWithMe(event) {
+  if (event) event.preventDefault();
+  location.href = _importBase() + '/with-me/';
+}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
@@ -4684,7 +4692,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260903b';
+  var ver = '20260903c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');

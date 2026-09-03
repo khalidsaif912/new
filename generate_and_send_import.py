@@ -1296,6 +1296,11 @@ function goToRosterDiff(event) {{
   location.href = target;
 }}
 
+function goToWithMe(event) {{
+  if (event) event.preventDefault();
+  location.href = _importBase() + '/with-me/';
+}}
+
 (function bindFlightSwitchIcons() {{
   var root = getSiteRootUrl();
   var iconUrl = root + '/assets/icons/flight.png?v=20260428d';

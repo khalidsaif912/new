@@ -488,11 +488,23 @@
       .replace(/"/g, '&quot;');
   }
 
+  function pageIsImport() {
+    return (location.pathname || '').indexOf('/import/') !== -1;
+  }
+
   function readSavedEmp() {
     try {
       var q = new URLSearchParams(location.search);
       var qid = (q.get('emp') || '').trim();
       if (qid) return qid;
+      if (pageIsImport()) {
+        return (
+          localStorage.getItem('importSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('exportSavedEmpId') ||
+          ''
+        ).trim();
+      }
       return (
         localStorage.getItem('exportSavedEmpId') ||
         localStorage.getItem('importSavedEmpId') ||
@@ -527,7 +539,7 @@
     if (!confirmProtectedSave(id)) return false;
     try {
       localStorage.setItem('savedEmpId', id);
-      if (usesImportRoster(dept)) {
+      if (pageIsImport() || usesImportRoster(dept)) {
         localStorage.setItem('importSavedEmpId', id);
         if (name) localStorage.setItem('importSavedEmpName', name);
       } else {
@@ -1763,12 +1775,13 @@
   }
 
   function init() {
+    if (pageIsImport()) setRosterKind('import');
     syncBannerTexture();
     loadNamesAr();
     state.lang = readLang();
     applyLang(state.lang);
     var home = document.getElementById('backBtn');
-    if (home) home.href = rootUrl() + '/';
+    if (home) home.href = rootUrl() + (pageIsImport() ? '/import/' : '/');
     document.getElementById('langToggle')?.addEventListener('click', function () {
       applyLang(state.lang === 'en' ? 'ar' : 'en');
     });

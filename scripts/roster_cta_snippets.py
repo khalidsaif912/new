@@ -1149,7 +1149,7 @@ def import_summary_bar_html(total_emp: int) -> str:
     """
     return f"""
   <div class="summaryBar">
-    <a href="{{{{BASE}}}}/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;">
+    <a href="{{{{BASE}}}}/import/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;" onclick="goToWithMe(event)">
       {CHIP_WITH_ME_HTML}
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
@@ -1261,7 +1261,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§Ã˜Âª'"
 
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
-IOS_PERF_VER = "20260903b"
+IOS_PERF_VER = "20260903c"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {

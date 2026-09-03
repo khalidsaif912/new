@@ -279,7 +279,13 @@ function setSummaryChipHrefs() {
   var exp = document.getElementById('exportBtn');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
+  var withMe = document.getElementById('withMeChipBtn');
   var welcome = document.getElementById('welcomeChip');
+  if (withMe) {
+    withMe.href = (location.pathname || '').indexOf('/import/') >= 0
+      ? importBase + '/with-me/'
+      : rootUrl + '/with-me/';
+  }
   if (my) {
     my.href = (location.pathname || '').indexOf('/import/') >= 0
       ? importBase + '/my-schedules/index.html'

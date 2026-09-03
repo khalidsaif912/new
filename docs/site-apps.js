@@ -359,8 +359,10 @@
   }
 
   function withMePageUrl() {
-    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/with-me/';
-    return 'https://khalidsaif912.github.io/roster-site/with-me/';
+    var isImport = (location.pathname || '').indexOf('/import/') !== -1;
+    var suffix = isImport ? '/import/with-me/' : '/with-me/';
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + suffix;
+    return 'https://khalidsaif912.github.io/roster-site' + suffix;
   }
 
   function spotlightItems() {
@@ -693,7 +695,6 @@
   }
 
   function ensureWithMeChip() {
-    if (/\/import(\/|$)/.test(location.pathname || '')) return;
     if (/\/with-me(\/|$)/.test(location.pathname || '')) return;
     var bar = document.querySelector('.summaryBar');
     if (!bar) return;
