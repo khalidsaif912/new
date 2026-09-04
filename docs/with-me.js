@@ -21,6 +21,7 @@
   var IMPORT_WITH_ME_DEPTS = { FLTA: 1 };
   var IMPORT_ROSTER_DEPTS = {
     FLTA: 1,
+    Supervisors: 1,
     'Flight Dispatch': 1,
     'Flight Dispatch (Export)': 1,
     'Flight Dispatch (Import)': 1,
@@ -28,6 +29,12 @@
     'Import Checkers': 1,
     'Import Operators': 1,
     'Release Control': 1
+  };
+  var EXPORT_ONLY_DEPTS = {
+    'Load Control': 1,
+    'Export Checker': 1,
+    'Export Operators': 1,
+    Officers: 1
   };
   var SHIFT_META = {
     Morning: { icon: '☀️' },
@@ -338,6 +345,17 @@
     ]).then(function (results) {
       var exportSch = results[0];
       var importSch = results[1];
+      if (pageIsImport()) {
+        if (importSch) {
+          setRosterKind('import');
+          return importSch;
+        }
+        if (exportSch) {
+          setRosterKind('import');
+          return exportSch;
+        }
+        throw new Error('no schedule');
+      }
       var wantsImport = (importSch && usesImportRoster(importSch.department)) ||
         (exportSch && usesImportRoster(exportSch.department));
       if (importSch && (wantsImport || !exportSch)) {
@@ -788,13 +806,36 @@
     }));
   }
 
+  function filterExportOnlyDepts(groups) {
+    return (groups || []).filter(function (g) {
+      return g && g.dept && !EXPORT_ONLY_DEPTS[g.dept];
+    });
+  }
+
+  function groupsFromPack(pack, shiftKey) {
+    var exportGroups = pack.htmls[0] ? parseRosterHtml(pack.htmls[0], shiftKey) : [];
+    var importRaw = pack.htmls[1] ? parseRosterHtml(pack.htmls[1], shiftKey) : [];
+    if (pageIsImport() || state.rosterKind === 'import') {
+      // Import With-me must never mix Export roster people.
+      return sortGroups(filterExportOnlyDepts(importRaw));
+    }
+    return mergeGroups(exportGroups, filterImportGroupsForWithMe(importRaw));
+  }
+
   function loadRoster(iso) {
-    var cacheKey = 'both:' + iso;
+    var kind = pageIsImport() || state.rosterKind === 'import' ? 'import' : 'both';
+    var cacheKey = kind + ':' + iso;
     if (state.rosterCache[cacheKey]) return state.rosterCache[cacheKey];
-    var p = Promise.all([
-      fetchRosterHtml('', iso).catch(function () { return ''; }),
-      fetchRosterHtml('/import', iso).catch(function () { return ''; })
-    ]).then(function (results) {
+    var p = (kind === 'import'
+      ? Promise.all([
+          Promise.resolve(''),
+          fetchRosterHtml('/import', iso).catch(function () { return ''; })
+        ])
+      : Promise.all([
+          fetchRosterHtml('', iso).catch(function () { return ''; }),
+          fetchRosterHtml('/import', iso).catch(function () { return ''; })
+        ])
+    ).then(function (results) {
       return { htmls: results, ok: !!(results[0] || results[1]) };
     }).catch(function () {
       return { htmls: ['', ''], ok: false };
@@ -1189,11 +1230,7 @@
   function peopleIdsForShift(pack, shiftKey) {
     var ids = Object.create(null);
     if (!pack || !pack.ok || !shiftKey) return ids;
-    var exportGroups = pack.htmls[0] ? parseRosterHtml(pack.htmls[0], shiftKey) : [];
-    var importGroups = pack.htmls[1]
-      ? filterImportGroupsForWithMe(parseRosterHtml(pack.htmls[1], shiftKey))
-      : [];
-    flattenPeople(mergeGroups(exportGroups, importGroups)).forEach(function (p) {
+    flattenPeople(groupsFromPack(pack, shiftKey)).forEach(function (p) {
       var id = String(p.id || empIdFromLabel(p.name) || '').trim();
       if (id) ids[id] = 1;
     });
@@ -1522,16 +1559,14 @@
         finish('<div class="restCard"><p>' + escapeHtml(t('noRoster')) + '</p></div>');
         return;
       }
-      var exportGroups = pack.htmls[0] ? parseRosterHtml(pack.htmls[0], shiftKey) : [];
-      var importGroups = pack.htmls[1]
-        ? filterImportGroupsForWithMe(parseRosterHtml(pack.htmls[1], shiftKey))
-        : [];
-      var groups = mergeGroups(exportGroups, importGroups);
+      var groups = groupsFromPack(pack, shiftKey);
       if (!groups.length) {
         finish('<div class="restCard"><p>' + escapeHtml(t('noRoster')) + '</p></div>');
         return;
       }
-      var nameAr = findNameArInHtml(pack.htmls[0], state.empId) || findNameArInHtml(pack.htmls[1], state.empId);
+      var nameAr = pageIsImport()
+        ? (findNameArInHtml(pack.htmls[1], state.empId) || findNameArInHtml(pack.htmls[0], state.empId))
+        : (findNameArInHtml(pack.htmls[0], state.empId) || findNameArInHtml(pack.htmls[1], state.empId));
       if (nameAr) {
         state.empNameAr = nameAr;
         paintChrome();
@@ -1672,17 +1707,24 @@
       var byId = {};
       var exportEmps = (results[0] && results[0].employees) || [];
       var importEmps = (results[1] && results[1].employees) || [];
-      exportEmps.forEach(function (emp) {
-        if (!emp || !emp.id) return;
-        byId[emp.id] = emp;
-      });
-      importEmps.forEach(function (emp) {
-        if (!emp || !emp.id) return;
-        var prev = byId[emp.id];
-        if (!prev || usesImportRoster(emp.department) || !prev.department) {
+      if (pageIsImport()) {
+        importEmps.forEach(function (emp) {
+          if (!emp || !emp.id) return;
           byId[emp.id] = emp;
-        }
-      });
+        });
+      } else {
+        exportEmps.forEach(function (emp) {
+          if (!emp || !emp.id) return;
+          byId[emp.id] = emp;
+        });
+        importEmps.forEach(function (emp) {
+          if (!emp || !emp.id) return;
+          var prev = byId[emp.id];
+          if (!prev || usesImportRoster(emp.department) || !prev.department) {
+            byId[emp.id] = emp;
+          }
+        });
+      }
       var employees = Object.keys(byId).map(function (id) { return byId[id]; });
       employees.sort(function (a, b) {
         return String(a.name || a.id).localeCompare(String(b.name || b.id), undefined, { sensitivity: 'base' });
