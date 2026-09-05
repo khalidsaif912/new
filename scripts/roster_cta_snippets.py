@@ -1169,9 +1169,9 @@ def import_summary_bar_html(total_emp: int) -> str:
       {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+    <a href="{{{{BASE}}}}/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       {CHIP_TRAINING_HTML}
-      <div class="chipLabel" data-key="trainingPage">Training</div>
+      <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
     <a href="{{{{BASE}}}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}

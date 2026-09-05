@@ -1664,9 +1664,9 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       {CHIP_WAVE_HTML}
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="{pages_base}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+    <a href="{pages_base}/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       {CHIP_TRAINING_HTML}
-      <div class="chipLabel" data-key="trainingPage">Training</div>
+      <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
     <a href="{pages_base}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}
@@ -2659,7 +2659,7 @@ var T = {{
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
   ar: {{
