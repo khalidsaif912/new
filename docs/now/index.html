@@ -456,7 +456,7 @@
       display:flex; 
       justify-content:center; 
       align-items:stretch;
-      gap:12px; 
+      gap:10px; 
       margin-top:14px;
       flex-wrap:wrap;
       position:relative;
@@ -496,11 +496,14 @@
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
       border-radius:14px;
-      padding:10px 12px;
+      padding:10px 10px;
       text-align:center;
       box-shadow:0 2px 8px rgba(15,23,42,.06);
       transition:all .25s ease;
       min-width:72px;
+      flex:0 0 auto;
+      width:auto;
+      box-sizing:border-box;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -622,14 +625,14 @@
 
     @media (max-width:600px){
       .summaryBar {
-        gap: 6px;
+        gap: 5px;
         flex-wrap: nowrap;
         justify-content: center;
       }
       .summaryBar:has(button.shiftFilterBtn) {
         flex-wrap: wrap;
       }
-      .summaryChip { padding: 8px 8px; min-width: 60px; }
+      .summaryChip { padding: 8px 7px; min-width: 60px; flex: 0 0 auto; width: auto; }
       .summaryChip .chipVal { font-size: 18px; }
       .summaryChip .chipVal .chip-icon { width: 20px; height: 20px; }
       .summaryChip .chipLabel { font-size: 10px; letter-spacing: .15px; font-weight:800; }
@@ -1375,8 +1378,6 @@
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
-      .summaryBar      { gap:8px; }
-      .summaryChip     { padding:8px 14px; }
       .summaryChip .chipVal { font-size:19px; }
     }
 
