@@ -912,6 +912,15 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       max-width:88px;
       overflow:hidden;
       text-overflow:ellipsis;
+      transition:opacity .28s ease, color .28s ease;
+    }}
+    .welcomeShiftEmoji {{
+      display:none;
+      font-size:22px;
+      line-height:1;
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+      .welcomeChip .chipLabel {{ transition:none; }}
     }}
     .waveHand {{
       display:inline-flex;
@@ -3083,21 +3092,155 @@ startSummarySwitchLoop();
     if (!full) return '';
     return full.split(/\\s+/)[0];
   }}
-  function syncWelcomeName() {{
-    var nameEl = document.getElementById('welcomeName');
-    if (!nameEl) return;
+  var chip = document.getElementById('welcomeChip');
+  var nameEl = document.getElementById('welcomeName');
+  var welcomeMode = 'name';
+  var welcomeShift = '';
+  var welcomeShiftColor = '';
+  var welcomeShiftGroup = '';
+  var welcomeFadeTimer = null;
+  function currentWelcomeName() {{
+    if (!nameEl) return '';
     var isAr = (typeof LANG !== 'undefined' ? LANG : (localStorage.getItem('rosterLang') || 'en')) === 'ar';
     var en = nameEl.getAttribute('data-name-en') || '';
     var ar = nameEl.getAttribute('data-name-ar') || '';
-    var show = (isAr && ar) ? ar : (en || ar);
-    if (show) nameEl.textContent = show;
+    return (isAr && ar) ? ar : (en || ar);
+  }}
+  function paintWelcomeLabel(animate) {{
+    if (!nameEl) return;
+    var next = (welcomeMode === 'shift' && welcomeShift) ? welcomeShift : currentWelcomeName();
+    if (!next) return;
+    var apply = function() {{
+      nameEl.textContent = next;
+      nameEl.style.color = (welcomeMode === 'shift' && welcomeShiftColor) ? welcomeShiftColor : '';
+      nameEl.style.opacity = '1';
+      paintWelcomeEmoji();
+    }};
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!animate || reduce) {{
+      apply();
+      return;
+    }}
+    nameEl.style.opacity = '0';
+    clearTimeout(welcomeFadeTimer);
+    welcomeFadeTimer = setTimeout(apply, 220);
+  }}
+  function syncWelcomeName() {{
+    paintWelcomeLabel(false);
   }}
   window.rosterSyncWelcomeName = syncWelcomeName;
+  function rosterIsoDate() {{
+    var picker = document.getElementById('datePicker');
+    if (picker && picker.value) return picker.value;
+    var m = (location.pathname || '').match(/(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
+    return m ? m[1] : '';
+  }}
+  function inferShiftGroup(code, group) {{
+    if (group) return group;
+    var u = String(code || '').toUpperCase();
+    if (/^(ME|MN|MO)/.test(u)) return 'Morning';
+    if (/^(AN|AF|AE)/.test(u)) return 'Afternoon';
+    if (/^(NN|NI|NE)/.test(u)) return 'Night';
+    if (u === 'OFF' || u === 'RD' || u === 'O') return 'Off Day';
+    if (u === 'AL' || u === 'LV') return 'Annual Leave';
+    if (u === 'SL') return 'Sick Leave';
+    if (u === 'TR' || u === 'TRG') return 'Training';
+    if (u === 'SB' || u === 'SBY') return 'Standby';
+    return '';
+  }}
+  function paintWelcomeEmoji() {{
+    if (!chip) return;
+    var slot = chip.querySelector('.waveHand') || chip.querySelector('.chipVal');
+    if (!slot) return;
+    var showShift = welcomeMode === 'shift' && welcomeShift;
+    var group = welcomeShiftGroup || inferShiftGroup(welcomeShift, '');
+    var icons = {{
+      Morning: '☀️', Afternoon: '🌤️', Night: '🌙',
+      'Off Day': '🛋️', 'Annual Leave': '✈️', 'Sick Leave': '🤒',
+      Training: '📚', Standby: '🧍'
+    }};
+    var el = slot.querySelector('.welcomeShiftEmoji');
+    if (!el) {{
+      el = document.createElement('span');
+      el.className = 'welcomeShiftEmoji';
+      el.setAttribute('aria-hidden', 'true');
+      slot.appendChild(el);
+    }}
+    el.textContent = icons[group] || '🕒';
+    el.style.display = showShift ? 'block' : 'none';
+    Array.prototype.forEach.call(slot.children, function(child) {{
+      if (child === el) return;
+      child.style.display = showShift ? 'none' : '';
+    }});
+    slot.style.animation = showShift ? 'none' : '';
+  }}
+  function shiftColorFor(group, statusEl) {{
+    if (statusEl && statusEl.style && statusEl.style.color) return statusEl.style.color;
+    var map = {{
+      Morning: '#92400e', Afternoon: '#9a3412', Night: '#5b21b6',
+      'Off Day': '#3730a3', 'Annual Leave': '#065f46', 'Sick Leave': '#b45309',
+      Training: '#7c3aed', Standby: '#0f766e'
+    }};
+    return map[group] || '';
+  }}
+  function shortShiftFromRow(row) {{
+    if (!row) return {{ code: '', color: '', group: '' }};
+    var statusEl = row.querySelector('.empStatus');
+    var raw = ((statusEl && statusEl.textContent) || '').replace(/\\s+/g, ' ').trim();
+    var code = raw.replace(/\\((?:FROM|من)\\s*\\d+\\s*(?:TO|إلى)\\s*\\d+\\)/gi, '').trim();
+    var card = row.closest('.shiftCard');
+    var group = (card && card.getAttribute('data-shift')) || '';
+    if (!code || /from|to|من|إلى/i.test(code) || code.length > 8) {{
+      var fallback = {{ 'Off Day': 'OFF', 'Annual Leave': 'AL', 'Sick Leave': 'SL', Training: 'TR', Standby: 'SB' }};
+      code = fallback[group] || code;
+    }}
+    return {{ code: code, color: shiftColorFor(group, statusEl), group: group }};
+  }}
+  function findEmpRow(id) {{
+    var rows = document.querySelectorAll('.empRow[data-emp-name]');
+    for (var i = 0; i < rows.length; i++) {{
+      if ((rows[i].getAttribute('data-emp-name') || '').indexOf(id) !== -1) return rows[i];
+    }}
+    return null;
+  }}
+  function lockWelcomeChipWidth() {{
+    if (!chip || !nameEl) return;
+    var prev = nameEl.textContent;
+    var prevColor = nameEl.style.color;
+    var w = 0;
+    var name = currentWelcomeName();
+    if (name) {{
+      nameEl.textContent = name;
+      w = Math.max(w, Math.ceil(chip.getBoundingClientRect().width));
+    }}
+    if (welcomeShift) {{
+      nameEl.textContent = welcomeShift;
+      w = Math.max(w, Math.ceil(chip.getBoundingClientRect().width));
+    }}
+    nameEl.textContent = prev;
+    nameEl.style.color = prevColor;
+    if (w) chip.style.minWidth = w + 'px';
+  }}
+  function startWelcomeShiftLoop() {{
+    if (!welcomeShift || window.__welcomeShiftTimer) return;
+    lockWelcomeChipWidth();
+    window.__welcomeShiftTimer = setInterval(function() {{
+      welcomeMode = welcomeMode === 'name' ? 'shift' : 'name';
+      paintWelcomeLabel(true);
+    }}, 2400);
+  }}
+  function setWelcomeShift(code, color, group) {{
+    welcomeShift = String(code || '').trim().toUpperCase();
+    welcomeShiftColor = color || '';
+    welcomeShiftGroup = inferShiftGroup(code, group);
+    if (!welcomeShift) return;
+    var nm = currentWelcomeName();
+    chip.title = nm ? (nm + ' · ' + welcomeShift) : welcomeShift;
+    startWelcomeShiftLoop();
+  }}
 
   var empId = getExportEmpId();
   if (!empId) return;
-  var chip = document.getElementById('welcomeChip');
-  var nameEl = document.getElementById('welcomeName');
   if (!chip || !nameEl) return;
 
   var empNameEl = document.querySelector('.empRow[data-emp-name*="' + empId + '"] .empName');
@@ -3109,16 +3252,39 @@ startSummarySwitchLoop();
     syncWelcomeName();
     chip.classList.add('visible');
   }}
+  var row = findEmpRow(empId);
+  if (row) {{
+    var fromRow = shortShiftFromRow(row);
+    if (fromRow.code) setWelcomeShift(fromRow.code, fromRow.color, fromRow.group);
+  }}
 
   var base = getSiteRootUrl() + '/';
   fetch(base + 'schedules/' + empId + '.json')
     .then(function(r) {{ return r.ok ? r.json() : null; }})
     .then(function(d) {{
-      if (!d || !d.name) return;
-      nameEl.setAttribute('data-name-en', firstNameFrom(d.name));
-      if (d.name_ar) nameEl.setAttribute('data-name-ar', firstNameFrom(d.name_ar));
-      syncWelcomeName();
-      chip.classList.add('visible');
+      if (!d) return;
+      if (d.name) {{
+        nameEl.setAttribute('data-name-en', firstNameFrom(d.name));
+        if (d.name_ar) nameEl.setAttribute('data-name-ar', firstNameFrom(d.name_ar));
+        chip.classList.add('visible');
+        paintWelcomeLabel(false);
+      }}
+      if (!welcomeShift && d.schedules) {{
+        var iso = rosterIsoDate();
+        var ym = iso.slice(0, 7);
+        var dayNum = parseInt(iso.slice(8, 10), 10);
+        var days = d.schedules[ym] || [];
+        for (var i = 0; i < days.length; i++) {{
+          var row = days[i];
+          if (!row) continue;
+          if (row.date === iso || Number(row.day) === dayNum) {{
+            setWelcomeShift(row.shift_code, shiftColorFor(row.shift_group, null), row.shift_group);
+            break;
+          }}
+        }}
+      }} else if (welcomeShift) {{
+        lockWelcomeChipWidth();
+      }}
     }}).catch(function() {{}});
 }})();
 
