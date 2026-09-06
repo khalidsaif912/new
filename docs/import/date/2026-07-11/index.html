@@ -520,11 +520,14 @@
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
       border-radius:14px;
-      padding:10px 12px;
+      padding:10px 10px;
       text-align:center;
       box-shadow:0 2px 8px rgba(15,23,42,.06);
       transition:all .25s ease;
       min-width:72px;
+      flex:0 0 auto;
+      width:auto;
+      box-sizing:border-box;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -626,14 +629,14 @@
 
     @media (max-width:600px){
       .summaryBar {
-        gap: 6px;
+        gap: 5px;
         flex-wrap: nowrap;
         justify-content: center;
       }
       .summaryBar:has(button.shiftFilterBtn) {
         flex-wrap: wrap;
       }
-      .summaryChip { padding: 8px 8px; min-width: 60px; }
+      .summaryChip { padding: 8px 7px; min-width: 60px; flex: 0 0 auto; width: auto; }
       .summaryChip .chipVal { font-size: 18px; }
       .summaryChip .chipVal .chip-icon { width: 20px; height: 20px; }
       .summaryChip .chipLabel { font-size: 10px; letter-spacing: .15px; font-weight:800; }
@@ -1461,9 +1464,7 @@
       .empName         { font-size:14px; }
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
-            .summaryBar      { gap:8px; }
-      .summaryChip     { padding:8px 14px; }
-      .summaryChip .chipVal { font-size:19px; }
+            .summaryChip .chipVal { font-size:19px; }
 }
 
       /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
@@ -1788,7 +1789,7 @@
     </a>
     <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-      <div class="chipLabel" data-key="trainingPage">Training</div>
+      <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
     <a href="{{BASE}}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
@@ -3773,7 +3774,7 @@ var T = {
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'Training', diffPage:'Diff', readSignPage:'Read&Sign',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
