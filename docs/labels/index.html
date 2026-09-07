@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b4f8a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="الليبل" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <title>SATS Cargo - Labels</title>
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -425,13 +432,36 @@
       border-bottom:var(--b3) solid #000;
     }
     .awb-box small{display:block;font-size:10px;font-weight:900;letter-spacing:0.3px}
+    .awb-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
     .awb{
       font-family:"Roboto Mono", monospace;
       font-size:30px;
       font-weight:900;
       line-height:1;
       white-space:nowrap;
+      flex:1;
+      min-width:0;
     }
+    .awb-scan{
+      flex:0 0 34px;
+      width:34px;
+      height:34px;
+      border:1.5px solid #111;
+      background:#fff;
+      border-radius:9px;
+      color:#0f766e;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+      cursor:pointer;
+    }
+    .awb-scan:active{transform:scale(0.96)}
+    .awb-scan svg{display:block}
     .ship-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -664,6 +694,7 @@
     .pbtn:active{transform:scale(0.98)}
     .b-print{background:#000}
     .b-save{background:#444}
+    .b-scan{background:#0f766e}
 
     .system-head{
       position:sticky;
@@ -671,20 +702,51 @@
       z-index:70;
       background:#fff;
       border-bottom:1px solid #ddd;
-      padding: 8px 12px;
+      padding: 8px 10px;
       display:flex;
       align-items:center;
-      justify-content:center;
+      justify-content:space-between;
+      gap:8px;
     }
 
     .top-title{
-      width:100%;
+      flex:1;
       text-align:center;
       font-weight:900;
       letter-spacing:1.2px;
       font-size:18px;
       color:#0b4f8a;
       user-select:none;
+    }
+
+    .pwa-install-btn{
+      flex:0 0 auto;
+      height:34px;
+      padding:0 12px;
+      border:none;
+      border-radius:17px;
+      background:#0b4f8a;
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .pwa-install-btn:active{transform:scale(0.97)}
+    .pwa-install-btn[hidden],
+    html.pwa-standalone .pwa-install-btn{display:none !important}
+    .pwa-install-btn svg{display:block}
+
+    .pwa-overlay .modal-card{direction:rtl; text-align:right}
+    .pwa-overlay .pwa-steps{
+      font-size:14px;
+      font-weight:700;
+      line-height:1.7;
+      color:#334155;
     }
 
     .signature{
@@ -855,6 +917,97 @@
     }
     .toast.show{display:block}
 
+    .scan-overlay{
+      position:fixed;
+      inset:0;
+      z-index:12000;
+      background:#0b1220;
+      display:none;
+      flex-direction:column;
+      color:#fff;
+      direction:rtl;
+    }
+    .scan-overlay.show{display:flex}
+    .scan-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px calc(10px + env(safe-area-inset-top, 0px));
+    }
+    .scan-title{font-weight:900;font-size:17px}
+    .scan-sub{font-size:12px;font-weight:700;color:#9fb0c3;margin-top:4px}
+    .scan-sub.err{color:#fca5a5}
+    .scan-x{
+      border:none;
+      background:#1e293b;
+      color:#fff;
+      width:36px;height:36px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+      flex:0 0 auto;
+    }
+    .scan-video-wrap{
+      position:relative;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+      background:#000;
+    }
+    #scanVideo{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .scan-reticle{
+      position:absolute;
+      left:7%;
+      right:7%;
+      top:50%;
+      height:96px;
+      transform:translateY(-50%);
+      border:2px solid #5eead4;
+      border-radius:14px;
+      box-shadow:0 0 0 9999px rgba(0,0,0,.42);
+      pointer-events:none;
+    }
+    .scan-reticle::after{
+      content:"";
+      position:absolute;
+      left:8%;
+      right:8%;
+      top:50%;
+      height:2px;
+      background:#5eead4;
+      animation:scanline 1.5s ease-in-out infinite;
+    }
+    @keyframes scanline{
+      0%,100%{transform:translateY(-28px);opacity:.35}
+      50%{transform:translateY(28px);opacity:1}
+    }
+    .scan-foot{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+      padding:12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+    .scan-act{
+      border:none;
+      background:#1e293b;
+      color:#fff;
+      height:42px;
+      min-width:96px;
+      padding:0 14px;
+      border-radius:21px;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .scan-act.on{background:#fbbf24;color:#111}
+
     @media print{
       @page{ size: 101mm 130mm; margin:0 !important; }
       html, body{
@@ -872,7 +1025,7 @@
         overflow:visible !important;
         background:#fff !important;
       }
-      .bottom, .notes-tools, .system-head, .no-print{display:none !important}
+      .bottom, .notes-tools, .system-head, .no-print, .awb-scan, .scan-overlay{display:none !important}
       .uld-plus, .sign-add, .sign-img-x, .sign-img-resize, .sign-head-btns, .uld-title-nav{display:none !important}
       .viewport{padding:0 !important; margin:0 !important; overflow:hidden !important; background:#fff !important;}
       html.uld-multi-print .viewport,
@@ -1003,7 +1156,15 @@
 
 <body>
   <header class="system-head no-print">
+    <button type="button" class="pwa-install-btn" id="installPwaBtn" title="تثبيت التطبيق">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12m0 0-4-4m4 4 4-4"/>
+        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+      </svg>
+      تثبيت
+    </button>
     <div class="top-title">ADD &amp; PRINT</div>
+    <span class="pwa-install-btn" style="visibility:hidden;pointer-events:none" aria-hidden="true">تثبيت</span>
   </header>
 
   <div class="notes-tools no-print" id="notesTools">
@@ -1062,7 +1223,15 @@
         </div>
         <div class="awb-box">
           <small>AIR WAYBILL NO. <span id="awbTrackHint" class="no-print"></span></small>
-          <div class="awb" id="ship_awb" contenteditable="true" inputmode="numeric">910-1732 8684</div>
+          <div class="awb-row">
+            <div class="awb" id="ship_awb" contenteditable="true" inputmode="numeric">910-1732 8684</div>
+            <button type="button" class="awb-scan no-print" title="مسح الباركود الطولي" aria-label="مسح الباركود" onclick="openBarcodeScanner()">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3l2-3h8l2 3h3a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="ship-grid">
           <div class="cell"><small>DESTINATION</small><strong id="ship_dest" contenteditable="true">LHR</strong></div>
@@ -1178,10 +1347,53 @@
 
   <div class="signature no-print">DESIGNED BY KHALID ALRAQADI</div>
 
+  <div class="modal-backdrop pwa-overlay no-print" id="pwaOverlay" aria-hidden="true" onclick="closePwaHelp(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pwaHelpTitle" onclick="event.stopPropagation()">
+      <div class="modal-accent"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="pwaHelpTitle">تثبيت الليبل كتطبيق</div>
+          <div class="modal-sub">تطبيق مستقل عن موقع الروستر</div>
+        </div>
+        <button class="modal-x" type="button" aria-label="إغلاق" onclick="closePwaHelp()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="pwa-steps">
+          <div><b>iPhone / iPad:</b> مشاركة ← Add to Home Screen ← Add</div>
+          <div style="margin-top:10px"><b>Android:</b> قائمة المتصفح ← تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية</div>
+          <div style="margin-top:10px"><b>الكمبيوتر:</b> أيقونة التثبيت في شريط العنوان، أو القائمة ← تثبيت SATS Labels</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn" type="button" onclick="closePwaHelp()">حسناً</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scan-overlay no-print" id="scanOverlay" aria-hidden="true">
+    <div class="scan-top">
+      <div>
+        <div class="scan-title">مسح الباركود</div>
+        <div class="scan-sub" id="scanStatus">وجّه الكاميرا نحو الباركود الطولي</div>
+      </div>
+      <button type="button" class="scan-x" id="scanCloseBtn" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="scan-video-wrap">
+      <video id="scanVideo" playsinline muted autoplay></video>
+      <div class="scan-reticle" aria-hidden="true"></div>
+    </div>
+    <div class="scan-foot">
+      <button type="button" class="scan-act" id="scanTorchBtn" hidden>الإضاءة</button>
+      <button type="button" class="scan-act" id="scanFileBtn">صورة</button>
+      <input type="file" id="scanFileInput" accept="image/*" hidden>
+    </div>
+  </div>
+
   <footer class="bottom">
     <button class="pbtn b-page" data-page="ship" title="ملصق AWB" onclick="showPage('ship')">AWB</button>
     <button class="pbtn b-page" data-page="uld" title="بطاقة ULD" onclick="showPage('uld')">ULD</button>
     <button class="pbtn b-page" data-page="notes" title="دفتر الشحن" onclick="showPage('notes')">دفتر</button>
+    <button class="ibtn b-scan" title="مسح باركود" aria-label="مسح الباركود" onclick="openBarcodeScanner()">📷</button>
     <button class="ibtn b-print" title="طباعة" onclick="printLabel()">🖨️</button>
     <button class="ibtn b-save" title="حفظ صورة" onclick="saveImage()">💾</button>
   </footer>
@@ -1343,6 +1555,29 @@
     }
     function digitsOnlySafe(x){
       return toLatinDigits(x).replace(/[^0-9]/g, "");
+    }
+
+    function formatAwbDisplay(digits){
+      const d = digitsOnlySafe(digits).slice(0, 11);
+      if (d.length <= 3) return d;
+      if (d.length <= 7) return d.slice(0,3) + "-" + d.slice(3);
+      return d.slice(0,3) + "-" + d.slice(3,7) + " " + d.slice(7);
+    }
+
+    function awbChecksumOk(d){
+      if (!/^\d{11}$/.test(d)) return false;
+      return (Number(d.slice(0, 10)) % 7) === Number(d[10]);
+    }
+
+    function extractAwbDigits(raw){
+      const digits = digitsOnlySafe(raw);
+      if (digits.length === 11) return digits;
+      if (digits.length < 11) return digits;
+      for (let i = 0; i <= digits.length - 11; i++){
+        const win = digits.slice(i, i + 11);
+        if (awbChecksumOk(win)) return win;
+      }
+      return digits.slice(0, 11);
     }
 
     function activePageId(){ return "page_" + pages[idx]; }
@@ -2460,10 +2695,7 @@ function syncFromShipping(){
       }
 
       function formatAwb3_4_4(digits){
-        const d = awbDigitsFromText(digits);
-        if (d.length <= 3) return d;
-        if (d.length <= 7) return d.slice(0,3) + "-" + d.slice(3);
-        return d.slice(0,3) + "-" + d.slice(3,7) + " " + d.slice(7);
+        return formatAwbDisplay(digits);
       }
 
       function getCaretCharOffset(el){
@@ -2973,6 +3205,275 @@ function fillAirlineModal(){
       return fillFromAwbTracking(digits);
     }
 
+    const LINEAR_BARCODE_FORMATS = ["code_128","code_39","code_93","codabar","itf","ean_13","ean_8","upc_a","upc_e"];
+    let linearDetectorPromise = null;
+    let scanStream = null;
+    let scanTimer = null;
+    let scanBusy = false;
+    let scanClosed = true;
+    let scanTorchOn = false;
+    let scanCanvas = null;
+
+    function setScanStatus(msg, kind){
+      const el = document.getElementById("scanStatus");
+      if (!el) return;
+      el.textContent = msg || "";
+      el.classList.toggle("err", kind === "err");
+    }
+
+    function getLinearBarcodeDetector(){
+      if (linearDetectorPromise) return linearDetectorPromise;
+      linearDetectorPromise = (async ()=>{
+        if (typeof window.BarcodeDetector === "function" && typeof window.BarcodeDetector.getSupportedFormats === "function"){
+          try{
+            const supported = await window.BarcodeDetector.getSupportedFormats();
+            if (supported.indexOf("code_128") !== -1){
+              const formats = LINEAR_BARCODE_FORMATS.filter(f => supported.indexOf(f) !== -1);
+              return new window.BarcodeDetector({ formats });
+            }
+          }catch(e){}
+        }
+        const mod = await import("https://cdn.jsdelivr.net/npm/barcode-detector@3/+esm");
+        const BD = mod.BarcodeDetector || (mod.default && (mod.default.BarcodeDetector || mod.default));
+        if (typeof BD !== "function") throw new Error("barcode detector unavailable");
+        try{
+          return new BD({ formats: ["linear_codes"] });
+        }catch(e){
+          return new BD({ formats: LINEAR_BARCODE_FORMATS });
+        }
+      })().catch(err => {
+        linearDetectorPromise = null;
+        throw err;
+      });
+      return linearDetectorPromise;
+    }
+
+    function grabScanBand(video){
+      const w = video.videoWidth;
+      const h = video.videoHeight;
+      if (!w || !h) return null;
+      if (!scanCanvas) scanCanvas = document.createElement("canvas");
+      const band = Math.max(90, Math.round(h * 0.32));
+      const y = Math.max(0, Math.round((h - band) / 2));
+      scanCanvas.width = w;
+      scanCanvas.height = band;
+      const ctx = scanCanvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(video, 0, y, w, band, 0, 0, w, band);
+      return scanCanvas;
+    }
+
+    function beepScan(){
+      try{
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        const ctx = new Ctx();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "square";
+        o.frequency.value = 880;
+        g.gain.value = 0.05;
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.08);
+        setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 180);
+      }catch(e){}
+    }
+
+    function applyScannedBarcode(raw){
+      const digits = extractAwbDigits(raw);
+      if (!digits) return false;
+      const awbEl = document.getElementById("ship_awb");
+      if (!awbEl) return false;
+      awbEl.textContent = formatAwbDisplay(digits);
+      showPage("ship");
+      syncFromShipping();
+      fitAwbNums();
+      scheduleSave();
+      if (digits.length === 11){
+        scheduleAwbFill(digits, { force: true, delay: 60 });
+        showToast("تم قراءة البوليصة");
+      } else {
+        showToast("رقم غير مكتمل — أكمل البوليصة");
+      }
+      return true;
+    }
+
+    function setupTorchButton(stream){
+      const btn = document.getElementById("scanTorchBtn");
+      if (!btn) return;
+      const track = stream && stream.getVideoTracks && stream.getVideoTracks()[0];
+      const caps = track && track.getCapabilities ? track.getCapabilities() : null;
+      scanTorchOn = false;
+      btn.classList.remove("on");
+      if (!caps || !caps.torch){
+        btn.hidden = true;
+        btn.onclick = null;
+        return;
+      }
+      btn.hidden = false;
+      btn.onclick = async ()=>{
+        scanTorchOn = !scanTorchOn;
+        try{
+          await track.applyConstraints({ advanced: [{ torch: scanTorchOn }] });
+          btn.classList.toggle("on", scanTorchOn);
+        }catch(e){
+          scanTorchOn = false;
+          btn.classList.remove("on");
+        }
+      };
+    }
+
+    function startScanLoop(video, detector){
+      scanClosed = false;
+      const tick = async ()=>{
+        if (scanClosed) return;
+        if (!scanBusy && video.readyState >= 2){
+          scanBusy = true;
+          try{
+            const frame = grabScanBand(video);
+            const codes = await detector.detect(frame || video);
+            if (!scanClosed && codes && codes.length){
+              for (let i = 0; i < codes.length; i++){
+                const raw = String((codes[i] && (codes[i].rawValue || codes[i].raw)) || "").trim();
+                if (raw && applyScannedBarcode(raw)){
+                  beepScan();
+                  try{ navigator.vibrate && navigator.vibrate(70); }catch(e){}
+                  closeBarcodeScanner();
+                  return;
+                }
+              }
+            }
+          }catch(e){}
+          scanBusy = false;
+        }
+        scanTimer = setTimeout(tick, 140);
+      };
+      tick();
+    }
+
+    function scanEscOnce(ev){
+      if (ev.key === "Escape") closeBarcodeScanner();
+    }
+
+    async function openBarcodeScanner(){
+      const overlay = document.getElementById("scanOverlay");
+      if (!overlay) return;
+      if (overlay.classList.contains("show")) return;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+      scanClosed = false;
+      setScanStatus("جاري فتح الكاميرا…");
+      window.addEventListener("keydown", scanEscOnce);
+      try{
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+          throw new Error("no_camera_api");
+        }
+        const streamP = navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
+        });
+        streamP.then(s => {
+          if (scanClosed) s.getTracks().forEach(t => { try{ t.stop(); }catch(e){} });
+        }).catch(()=>{});
+        const detectorP = getLinearBarcodeDetector();
+        const stream = await Promise.race([
+          streamP,
+          new Promise((_, reject) => setTimeout(() => {
+            const err = new Error("camera_timeout");
+            err.name = "TimeoutError";
+            reject(err);
+          }, 10000))
+        ]);
+        if (scanClosed){
+          stream.getTracks().forEach(t => { try{ t.stop(); }catch(e){} });
+          return;
+        }
+        scanStream = stream;
+        const video = document.getElementById("scanVideo");
+        video.srcObject = stream;
+        try{ await video.play(); }catch(e){}
+        setupTorchButton(stream);
+        const detector = await detectorP;
+        if (scanClosed) return;
+        setScanStatus("وجّه الكاميرا نحو الباركود الطولي");
+        startScanLoop(video, detector);
+      }catch(e){
+        if (scanClosed) return;
+        const name = (e && e.name) || "";
+        const msg = (name === "NotAllowedError" || name === "PermissionDeniedError")
+          ? "اسمح للكاميرا من إعدادات المتصفح"
+          : (name === "NotFoundError" || String(e && e.message) === "no_camera_api")
+            ? "لا توجد كاميرا — يمكنك اختيار صورة"
+            : "تعذر فتح الكاميرا — يمكنك اختيار صورة";
+        setScanStatus(msg, "err");
+        showToast(msg);
+      }
+    }
+
+    function closeBarcodeScanner(){
+      scanClosed = true;
+      clearTimeout(scanTimer);
+      scanTimer = null;
+      scanBusy = false;
+      window.removeEventListener("keydown", scanEscOnce);
+      const video = document.getElementById("scanVideo");
+      if (video){
+        try{ video.pause(); }catch(e){}
+        video.srcObject = null;
+      }
+      if (scanStream){
+        scanStream.getTracks().forEach(t => { try{ t.stop(); }catch(e){} });
+        scanStream = null;
+      }
+      scanTorchOn = false;
+      const torchBtn = document.getElementById("scanTorchBtn");
+      if (torchBtn){
+        torchBtn.classList.remove("on");
+        torchBtn.hidden = true;
+      }
+      const overlay = document.getElementById("scanOverlay");
+      if (overlay){
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+    }
+
+    function bindBarcodeScannerUi(){
+      const closeBtn = document.getElementById("scanCloseBtn");
+      const fileBtn = document.getElementById("scanFileBtn");
+      const fileInput = document.getElementById("scanFileInput");
+      if (closeBtn) closeBtn.addEventListener("click", closeBarcodeScanner);
+      if (fileBtn && fileInput){
+        fileBtn.addEventListener("click", ()=> fileInput.click());
+        fileInput.addEventListener("change", async ()=>{
+          const file = fileInput.files && fileInput.files[0];
+          fileInput.value = "";
+          if (!file) return;
+          setScanStatus("جاري قراءة الصورة…");
+          try{
+            const detector = await getLinearBarcodeDetector();
+            const bmp = await createImageBitmap(file);
+            const codes = await detector.detect(bmp);
+            if (bmp.close) bmp.close();
+            const raw = codes && codes[0] && (codes[0].rawValue || codes[0].raw) || "";
+            if (raw && applyScannedBarcode(raw)){
+              beepScan();
+              closeBarcodeScanner();
+              return;
+            }
+            setScanStatus("لم يُقرأ باركود — جرّب صورة أوضح", "err");
+          }catch(e){
+            setScanStatus("تعذر قراءة الصورة", "err");
+          }
+        });
+      }
+    }
+
     function showToast(msg){
       const t = document.getElementById("toast");
       if(!t) return;
@@ -2980,6 +3481,65 @@ function fillAirlineModal(){
       t.classList.add("show");
       clearTimeout(window.__toastTimer);
       window.__toastTimer = setTimeout(()=>t.classList.remove("show"), 1400);
+    }
+
+    let deferredPwaPrompt = null;
+
+    function isLabelsStandalone(){
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function openPwaHelp(){
+      const m = document.getElementById("pwaOverlay");
+      if (!m) return;
+      m.classList.add("show");
+      m.setAttribute("aria-hidden", "false");
+    }
+
+    function closePwaHelp(e){
+      if (e && e.target && e.target.id && e.target.id !== "pwaOverlay") return;
+      const m = document.getElementById("pwaOverlay");
+      if (!m) return;
+      m.classList.remove("show");
+      m.setAttribute("aria-hidden", "true");
+    }
+
+    function setupLabelsPwa(){
+      if (isLabelsStandalone()){
+        document.documentElement.classList.add("pwa-standalone");
+        const btn = document.getElementById("installPwaBtn");
+        if (btn) btn.hidden = true;
+        return;
+      }
+      window.addEventListener("beforeinstallprompt", (e)=>{
+        e.preventDefault();
+        deferredPwaPrompt = e;
+      });
+      window.addEventListener("appinstalled", ()=>{
+        deferredPwaPrompt = null;
+        document.documentElement.classList.add("pwa-standalone");
+        const btn = document.getElementById("installPwaBtn");
+        if (btn) btn.hidden = true;
+        showToast("تم تثبيت التطبيق");
+      });
+      const btn = document.getElementById("installPwaBtn");
+      if (btn){
+        btn.addEventListener("click", async ()=>{
+          if (deferredPwaPrompt){
+            const ev = deferredPwaPrompt;
+            deferredPwaPrompt = null;
+            try{
+              ev.prompt();
+              await ev.userChoice;
+            }catch(err){}
+            return;
+          }
+          openPwaHelp();
+        });
+      }
+      if ("serviceWorker" in navigator){
+        navigator.serviceWorker.register("sw.js?v=1").catch(()=>{});
+      }
     }
 
     function copyAirlineInfo(){
@@ -3028,6 +3588,8 @@ function fillAirlineModal(){
       bindName();
       bindSignImage();
       bindUppercaseCE();
+      bindBarcodeScannerUi();
+      setupLabelsPwa();
       syncFromShipping();
 
       try{
