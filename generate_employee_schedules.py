@@ -37,7 +37,7 @@ def excel_url_from_env() -> str:
         or os.environ.get("EXPORT_EXCEL_URL", "").strip()
     )
 
-INVENTORY_EMP_IDS = frozenset({"82592", "81404"})
+INVENTORY_EMP_IDS = frozenset({"82592", "990737"})
 INVENTORY_DEPT_NAME = "Inventory"
 
 DEPARTMENTS = [

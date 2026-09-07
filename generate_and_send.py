@@ -318,7 +318,7 @@ DEPT_COLORS = [
 UNASSIGNED_COLOR = {"name": "gray", "base": "#6b7280", "light": "#6b728015", "border": "#6b728018", "grad_from": "#6b7280", "grad_to": "#6b7280cc"}
 
 # Inventory is not an Excel sheet; these IDs are pulled out of their source departments.
-INVENTORY_EMP_IDS = frozenset({"82592", "81404"})
+INVENTORY_EMP_IDS = frozenset({"82592", "990737"})
 INVENTORY_DEPT_NAME = "Inventory"
 INVENTORY_COLOR = DEPT_COLORS[5]
 
