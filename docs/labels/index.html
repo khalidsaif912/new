@@ -717,45 +717,52 @@
       text-align:center;
       font-weight:900;
       letter-spacing:1.2px;
-      font-size:clamp(13px, 4.6vw, 18px);
+      font-size:clamp(12px, 4.2vw, 18px);
       color:#0b4f8a;
       user-select:none;
-      padding-inline: 76px;
+      padding-inline: 86px;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
     }
 
-    .pwa-install-btn{
+    .head-action-btn{
       position:absolute;
       top: max(8px, env(safe-area-inset-top, 0px));
-      inset-inline-start: 10px;
       z-index: 2;
       height:34px;
       min-width:44px;
       padding:0 10px;
-      border:none;
       border-radius:17px;
-      background:#0b4f8a;
-      color:#fff;
       font-size:12px;
       font-weight:800;
       letter-spacing:.2px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:5px;
+      gap:4px;
       cursor:pointer;
       white-space:nowrap;
+      text-decoration:none;
     }
-    .pwa-install-btn:active{transform:scale(0.97)}
-    .pwa-install-btn[hidden],
-    html.pwa-standalone .pwa-install-btn{display:none !important}
-    html.pwa-standalone .top-title{padding-inline: 10px}
-    .pwa-install-btn svg{display:block; flex:0 0 auto}
+    .head-action-btn svg{display:block; flex:0 0 auto}
+    .head-action-btn:active{transform:scale(0.97)}
+
+    .pwa-install-btn{
+      inset-inline-start: 10px;
+      border:none;
+      background:#0b4f8a;
+      color:#fff;
+    }
+    .pwa-home-btn{
+      inset-inline-end: 10px;
+      background:#eff6ff;
+      color:#0b4f8a;
+      border:1.5px solid #93c5fd;
+    }
 
     @media (max-width: 380px){
-      .pwa-install-btn{
+      .head-action-btn{
         height:32px;
         padding:0 8px;
         font-size:11px;
@@ -763,7 +770,7 @@
       }
       .top-title{
         letter-spacing:0.4px;
-        padding-inline: 68px;
+        padding-inline: 78px;
       }
     }
 
@@ -1182,7 +1189,7 @@
 
 <body>
   <header class="system-head no-print">
-    <button type="button" class="pwa-install-btn" id="installPwaBtn" title="تثبيت التطبيق">
+    <button type="button" class="head-action-btn pwa-install-btn" id="installPwaBtn" title="تثبيت التطبيق">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 3v12m0 0-4-4m4 4 4-4"/>
         <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
@@ -1190,6 +1197,13 @@
       تثبيت
     </button>
     <div class="top-title">ADD &amp; PRINT</div>
+    <a class="head-action-btn pwa-home-btn" id="labelsHomeBtn" href="https://khalidsaif912.github.io/new/docs/" title="الصفحة الرئيسية">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 11.5 12 4l8 7.5"/>
+        <path d="M6.5 10.5V20h11V10.5"/>
+      </svg>
+      الرئيسية
+    </a>
   </header>
 
   <div class="notes-tools no-print" id="notesTools">
@@ -1387,6 +1401,7 @@
           <div><b>iPhone / iPad:</b> مشاركة ← Add to Home Screen ← Add</div>
           <div style="margin-top:10px"><b>Android:</b> قائمة المتصفح ← تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية</div>
           <div style="margin-top:10px"><b>الكمبيوتر:</b> أيقونة التثبيت في شريط العنوان، أو القائمة ← تثبيت SATS Labels</div>
+          <div style="margin-top:10px">إذا فتحت الليبل من تطبيق الروستر، ثبّته من هنا ليصبح تطبيقًا مستقلًا. زر <b>الرئيسية</b> يعيدك للروستر.</div>
         </div>
       </div>
       <div class="modal-foot">
@@ -3510,8 +3525,19 @@ function fillAirlineModal(){
 
     let deferredPwaPrompt = null;
 
-    function isLabelsStandalone(){
+    function isStandaloneDisplay(){
       return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function rosterHomeUrl(){
+      var host = location.hostname || "";
+      if (host === "127.0.0.1" || host === "localhost") return "/";
+      if (host.endsWith("github.io")) {
+        var path = location.pathname || "";
+        var cut = path.indexOf("/labels");
+        if (cut !== -1) return location.origin + path.slice(0, cut) + "/";
+      }
+      return "https://khalidsaif912.github.io/new/docs/";
     }
 
     function openPwaHelp(){
@@ -3530,11 +3556,10 @@ function fillAirlineModal(){
     }
 
     function setupLabelsPwa(){
-      if (isLabelsStandalone()){
+      const home = document.getElementById("labelsHomeBtn");
+      if (home) home.href = rosterHomeUrl();
+      if (isStandaloneDisplay()){
         document.documentElement.classList.add("pwa-standalone");
-        const btn = document.getElementById("installPwaBtn");
-        if (btn) btn.hidden = true;
-        return;
       }
       window.addEventListener("beforeinstallprompt", (e)=>{
         e.preventDefault();
@@ -3543,12 +3568,11 @@ function fillAirlineModal(){
       window.addEventListener("appinstalled", ()=>{
         deferredPwaPrompt = null;
         document.documentElement.classList.add("pwa-standalone");
-        const btn = document.getElementById("installPwaBtn");
-        if (btn) btn.hidden = true;
         showToast("تم تثبيت التطبيق");
       });
       const btn = document.getElementById("installPwaBtn");
       if (btn){
+        btn.hidden = false;
         btn.addEventListener("click", async ()=>{
           if (deferredPwaPrompt){
             const ev = deferredPwaPrompt;
@@ -3563,7 +3587,7 @@ function fillAirlineModal(){
         });
       }
       if ("serviceWorker" in navigator){
-        navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
+        navigator.serviceWorker.register("sw.js?v=3").catch(()=>{});
       }
     }
 
