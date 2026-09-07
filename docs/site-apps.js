@@ -1032,8 +1032,9 @@
   }
 
   function ensureLabelsSiteButton() {
-    var primary = document.querySelector('.quickActions.roster-cta');
-    if (!primary || !primary.parentNode) return;
+    var after = document.querySelector('.quickActions.secondaryBar')
+      || document.querySelector('.quickActions.roster-cta');
+    if (!after || !after.parentNode) return;
     var bar = document.getElementById('labelsSiteBar');
     if (!bar) {
       bar = document.createElement('nav');
@@ -1052,7 +1053,9 @@
         '<span class="roster-cta-label"></span>' +
         '<span class="labelsSiteBtnSub"></span>' +
         '</span></a>';
-      primary.parentNode.insertBefore(bar, primary.nextSibling);
+    }
+    if (bar.previousElementSibling !== after) {
+      after.parentNode.insertBefore(bar, after.nextSibling);
     }
     var a = document.getElementById('labelsSiteBtn');
     if (!a) return;
