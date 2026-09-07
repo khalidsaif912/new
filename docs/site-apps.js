@@ -14,8 +14,6 @@
       flightsSub: 'Airport board',
       labels: 'SATS Labels',
       labelsSub: 'Cargo labels',
-      labelsJump: 'SATS Labels',
-      labelsJumpSub: 'Open & install the app',
       calc: 'Quantities',
       calcSub: 'Shipment calc',
       quicklist: 'QuickList',
@@ -67,8 +65,6 @@
       flightsSub: 'لوحة المطار',
       labels: 'ملصقات SATS',
       labelsSub: 'ملصقات الشحن',
-      labelsJump: 'ملصقات SATS',
-      labelsJumpSub: 'افتح وثبّت التطبيق',
       calc: 'حساب الكميات',
       calcSub: 'حساب الشحنات',
       quicklist: 'قوائم المشتريات',
@@ -246,7 +242,7 @@
       else btn.textContent = t('btn');
     }
     ensureAlumniButton();
-    ensureLabelsSiteButton();
+    removeLabelsSiteButton();
     ensureSpotlightButton();
     var sheet = document.getElementById('siteAppsSheet');
     if (!sheet) return;
@@ -505,9 +501,17 @@
     var link = document.querySelector('.siteAppsLink--labels, a.siteAppsLink[data-app-id="labels"]');
     if (!link) return;
     link.href = labelsPageUrl();
-    link.setAttribute('data-open-same', '1');
-    link.removeAttribute('target');
-    link.removeAttribute('rel');
+    var host = location.hostname || '';
+    var local = host === '127.0.0.1' || host === 'localhost';
+    if (local) {
+      link.setAttribute('data-open-same', '1');
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+    } else {
+      link.removeAttribute('data-open-same');
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
   }
 
   function patchCalcLink() {
@@ -872,17 +876,6 @@
     var style = document.createElement('style');
     style.id = 'siteAppsCompactCss';
     style.textContent = [
-      '.quickActions.labelsSiteBar{max-width:min(100%,540px)!important;margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;margin-inline:auto!important;}',
-      '#labelsSiteBtn.roster-cta-btn--labels{',
-      'display:inline-flex!important;align-items:center!important;justify-content:center!important;',
-      'gap:8px!important;width:100%!important;min-height:48px!important;padding:8px 12px!important;',
-      'background:#ecfdf5!important;border:1.5px solid #6ee7b7!important;border-radius:999px!important;',
-      'color:#065f46!important;text-decoration:none!important;box-shadow:none!important;font-weight:800!important;',
-      '}',
-      '#labelsSiteBtn .labelsSiteBtnLabel{display:flex;flex-direction:column;align-items:center;line-height:1.2;min-width:0;}',
-      '#labelsSiteBtn .roster-cta-label{font-size:13px!important;letter-spacing:-.01em;color:inherit!important;}',
-      '#labelsSiteBtn .labelsSiteBtnSub{font-size:10px;font-weight:700;color:#0f766e;}',
-      '#labelsSiteBtn .roster-cta-icon svg{width:20px;height:20px;}',
       '.quickActions.secondaryBar{max-width:min(100%,540px)!important;margin-top:8px!important;gap:8px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}',
       '.secondaryBar .roster-cta-btn{min-height:46px!important;padding:10px 10px!important;font-size:12.5px!important;width:100%!important;min-width:0!important;}',
       '#alumniBtn.roster-cta-btn--alumni,a.roster-cta-btn--alumni{',
@@ -1031,48 +1024,9 @@
     if (lbl) lbl.textContent = alumniLabel();
   }
 
-  function ensureLabelsSiteButton() {
-    var after = document.querySelector('.quickActions.secondaryBar')
-      || document.querySelector('.quickActions.roster-cta');
-    if (!after || !after.parentNode) return;
+  function removeLabelsSiteButton() {
     var bar = document.getElementById('labelsSiteBar');
-    if (!bar) {
-      bar = document.createElement('nav');
-      bar.id = 'labelsSiteBar';
-      bar.className = 'quickActions labelsSiteBar';
-      bar.setAttribute('aria-label', 'SATS Labels');
-      bar.innerHTML =
-        '<a class="roster-cta-btn roster-cta-btn--labels" id="labelsSiteBtn" href="#">' +
-        '<span class="roster-cta-icon" aria-hidden="true">' +
-        '<svg viewBox="0 0 64 64" width="22" height="22" aria-hidden="true">' +
-        '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
-        '<path d="M10 12h24l18 18-6 6L28 18H10z" fill="#6ee7b7"/>' +
-        '<circle cx="22" cy="24" r="4.2" fill="#fff" stroke="#0f172a" stroke-width="2"/>' +
-        '</svg></span>' +
-        '<span class="labelsSiteBtnLabel">' +
-        '<span class="roster-cta-label"></span>' +
-        '<span class="labelsSiteBtnSub"></span>' +
-        '</span></a>';
-    }
-    if (bar.previousElementSibling !== after) {
-      after.parentNode.insertBefore(bar, after.nextSibling);
-    }
-    var a = document.getElementById('labelsSiteBtn');
-    if (!a) return;
-    a.href = labelsPageUrl();
-    var host = location.hostname || '';
-    var local = host === '127.0.0.1' || host === 'localhost';
-    if (local) {
-      a.removeAttribute('target');
-      a.removeAttribute('rel');
-    } else {
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-    }
-    var lbl = a.querySelector('.roster-cta-label');
-    var sub = a.querySelector('.labelsSiteBtnSub');
-    if (lbl) lbl.textContent = t('labelsJump');
-    if (sub) sub.textContent = t('labelsJumpSub');
+    if (bar) bar.remove();
   }
 
   var SPOTLIGHT_EMOJIS = [
@@ -1263,14 +1217,14 @@
   function init() {
     injectCompactStyles();
     ensureAlumniButton();
-    ensureLabelsSiteButton();
+    removeLabelsSiteButton();
     ensureSpotlightButton();
     ensureSpotlightPopup();
     bindUi();
     bindSpotlightUi();
     applyI18n();
     ensureAlumniButton();
-    ensureLabelsSiteButton();
+    removeLabelsSiteButton();
     ensureSpotlightButton();
     patchLabelsLink();
     patchCalcLink();
