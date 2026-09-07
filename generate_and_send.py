@@ -372,6 +372,23 @@ def insert_card_after_export_operators(cards: list, extra_card: str) -> list:
         out.append(extra_card)
     return out
 
+
+def move_officers_card_last(cards: list) -> list:
+    officers = []
+    rest = []
+    for card in cards:
+        if card and '<div class="deptTitle">Officers</div>' in card:
+            officers.append(card)
+        else:
+            rest.append(card)
+    return rest + officers
+
+
+def move_officers_dept_last(items: list) -> list:
+    officers = [d for d in items if d.get("dept") == "Officers"]
+    rest = [d for d in items if d.get("dept") != "Officers"]
+    return rest + officers
+
 # =========================
 # Shift group colors (Morning/Afternoon/Night/etc.)
 # =========================
@@ -3494,6 +3511,8 @@ def generate_date_pages_for_month(
                     employees_total_all += buckets_employee_count(inventory_buckets)
                     employees_total_now += buckets_employee_count(inventory_buckets_now)
                     depts_count += 1
+                dept_cards_all = move_officers_card_last(dept_cards_all)
+                dept_cards_now = move_officers_card_last(dept_cards_now)
 
                 if employees_total_all == 0:
                     notice_html = (
@@ -4226,6 +4245,9 @@ def main():
         employees_total_now += sum(len(inventory_buckets.get(g, [])) for g in [active_group, "Off Day", "Annual Leave", "Sick Leave", "Training", "Standby", "Other"])
         depts_count += 1
         all_shifts_by_dept.append({"dept": INVENTORY_DEPT_NAME, "shifts": inventory_buckets})
+    dept_cards_all = move_officers_card_last(dept_cards_all)
+    dept_cards_now = move_officers_card_last(dept_cards_now)
+    all_shifts_by_dept = move_officers_dept_last(all_shifts_by_dept)
 
     os.makedirs("docs", exist_ok=True)
     os.makedirs("docs/now", exist_ok=True)
