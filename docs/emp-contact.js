@@ -42,15 +42,15 @@
 
   function empIdFromRow(row) {
     var raw = row.getAttribute('data-emp-name') || '';
-    var m = raw.match(/(\d{3,})\s*$/) || raw.match(/- (\d+)/);
+    var m = raw.match(/-\s*(\d{3,})/) || raw.match(/(\d{3,})/);
     return m ? m[1] : '';
   }
 
   function empDisplayName(row) {
     var raw = row.getAttribute('data-emp-name') || '';
     return String(raw)
-      .replace(/\s*[-–—]\s*\d+\s*$/, '')
       .replace(/\s*\(\s*Inventory\s*\)\s*$/i, '')
+      .replace(/\s*[-–—]\s*\d+\s*$/, '')
       .trim();
   }
 

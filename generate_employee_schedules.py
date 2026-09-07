@@ -37,6 +37,9 @@ def excel_url_from_env() -> str:
         or os.environ.get("EXPORT_EXCEL_URL", "").strip()
     )
 
+INVENTORY_EMP_IDS = frozenset({"82592", "81404"})
+INVENTORY_DEPT_NAME = "Inventory"
+
 DEPARTMENTS = [
     ("Officers", "Officers"),
     ("Supervisors", "Supervisors"),
@@ -232,8 +235,9 @@ def get_daynum_to_col(ws, date_row: int):
 
 
 def extract_employee_id(name_str):
-    """يستخرج الرقم من نص مثل: Ahmed Ali - 12345"""
-    match = re.search(r'-\s*(\d+)\s*$', name_str)
+    """Extract the staff number from names like 'Ahmed Ali - 12345' or
+    'Mohamed Al Subhi - 82592 (Inventory)'."""
+    match = re.search(r'-\s*(\d{3,})', name_str or "")
     if match:
         return match.group(1).strip()
     return None
@@ -287,7 +291,7 @@ def generate_employee_schedules(wb, year: int, month: int):
             if not emp_id:
                 continue
             
-            emp_name = re.sub(r'\s*-\s*\d+\s*$', '', name).strip()
+            emp_name = re.sub(r'\s*-\s*\d{3,}(?:\s*\([^)]*\))?\s*$', '', name).strip()
             
             # قراءة مناوبات الشهر
             month_schedule = []
@@ -320,7 +324,9 @@ def generate_employee_schedules(wb, year: int, month: int):
                 month_key = f"{year}-{month:02d}"
                 all_employees[emp_id]["name"] = emp_name
                 all_employees[emp_id]["id"] = emp_id
-                all_employees[emp_id]["department"] = dept_name
+                all_employees[emp_id]["department"] = (
+                    INVENTORY_DEPT_NAME if emp_id in INVENTORY_EMP_IDS else dept_name
+                )
                 all_employees[emp_id]["schedules"][month_key] = month_schedule
                 emp_count += 1
         
