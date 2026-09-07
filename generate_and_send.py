@@ -317,6 +317,61 @@ DEPT_COLORS = [
 # قسم Unassigned يأخذ لون برتقالي/رمادي
 UNASSIGNED_COLOR = {"name": "gray", "base": "#6b7280", "light": "#6b728015", "border": "#6b728018", "grad_from": "#6b7280", "grad_to": "#6b7280cc"}
 
+# Inventory is not an Excel sheet; these IDs are pulled out of their source departments.
+INVENTORY_EMP_IDS = frozenset({"82592", "81404"})
+INVENTORY_DEPT_NAME = "Inventory"
+INVENTORY_COLOR = DEPT_COLORS[5]
+
+
+def employee_id_from_name(name: str) -> str:
+    m = re.search(r"(\d{4,})", name or "")
+    return m.group(1) if m else ""
+
+
+def is_inventory_employee(name: str) -> bool:
+    return employee_id_from_name(name) in INVENTORY_EMP_IDS
+
+
+def empty_shift_buckets() -> dict:
+    return {k: [] for k in GROUP_ORDER}
+
+
+def take_inventory_employees(buckets: dict) -> dict:
+    taken = empty_shift_buckets()
+    for group_key, emps in list(buckets.items()):
+        keep = []
+        for emp in emps:
+            if is_inventory_employee(emp.get("name", "")):
+                taken.setdefault(group_key, []).append(emp)
+            else:
+                keep.append(emp)
+        buckets[group_key] = keep
+    return taken
+
+
+def merge_shift_buckets(dest: dict, src: dict) -> None:
+    for group_key, emps in src.items():
+        dest.setdefault(group_key, []).extend(emps)
+
+
+def buckets_employee_count(buckets: dict) -> int:
+    return sum(len(buckets.get(g, [])) for g in GROUP_ORDER)
+
+
+def insert_card_after_export_operators(cards: list, extra_card: str) -> list:
+    if not extra_card:
+        return cards
+    out = []
+    inserted = False
+    for card in cards:
+        out.append(card)
+        if (not inserted) and card and "Export Operators" in card:
+            out.append(extra_card)
+            inserted = True
+    if not inserted:
+        out.append(extra_card)
+    return out
+
 # =========================
 # Shift group colors (Morning/Afternoon/Night/etc.)
 # =========================
@@ -2667,7 +2722,7 @@ var T = {{
     from:'FROM', to:'TO',
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
-    exportChecker:'Export Checker', exportOps:'Export Operators',
+    exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
@@ -2681,7 +2736,7 @@ var T = {{
     from:'من', to:'إلى',
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
-    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
@@ -2742,7 +2797,7 @@ function applyLang(lang) {{
   }});
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) {{ el.textContent=t.total; }});
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
-    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
     'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
     'Unassigned':t.unassigned}};
   document.querySelectorAll('.deptTitle').forEach(function(el) {{
@@ -3371,6 +3426,8 @@ def generate_date_pages_for_month(
             employees_total_all = 0
             employees_total_now = 0
             depts_count = 0
+            inventory_buckets = empty_shift_buckets()
+            inventory_buckets_now = empty_shift_buckets()
 
             notice_html = ""
             if wb is None:
@@ -3416,6 +3473,8 @@ def generate_date_pages_for_month(
 
                         # /now page: include ALL groups so the shift filter buttons work for any date
                         buckets_now.setdefault(grp, []).append({"name": name, "shift": label})
+                    merge_shift_buckets(inventory_buckets, take_inventory_employees(buckets))
+                    merge_shift_buckets(inventory_buckets_now, take_inventory_employees(buckets_now))
                     dept_color = UNASSIGNED_COLOR if dept_name == "Unassigned" else DEPT_COLORS[idx % len(DEPT_COLORS)]
                     open_group_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
 
@@ -3424,6 +3483,16 @@ def generate_date_pages_for_month(
 
                     employees_total_all += sum(len(buckets.get(g, [])) for g in GROUP_ORDER)
                     employees_total_now += sum(len(buckets_now.get(g, [])) for g in GROUP_ORDER)
+                    depts_count += 1
+
+                inv_open_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
+                inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=inv_open_full)
+                inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets_now, open_group=active_group)
+                if inv_card_all:
+                    dept_cards_all = insert_card_after_export_operators(dept_cards_all, inv_card_all)
+                    dept_cards_now = insert_card_after_export_operators(dept_cards_now, inv_card_now)
+                    employees_total_all += buckets_employee_count(inventory_buckets)
+                    employees_total_now += buckets_employee_count(inventory_buckets_now)
                     depts_count += 1
 
                 if employees_total_all == 0:
@@ -4080,6 +4149,8 @@ def main():
     employees_total_all = 0
     employees_total_now = 0
     depts_count = 0
+    inventory_buckets = empty_shift_buckets()
+    inventory_buckets_now = empty_shift_buckets()
 
     for idx, (sheet_name, dept_name) in enumerate(DEPARTMENTS):
         if sheet_name not in wb.sheetnames:
@@ -4120,6 +4191,9 @@ def main():
             if grp == active_group:
                 buckets_now.setdefault(grp, []).append({"name": name, "shift": label})
 
+        merge_shift_buckets(inventory_buckets, take_inventory_employees(buckets))
+        merge_shift_buckets(inventory_buckets_now, take_inventory_employees(buckets_now))
+
         all_shifts_by_dept.append({"dept": dept_name, "shifts": buckets})
 
         if dept_name == "Unassigned":
@@ -4140,6 +4214,18 @@ def main():
         employees_total_now += sum(len(buckets.get(g, [])) for g in [active_group, "Off Day", "Annual Leave", "Sick Leave", "Training", "Standby", "Other"])
 
         depts_count += 1
+
+    inv_open_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
+    inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=inv_open_full)
+    inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=active_group)
+    if inv_card_all:
+        dept_cards_all = insert_card_after_export_operators(dept_cards_all, inv_card_all)
+        dept_cards_now = insert_card_after_export_operators(dept_cards_now, inv_card_now)
+        inv_count = buckets_employee_count(inventory_buckets)
+        employees_total_all += inv_count
+        employees_total_now += sum(len(inventory_buckets.get(g, [])) for g in [active_group, "Off Day", "Annual Leave", "Sick Leave", "Training", "Standby", "Other"])
+        depts_count += 1
+        all_shifts_by_dept.append({"dept": INVENTORY_DEPT_NAME, "shifts": inventory_buckets})
 
     os.makedirs("docs", exist_ok=True)
     os.makedirs("docs/now", exist_ok=True)
