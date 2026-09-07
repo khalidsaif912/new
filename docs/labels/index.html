@@ -703,26 +703,37 @@
       background:#fff;
       border-bottom:1px solid #ddd;
       padding: 8px 10px;
+      padding-top: max(8px, env(safe-area-inset-top, 0px));
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:8px;
+      justify-content:center;
+      min-height:50px;
+      overflow:visible;
     }
 
     .top-title{
       flex:1;
+      min-width:0;
       text-align:center;
       font-weight:900;
       letter-spacing:1.2px;
-      font-size:18px;
+      font-size:clamp(13px, 4.6vw, 18px);
       color:#0b4f8a;
       user-select:none;
+      padding-inline: 76px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
 
     .pwa-install-btn{
-      flex:0 0 auto;
+      position:absolute;
+      top: max(8px, env(safe-area-inset-top, 0px));
+      inset-inline-start: 10px;
+      z-index: 2;
       height:34px;
-      padding:0 12px;
+      min-width:44px;
+      padding:0 10px;
       border:none;
       border-radius:17px;
       background:#0b4f8a;
@@ -732,6 +743,7 @@
       letter-spacing:.2px;
       display:inline-flex;
       align-items:center;
+      justify-content:center;
       gap:5px;
       cursor:pointer;
       white-space:nowrap;
@@ -739,7 +751,21 @@
     .pwa-install-btn:active{transform:scale(0.97)}
     .pwa-install-btn[hidden],
     html.pwa-standalone .pwa-install-btn{display:none !important}
-    .pwa-install-btn svg{display:block}
+    html.pwa-standalone .top-title{padding-inline: 10px}
+    .pwa-install-btn svg{display:block; flex:0 0 auto}
+
+    @media (max-width: 380px){
+      .pwa-install-btn{
+        height:32px;
+        padding:0 8px;
+        font-size:11px;
+        gap:3px;
+      }
+      .top-title{
+        letter-spacing:0.4px;
+        padding-inline: 68px;
+      }
+    }
 
     .pwa-overlay .modal-card{direction:rtl; text-align:right}
     .pwa-overlay .pwa-steps{
@@ -1164,7 +1190,6 @@
       تثبيت
     </button>
     <div class="top-title">ADD &amp; PRINT</div>
-    <span class="pwa-install-btn" style="visibility:hidden;pointer-events:none" aria-hidden="true">تثبيت</span>
   </header>
 
   <div class="notes-tools no-print" id="notesTools">
@@ -3538,7 +3563,7 @@ function fillAirlineModal(){
         });
       }
       if ("serviceWorker" in navigator){
-        navigator.serviceWorker.register("sw.js?v=1").catch(()=>{});
+        navigator.serviceWorker.register("sw.js?v=2").catch(()=>{});
       }
     }
 

@@ -1,4 +1,4 @@
-const SW_VERSION = "sats-labels-2026-09-07-v1";
+const SW_VERSION = "sats-labels-2026-09-07-v2";
 
 self.addEventListener("install", function () {
   self.skipWaiting();
