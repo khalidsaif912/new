@@ -6,6 +6,25 @@
   var PAGE_BANNER_ID = 'chg-page-banner';
   var STYLE_ID = 'chg-styles';
 
+  function chgClockIco() {
+    return (
+      '<span class="chg-day-ico chg-day-ico-shift" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none">' +
+      '<circle cx="12" cy="12" r="7.5" stroke="#fff" stroke-width="2"/>' +
+      '<path d="M12 8v4.5l3 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg></span>'
+    );
+  }
+  function chgAbsIco() {
+    return (
+      '<span class="chg-day-ico chg-day-ico-abs" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none">' +
+      '<circle cx="12" cy="8" r="3" stroke="#fff" stroke-width="2"/>' +
+      '<path d="M6.5 19c1.1-2.8 2.9-4.2 5.5-4.2s4.4 1.4 5.5 4.2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M6 6l12 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>' +
+      '</svg></span>'
+    );
+  }
   function chgBellSvg(size) {
     return (
       '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" fill="none" aria-hidden="true">' +
@@ -99,6 +118,7 @@
         changedToday: 'تم تعديل هذا اليوم',
         changedDates: 'الأيام المتغيرة',
         recordedAbsence: 'غياب مسجّل',
+        shiftChange: 'تغيّر المناوبة',
         tabShift: 'تغيّر المناوبة',
         tabAbsence: 'أيام الغياب',
         updateFor: 'تنبيه تحديث للموظف: ',
@@ -133,6 +153,7 @@
         changedToday: 'This day was changed',
         changedDates: 'Changed dates',
         recordedAbsence: 'Recorded absence',
+        shiftChange: 'Shift change',
         tabShift: 'Shift changes',
         tabAbsence: 'Absences',
         updateFor: 'Update alert for: ',
@@ -550,20 +571,20 @@
         70% { transform: scale(0.98) translateY(0); }
       }
       @keyframes chgFaceBell {
-        0%, 38% { opacity: 1; transform: scale(1); visibility: visible; }
-        46%, 88% { opacity: 0; transform: scale(.82); visibility: hidden; }
-        96%, 100% { opacity: 1; transform: scale(1); visibility: visible; }
+        0% { opacity: 1; visibility: visible; transform: translateX(-5px) rotate(-10deg) scale(1.08); }
+        4% { transform: translateX(5px) rotate(10deg) scale(1.06); }
+        8% { transform: translateX(-4px) rotate(-8deg) scale(1.04); }
+        12% { transform: translateX(4px) rotate(7deg) scale(1.03); }
+        16% { transform: translateX(-2px) rotate(-4deg) scale(1.01); }
+        20%, 38% { opacity: 1; visibility: visible; transform: translateX(0) rotate(0) scale(1); }
+        46%, 88% { opacity: 0; visibility: hidden; transform: scale(.82); }
+        96% { opacity: 1; visibility: visible; transform: translateX(-4px) rotate(-8deg) scale(1.06); }
+        100% { opacity: 1; visibility: visible; transform: translateX(0) rotate(0) scale(1); }
       }
       @keyframes chgFaceAbs {
-        0%, 38% { opacity: 0; visibility: hidden; transform: scale(.82) rotate(0); }
-        44% { opacity: 1; visibility: visible; transform: translateX(-5px) rotate(-10deg) scale(1.08); }
-        48% { transform: translateX(5px) rotate(10deg) scale(1.06); }
-        52% { transform: translateX(-4px) rotate(-8deg) scale(1.04); }
-        56% { transform: translateX(4px) rotate(7deg) scale(1.03); }
-        60% { transform: translateX(-2px) rotate(-4deg) scale(1.01); }
-        64% { transform: translateX(1px) rotate(2deg) scale(1); }
-        68%, 88% { opacity: 1; visibility: visible; transform: translateX(0) rotate(0) scale(1); }
-        96%, 100% { opacity: 0; visibility: hidden; transform: scale(.82); }
+        0%, 38% { opacity: 0; visibility: hidden; transform: none; }
+        46%, 88% { opacity: 1; visibility: visible; transform: none; }
+        96%, 100% { opacity: 0; visibility: hidden; transform: none; }
       }
       @media (prefers-reduced-motion: reduce) {
         #${HOME_ICON_ID} .chg-dot-icon,
@@ -592,16 +613,21 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: min(300px, calc(100vw - 28px));
-        background: linear-gradient(180deg, #fff7f7 0%, #ffffff 42%);
-        border: 2px solid #dc2626;
-        border-radius: 18px;
+        width: min(340px, calc(100vw - 28px));
+        border: 10px solid transparent;
+        border-radius: 24px;
+        background:
+          linear-gradient(#fffdf8, #fffdf8) padding-box,
+          repeating-linear-gradient(
+            45deg,
+            #c62828 0 8px,
+            #ffffff 8px 16px
+          ) border-box;
         box-shadow:
-          0 0 0 6px rgba(220,38,38,.22),
-          0 22px 50px rgba(153,27,27,.42);
+          0 8px 16px rgba(28, 25, 23, .16),
+          0 22px 48px rgba(28, 25, 23, .32);
         z-index: 100040;
-        overflow: hidden;
-        animation: chgCardPop .42s ease-out, chgCardGlow 1.8s ease-in-out .42s infinite;
+        animation: chgCardPop .42s ease-out, chgCardGlow 2.4s ease-in-out .42s infinite;
       }
 
       #${HOME_CARD_ID}[hidden] {
@@ -611,19 +637,19 @@
 
       @keyframes chgCardPop {
         0% { transform: translate(-50%, -50%) scale(.9); }
-        70% { transform: translate(-50%, -50%) scale(1.04); }
+        70% { transform: translate(-50%, -50%) scale(1.03); }
         100% { transform: translate(-50%, -50%) scale(1); }
       }
       @keyframes chgCardGlow {
         0%, 100% {
           box-shadow:
-            0 0 0 5px rgba(220,38,38,.22),
-            0 22px 50px rgba(153,27,27,.4);
+            0 8px 16px rgba(28, 25, 23, .16),
+            0 22px 48px rgba(28, 25, 23, .32);
         }
         50% {
           box-shadow:
-            0 0 0 11px rgba(239,68,68,.38),
-            0 28px 64px rgba(220,38,38,.5);
+            0 10px 20px rgba(28, 25, 23, .2),
+            0 28px 56px rgba(28, 25, 23, .4);
         }
       }
 
@@ -635,9 +661,9 @@
 
       .chg-card-head {
         position: relative;
-        padding: 14px 14px 12px;
-        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-        border-bottom: 1px solid rgba(127,29,29,.35);
+        padding: 14px 16px 12px;
+        background: #fffdf8;
+        border-bottom: 1px solid #e5e7eb;
       }
 
       .chg-card-close {
@@ -647,22 +673,22 @@
         width: 30px;
         height: 30px;
         border-radius: 10px;
-        border: 1px solid rgba(255,255,255,.35);
-        background: rgba(255,255,255,.18);
-        color: #fff;
-        font-size: 16px;
-        font-weight: 900;
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        font-size: 22px;
+        font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         line-height: 1;
-        transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
+        transition: color .12s ease, background-color .12s ease;
       }
       .chg-card-close:hover {
-        background: rgba(255,255,255,.28);
-        border-color: rgba(255,255,255,.55);
-        transform: translateY(-1px);
+        background: #f3f4f6;
+        color: #4b5563;
+        transform: none;
       }
       .chg-card-close:active {
         transform: translateY(0);
@@ -673,45 +699,46 @@
       }
 
       .chg-card-title {
-        font-size: 15px;
-        font-weight: 900;
-        color: #fff;
-        margin: 0 0 4px 0;
-        text-shadow: 0 1px 0 rgba(127,29,29,.35);
+        font-size: 16px;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 28px 4px 0;
       }
 
       .chg-card-text {
         margin: 0;
         font-size: 13px;
-        line-height: 1.7;
-        color: #fee2e2;
+        line-height: 1.6;
+        color: #6b7280;
+      }
+
+      body.ar .chg-card-title {
+        margin: 0 0 4px 28px;
       }
 
       .chg-card-body {
-        padding: 12px 14px;
+        padding: 0 14px 12px;
       }
       .chg-tabs {
-        margin: 10px 14px 0;
+        margin: 12px 14px 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
         align-items: stretch;
-        background: linear-gradient(180deg, #9f1239 0%, #881337 100%);
+        background: #fff8e7;
         border-radius: 12px 12px 0 0;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(136,19,55,.28);
-        border: 1px solid #be123c;
+        border: 1px solid #1b5e20;
         border-bottom: none;
       }
       .chg-tab {
         border: none;
-        border-bottom: 3px solid transparent;
-        border-right: 1px solid rgba(255,255,255,.12);
-        background: transparent;
-        color: rgba(255,255,255,.55);
+        border-bottom: 3px solid #fbc02d;
+        background: #fff8e7;
+        color: #1b5e20;
         padding: 12px 8px 10px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: .3px;
+        letter-spacing: .4px;
         text-transform: uppercase;
         cursor: pointer;
         transition: color .2s ease, border-color .2s ease, background-color .2s ease;
@@ -720,53 +747,85 @@
         border-right: none;
       }
       .chg-tab:hover {
-        color: rgba(255,255,255,.85);
-        background: rgba(255,255,255,.05);
+        color: #145218;
+        background: #fff3d6;
       }
       .chg-tab.active {
         color: #ffffff;
-        border-bottom-color: #facc15;
-        background: rgba(255,255,255,.08);
+        border-bottom-color: #1b5e20;
+        background: #1b5e20;
       }
 
       .chg-days {
         list-style: none;
         margin: 0;
         padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        background: #f3f4f6;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .chg-tabs + .chg-card-body {
+        padding-top: 0;
+      }
+      .chg-tabs + .chg-card-body .chg-days {
+        border-radius: 0 0 12px 12px;
+        border: 1px solid #1b5e20;
+        border-top: none;
       }
 
       .chg-day {
-        background: #fff1f2;
-        border: 1px solid #fecaca;
-        border-radius: 12px;
-        padding: 9px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        border-radius: 0;
+        padding: 10px 12px;
+      }
+      .chg-day:last-child {
+        border-bottom: none;
+      }
+
+      .chg-day-main {
+        min-width: 0;
       }
 
       .chg-day-date {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 800;
-        color: #9f1239;
-        margin-bottom: 4px;
+        color: #111827;
+        margin-bottom: 2px;
       }
 
       .chg-day-shifts {
         font-size: 12px;
-        color: #475569;
+        color: #4b5563;
       }
+
+      .chg-day-ico {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chg-day-ico-shift { background: #1b5e20; }
+      .chg-day-ico-abs { background: #c62828; }
 
       .chg-card-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding: 0 14px 14px;
+        gap: 10px;
+        padding: 0 14px 16px;
       }
 
       .chg-btn {
         border: none;
-        border-radius: 12px;
+        border-radius: 999px;
         padding: 12px 10px;
         font-size: 13px;
         font-weight: 800;
@@ -774,32 +833,32 @@
       }
 
       .chg-btn-primary {
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        background: #c62828;
         color: #fff;
-        box-shadow: 0 6px 16px rgba(185,28,28,.28);
+        box-shadow: none;
       }
 
       .chg-btn-muted {
         background: #fff;
-        color: #b91c1c;
-        border: 1px solid #fecaca;
+        color: #1b5e20;
+        border: 2px solid #1b5e20;
       }
       .chg-options {
         display: grid;
         gap: 8px;
-        padding: 0 14px 12px;
+        padding: 0 16px 10px;
       }
       .chg-opt {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        color: #7f1d1d;
-        background: #fff1f2;
-        border: 1px solid #fecaca;
-        border-radius: 10px;
-        padding: 8px 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #111827;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
         cursor: pointer;
       }
       .chg-opt input {
@@ -926,17 +985,20 @@
     }
   });
 
-  function shortDaysHtml(alert) {
+  function shortDaysHtml(alert, lang) {
     var days = (alert.days || []).slice(0, 3);
     if (!days.length) return '';
 
     return '<ul class="chg-days">' + days.map(function (item) {
-      var oldCode = item.old_shift_code || '-';
-      var newCode = item.new_shift_code || '-';
+      var newCode = item.new_shift_code || item.old_shift_code || '';
+      var detail = t('shiftChange', lang) + (newCode ? ' (' + newCode + ')' : '');
       return (
         '<li class="chg-day">' +
-          '<div class="chg-day-date">' + escapeHtml(item.date || '') + '</div>' +
-          '<div class="chg-day-shifts">' + escapeHtml(oldCode + ' → ' + newCode) + '</div>' +
+          '<div class="chg-day-main">' +
+            '<div class="chg-day-date">' + escapeHtml(item.date || '') + '</div>' +
+            '<div class="chg-day-shifts">' + escapeHtml(detail) + '</div>' +
+          '</div>' +
+          chgClockIco() +
         '</li>'
       );
     }).join('') + '</ul>';
@@ -946,7 +1008,15 @@
     var list = dates || [];
     if (!list.length) return '';
     return '<ul class="chg-days">' + list.map(function (d) {
-      return '<li class="chg-day"><div class="chg-day-date">' + escapeHtml(d) + '</div><div class="chg-day-shifts">' + escapeHtml(t('recordedAbsence', lang)) + '</div></li>';
+      return (
+        '<li class="chg-day">' +
+          '<div class="chg-day-main">' +
+            '<div class="chg-day-date">' + escapeHtml(d) + '</div>' +
+            '<div class="chg-day-shifts">' + escapeHtml(t('recordedAbsence', lang)) + '</div>' +
+          '</div>' +
+          chgAbsIco() +
+        '</li>'
+      );
     }).join('') + '</ul>';
   }
 
@@ -1024,7 +1094,7 @@
     var titleText = hasAbsenceTab && !hasShiftTab
       ? t('recordedAbsence', lang)
       : t('changed', lang);
-    var shiftContent = shortDaysHtml(alert);
+    var shiftContent = shortDaysHtml(alert, lang);
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
       ? ('<div class="chg-tabs">' +

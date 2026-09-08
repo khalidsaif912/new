@@ -97,10 +97,19 @@ def test_change_alert_popup_survives_generate():
     js = (ROOT / "docs" / "change-alert.js").read_text(encoding="utf-8")
     assert "function paintHomeAlertIcon" in js
     assert "has-absences" in js
+    assert "chgFaceBell" in js
     assert "chgFaceAbs" in js
     assert "chgCardGlow" in js
-    assert "margin: 10px 14px 0" in js
+    assert "repeating-linear-gradient" in js
+    assert "#c62828" in js
+    assert "margin: 12px 14px 0" in js
     assert "absencesWord" in js
+    assert "chg-card-accent" not in js
+    bell_block = js.split("@keyframes chgFaceBell", 1)[1].split("@keyframes", 1)[0]
+    abs_block = js.split("@keyframes chgFaceAbs", 1)[1].split("@media", 1)[0]
+    assert "rotate(-10deg)" in bell_block
+    assert "transform: none" in abs_block
+    assert ".chg-tab.active" in js and "#1b5e20" in js
 
     tag = "change-alert.js?v=" + CHANGE_ALERT_VER
     assert tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
