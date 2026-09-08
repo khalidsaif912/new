@@ -111,7 +111,9 @@
         orgUpdate: function (n) {
           return 'تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التنبيهات.';
         },
-        absenceSummary: 'لديك أيام غياب مسجلة.',
+        absenceSummary: function (n) {
+          return 'لديك ' + n + ' ' + (n === 1 ? 'يوم غياب' : 'أيام غياب') + ' مسجّلة في النظام.';
+        },
         guestAbsenceSummary:
           'توجد غيابات مسجّلة في النظام. عيّن رقمك من «جدولي» لعرض تفاصيلك إن وُجدت.'
       },
@@ -140,7 +142,9 @@
         orgUpdate: function (n) {
           return 'A roster update was published (' + n + ' change(s)). Check your schedule or the alerts page.';
         },
-        absenceSummary: 'You have recorded absence days.',
+        absenceSummary: function (n) {
+          return 'You have ' + n + ' recorded ' + (n === 1 ? 'absence day' : 'absence days') + '.';
+        },
         guestAbsenceSummary:
           'Recorded absences exist in the system. Set your employee ID in My Schedule to see yours if any.'
       }
@@ -235,12 +239,23 @@
     return url + sep + 'v=' + Math.floor(Date.now() / 3600000);
   }
 
-  function fetchJson(url) {
-    // Allow short browser caching; hourly bust keeps alerts reasonably fresh.
-    return fetch(cacheBustHourly(url), { cache: 'default' }).then(function (res) {
+  function fetchJson(url, opts) {
+    var fresh = !!(opts && opts.fresh);
+    var bust = fresh
+      ? (url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now())
+      : cacheBustHourly(url);
+    return fetch(bust, { cache: fresh ? 'no-store' : 'default' }).then(function (res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
     });
+  }
+
+  function normalizeEmpId(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!s) return '';
+    if (!/^\d+$/.test(s)) return s;
+    var n = String(Number(s));
+    return n === 'NaN' ? s : n;
   }
 
   function activeAlert(data) {
@@ -358,14 +373,20 @@
   function findAbsenceDates(empId, empName, absData) {
     var records = (absData && absData.records) || [];
     if (!records.length) return [];
+    var wantId = normalizeEmpId(empId);
     var cleanName = String(empName || '').replace(/-\s*\d+\s*$/, '').trim();
     var out = [];
     records.forEach(function (rec) {
       var matched = false;
       var nums = (rec && rec.empNos) || [];
-      if (empId && nums.indexOf(String(empId)) !== -1) {
-        out.push(String(rec.date || ''));
-        matched = true;
+      if (wantId) {
+        for (var n = 0; n < nums.length; n++) {
+          if (normalizeEmpId(nums[n]) === wantId) {
+            out.push(String(rec.date || ''));
+            matched = true;
+            break;
+          }
+        }
       }
       if (!matched && cleanName) {
         var names = (rec && rec.names) || [];
@@ -798,7 +819,7 @@
   }
 
   function absenceDaysHtml(dates, lang) {
-    var list = (dates || []).slice(0, 6);
+    var list = dates || [];
     if (!list.length) return '';
     return '<ul class="chg-days">' + list.map(function (d) {
       return '<li class="chg-day"><div class="chg-day-date">' + escapeHtml(d) + '</div><div class="chg-day-shifts">' + escapeHtml(t('recordedAbsence', lang)) + '</div></li>';
@@ -857,13 +878,16 @@
     var summaryText = alertSummaryText(alert, lang);
     var hasShiftTab = !!(alert && alert.days && alert.days.length);
     var hasAbsenceTab = !!(absences && absences.length);
-    var defaultTab = hasShiftTab ? 'shift' : 'absence';
+    var defaultTab = hasAbsenceTab ? 'absence' : 'shift';
+    var titleText = hasAbsenceTab && !hasShiftTab
+      ? t('recordedAbsence', lang)
+      : t('changed', lang);
     var shiftContent = shortDaysHtml(alert);
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
       ? ('<div class="chg-tabs">' +
-         '<button class="chg-tab active" data-act="tab:shift">' + escapeHtml(t('tabShift', lang)) + '</button>' +
-         '<button class="chg-tab" data-act="tab:absence">' + escapeHtml(t('tabAbsence', lang)) + '</button>' +
+         '<button class="chg-tab' + (defaultTab === 'shift' ? ' active' : '') + '" data-act="tab:shift">' + escapeHtml(t('tabShift', lang)) + '</button>' +
+         '<button class="chg-tab' + (defaultTab === 'absence' ? ' active' : '') + '" data-act="tab:absence">' + escapeHtml(t('tabAbsence', lang)) + '</button>' +
          '</div>')
       : '';
     var bodyHtml = (defaultTab === 'shift' ? shiftContent : absenceContent);
@@ -872,7 +896,7 @@
     card.innerHTML =
       '<div class="chg-card-head">' +
         '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
-        '<div class="chg-card-title">' + escapeHtml(t('changed', lang)) + '</div>' +
+        '<div class="chg-card-title">' + escapeHtml(titleText) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +
       '</div>' +
       tabsHtml +
@@ -1109,7 +1133,7 @@ function renderGlobalGuestAlerts() {
 
   Promise.all([
     fetchJson(diffUrl).catch(function () { return null; }),
-    fetchJson(base + 'absence-data.json').catch(function () { return null; })
+    fetchJson(base + 'absence-data.json', { fresh: true }).catch(function () { return null; })
   ]).then(function (arr) {
     if (getEmployeeId()) return;
     var diffData = arr[0];
@@ -1191,7 +1215,7 @@ function renderForEmployee(empId) {
           if (personal) return personal;
           return buildOrgWideAlertFromDiff(diffData, lang);
         }).catch(function () { return null; });
-      var absPromise = fetchJson(base + 'absence-data.json')
+      var absPromise = fetchJson(base + 'absence-data.json', { fresh: true })
         .then(function (absData) { return findAbsenceDates(empId, empName, absData); })
         .catch(function () { return []; });
       return Promise.all([diffPromise, absPromise]).then(function (arr) {
@@ -1213,22 +1237,25 @@ function renderForEmployee(empId) {
         return;
       }
 
-      if (!alert || !alert.is_active) {
-        if (!absences.length) {
-          if (currentEmpId === empId) clearAlertState();
-          return;
-        }
+      if (absences.length) {
+        var baseHash = (alert && alert.is_active && alert.change_hash) ? alert.change_hash : 'absence';
+        var hasShiftDays = !!(alert && alert.days && alert.days.length);
         alert = {
           is_active: true,
           force_show: true,
-          change_hash: 'absence_' + absences.join('|'),
-          total_changed_days: absences.length,
-          summary: {
-            ar: t('absenceSummary', 'ar'),
-            en: t('absenceSummary', 'en')
-          },
-          days: []
+          change_hash: baseHash + '|abs|' + absences.join('|'),
+          total_changed_days: hasShiftDays ? alert.total_changed_days : absences.length,
+          summary: hasShiftDays
+            ? alert.summary
+            : {
+                ar: t('absenceSummary', 'ar', absences.length),
+                en: t('absenceSummary', 'en', absences.length)
+              },
+          days: hasShiftDays ? alert.days : []
         };
+      } else if (!alert || !alert.is_active) {
+        if (currentEmpId === empId) clearAlertState();
+        return;
       }
 
       lastRenderedEmpId = empId;
