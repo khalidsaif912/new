@@ -54,7 +54,6 @@ from roster_app.cache_io import (
 )
 from roster_app.email_service import send_email
 from roster_app.settings import (
-    AUTO_OPEN_ACTIVE_SHIFT_IN_FULL,
     DAYS,
     DEPARTMENTS,
     EXCEL_URL,
@@ -2997,13 +2996,20 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){{
-      shiftCard.removeAttribute('open');
+      var key = shiftCard.dataset.shift || '';
+      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){{
+        shiftCard.open = false;
+        shiftCard.removeAttribute('open');
+      }}
     }});
     var currentShift = getCurrentShiftForMuscat();
     var target = shiftCards.find(function(shiftCard){{
       return shiftCard.dataset.shift === currentShift;
-    }}) || shiftCards[0];
-    if(target) target.setAttribute('open', '');
+    }});
+    if(target) {{
+      target.open = true;
+      target.setAttribute('open', '');
+    }}
   }}
 
   function cardHasSavedEmployee(card){{
@@ -3436,7 +3442,6 @@ def generate_date_pages_for_month(
         try:
             date_obj = dt(year, month, day, tzinfo=TZ)
             dow = (date_obj.weekday() + 1) % 7  # Sun=0
-            active_group = current_shift_key(dt.now(TZ))
 
             dept_cards_all = []
             dept_cards_now = []
@@ -3493,18 +3498,18 @@ def generate_date_pages_for_month(
                     merge_shift_buckets(inventory_buckets, take_inventory_employees(buckets))
                     merge_shift_buckets(inventory_buckets_now, take_inventory_employees(buckets_now))
                     dept_color = UNASSIGNED_COLOR if dept_name == "Unassigned" else DEPT_COLORS[idx % len(DEPT_COLORS)]
-                    open_group_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
 
-                    dept_cards_all.append(dept_card_html(dept_name, dept_color, buckets, open_group=open_group_full))
-                    dept_cards_now.append(dept_card_html(dept_name, dept_color, buckets_now, open_group=active_group))
+                    # Never bake which shift is open into HTML: the viewer clock
+                    # (docs/open-current-shift.js) opens Morning/Afternoon/Night live.
+                    dept_cards_all.append(dept_card_html(dept_name, dept_color, buckets))
+                    dept_cards_now.append(dept_card_html(dept_name, dept_color, buckets_now))
 
                     employees_total_all += sum(len(buckets.get(g, [])) for g in GROUP_ORDER)
                     employees_total_now += sum(len(buckets_now.get(g, [])) for g in GROUP_ORDER)
                     depts_count += 1
 
-                inv_open_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
-                inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=inv_open_full)
-                inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets_now, open_group=active_group)
+                inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets)
+                inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets_now)
                 if inv_card_all:
                     dept_cards_all = insert_card_after_export_operators(dept_cards_all, inv_card_all)
                     dept_cards_now = insert_card_after_export_operators(dept_cards_now, inv_card_now)
@@ -4220,12 +4225,11 @@ def main():
         else:
             dept_color = DEPT_COLORS[idx % len(DEPT_COLORS)]
 
-        open_group_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
-        card_all = dept_card_html(dept_name, dept_color, buckets, open_group=open_group_full)
+        card_all = dept_card_html(dept_name, dept_color, buckets)
         dept_cards_all.append(card_all)
 
         # صفحة /now/ تحتوي على كل الورديات (سيتم الفلترة بـ JavaScript)
-        card_now = dept_card_html(dept_name, dept_color, buckets, open_group=active_group)
+        card_now = dept_card_html(dept_name, dept_color, buckets)
         dept_cards_now.append(card_now)
 
         employees_total_all += sum(len(buckets.get(g, [])) for g in GROUP_ORDER)
@@ -4234,9 +4238,8 @@ def main():
 
         depts_count += 1
 
-    inv_open_full = active_group if AUTO_OPEN_ACTIVE_SHIFT_IN_FULL else None
-    inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=inv_open_full)
-    inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets, open_group=active_group)
+    inv_card_all = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets)
+    inv_card_now = dept_card_html(INVENTORY_DEPT_NAME, INVENTORY_COLOR, inventory_buckets)
     if inv_card_all:
         dept_cards_all = insert_card_after_export_operators(dept_cards_all, inv_card_all)
         dept_cards_now = insert_card_after_export_operators(dept_cards_now, inv_card_now)

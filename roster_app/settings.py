@@ -10,7 +10,6 @@ SOURCE_NAME_FALLBACK = os.environ.get("SOURCE_NAME_FALLBACK", "latest.xlsx").str
 
 PAGES_BASE_URL = os.environ.get("PAGES_BASE_URL", "").strip()  # optional
 TZ = ZoneInfo("Asia/Muscat")
-AUTO_OPEN_ACTIVE_SHIFT_IN_FULL = True
 
 # Local cache directory inside repo (committed by actions)
 ROSTERS_DIR = os.environ.get("ROSTERS_DIR", "rosters").strip() or "rosters"

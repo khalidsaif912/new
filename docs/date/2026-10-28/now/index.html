@@ -4,18 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260901b"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260903c"></script>
   <title>Duty Roster</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ═══════ RESET ═══════ */
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --date-font-en: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-      --date-font-ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
     }
     html, body {
       width:100%;
@@ -138,13 +133,32 @@
       #banner-changer-btn { padding:2px; min-width:0; min-height:0; }
       #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
-@media (max-width:720px) {
-      .langToggle { padding:2px; }
-      .langToggle-icon svg { width:13px; height:13px; }
-      .langToggle-label { font-size:8px; }
-      #banner-changer-btn { padding:2px; }
-      #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
     }
+    .header.homeDateSplit #banner-changer-btn { grid-column:1; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle { grid-column:3; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px; height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
 
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .empStatus, .empStatusHit { direction:ltr; unicode-bidi:isolate; }
@@ -200,254 +214,84 @@
       40% { transform:rotate(-6deg); }
     }
 
-    /* Date — with-me split layout (homepage trial) */
-    .header.homeDateSplit {
-      display:grid;
-      grid-template-columns:28px minmax(0,1fr) 28px;
-      grid-template-rows:auto auto;
-      align-items:center;
-      direction:ltr;
-      padding:26px 18px 12px;
-      min-height:0;
-    }
-    .header.homeDateSplit .bannerTitle,
-    .header.homeDateSplit > h1 {
-      grid-column:1 / -1;
-      grid-row:1;
-    }
-    .header.homeDateSplit #banner-changer-btn {
-      grid-column:1;
-      grid-row:2;
-      position:relative !important;
-      inset:auto !important;
-      bottom:auto !important;
-      top:auto !important;
-      left:auto !important;
-      right:auto !important;
-      justify-self:center;
-      align-self:center;
-      transform:none !important;
-      z-index:31;
-    }
-    .header.homeDateSplit .langToggle,
-    .header.homeDateSplit #langToggle {
-      grid-column:3;
-      grid-row:2;
-      position:relative !important;
-      inset:auto !important;
-      bottom:auto !important;
-      top:auto !important;
-      left:auto !important;
-      right:auto !important;
-      justify-self:center;
-      align-self:center;
-      transform:none !important;
-      z-index:31;
-    }
-    .header.homeDateSplit .langToggle:hover,
-    .header.homeDateSplit #banner-changer-btn:hover {
-      transform:scale(1.08) !important;
-    }
-    body.ar .header.homeDateSplit .langToggle,
-    body.ar .header.homeDateSplit #langToggle {
-      grid-column:3;
-      right:auto !important;
-      left:auto !important;
-    }
-    body.ar .header.homeDateSplit #banner-changer-btn {
-      grid-column:1;
-      left:auto !important;
-      right:auto !important;
-    }
-    .header.homeDateSplit .langToggle,
-    .header.homeDateSplit #langToggle,
-    .header.homeDateSplit #banner-changer-btn {
-      padding:2px;
-      min-width:0;
-      min-height:0;
-      width:auto;
-      height:auto;
-    }
-    .header.homeDateSplit .langToggle-icon svg,
-    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
-      width:13px;
-      height:13px;
-    }
-    .header.homeDateSplit .langToggle-label { font-size:8px; }
-    .header.homeDateSplit .datePickerWrapper {
-      grid-column:2;
-      grid-row:2;
+    /* Date Picker Wrapper */
+    .datePickerWrapper {
       position:relative;
-      display:block;
-      width:100%;
-      max-width:100%;
-      margin-top:0;
+      display:inline-block;
+      margin-top:14px;
       z-index:20;
-      min-height:56px;
+      min-height:44px;
+      min-width:min(100%, 220px);
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-    .header.homeDateSplit .dateTag {
-      display:flex;
+    .header .dateTag {
+      display:inline-flex;
       align-items:center;
-      justify-content:center;
-      min-height:56px;
-      padding:0;
-      border:none;
-      border-radius:0;
-      background:transparent;
-      color:#fff;
+      gap:8px;
+      background:rgba(255,255,255,.18);
+      padding:5px 18px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.3px;
       cursor:pointer;
+      transition:all .3s;
+      border:2px solid rgba(255,255,255,.2);
+      -webkit-tap-highlight-color:transparent;
       user-select:none;
       -webkit-user-select:none;
-      text-align:center;
-      line-height:1;
+      direction:ltr;
       position:relative;
       z-index:3;
       pointer-events:auto;
-      -webkit-tap-highlight-color:transparent;
+      color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
-    .header.homeDateSplit .dateTagMain {
-      position:relative;
-      display:flex;
+    .dateTag-icon {
+      display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:min(2.4vw, 12px);
-      pointer-events:none;
-      padding-bottom:0;
-      direction:ltr;
-      width:max-content;
-      max-width:100%;
-      margin-inline:auto;
-    }
-    body.ar .header.homeDateSplit .dateTagMain,
-    html[lang="ar"] .header.homeDateSplit .dateTagMain {
-      direction:rtl;
-    }
-    .header.homeDateSplit .dateTagDay,
-    .header.homeDateSplit .dateTagWeek,
-    .header.homeDateSplit .dateTagMonth {
-      font-family: var(--date-font-en);
-      color:rgba(255,255,255,.72);
-      text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 1px rgba(255,255,255,.45);
-      -webkit-text-stroke:0.15px rgba(0,0,0,.28);
-      paint-order:stroke fill;
-    }
-    body.ar .header.homeDateSplit .dateTagDay,
-    body.ar .header.homeDateSplit .dateTagWeek,
-    body.ar .header.homeDateSplit .dateTagMonth,
-    html[lang="ar"] .header.homeDateSplit .dateTagDay,
-    html[lang="ar"] .header.homeDateSplit .dateTagWeek,
-    html[lang="ar"] .header.homeDateSplit .dateTagMonth {
-      font-family: var(--date-font-ar);
-    }
-    .header.homeDateSplit .dateTagSide {
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      justify-content:center;
-      gap:3px;
-      line-height:1;
-      padding-inline-start:min(1.8vw, 10px);
-      border-inline-start:1px solid rgba(255,255,255,.35);
-      flex:0 0 auto;
-      direction:ltr;
-      unicode-bidi:isolate;
-      min-width:0;
-      width:max-content;
-      max-width:none;
-    }
-    body.ar .header.homeDateSplit .dateTagSide,
-    html[lang="ar"] .header.homeDateSplit .dateTagSide {
-      align-items:flex-end;
-      padding-inline-start:0;
-      padding-inline-end:min(1.8vw, 10px);
-      border-inline-start:none;
-      border-inline-end:1px solid rgba(255,255,255,.35);
-    }
-    .header.homeDateSplit .dateTagWeek {
-      display:block;
-      font-size:clamp(13px, 3.8vw, 17px);
-      font-weight:700;
-      letter-spacing:-.01em;
-      line-height:1.05;
-      text-align:left;
-      white-space:nowrap;
-      width:100%;
-      overflow:visible;
+      flex-shrink:0;
+      line-height:0;
+      color:#fff;
       pointer-events:none;
     }
-    body.ar .header.homeDateSplit .dateTagWeek {
-      letter-spacing:0;
-      text-align:right;
-    }
-    .header.homeDateSplit .dateTagDay {
+    .dateTag-icon svg {
       display:block;
-      font-size:clamp(56px, 18vw, 88px);
-      font-weight:800;
-      letter-spacing:-.04em;
-      line-height:.9;
-      font-variant-numeric:tabular-nums;
-      flex:0 0 auto;
+      width:16px;
+      height:16px;
       pointer-events:none;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
     }
-    body.ar .header.homeDateSplit .dateTagDay { letter-spacing:0; }
-    .header.homeDateSplit .dateTagMonthWrap {
-      display:block;
-      line-height:1;
-      text-align:left;
-      width:100%;
-    }
-    body.ar .header.homeDateSplit .dateTagMonthWrap,
-    html[lang="ar"] .header.homeDateSplit .dateTagMonthWrap {
-      text-align:right;
-    }
-    .header.homeDateSplit .dateTagMonth {
-      display:block;
-      font-size:clamp(22px, 7vw, 36px);
-      font-weight:700;
-      letter-spacing:-.02em;
-      line-height:1;
-      text-transform:none;
-      text-align:left;
-      white-space:nowrap;
-      max-width:100%;
-      overflow:visible;
+    .dateTag-label {
+      line-height:1.2;
       pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
     }
-    body.ar .header.homeDateSplit .dateTagMonth {
-      letter-spacing:0;
-      text-align:right;
+    .header .dateTag:hover {
+      background:rgba(255,255,255,.25);
+      transform:translateY(-1px);
     }
-    .header.homeDateSplit .datePickerWrapper #datePicker {
+    /* Transparent date input over #dateTag — native picker on iOS + desktop */
+    .datePickerWrapper #datePicker {
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
-      min-height:56px;
+      min-height:44px;
       margin:0;
       padding:0;
       opacity:0;
       cursor:pointer;
       font-size:16px;
+      line-height:44px;
       border:none;
       z-index:5;
       pointer-events:auto;
       color:transparent;
       background:transparent;
       touch-action:manipulation;
-    }
-    .header.homeDateSplit .datePickerWrapper #datePicker.datePicker-center-open {
-      position:fixed;
-      left:50%;
-      top:max(18vh, calc(env(safe-area-inset-top, 0px) + 72px));
-      right:auto;
-      bottom:auto;
-      width:1px;
-      height:1px;
-      min-height:0;
-      transform:translate(-50%, -50%);
-      z-index:10000;
     }
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
@@ -465,7 +309,7 @@
       display:flex; 
       justify-content:center; 
       align-items:stretch;
-      gap:12px; 
+      gap:10px; 
       margin-top:14px;
       flex-wrap:wrap;
       position:relative;
@@ -565,8 +409,10 @@
     #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
-      font-size:11px;      font-weight:800;      color:#334155;
-      text-transform:uppercase;
+      font-size:11px;
+      font-weight:800; 
+      color:#334155; 
+      text-transform:uppercase; 
       letter-spacing:.2px; 
       margin-top:4px;
       line-height:1.1;
@@ -1115,222 +961,6 @@
       .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-    }
-    .siteShareUrl {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      direction: ltr;
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
-    .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
-    }
-    .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-    }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
-    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
@@ -1388,78 +1018,6 @@
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
       .summaryChip .chipVal { font-size:19px; }
-    }
-
-      /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .shiftCopySheet {
-      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
-      pointer-events: none; visibility: hidden;
-    }
-    .shiftCopySheet.open { display: flex; pointer-events: auto; visibility: visible; }
-    .shiftCopyCard {
-      width: min(100%, 380px); background: #fff; border-radius: 18px; padding: 18px 16px 14px;
-      border: 1px solid rgba(15,23,42,.1); box-shadow: 0 20px 48px rgba(15,23,42,.22);
-      text-align: center;
-    }
-    .shiftCopyTitle { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
-    .shiftCopyHint { font-size: 12px; color: #64748b; margin: 0 0 14px; line-height: 1.4; }
-    .shiftCopyGrid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 6px; }
-    .shiftCopyOpt {
-      display: flex; align-items: center; gap: 12px;
-      min-height: 52px; padding: 8px 10px 8px 14px; border-radius: 14px;
-      border: 1.5px solid #e2e8f0; background: #f8fafc;
-      font: inherit; text-align: start; -webkit-tap-highlight-color: transparent;
-    }
-    .shiftCopyOpt-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 12px; background: #fff;
-      border: 1px solid #e2e8f0; flex-shrink: 0;
-    }
-    .shiftCopyOpt-main {
-      flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0;
-    }
-    .shiftCopyOpt-label { font-size: 14px; font-weight: 800; color: #1e293b; }
-    .shiftCopyOpt-count {
-      min-width: 26px; padding: 2px 8px; border-radius: 999px;
-      font-size: 12px; font-weight: 800; color: #475569;
-      background: #eef2f7; border: 1px solid #e2e8f0; text-align: center;
-    }
-    .shiftCopyOpt-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .shiftCopyAct {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
-      border: 1.5px solid #e2e8f0; background: #fff; font: inherit;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-    }
-    .shiftCopyAct:active { transform: scale(.94); }
-    .shiftCopyAct svg { display: block; }
-    .shiftCopyAct--share { background: #ecfdf5; border-color: #86efac; }
-    .shiftCopyOpt.is-empty { opacity: .5; }
-    .shiftCopyOpt.is-empty .shiftCopyAct { pointer-events: none; }
-    .shiftCopyOpt--morning { border-color: #fcd34d; background: #fffbeb; }
-    .shiftCopyOpt--morning .shiftCopyOpt-icon { background: #fef9c3; border-color: #fde68a; }
-    .shiftCopyOpt--afternoon { border-color: #fdba74; background: #fff7ed; }
-    .shiftCopyOpt--afternoon .shiftCopyOpt-icon { background: #ffedd5; border-color: #fed7aa; }
-    .shiftCopyOpt--night { border-color: #c4b5fd; background: #f5f3ff; }
-    .shiftCopyOpt--night .shiftCopyOpt-icon { background: #ede9fe; border-color: #ddd6fe; }
-    .shiftCopyOpt--annual { border-color: #fca5a5; background: #fef2f2; }
-    .shiftCopyOpt--annual .shiftCopyOpt-icon { background: #fee2e2; border-color: #fecaca; }
-    .shiftCopyOpt--training { border-color: #d8b4fe; background: #faf5ff; }
-    .shiftCopyOpt--training .shiftCopyOpt-icon { background: #f3e8ff; border-color: #e9d5ff; }
-    .shiftCopyStatus {
-      min-height: 18px; margin: 10px 0 12px; font-size: 12.5px; font-weight: 700;
-      line-height: 1.4; color: #64748b;
-    }
-    .shiftCopyStatus.is-ok { color: #166534; }
-    .shiftCopyStatus.is-err { color: #b91c1c; }
-    .shiftCopyCloseWrap { margin-top: 2px; }
-    .shiftCopyCloseWrap .roster-cta-btn { width: 100%; }
-    body.ar .shiftCopyOpt { text-align: start; }
-    @media (hover: hover) {
-      .shiftCopyAct--copy:hover { background: #f1f5f9; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
-      .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
   </style>
@@ -1538,7 +1096,7 @@
             bes.textContent =
               'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + bPos + '!important;background-repeat:no-repeat!important}}' +
               'html.roster-banner-early .header::before,html.roster-banner-early .header::after,html.roster-banner-early .topbar::before,html.roster-banner-early .topbar::after{{content:none!important;opacity:0!important;display:none!important}}' +
-              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 52px!important}}';
+              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 12px!important}}';
             document.head.appendChild(bes);
           }}
           if (!document.querySelector('link[data-banner-preload="1"]')) {{
@@ -1561,24 +1119,14 @@
 <div class="wrap">
 
   <!-- ════ HEADER ════ -->
-  <div class="header homeDateSplit">
+  <div class="header">
     <button class="langToggle" id="langToggle" onclick="toggleLang()" type="button" title="Switch language"><span class="langToggle-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span><span class="langToggle-label" id="langToggleLabel">Ã˜Â¹</span></button>
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker">
-        <span class="dateTagMain">
-          <span class="dateTagDay" id="dateTagDay"></span>
-          <span class="dateTagSide">
-            <span class="dateTagWeek" id="dateTagWeek"></span>
-            <span class="dateTagMonthWrap">
-              <span class="dateTagMonth" id="dateTagMonth"></span>
-            </span>
-          </span>
-        </span>
-      </label>
+      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">28 October 2026</span></label>
       <input id="datePicker" type="date" value="2026-10-28" min="2026-08-01" max="2026-10-31" aria-label="Select roster date" />
     </div>
   </div>
@@ -1607,7 +1155,7 @@
       <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="https://khalidsaif912.github.io/roster-site/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+    <a href="https://khalidsaif912.github.io/roster-site/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
@@ -1655,7 +1203,6 @@
 </nav>
 
 
-
   <!-- ════ COPY SHIFT ════ -->
 <nav class="quickActions secondaryBar" aria-label="More actions">
   <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
@@ -1671,7 +1218,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 September 2026 / 11:42</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">8 September 2026 / 14:50</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export New Roster SEPTEMBER 2026.xlsx</strong>
   </div>
 
@@ -2118,7 +1665,7 @@ function buildBannerHeaderForSnapshot() {
   clone.style.backgroundPosition = bg.position;
   clone.style.backgroundRepeat = bg.repeat;
   if (bg.color) clone.style.backgroundColor = bg.color;
-  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label, .dateTagDay, .dateTagWeek, .dateTagMonth').forEach(function(el) {
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {
     el.style.position = 'relative';
     el.style.zIndex = '2';
     el.style.color = '#fff';
@@ -2393,62 +1940,59 @@ function goToEmployeeSchedule(empName) {
       String(muscatTime.getDate()).padStart(2, '0');
   }
 
-  var MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
-  function formatIsoLabel(iso) {
-    var d = new Date(iso + 'T00:00:00');
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
-  function weekdayLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
-    var names = lang === 'ar' ? DAYS_AR : DAYS_EN;
-    return names[d.getUTCDay()] || '';
-  }
-
-  function dayNumLabel(iso) {
-    var p = (iso || '').split('-');
-    return p.length === 3 ? String(parseInt(p[2], 10)) : '';
-  }
-
-  function monthNameLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var mo = parseInt(p[1], 10);
-    var months = lang === 'ar' ? MONTHS_AR : MONTHS_EN;
-    return months[mo - 1] || '';
-  }
-
-  function syncHeaderDate(iso, langOverride) {
+  function formatIsoLabel(iso, langOverride) {
     var lang = langOverride
       || (typeof LANG !== 'undefined' && LANG)
       || document.documentElement.getAttribute('lang')
       || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return iso;
+    var months = ar
+      ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var mo = parseInt(p[1], 10);
+    var day = String(parseInt(p[2], 10));
+    return day + ' ' + (months[mo - 1] || p[1]) + ' ' + p[0];
+  }
+
+  function syncHeaderDate(iso, langOverride) {
+    if (window.rosterPaintHeaderDate) {
+      window.rosterPaintHeaderDate(iso, langOverride);
+      return;
+    }
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
     var dateWeek = document.getElementById('dateTagWeek');
     var dateDay = document.getElementById('dateTagDay');
     var dateMonth = document.getElementById('dateTagMonth');
-    if (dateDay) {
-      if (dateWeek) dateWeek.textContent = weekdayLabel(iso, lang);
-      dateDay.textContent = dayNumLabel(iso);
-      if (dateMonth) dateMonth.textContent = monthNameLabel(iso, lang);
+    var p = String(iso || '').split('-');
+    if (dateDay && p.length === 3) {
+      var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+      var days = ar
+        ? ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var months = ar
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      if (dateWeek) dateWeek.textContent = days[d.getUTCDay()] || '';
+      dateDay.textContent = String(parseInt(p[2], 10));
+      if (dateMonth) dateMonth.textContent = months[parseInt(p[1], 10) - 1] || '';
       return;
     }
     var tag = document.getElementById('dateTag');
     if (tag) {
       var dateLbl = document.getElementById('dateTagLabel');
-      var dateText = formatIsoLabel(iso);
+      var dateText = formatIsoLabel(iso, lang);
       if (dateLbl) dateLbl.textContent = dateText;
       else tag.textContent = dateText;
     }
   }
+  window.rosterSyncHeaderDate = syncHeaderDate;
+
   var path = window.location.pathname || '/';
   var pageDateMatch = path.match(/\/date\/(\d{4})-(\d{2})-(\d{2})\//);
   var effectiveIso = pageDateMatch
@@ -2636,17 +2180,6 @@ function goToEmployeeSchedule(empName) {
     window.location.href = target;
   });
 
-  (function loadDateBannerNav() {
-    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
-    if (!root) {
-      var p = location.pathname || '/';
-      root = p.replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/').replace(/\/now\/.*$/i, '/').replace(/\/+$/, '') || '';
-    }
-    var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
-    document.head.appendChild(s);
-  })();
-
 })();
 
 // ═══════════════════════════════════════════════════
@@ -2793,7 +2326,7 @@ var T = {
     from:'FROM', to:'TO',
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
-    exportChecker:'Export Checker', exportOps:'Export Operators',
+    exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
@@ -2807,7 +2340,7 @@ var T = {
     from:'من', to:'إلى',
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
-    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
@@ -2870,7 +2403,7 @@ function applyLang(lang) {
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
-    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
     'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
     'Unassigned':t.unassigned};
   document.querySelectorAll('.deptTitle').forEach(function(el) {
@@ -2941,7 +2474,7 @@ function applyLang(lang) {
     var datePickerEl = document.getElementById('datePicker');
     var iso = datePickerEl && datePickerEl.value;
     if (!iso) {
-      var m = (window.location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+      var m = (window.location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
       if (m) iso = m[1];
     }
     if (iso) window.rosterSyncHeaderDate(iso, lang);
@@ -3000,7 +2533,7 @@ startSummarySwitchLoop();
     if (document.getElementById('bgTextureShuffleBtn')) return;
     try {
       var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260901b';
+      var src = root + '/bg-texture-shuffle.js?v=20260903c';
       if (document.querySelector('script[data-local-src="' + src + '"]')) return;
       var s = document.createElement('script');
       s.src = src;
@@ -3053,13 +2586,20 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){
-      shiftCard.removeAttribute('open');
+      var key = shiftCard.dataset.shift || '';
+      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
+        shiftCard.open = false;
+        shiftCard.removeAttribute('open');
+      }
     });
     var currentShift = getCurrentShiftForMuscat();
     var target = shiftCards.find(function(shiftCard){
       return shiftCard.dataset.shift === currentShift;
-    }) || shiftCards[0];
-    if(target) target.setAttribute('open', '');
+    });
+    if(target) {
+      target.open = true;
+      target.setAttribute('open', '');
+    }
   }
 
   function cardHasSavedEmployee(card){
@@ -3462,7 +3002,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260903b';
+  var ver = '20260903c';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3472,6 +3012,7 @@ function goToRosterDiff(event) {
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
+  addScript(root + '/open-current-shift.js?v=20260908s');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20260806c');
@@ -3483,7 +3024,7 @@ function goToRosterDiff(event) {
   addScript(root + '/banner-changer.js?v=20260903a');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260830wm');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
