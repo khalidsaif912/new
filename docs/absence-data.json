@@ -1,14 +1,62 @@
 {
-  "generated_at": "2026-08-10T16:26:33.457372",
-  "total_records": 47,
+  "generated_at": "2026-09-08T10:08:53.609341",
+  "total_records": 206,
   "records": [
     {
-      "date": "2026-05-17",
+      "date": "2026-05-05",
       "names": [
-        "Imad Khamis Salim Al Makhmari"
+        "Abid Yahya Ramadhan Al Zadjali"
       ],
       "empNos": [
-        "82655"
+        "81034"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "names": [
+        "Yasir Humaid Said Al Gharabi"
+      ],
+      "empNos": [
+        "990786"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-05-19",
+      "names": [
+        "Abid Yahya Ramadhan Al Zadjali"
+      ],
+      "empNos": [
+        "81034"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "names": [
+        "Abid Yahya Ramadhan Al Zadjali"
+      ],
+      "empNos": [
+        "81034"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-05-25",
+      "names": [
+        "Abid Yahya Ramadhan Al Zadjali"
+      ],
+      "empNos": [
+        "81034"
       ],
       "sections": [
         "Cargo - Exp/Imp Operation"
@@ -17,33 +65,24 @@
     {
       "date": "2026-06-01",
       "names": [
-        "Hilal Khalaf Khalfan Al Shammakhi",
-        "Yasir Humaid Said Al Gharabi"
+        "Hilal Khalaf Khalfan Al Shammakhi"
       ],
       "empNos": [
-        "81991",
-        "990786"
+        "81991"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
     {
       "date": "2026-06-02",
       "names": [
-        "Yasir Humaid Said Al Gharabi",
-        "Adil Ali Khamis Al Zadjali",
         "Sulaiman Salim Saif Al Maharbi"
       ],
       "empNos": [
-        "990786",
-        "8584",
         "80833"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
@@ -51,53 +90,26 @@
       "date": "2026-06-03",
       "names": [
         "Dhaigham Anees Khalfan Al Sulaimi",
-        "Hafedh Said Humaid Al Salmani",
-        "Omar Abdul Aziz Salim Al Harthy",
-        "Ahmed Darwish Abdullah Al Farsi",
-        "Yasir Humaid Said Al Gharabi"
+        "Ahmed Darwish Abdullah Al Farsi"
       ],
       "empNos": [
         "82465",
-        "990893",
-        "82662",
-        "82456",
-        "990786"
+        "82456"
       ],
       "sections": [
         "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation"
-      ]
-    },
-    {
-      "date": "2026-06-05",
-      "names": [
-        "Mahmood Abdullah Abid Al Hadidi"
-      ],
-      "empNos": [
-        "82452"
-      ],
-      "sections": [
         "Cargo - Exp/Imp Operation"
       ]
     },
     {
       "date": "2026-06-07",
       "names": [
-        "Jamal Salim Ali Al Hadi",
-        "Ammar Yasir Marzouq Al Hadabi",
-        "Abdullah Hamed Sulaiman Al Amri"
+        "Jamal Salim Ali Al Hadi"
       ],
       "empNos": [
-        "82565",
-        "82552",
-        "82463"
+        "82565"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
@@ -105,62 +117,38 @@
       "date": "2026-06-10",
       "names": [
         "Salim Khamis Salim Al Maawali",
-        "Mohammed Sulaiman Khamis Al Maskari",
         "Ahmed Darwish Abdullah Al Farsi"
       ],
       "empNos": [
         "80481",
-        "82666",
         "82456"
       ],
       "sections": [
         "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation"
-      ]
-    },
-    {
-      "date": "2026-06-11",
-      "names": [
-        "Qais Salmeen Suweilem Al Rashdi"
-      ],
-      "empNos": [
-        "82409"
-      ],
-      "sections": [
         "Cargo - Exp/Imp Operation"
       ]
     },
     {
       "date": "2026-06-12",
       "names": [
-        "Mohammed Sulaiman Khamis Al Maskari",
-        "Talal Mahmood Darwish Albalushi",
         "Mudathir Abdullah Said Al Hajri"
       ],
       "empNos": [
-        "82666",
-        "81300",
         "82441"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
     {
       "date": "2026-06-13",
       "names": [
-        "Abdul Fattah Mubarak Sulaiym Al Shekaili",
-        "Amur Sulaiman Hamed Al Makarshi"
+        "Abdul Fattah Mubarak Sulaiym Al Shekaili"
       ],
       "empNos": [
-        "990465",
-        "82563"
+        "990465"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
@@ -179,37 +167,10 @@
     {
       "date": "2026-06-15",
       "names": [
-        "Mohammed Sulaiman Khamis Al Maskari",
         "Ahmed Mohammed Issa Al Balushi"
       ],
       "empNos": [
-        "82666",
         "82415"
-      ],
-      "sections": [
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation"
-      ]
-    },
-    {
-      "date": "2026-06-16",
-      "names": [
-        "Mohammed Sulaiman Khamis Al Maskari"
-      ],
-      "empNos": [
-        "82666"
-      ],
-      "sections": [
-        "Cargo - Exp/Imp Operation"
-      ]
-    },
-    {
-      "date": "2026-06-17",
-      "names": [
-        "Mohammed Sulaiman Khamis Al Maskari"
-      ],
-      "empNos": [
-        "82666"
       ],
       "sections": [
         "Cargo - Exp/Imp Operation"
@@ -218,17 +179,14 @@
     {
       "date": "2026-06-19",
       "names": [
-        "Khamis Juma Khamis Al Hinai",
-        "Mohammed Sulaiman Khamis Al Maskari",
-        "Haitham Abdeen Shambeh Al Balushi"
+        "Haitham Abdeen Shambeh Al Balushi",
+        "Khamis Juma Khamis Al Hinai"
       ],
       "empNos": [
-        "82467",
-        "82666",
-        "82419"
+        "82419",
+        "82467"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
@@ -251,24 +209,15 @@
     {
       "date": "2026-06-21",
       "names": [
-        "Adil Ali Murad Al Bulushi"
+        "Adil Ali Murad Al Bulushi",
+        "Abid Yahya Ramadhan Al Zadjali"
       ],
       "empNos": [
-        "82457"
+        "82457",
+        "81034"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation"
-      ]
-    },
-    {
-      "date": "2026-06-23",
-      "names": [
-        "Mohammed Sulaiman Khamis Al Maskari"
-      ],
-      "empNos": [
-        "82666"
-      ],
-      "sections": [
+        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
@@ -317,18 +266,12 @@
     {
       "date": "2026-06-27",
       "names": [
-        "Khalifa Obaid Saloom Al-Saadi",
-        "Ammar Nasser Hamed Al Hashmi",
-        "Ali Rashid Salim Al Marjabi"
+        "Ammar Nasser Hamed Al Hashmi"
       ],
       "empNos": [
-        "82537",
-        "82659",
-        "82577"
+        "82659"
       ],
       "sections": [
-        "Cargo - Exp/Imp Operation",
-        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
     },
@@ -345,16 +288,811 @@
       ]
     },
     {
-      "date": "2026-06-29",
+      "date": "2026-07-01",
       "names": [
-        "Adil Ali Khamis Al Zadjali",
+        "Abdul Fattah Mubarak Sulaiym Al Shekaili",
+        "Abdullah Hamed Sulaiman Al Amri",
+        "Ammar Nasser Hamed Al Hashmi",
+        "Ibrahim Saleh Hashil Al Qutaiti"
+      ],
+      "empNos": [
+        "990465",
+        "82463",
+        "82659",
+        "81351"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-02",
+      "names": [
+        "Al Muthana Ahmed Salim Al Shanfari",
+        "Qais Khamis Salim Al Mukhaini",
+        "Ammar Nasser Hamed Al Hashmi"
+      ],
+      "empNos": [
+        "82445",
+        "82435",
+        "82659"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-03",
+      "names": [
+        "Ammar Nasser Hamed Al Hashmi",
+        "Mohamed Sulaiman Hamed Al-Alawi",
+        "Abdul Fattah Mubarak Sulaiym Al Shekaili",
+        "Yousuf Mohamed Issa Al Balushi",
+        "Bushra Khamis Mohammed Al Waheibi",
+        "Sulaiman Rashid Sulaiman Al Hatmi"
+      ],
+      "empNos": [
+        "82659",
+        "82643",
+        "990465",
+        "82587",
+        "82657",
+        "82660"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-04",
+      "names": [
+        "Ali Omar Ali Al Riyami",
+        "Ahmed Nasser Said Al Mawali",
+        "Sulaiman Rashid Sulaiman Al Hatmi",
+        "Adil Ali Murad Al Bulushi",
+        "Ammar Nasser Hamed Al Hashmi",
+        "Ghith Zayid Saif Al Habsi"
+      ],
+      "empNos": [
+        "82459",
+        "82283",
+        "82660",
+        "82457",
+        "82659",
+        "82439"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-05",
+      "names": [
+        "Moosa Nasser Humaid Al Hadi",
+        "Ali Omar Ali Al Riyami",
+        "Said Amur Said Al Luwaihi",
+        "Waleed Khalifa Khamis Al Haddabi",
+        "Ahmed Thunai Masaud Al Rujaibi"
+      ],
+      "empNos": [
+        "82536",
+        "82459",
+        "82446",
+        "80482",
+        "82476"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-06",
+      "names": [
+        "Maqbool Hussain Haji Al Balushi",
+        "Hilal Khalaf Khalfan Al Shammakhi",
+        "Fahim Salim Hamed Al Hasni",
+        "Said Amur Said Al Luwaihi",
+        "Raad Hassan Mohamed Al Farsi",
+        "Mohamedd Mubarak Mohamedd Al Falahi"
+      ],
+      "empNos": [
+        "990347",
+        "81991",
+        "8930",
+        "82446",
+        "82578",
+        "8762"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-07",
+      "names": [
+        "Abdullah Hamed Sulaiman Al Amri",
+        "Qais Salmeen Suweilem Al Rashdi",
+        "Said Amur Said Al Luwaihi",
+        "Hamed Saif Hamed Al Fulaiti"
+      ],
+      "empNos": [
+        "82463",
+        "82409",
+        "82446",
+        "82596"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-08",
+      "names": [
+        "Qais Salmeen Suweilem Al Rashdi",
+        "Said Amur Said Al Luwaihi",
+        "Nayif Darwish Ali Al Balushi",
+        "Miss. Muna Saud Abdullah Al Amri"
+      ],
+      "empNos": [
+        "82409",
+        "82446",
+        "82453",
+        "81026"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-09",
+      "names": [
+        "Qais Salmeen Suweilem Al Rashdi",
+        "Riyadh Mubarak Juma Al Sulti",
+        "Salim Mohamed Hamed Al Masroori",
+        "Said Amur Said Al Luwaihi",
+        "Ahmed Darwish Abdullah Al Farsi",
+        "Ahmed Nasser Said Al Mawali"
+      ],
+      "empNos": [
+        "82409",
+        "82424",
+        "8926",
+        "82446",
+        "82456",
+        "82283"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-10",
+      "names": [
+        "Ahmed Nasser Said Al Mawali",
+        "Ali Juma Salim Al Maqbali",
+        "Qasim Salim Qasim Al Maqbali",
+        "Sulaiman Rashid Sulaiman Al Hatmi",
+        "Mohamed Ibrahim Shambeh Al Bulushi"
+      ],
+      "empNos": [
+        "82283",
+        "82474",
+        "81409",
+        "82660",
+        "82613"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-11",
+      "names": [
+        "Jamal Nasser Al Sinani",
+        "Imad Khamis Salim Al Makhmari",
+        "Mahnad Khalid Abdallah Al-Hadi",
+        "Ali Juma Salim Al Maqbali",
+        "Mahmood Darwish Habib Al Shamsi",
+        "Ali Omar Ali Al Riyami",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Sulaiman Rashid Sulaiman Al Hatmi",
+        "Mahamad Marhoon Said Al Maharbi",
+        "Ahmed Nasser Said Al Mawali",
+        "Mohamed Saif Salam Al Maawali",
+        "Ahmed Hilal Hamood Al Husaini"
+      ],
+      "empNos": [
+        "81399",
+        "82655",
+        "82665",
+        "82474",
+        "82286",
+        "82459",
+        "82572",
+        "82660",
+        "82460",
+        "82283",
+        "82535",
+        "82455"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-12",
+      "names": [
+        "Ahmed Nasser Said Al Mawali",
+        "Naif Mubarak Marzouq All Saad",
+        "Ahmed Hilal Hamood Al Husaini",
+        "Moosa Nasser Humaid Al Hadi",
+        "Mubarak Hassen Obaid Al Nofli",
+        "Imad Khamis Salim Al Makhmari",
+        "Mahnad Khalid Abdallah Al-Hadi",
+        "Ali Juma Salim Al Maqbali",
+        "Ahmed Mohammed Issa Al Balushi",
+        "Mahmood Darwish Habib Al Shamsi",
+        "Ali Omar Ali Al Riyami",
+        "Hilal Khalaf Khalfan Al Shammakhi"
+      ],
+      "empNos": [
+        "82283",
+        "82461",
+        "82455",
+        "82536",
+        "82114",
+        "82655",
+        "82665",
+        "82474",
+        "82415",
+        "82286",
+        "82459",
+        "81991"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-13",
+      "names": [
+        "Mohamedd Mubarak Mohamedd Al Falahi",
+        "Khalifa Mohammed Salim Al Maqbali",
+        "Waleed Khalifa Khamis Al Haddabi",
+        "Ali Juma Salim Al Maqbali"
+      ],
+      "empNos": [
+        "8762",
+        "82673",
+        "80482",
+        "82474"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-14",
+      "names": [
+        "Mohamedd Mubarak Mohamedd Al Falahi",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Mohamed Nasser Said Al Mazro'Ei",
+        "Ali Juma Salim Al Maqbali"
+      ],
+      "empNos": [
+        "8762",
+        "82572",
+        "82658",
+        "82474"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-15",
+      "names": [
+        "Hamed Saif Hamed Al Fulaiti",
+        "Ahmed Hadid Ramadhan Al Muqaimi",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Qais Salmeen Suweilem Al Rashdi"
+      ],
+      "empNos": [
+        "82596",
+        "82548",
+        "82572",
+        "82409"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-16",
+      "names": [
+        "Mudathir Abdullah Said Al Hajri",
+        "Khamis Juma Khamis Al Hinai",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Hosni Mubarak Juma Al Sulti",
+        "Qais Salmeen Suweilem Al Rashdi"
+      ],
+      "empNos": [
+        "82441",
+        "82467",
+        "82572",
+        "80695",
+        "82409"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "names": [
+        "Khamis Juma Khamis Al Hinai",
+        "Badar Ali Abdullah Al-Shehhi",
+        "Abdullah Juma Hashil Al Shekaili",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Zakariya Mohamed Yaqoob Abdul Karim Al Balushi"
+      ],
+      "empNos": [
+        "82467",
+        "82583",
+        "82645",
+        "82572",
+        "82429"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-18",
+      "names": [
+        "Badar Ali Abdullah Al-Shehhi",
+        "Qais Khamis Salim Al Mukhaini",
+        "Adil Ali Murad Al Bulushi",
+        "Abdullah Juma Hashil Al Shekaili",
+        "Mohammed Khamis Juma Al Bulushi",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Zakariya Mohamed Yaqoob Abdul Karim Al Balushi",
+        "Waleed Khalifa Khamis Al Haddabi"
+      ],
+      "empNos": [
+        "82583",
+        "82435",
+        "82457",
+        "82645",
+        "82330",
+        "82572",
+        "82429",
+        "80482"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-19",
+      "names": [
+        "Jaffar Abdul Redha Mohamed Al Ajmi",
+        "Mohammed Khamis Juma Al Bulushi",
+        "Badar Saif Nasser Al Fulaiti",
+        "Mohamed Hamed Hilal Al Toobi",
+        "Mohamed Rashid Mabiwa Al Saadi",
+        "Adil Ali Murad Al Bulushi",
+        "Said Amur Said Al Luwaihi",
+        "Mahnad Khalid Abdallah Al-Hadi"
+      ],
+      "empNos": [
+        "80831",
+        "82330",
+        "82468",
+        "82130",
+        "82420",
+        "82457",
+        "82446",
+        "82665"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-20",
+      "names": [
+        "Abid Yahya Ramadhan Al Zadjali",
+        "Dhaigham Anees Khalfan Al Sulaimi",
+        "Ahmed Rashid Nasser Al Hadi",
+        "Said Amur Said Al Luwaihi",
+        "Yaarab Khalfan Ruzaiq Al Raqadi",
+        "Mohammed Khamis Juma Al Bulushi",
+        "Dawood Sulaiman Salim Al-Siyabi",
+        "Mohamed Rashid Mabiwa Al Saadi"
+      ],
+      "empNos": [
+        "81034",
+        "82465",
+        "82654",
+        "82446",
+        "82571",
+        "82330",
+        "82672",
+        "82420"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-21",
+      "names": [
+        "Said Amur Said Al Luwaihi",
+        "Jamal Nasser Al Sinani",
+        "Raad Hassan Mohamed Al Farsi",
+        "Mohamed Rashid Mabiwa Al Saadi",
+        "Mohammed Khamis Juma Al Bulushi",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Hilal Khalaf Khalfan Al Shammakhi"
+      ],
+      "empNos": [
+        "82446",
+        "81399",
+        "82578",
+        "82420",
+        "82330",
+        "82572",
+        "81991"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-22",
+      "names": [
+        "Badar Saif Nasser Al Fulaiti",
+        "Said Amur Said Al Luwaihi",
+        "Mohamed Rashid Mabiwa Al Saadi",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Fritzardo Cruz Magcaling",
+        "Jamal Nasser Al Sinani"
+      ],
+      "empNos": [
+        "82468",
+        "82446",
+        "82420",
+        "82572",
+        "80269",
+        "81399"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-23",
+      "names": [
+        "Badar Saif Nasser Al Fulaiti",
+        "Allan Vianzon Tajonera",
+        "Riyadh Ahmed Said Al Jabri",
+        "Mahir Mohamed Abdullah Al Balushi",
+        "Said Amur Said Al Luwaihi",
+        "Abdallah Ali Mohammed Al Sawaai"
+      ],
+      "empNos": [
+        "82468",
+        "80276",
+        "82555",
+        "82422",
+        "82446",
+        "82113"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "names": [
+        "Mazin Salim Harib Alsiyabi",
+        "Imad Khamis Salim Al Makhmari"
+      ],
+      "empNos": [
+        "81223",
+        "82655"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-25",
+      "names": [
+        "Sulaiman Rashid Sulaiman Al Hatmi",
+        "Khamis Juma Khamis Al Hinai"
+      ],
+      "empNos": [
+        "82660",
+        "82467"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-26",
+      "names": [
+        "Badar Saif Nasser Al Fulaiti",
+        "Tariq Said Hamed Al Shidhani",
+        "Marwa Mohsin Saleh Al Ismaili",
+        "Haiyan Hamed Khalfan Alghannami"
+      ],
+      "empNos": [
+        "82468",
+        "82443",
+        "82485",
+        "81301"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-27",
+      "names": [
+        "Qais Khamis Salim Al Mukhaini",
+        "Marwan Khalfan Khamis Al Difa'I"
+      ],
+      "empNos": [
+        "82435",
+        "82437"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-28",
+      "names": [
+        "Mohamde Nasser Saif Al Yaarubi",
+        "Younis Mohammed Nasser Al Siyabi",
+        "Ismail Juma Mubarak Al Maharbi",
+        "Haitham Mubarak Marhoon Al Hadabi"
+      ],
+      "empNos": [
+        "82444",
+        "80480",
+        "82331",
+        "82572"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "names": [
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Anwar Hamed Khamis Al Amri",
+        "Badar Saif Nasser Al Fulaiti",
+        "Jaffar Abdul Redha Mohamed Al Ajmi",
+        "Mohammed Laluh Murad Al Zadjali",
+        "Khalil Mohammed Salim Al Hinai",
         "Nayif Darwish Ali Al Balushi"
       ],
       "empNos": [
-        "8584",
+        "82572",
+        "82566",
+        "82468",
+        "80831",
+        "81259",
+        "82671",
         "82453"
       ],
       "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "names": [
+        "Qais Khamis Salim Al Mukhaini",
+        "Mohamde Nasser Saif Al Yaarubi",
+        "Fritzardo Cruz Magcaling",
+        "Haitham Mubarak Marhoon Al Hadabi",
+        "Waheb Abdallah Hamed Al Baraidai",
+        "Ghith Zayid Saif Al Habsi",
+        "Faisal Yousuf Mohammed Al Balushi",
+        "Bushra Khamis Mohammed Al Waheibi",
+        "Allan Vianzon Tajonera",
+        "Hosni Mubarak Juma Al Sulti",
+        "Mohammed Laluh Murad Al Zadjali",
+        "Ali Sultan Amur Al Mamri"
+      ],
+      "empNos": [
+        "82435",
+        "82444",
+        "80269",
+        "82572",
+        "82470",
+        "82439",
+        "82656",
+        "82657",
+        "80276",
+        "80695",
+        "81259",
+        "82574"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation"
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "names": [
+        "Mohammed Laluh Murad Al Zadjali",
+        "Hosni Mubarak Juma Al Sulti",
+        "Allan Vianzon Tajonera",
+        "Asad Said Ali Al Omairy",
+        "Jihad Sami Mohammed Al Sarmi",
+        "Haitham Mubarak Marhoon Al Hadabi"
+      ],
+      "empNos": [
+        "81259",
+        "80695",
+        "80276",
+        "81348",
+        "82579",
+        "82572"
+      ],
+      "sections": [
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
+        "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation",
         "Cargo - Exp/Imp Operation"
       ]
