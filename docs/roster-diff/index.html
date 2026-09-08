@@ -1177,6 +1177,33 @@
       return '';
     }
 
+    function parseGeneratedAt(value) {
+      const t = Date.parse(String(value || ''));
+      return Number.isFinite(t) ? t : 0;
+    }
+
+    async function resolveStartPanel(kind) {
+      const q = new URLSearchParams(location.search);
+      const tab = (q.get('tab') || q.get('panel') || '').toLowerCase();
+      if (tab === 'absence' || tab === 'abs') return 'absence';
+      if (tab === 'diff' || tab === 'roster' || tab === 'changes') return 'diff';
+
+      const root = getSiteRootPath();
+      const bust = `ts=${Date.now()}`;
+      try {
+        const [absRes, diffRes] = await Promise.all([
+          fetch(`${root}/absence-data.json?${bust}`, { cache: 'no-store' }),
+          fetch(`${root}/roster-diff/data/${kind}-latest.json?${bust}`, { cache: 'no-store' }),
+        ]);
+        const absData = absRes.ok ? await absRes.json() : null;
+        const diffData = diffRes.ok ? await diffRes.json() : null;
+        const absAt = parseGeneratedAt(absData && absData.generated_at);
+        const diffAt = parseGeneratedAt(diffData && diffData.generated_at);
+        if (absAt && absAt >= diffAt) return 'absence';
+      } catch (e) {}
+      return 'diff';
+    }
+
     (function wireTopNav() {
       const root = getSiteRootPath();
       const today = new Date();
@@ -1858,12 +1885,16 @@
       document.body.appendChild(s);
     })();
 
-    loadDiff(currentDiffKind);
-    if (currentDiffKind === 'import') {
-      const expBtn = document.getElementById('exportBtn');
-      const impBtn = document.getElementById('importBtn');
-      if (expBtn && impBtn) { expBtn.classList.add('importChip'); impBtn.classList.remove('importChip'); }
-    }
+    (async function bootRosterDiff() {
+      currentPanel = await resolveStartPanel(currentDiffKind);
+      applyDiffModeUi(currentDiffKind);
+      await loadDiff(currentDiffKind);
+      if (currentDiffKind === 'import') {
+        const expBtn = document.getElementById('exportBtn');
+        const impBtn = document.getElementById('importBtn');
+        if (expBtn && impBtn) { expBtn.classList.add('importChip'); impBtn.classList.remove('importChip'); }
+      }
+    })();
   </script>
 <script defer src="../site-visits.js?v=20260809a"></script>
 </body>
