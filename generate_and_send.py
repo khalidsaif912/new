@@ -6,6 +6,7 @@ import calendar
 import argparse
 from pathlib import Path
 from html import escape as html_escape
+import shutil
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
@@ -34,6 +35,12 @@ from roster_cta_snippets import (  # noqa: E402
     IOS_PERF_VER,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
     PERF_RENDER_CSS,
+)
+from home_date_split import (  # noqa: E402
+    DATE_FONT_LINKS,
+    DATE_FONT_VARS,
+    DATE_SPLIT_CSS,
+    assert_split_date_banner,
 )
 from datetime import datetime
 from io import BytesIO
@@ -869,7 +876,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     min_attr = f'min="{min_date}"' if min_date else ""
     max_attr = f'max="{max_date}"' if max_date else ""
 
-    return f"""<!doctype html>
+    html = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -877,11 +884,13 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <meta name="x-apple-disable-message-reformatting">
   <script defer src="{pages_base}/ios-tap-fix.js?v={IOS_PERF_VER}"></script>
   <title>Duty Roster</title>
+{DATE_FONT_LINKS}
   <style>
     /* ═══════ RESET ═══════ */
     :root {{
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+{DATE_FONT_VARS}
     }}
     html, body {{
       width:100%;
@@ -1014,85 +1023,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       40% {{ transform:rotate(-6deg); }}
     }}
 
-    /* Date Picker Wrapper */
-    .datePickerWrapper {{
-      position:relative;
-      display:inline-block;
-      margin-top:14px;
-      z-index:20;
-      min-height:44px;
-      min-width:min(100%, 220px);
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }}
-    .header .dateTag {{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,.18);
-      padding:5px 18px;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.3px;
-      cursor:pointer;
-      transition:all .3s;
-      border:2px solid rgba(255,255,255,.2);
-      -webkit-tap-highlight-color:transparent;
-      user-select:none;
-      -webkit-user-select:none;
-      direction:ltr;
-      position:relative;
-      z-index:3;
-      pointer-events:auto;
-      color:#fff;
-      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
-    }}
-    .dateTag-icon {{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      flex-shrink:0;
-      line-height:0;
-      color:#fff;
-      pointer-events:none;
-    }}
-    .dateTag-icon svg {{
-      display:block;
-      width:16px;
-      height:16px;
-      pointer-events:none;
-      filter:drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(255,255,255,.45));
-    }}
-    .dateTag-label {{
-      line-height:1.2;
-      pointer-events:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.72),0 0 5px rgba(0,0,0,.38),0 0 1px rgba(255,255,255,.5);
-    }}
-    .header .dateTag:hover {{
-      background:rgba(255,255,255,.25);
-      transform:translateY(-1px);
-    }}
-    /* Transparent date input over #dateTag — native picker on iOS + desktop */
-    .datePickerWrapper #datePicker {{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      min-height:44px;
-      margin:0;
-      padding:0;
-      opacity:0;
-      cursor:pointer;
-      font-size:16px;
-      line-height:44px;
-      border:none;
-      z-index:5;
-      pointer-events:auto;
-      color:transparent;
-      background:transparent;
-      touch-action:manipulation;
-    }}
+{DATE_SPLIT_CSS}
 
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {{
       touch-action:manipulation;
@@ -1709,14 +1640,24 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 <div class="wrap">
 
   <!-- ════ HEADER ════ -->
-  <div class="header">
+  <div class="header homeDateSplit">
     {LANG_TOGGLE_HTML}
     <h1 id="pageTitle" class="bannerTitle">
       <span class="bannerTitleEyebrow" id="pageTitleEyebrow">Export</span>
       <span class="bannerTitleMain" id="pageTitleMain">Duty Roster</span>
     </h1>
     <div class="datePickerWrapper">
-      <label class="dateTag" id="dateTag" for="datePicker"><span class="dateTag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dateTag-label" id="dateTagLabel">{date_label}</span></label>
+      <label class="dateTag" id="dateTag" for="datePicker">
+        <span class="dateTagMain">
+          <span class="dateTagDay" id="dateTagDay"></span>
+          <span class="dateTagSide">
+            <span class="dateTagWeek" id="dateTagWeek"></span>
+            <span class="dateTagMonthWrap">
+              <span class="dateTagMonth" id="dateTagMonth"></span>
+            </span>
+          </span>
+        </span>
+      </label>
       <input id="datePicker" type="date" value="{iso_date}" {min_attr} {max_attr} aria-label="Select roster date" />
     </div>
   </div>
@@ -2077,7 +2018,7 @@ function buildBannerHeaderForSnapshot() {{
   clone.style.backgroundPosition = bg.position;
   clone.style.backgroundRepeat = bg.repeat;
   if (bg.color) clone.style.backgroundColor = bg.color;
-  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {{
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label, .dateTagDay, .dateTagWeek, .dateTagMonth').forEach(function(el) {{
     el.style.position = 'relative';
     el.style.zIndex = '2';
     el.style.color = '#fff';
@@ -3415,6 +3356,8 @@ function goToRosterDiff(event) {{
 
 </body>
 </html>"""
+    assert_split_date_banner(html, "export page_shell_html")
+    return html
 
 
 def generate_date_pages_for_month(
@@ -4159,6 +4102,7 @@ def main():
 
         with open("docs/index.html", "w", encoding="utf-8") as f:
             f.write(html_full)
+        shutil.copy2("docs/index.html", "docs/home.html")
 
         with open("docs/now/index.html", "w", encoding="utf-8") as f:
             f.write(html_now)
@@ -4298,6 +4242,7 @@ def main():
 
     with open("docs/index.html", "w", encoding="utf-8") as f:
         f.write(html_full)
+    shutil.copy2("docs/index.html", "docs/home.html")
 
     with open("docs/now/index.html", "w", encoding="utf-8") as f:
         f.write(html_now)

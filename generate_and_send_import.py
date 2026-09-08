@@ -59,6 +59,7 @@ from roster_cta_snippets import (  # noqa: E402
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
 )
+from home_date_split import assert_split_date_banner  # noqa: E402
 
 DATE_TAG_SVG = (
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" '
@@ -1826,6 +1827,7 @@ def main() -> None:
         style, export_script, parsed, display_date, repo_base_path="/import",
         min_date=min_date, max_date=max_date,
     )
+    assert_split_date_banner(duty_html, "import duty html")
     (out_root / "index.html").write_text(duty_html, encoding="utf-8")
 
     # Generate /now/ alias (same content)

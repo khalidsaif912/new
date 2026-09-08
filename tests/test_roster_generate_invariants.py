@@ -59,3 +59,28 @@ def test_shared_shift_script_has_no_morning_fallback():
     assert "Asia/Muscat" in js
     assert "open-current-shift.js?v=20260908s" in snippets
     assert snippets.count("open-current-shift.js?v=20260908s") == 2
+
+
+def test_export_generator_owns_split_date_banner():
+    from generate_and_send import page_shell_html
+    from home_date_split import assert_split_date_banner
+
+    html = page_shell_html(
+        date_label="8 September 2026",
+        iso_date="2026-09-08",
+        employees_total=1,
+        departments_total=1,
+        dept_cards_html="<div class='deptCard'></div>",
+        cta_url="/now/",
+        sent_time="15:00",
+        is_now_page=False,
+        min_date="2026-08-01",
+        max_date="2026-10-31",
+    )
+    assert_split_date_banner(html)
+    assert 'id="dateTagLabel"' not in html
+    assert 'id="dateTagDay"' in html
+    gen = (ROOT / "generate_and_send.py").read_text(encoding="utf-8")
+    assert "DATE_SPLIT_CSS" in gen
+    assert 'class="header homeDateSplit"' in gen
+    assert "shutil.copy2" in gen and "docs/home.html" in gen
