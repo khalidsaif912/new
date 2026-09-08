@@ -1,20 +1,22 @@
 """
 process_absence.py
 ------------------
-Directly downloads absence Excel from ABSENCE_EXCEL_URL, validates payload signature,
-parses rows, and regenerates docs/absence-data.json.
+Loads absence Excel from ABSENCE_EXCEL_FILE when set, otherwise downloads
+ABSENCE_EXCEL_URL, then regenerates docs/absence-data.json.
 """
 
+import hashlib
 import json
 import os
 import re
 import sys
 from datetime import datetime
 from io import BytesIO
-from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+from pathlib import Path
 
 import pandas as pd
-import requests
+
+from roster_app.cache_io import download_excel_with_meta
 
 try:
     from pyxlsb import open_workbook
@@ -23,26 +25,14 @@ except ImportError:
 
 
 ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
+ABSENCE_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
+ARCHIVE_PATH = Path("absence-archive") / "absence-report.xlsb"
+HASH_FILE = Path("last_absence_hash.txt")
 COL_EMP_NO = 1
 COL_NAME = 2
 COL_SECTION = 3
 COL_DATE = 4
-
-
-def _add_download_param_if_needed(url: str) -> str:
-    parsed = urlparse(url)
-    host = (parsed.netloc or "").lower()
-    if (
-        "sharepoint.com" not in host
-        and "onedrive.live.com" not in host
-        and "1drv.ms" not in host
-    ):
-        return url
-    params = dict(parse_qsl(parsed.query, keep_blank_values=True))
-    if "download" not in params:
-        params["download"] = "1"
-    return urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
 
 
 def _is_excel_signature(data: bytes) -> bool:
@@ -53,43 +43,40 @@ def _is_excel_signature(data: bytes) -> bool:
 def download_xlsb(url: str) -> tuple[bytes, str, str]:
     if not url:
         raise ValueError("ABSENCE_EXCEL_URL is empty")
+    data, meta = download_excel_with_meta(url)
+    return data, (meta.get("content_type") or ""), url
 
-    final_request_url = _add_download_param_if_needed(url)
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
-        ),
-        "Accept": "application/octet-stream,*/*",
-    }
 
-    r = requests.get(
-        final_request_url,
-        headers=headers,
-        allow_redirects=True,
-        timeout=60,
-    )
-    r.raise_for_status()
-
-    data = r.content or b""
-    content_type = (r.headers.get("Content-Type") or "").lower()
-    first16 = data[:16].hex()
-
-    print(f"Requested URL: {final_request_url}")
-    print(f"Final URL: {r.url}")
-    print(f"Content-Type: {content_type or 'unknown'}")
-    print(f"First 16 bytes: {first16}")
-    print(f"File size: {len(data):,} bytes")
-
+def load_absence_from_file(file_path: str) -> tuple[bytes, str, str]:
+    p = Path(file_path)
+    if not p.is_file():
+        raise ValueError(f"ABSENCE_EXCEL_FILE does not exist: {p}")
+    data = p.read_bytes()
+    if not data:
+        raise ValueError(f"ABSENCE_EXCEL_FILE is empty: {p}")
     if (data[:8] or b"").startswith(b"\x89PNG\r\n\x1a\n"):
-        raise ValueError("SharePoint returned a preview PNG, not the Excel file.")
-    if "text/html" in content_type or b"<html" in data[:4096].lower():
-        raise ValueError("SharePoint returned an HTML page, not the Excel file.")
+        raise ValueError(f"{p} is a PNG preview, not an Excel file.")
+    if b"<html" in data[:4096].lower():
+        raise ValueError(f"{p} looks like an HTML page, not an Excel file.")
     if not _is_excel_signature(data):
-        raise ValueError("Downloaded payload is not a valid Excel file signature.")
+        raise ValueError(f"{p} is not a valid Excel file signature.")
+    suffix = p.suffix.lower()
+    if suffix == ".xlsx":
+        content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    elif suffix == ".xlsb":
+        content_type = "application/vnd.ms-excel.sheet.binary.spreadsheetml.sheet"
+    else:
+        content_type = "application/octet-stream"
+    print(f"Loaded local file: {p.resolve()} ({len(data):,} bytes)")
+    return data, content_type, str(p.resolve())
 
-    return data, content_type, r.url
+
+def archive_absence_file(data: bytes) -> None:
+    ARCHIVE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ARCHIVE_PATH.write_bytes(data)
+    digest = hashlib.sha256(data).hexdigest()
+    HASH_FILE.write_text(digest + "\n", encoding="utf-8")
+    print(f"Archived {len(data):,} bytes -> {ARCHIVE_PATH} | hash={digest[:12]}")
 
 
 def clean_date(raw):
@@ -167,10 +154,15 @@ def _extract_rows(data, content_type):
 def main():
     print("Loading absence report...")
     try:
-        data, content_type, final_url = download_xlsb(ABSENCE_URL)
-        print(f"Download succeeded from: {final_url}")
+        if ABSENCE_FILE:
+            data, content_type, source = load_absence_from_file(ABSENCE_FILE)
+            print(f"Using local file: {source}")
+        else:
+            data, content_type, source = download_xlsb(ABSENCE_URL)
+            print(f"Download succeeded from: {source}")
+        archive_absence_file(data)
     except Exception as e:
-        print(f"Failed to download: {e}")
+        print(f"Failed to load absence file: {e}")
         sys.exit(1)
 
     records_by_date = {}

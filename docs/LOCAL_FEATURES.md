@@ -18,8 +18,8 @@ This file documents where each major local site feature is implemented.
 - Frontend script: `docs/absence-alert.js`
 - Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
 - Data builder script: `process_absence.py`
-- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — direct download link for the `.xlsb` absence report (SharePoint/OneDrive style URL; the script may append `download=1`).
-- Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG)
+- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. `process_absence.py` downloads it with the same session/warmup flow as the roster Excel (`download=1&web=0`).
+- Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC)
 
 ## Floating alert icons (optional)
 - Preference key (localStorage): `rosterFloatingAlertDots` — value `"0"` hides the floating envelope (`absence-alert.js`) and the floating change icon (`change-alert.js`) on roster home pages. Any other value or unset = show.

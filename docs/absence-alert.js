@@ -7,7 +7,7 @@
   const STORAGE_LANG_LEGACY = "appLang";
   /** Human-facing workbook (attendance / absence); JSON on site is built from the automated download URL. */
   const ABSENCE_SHAREPOINT_SOURCE =
-    "https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQD1R5qA4TnVS7Knr8-YdfzcAYpj0wCOuDb_HSa82slp23Y?e=nfZEPG";
+    "https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC";
 
   function deployBasePath() {
     if (location.protocol === "file:") return "";

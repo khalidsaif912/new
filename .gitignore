@@ -35,3 +35,8 @@ EXP/
 /JUN *IMPORT*.xlsx
 
 _local_abacus_admin_key.txt
+
+# SharePoint download debug payload
+debug_sharepoint_response.png
+tmp-*.bin
+
