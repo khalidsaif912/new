@@ -84,3 +84,46 @@ def test_export_generator_owns_split_date_banner():
     assert "DATE_SPLIT_CSS" in gen
     assert 'class="header homeDateSplit"' in gen
     assert "shutil.copy2" in gen and "docs/home.html" in gen
+
+
+def test_change_alert_popup_survives_generate():
+    from generate_and_send import page_shell_html
+    from roster_cta_snippets import (
+        CHANGE_ALERT_VER,
+        LOAD_LOCAL_ENHANCEMENTS_EXPORT,
+        LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+    )
+
+    js = (ROOT / "docs" / "change-alert.js").read_text(encoding="utf-8")
+    assert "function paintHomeAlertIcon" in js
+    assert "has-absences" in js
+    assert "chgFaceAbs" in js
+    assert "chgCardGlow" in js
+    assert "margin: 10px 14px 0" in js
+    assert "absencesWord" in js
+
+    tag = "change-alert.js?v=" + CHANGE_ALERT_VER
+    assert tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
+    assert tag in LOAD_LOCAL_ENHANCEMENTS_IMPORT
+    assert LOAD_LOCAL_ENHANCEMENTS_EXPORT.count("change-alert.js") == 1
+    assert LOAD_LOCAL_ENHANCEMENTS_IMPORT.count("change-alert.js") == 1
+
+    gen = (ROOT / "generate_and_send.py").read_text(encoding="utf-8")
+    imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
+    assert "LOAD_LOCAL_ENHANCEMENTS_EXPORT" in gen
+    assert "LOAD_LOCAL_ENHANCEMENTS_IMPORT" in imp
+
+    html = page_shell_html(
+        date_label="8 September 2026",
+        iso_date="2026-09-08",
+        employees_total=1,
+        departments_total=1,
+        dept_cards_html="<div class='deptCard'></div>",
+        cta_url="/now/",
+        sent_time="15:00",
+        is_now_page=False,
+        min_date="2026-08-01",
+        max_date="2026-10-31",
+    )
+    assert tag in html
+
