@@ -32,6 +32,23 @@
       '<path d="M10 18a2 2 0 0 0 4 0" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>'
     );
   }
+  function chgSaveIco() {
+    return (
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">' +
+      '<path d="M12 3v12m0 0-4-4m4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+      '</svg>'
+    );
+  }
+  function chgPrintIco() {
+    return (
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">' +
+      '<path d="M7 8V4h10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M6 14h12v7H6v-7z" stroke="currentColor" stroke-width="2"/>' +
+      '<path d="M4 10h16v7H4v-7z" stroke="currentColor" stroke-width="2"/>' +
+      '</svg>'
+    );
+  }
   function toggleWelcomeVsScheduleChip() {
     try {
       var path = window.location.pathname || '';
@@ -129,6 +146,10 @@
         publishedRoster: 'تم نشر ملف روستر جديد',
         newRosterName: 'اسم الروستر الجديد',
         apply: 'تطبيق',
+        saveImage: 'حفظ',
+        printLabel: 'طباعة',
+        saving: 'جاري الحفظ…',
+        saveFailed: 'تعذر حفظ الصورة',
         changedDaysCount: function (n) {
           return 'لديك ' + n + ' يوم/أيام بتغييرات في الروستر.';
         },
@@ -168,6 +189,10 @@
         publishedRoster: 'A new roster file was published',
         newRosterName: 'New roster name',
         apply: 'Apply',
+        saveImage: 'Save',
+        printLabel: 'Print',
+        saving: 'Saving…',
+        saveFailed: 'Could not save image',
         changedDaysCount: function (n) {
           return 'You have ' + n + ' changed day(s) in the roster.';
         },
@@ -696,43 +721,54 @@
         border-bottom: 1px solid #e5e7eb;
       }
 
-      .chg-card-close {
+      .chg-tools {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 30px;
-        height: 30px;
-        border-radius: 10px;
+        top: 6px;
+        inset-inline-end: 6px;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        z-index: 2;
+      }
+      .chg-tool,
+      .chg-card-close {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        margin: 0;
         border: none;
+        border-radius: 6px;
         background: transparent;
-        color: #9ca3af;
-        font-size: 22px;
-        font-weight: 700;
+        color: #6b7280;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         line-height: 1;
-        transition: color .12s ease, background-color .12s ease;
       }
+      .chg-tool svg {
+        display: block;
+      }
+      .chg-card-close {
+        font-size: 22px;
+        font-weight: 400;
+        color: #6b7280;
+      }
+      .chg-tool:hover,
       .chg-card-close:hover {
         background: #f3f4f6;
-        color: #4b5563;
-        transform: none;
+        color: #374151;
       }
-      .chg-card-close:active {
-        transform: translateY(0);
-      }
-      body.ar .chg-card-close {
-        right: auto;
-        left: 10px;
+      .chg-tool:disabled {
+        opacity: .45;
+        cursor: wait;
       }
 
       .chg-card-title {
         font-size: 16px;
         font-weight: 800;
         color: #111827;
-        margin: 0 28px 4px 0;
+        margin: 0 92px 4px 0;
       }
 
       .chg-card-text {
@@ -779,7 +815,7 @@
       }
 
       body.ar .chg-card-title {
-        margin: 0 0 4px 28px;
+        margin: 0 0 4px 92px;
       }
 
       .chg-card-body {
@@ -1023,6 +1059,35 @@
         right: auto;
         left: 6px;
       }
+
+      #chgPrintSheet {
+        display: none;
+      }
+      #chgCaptureSheet {
+        pointer-events: none;
+      }
+      @media print {
+        #chgCaptureSheet { display: none !important; }
+        @page { size: 101mm 130mm; margin: 0; }
+        html.chg-printing body > *:not(#chgPrintSheet) {
+          display: none !important;
+        }
+        html.chg-printing #chgPrintSheet {
+          display: flex !important;
+          flex-direction: column;
+          position: static !important;
+          left: auto !important;
+          top: auto !important;
+          transform: none !important;
+          animation: none !important;
+          width: 101mm !important;
+          height: 130mm !important;
+          max-width: none !important;
+          margin: 0 !important;
+          box-shadow: none !important;
+          overflow: hidden;
+        }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -1136,6 +1201,117 @@
     icon.setAttribute('aria-label', t('absenceSummary', lang, n));
   }
 
+  var LABEL_W = '101mm';
+  var LABEL_H = '130mm';
+
+  function loadHtml2Canvas() {
+    if (typeof window.html2canvas === 'function') {
+      return Promise.resolve(window.html2canvas);
+    }
+    if (typeof window.ensureHtml2Canvas === 'function') {
+      return window.ensureHtml2Canvas();
+    }
+    return new Promise(function (resolve, reject) {
+      var existing = document.querySelector('script[data-chg-h2c="1"]');
+      if (existing) {
+        existing.addEventListener('load', function () {
+          if (typeof window.html2canvas === 'function') resolve(window.html2canvas);
+          else reject(new Error('html2canvas missing'));
+        });
+        existing.addEventListener('error', function () {
+          reject(new Error('html2canvas load failed'));
+        });
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.async = true;
+      s.setAttribute('data-chg-h2c', '1');
+      s.onload = function () {
+        if (typeof window.html2canvas === 'function') resolve(window.html2canvas);
+        else reject(new Error('html2canvas missing'));
+      };
+      s.onerror = function () {
+        reject(new Error('html2canvas load failed'));
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  function buildAlertLabelNode(card) {
+    var clone = card.cloneNode(true);
+    clone.id = 'chgPrintSheet';
+    clone.hidden = false;
+    clone.removeAttribute('hidden');
+    clone.querySelectorAll('.chg-card-close, .chg-options, .chg-card-actions, .chg-tools').forEach(function (el) {
+      el.remove();
+    });
+    clone.style.animation = 'none';
+    clone.style.position = 'static';
+    clone.style.left = 'auto';
+    clone.style.top = 'auto';
+    clone.style.transform = 'none';
+    clone.style.width = LABEL_W;
+    clone.style.height = LABEL_H;
+    clone.style.maxWidth = 'none';
+    clone.style.boxShadow = 'none';
+    clone.style.display = 'flex';
+    clone.style.flexDirection = 'column';
+    clone.style.overflow = 'hidden';
+    clone.style.background = '#fffdf8';
+    return clone;
+  }
+
+  function printAlertLabel(card) {
+    var old = document.getElementById('chgPrintSheet');
+    if (old) old.remove();
+    var sheet = buildAlertLabelNode(card);
+    document.body.appendChild(sheet);
+    document.documentElement.classList.add('chg-printing');
+    var cleanup = function () {
+      document.documentElement.classList.remove('chg-printing');
+      if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    setTimeout(cleanup, 1500);
+  }
+
+  function saveAlertLabel(card, lang) {
+    var old = document.getElementById('chgCaptureSheet');
+    if (old) old.remove();
+    var host = document.createElement('div');
+    host.id = 'chgCaptureSheet';
+    host.style.cssText =
+      'position:fixed;left:-9999px;top:0;width:' + LABEL_W + ';height:' + LABEL_H + ';z-index:-1;pointer-events:none;';
+    var sheet = buildAlertLabelNode(card);
+    sheet.id = 'chgCaptureInner';
+    sheet.style.display = 'flex';
+    host.appendChild(sheet);
+    document.body.appendChild(host);
+    return loadHtml2Canvas()
+      .then(function (h2c) {
+        return h2c(sheet, {
+          backgroundColor: '#fffdf8',
+          scale: 2,
+          useCORS: true
+        });
+      })
+      .then(function (canvas) {
+        var a = document.createElement('a');
+        a.download = 'roster-alert.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      })
+      .catch(function () {
+        window.alert(t('saveFailed', lang));
+      })
+      .then(function () {
+        if (host && host.parentNode) host.parentNode.removeChild(host);
+      });
+  }
+
   function ensureHomeUI(empId, alert, lang, absences, empName) {
     var icon = document.getElementById(HOME_ICON_ID);
     if (!icon) {
@@ -1186,7 +1362,11 @@
 
     card.innerHTML =
       '<div class="chg-card-head">' +
-        '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
+        '<div class="chg-tools">' +
+          '<button class="chg-tool" type="button" data-act="saveImg" aria-label="' + escapeHtml(t('saveImage', lang)) + '" title="' + escapeHtml(t('saveImage', lang)) + '">' + chgSaveIco() + '</button>' +
+          '<button class="chg-tool" type="button" data-act="print" aria-label="' + escapeHtml(t('printLabel', lang)) + '" title="' + escapeHtml(t('printLabel', lang)) + '">' + chgPrintIco() + '</button>' +
+          '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
+        '</div>' +
         '<div class="chg-card-title">' + escapeHtml(titleText) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +
         rosterHtml +
@@ -1218,7 +1398,8 @@
     setLastAlertPayload(empId, alert, absences, empName);
 
     card.onclick = function (e) {
-      var act = e.target && e.target.getAttribute('data-act');
+      var btn = e.target && e.target.closest ? e.target.closest('[data-act]') : e.target;
+      var act = btn && btn.getAttribute ? btn.getAttribute('data-act') : '';
       if (!act) return;
 
       if (act === 'apply') {
@@ -1237,6 +1418,18 @@
         markMinimized(empId, alert);
         card.hidden = true;
         icon.hidden = false;
+        return;
+      }
+      if (act === 'saveImg') {
+        var saveBtn = card.querySelector('[data-act="saveImg"]');
+        if (saveBtn) saveBtn.disabled = true;
+        saveAlertLabel(card, lang).then(function () {
+          if (saveBtn) saveBtn.disabled = false;
+        });
+        return;
+      }
+      if (act === 'print') {
+        printAlertLabel(card);
         return;
       }
       if (act === 'openDiff') {

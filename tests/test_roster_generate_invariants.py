@@ -109,6 +109,9 @@ def test_change_alert_popup_survives_generate():
     abs_block = js.split("@keyframes chgFaceAbs", 1)[1].split("@media", 1)[0]
     assert "rotate(-10deg)" in bell_block
     assert "transform: none" in abs_block
+    assert "chg-tools" in js
+    assert 'data-act="saveImg"' in js
+    assert 'data-act="print"' in js
     assert ".chg-tab.active" in js and "#1b5e20" in js
     assert "chg-roster-name" in js
     assert "function buildOrgWideAlertFromDiff" in js
