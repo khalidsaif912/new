@@ -1,6 +1,7 @@
 /**
- * Site visitor counts (today + this month).
- * Counts unique visitors from Mantle visit log. Mounted outside `.footer`.
+ * Site visitor counts (today + this month + total).
+ * Unique people for today/month from a compact Mantle counts doc (survives log prune).
+ * Total is lifetime visitor-days and never shrinks (Abacus floor + new person-days).
  */
 (function () {
   'use strict';
@@ -8,7 +9,7 @@
   var NS = 'khalidsaif912.github.io';
   // Legacy Abacus keys kept for optional TOTAL baseline only (read, never hit from here).
   var TOTAL_KEY = 'total-visits';
-  var CACHE_KEY = 'rosterVisitCountsV3';
+  var CACHE_KEY = 'rosterVisitCountsV4';
   var TOTAL_FLOOR_KEY = 'rosterVisitTotalFloor';
   var cached = { day: null, month: null, total: null, dayKey: '', monthKey: '' };
   var booted = false;
@@ -17,7 +18,7 @@
 
   var I18N = {
     en: { day: 'Today', month: 'This month', total: 'Total' },
-    ar: { day: 'زوار اليوم', month: 'هذا الشهر', total: 'الإجمالي' }
+    ar: { day: 'زوار اليوم', month: 'زوار الشهر', total: 'الإجمالي' }
   };
 
   var HOST_HTML =
@@ -107,8 +108,6 @@
   function readPersisted(keys) {
     try {
       var raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) raw = localStorage.getItem('rosterVisitCountsV2');
-      if (!raw) raw = localStorage.getItem('rosterVisitCountsV1');
       if (!raw) return;
       var data = JSON.parse(raw);
       if (!data) return;
@@ -312,12 +311,255 @@
         seenDay[id] = 1;
         dayN += 1;
       }
-      if (day.indexOf(keys.month) === 0 && !seenMonth[stamp]) {
-        seenMonth[stamp] = 1;
+      if (day.indexOf(keys.month) === 0 && !seenMonth[id]) {
+        seenMonth[id] = 1;
         monthN += 1;
       }
     });
     return { day: dayN, month: monthN, total: totalN };
+  }
+
+  var LEGACY_TOTAL_FLOOR = 812;
+  var countsWriteChain = Promise.resolve();
+
+  function prevMonthKey(monthKey) {
+    var p = String(monthKey || '').split('-');
+    var y = Number(p[0]);
+    var m = Number(p[1]);
+    if (!y || !m) return '';
+    m -= 1;
+    if (m < 1) {
+      m = 12;
+      y -= 1;
+    }
+    return y + '-' + String(m).padStart(2, '0');
+  }
+
+  function emptyCountsDoc(keys) {
+    return {
+      v: 1,
+      dayKey: keys.day,
+      dayIds: [],
+      monthKey: keys.month,
+      monthIds: [],
+      months: {},
+      total: 0,
+      stamps: []
+    };
+  }
+
+  function normalizeCountsDoc(raw, keys) {
+    var doc = raw && typeof raw === 'object' ? raw : {};
+    return {
+      v: 1,
+      dayKey: String(doc.dayKey || keys.day),
+      dayIds: Array.isArray(doc.dayIds) ? doc.dayIds.map(String) : [],
+      monthKey: String(doc.monthKey || keys.month),
+      monthIds: Array.isArray(doc.monthIds) ? doc.monthIds.map(String) : [],
+      months: doc.months && typeof doc.months === 'object' ? doc.months : {},
+      total: Math.max(0, Math.floor(Number(doc.total) || 0)),
+      stamps: Array.isArray(doc.stamps) ? doc.stamps.map(String) : []
+    };
+  }
+
+  function pushUnique(arr, id) {
+    if (!id || arr.indexOf(id) !== -1) return false;
+    arr.push(id);
+    return true;
+  }
+
+  function rollCountsDoc(doc, keys) {
+    if (doc.dayKey !== keys.day) {
+      doc.dayKey = keys.day;
+      doc.dayIds = [];
+    }
+    if (doc.monthKey !== keys.month) {
+      if (!doc.months) doc.months = {};
+      if (doc.monthKey && doc.monthIds && doc.monthIds.length) {
+        doc.months[doc.monthKey] = doc.monthIds.length;
+      }
+      doc.monthKey = keys.month;
+      doc.monthIds = [];
+    }
+  }
+
+  function trimStamps(stamps, keys) {
+    var keep = [keys.month, prevMonthKey(keys.month)].filter(Boolean);
+    var out = [];
+    var seen = Object.create(null);
+    (stamps || []).forEach(function (stamp) {
+      var s = String(stamp || '');
+      if (!s || seen[s]) return;
+      var ok = false;
+      for (var i = 0; i < keep.length; i++) {
+        if (s.indexOf(keep[i]) === 0) {
+          ok = true;
+          break;
+        }
+      }
+      if (!ok) return;
+      seen[s] = 1;
+      out.push(s);
+    });
+    if (out.length > 900) out = out.slice(out.length - 900);
+    return out;
+  }
+
+  function ingestVisit(doc, id, day, keys, opts) {
+    id = String(id || '').trim();
+    day = String(day || '').trim();
+    if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+    rollCountsDoc(doc, keys);
+    var dirty = false;
+    if (day === keys.day && pushUnique(doc.dayIds, id)) dirty = true;
+    if (day.indexOf(keys.month) === 0 && pushUnique(doc.monthIds, id)) dirty = true;
+    var stamp = day + ':' + id;
+    if (doc.stamps.indexOf(stamp) === -1) {
+      doc.stamps.push(stamp);
+      dirty = true;
+      if (!(opts && opts.bootstrap)) {
+        doc.total = (Number(doc.total) || 0) + 1;
+      }
+    }
+    return dirty;
+  }
+
+  function ingestLogList(doc, list, keys, opts) {
+    var dirty = false;
+    var wasEmpty = !(doc.stamps && doc.stamps.length);
+    var bootstrap = !!(opts && opts.bootstrap) || wasEmpty;
+    (Array.isArray(list) ? list : []).forEach(function (row) {
+      if (!row) return;
+      if (ingestVisit(doc, row.id, row.day, keys, { bootstrap: bootstrap })) dirty = true;
+    });
+    if (bootstrap) {
+      var nextTotal = Math.max(
+        Number(doc.total) || 0,
+        LEGACY_TOTAL_FLOOR,
+        readTotalFloor(),
+        doc.stamps.length
+      );
+      if (nextTotal !== doc.total) {
+        doc.total = nextTotal;
+        dirty = true;
+      }
+    }
+    var trimmed = trimStamps(doc.stamps, keys);
+    if (trimmed.length !== doc.stamps.length) {
+      doc.stamps = trimmed;
+      dirty = true;
+    }
+    return dirty;
+  }
+
+  function paintFromCountsDoc(doc, keys) {
+    keys = keys || muscatYmd();
+    cached.day = (doc.dayIds || []).length;
+    cached.month = (doc.monthIds || []).length;
+    cached.total = Math.max(Number(doc.total) || 0, LEGACY_TOTAL_FLOOR, readTotalFloor());
+    cached.dayKey = keys.day;
+    cached.monthKey = keys.month;
+    raiseTotalFloor(cached.total);
+    persistCounts(keys);
+    paint();
+  }
+
+  function fetchCountsDoc() {
+    return fetch(COUNTS_URL + '?ts=' + Date.now(), {
+      headers: visitHeaders(),
+      cache: 'no-store'
+    }).then(function (r) {
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error('counts read');
+      return r.json();
+    });
+  }
+
+  function postCountsDoc(doc, attempt) {
+    attempt = attempt || 0;
+    return fetch(COUNTS_URL, {
+      method: 'POST',
+      headers: visitHeaders(),
+      body: JSON.stringify(doc)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('counts write ' + r.status);
+    }).catch(function (err) {
+      if (attempt >= 2) throw err;
+      return new Promise(function (resolve) {
+        setTimeout(resolve, 350 * (attempt + 1));
+      }).then(function () {
+        return postCountsDoc(doc, attempt + 1);
+      });
+    });
+  }
+
+  function mergeCountsDocs(base, incoming, keys) {
+    var doc = normalizeCountsDoc(base, keys);
+    rollCountsDoc(doc, keys);
+    var src = normalizeCountsDoc(incoming, keys);
+    if (src.dayKey === keys.day) {
+      src.dayIds.forEach(function (id) {
+        pushUnique(doc.dayIds, id);
+      });
+    }
+    if (src.monthKey === keys.month) {
+      src.monthIds.forEach(function (id) {
+        pushUnique(doc.monthIds, id);
+      });
+    }
+    (src.stamps || []).forEach(function (stamp) {
+      if (doc.stamps.indexOf(stamp) === -1) doc.stamps.push(stamp);
+    });
+    doc.total = Math.max(Number(doc.total) || 0, Number(src.total) || 0, LEGACY_TOTAL_FLOOR);
+    if (src.months) {
+      if (!doc.months) doc.months = {};
+      Object.keys(src.months).forEach(function (k) {
+        var n = Number(src.months[k]) || 0;
+        doc.months[k] = Math.max(Number(doc.months[k]) || 0, n);
+      });
+    }
+    doc.stamps = trimStamps(doc.stamps, keys);
+    return doc;
+  }
+
+  function queueCountsWrite(doc) {
+    countsWriteChain = countsWriteChain
+      .then(function () {
+        return fetchCountsDoc()
+          .catch(function () {
+            return null;
+          })
+          .then(function (raw) {
+            var keys = muscatYmd();
+            var merged = mergeCountsDocs(raw, doc, keys);
+            paintFromCountsDoc(merged, keys);
+            return postCountsDoc(merged);
+          });
+      })
+      .catch(function () {});
+    return countsWriteChain;
+  }
+
+  function syncCountsWithLog(list, keys, extraVisit) {
+    keys = keys || muscatYmd();
+    return fetchCountsDoc()
+      .catch(function () {
+        return null;
+      })
+      .then(function (raw) {
+        var doc = normalizeCountsDoc(raw, keys);
+        var bootstrap = !(raw && (raw.stamps || []).length);
+        var dirty = ingestLogList(doc, list, keys, { bootstrap: bootstrap });
+        if (extraVisit && extraVisit.id && extraVisit.day) {
+          if (ingestVisit(doc, extraVisit.id, extraVisit.day, keys, { bootstrap: false })) {
+            dirty = true;
+          }
+        }
+        doc.stamps = trimStamps(doc.stamps, keys);
+        paintFromCountsDoc(doc, keys);
+        if (dirty || !raw) queueCountsWrite(doc);
+        return doc;
+      });
   }
 
   function readTotalFloor() {
@@ -346,11 +588,9 @@
     cached.month = c.month;
     cached.dayKey = keys.day;
     cached.monthKey = keys.month;
-    // Total: never go below log-derived value or a previously observed floor /
-    // legacy Abacus total (log is capped ~220 rows by size, so lifetime can be higher).
-    var floor = Math.max(c.total, readTotalFloor());
-    cached.total = floor;
-    raiseTotalFloor(floor);
+    var floor = Math.max(c.total, readTotalFloor(), LEGACY_TOTAL_FLOOR);
+    if (cached.total == null || floor > cached.total) cached.total = floor;
+    raiseTotalFloor(cached.total);
     persistCounts(keys);
     paint();
     return c;
@@ -391,15 +631,18 @@
     return fetchVisitLogList()
       .then(function (list) {
         applyCountsFromList(list, keys);
-        // Blend legacy public total so pruning Mantle does not shrink the displayed lifetime total.
-        return getLegacyTotalOnly().then(function (legacy) {
-          if (legacy != null) {
-            var next = Math.max(Number(cached.total || 0), Number(legacy) || 0, countsFromLog(list, keys).total);
-            cached.total = next;
-            raiseTotalFloor(next);
-            persistCounts(keys);
-            paint();
-          }
+        return syncCountsWithLog(list, keys).then(function () {
+          return getLegacyTotalOnly().then(function (legacy) {
+            if (legacy != null) {
+              var next = Math.max(Number(cached.total || 0), Number(legacy) || 0, LEGACY_TOTAL_FLOOR);
+              if (next > Number(cached.total || 0)) {
+                cached.total = next;
+                raiseTotalFloor(next);
+                persistCounts(keys);
+                paint();
+              }
+            }
+          });
         });
       })
       .catch(function () {
@@ -797,6 +1040,7 @@
   var VISIT_LOG_NS = 'roster-site-visits';
   var VISIT_LOG_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
+  var COUNTS_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/counts';
   var PHONE_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/phones';
   // v4: also log guests without saved employee id (once/day per device).
   // v5: still one row per visitor/day, but merge every distinct page visited that day.
@@ -930,8 +1174,8 @@
     var i = kept.length - 1;
     while (i >= 0 && JSON.stringify({ log: kept }).length > maxBytes) {
       var row = kept[i];
-      if (row && Array.isArray(row.pages) && row.pages.length > 3) {
-        row.pages = row.pages.slice(-Math.max(3, Math.floor(row.pages.length / 2)));
+      if (row && Array.isArray(row.pages) && row.pages.length > 4) {
+        row.pages = row.pages.slice(-4);
       } else if (kept.length > 1) {
         kept.pop();
         i = kept.length - 1;
@@ -1013,6 +1257,7 @@
             var snap = kept.slice();
             snap.unshift(prev);
             applyCountsFromList(snap, muscatYmd());
+            syncCountsWithLog(snap, muscatYmd(), { id: prev.id, day: prev.day }).catch(function () {});
           } catch (eSnap) {}
           return null;
         }
@@ -1055,6 +1300,7 @@
           } catch (e2) {}
           try {
             applyCountsFromList(kept, muscatYmd());
+            syncCountsWithLog(kept, muscatYmd(), { id: merged.id, day: merged.day }).catch(function () {});
           } catch (eCount) {}
           try {
             pingVisitServer(merged);
