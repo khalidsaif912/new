@@ -124,12 +124,16 @@
         updateFor: 'تنبيه تحديث للموظف: ',
         minimizeOpt: 'تصغير (إخفاء النافذة فقط)',
         alertsPage: 'صفحة التنبيهات',
+        changesPage: 'صفحة التغيرات',
+        newRoster: 'روستر جديد',
+        publishedRoster: 'تم نشر ملف روستر جديد',
+        newRosterName: 'اسم الروستر الجديد',
         apply: 'تطبيق',
         changedDaysCount: function (n) {
           return 'لديك ' + n + ' يوم/أيام بتغييرات في الروستر.';
         },
         orgUpdate: function (n) {
-          return 'تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التنبيهات.';
+          return 'تم نشر تحديث على ملف الروستر (' + n + ' تغييراً). راجع جدولك أو صفحة التغيرات.';
         },
         absenceSummary: function (n) {
           return 'لديك ' + n + ' ' + (n === 1 ? 'يوم غياب' : 'أيام غياب') + ' مسجّلة في النظام.';
@@ -159,12 +163,16 @@
         updateFor: 'Update alert for: ',
         minimizeOpt: 'Minimize (hide card only)',
         alertsPage: 'Alerts page',
+        changesPage: 'Changes page',
+        newRoster: 'New roster',
+        publishedRoster: 'A new roster file was published',
+        newRosterName: 'New roster name',
         apply: 'Apply',
         changedDaysCount: function (n) {
           return 'You have ' + n + ' changed day(s) in the roster.';
         },
         orgUpdate: function (n) {
-          return 'A roster update was published (' + n + ' change(s)). Check your schedule or the alerts page.';
+          return 'A roster update was published (' + n + ' change(s)). Check your schedule or the changes page.';
         },
         absenceSummary: function (n) {
           return 'You have ' + n + ' recorded ' + (n === 1 ? 'absence day' : 'absence days') + '.';
@@ -351,9 +359,10 @@
       };
     });
 
-    return {
+    return attachRosterMeta({
       is_active: true,
       force_show: true,
+      kind: 'personal',
       change_hash: 'diff_' + String((diffData && diffData.generated_at) || '') + '_' + empId,
       total_changed_days: days.length,
       summary: {
@@ -361,23 +370,44 @@
         en: t('changedDaysCount', 'en', days.length)
       },
       days: days
-    };
+    }, diffData);
   }
 
-  /** When the diff workbook has changes but none match this employee, still surface an org-wide notice on home. */
+  function prettyRosterName(file) {
+    var s = String(file == null ? '' : file).replace(/\\/g, '/').trim();
+    if (!s) return '';
+    var base = s.split('/').pop() || s;
+    return base.replace(/\.(xlsx|xls|xlsb|xlsm)$/i, '').trim();
+  }
+
+  function attachRosterMeta(alert, diffData) {
+    if (!alert) return alert;
+    var name = prettyRosterName(diffData && diffData.new_file);
+    if (name) alert.roster_name = name;
+    return alert;
+  }
+
+  function isOrgAlert(alert) {
+    return !!(alert && alert.kind === 'org');
+  }
+
+  /** When a new roster is published, show a notice even if this employee's own days did not change. */
   function buildOrgWideAlertFromDiff(diffData, lang) {
     var rows = (diffData && diffData.changes) || [];
-    if (!rows.length) return null;
+    var newFile = prettyRosterName(diffData && diffData.new_file);
+    if (!rows.length && !newFile) return null;
     var n = Number(diffData.total_changes);
     if (!n || n !== n) n = rows.length;
     return {
       is_active: true,
       force_show: true,
-      change_hash: 'orgdiff_' + String((diffData && diffData.generated_at) || '') + '_' + n,
+      kind: 'org',
+      roster_name: newFile,
+      change_hash: 'orgdiff_' + String((diffData && diffData.generated_at) || '') + '_' + n + '_' + newFile,
       total_changed_days: 0,
       summary: {
-        ar: t('orgUpdate', 'ar', n),
-        en: t('orgUpdate', 'en', n)
+        ar: newFile ? t('publishedRoster', 'ar') : t('orgUpdate', 'ar', n),
+        en: newFile ? t('publishedRoster', 'en') : t('orgUpdate', 'en', n)
       },
       days: []
     };
@@ -710,6 +740,42 @@
         font-size: 13px;
         line-height: 1.6;
         color: #6b7280;
+      }
+
+      .chg-roster-name {
+        margin: 10px 0 0;
+        padding: 10px 12px;
+        background: #fff8e7;
+        border: 1px solid #1b5e20;
+        border-radius: 12px;
+      }
+      .chg-roster-name-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: #1b5e20;
+        margin-bottom: 4px;
+      }
+      .chg-roster-name-file {
+        display: block;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+      #chg-tab-body:empty {
+        display: none;
+      }
+      .chg-card-body:has(#chg-tab-body:empty) {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      .chg-page-actions {
+        margin-top: 10px;
+      }
+      .chg-page-actions .chg-btn {
+        width: 100%;
       }
 
       body.ar .chg-card-title {
@@ -1079,6 +1145,9 @@
       document.body.appendChild(icon);
     }
     paintHomeAlertIcon(icon, absences, lang);
+    if (isOrgAlert(alert) && !(absences && absences.length)) {
+      icon.setAttribute('aria-label', t('newRoster', lang));
+    }
 
     var card = document.getElementById(HOME_CARD_ID);
     if (!card) {
@@ -1090,10 +1159,11 @@
     var summaryText = alertSummaryText(alert, lang);
     var hasShiftTab = !!(alert && alert.days && alert.days.length);
     var hasAbsenceTab = !!(absences && absences.length);
+    var isOrg = isOrgAlert(alert);
     var defaultTab = hasAbsenceTab ? 'absence' : 'shift';
-    var titleText = hasAbsenceTab && !hasShiftTab
-      ? t('recordedAbsence', lang)
-      : t('changed', lang);
+    var titleText = isOrg
+      ? t('newRoster', lang)
+      : (hasAbsenceTab && !hasShiftTab ? t('recordedAbsence', lang) : t('changed', lang));
     var shiftContent = shortDaysHtml(alert, lang);
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
@@ -1104,12 +1174,22 @@
       : '';
     var bodyHtml = (defaultTab === 'shift' ? shiftContent : absenceContent);
     var fallbackText = t('updateFor', lang) + (empName || empId);
+    var rosterName = (alert && alert.roster_name) ? String(alert.roster_name).trim() : '';
+    var rosterHtml = rosterName
+      ? ('<div class="chg-roster-name">' +
+           '<span class="chg-roster-name-label">' + escapeHtml(t('newRosterName', lang)) + '</span>' +
+           '<span class="chg-roster-name-file">' + escapeHtml(rosterName) + '</span>' +
+         '</div>')
+      : '';
+    var diffBtnClass = isOrg ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
+    var applyBtnClass = isOrg ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
 
     card.innerHTML =
       '<div class="chg-card-head">' +
         '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
         '<div class="chg-card-title">' + escapeHtml(titleText) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +
+        rosterHtml +
       '</div>' +
       tabsHtml +
       '<div class="chg-card-body">' +
@@ -1119,8 +1199,8 @@
         '<label class="chg-opt"><input type="checkbox" id="chgOptMin"> ' + escapeHtml(t('minimizeOpt', lang)) + '</label>' +
       '</div>' +
       '<div class="chg-card-actions">' +
-        '<button class="chg-btn chg-btn-muted" data-act="openDiff">' + escapeHtml(t('alertsPage', lang)) + '</button>' +
-        '<button class="chg-btn chg-btn-primary" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
+        '<button class="' + diffBtnClass + '" data-act="openDiff">' + escapeHtml(t('changesPage', lang)) + '</button>' +
+        '<button class="' + applyBtnClass + '" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
       '</div>';
 
     icon.hidden = false;
@@ -1186,15 +1266,27 @@
     if (old) old.remove();
 
     var summaryText = alertSummaryText(alert, lang);
+    var isOrg = isOrgAlert(alert);
+    var rosterName = (alert && alert.roster_name) ? String(alert.roster_name).trim() : '';
+    var rosterHtml = rosterName
+      ? ('<div class="chg-roster-name">' +
+           '<span class="chg-roster-name-label">' + escapeHtml(t('newRosterName', lang)) + '</span>' +
+           '<span class="chg-roster-name-file">' + escapeHtml(rosterName) + '</span>' +
+         '</div>')
+      : '';
     var box = document.createElement('div');
     box.id = PAGE_BANNER_ID;
 
     box.innerHTML =
       '<div class="chg-page-top">' +
-        '<div class="chg-page-title">' + escapeHtml(t('changed', lang)) + '</div>' +
+        '<div class="chg-page-title">' + escapeHtml(isOrg ? t('newRoster', lang) : t('changed', lang)) + '</div>' +
         '<button class="chg-page-close" type="button" data-act="close" aria-label="' + t('close', lang) + '">✕</button>' +
       '</div>' +
       '<p class="chg-page-text">' + escapeHtml(summaryText) + '</p>' +
+      rosterHtml +
+      '<div class="chg-page-actions">' +
+        '<button class="chg-btn chg-btn-primary" type="button" data-act="openDiff">' + escapeHtml(t('changesPage', lang)) + '</button>' +
+      '</div>' +
       (
         (alert.days || []).length
           ? '<ul class="chg-page-list">' + alert.days.map(function (item) {
@@ -1208,9 +1300,14 @@
     holder.insertBefore(box, holder.firstChild);
     setLastAlertPayload(getEmployeeId() || GUEST_EMP_ID, alert, [], '');
     box.onclick = function (e) {
-      if (e.target && e.target.getAttribute('data-act') === 'close') {
+      var act = e.target && e.target.getAttribute('data-act');
+      if (act === 'close') {
         markPageDismissed(getEmployeeId(), alert);
         box.remove();
+        return;
+      }
+      if (act === 'openDiff') {
+        window.location.href = getBase() + 'roster-diff/index.html';
       }
     };
   }
@@ -1372,6 +1469,8 @@ function renderGlobalGuestAlerts() {
       alert = {
         is_active: true,
         force_show: true,
+        kind: 'org',
+        roster_name: orgAlert.roster_name || '',
         change_hash: 'guestcombo_' + orgAlert.change_hash + '_' + guestAbsAlert.change_hash,
         total_changed_days: 0,
         summary: merged,
@@ -1415,18 +1514,22 @@ function renderForEmployee(empId) {
       var alert = data ? activeAlert(data) : null;
       var empName = data && data.name ? data.name : '';
 
-      // Fallback: use latest roster-diff output when per-employee alert is missing.
+      // Always load the latest roster-diff so a new roster still pops up
+      // even when this employee's own days did not change.
       var isImport = path.indexOf('/import/') !== -1;
       var kind = isImport ? 'import' : 'export';
       var base = getBase();
       var diffUrl = base + 'roster-diff/data/' + kind + '-latest.json';
-      var diffPromise = alert && alert.is_active
-        ? Promise.resolve(alert)
-        : fetchJson(diffUrl).then(function (diffData) {
-          var personal = buildAlertFromDiff(empId, diffData, lang);
-          if (personal) return personal;
-          return buildOrgWideAlertFromDiff(diffData, lang);
-        }).catch(function () { return null; });
+      var jsonAlert = alert && alert.is_active ? alert : null;
+      var jsonHasDays = !!(jsonAlert && jsonAlert.days && jsonAlert.days.length);
+      var diffPromise = fetchJson(diffUrl).then(function (diffData) {
+        var personal = buildAlertFromDiff(empId, diffData, lang);
+        if (personal) return personal;
+        if (jsonHasDays) return attachRosterMeta(jsonAlert, diffData);
+        var org = buildOrgWideAlertFromDiff(diffData, lang);
+        if (org) return org;
+        return jsonAlert ? attachRosterMeta(jsonAlert, diffData) : null;
+      }).catch(function () { return jsonAlert; });
       var absPromise = fetchJson(base + 'absence-data.json', { fresh: true })
         .then(function (absData) { return findAbsenceDates(empId, empName, absData); })
         .catch(function () { return []; });
@@ -1452,12 +1555,15 @@ function renderForEmployee(empId) {
       if (absences.length) {
         var baseHash = (alert && alert.is_active && alert.change_hash) ? alert.change_hash : 'absence';
         var hasShiftDays = !!(alert && alert.days && alert.days.length);
+        var keepOrg = isOrgAlert(alert);
         alert = {
           is_active: true,
           force_show: true,
+          kind: keepOrg ? 'org' : (alert && alert.kind) || '',
+          roster_name: (alert && alert.roster_name) || '',
           change_hash: baseHash + '|abs|' + absences.join('|'),
           total_changed_days: hasShiftDays ? alert.total_changed_days : absences.length,
-          summary: hasShiftDays
+          summary: (hasShiftDays || keepOrg)
             ? alert.summary
             : {
                 ar: t('absenceSummary', 'ar', absences.length),
