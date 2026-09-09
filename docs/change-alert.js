@@ -729,19 +729,25 @@
 
       .chg-card-head {
         position: relative;
-        padding: 14px 16px 12px;
+        padding: 10px 12px 12px;
         background: #fffdf8;
         border-bottom: 1px solid #e5e7eb;
       }
 
+      .chg-card-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 28px;
+        margin: 0 0 8px;
+      }
+
       .chg-tools {
-        position: absolute;
-        top: 6px;
-        inset-inline-end: 6px;
         display: flex;
         align-items: center;
         gap: 2px;
-        z-index: 2;
+        margin-inline-start: auto;
+        flex: 0 0 auto;
       }
       .chg-tool,
       .chg-card-close {
@@ -777,11 +783,36 @@
         cursor: wait;
       }
 
+      .chg-emp-id {
+        display: inline-flex;
+        align-items: center;
+        height: 28px;
+        padding: 0 4px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: ui-monospace, "Cascadia Mono", "Segoe UI", Tahoma, sans-serif;
+        letter-spacing: 0.02em;
+        line-height: 1;
+        direction: ltr;
+        unicode-bidi: isolate;
+        flex: 0 0 auto;
+      }
+      .chg-emp-id-sep {
+        margin: 0 1px;
+        font-weight: 500;
+      }
+      .chg-emp-id-num {
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.08em;
+      }
       .chg-card-title {
         font-size: 16px;
         font-weight: 800;
         color: #111827;
-        margin: 0 92px 4px 0;
+        margin: 0 0 4px;
       }
 
       .chg-card-text {
@@ -825,10 +856,6 @@
       }
       .chg-page-actions .chg-btn {
         width: 100%;
-      }
-
-      body.ar .chg-card-title {
-        margin: 0 0 4px 92px;
       }
 
       .chg-card-body {
@@ -1422,14 +1449,26 @@
       : '';
     var diffBtnClass = isOrg ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
     var applyBtnClass = isOrg ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
+    var showEmpId = !!(empId && empId !== GUEST_EMP_ID);
+    var empSn = String(empId || '').replace(/^SN-/i, '');
+    var empIdHtml = showEmpId
+      ? ('<div class="chg-emp-id" dir="ltr" title="SN-' + escapeHtml(empSn) + '">' +
+           '<span class="chg-emp-id-pre">SN</span>' +
+           '<span class="chg-emp-id-sep">-</span>' +
+           '<span class="chg-emp-id-num">' + escapeHtml(empSn) + '</span>' +
+         '</div>')
+      : '';
 
     card.innerHTML =
       '<div class="chg-card-frame"><div class="chg-card-inner">' +
       '<div class="chg-card-head">' +
-        '<div class="chg-tools">' +
-          '<button class="chg-tool" type="button" data-act="saveImg" aria-label="' + escapeHtml(t('saveImage', lang)) + '" title="' + escapeHtml(t('saveImage', lang)) + '">' + chgSaveIco() + '</button>' +
-          '<button class="chg-tool" type="button" data-act="print" aria-label="' + escapeHtml(t('printLabel', lang)) + '" title="' + escapeHtml(t('printLabel', lang)) + '">' + chgPrintIco() + '</button>' +
-          '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
+        '<div class="chg-card-bar">' +
+          empIdHtml +
+          '<div class="chg-tools">' +
+            '<button class="chg-tool" type="button" data-act="saveImg" aria-label="' + escapeHtml(t('saveImage', lang)) + '" title="' + escapeHtml(t('saveImage', lang)) + '">' + chgSaveIco() + '</button>' +
+            '<button class="chg-tool" type="button" data-act="print" aria-label="' + escapeHtml(t('printLabel', lang)) + '" title="' + escapeHtml(t('printLabel', lang)) + '">' + chgPrintIco() + '</button>' +
+            '<button class="chg-card-close" type="button" aria-label="' + escapeHtml(t('close', lang)) + '" data-act="close">×</button>' +
+          '</div>' +
         '</div>' +
         '<div class="chg-card-title">' + escapeHtml(titleText) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +

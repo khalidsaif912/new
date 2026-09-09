@@ -118,6 +118,10 @@ def test_change_alert_popup_survives_generate():
     assert "chg-card-frame" in js
     assert ".chg-tab.active" in js and "#1b5e20" in js
     assert "chg-roster-name" in js
+    assert "chg-card-bar" in js
+    assert "chg-emp-id" in js
+    assert "chg-emp-id-num" in js
+    assert ">SN</span>" in js
     assert "function buildOrgWideAlertFromDiff" in js
     assert "changesPage" in js
 
