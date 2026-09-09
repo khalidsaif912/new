@@ -684,7 +684,7 @@
   var p = deployBase();
   var base = (location.origin||'') + p + (p && p.charAt(p.length-1) !== '/' ? '/' : '');
   if (!p) base = (location.origin||'') + '/';
-  var u = base + 'change-alert.js?v=20260909a';
+  var u = base + 'change-alert.js?v=20260909d';
   if (document.querySelector('script[data-chg-alert]')) return;
   var s = document.createElement('script');
   s.src = u; s.defer = true; s.setAttribute('data-chg-alert','1');
