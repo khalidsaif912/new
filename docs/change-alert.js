@@ -669,20 +669,33 @@
         top: 50%;
         transform: translate(-50%, -50%);
         width: min(340px, calc(100vw - 28px));
-        border: 10px solid transparent;
+        padding: 0;
+        border: none;
         border-radius: 24px;
-        background:
-          linear-gradient(#fffdf8, #fffdf8) padding-box,
-          repeating-linear-gradient(
-            45deg,
-            #c62828 0 8px,
-            #ffffff 8px 16px
-          ) border-box;
+        background: transparent;
         box-shadow:
           0 8px 16px rgba(28, 25, 23, .16),
           0 22px 48px rgba(28, 25, 23, .32);
         z-index: 100040;
         animation: chgCardPop .42s ease-out, chgCardGlow 2.4s ease-in-out .42s infinite;
+      }
+      #${HOME_CARD_ID} .chg-card-frame {
+        padding: 10px;
+        border-radius: 24px;
+        background: repeating-linear-gradient(
+          45deg,
+          #c62828 0px,
+          #c62828 8px,
+          #ffffff 8px,
+          #ffffff 16px
+        );
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      #${HOME_CARD_ID} .chg-card-inner {
+        background: #fffdf8;
+        border-radius: 14px;
+        overflow: hidden;
       }
 
       #${HOME_CARD_ID}[hidden] {
@@ -1063,29 +1076,36 @@
       #chgPrintSheet {
         display: none;
       }
-      #chgCaptureSheet {
-        pointer-events: none;
-      }
       @media print {
-        #chgCaptureSheet { display: none !important; }
         @page { size: 101mm 130mm; margin: 0; }
+        html.chg-printing,
+        html.chg-printing body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #fff !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
         html.chg-printing body > *:not(#chgPrintSheet) {
           display: none !important;
         }
         html.chg-printing #chgPrintSheet {
           display: flex !important;
-          flex-direction: column;
+          align-items: center;
+          justify-content: center;
           position: static !important;
-          left: auto !important;
-          top: auto !important;
-          transform: none !important;
-          animation: none !important;
           width: 101mm !important;
           height: 130mm !important;
-          max-width: none !important;
           margin: 0 !important;
-          box-shadow: none !important;
-          overflow: hidden;
+          padding: 0 !important;
+          background: #fff !important;
+        }
+        html.chg-printing #chgPrintSheet img {
+          display: block;
+          max-width: 101mm;
+          max-height: 130mm;
+          width: auto;
+          height: auto;
         }
       }
     `;
@@ -1201,9 +1221,6 @@
     icon.setAttribute('aria-label', t('absenceSummary', lang, n));
   }
 
-  var LABEL_W = '101mm';
-  var LABEL_H = '130mm';
-
   function loadHtml2Canvas() {
     if (typeof window.html2canvas === 'function') {
       return Promise.resolve(window.html2canvas);
@@ -1238,77 +1255,123 @@
     });
   }
 
-  function buildAlertLabelNode(card) {
-    var clone = card.cloneNode(true);
-    clone.id = 'chgPrintSheet';
-    clone.hidden = false;
-    clone.removeAttribute('hidden');
-    clone.querySelectorAll('.chg-card-close, .chg-options, .chg-card-actions, .chg-tools').forEach(function (el) {
-      el.remove();
-    });
-    clone.style.animation = 'none';
-    clone.style.position = 'static';
-    clone.style.left = 'auto';
-    clone.style.top = 'auto';
-    clone.style.transform = 'none';
-    clone.style.width = LABEL_W;
-    clone.style.height = LABEL_H;
-    clone.style.maxWidth = 'none';
-    clone.style.boxShadow = 'none';
-    clone.style.display = 'flex';
-    clone.style.flexDirection = 'column';
-    clone.style.overflow = 'hidden';
-    clone.style.background = '#fffdf8';
-    return clone;
+  function chgRoundRect(ctx, x, y, w, h, r) {
+    var rad = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(x, y, w, h, rad);
+      return;
+    }
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
   }
 
-  function printAlertLabel(card) {
-    var old = document.getElementById('chgPrintSheet');
-    if (old) old.remove();
-    var sheet = buildAlertLabelNode(card);
-    document.body.appendChild(sheet);
-    document.documentElement.classList.add('chg-printing');
-    var cleanup = function () {
-      document.documentElement.classList.remove('chg-printing');
-      if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
-      window.removeEventListener('afterprint', cleanup);
-    };
-    window.addEventListener('afterprint', cleanup);
-    window.print();
-    setTimeout(cleanup, 1500);
+  function paintAlertStripeFrame(innerCanvas, scale) {
+    var pad = Math.round(10 * scale);
+    var outerR = Math.round(24 * scale);
+    var innerR = Math.round(14 * scale);
+    var stripe = Math.round(8 * scale);
+    var w = innerCanvas.width + pad * 2;
+    var h = innerCanvas.height + pad * 2;
+    var out = document.createElement('canvas');
+    out.width = w;
+    out.height = h;
+    var ctx = out.getContext('2d');
+    ctx.save();
+    chgRoundRect(ctx, 0, 0, w, h, outerR);
+    ctx.clip();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#c62828';
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(Math.PI / 4);
+    var diag = Math.sqrt(w * w + h * h) + stripe * 2;
+    var period = stripe * 2;
+    var x;
+    for (x = -diag; x < diag; x += period) {
+      ctx.fillRect(x, -diag, stripe, diag * 2);
+    }
+    ctx.restore();
+    ctx.save();
+    chgRoundRect(ctx, pad, pad, innerCanvas.width, innerCanvas.height, innerR);
+    ctx.clip();
+    ctx.drawImage(innerCanvas, pad, pad);
+    ctx.restore();
+    return out;
   }
 
-  function saveAlertLabel(card, lang) {
-    var old = document.getElementById('chgCaptureSheet');
-    if (old) old.remove();
-    var host = document.createElement('div');
-    host.id = 'chgCaptureSheet';
-    host.style.cssText =
-      'position:fixed;left:-9999px;top:0;width:' + LABEL_W + ';height:' + LABEL_H + ';z-index:-1;pointer-events:none;';
-    var sheet = buildAlertLabelNode(card);
-    sheet.id = 'chgCaptureInner';
-    sheet.style.display = 'flex';
-    host.appendChild(sheet);
-    document.body.appendChild(host);
+  function captureAlertCard(card) {
+    var inner = card.querySelector('.chg-card-inner') || card;
+    var prevAnim = card.style.animation;
+    card.style.animation = 'none';
     return loadHtml2Canvas()
       .then(function (h2c) {
-        return h2c(sheet, {
+        return h2c(inner, {
           backgroundColor: '#fffdf8',
           scale: 2,
-          useCORS: true
+          useCORS: true,
+          logging: false
         });
       })
       .then(function (canvas) {
-        var a = document.createElement('a');
-        a.download = 'roster-alert.png';
-        a.href = canvas.toDataURL('image/png');
-        a.click();
-      })
+        card.style.animation = prevAnim;
+        return paintAlertStripeFrame(canvas, 2);
+      }, function (err) {
+        card.style.animation = prevAnim;
+        throw err;
+      });
+  }
+
+  function downloadAlertCanvas(canvas) {
+    var a = document.createElement('a');
+    a.download = 'roster-alert.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }
+
+  function printAlertCanvas(canvas) {
+    var old = document.getElementById('chgPrintSheet');
+    if (old) old.remove();
+    var sheet = document.createElement('div');
+    sheet.id = 'chgPrintSheet';
+    var img = document.createElement('img');
+    img.alt = '';
+    img.src = canvas.toDataURL('image/png');
+    sheet.appendChild(img);
+    document.body.appendChild(sheet);
+    document.documentElement.classList.add('chg-printing');
+    var cleaned = false;
+    var cleanup = function () {
+      if (cleaned) return;
+      cleaned = true;
+      document.documentElement.classList.remove('chg-printing');
+      if (sheet.parentNode) sheet.parentNode.removeChild(sheet);
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(cleanup, 120000);
+    var startPrint = function () { window.print(); };
+    if (img.complete) startPrint();
+    else img.onload = startPrint;
+  }
+
+  function saveAlertLabel(card, lang) {
+    return captureAlertCard(card)
+      .then(downloadAlertCanvas)
       .catch(function () {
         window.alert(t('saveFailed', lang));
-      })
-      .then(function () {
-        if (host && host.parentNode) host.parentNode.removeChild(host);
+      });
+  }
+
+  function printAlertLabel(card, lang) {
+    return captureAlertCard(card)
+      .then(printAlertCanvas)
+      .catch(function () {
+        window.alert(t('saveFailed', lang));
       });
   }
 
@@ -1361,6 +1424,7 @@
     var applyBtnClass = isOrg ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
 
     card.innerHTML =
+      '<div class="chg-card-frame"><div class="chg-card-inner">' +
       '<div class="chg-card-head">' +
         '<div class="chg-tools">' +
           '<button class="chg-tool" type="button" data-act="saveImg" aria-label="' + escapeHtml(t('saveImage', lang)) + '" title="' + escapeHtml(t('saveImage', lang)) + '">' + chgSaveIco() + '</button>' +
@@ -1381,7 +1445,7 @@
       '<div class="chg-card-actions">' +
         '<button class="' + diffBtnClass + '" data-act="openDiff">' + escapeHtml(t('changesPage', lang)) + '</button>' +
         '<button class="' + applyBtnClass + '" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
-      '</div>';
+      '</div></div></div>';
 
     icon.hidden = false;
     card.hidden = isMinimized(empId, alert);
@@ -1421,15 +1485,11 @@
         return;
       }
       if (act === 'saveImg') {
-        var saveBtn = card.querySelector('[data-act="saveImg"]');
-        if (saveBtn) saveBtn.disabled = true;
-        saveAlertLabel(card, lang).then(function () {
-          if (saveBtn) saveBtn.disabled = false;
-        });
+        saveAlertLabel(card, lang);
         return;
       }
       if (act === 'print') {
-        printAlertLabel(card);
+        printAlertLabel(card, lang);
         return;
       }
       if (act === 'openDiff') {

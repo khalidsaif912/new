@@ -112,6 +112,10 @@ def test_change_alert_popup_survives_generate():
     assert "chg-tools" in js
     assert 'data-act="saveImg"' in js
     assert 'data-act="print"' in js
+    assert "function captureAlertCard" in js
+    assert "function paintAlertStripeFrame" in js
+    assert "chg-card-inner" in js
+    assert "chg-card-frame" in js
     assert ".chg-tab.active" in js and "#1b5e20" in js
     assert "chg-roster-name" in js
     assert "function buildOrgWideAlertFromDiff" in js

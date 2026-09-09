@@ -1265,7 +1265,7 @@ I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§�
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
 IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
-CHANGE_ALERT_VER = "20260909d"
+CHANGE_ALERT_VER = "20260909f"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
