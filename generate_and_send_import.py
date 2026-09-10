@@ -1934,6 +1934,11 @@ def main() -> None:
 
     write_legacy_roster_site_import_redirect(repo_root)
     try:
+        from mantle_overlay_snapshot import snapshot_banner_overlay
+        snapshot_banner_overlay(repo_root / "docs")
+    except Exception as e:
+        print(f"WARNING: banner overlay snapshot skipped: {e}")
+    try:
         name_i18n.flush()
     except Exception as e:
         print(f"WARNING: could not write name translations: {e}")

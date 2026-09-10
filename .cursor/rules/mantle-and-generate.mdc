@@ -1,0 +1,19 @@
+---
+description: Mantle rate-limit and generate durability for banners/ticker
+alwaysApply: true
+---
+
+# Mantle + roster generate
+
+Live banners, ticker messages, and visit counts live on MantleDB (`roster-site-visits`). The published site is GitHub Pages static files.
+
+Do not poll Mantle every few seconds. Keep backoff + local cache in `docs/holiday-ticker.js`, `docs/banner-store.js`, and `docs/site-visits.js`. After a 429, stop retrying.
+
+Roster generate must not drop this:
+
+- Script tags come from `LOAD_LOCAL_ENHANCEMENTS_*` in `scripts/roster_cta_snippets.py` via `MANTLE_CLIENT_VER`. Bump that constant when those JS files change.
+- `generate_and_send.py` / `generate_and_send_import.py` rewrite HTML from those snippets. They must not hardcode old `?v=` strings.
+- Shared JS under `docs/*.js` is not regenerated from Excel. Edit the JS files, not a one-off date page.
+- Banner add/remove overlay is snapshotted to `docs/assets/banners/overlay.json` on generate so deletions survive Mantle outages after the next successful snapshot + publish.
+
+Fix the client and the snippet/generator, not hundreds of HTML files by hand, unless you also update the snippet version.

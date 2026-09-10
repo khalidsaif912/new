@@ -465,26 +465,30 @@
   }
 
   function fetchCountsDoc() {
+    if (mantleIsBackedOff()) return Promise.reject(new Error('backoff'));
     return fetch(COUNTS_URL + '?ts=' + Date.now(), {
       headers: visitHeaders(),
       cache: 'no-store'
     }).then(function (r) {
+      mantleNoteStatus(r.status);
       if (r.status === 404) return null;
-      if (!r.ok) throw new Error('counts read');
+      if (!r.ok) throw new Error('counts read ' + r.status);
       return r.json();
     });
   }
 
   function postCountsDoc(doc, attempt) {
+    if (mantleIsBackedOff()) return Promise.reject(new Error('backoff'));
     attempt = attempt || 0;
     return fetch(COUNTS_URL, {
       method: 'POST',
       headers: visitHeaders(),
       body: JSON.stringify(doc)
     }).then(function (r) {
+      mantleNoteStatus(r.status);
       if (!r.ok) throw new Error('counts write ' + r.status);
     }).catch(function (err) {
-      if (attempt >= 2) throw err;
+      if (mantleIsBackedOff() || attempt >= 2) throw err;
       return new Promise(function (resolve) {
         setTimeout(resolve, 350 * (attempt + 1));
       }).then(function () {
@@ -597,11 +601,13 @@
   }
 
   function fetchVisitLogList() {
+    if (mantleIsBackedOff()) return Promise.reject(new Error('backoff'));
     return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), {
       headers: visitHeaders(),
       cache: 'no-store'
     }).then(function (r) {
-      if (!r.ok) throw new Error('read');
+      mantleNoteStatus(r.status);
+      if (!r.ok) throw new Error('read ' + r.status);
       return r.json();
     }).then(function (cur) {
       return Array.isArray(cur && cur.log) ? cur.log.slice() : [];
@@ -1042,6 +1048,23 @@
   var VISIT_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/index';
   var COUNTS_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/counts';
   var PHONE_LOG_URL = 'https://mantledb.sh/v2/' + VISIT_LOG_NS + '/phones';
+  var MANTLE_BACKOFF_KEY = 'rosterMantleBackoffUntil';
+
+  function mantleIsBackedOff() {
+    try {
+      return Number(localStorage.getItem(MANTLE_BACKOFF_KEY) || 0) > Date.now();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function mantleNoteStatus(status) {
+    if (Number(status) !== 429) return;
+    try {
+      localStorage.setItem(MANTLE_BACKOFF_KEY, String(Date.now() + 45 * 60 * 1000));
+    } catch (e) {}
+  }
+
   // v4: also log guests without saved employee id (once/day per device).
   // v5: still one row per visitor/day, but merge every distinct page visited that day.
   var VISIT_LOGGED_KEY = 'rosterVisitLoggedDayV4';
@@ -1190,6 +1213,7 @@
 
   function postVisitRow(row, stamp, attempt) {
     attempt = attempt || 0;
+    if (mantleIsBackedOff()) return Promise.resolve(null);
     var headers = visitHeaders();
     var pageKey = String((row && row.page) || '').trim() || 'site';
     var at = Number(row && row.at) || Date.now();
@@ -1207,7 +1231,8 @@
 
     return fetch(VISIT_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
-        if (!r.ok) throw new Error('read');
+        mantleNoteStatus(r.status);
+        if (!r.ok) throw new Error('read ' + r.status);
         return r.json();
       })
       .then(function (cur) {
@@ -1288,6 +1313,7 @@
           headers: headers,
           body: body
         }).then(function (r) {
+          mantleNoteStatus(r.status);
           if (!r.ok) throw new Error('write ' + r.status);
           try {
             localStorage.setItem(VISIT_LOGGED_KEY, stamp);
@@ -1308,7 +1334,7 @@
         });
       })
       .catch(function (err) {
-        if (attempt >= 2) throw err;
+        if (mantleIsBackedOff() || attempt >= 2) throw err;
         return new Promise(function (resolve) {
           setTimeout(resolve, 400 * (attempt + 1));
         }).then(function () {
@@ -1497,12 +1523,14 @@
   }
 
   function savePhoneToMantle(row) {
+    if (mantleIsBackedOff()) return Promise.reject(new Error('backoff'));
     var headers = visitHeaders();
     return fetch(PHONE_LOG_URL + '?ts=' + Date.now(), { headers: headers, cache: 'no-store' })
       .then(function (r) {
+        mantleNoteStatus(r.status);
         // First save: document may not exist yet (404) — treat as empty list.
         if (r.status === 404) return {};
-        if (!r.ok) throw new Error('read');
+        if (!r.ok) throw new Error('read ' + r.status);
         return r.json().catch(function () { return {}; });
       })
       .then(function (cur) {
@@ -1517,7 +1545,8 @@
           headers: headers,
           body: JSON.stringify({ phones: kept })
         }).then(function (r) {
-          if (!r.ok) throw new Error('write');
+          mantleNoteStatus(r.status);
+          if (!r.ok) throw new Error('write ' + r.status);
         });
       });
   }

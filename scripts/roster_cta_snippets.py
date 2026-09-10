@@ -1266,6 +1266,8 @@ I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§�
 IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
 CHANGE_ALERT_VER = "20260909j"
+# Ticker + banners + visit counts (Mantle backoff/cache). Bump when those JS files change.
+MANTLE_CLIENT_VER = "20260910a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1283,13 +1285,13 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/open-current-shift.js?v=20260908s');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260909v');
+  addScript(root + '/site-visits.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/emp-contact.js?v=20260902c');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-  addScript(root + '/banner-store.js?v=20260910a');
-  addScript(root + '/banner-changer.js?v=20260910a');
+  addScript(root + '/banner-store.js?v=""" + MANTLE_CLIENT_VER + """');
+  addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=' + ver);
@@ -1298,7 +1300,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
-    addScript(root + '/holiday-ticker.js?v=20260910a');
+    addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
@@ -1328,10 +1330,10 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
-  addScript(root + '/site-visits.js?v=20260909v');
+  addScript(root + '/site-visits.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
-  addScript(root + '/banner-store.js?v=20260910a');
-  addScript(root + '/banner-changer.js?v=20260910a');
+  addScript(root + '/banner-store.js?v=""" + MANTLE_CLIENT_VER + """');
+  addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/date-banner-nav.js?v=20260902a');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
@@ -1342,7 +1344,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
-    addScript(root + '/holiday-ticker.js?v=20260910a');
+    addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);

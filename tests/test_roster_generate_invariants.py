@@ -150,3 +150,58 @@ def test_change_alert_popup_survives_generate():
     )
     assert tag in html
 
+
+def test_mantle_clients_survive_generate():
+    from generate_and_send import page_shell_html
+    from roster_cta_snippets import (
+        LOAD_LOCAL_ENHANCEMENTS_EXPORT,
+        LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+        MANTLE_CLIENT_VER,
+    )
+
+    ticker = (ROOT / "docs" / "holiday-ticker.js").read_text(encoding="utf-8")
+    store = (ROOT / "docs" / "banner-store.js").read_text(encoding="utf-8")
+    visits = (ROOT / "docs" / "site-visits.js").read_text(encoding="utf-8")
+    overlay = (ROOT / "docs" / "assets" / "banners" / "overlay.json").read_text(encoding="utf-8")
+    snippets = (ROOT / "scripts" / "roster_cta_snippets.py").read_text(encoding="utf-8")
+    gen = (ROOT / "generate_and_send.py").read_text(encoding="utf-8")
+    imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
+
+    assert "document.hidden ? 20000 : 4000" not in ticker
+    assert "POLL_VISIBLE_MS = 180000" in ticker
+    assert "RosterMantle" in ticker
+    assert "rosterMantleBackoffUntil" in ticker
+    assert "rosterTickerStoreV1" in ticker
+    assert "overlay.json" in store
+    assert "rosterBannerOverlayV1" in store
+    assert "rosterMantleBackoffUntil" in visits
+    assert '"removed"' in overlay
+    assert "MANTLE_CLIENT_VER" in snippets
+    assert "snapshot_banner_overlay" in gen
+    assert "snapshot_banner_overlay" in imp
+
+    tag_ticker = "holiday-ticker.js?v=" + MANTLE_CLIENT_VER
+    tag_store = "banner-store.js?v=" + MANTLE_CLIENT_VER
+    tag_visits = "site-visits.js?v=" + MANTLE_CLIENT_VER
+    for blob in (LOAD_LOCAL_ENHANCEMENTS_EXPORT, LOAD_LOCAL_ENHANCEMENTS_IMPORT):
+        assert tag_ticker in blob
+        assert tag_store in blob
+        assert tag_visits in blob
+        assert blob.count("holiday-ticker.js") == 1
+
+    html = page_shell_html(
+        date_label="8 September 2026",
+        iso_date="2026-09-08",
+        employees_total=1,
+        departments_total=1,
+        dept_cards_html="<div class='deptCard'></div>",
+        cta_url="/now/",
+        sent_time="15:00",
+        is_now_page=False,
+        min_date="2026-08-01",
+        max_date="2026-10-31",
+    )
+    assert tag_ticker in html
+    assert tag_store in html
+    assert tag_visits in html
+

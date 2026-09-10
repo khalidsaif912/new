@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="حساب الكميات">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="حساب الكميات">
 <meta name="theme-color" content="#12181F">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>حساب الكميات — Quantity Calculation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Rubik:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
+    <style>
 :root{
   --ink:#12181F; --ink-2:#1C2733;
   --steel:#2E5D7D; --steel-2:#3F7BA3;
@@ -252,8 +252,8 @@ main{padding:16px;}
   .tab{min-height:42px;}
   .del{min-width:22px;min-height:22px;}
   .add-btn,.btn{min-height:46px;}
-}
-</style>
+        }
+    </style>
 </head>
 <body>
 <div class="app">
@@ -263,12 +263,12 @@ main{padding:16px;}
       <div class="hd-title">
         <div class="mark">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
-        </div>
+                        </div>
         <div>
           <h1>حساب الكميات</h1>
           <small>QUANTITY CALCULATION</small>
-        </div>
-      </div>
+                        </div>
+                    </div>
       <div class="hd-icons">
         <button class="icon-btn" title="الرئيسية" id="homeBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
@@ -278,9 +278,9 @@ main{padding:16px;}
         </button>
         <button class="icon-btn" title="تثبيت التطبيق" id="installBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-        </button>
-      </div>
-    </div>
+                    </button>
+                </div>
+            </div>
   </header>
 
   <main>
@@ -289,19 +289,19 @@ main{padding:16px;}
         <div>
           <span class="lbl">رقم الشحنة AWB</span>
           <input type="text" id="awbInput" inputmode="numeric" placeholder="12345678" maxlength="14">
-        </div>
+                    </div>
         <div>
           <span class="lbl">الكمية QTY</span>
           <input type="number" id="qtyInput" placeholder="0" min="1">
-        </div>
-      </div>
+                </div>
+            </div>
       <button class="add-btn" id="addBtn">إضافة / تحديث الشحنة</button>
-    </div>
+        </div>
 
     <div class="form-collapsed" id="formCollapsed">
       <span>الشحنة النشطة: <b id="collapsedAwb" style="font-family:'IBM Plex Mono';direction:ltr;"></b></span>
       <button id="expandBtn">+ شحنة جديدة</button>
-    </div>
+            </div>
 
     <div class="empty" id="emptyState">
       <svg viewBox="0 0 64 64" fill="none">
@@ -319,18 +319,18 @@ main{padding:16px;}
         <div>
           <span class="awb" id="panelAwb"></span>
           <span class="qty" id="panelQty"></span>
-        </div>
-      </div>
+                </div>
+                    </div>
 
       <div class="gauge">
         <div class="gauge-top"><span>المستخدم / الإجمالي</span><b id="gaugeText">0 / 0</b></div>
         <div class="gauge-bar"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
         <div class="gauge-status ok" id="gaugeStatus">✓ متبقٍ 0</div>
-      </div>
+                    </div>
 
       <div class="parts-grid" id="partsGrid"></div>
       <div class="hint">اضغط مطولاً على أي جزء لتكراره على عدة باليتات (2–10)</div>
-    </div>
+                </div>
   </main>
 
   <div class="footer">
@@ -338,30 +338,30 @@ main{padding:16px;}
     <div style="display:flex;align-items:center;gap:10px;">
       <span>الشحنات: <b class="count" id="footerCount">0</b></span>
       <div class="info" id="infoBtn">!</div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <!-- alert -->
 <div class="overlay" id="alertOverlay">
   <div class="sheet">
-    <h3 id="alertTitle">تنبيه</h3>
+            <h3 id="alertTitle">تنبيه</h3>
     <p id="alertMsg"></p>
     <div class="actions"><button class="btn primary" style="width:100%" id="alertOk">حسناً</button></div>
-  </div>
-</div>
+        </div>
+    </div>
 
 <!-- confirm -->
 <div class="overlay" id="confirmOverlay">
   <div class="sheet">
-    <h3 id="confirmTitle">تأكيد</h3>
+            <h3 id="confirmTitle">تأكيد</h3>
     <p id="confirmMsg"></p>
     <div class="actions">
       <button class="btn ghost-btn" id="confirmCancel">إلغاء</button>
       <button class="btn danger" id="confirmOk">تأكيد</button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <!-- repeat -->
 <div class="overlay bottom" id="repeatOverlay">
@@ -453,13 +453,13 @@ function addShipment(){
   const isNew = !shipments[awb];
   if(isNew){
     shipments[awb] = { quantity: qty, parts:[{id:partIdSeq++, qty:''}], celebrated:false };
-  } else {
+            } else {
     shipments[awb].quantity = qty;
   }
   activeTab = awb;
   collapseForm(awb);
   renderAll();
-  saveData();
+            saveData();
   toast(isNew ? 'تمت إضافة الشحنة' : 'تم تحديث الشحنة');
   setTimeout(()=>{
     const firstInput = document.querySelector('.part input');
@@ -514,7 +514,7 @@ function deletePartAsk(awb, partId){
   showConfirm('حذف هذا الجزء؟', ()=>{
     s.parts = s.parts.filter(p=>p.id!==partId);
     renderAll();
-    saveData();
+            saveData();
     toast('تم حذف الجزء');
   });
 }
@@ -529,7 +529,7 @@ function updatePartQty(awb, partId, val){
     if(rem===0 && !s.celebrated){ s.celebrated = true; celebrate(); }
     if(rem!==0) s.celebrated = false;
     renderGauge(awb); renderTabs(); renderFooter();
-    saveData();
+                    saveData();
   }
   const inp = document.querySelector(`.part[data-id="${partId}"] input`);
   if(inp && inp.value !== clean) inp.value = clean;
@@ -569,7 +569,7 @@ function confirmRepeat(n){
   s.parts.splice(idx,1,...newParts);
   $('repeatOverlay').classList.remove('show');
   renderAll();
-  saveData();
+                saveData();
   toast(`تم تكرار الجزء ×${n}`);
 }
 $('repeatCancel').onclick = ()=> $('repeatOverlay').classList.remove('show');
@@ -746,10 +746,10 @@ function loadData(){
     if(!keys.length) return false;
     activeTab = (data.activeTab && shipments[data.activeTab]) ? data.activeTab : keys[0];
     collapseForm(activeTab);
-    return true;
+                    return true;
   }catch(e){
-    return false;
-  }
+            return false;
+        }
 }
 
 function getRosterHomeUrl(){
@@ -769,8 +769,8 @@ function getRosterHomeUrl(){
 
 function refreshCalculatorPage(){
   const url = new URL(window.location.href);
-  url.searchParams.set('v', String(Date.now()));
-  window.location.replace(url.toString());
+            url.searchParams.set('v', String(Date.now()));
+                window.location.replace(url.toString());
 }
 
 let deferredPwaPrompt = null;
@@ -784,7 +784,7 @@ function setupPwa(){
     return;
   }
   window.addEventListener('beforeinstallprompt', e=>{
-    e.preventDefault();
+                    e.preventDefault();
     deferredPwaPrompt = e;
   });
   window.addEventListener('appinstalled', ()=>{
@@ -825,7 +825,7 @@ if(loadData()){
 renderAll();
 window.addEventListener('beforeunload', saveData);
 setInterval(()=>{ if(Object.keys(shipments).length) saveData(); }, 60000);
-</script>
+    </script>
 <script defer src="../site-visits.js?v=20260809a"></script>
 </body>
 </html>

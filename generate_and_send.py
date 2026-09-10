@@ -4107,6 +4107,12 @@ def main():
         with open("docs/now/index.html", "w", encoding="utf-8") as f:
             f.write(html_now)
 
+        try:
+            from mantle_overlay_snapshot import snapshot_banner_overlay
+            snapshot_banner_overlay(Path("docs"))
+        except Exception as e:
+            print(f"WARNING: banner overlay snapshot skipped: {e}")
+
         print("⚠️ Skipping email (no current-month roster workbook).")
         return
 
@@ -4255,6 +4261,12 @@ def main():
             f.write(_src)
 
     write_site_last_updated_json(datetime.now(TZ))
+
+    try:
+        from mantle_overlay_snapshot import snapshot_banner_overlay
+        snapshot_banner_overlay(Path("docs"))
+    except Exception as e:
+        print(f"WARNING: banner overlay snapshot skipped: {e}")
 
     # Persist any newly discovered Arabic name translations for owner review.
     try:

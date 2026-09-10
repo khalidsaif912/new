@@ -117,6 +117,10 @@
     return bannersAssetPath() + 'manifest.json';
   }
 
+  function overlayFileUrl() {
+    return bannersAssetPath() + 'overlay.json';
+  }
+
   function mantleHeaders(write) {
     var h = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
     if (write) h['Content-Type'] = 'application/json';
@@ -255,15 +259,32 @@
     }
   }
 
+  async function loadStaticOverlayFile() {
+    try {
+      var res = await fetch(overlayFileUrl() + '?ts=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return { removed: [], custom: [] };
+      return normalizeOverlay(await res.json());
+    } catch (e) {
+      return { removed: [], custom: [] };
+    }
+  }
+
+  function overlayHasItems(ov) {
+    return !!(ov && ((ov.removed && ov.removed.length) || (ov.custom && ov.custom.length)));
+  }
+
   async function loadOverlay() {
+    var staticOv = await loadStaticOverlayFile();
     var cached = mantle().readCache(OVERLAY_CACHE_KEY);
+    if (cached && typeof cached === 'object') overlay = normalizeOverlay(cached);
+    else if (overlayHasItems(staticOv)) overlay = staticOv;
     try {
       var res = await mantle().fetchRes(MANTLE_URL + '?ts=' + Date.now(), {
         headers: mantleHeaders(false),
         cache: 'no-store',
       });
       if (res.status === 404) {
-        overlay = { removed: [], custom: [] };
+        overlay = overlayHasItems(staticOv) ? staticOv : { removed: [], custom: [] };
         overlayFetchOk = true;
         mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
         return;
@@ -273,10 +294,13 @@
       overlayFetchOk = true;
       mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
     } catch (e) {
-      // Keep prior overlay / disk cache; do NOT claim a successful empty catalog.
       overlayFetchOk = false;
       if (cached && typeof cached === 'object') {
         overlay = normalizeOverlay(cached);
+        overlayFetchOk = true;
+      } else if (overlayHasItems(staticOv)) {
+        overlay = staticOv;
+        overlayFetchOk = true;
       } else {
         overlay = overlay || { removed: [], custom: [] };
       }

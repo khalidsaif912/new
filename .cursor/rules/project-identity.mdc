@@ -16,3 +16,5 @@ This workspace is **roster-site**: a Python 3.10+ local roster generator and sta
 When asked to open the site locally: reuse port 8011 if it already serves `docs/`; otherwise start `scripts/serve_docs.ps1`, then open the URL.
 
 Do not push unless explicitly asked. Prefer archive over delete for legacy files.
+
+Ticker/banners/visits: edit shared `docs/*.js` and `MANTLE_CLIENT_VER` in `scripts/roster_cta_snippets.py` so new generate runs keep the fix. See `.cursor/rules/mantle-and-generate.mdc`.
