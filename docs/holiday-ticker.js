@@ -5,6 +5,81 @@
 (function () {
   'use strict';
 
+  (function attachRosterMantle(g) {
+    if (!g || g.RosterMantle) return;
+    var BACKOFF_KEY = 'rosterMantleBackoffUntil';
+    var BACKOFF_N_KEY = 'rosterMantleBackoffN';
+    var inflight = Object.create(null);
+    function now() { return Date.now(); }
+    function readNum(key) {
+      try { return Number(g.localStorage.getItem(key) || 0) || 0; } catch (e) { return 0; }
+    }
+    function writeNum(key, n) {
+      try { g.localStorage.setItem(key, String(n)); } catch (e) {}
+    }
+    function backoffUntil() { return readNum(BACKOFF_KEY); }
+    function backingOff() { return now() < backoffUntil(); }
+    function remainingMs() { return Math.max(0, backoffUntil() - now()); }
+    function markRateLimit(res) {
+      var n = Math.min(readNum(BACKOFF_N_KEY) + 1, 6);
+      writeNum(BACKOFF_N_KEY, n);
+      var wait = Math.min(3600000, Math.round(600000 * Math.pow(1.5, n - 1)));
+      try {
+        var ra = res && res.headers && res.headers.get && Number(res.headers.get('retry-after'));
+        if (ra > 0) wait = Math.max(wait, Math.min(ra * 1000, 3600000));
+      } catch (e) {}
+      writeNum(BACKOFF_KEY, now() + wait);
+      return wait;
+    }
+    function clearBackoff() {
+      try { g.localStorage.removeItem(BACKOFF_N_KEY); } catch (e) {}
+    }
+    function fetchRes(url, opts) {
+      opts = opts || {};
+      var method = String(opts.method || 'GET').toUpperCase();
+      if (backingOff() && !opts.force) {
+        var err = new Error('backoff');
+        err.code = 'backoff';
+        return Promise.reject(err);
+      }
+      var key = method + ' ' + String(url).replace(/\?ts=\d+/g, '');
+      if (method === 'GET' && inflight[key]) return inflight[key];
+      var p = fetch(url, opts).then(function (res) {
+        if (res.status === 429) {
+          markRateLimit(res);
+          var err = new Error('rate');
+          err.code = 'rate';
+          err.status = 429;
+          throw err;
+        }
+        if (res.ok) clearBackoff();
+        return res;
+      }).finally(function () {
+        if (inflight[key] === p) delete inflight[key];
+      });
+      if (method === 'GET') inflight[key] = p;
+      return p;
+    }
+    function readCache(key) {
+      try {
+        var raw = g.localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+    function writeCache(key, value) {
+      try { g.localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+    }
+    g.RosterMantle = {
+      backingOff: backingOff,
+      remainingMs: remainingMs,
+      markRateLimit: markRateLimit,
+      clearBackoff: clearBackoff,
+      fetchRes: fetchRes,
+      readCache: readCache,
+      writeCache: writeCache
+    };
+  })(typeof window !== 'undefined' ? window : typeof globalThis !== 'undefined' ? globalThis : this);
+
   var PREVIEW_HOLIDAYS = true; // also scroll upcoming holidays while empty/previewing
   var TICKER_ID = 'holidayTicker';
   var STYLE_ID = 'holidayTickerCss';
@@ -12,10 +87,18 @@
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
   var MANTLE_IMG_NS = 'https://mantledb.sh/v2/roster-site-visits/ticker-img-';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+  var STORE_CACHE_KEY = 'rosterTickerStoreV1';
+  var IMG_DISK_KEY = 'rosterTickerImgCacheV1';
+  var POLL_AT_KEY = 'rosterTickerPollAt';
+  var POLL_VISIBLE_MS = 180000;
+  var POLL_CHAT_MS = 30000;
+  var POLL_HIDDEN_MS = 360000;
+  var CROSS_TAB_MS = 45000;
   var EMOJI_DEFAULTS = { '82437': '1f349' };
   var holidaysCache = null;
   var messagesCache = null;
   var imageCache = Object.create(null);
+  var lastStoreFromNetwork = false;
   var showModeCache = 'both';
   var scrollSpeedCache = 'slow';
   var staffById = null;
@@ -130,6 +213,58 @@
       'Content-Type': 'application/json',
       'X-Mantle-Key': MANTLE_KEY
     };
+  }
+
+  function mantle() {
+    return (typeof window !== 'undefined' && window.RosterMantle) || {
+      backingOff: function () { return false; },
+      remainingMs: function () { return 0; },
+      fetchRes: function (url, opts) { return fetch(url, opts); },
+      readCache: function () { return null; },
+      writeCache: function () {}
+    };
+  }
+
+  function recentlyPolled(minMs) {
+    try {
+      var t = Number(localStorage.getItem(POLL_AT_KEY) || 0);
+      return t && Date.now() - t < (minMs || CROSS_TAB_MS);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markPolled() {
+    try { localStorage.setItem(POLL_AT_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  function readCachedStore() {
+    var raw = mantle().readCache(STORE_CACHE_KEY);
+    return raw && typeof raw === 'object' ? normalizeStore(raw) : null;
+  }
+
+  function writeCachedStore(store) {
+    mantle().writeCache(STORE_CACHE_KEY, normalizeStore(store));
+  }
+
+  function readImgDisk(id) {
+    var all = mantle().readCache(IMG_DISK_KEY) || {};
+    return safeImageData(all[id]);
+  }
+
+  function writeImgDisk(id, data) {
+    if (!id || !data) return;
+    var all = mantle().readCache(IMG_DISK_KEY) || {};
+    if (!all || typeof all !== 'object') all = {};
+    all[id] = data;
+    var keys = Object.keys(all);
+    var blob = JSON.stringify(all);
+    while (blob.length > 1800000 && keys.length > 1) {
+      delete all[keys.shift()];
+      keys = Object.keys(all);
+      blob = JSON.stringify(all);
+    }
+    mantle().writeCache(IMG_DISK_KEY, all);
   }
 
   function digitsOnly(v) {
@@ -300,14 +435,34 @@
     return { id: id, name: '', ok: false, reason: 'unknown' };
   }
 
-  async function readFullStore() {
-    var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), {
-      headers: mantleHeaders(),
-      cache: 'no-store'
-    });
-    if (!res.ok) throw new Error('read');
-    var json = await res.json();
-    return normalizeStore(json);
+  async function readFullStore(requireNetwork) {
+    lastStoreFromNetwork = false;
+    var cached = readCachedStore();
+    if (!requireNetwork) {
+      if (mantle().backingOff() && cached) return cached;
+      if (recentlyPolled(CROSS_TAB_MS) && cached) return cached;
+    } else if (mantle().backingOff()) {
+      var early = new Error('backoff');
+      early.code = 'backoff';
+      throw early;
+    }
+    try {
+      var res = await mantle().fetchRes(MANTLE_URL + '?ts=' + Date.now(), {
+        headers: mantleHeaders(),
+        cache: 'no-store',
+        force: !!requireNetwork
+      });
+      if (!res.ok) throw new Error('read');
+      var json = await res.json();
+      var store = normalizeStore(json);
+      writeCachedStore(store);
+      markPolled();
+      lastStoreFromNetwork = true;
+      return store;
+    } catch (e) {
+      if (!requireNetwork && cached) return cached;
+      throw e;
+    }
   }
 
   async function writeFullStore(store) {
@@ -316,12 +471,16 @@
     payload.approved = (payload.approved || []).slice(0, 40);
     while (JSON.stringify(payload).length > 50000 && payload.pending.length > 1) payload.pending.pop();
     while (JSON.stringify(payload).length > 50000 && payload.approved.length > 1) payload.approved.pop();
-    var res = await fetch(MANTLE_URL, {
+    var res = await mantle().fetchRes(MANTLE_URL, {
       method: 'POST',
       headers: mantleHeaders(),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      force: true
     });
     if (!res.ok) throw new Error('write');
+    writeCachedStore(payload);
+    markPolled();
+    lastStoreFromNetwork = true;
   }
 
   function validTickerId(id) {
@@ -346,27 +505,37 @@
     if (!validTickerId(id)) throw new Error('id');
     var safe = safeImageData(dataUrl);
     if (!safe) throw new Error('img');
-    var res = await fetch(imageDocUrl(id), {
+    var res = await mantle().fetchRes(imageDocUrl(id), {
       method: 'POST',
       headers: mantleHeaders(),
-      body: JSON.stringify({ d: safe, at: Date.now() })
+      body: JSON.stringify({ d: safe, at: Date.now() }),
+      force: true
     });
     if (!res.ok) throw new Error('imgwrite');
     imageCache[id] = safe;
+    writeImgDisk(id, safe);
   }
 
   async function loadTickerImage(id) {
     if (!validTickerId(id)) return '';
     if (imageCache[id]) return imageCache[id];
+    var disk = readImgDisk(id);
+    if (disk) {
+      imageCache[id] = disk;
+      return disk;
+    }
     try {
-      var res = await fetch(imageDocUrl(id) + '?ts=' + Date.now(), {
+      var res = await mantle().fetchRes(imageDocUrl(id) + '?ts=' + Date.now(), {
         headers: { 'X-Mantle-Key': MANTLE_KEY },
         cache: 'no-store'
       });
       if (!res.ok) return '';
       var json = await res.json();
       var safe = safeImageData(json && json.d);
-      if (safe) imageCache[id] = safe;
+      if (safe) {
+        imageCache[id] = safe;
+        writeImgDisk(id, safe);
+      }
       return safe;
     } catch (e) {
       return '';
@@ -1265,6 +1434,11 @@
           sendBtn.textContent = need ? 'إرسال' : 'نشر';
           renderChatFeed(store.approved || [], resolvedEmp.id || readSavedIdentity().id);
         } catch (e) {
+          var cached = readCachedStore();
+          if (cached) {
+            renderChatFeed(cached.approved || [], resolvedEmp.id || readSavedIdentity().id);
+            return;
+          }
           var feed = document.getElementById('htcFeed');
           if (feed) feed.innerHTML = '<div class="htc-empty">تعذر تحميل الرسائل.</div>';
         }
@@ -1396,7 +1570,7 @@
         sendBtn.disabled = true;
         statusEl.textContent = pendingImage ? 'جاري رفع الصورة…' : 'جاري الإرسال…';
         try {
-          var store = await readFullStore();
+          var store = await readFullStore(true);
           var needApproval = store.requireApproval !== false;
           var emoji = await resolveEmoji(emp.id);
           var row = {
@@ -1434,7 +1608,9 @@
           await refreshFeed();
         } catch (e) {
           statusEl.className = 'htc-status err';
-          statusEl.textContent = 'تعذر الإرسال. حاول مرة أخرى.';
+          statusEl.textContent = (e && (e.code === 'backoff' || e.code === 'rate' || e.status === 429))
+            ? 'الخادم مشغول الآن. أعد المحاولة بعد قليل، والرسائل المحفوظة ستظهر من الجهاز.'
+            : 'تعذر الإرسال. حاول مرة أخرى.';
         } finally {
           sendBtn.disabled = false;
         }
@@ -1735,11 +1911,22 @@
   function loadTickerStore() {
     if (messagesCache) return messagesCache;
     messagesCache = readFullStore().catch(function () {
+      var cached = readCachedStore();
+      if (cached) return cached;
       showModeCache = 'both';
       scrollSpeedCache = 'slow';
       return normalizeStore({});
     });
     return messagesCache;
+  }
+
+  function nextPollDelay() {
+    if (mantle().backingOff()) {
+      return Math.min(600000, Math.max(120000, mantle().remainingMs() + 4000));
+    }
+    var modal = document.getElementById(MODAL_ID);
+    if (modal && modal.classList.contains('on')) return POLL_CHAT_MS;
+    return document.hidden ? POLL_HIDDEN_MS : POLL_VISIBLE_MS;
   }
 
   function refresh() {
@@ -1749,7 +1936,7 @@
       showModeCache = store.showMode;
       scrollSpeedCache = store.scrollSpeed;
       var removed = pruneExpired(store);
-      if (removed) {
+      if (removed && lastStoreFromNetwork) {
         writeFullStore(store).catch(function () {});
       }
       noticeIncoming(store);
@@ -1774,9 +1961,9 @@
     }, 1500);
     function pollMessages() {
       refresh();
-      setTimeout(pollMessages, document.hidden ? 20000 : 4000);
+      setTimeout(pollMessages, nextPollDelay());
     }
-    setTimeout(pollMessages, 4000);
+    setTimeout(pollMessages, nextPollDelay());
     document.addEventListener('visibilitychange', function () {
       marqueePaused = false;
       marqueeLastTs = 0;

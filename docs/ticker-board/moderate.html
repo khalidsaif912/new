@@ -346,6 +346,8 @@
     var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ticker-messages';
     var MANTLE_IMG_NS = 'https://mantledb.sh/v2/roster-site-visits/ticker-img-';
     var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
+    var STORE_CACHE_KEY = 'rosterTickerStoreV1';
+    var IMG_DISK_KEY = 'rosterTickerImgCacheV1';
     var imageCache = Object.create(null);
     var tab = 'messages';
     var filter = 'pending';
@@ -438,6 +440,56 @@
       return { 'Content-Type': 'application/json', 'X-Mantle-Key': MANTLE_KEY };
     }
 
+    function mantle() {
+      return window.RosterMantle || null;
+    }
+
+    function backingOff() {
+      if (mantle() && mantle().backingOff()) return true;
+      try {
+        return Date.now() < Number(localStorage.getItem('rosterMantleBackoffUntil') || 0);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function mark429(res) {
+      if (mantle() && mantle().markRateLimit) mantle().markRateLimit(res);
+      else {
+        try {
+          var until = Date.now() + 600000;
+          localStorage.setItem('rosterMantleBackoffUntil', String(until));
+        } catch (e) {}
+      }
+    }
+
+    function readCachedStore() {
+      try {
+        var raw = localStorage.getItem(STORE_CACHE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+
+    function writeCachedStore(next) {
+      try { localStorage.setItem(STORE_CACHE_KEY, JSON.stringify(next)); } catch (e) {}
+    }
+
+    function readImgDisk(id) {
+      try {
+        var all = JSON.parse(localStorage.getItem(IMG_DISK_KEY) || '{}');
+        return safeImageData(all[id]);
+      } catch (e) { return ''; }
+    }
+
+    function writeImgDisk(id, data) {
+      if (!id || !data) return;
+      try {
+        var all = JSON.parse(localStorage.getItem(IMG_DISK_KEY) || '{}');
+        all[id] = data;
+        localStorage.setItem(IMG_DISK_KEY, JSON.stringify(all));
+      } catch (e) {}
+    }
+
     function messageHasImage(m) {
       return !!(m && (m.img === 1 || m.img === true || m.img === '1'));
     }
@@ -452,25 +504,35 @@
       id = String(id || '');
       if (!/^t[a-z0-9]{8,32}$/i.test(id)) return '';
       if (imageCache[id]) return imageCache[id];
+      var disk = readImgDisk(id);
+      if (disk) {
+        imageCache[id] = disk;
+        return disk;
+      }
+      if (backingOff()) return '';
       try {
         var res = await fetch(MANTLE_IMG_NS + encodeURIComponent(id) + '?ts=' + Date.now(), {
           headers: headers(),
           cache: 'no-store'
         });
+        if (res.status === 429) {
+          mark429(res);
+          return '';
+        }
         if (!res.ok) return '';
         var json = await res.json();
         var safe = safeImageData(json && json.d);
-        if (safe) imageCache[id] = safe;
+        if (safe) {
+          imageCache[id] = safe;
+          writeImgDisk(id, safe);
+        }
         return safe;
       } catch (e) {
         return '';
       }
     }
 
-    async function readStore() {
-      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), { headers: headers(), cache: 'no-store' });
-      if (!res.ok) throw new Error('read');
-      var json = await res.json();
+    function normalizeLoaded(json) {
       return {
         pending: Array.isArray(json.pending) ? json.pending.slice() : [],
         approved: Array.isArray(json.approved) ? json.approved.slice() : [],
@@ -480,6 +542,24 @@
         scrollSpeed: normalizeScrollSpeed(json.scrollSpeed),
         expireHours: normalizeExpireHours(json.expireHours)
       };
+    }
+
+    async function readStore(requireNetwork) {
+      var cached = readCachedStore();
+      if (!requireNetwork && backingOff() && cached) return normalizeLoaded(cached);
+      var res = await fetch(MANTLE_URL + '?ts=' + Date.now(), { headers: headers(), cache: 'no-store' });
+      if (res.status === 429) {
+        mark429(res);
+        if (!requireNetwork && cached) return normalizeLoaded(cached);
+        throw new Error('rate');
+      }
+      if (!res.ok) {
+        if (!requireNetwork && cached) return normalizeLoaded(cached);
+        throw new Error('read');
+      }
+      var next = normalizeLoaded(await res.json());
+      writeCachedStore(next);
+      return next;
     }
 
     async function writeStore(next) {
@@ -497,7 +577,12 @@
         headers: headers(),
         body: JSON.stringify(next)
       });
+      if (res.status === 429) {
+        mark429(res);
+        throw new Error('rate');
+      }
       if (!res.ok) throw new Error('write');
+      writeCachedStore(next);
     }
 
     function setStatus(text, isErr) {
@@ -543,16 +628,16 @@
     async function savePatch(patch, okMsg) {
       setStatus('جاري الحفظ…');
       try {
-        store = await readStore();
+        store = await readStore(true);
         Object.keys(patch).forEach(function (k) { store[k] = patch[k]; });
         pruneExpired(store);
         await writeStore(store);
-        store = await readStore();
+        store = await readStore(true);
         paintSettings();
         paintList();
         setStatus(okMsg || 'تم الحفظ');
       } catch (e) {
-        setStatus('تعذر حفظ الخيار', true);
+        setStatus((e && e.message === 'rate') ? 'الخادم مشغول. حاول بعد قليل.' : 'تعذر حفظ الخيار', true);
       }
     }
 
@@ -687,27 +772,33 @@
       try {
         store = await readStore();
         var removed = pruneExpired(store);
-        if (removed) {
+        if (removed && !backingOff()) {
           await writeStore(store);
-          store = await readStore();
+          store = await readStore(true);
         }
         render();
       } catch (e) {
+        var cached = readCachedStore();
+        if (cached) {
+          store = normalizeLoaded(cached);
+          render();
+          return;
+        }
         list.innerHTML = '<div class="error">تعذر تحميل الرسائل</div>';
       }
     }
 
     async function mutate(fn) {
       try {
-        store = await readStore();
+        store = await readStore(true);
         fn(store);
         pruneExpired(store);
         await writeStore(store);
-        store = await readStore();
+        store = await readStore(true);
         render();
         return true;
       } catch (e) {
-        alert('تعذر حفظ التعديل');
+        alert((e && e.message === 'rate') ? 'الخادم مشغول. حاول بعد قليل.' : 'تعذر حفظ التعديل');
         return false;
       }
     }
