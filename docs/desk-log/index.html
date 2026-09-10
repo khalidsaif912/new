@@ -799,7 +799,7 @@
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20260903a"></script>
+  <script src="../banner-store.js?v=20260910a"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1949,6 +1949,9 @@
           if (e && e.message === 'large') msg = 'الصورة كبيرة جداً حتى بعد الضغط — جرّب صورة أبسط أو أصغر';
           else if (e && e.message === 'imgwrite') msg = 'فشل حفظ الصورة على السيرفر';
           else if (e && e.message === 'save') msg = 'فشل حفظ قائمة البنرات';
+          else if (e && (e.message === 'overlay-offline' || e.code === 'rate' || e.code === 'backoff')) {
+            msg = 'الخادم مشغول الآن. البنرات المحفوظة تبقى ظاهرة، وأعد الرفع بعد قليل.';
+          }
           setBannerStatus(msg, true);
         } finally {
           if (confirmBtn) confirmBtn.disabled = false;

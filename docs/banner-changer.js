@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260903a';
+  const BANNER_STORE_VER = '20260910a';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -118,10 +118,19 @@
 
   async function fetchOverlayDirect() {
     try {
+      if (typeof window !== 'undefined' && window.RosterMantle && window.RosterMantle.backingOff()) {
+        return window.RosterMantle.readCache('rosterBannerOverlayV1') || { removed: [], custom: [] };
+      }
       var res = await fetch(MANTLE_BANNERS_URL + '?ts=' + Date.now(), {
         headers: { Accept: 'application/json', 'X-Mantle-Key': MANTLE_BANNERS_KEY },
         cache: 'no-store',
       });
+      if (res.status === 429) {
+        if (window.RosterMantle && window.RosterMantle.markRateLimit) window.RosterMantle.markRateLimit(res);
+        return window.RosterMantle && window.RosterMantle.readCache
+          ? window.RosterMantle.readCache('rosterBannerOverlayV1')
+          : null;
+      }
       if (res.status === 404) return { removed: [], custom: [] };
       if (!res.ok) return null;
       return await res.json();
@@ -208,6 +217,12 @@
       if (res.ok) {
         const json = await res.json();
         const overlayRaw = await fetchOverlayDirect();
+        if (!overlayRaw) {
+          catalogReady = true;
+          availableBanners = Array.isArray(json.banners) ? json.banners.slice() : availableBanners;
+          BANNER_LAYOUT = json.layouts && typeof json.layouts === 'object' ? json.layouts : BANNER_LAYOUT;
+          return catalogReady;
+        }
         const merged = applyOverlayToManifest(json, overlayRaw);
         availableBanners = merged.banners;
         BANNER_LAYOUT = merged.layouts;
@@ -426,7 +441,9 @@
     if (store) {
       const url = await store.resolveBannerUrl(name);
       if (url) return withLiveQuery(url, name);
+      if (store.isCustomName && store.isCustomName(name)) return '';
     }
+    if (/^custom:/i.test(String(name || ''))) return '';
     return withLiveQuery(BANNERS_PATH + name, name);
   }
 
