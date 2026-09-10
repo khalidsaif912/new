@@ -9,6 +9,10 @@ Live banners, ticker messages, and visit counts live on MantleDB (`roster-site-v
 
 Do not poll Mantle every few seconds. Keep backoff + local cache in `docs/holiday-ticker.js`, `docs/banner-store.js`, and `docs/site-visits.js`. After a 429, stop retrying.
 
+Never treat a failed Mantle overlay as `{ removed: [], custom: [] }` — that brings deleted banners back and hides custom ones. Use `overlay.json` + local cache, or keep the last good catalog.
+
+Ticker compose must show cached messages, not a “server busy” error. Sends and banner uploads save locally first, then sync when Mantle is up.
+
 Roster generate must not drop this:
 
 - Script tags come from `LOAD_LOCAL_ENHANCEMENTS_*` in `scripts/roster_cta_snippets.py` via `MANTLE_CLIENT_VER`. Bump that constant when those JS files change.

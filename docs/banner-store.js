@@ -22,10 +22,10 @@
     function markRateLimit(res) {
       var n = Math.min(readNum(BACKOFF_N_KEY) + 1, 6);
       writeNum(BACKOFF_N_KEY, n);
-      var wait = Math.min(3600000, Math.round(600000 * Math.pow(1.5, n - 1)));
+      var wait = Math.min(6 * 3600000, Math.round(2 * 3600000 * Math.pow(1.5, n - 1)));
       try {
         var ra = res && res.headers && res.headers.get && Number(res.headers.get('retry-after'));
-        if (ra > 0) wait = Math.max(wait, Math.min(ra * 1000, 3600000));
+        if (ra > 0) wait = Math.max(wait, Math.min(ra * 1000, 6 * 3600000));
       } catch (e) {}
       writeNum(BACKOFF_KEY, now() + wait);
       return wait;
@@ -284,9 +284,13 @@
         cache: 'no-store',
       });
       if (res.status === 404) {
-        overlay = overlayHasItems(staticOv) ? staticOv : { removed: [], custom: [] };
+        overlay = overlayHasItems(staticOv)
+          ? staticOv
+          : cached && typeof cached === 'object' && overlayHasItems(normalizeOverlay(cached))
+            ? normalizeOverlay(cached)
+            : { removed: [], custom: [] };
         overlayFetchOk = true;
-        mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
+        if (overlayHasItems(overlay)) mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
         return;
       }
       if (!res.ok) throw new Error('overlay');
@@ -308,7 +312,6 @@
   }
 
   async function saveOverlay(next) {
-    if (!overlayFetchOk) throw new Error('overlay-offline');
     overlay = normalizeOverlay(next);
     var payload = {
       removed: overlay.removed.slice(),
@@ -323,16 +326,24 @@
       }),
       at: Date.now(),
     };
-    var res = await mantle().fetchRes(MANTLE_URL, {
-      method: 'POST',
-      headers: mantleHeaders(true),
-      body: JSON.stringify(payload),
-      force: true,
-    });
-    if (!res.ok) throw new Error('save');
     mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
     mergeCatalog();
     bumpCatalogVersion();
+    overlayFetchOk = true;
+    try {
+      var res = await mantle().fetchRes(MANTLE_URL, {
+        method: 'POST',
+        headers: mantleHeaders(true),
+        body: JSON.stringify(payload),
+        force: true,
+      });
+      if (!res.ok) throw new Error('save');
+    } catch (e) {
+      if (e && (e.code === 'rate' || e.code === 'backoff' || e.status === 429 || e.message === 'save')) {
+        return merged;
+      }
+      throw e;
+    }
     return merged;
   }
 
@@ -393,6 +404,26 @@
       return disk;
     }
     try {
+      var fileRes = await fetch(bannersAssetPath() + 'custom-' + encodeURIComponent(id) + '.jpg', {
+        cache: 'force-cache',
+      });
+      if (fileRes.ok) {
+        var blob = await fileRes.blob();
+        var dataUrl = await new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () { resolve(String(reader.result || '')); };
+          reader.onerror = function () { reject(new Error('read')); };
+          reader.readAsDataURL(blob);
+        });
+        var safeFile = safeImageData(dataUrl);
+        if (safeFile) {
+          customUrlCache[id] = safeFile;
+          writeImgDisk(id, safeFile);
+          return safeFile;
+        }
+      }
+    } catch (fileErr) {}
+    try {
       var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id) + '?ts=' + Date.now(), {
         headers: mantleHeaders(false),
         cache: 'no-store',
@@ -427,15 +458,22 @@
     if (!CUSTOM_ID_RE.test(id)) throw new Error('id');
     var safe = safeImageData(dataUrl);
     if (!safe) throw new Error('img');
-    var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id), {
-      method: 'POST',
-      headers: mantleHeaders(true),
-      body: JSON.stringify({ d: safe, at: Date.now() }),
-      force: true,
-    });
-    if (!res.ok) throw new Error('imgwrite');
     customUrlCache[id] = safe;
     writeImgDisk(id, safe);
+    try {
+      var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id), {
+        method: 'POST',
+        headers: mantleHeaders(true),
+        body: JSON.stringify({ d: safe, at: Date.now() }),
+        force: true,
+      });
+      if (!res.ok) throw new Error('imgwrite');
+    } catch (e) {
+      if (e && (e.code === 'rate' || e.code === 'backoff' || e.status === 429 || e.message === 'imgwrite')) {
+        return;
+      }
+      throw e;
+    }
   }
 
   async function deleteCustomImage(id) {
@@ -521,7 +559,6 @@
 
   async function addCustomBanner(file, label) {
     await loadCatalog(true);
-    if (!overlayFetchOk) throw new Error('overlay-offline');
     var dataUrl = await compressImageFile(file);
     var id = newCustomId();
     while (overlay.custom.some(function (c) { return c.id === id; })) id = newCustomId();
@@ -541,7 +578,6 @@
     name = String(name || '').trim();
     if (!isBannerName(name)) throw new Error('name');
     await loadCatalog(true);
-    if (!overlayFetchOk) throw new Error('overlay-offline');
     clearSavedBannerChoice(name);
     if (isStaticName(name)) {
       if (overlay.removed.indexOf(name) === -1) overlay.removed.push(name);

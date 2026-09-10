@@ -168,7 +168,8 @@ def test_mantle_clients_survive_generate():
     imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
 
     assert "document.hidden ? 20000 : 4000" not in ticker
-    assert "POLL_VISIBLE_MS = 180000" in ticker
+    assert "الخادم مشغول الآن. أعد المحاولة بعد قليل" not in ticker
+    assert "لا رسائل بعد." in ticker
     assert "RosterMantle" in ticker
     assert "rosterMantleBackoffUntil" in ticker
     assert "rosterTickerStoreV1" in ticker
