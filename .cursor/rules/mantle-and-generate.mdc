@@ -5,11 +5,20 @@ alwaysApply: true
 
 # Mantle + roster generate
 
-Live banners, ticker messages, and visit counts live on MantleDB (`roster-site-visits`). The published site is GitHub Pages static files.
+Ticker messages and visit counts live on MantleDB (`roster-site-visits`). They share a free-tier cap of about 10k requests / 24h with any leftover Mantle calls.
+
+**Visitor banners are GitHub files**, not Mantle:
+
+- `docs/assets/banners/manifest.json`
+- `docs/assets/banners/overlay.json`
+- `docs/assets/banners/banner*.jpg`
+- `docs/assets/banners/custom-*.jpg` (desk-log uploads, snapshotted on generate)
+
+Public roster pages must not GET Mantle for banner overlay or banner images. Desk-log (`/desk-log`) may still read/write Mantle so uploads sync; `scripts/mantle_overlay_snapshot.py` copies that into the GitHub files on generate. Until a snapshot + publish, a new upload is local/Mantle-only and will not appear for other visitors.
 
 Do not poll Mantle every few seconds. Keep backoff + local cache in `docs/holiday-ticker.js`, `docs/banner-store.js`, and `docs/site-visits.js`. After a 429, stop retrying.
 
-Never treat a failed Mantle overlay as `{ removed: [], custom: [] }` — that brings deleted banners back and hides custom ones. Use `overlay.json` + local cache, or keep the last good catalog.
+Never treat a failed Mantle overlay as `{ removed: [], custom: [] }` — that brings deleted banners back and hides custom ones. Use `overlay.json` + local cache, or keep the last good catalog. Snapshot must not rewrite overlay.json to empty on 429.
 
 Ticker compose must show cached messages, not a “server busy” error. Sends and banner uploads save locally first, then sync when Mantle is up.
 
@@ -18,6 +27,7 @@ Roster generate must not drop this:
 - Script tags come from `LOAD_LOCAL_ENHANCEMENTS_*` in `scripts/roster_cta_snippets.py` via `MANTLE_CLIENT_VER`. Bump that constant when those JS files change.
 - `generate_and_send.py` / `generate_and_send_import.py` rewrite HTML from those snippets. They must not hardcode old `?v=` strings.
 - Shared JS under `docs/*.js` is not regenerated from Excel. Edit the JS files, not a one-off date page.
-- Banner add/remove overlay is snapshotted to `docs/assets/banners/overlay.json` on generate so deletions survive Mantle outages after the next successful snapshot + publish.
+- Banner add/remove overlay is snapshotted to `docs/assets/banners/overlay.json` (and custom JPEGs) on generate so the public catalog survives Mantle outages after the next successful snapshot + publish.
+- Prefer archive over delete for `banner*.jpg`: drop the name from `manifest.json`, keep the file.
 
 Fix the client and the snippet/generator, not hundreds of HTML files by hand, unless you also update the snippet version.

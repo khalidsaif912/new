@@ -175,6 +175,9 @@ def test_mantle_clients_survive_generate():
     assert "rosterTickerStoreV1" in ticker
     assert "overlay.json" in store
     assert "rosterBannerOverlayV1" in store
+    assert "if (!isDeskLogPage()) return;" in store
+    assert "if (!isDeskLogPage()) return '';" in store
+    assert "custom-" in store
     assert "rosterMantleBackoffUntil" in visits
     assert '"removed"' in overlay
     assert "MANTLE_CLIENT_VER" in snippets

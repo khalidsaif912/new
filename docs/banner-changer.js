@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260910c';
+  const BANNER_STORE_VER = '20260910d';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -147,11 +147,17 @@
     return null;
   }
 
+  function isDeskLogPage() {
+    return (location.pathname || '').indexOf('/desk-log') !== -1;
+  }
+
   async function fetchOverlayDirect() {
+    var fileOv = await fetchStaticOverlayFile();
+    if (!isDeskLogPage()) return fileOv;
     var cached = cachedOverlayOrNull();
     try {
       if (typeof window !== 'undefined' && window.RosterMantle && window.RosterMantle.backingOff()) {
-        return cached || (await fetchStaticOverlayFile());
+        return cached || fileOv;
       }
       var res = await fetch(MANTLE_BANNERS_URL + '?ts=' + Date.now(), {
         headers: { Accept: 'application/json', 'X-Mantle-Key': MANTLE_BANNERS_KEY },
@@ -159,13 +165,13 @@
       });
       if (res.status === 429) {
         if (window.RosterMantle && window.RosterMantle.markRateLimit) window.RosterMantle.markRateLimit(res);
-        return cached || (await fetchStaticOverlayFile());
+        return cached || fileOv;
       }
-      if (res.status === 404) return cached || (await fetchStaticOverlayFile()) || { removed: [], custom: [] };
-      if (!res.ok) return cached || (await fetchStaticOverlayFile());
+      if (res.status === 404) return cached || fileOv || { removed: [], custom: [] };
+      if (!res.ok) return cached || fileOv;
       return await res.json();
     } catch (e) {
-      return cached || (await fetchStaticOverlayFile());
+      return cached || fileOv;
     }
   }
 

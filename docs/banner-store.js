@@ -1,5 +1,7 @@
 /**
- * Banner catalog — static manifest + Mantle overlay for add/remove from desk-log.
+ * Banner catalog — GitHub files for visitors; Mantle only on /desk-log.
+ * Public pages read manifest.json + overlay.json + banner*.jpg / custom-*.jpg.
+ * Desk-log writes Mantle; generate snapshots that into GitHub files.
  */
 (function (global) {
   'use strict';
@@ -121,6 +123,10 @@
     return bannersAssetPath() + 'overlay.json';
   }
 
+  function isDeskLogPage() {
+    return (location.pathname || '').indexOf('/desk-log') !== -1;
+  }
+
   function mantleHeaders(write) {
     var h = { Accept: 'application/json', 'X-Mantle-Key': MANTLE_KEY };
     if (write) h['Content-Type'] = 'application/json';
@@ -226,11 +232,18 @@
 
     (baseManifest.banners || []).forEach(function (name) {
       name = String(name || '').trim();
-      if (!isStaticName(name)) return;
-      if (overlay.removed.indexOf(name) >= 0) return;
-      if (seen[name]) return;
-      seen[name] = 1;
-      banners.push(name);
+      if (isStaticName(name)) {
+        if (overlay.removed.indexOf(name) >= 0) return;
+        if (seen[name]) return;
+        seen[name] = 1;
+        banners.push(name);
+        return;
+      }
+      if (isCustomName(name)) {
+        if (seen[name]) return;
+        seen[name] = 1;
+        banners.push(name);
+      }
     });
 
     overlay.custom.forEach(function (item) {
@@ -275,9 +288,16 @@
 
   async function loadOverlay() {
     var staticOv = await loadStaticOverlayFile();
+    overlay = staticOv || { removed: [], custom: [] };
+    overlayFetchOk = true;
+    // Visitors use GitHub files only. Mantle is for desk-log live edits, then generate snapshots.
+    if (!isDeskLogPage()) return;
     var cached = mantle().readCache(OVERLAY_CACHE_KEY);
-    if (cached && typeof cached === 'object') overlay = normalizeOverlay(cached);
-    else if (overlayHasItems(staticOv)) overlay = staticOv;
+    if (cached && typeof cached === 'object' && overlayHasItems(normalizeOverlay(cached))) {
+      overlay = normalizeOverlay(cached);
+    } else if (overlayHasItems(staticOv)) {
+      overlay = staticOv;
+    }
     try {
       var res = await mantle().fetchRes(MANTLE_URL + '?ts=' + Date.now(), {
         headers: mantleHeaders(false),
@@ -288,7 +308,7 @@
           ? staticOv
           : cached && typeof cached === 'object' && overlayHasItems(normalizeOverlay(cached))
             ? normalizeOverlay(cached)
-            : { removed: [], custom: [] };
+            : overlay;
         overlayFetchOk = true;
         if (overlayHasItems(overlay)) mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
         return;
@@ -298,15 +318,13 @@
       overlayFetchOk = true;
       mantle().writeCache(OVERLAY_CACHE_KEY, overlay);
     } catch (e) {
-      overlayFetchOk = false;
-      if (cached && typeof cached === 'object') {
+      overlayFetchOk = overlayHasItems(overlay);
+      if (cached && typeof cached === 'object' && overlayHasItems(normalizeOverlay(cached))) {
         overlay = normalizeOverlay(cached);
         overlayFetchOk = true;
       } else if (overlayHasItems(staticOv)) {
         overlay = staticOv;
         overlayFetchOk = true;
-      } else {
-        overlay = overlay || { removed: [], custom: [] };
       }
     }
   }
@@ -350,8 +368,10 @@
   async function loadCatalog(force) {
     if (!force && loadPromise) return loadPromise;
     loadPromise = (async function () {
-      var cached = mantle().readCache(OVERLAY_CACHE_KEY);
-      if (cached && typeof cached === 'object') overlay = normalizeOverlay(cached);
+      if (isDeskLogPage()) {
+        var cached = mantle().readCache(OVERLAY_CACHE_KEY);
+        if (cached && typeof cached === 'object') overlay = normalizeOverlay(cached);
+      }
       await loadManifestFile();
       await loadOverlay();
       return mergeCatalog();
@@ -423,6 +443,8 @@
         }
       }
     } catch (fileErr) {}
+    // Visitors never GET Mantle images — that shared the ticker's 10k/day quota.
+    if (!isDeskLogPage()) return '';
     try {
       var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id) + '?ts=' + Date.now(), {
         headers: mantleHeaders(false),
