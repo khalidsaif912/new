@@ -50,6 +50,7 @@ SKIP_PREFIXES = (
     "calculator/",
     "QuickList/",
     "a-cup-of-book/",
+    "book-list/",
     "alumni/",
     "ideas/",
     "training/",
@@ -182,17 +183,17 @@ def patch_chip(text: str) -> tuple[str, bool]:
 
 
 def patch_apps_ver(text: str) -> tuple[str, bool]:
-    if "site-apps.js?v=20260830wm" in text:
+    if "site-apps.js?v=20260911b" in text:
         return text, False
     text2, n = SITE_APPS_VER_RE.subn(
-        "addScript(root + '/site-apps.js?v=20260830wm');",
+        "addScript(root + '/site-apps.js?v=20260911b');",
         text,
         count=1,
     )
     if n:
         return text2, True
     text2, n = SITE_APPS_VER_FIXED_RE.subn(
-        "addScript(root + '/site-apps.js?v=20260830wm');",
+        "addScript(root + '/site-apps.js?v=20260911b');",
         text,
         count=1,
     )

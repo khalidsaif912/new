@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cargo matching</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=22" />
+</head>
+<body>
+  <aside class="rail" id="rail">
+    <div class="rail-inner">
+      <div class="rail-head">
+        <div>
+          <h2 data-i18n="flights">Flights</h2>
+          <p class="rail-sub" data-i18n="savedLocally">Saved on this device</p>
+        </div>
+        <button type="button" class="rail-add" id="addFlightBtn" data-i18n="addFlight">Add flight</button>
+      </div>
+      <div class="rail-list" id="flightList"></div>
+      <div class="rail-foot">
+        <button type="button" class="btn ghost lang-btn" id="langBtn">العربية</button>
+      </div>
+    </div>
+    <div class="rail-toggle" id="railCollapsed">
+      <button type="button" class="edge-handle" id="railEdge" aria-label="Collapse">
+        <span class="edge-handle-bar"></span>
+      </button>
+      <button type="button" class="lang-mini lang-btn" id="langMini">ع</button>
+    </div>
+  </aside>
+
+  <div class="page">
+    <header class="top">
+      <div>
+        <h1 data-i18n="title">Cargo matching</h1>
+        <p class="lead" id="lead" data-i18n="lead">The Load Plan is the source. Upload both files to see what is booked and what is not.</p>
+      </div>
+      <div class="flight-chip" id="flightChip" hidden></div>
+    </header>
+
+    <section class="desk" id="desk">
+      <label class="drop" id="drop">
+        <input id="fileInput" type="file" accept="application/pdf" multiple hidden />
+        <strong data-i18n="dropStrong">Drop the Load Plan and Book List</strong>
+        <span data-i18n="dropHint">or click to choose</span>
+      </label>
+      <div class="filebar">
+        <span id="planFile">Load Plan</span>
+        <span class="dot">·</span>
+        <span id="bookFile">Book List</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="compareBtn" data-i18n="compare" disabled>Compare</button>
+        <button type="button" class="btn ghost" id="demoBtn" data-i18n="demo">Try current files</button>
+        <button type="button" class="btn ghost" id="resetBtn" data-i18n="addFlight" hidden>Add flight</button>
+      </div>
+      <p class="error" id="error" hidden></p>
+    </section>
+
+    <section class="result" id="result" hidden>
+      <article class="verdict" id="verdict">
+        <h2 id="verdictTitle"></h2>
+        <div class="counts" id="stats"></div>
+      </article>
+
+      <div class="toolbar">
+        <input class="search" id="search" type="search" data-i18n-placeholder="search" placeholder="Search by AWB" />
+        <label class="track">
+          <span data-i18n="openFlightIn">Open flight in</span>
+          <select id="trackPreset">
+            <option value="https://www.google.com/search?q={flight}+{date}">Google</option>
+            <option value="https://www.flightradar24.com/data/flights/{flight}">FlightRadar24</option>
+            <option value="https://www.flightaware.com/live/flight/{flight}">FlightAware</option>
+            <option value="custom">Custom URL…</option>
+          </select>
+        </label>
+      </div>
+      <input id="trackUrl" class="track-custom" type="text" dir="ltr" hidden placeholder="https://…/{flight}" />
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="colStatus">Status</th>
+              <th data-i18n="colAwb">AWB</th>
+              <th data-i18n="colRoute">Route</th>
+              <th data-i18n="colPcs">Pieces</th>
+              <th data-i18n="colWgt">Weight</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <section class="extra" id="extraBox" hidden>
+        <h3 data-i18n="extraTitle">Not on Load Plan — NOT READY</h3>
+        <div class="nr-list" id="extraList"></div>
+      </section>
+    </section>
+  </div>
+  <script src="app.js?v=20"></script>
+</body>
+</html>

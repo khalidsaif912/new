@@ -1294,7 +1294,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260911b');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
@@ -1338,7 +1338,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=' + ver);
+    addScript(root + '/site-apps.js?v=20260911b');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

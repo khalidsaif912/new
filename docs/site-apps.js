@@ -20,6 +20,8 @@
       quicklistSub: 'Shopping lists',
       book: 'A Cup of Book',
       bookSub: 'Reading topics',
+      booklist: 'Book List',
+      booklistSub: 'Load Plan vs bookings',
       wa: 'WhatsApp Styler',
       waSub: 'Format text fast',
       games: 'Memory Games',
@@ -71,6 +73,8 @@
       quicklistSub: 'سجل المنزل',
       book: 'A Cup of Book',
       bookSub: 'مواضيع القراءة',
+      booklist: 'Book List',
+      booklistSub: 'مطابقة Load Plan',
       wa: 'تنسيق واتساب',
       waSub: 'تنسيق النص بسرعة',
       games: 'ألعاب الذاكرة',
@@ -167,6 +171,15 @@
       '<path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/>' +
       '<path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>' +
       '<path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>' +
+      '</svg>',
+    booklist:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="10" y="8" width="32" height="44" rx="5" fill="#fff7ed" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M18 20h16M18 28h12M18 36h14" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<rect x="28" y="18" width="26" height="36" rx="5" fill="#fdba74" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M36 30h10M36 38h8" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<circle cx="46" cy="46" r="8" fill="#38bdf8" stroke="#0f172a" stroke-width="2"/>' +
+      '<path d="M43 46l2.2 2.2 4.4-4.8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
       '</svg>',
     wa:
       '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
@@ -271,6 +284,7 @@
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
+    ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
@@ -292,6 +306,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
@@ -346,6 +361,10 @@
       return getSiteRootUrl() + '/a-cup-of-book/';
     }
     return 'https://khalidsaif912.github.io/new/docs/a-cup-of-book/';
+  }
+
+  function bookListPageUrl() {
+    return 'https://book-list.158-220-106-38.sslip.io/';
   }
 
   function alumniPageUrl() {
@@ -577,6 +596,57 @@
     patchBookLink();
   }
 
+  function patchBookListLink() {
+    var link = document.querySelector('.siteAppsLink--booklist, a.siteAppsLink[data-app-id="booklist"]');
+    if (!link) return;
+    link.href = bookListPageUrl();
+    link.setAttribute('data-open-same', '1');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+  }
+
+  function ensureBookListAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var existing = grid.querySelector('.siteAppsLink--booklist, [data-app-id="booklist"]');
+    if (existing) {
+      patchBookListLink();
+      var title = existing.querySelector('[data-i18n="booklist"]');
+      var sub = existing.querySelector('[data-i18n-sub="booklist"]');
+      if (title) title.textContent = t('booklist');
+      if (sub) sub.textContent = t('booklistSub');
+      var icon = existing.querySelector('.siteAppsLink-icon');
+      if (icon) icon.innerHTML = iconForApp('booklist');
+      return;
+    }
+    var link = document.createElement('a');
+    link.className = 'siteAppsLink siteAppsLink--booklist';
+    link.setAttribute('data-app-id', 'booklist');
+    link.setAttribute('data-open-same', '1');
+    link.href = bookListPageUrl();
+    link.innerHTML =
+      '<span class="siteAppsLink-icon">' +
+      iconForApp('booklist') +
+      '</span>' +
+      '<span class="siteAppsLink-title" data-i18n="booklist">' +
+      t('booklist') +
+      '</span>' +
+      '<span class="siteAppsLink-sub" data-i18n-sub="booklist">' +
+      t('booklistSub') +
+      '</span>';
+    var labels = grid.querySelector('.siteAppsLink--labels, [data-app-id="labels"]');
+    if (labels && labels.nextSibling) {
+      grid.insertBefore(link, labels.nextSibling);
+    } else if (labels) {
+      grid.appendChild(link);
+    } else {
+      var calc = grid.querySelector('.siteAppsLink--calc');
+      if (calc && calc.nextSibling) grid.insertBefore(link, calc.nextSibling);
+      else grid.appendChild(link);
+    }
+    patchBookListLink();
+  }
+
   function ensureWhatsAppAppLink() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
@@ -771,7 +841,7 @@
       );
     }
 
-    var order = ['wa', 'readSign', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var order = ['wa', 'readSign', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -830,6 +900,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
@@ -850,6 +921,13 @@
         e.preventDefault();
         closeModal();
         window.location.assign(bookPageUrl());
+        return;
+      }
+      if (e.target.closest('a.siteAppsLink--booklist')) {
+        if (!isStandaloneApp()) return;
+        e.preventDefault();
+        closeModal();
+        window.location.assign(bookListPageUrl());
         return;
       }
       var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
@@ -949,6 +1027,7 @@
       '.siteAppsLink--calc .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--quicklist .siteAppsLink-icon{background:linear-gradient(160deg,#f5f3ff,#ddd6fe)!important;border-color:#c4b5fd!important;}',
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--booklist .siteAppsLink-icon{background:linear-gradient(160deg,#fff7ed,#fdba74)!important;border-color:#fb923c!important;}',
       '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
       '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       'a.summaryChip.withMeChip .chipVal{color:#4f46e5;}',
@@ -1230,6 +1309,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
+    ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureReadSignAppLink();
