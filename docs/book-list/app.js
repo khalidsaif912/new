@@ -50,6 +50,7 @@ const I18N = {
     colWgt: "Weight",
     extraTitle: "Not on Load Plan — NOT READY",
     langBtn: "العربية",
+    roster: "Roster",
     flights: "Flights",
     addFlight: "Add flight",
     deleteFlight: "Remove",
@@ -136,6 +137,7 @@ const I18N = {
     colWgt: "الوزن",
     extraTitle: "خارج خطة التحميل — NOT READY",
     langBtn: "English",
+    roster: "الوردية",
     flights: "الرحلات",
     addFlight: "إضافة رحلة",
     deleteFlight: "حذف",
@@ -664,6 +666,23 @@ async function loadCargo(serial) {
   }
 }
 
+function rosterHomeUrl() {
+  const host = location.hostname || "";
+  if (host === "127.0.0.1" || host === "localhost") {
+    if (location.port === "8011") return `${location.origin}/`;
+    return "http://127.0.0.1:8011/";
+  }
+  return "https://khalidsaif912.github.io/new/";
+}
+
+function bindRosterLinks() {
+  const href = rosterHomeUrl();
+  ["rosterBtn", "rosterMini"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.href = href;
+  });
+}
+
 function applyLang() {
   const ui = t();
   document.documentElement.lang = lang;
@@ -672,6 +691,11 @@ function applyLang() {
   document.querySelectorAll(".lang-btn").forEach((btn) => {
     btn.textContent = btn.id === "langMini" ? (lang === "en" ? "ع" : "EN") : ui.langBtn;
   });
+  const rosterMini = document.getElementById("rosterMini");
+  if (rosterMini) {
+    rosterMini.title = ui.roster;
+    rosterMini.setAttribute("aria-label", ui.roster);
+  }
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const value = ui[el.dataset.i18n];
     if (typeof value === "string") el.textContent = value;
@@ -894,6 +918,7 @@ function renderTable() {
 }
 
 loadTrack();
+bindRosterLinks();
 applyLang();
 setRailOpen(true);
 refreshSavedFlights()

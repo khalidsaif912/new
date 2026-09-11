@@ -184,29 +184,85 @@ body.rail-collapsed .rail-inner { display: none; }
   border-top: 1px solid rgba(246,239,227,0.12);
   flex-shrink: 0;
 }
-.rail-foot .lang-btn {
+.rail-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.rail-foot .lang-btn,
+.rail-foot .roster-btn {
   width: 100%;
+  min-height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  text-decoration: none;
+}
+.rail-foot .lang-btn {
   border: 1px solid rgba(246,239,227,0.18);
   color: #f6efe3;
   background: transparent;
-  border-radius: 12px;
 }
 .rail-foot .lang-btn:hover { background: rgba(246,239,227,0.08); }
-.lang-mini {
+.rail-foot .roster-btn {
+  border: 0;
+  background: #f6efe3;
+  color: var(--navy);
+}
+.rail-foot .roster-btn:hover { background: #fff; }
+.rail-foot .roster-btn svg { flex-shrink: 0; }
+.rail-sign {
+  margin: 12px 0 2px;
+  text-align: center;
+}
+.rail-sign-by {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c4b8a4;
+  margin-bottom: 4px;
+}
+.rail-sign-name {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #f6efe3;
+}
+.rail-mini-actions {
   display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+.lang-mini,
+.roster-mini {
   border: 1px solid rgba(246,239,227,0.22);
   background: none;
   color: #f6efe3;
   border-radius: 999px;
   width: 36px;
   height: 36px;
-  margin-top: auto;
   font: inherit;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
+  display: none;
+  place-items: center;
 }
-body.rail-collapsed .lang-mini { display: grid; place-items: center; }
+.roster-mini { background: #f6efe3; color: var(--navy); border-color: transparent; }
+body.rail-collapsed .rail-mini-actions { display: flex; }
+body.rail-collapsed .lang-mini,
+body.rail-collapsed .roster-mini { display: grid; }
 .edge-handle {
   width: 24px;
   height: 140px;
@@ -242,7 +298,7 @@ body.rail-collapsed .edge-handle {
   width: 56px;
   transform: translateY(-50%);
 }
-body.rail-collapsed .lang-mini {
+body.rail-collapsed .rail-mini-actions {
   position: relative;
   z-index: 1;
 }
