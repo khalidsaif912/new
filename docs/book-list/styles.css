@@ -498,6 +498,7 @@ tbody tr.inbound-row:hover td { background: #f6f4ee; }
 .pill.unbooked, .pill.partial { background: #f8e6e4; color: var(--stamp); }
 .pill.mismatch { background: #f8edd4; color: var(--warn); }
 .pill.matched { background: #e7f6ee; color: var(--go); }
+.pill.notready { background: #f8e6e4; color: var(--stamp); }
 .nr { color: var(--warn); font-size: 12px; }
 .diff { color: var(--stamp); font-weight: 700; }
 .note { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
@@ -551,24 +552,14 @@ tbody tr.inbound-row:hover td { background: #f6f4ee; }
 .dates { color: var(--muted); font-size: 13px; }
 
 .extra {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px 16px;
-}
-.extra h3 { margin: 0 0 10px; font-size: 1rem; }
-
-.nr-list { display: grid; gap: 6px; }
-.nr-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 12px;
-  align-items: center;
-  font-size: 14px;
-  padding: 7px 0;
-  border-bottom: 1px solid #efe7d8;
+  gap: 10px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
 }
-.nr-row:last-child { border: 0; }
+.extra h3 { margin: 2px 4px 0; font-size: 1rem; }
 
 @media (max-width: 800px) {
   .rail {

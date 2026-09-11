@@ -49,6 +49,7 @@ const I18N = {
     colPcs: "Pieces",
     colWgt: "Weight",
     extraTitle: "Not on Load Plan — NOT READY",
+    notOnPlan: "Not on the Load Plan",
     langBtn: "العربية",
     roster: "Roster",
     flights: "Flights",
@@ -67,6 +68,7 @@ const I18N = {
       partial: "Partial",
       mismatch: "Discrepancy",
       matched: "Matched",
+      notReady: "Not ready",
     },
     notReady: "not ready",
     emptyRows: "No shipments here.",
@@ -136,6 +138,7 @@ const I18N = {
     colPcs: "القطع",
     colWgt: "الوزن",
     extraTitle: "خارج خطة التحميل — NOT READY",
+    notOnPlan: "ليست في خطة التحميل",
     langBtn: "English",
     roster: "الوردية",
     flights: "الرحلات",
@@ -154,6 +157,7 @@ const I18N = {
       partial: "حجز جزئي",
       mismatch: "اختلاف",
       matched: "مطابقة",
+      notReady: "غير جاهزة",
     },
     notReady: "غير جاهزة",
     emptyRows: "لا توجد شحنات هنا.",
@@ -758,7 +762,10 @@ document.getElementById("railCollapsed").addEventListener("click", (event) => {
   setRailOpen(true);
 });
 resetBtn.addEventListener("click", startNewFlight);
-searchEl.addEventListener("input", renderTable);
+searchEl.addEventListener("input", () => {
+  renderTable();
+  renderExtras();
+});
 trackPreset.addEventListener("change", () => {
   trackUrl.hidden = trackPreset.value !== "custom";
   saveTrack();
@@ -860,18 +867,31 @@ function applyReport(data, opts = {}) {
 function renderExtras() {
   const extraBox = document.getElementById("extraBox");
   const items = extras();
+  const ui = t();
+  const q = searchEl.value.trim();
+  const rows = items.filter((item) => !q || item.awb.includes(q) || String(item.serial).includes(q));
   extraBox.hidden = items.length === 0;
-  document.getElementById("extraList").innerHTML = items
+  document.getElementById("extraList").innerHTML = rows
     .map((item) => {
       const open = openSerial === item.serial;
-      return `<div class="nr-row">
-        <button type="button" class="awb-btn" data-serial="${item.serial}">${item.awb}</button>
-        <span>${item.org && item.dest ? `${item.org} → ${item.dest}` : "—"}</span>
-        <span class="mono">${item.pcs}</span>
-      </div>
-      ${open ? `<div class="inbound extra-track">${inboundHtml(item)}</div>` : ""}`;
+      const note = `<span class="note">${ui.notOnPlan}</span>`;
+      const panel = open ? inboundHtml(item) : "";
+      return `<tr>
+        <td><span class="pill notready">${ui.labels.notReady}</span></td>
+        <td>
+          <button type="button" class="awb-btn" data-serial="${item.serial}">${item.awb}</button>
+          ${note}
+        </td>
+        <td>${item.org && item.dest ? `${item.org} → ${item.dest}` : "—"}</td>
+        <td class="mono">${fmtNum(item.pcs)}</td>
+        <td class="mono">${fmtNum(item.wgt)}</td>
+      </tr>
+      ${panel ? `<tr class="inbound-row"><td colspan="5">${panel}</td></tr>` : ""}`;
     })
     .join("");
+  if (!rows.length && items.length) {
+    document.getElementById("extraList").innerHTML = `<tr><td colspan="5">${ui.emptyRows}</td></tr>`;
+  }
   bindAwbClicks(document.getElementById("extraList"));
 }
 
