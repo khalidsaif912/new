@@ -23,10 +23,10 @@
     function markRateLimit(res) {
       var n = Math.min(readNum(BACKOFF_N_KEY) + 1, 6);
       writeNum(BACKOFF_N_KEY, n);
-      var wait = Math.min(3600000, Math.round(600000 * Math.pow(1.5, n - 1)));
+      var wait = Math.min(6 * 3600000, Math.round(2 * 3600000 * Math.pow(1.5, n - 1)));
       try {
         var ra = res && res.headers && res.headers.get && Number(res.headers.get('retry-after'));
-        if (ra > 0) wait = Math.max(wait, Math.min(ra * 1000, 3600000));
+        if (ra > 0) wait = Math.max(wait, Math.min(ra * 1000, 6 * 3600000));
       } catch (e) {}
       writeNum(BACKOFF_KEY, now() + wait);
       return wait;
@@ -471,16 +471,20 @@
     payload.approved = (payload.approved || []).slice(0, 40);
     while (JSON.stringify(payload).length > 50000 && payload.pending.length > 1) payload.pending.pop();
     while (JSON.stringify(payload).length > 50000 && payload.approved.length > 1) payload.approved.pop();
-    var res = await mantle().fetchRes(MANTLE_URL, {
-      method: 'POST',
-      headers: mantleHeaders(),
-      body: JSON.stringify(payload),
-      force: true
-    });
-    if (!res.ok) throw new Error('write');
     writeCachedStore(payload);
     markPolled();
-    lastStoreFromNetwork = true;
+    try {
+      var res = await mantle().fetchRes(MANTLE_URL, {
+        method: 'POST',
+        headers: mantleHeaders(),
+        body: JSON.stringify(payload),
+        force: true
+      });
+      if (!res.ok) throw new Error('write');
+      lastStoreFromNetwork = true;
+    } catch (e) {
+      lastStoreFromNetwork = false;
+    }
   }
 
   function validTickerId(id) {
@@ -505,15 +509,17 @@
     if (!validTickerId(id)) throw new Error('id');
     var safe = safeImageData(dataUrl);
     if (!safe) throw new Error('img');
-    var res = await mantle().fetchRes(imageDocUrl(id), {
-      method: 'POST',
-      headers: mantleHeaders(),
-      body: JSON.stringify({ d: safe, at: Date.now() }),
-      force: true
-    });
-    if (!res.ok) throw new Error('imgwrite');
     imageCache[id] = safe;
     writeImgDisk(id, safe);
+    try {
+      var res = await mantle().fetchRes(imageDocUrl(id), {
+        method: 'POST',
+        headers: mantleHeaders(),
+        body: JSON.stringify({ d: safe, at: Date.now() }),
+        force: true
+      });
+      if (!res.ok) throw new Error('imgwrite');
+    } catch (e) {}
   }
 
   async function loadTickerImage(id) {
@@ -1435,12 +1441,12 @@
           renderChatFeed(store.approved || [], resolvedEmp.id || readSavedIdentity().id);
         } catch (e) {
           var cached = readCachedStore();
+          var feed = document.getElementById('htcFeed');
           if (cached) {
             renderChatFeed(cached.approved || [], resolvedEmp.id || readSavedIdentity().id);
             return;
           }
-          var feed = document.getElementById('htcFeed');
-          if (feed) feed.innerHTML = '<div class="htc-empty">تعذر تحميل الرسائل.</div>';
+          if (feed) feed.innerHTML = '<div class="htc-empty">لا رسائل بعد.</div>';
         }
       }
       modal._htcRefreshFeed = refreshFeed;
@@ -1570,7 +1576,12 @@
         sendBtn.disabled = true;
         statusEl.textContent = pendingImage ? 'جاري رفع الصورة…' : 'جاري الإرسال…';
         try {
-          var store = await readFullStore(true);
+          var store;
+          try {
+            store = await readFullStore(false);
+          } catch (readErr) {
+            store = normalizeStore(readCachedStore() || {});
+          }
           var needApproval = store.requireApproval !== false;
           var emoji = await resolveEmoji(emp.id);
           var row = {
@@ -1597,6 +1608,7 @@
           msgInput.value = '';
           countEl.textContent = '0';
           setPendingImage('');
+          statusEl.className = lastStoreFromNetwork ? 'htc-status' : 'htc-status';
           statusEl.textContent = needApproval
             ? 'تم الإرسال. بانتظار اعتماد المشرف.'
             : 'تم النشر.';
@@ -1608,9 +1620,7 @@
           await refreshFeed();
         } catch (e) {
           statusEl.className = 'htc-status err';
-          statusEl.textContent = (e && (e.code === 'backoff' || e.code === 'rate' || e.status === 429))
-            ? 'الخادم مشغول الآن. أعد المحاولة بعد قليل، والرسائل المحفوظة ستظهر من الجهاز.'
-            : 'تعذر الإرسال. حاول مرة أخرى.';
+          statusEl.textContent = 'تعذر الإرسال. حاول مرة أخرى.';
         } finally {
           sendBtn.disabled = false;
         }

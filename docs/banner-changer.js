@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260910a';
+  const BANNER_STORE_VER = '20260910d';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -116,10 +116,48 @@
     });
   }
 
+  async function fetchStaticOverlayFile() {
+    try {
+      var res = await fetch(BANNERS_PATH + 'overlay.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return null;
+      var json = await res.json();
+      if (!json || typeof json !== 'object') return null;
+      var has =
+        (Array.isArray(json.removed) && json.removed.length) ||
+        (Array.isArray(json.custom) && json.custom.length);
+      return has ? json : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function cachedOverlayOrNull() {
+    try {
+      var cached =
+        window.RosterMantle && window.RosterMantle.readCache
+          ? window.RosterMantle.readCache('rosterBannerOverlayV1')
+          : null;
+      if (cached && typeof cached === 'object') {
+        var has =
+          (Array.isArray(cached.removed) && cached.removed.length) ||
+          (Array.isArray(cached.custom) && cached.custom.length);
+        if (has) return cached;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function isDeskLogPage() {
+    return (location.pathname || '').indexOf('/desk-log') !== -1;
+  }
+
   async function fetchOverlayDirect() {
+    var fileOv = await fetchStaticOverlayFile();
+    if (!isDeskLogPage()) return fileOv;
+    var cached = cachedOverlayOrNull();
     try {
       if (typeof window !== 'undefined' && window.RosterMantle && window.RosterMantle.backingOff()) {
-        return window.RosterMantle.readCache('rosterBannerOverlayV1') || { removed: [], custom: [] };
+        return cached || fileOv;
       }
       var res = await fetch(MANTLE_BANNERS_URL + '?ts=' + Date.now(), {
         headers: { Accept: 'application/json', 'X-Mantle-Key': MANTLE_BANNERS_KEY },
@@ -127,15 +165,13 @@
       });
       if (res.status === 429) {
         if (window.RosterMantle && window.RosterMantle.markRateLimit) window.RosterMantle.markRateLimit(res);
-        return window.RosterMantle && window.RosterMantle.readCache
-          ? window.RosterMantle.readCache('rosterBannerOverlayV1')
-          : null;
+        return cached || fileOv;
       }
-      if (res.status === 404) return { removed: [], custom: [] };
-      if (!res.ok) return null;
+      if (res.status === 404) return cached || fileOv || { removed: [], custom: [] };
+      if (!res.ok) return cached || fileOv;
       return await res.json();
     } catch (e) {
-      return null;
+      return cached || fileOv;
     }
   }
 
@@ -219,8 +255,6 @@
         const overlayRaw = await fetchOverlayDirect();
         if (!overlayRaw) {
           catalogReady = true;
-          availableBanners = Array.isArray(json.banners) ? json.banners.slice() : availableBanners;
-          BANNER_LAYOUT = json.layouts && typeof json.layouts === 'object' ? json.layouts : BANNER_LAYOUT;
           return catalogReady;
         }
         const merged = applyOverlayToManifest(json, overlayRaw);
