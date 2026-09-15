@@ -20,6 +20,11 @@ fi
 
 git commit -m "$msg"
 
+# Shallow Actions checkouts cannot rebase onto origin/main; deepen first.
+if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)" = "true" ]; then
+  git fetch --prune --unshallow origin "$branch" || git fetch --prune --depth=200 origin "$branch"
+fi
+
 for attempt in 1 2 3 4 5; do
   git fetch origin "$branch"
   if git pull --rebase --autostash origin "$branch" && git push origin "HEAD:$branch"; then

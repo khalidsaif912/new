@@ -1,0 +1,16 @@
+---
+description: Fix roster publish delays and CI push races at the root, never by one-off generate.
+alwaysApply: true
+---
+
+# Roster publish — root cause only
+
+When a new roster exists but the site is stale, do not stop at a manual `workflow_dispatch` or “wait for cron”. GitHub public-repo cron is often delayed by hours. Power Automate saves `/ROSTER_UPLOADS/latest.xlsx` under the **same name**, so the site updates only when Actions actually runs.
+
+Required chain:
+
+1. After PA **Create file** / overwrite of `latest.xlsx`, HTTP POST `repository_dispatch` (`export-roster-updated` or `import-roster-updated`) to `khalidsaif912/new`.
+2. Workflows share concurrency group `docs-main` (`cancel-in-progress: false`) and push via `scripts/ci_commit_and_push.sh` (rebase + retry). Never a bare `git push` that can lose a generate.
+3. If a workflow YAML change cannot be pushed (OAuth missing `workflow` scope), refresh `gh` with `-s workflow` or push over SSH. Do not leave the fix local.
+
+Hash/fingerprint detection already catches same-name overwrites; the failure mode is **not running soon enough** or **losing the push**.
