@@ -154,6 +154,32 @@
       #banner-changer-btn { padding:2px; min-width:0; min-height:0; }
       #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
+    }
+    .header.homeDateSplit #banner-changer-btn { grid-column:1; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle { grid-column:3; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px; height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
 
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .empStatus, .empStatusHit { direction:ltr; unicode-bidi:isolate; }
@@ -209,7 +235,8 @@
       40% { transform:rotate(-6deg); }
     }
 
-    /* Date — with-me split layout (homepage trial) */
+
+    /* Date — with-me split layout */
     .header.homeDateSplit {
       display:grid;
       grid-template-columns:28px minmax(0,1fr) 28px;
@@ -459,6 +486,7 @@
       z-index:10000;
     }
 
+
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
@@ -474,7 +502,7 @@
       display:flex; 
       justify-content:center; 
       align-items:stretch;
-      gap:12px; 
+      gap:10px; 
       margin-top:14px;
       flex-wrap:wrap;
       position:relative;
@@ -574,8 +602,10 @@
     #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
-      font-size:11px;      font-weight:800;      color:#334155;
-      text-transform:uppercase;
+      font-size:11px;
+      font-weight:800; 
+      color:#334155; 
+      text-transform:uppercase; 
       letter-spacing:.2px; 
       margin-top:4px;
       line-height:1.1;
@@ -1124,222 +1154,6 @@
       .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-    }
-    .siteShareUrl {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      direction: ltr;
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
-    .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
-    }
-    .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-    }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
-    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
@@ -1397,78 +1211,6 @@
       .empStatus       { font-size:12px; }
       .shiftLabel      { font-size:14px; }
       .summaryChip .chipVal { font-size:19px; }
-    }
-
-      /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .shiftCopySheet {
-      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
-      pointer-events: none; visibility: hidden;
-    }
-    .shiftCopySheet.open { display: flex; pointer-events: auto; visibility: visible; }
-    .shiftCopyCard {
-      width: min(100%, 380px); background: #fff; border-radius: 18px; padding: 18px 16px 14px;
-      border: 1px solid rgba(15,23,42,.1); box-shadow: 0 20px 48px rgba(15,23,42,.22);
-      text-align: center;
-    }
-    .shiftCopyTitle { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
-    .shiftCopyHint { font-size: 12px; color: #64748b; margin: 0 0 14px; line-height: 1.4; }
-    .shiftCopyGrid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 6px; }
-    .shiftCopyOpt {
-      display: flex; align-items: center; gap: 12px;
-      min-height: 52px; padding: 8px 10px 8px 14px; border-radius: 14px;
-      border: 1.5px solid #e2e8f0; background: #f8fafc;
-      font: inherit; text-align: start; -webkit-tap-highlight-color: transparent;
-    }
-    .shiftCopyOpt-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 12px; background: #fff;
-      border: 1px solid #e2e8f0; flex-shrink: 0;
-    }
-    .shiftCopyOpt-main {
-      flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0;
-    }
-    .shiftCopyOpt-label { font-size: 14px; font-weight: 800; color: #1e293b; }
-    .shiftCopyOpt-count {
-      min-width: 26px; padding: 2px 8px; border-radius: 999px;
-      font-size: 12px; font-weight: 800; color: #475569;
-      background: #eef2f7; border: 1px solid #e2e8f0; text-align: center;
-    }
-    .shiftCopyOpt-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .shiftCopyAct {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
-      border: 1.5px solid #e2e8f0; background: #fff; font: inherit;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-    }
-    .shiftCopyAct:active { transform: scale(.94); }
-    .shiftCopyAct svg { display: block; }
-    .shiftCopyAct--share { background: #ecfdf5; border-color: #86efac; }
-    .shiftCopyOpt.is-empty { opacity: .5; }
-    .shiftCopyOpt.is-empty .shiftCopyAct { pointer-events: none; }
-    .shiftCopyOpt--morning { border-color: #fcd34d; background: #fffbeb; }
-    .shiftCopyOpt--morning .shiftCopyOpt-icon { background: #fef9c3; border-color: #fde68a; }
-    .shiftCopyOpt--afternoon { border-color: #fdba74; background: #fff7ed; }
-    .shiftCopyOpt--afternoon .shiftCopyOpt-icon { background: #ffedd5; border-color: #fed7aa; }
-    .shiftCopyOpt--night { border-color: #c4b5fd; background: #f5f3ff; }
-    .shiftCopyOpt--night .shiftCopyOpt-icon { background: #ede9fe; border-color: #ddd6fe; }
-    .shiftCopyOpt--annual { border-color: #fca5a5; background: #fef2f2; }
-    .shiftCopyOpt--annual .shiftCopyOpt-icon { background: #fee2e2; border-color: #fecaca; }
-    .shiftCopyOpt--training { border-color: #d8b4fe; background: #faf5ff; }
-    .shiftCopyOpt--training .shiftCopyOpt-icon { background: #f3e8ff; border-color: #e9d5ff; }
-    .shiftCopyStatus {
-      min-height: 18px; margin: 10px 0 12px; font-size: 12.5px; font-weight: 700;
-      line-height: 1.4; color: #64748b;
-    }
-    .shiftCopyStatus.is-ok { color: #166534; }
-    .shiftCopyStatus.is-err { color: #b91c1c; }
-    .shiftCopyCloseWrap { margin-top: 2px; }
-    .shiftCopyCloseWrap .roster-cta-btn { width: 100%; }
-    body.ar .shiftCopyOpt { text-align: start; }
-    @media (hover: hover) {
-      .shiftCopyAct--copy:hover { background: #f1f5f9; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
-      .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
   </style>
@@ -1564,6 +1306,8 @@
     }
     a.summaryChip.exportChip .chipVal { color:#059669; }
     a.summaryChip.exportChip:hover { box-shadow:0 8px 20px rgba(5,150,105,.18); }
+    a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
+    a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
     .welcomeChip.visible {
       display: flex;
     }
@@ -1572,6 +1316,14 @@
       overflow: hidden;
       text-overflow: ellipsis;
       transition: opacity .28s ease, color .28s ease;
+    }
+    .welcomeShiftEmoji {
+      display: none;
+      font-size: 22px;
+      line-height: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .welcomeChip .chipLabel { transition: none; }
     }
     .waveHand {
       display: inline-block;
@@ -1708,7 +1460,7 @@
 
   
   <div class="summaryBar">
-        <a href="{{BASE}}/import/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;" onclick="goToWithMe(event)">
+    <a href="{{BASE}}/import/with-me/" id="withMeChipBtn" class="summaryChip withMeChip" style="text-decoration:none;" onclick="goToWithMe(event)">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
@@ -1728,7 +1480,7 @@
       <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
@@ -2431,7 +2183,7 @@
 
     
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">03SEP2026 / 13:44</strong>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">15SEP2026 / 06:50</strong>
     <br>Total: <strong id="importTotalEmployees">68 employees</strong>
      &nbsp;·&nbsp; Source: <strong id="importSourceName">SEPTEMBER 2026 ROSTER IMPORT OPERATIONS.xlsx</strong>
   </div>
@@ -3061,7 +2813,7 @@ function buildBannerHeaderForSnapshot() {
   clone.style.backgroundPosition = bg.position;
   clone.style.backgroundRepeat = bg.repeat;
   if (bg.color) clone.style.backgroundColor = bg.color;
-  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label').forEach(function(el) {
+  clone.querySelectorAll('.bannerTitle, .bannerTitleEyebrow, .bannerTitleMain, .dateTag, .dateTag-label, .dateTagDay, .dateTagWeek, .dateTagMonth').forEach(function(el) {
     el.style.position = 'relative';
     el.style.zIndex = '2';
     el.style.color = '#fff';
@@ -3336,58 +3088,53 @@ function goToEmployeeSchedule(empName) {
       String(muscatTime.getDate()).padStart(2, '0');
   }
 
-  var MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
-  function formatIsoLabel(iso) {
-    var d = new Date(iso + 'T00:00:00');
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
-  function weekdayLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
-    var names = lang === 'ar' ? DAYS_AR : DAYS_EN;
-    return names[d.getUTCDay()] || '';
-  }
-
-  function dayNumLabel(iso) {
-    var p = (iso || '').split('-');
-    return p.length === 3 ? String(parseInt(p[2], 10)) : '';
-  }
-
-  function monthNameLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var mo = parseInt(p[1], 10);
-    var months = lang === 'ar' ? MONTHS_AR : MONTHS_EN;
-    return months[mo - 1] || '';
-  }
-
-  function syncHeaderDate(iso, langOverride) {
+  function formatIsoLabel(iso, langOverride) {
     var lang = langOverride
       || (typeof LANG !== 'undefined' && LANG)
       || document.documentElement.getAttribute('lang')
       || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return iso;
+    var months = ar
+      ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var mo = parseInt(p[1], 10);
+    var day = String(parseInt(p[2], 10));
+    return day + ' ' + (months[mo - 1] || p[1]) + ' ' + p[0];
+  }
+
+  function syncHeaderDate(iso, langOverride) {
+    if (window.rosterPaintHeaderDate) {
+      window.rosterPaintHeaderDate(iso, langOverride);
+      return;
+    }
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
     var dateWeek = document.getElementById('dateTagWeek');
     var dateDay = document.getElementById('dateTagDay');
     var dateMonth = document.getElementById('dateTagMonth');
-    if (dateDay) {
-      if (dateWeek) dateWeek.textContent = weekdayLabel(iso, lang);
-      dateDay.textContent = dayNumLabel(iso);
-      if (dateMonth) dateMonth.textContent = monthNameLabel(iso, lang);
+    var p = String(iso || '').split('-');
+    if (dateDay && p.length === 3) {
+      var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+      var days = ar
+        ? ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var months = ar
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      if (dateWeek) dateWeek.textContent = days[d.getUTCDay()] || '';
+      dateDay.textContent = String(parseInt(p[2], 10));
+      if (dateMonth) dateMonth.textContent = months[parseInt(p[1], 10) - 1] || '';
       return;
     }
     var tag = document.getElementById('dateTag');
     if (tag) {
       var dateLbl = document.getElementById('dateTagLabel');
-      var dateText = formatIsoLabel(iso);
+      var dateText = formatIsoLabel(iso, lang);
       if (dateLbl) dateLbl.textContent = dateText;
       else tag.textContent = dateText;
     }
@@ -3579,17 +3326,6 @@ function goToEmployeeSchedule(empName) {
     window.location.href = target;
   });
 
-  (function loadDateBannerNav() {
-    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
-    if (!root) {
-      var p = location.pathname || '/';
-      root = p.replace(/\/date\/\d{4}-\d{2}-\d{2}\/.*$/i, '/').replace(/\/now\/.*$/i, '/').replace(/\/+$/, '') || '';
-    }
-    var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
-    document.head.appendChild(s);
-  })();
-
 })();
 
 // ═══════════════════════════════════════════════════
@@ -3736,7 +3472,7 @@ var T = {
     from:'FROM', to:'TO',
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
-    exportChecker:'Export Checker', exportOps:'Export Operators',
+    exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
@@ -3750,7 +3486,7 @@ var T = {
     from:'من', to:'إلى',
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
-    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
@@ -3813,7 +3549,7 @@ function applyLang(lang) {
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
-    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
     'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
     'Unassigned':t.unassigned};
   document.querySelectorAll('.deptTitle').forEach(function(el) {
@@ -3884,7 +3620,7 @@ function applyLang(lang) {
     var datePickerEl = document.getElementById('datePicker');
     var iso = datePickerEl && datePickerEl.value;
     if (!iso) {
-      var m = (window.location.pathname || '').match(/\/date\/(\d{4}-\d{2}-\d{2})\//);
+      var m = (window.location.pathname || '').match(/(\d{4}-\d{2}-\d{2})/);
       if (m) iso = m[1];
     }
     if (iso) window.rosterSyncHeaderDate(iso, lang);
@@ -3921,7 +3657,7 @@ startSummarySwitchLoop();
     if (document.getElementById('bgTextureShuffleBtn')) return;
     try {
       var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260901b';
+      var src = root + '/bg-texture-shuffle.js?v=20260903c';
       if (document.querySelector('script[data-local-src="' + src + '"]')) return;
       var s = document.createElement('script');
       s.src = src;
@@ -3974,13 +3710,20 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){
-      shiftCard.removeAttribute('open');
+      var key = shiftCard.dataset.shift || '';
+      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
+        shiftCard.open = false;
+        shiftCard.removeAttribute('open');
+      }
     });
     var currentShift = getCurrentShiftForMuscat();
     var target = shiftCards.find(function(shiftCard){
       return shiftCard.dataset.shift === currentShift;
-    }) || shiftCards[0];
-    if(target) target.setAttribute('open', '');
+    });
+    if(target) {
+      target.open = true;
+      target.setAttribute('open', '');
+    }
   }
 
   function cardHasSavedEmployee(card){
@@ -4159,13 +3902,9 @@ function goToImport(event) {
     });
 }
 
-function goToWithMe(event) {
-  if (event) event.preventDefault();
-  location.href = _importBase() + '/with-me/';
-}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
-  var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }
 
@@ -4564,14 +4303,15 @@ function goToExport(event) {
   location.href = root + '/date/' + iso + '/';
 }
 
-function goToWithMe(event) {
-  if (event) event.preventDefault();
-  location.href = _importBase() + '/with-me/';
-}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
   location.href = target;
+}
+
+function goToWithMe(event) {
+  if (event) event.preventDefault();
+  location.href = _importBase() + '/with-me/';
 }
 
 (function bindFlightSwitchIcons() {
@@ -4590,8 +4330,6 @@ function setSummaryChipHrefs() {
   var welcome = document.getElementById('welcomeChip');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
-  var withMe = document.getElementById('withMeChipBtn');
-  if (withMe) withMe.href = _importBase() + '/with-me/';
   if (my) my.href = importBase;
   if (exp) {
     var iso = '';
@@ -4629,6 +4367,7 @@ setSummaryChipHrefs();
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
+  addScript(root + '/open-current-shift.js?v=20260908s');
   addScript(root + '/emp-contact.js?v=20260902c');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
