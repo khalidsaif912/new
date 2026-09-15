@@ -2347,9 +2347,9 @@
         "day": 16,
         "day_name_ar": "الأربعاء",
         "day_name_en": "Wednesday",
-        "shift_code": "AN13",
-        "shift_label": "🌆 Afternoon (AN13)",
-        "shift_group": "Afternoon"
+        "shift_code": "MN06",
+        "shift_label": "🌅 Morning (MN06)",
+        "shift_group": "Morning"
       },
       {
         "date": "2026-09-17",
@@ -2383,9 +2383,9 @@
         "day": 20,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day"
+        "shift_code": "OTN",
+        "shift_label": "⏱️ OTN",
+        "shift_group": "Standby"
       },
       {
         "date": "2026-09-21",
@@ -2455,9 +2455,9 @@
         "day": 28,
         "day_name_ar": "الاثنين",
         "day_name_en": "Monday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day"
+        "shift_code": "OTN",
+        "shift_label": "⏱️ OTN",
+        "shift_group": "Standby"
       },
       {
         "date": "2026-09-29",
