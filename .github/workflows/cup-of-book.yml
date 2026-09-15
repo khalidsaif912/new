@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "0 */3 * * *"
 
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -40,12 +44,5 @@ jobs:
 
       - name: Commit and push image updates
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/a-cup-of-book/images/ docs/a-cup-of-book/index.html
-          if git diff --staged --quiet; then
-            echo "No image or gallery list changes to commit."
-            exit 0
-          fi
-          git commit -m "Add latest A Cup of Book image"
-          git push
+          bash scripts/ci_commit_and_push.sh "Add latest A Cup of Book image"

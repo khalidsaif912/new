@@ -1,8 +1,16 @@
 name: Import Roster Site (WO/Export)
 on:
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [import-roster-updated]
   schedule:
+    # Backup only. GitHub often delays public-repo cron by hours; Power Automate
+    # must fire repository_dispatch as soon as the import Excel is written.
     - cron: "*/10 * * * *"
+
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -13,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5

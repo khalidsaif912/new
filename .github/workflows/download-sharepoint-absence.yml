@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "0 3 * * *"
 
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -50,17 +54,10 @@ jobs:
 
       - name: Commit and push absence updates
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
           if [ -f "docs/absence-data.json" ]; then git add docs/absence-data.json; fi
           if [ -f "last_absence_hash.txt" ]; then git add last_absence_hash.txt; fi
           if [ -d "absence-archive" ]; then git add absence-archive; fi
-          if git diff --staged --quiet; then
-            echo "No absence changes to commit"
-          else
-            git commit -m "Update absence data"
-            git push
-          fi
+          bash scripts/ci_commit_and_push.sh "Update absence data"
 
       - name: Upload downloaded absence file
         if: hashFiles('absence-archive/absence-report.xlsb') != ''

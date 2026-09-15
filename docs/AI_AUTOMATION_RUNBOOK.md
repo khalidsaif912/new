@@ -58,18 +58,20 @@ When changing deployment mode, always re-test all primary buttons:
 File: `.github/workflows/roster.yml`
 
 Trigger:
-- `schedule: */10 * * * *` (every 10 minutes)
-- manual trigger via `workflow_dispatch`
+- **Primary:** `repository_dispatch` type `export-roster-updated` (Power Automate HTTP after `latest.xlsx` is written)
+- **Backup:** `schedule: */10 * * * *` (GitHub often delays this by hours on public repos — do not rely on it for same-day overwrites)
+- **Manual:** `workflow_dispatch`
 
 Core logic:
 1. Reads current source filename from `EXPORT_SOURCE_NAME_URL`
 2. Compares with committed `last_filename.txt` (name) and SHA-256 of `EXPORT_EXCEL_URL` (content)
-3. Regenerates when **either** changes, or on manual `workflow_dispatch` (no fixed “mandatory hours” gate)
-4. Email sends only when name or content changed (not every 10-minute poll)
+3. Regenerates when **either** changes, or on `workflow_dispatch` / `repository_dispatch` (no fixed “mandatory hours” gate)
+4. Email sends only when name or content changed (not every poll or empty forced refresh)
 5. If processing required:
    - runs `generate_and_send.py`
    - runs `generate_employee_schedules.py`
-   - commits updated `docs`, `rosters`, and state files
+   - commits updated `docs`, `rosters`, and state files using rebase+retry push
+6. All docs-pushing workflows share concurrency group `docs-main` so export cannot lose a push to import/training/absence
 
 ---
 
@@ -78,16 +80,17 @@ Core logic:
 File: `.github/workflows/import_roster.yml`
 
 Trigger:
-- `schedule: */10 * * * *`
-- manual trigger
+- **Primary:** `repository_dispatch` type `import-roster-updated`
+- **Backup:** `schedule: */10 * * * *`
+- **Manual:** `workflow_dispatch`
 
 Core logic:
 1. Reads source filename from `IMPORT_SOURCE_NAME_URL`
 2. Compares name against `import_last_filename.txt` and Excel hash under `import-rosters/.versions/`
-3. Regenerates when name or content changes (or manual dispatch)
+3. Regenerates when name or content changes (or dispatch / manual)
 4. If needed:
    - runs `generate_and_send_import.py`
-   - commits updated `docs/import` and state files
+   - commits updated `docs/import` and state files (rebase+retry, same `docs-main` queue)
 
 ---
 
@@ -213,12 +216,22 @@ If these are removed/reset:
 
 ## 9) How Updates Happen in Practice
 
-## New roster uploaded
-- Source filename changes at `*_SOURCE_NAME_URL`
-- Next scheduled run detects diff
-- Generator rebuilds site
-- Action commits and pushes
-- GitHub Pages deploys new static output
+## New roster uploaded (required Power Automate step)
+
+After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text):
+
+1. HTTP **POST** `https://api.github.com/repos/khalidsaif912/new/dispatches`
+2. Headers:
+   - `Accept: application/vnd.github+json`
+   - `Authorization: Bearer <GitHub PAT>`
+   - `X-GitHub-Api-Version: 2022-11-28`
+3. Body:
+   - Export: `{"event_type":"export-roster-updated"}`
+   - Import: `{"event_type":"import-roster-updated"}`
+4. PAT: classic `repo` scope, **or** fine-grained **Contents: Read and write** on `khalidsaif912/new`
+5. GitHub Actions regenerates and pushes immediately. Cron is only a backup.
+
+Without this HTTP action, same-name overwrites wait for GitHub’s delayed schedule (often hours).
 
 ## Same roster filename but content changed
 - CI compares **SHA-256** of the Excel bytes and a **logical content fingerprint**
@@ -227,6 +240,7 @@ If these are removed/reset:
   is less likely to serve a stale copy when the file was overwritten in place.
 - If either hash or fingerprint differs → regenerate pages + rebuild roster-diff.
 - Prefer renaming versions upstream (`Version 5` → `Version 5.1` → `Version 6`) when possible.
+- Concurrent docs workflows queue on `docs-main` and `git pull --rebase` before push so a generate is not discarded.
 
 ## Training list changed
 - Training workflow runs every 30 minutes
@@ -259,11 +273,14 @@ If these are removed/reset:
 
 ## Symptom: No automatic updates
 - Cause candidates:
+  - Power Automate did not POST `repository_dispatch` after Create file
+  - GitHub cron delay (backup only — often hours)
   - missing secrets in this repo
   - invalid OneShare links
   - workflow disabled
-  - action failed during fetch/parse
+  - action failed during fetch/parse **or** (legacy) `git push` lost a race
 - Fix:
+  - confirm PA HTTP action after Create file (`export-roster-updated` / `import-roster-updated`)
   - check Actions logs
   - test each URL endpoint from runner perspective
   - re-add secrets
@@ -283,7 +300,6 @@ If these are removed/reset:
 ## 12) Recommended Hardening (Future)
 
 - Move fixed base URL fallback away from old repository naming.
-- Add hash-based source comparison (not filename-only).
 - Centralize base-path helper in generator templates to avoid drift.
 - Add post-deploy URL smoke test workflow.
 - Add workflow alerts on repeated failures.

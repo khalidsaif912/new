@@ -1,8 +1,16 @@
 name: Roster Site + Email
 on:
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [export-roster-updated]
   schedule:
+    # Backup only. GitHub often delays public-repo cron by hours; Power Automate
+    # must fire repository_dispatch as soon as latest.xlsx is written.
     - cron: "*/10 * * * *"
+
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -13,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -160,25 +170,18 @@ jobs:
       - name: Commit updated docs
         if: success()
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
           git add docs rosters last_filename.txt
           if [ -f last_absence_hash.txt ]; then git add last_absence_hash.txt; fi
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            if [ "${{ steps.check_changes.outputs.should_process }}" == "true" ]; then
-              if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
-                git commit -m "Update roster: ${{ steps.check_changes.outputs.filename }}"
-              else
-                git commit -m "Refresh export roster pages"
-              fi
+          if [ "${{ steps.check_changes.outputs.should_process }}" == "true" ]; then
+            if [ "${{ steps.check_changes.outputs.changed }}" == "true" ]; then
+              MSG="Update roster: ${{ steps.check_changes.outputs.filename }}"
             else
-              git commit -m "Update absence data"
+              MSG="Refresh export roster pages"
             fi
-            git push
-            echo "Pushed!"
+          else
+            MSG="Update absence data"
           fi
+          bash scripts/ci_commit_and_push.sh "$MSG"
 
       - name: Skip - No action needed
         if: steps.check_changes.outputs.should_process == 'false'

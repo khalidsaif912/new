@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -38,13 +42,5 @@ jobs:
 
       - name: Commit and push if changed
         run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add training_courses_data.json docs/training
-          git commit -m "Auto-update training pages in docs folder"
-          git push
+          bash scripts/ci_commit_and_push.sh "Auto-update training pages in docs folder"

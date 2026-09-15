@@ -40,6 +40,13 @@ from roster_app.cache_io import (  # noqa: E402
 )
 
 MUSCAT = timezone(timedelta(hours=4))
+FORCED_EVENTS = frozenset({"workflow_dispatch", "repository_dispatch"})
+
+
+def is_forced_event(event_name: str | None = None) -> bool:
+    """Manual run or Power Automate / API dispatch — always regenerate."""
+    name = (event_name if event_name is not None else os.getenv("GITHUB_EVENT_NAME") or "").strip()
+    return name in FORCED_EVENTS
 
 
 def _http_get_text(url: str) -> str:
@@ -189,9 +196,9 @@ def gate_export() -> int:
     else:
         print("Skipping Excel hash check (missing URL or month)")
 
-    is_manual = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
+    forced = is_forced_event()
     now = datetime.now(MUSCAT)
-    should_process = name_changed or content_changed or is_manual
+    should_process = name_changed or content_changed or forced
     should_send_email = name_changed or content_changed or _email_window(now)
 
     print(f"Current file: {current_name}")
@@ -199,7 +206,7 @@ def gate_export() -> int:
     print(f"Month key: {month_key or 'unknown'}")
     print(f"Name changed: {name_changed}")
     print(f"Content changed: {content_changed}")
-    print(f"Manual dispatch: {is_manual}")
+    print(f"Forced event: {forced} ({os.getenv('GITHUB_EVENT_NAME') or 'none'})")
     print(f"Should process: {should_process}")
     print(f"Should send email: {should_send_email}")
 
@@ -252,15 +259,15 @@ def gate_import() -> int:
     else:
         print("Skipping import Excel hash check")
 
-    is_manual = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
-    should_process = name_changed or content_changed or is_manual
+    forced = is_forced_event()
+    should_process = name_changed or content_changed or forced
 
     print(f"Current file: {current_name}")
     print(f"Previous file: {old_name}")
     print(f"Month key: {month_key or 'unknown'}")
     print(f"Name changed: {name_changed}")
     print(f"Content changed: {content_changed}")
-    print(f"Manual dispatch: {is_manual}")
+    print(f"Forced event: {forced} ({os.getenv('GITHUB_EVENT_NAME') or 'none'})")
     print(f"Should process: {should_process}")
 
     _write_github_output(

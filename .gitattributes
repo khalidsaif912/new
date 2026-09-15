@@ -1,0 +1,2 @@
+# Keep shell scripts Unix-safe on GitHub Actions (Ubuntu).
+*.sh text eol=lf
