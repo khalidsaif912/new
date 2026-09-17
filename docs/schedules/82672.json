@@ -2374,18 +2374,18 @@
         "day": 19,
         "day_name_ar": "السبت",
         "day_name_en": "Saturday",
-        "shift_code": "OTM",
-        "shift_label": "⏱️ OTM",
-        "shift_group": "Standby"
+        "shift_code": "OFF",
+        "shift_label": "🛌 Off Day",
+        "shift_group": "Off Day"
       },
       {
         "date": "2026-09-20",
         "day": 20,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "OTA",
-        "shift_label": "⏱️ OTA",
-        "shift_group": "Standby"
+        "shift_code": "OFF",
+        "shift_label": "🛌 Off Day",
+        "shift_group": "Off Day"
       },
       {
         "date": "2026-09-21",
