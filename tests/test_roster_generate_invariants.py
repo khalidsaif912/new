@@ -168,12 +168,16 @@ def test_mantle_clients_survive_generate():
     imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
 
     assert "document.hidden ? 20000 : 4000" not in ticker
-    assert "POLL_VISIBLE_MS = 180000" in ticker
+    assert "الخادم مشغول الآن. أعد المحاولة بعد قليل" not in ticker
+    assert "لا رسائل بعد." in ticker
     assert "RosterMantle" in ticker
     assert "rosterMantleBackoffUntil" in ticker
     assert "rosterTickerStoreV1" in ticker
     assert "overlay.json" in store
     assert "rosterBannerOverlayV1" in store
+    assert "if (!isDeskLogPage()) return;" in store
+    assert "if (!isDeskLogPage()) return '';" in store
+    assert "custom-" in store
     assert "rosterMantleBackoffUntil" in visits
     assert '"removed"' in overlay
     assert "MANTLE_CLIENT_VER" in snippets
