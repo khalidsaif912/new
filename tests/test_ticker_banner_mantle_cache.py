@@ -38,7 +38,7 @@ def test_banner_store_uses_overlay_cache_and_refuses_blind_saves():
 
 def test_banner_changer_does_not_fallback_custom_to_static_path():
     assert "if (/^custom:/i.test(String(name || ''))) return '';" in CHANGER
-    assert "BANNER_STORE_VER = '20260923c'" in CHANGER
+    assert "BANNER_STORE_VER = '20260923d'" in CHANGER
     assert 'value="date"' in CHANGER
     assert "التاريخ فقط" in CHANGER
     assert "bannerChromeSettingsBtn" in CHANGER
@@ -47,11 +47,11 @@ def test_banner_changer_does_not_fallback_custom_to_static_path():
 
 
 def test_pages_load_busted_script_versions():
-    assert "holiday-ticker.js?v=20260923c" in SNIPPETS
-    assert "banner-store.js?v=20260923c" in SNIPPETS
-    assert "banner-changer.js?v=20260923c" in SNIPPETS
-    assert "holiday-ticker.js?v=20260923c" in INDEX
-    assert "banner-store.js?v=20260923c" in INDEX
+    assert "holiday-ticker.js?v=20260923d" in SNIPPETS
+    assert "banner-store.js?v=20260923d" in SNIPPETS
+    assert "banner-changer.js?v=20260923d" in SNIPPETS
+    assert "holiday-ticker.js?v=20260923d" in INDEX
+    assert "banner-store.js?v=20260923d" in INDEX
     assert "holiday-ticker.js?v=20260814r" not in INDEX
 
 
