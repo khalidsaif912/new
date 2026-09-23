@@ -24,29 +24,37 @@ def test_ticker_keeps_last_good_store_and_images_on_disk():
     assert "rosterTickerImgCacheV1" in TICKER
     assert "lastStoreFromNetwork" in TICKER
     assert "if (removed && lastStoreFromNetwork)" in TICKER
-    assert "readFullStore(true)" in TICKER
+    assert "async function readFullStore(requireNetwork)" in TICKER
+    assert "readFullStore(false)" in TICKER
 
 
 def test_banner_store_uses_overlay_cache_and_refuses_blind_saves():
     assert "rosterBannerOverlayV1" in STORE
     assert "rosterBannerImgCacheV1" in STORE
-    assert 'if (!overlayFetchOk) throw new Error("overlay-offline")' in STORE or (
-        "if (!overlayFetchOk) throw new Error('overlay-offline')" in STORE
-    )
     assert "RosterMantle" in STORE
+    assert "overlayLoadedSuccessfully" in STORE
+    assert "if (!isDeskLogPage()) return;" in STORE
 
 
 def test_banner_changer_does_not_fallback_custom_to_static_path():
     assert "if (/^custom:/i.test(String(name || ''))) return '';" in CHANGER
-    assert "BANNER_STORE_VER = '20260910a'" in CHANGER
+    assert "BANNER_STORE_VER = '20260910d'" in CHANGER
+    assert "if (!isDeskLogPage()) return fileOv;" in CHANGER
+
+
+def test_public_banners_do_not_get_mantle():
+    assert "if (!isDeskLogPage()) return;" in STORE
+    assert "if (!isDeskLogPage()) return '';" in STORE
+    assert "custom-' + encodeURIComponent(id) + '.jpg'" in STORE
+    assert "Visitors never GET Mantle images" in STORE
 
 
 def test_pages_load_busted_script_versions():
-    assert "holiday-ticker.js?v=20260910a" in SNIPPETS
-    assert "banner-store.js?v=20260910a" in SNIPPETS
-    assert "banner-changer.js?v=20260910a" in SNIPPETS
-    assert "holiday-ticker.js?v=20260910a" in INDEX
-    assert "banner-store.js?v=20260910a" in INDEX
+    assert 'MANTLE_CLIENT_VER = "20260910d"' in SNIPPETS
+    assert 'banner-store.js?v=""" + MANTLE_CLIENT_VER' in SNIPPETS
+    assert 'holiday-ticker.js?v=""" + MANTLE_CLIENT_VER' in SNIPPETS
+    assert "holiday-ticker.js?v=20260910d" in INDEX
+    assert "banner-store.js?v=20260910d" in INDEX
     assert "holiday-ticker.js?v=20260814r" not in INDEX
 
 
