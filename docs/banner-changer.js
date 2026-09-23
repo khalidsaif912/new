@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260923a';
+  const BANNER_STORE_VER = '20260923b';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -1052,18 +1052,82 @@
       '#bannerChromeFadeSettings{',
       'grid-column:1/-1!important;',
       'min-height:0!important;',
-      'padding:7px 9px!important;',
-      'gap:4px 8px!important;',
-      'flex-direction:row!important;',
-      'flex-wrap:wrap!important;',
-      'align-items:center!important;',
+      'padding:10px 11px!important;',
+      'gap:8px!important;',
+      'flex-direction:column!important;',
+      'flex-wrap:nowrap!important;',
+      'align-items:stretch!important;',
       '}',
-      '#bannerChromeFadeSettings > div:first-child{',
-      'margin:0 6px 0 0!important;',
+      '#bannerChromeFadeSettings .bcf-head{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'gap:2px!important;',
+      '}',
+      '#bannerChromeFadeSettings .bcf-title{',
+      'margin:0!important;',
+      'color:#f5ead8!important;',
+      'font-size:12px!important;',
+      'font-weight:800!important;',
+      'line-height:1.25!important;',
+      '}',
+      '#bannerChromeFadeSettings .bcf-sub{',
+      'margin:0!important;',
+      'color:rgba(214,199,165,.78)!important;',
       'font-size:10px!important;',
-      'white-space:nowrap!important;',
+      'font-weight:600!important;',
+      'line-height:1.35!important;',
       '}',
-      '#bannerChromeFadeSettings label{font-size:9px!important;gap:3px!important;}',
+      '#bannerChromeFadeSettings .bcf-grid{',
+      'display:grid!important;',
+      'grid-template-columns:repeat(2,minmax(0,1fr))!important;',
+      'gap:7px!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'align-items:flex-start!important;',
+      'justify-content:center!important;',
+      'gap:2px!important;',
+      'margin:0!important;',
+      'padding:9px 10px!important;',
+      'min-height:52px!important;',
+      'border-radius:11px!important;',
+      'border:1.5px solid rgba(224,189,99,.28)!important;',
+      'background:rgba(0,0,0,.22)!important;',
+      'color:#e8dcc4!important;',
+      'cursor:pointer!important;',
+      'box-sizing:border-box!important;',
+      'transition:border-color .15s ease,background .15s ease,box-shadow .15s ease!important;',
+      '-webkit-tap-highlight-color:transparent!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt:hover{',
+      'border-color:rgba(224,189,99,.55)!important;',
+      'background:rgba(224,189,99,.08)!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt.is-on{',
+      'border-color:#e0bd63!important;',
+      'background:rgba(224,189,99,.16)!important;',
+      'box-shadow:inset 0 0 0 1px rgba(224,189,99,.35)!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt .bcf-name{',
+      'font-size:11px!important;',
+      'font-weight:800!important;',
+      'line-height:1.2!important;',
+      'color:#f7efdf!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt .bcf-hint{',
+      'font-size:9px!important;',
+      'font-weight:600!important;',
+      'line-height:1.3!important;',
+      'color:rgba(214,199,165,.75)!important;',
+      '}',
+      '#bannerChromeFadeSettings label.bcf-opt input{',
+      'position:absolute!important;',
+      'opacity:0!important;',
+      'pointer-events:none!important;',
+      'width:0!important;',
+      'height:0!important;',
+      '}',
     ].join('');
     document.head.appendChild(style);
   }
@@ -1445,41 +1509,77 @@
     cell.id = 'bannerChromeFadeSettings';
     cell.style.cssText = [
       'grid-column:1/-1',
-      'border-radius:10px',
-      'border:1.5px dashed rgba(224,189,99,.45)',
-      'background:rgba(255,255,255,.04)',
-      'padding:7px 9px',
+      'border-radius:12px',
+      'border:1.5px solid rgba(224,189,99,.35)',
+      'background:rgba(255,255,255,.05)',
+      'padding:10px 11px',
       'display:flex',
-      'flex-direction:row',
-      'flex-wrap:wrap',
-      'align-items:center',
-      'gap:4px 8px',
+      'flex-direction:column',
+      'gap:8px',
       'box-sizing:border-box'
     ].join(';');
+    var options = [
+      { value: 'off', name: 'بدون إخفاء', hint: 'كل العناصر تبقى ظاهرة' },
+      { value: 'title', name: 'العنوان فقط', hint: 'يبقى العنوان ويخفى الباقي' },
+      { value: 'date', name: 'التاريخ فقط', hint: 'يبقى التاريخ ويخفى الباقي' },
+      { value: 'all', name: 'إخفاء الكل', hint: 'يخفى العنوان والتاريخ والأزرار' }
+    ];
     cell.innerHTML =
-      '<div style="color:#f5ead8;font-size:10px;font-weight:800;line-height:1.2;">إخفاء العناصر</div>' +
-      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
-      '<input type="radio" name="bannerChromeFade" value="off" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">بدون إخفاء</label>' +
-      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
-      '<input type="radio" name="bannerChromeFade" value="title" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إبقاء العنوان</label>' +
-      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
-      '<input type="radio" name="bannerChromeFade" value="date" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إظهار التاريخ فقط</label>' +
-      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
-      '<input type="radio" name="bannerChromeFade" value="all" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إخفاء الكل</label>';
+      '<div class="bcf-head">' +
+      '<div class="bcf-title">ماذا يظهر على البنر؟</div>' +
+      '<div class="bcf-sub">بعد ثوانٍ بدون لمس، اختر ما يبقى واضحاً</div>' +
+      '</div>' +
+      '<div class="bcf-grid">' +
+      options
+        .map(function (opt) {
+          return (
+            '<label class="bcf-opt' +
+            (opt.value === mode ? ' is-on' : '') +
+            '">' +
+            '<input type="radio" name="bannerChromeFade" value="' +
+            opt.value +
+            '">' +
+            '<span class="bcf-name">' +
+            opt.name +
+            '</span>' +
+            '<span class="bcf-hint">' +
+            opt.hint +
+            '</span>' +
+            '</label>'
+          );
+        })
+        .join('') +
+      '</div>';
     grid.appendChild(cell);
+
+    function syncSelected() {
+      var current = getChromeFadeMode();
+      cell.querySelectorAll('label.bcf-opt').forEach(function (lab) {
+        var input = lab.querySelector('input');
+        lab.classList.toggle('is-on', !!(input && input.value === current && input.checked));
+      });
+    }
+
     cell.querySelectorAll('input[name="bannerChromeFade"]').forEach(function (input) {
       if (input.value === mode) input.checked = true;
       input.addEventListener('change', function () {
         if (!input.checked) return;
         setChromeFadeMode(input.value);
+        syncSelected();
       });
       input.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    });
+    cell.querySelectorAll('label.bcf-opt').forEach(function (lab) {
+      lab.addEventListener('click', function (e) {
         e.stopPropagation();
       });
     });
     cell.addEventListener('click', function (e) {
       e.stopPropagation();
     });
+    syncSelected();
   }
 
   function init() {
