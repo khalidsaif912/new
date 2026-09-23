@@ -1307,12 +1307,6 @@
     ],
     "2026-11": [
       {
-        "day": 5,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
         "day": 6,
         "shift_code": "O",
         "shift_group": "Off Day",
@@ -1325,13 +1319,7 @@
         "projected": true
       },
       {
-        "day": 12,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 13,
+        "day": 8,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
@@ -1343,37 +1331,37 @@
         "projected": true
       },
       {
-        "day": 19,
+        "day": 15,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 20,
+        "day": 16,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 21,
+        "day": 22,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 26,
+        "day": 23,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 27,
+        "day": 24,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 28,
+        "day": 30,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
@@ -1381,19 +1369,25 @@
     ],
     "2026-12": [
       {
-        "day": 3,
+        "day": 1,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 4,
+        "day": 2,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
       },
       {
-        "day": 5,
+        "day": 8,
+        "shift_code": "O",
+        "shift_group": "Off Day",
+        "projected": true
+      },
+      {
+        "day": 9,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
@@ -1405,13 +1399,7 @@
         "projected": true
       },
       {
-        "day": 11,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 12,
+        "day": 16,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
@@ -1424,12 +1412,6 @@
       },
       {
         "day": 18,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 19,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
@@ -1448,12 +1430,6 @@
       },
       {
         "day": 26,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 31,
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
