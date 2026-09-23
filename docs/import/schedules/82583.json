@@ -1119,7 +1119,6 @@
     ],
     "2026-10": [
       {
-<<<<<<< HEAD
         "date": "2026-10-01",
         "day": 1,
         "shift_code": "OFF",
@@ -1304,77 +1303,6 @@
         "day": 31,
         "shift_code": "NN21",
         "shift_group": "Night"
-=======
-        "day": 1,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 2,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 3,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 9,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 10,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 11,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 17,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 18,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 19,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 25,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 26,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "day": 27,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
       }
     ],
     "2026-11": [
@@ -1523,7 +1451,6 @@
         "shift_code": "O",
         "shift_group": "Off Day",
         "projected": true
->>>>>>> 06976571ae (Add projected OFF days for Oct–Dec on My Schedule (export + import).)
       }
     ]
   },
