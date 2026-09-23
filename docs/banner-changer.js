@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260910a';
+  const BANNER_STORE_VER = '20260923a';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -1256,17 +1256,17 @@
   var CHROME_FADE_KEY = 'roster_banner_chrome_fade';
   var chromeFadeTimer = null;
 
-  /** off | title (keep title) | all */
+  /** off | title (keep title) | date (keep date) | all */
   function getChromeFadeMode() {
     try {
       var v = localStorage.getItem(CHROME_FADE_KEY) || 'all';
-      if (v === 'off' || v === 'title' || v === 'all') return v;
+      if (v === 'off' || v === 'title' || v === 'date' || v === 'all') return v;
     } catch (e) {}
     return 'all';
   }
 
   function setChromeFadeMode(mode) {
-    if (mode !== 'off' && mode !== 'title' && mode !== 'all') mode = 'all';
+    if (mode !== 'off' && mode !== 'title' && mode !== 'date' && mode !== 'all') mode = 'all';
     try {
       localStorage.setItem(CHROME_FADE_KEY, mode);
     } catch (e) {}
@@ -1307,18 +1307,22 @@
       style.textContent = rules.join('');
       return;
     }
+    // Always dim chrome controls (except date in "date" mode).
     rules.push(
       'html.header-chrome-dim #langToggle,',
       'html.header-chrome-dim #banner-changer-btn,',
-      'html.header-chrome-dim #spotlightEmojiBtn,',
-      'html.header-chrome-dim #dateTag,',
-      'html.header-chrome-dim .header .dateTag{',
+      'html.header-chrome-dim #spotlightEmojiBtn{',
       'opacity:' + CHROME_DIM_OPACITY + '!important;',
       'pointer-events:auto!important;',
       '}'
     );
-    if (mode === 'all') {
+    if (mode === 'date') {
       rules.push(
+        'html.header-chrome-dim #dateTag,',
+        'html.header-chrome-dim .header .dateTag{',
+        'opacity:1!important;',
+        'pointer-events:auto!important;',
+        '}',
         'html.header-chrome-dim #pageTitle,',
         'html.header-chrome-dim .bannerTitle,',
         'html.header-chrome-dim .bannerTitleEyebrow,',
@@ -1330,18 +1334,39 @@
         '}'
       );
     } else {
-      // title mode: force title fully visible while controls dim
       rules.push(
-        'html.header-chrome-dim #pageTitle,',
-        'html.header-chrome-dim .bannerTitle,',
-        'html.header-chrome-dim .bannerTitleEyebrow,',
-        'html.header-chrome-dim .bannerTitleMain,',
-        'html.header-chrome-dim .page-title,',
-        'html.header-chrome-dim .page-title-eyebrow,',
-        'html.header-chrome-dim .page-title-main{',
-        'opacity:1!important;',
+        'html.header-chrome-dim #dateTag,',
+        'html.header-chrome-dim .header .dateTag{',
+        'opacity:' + CHROME_DIM_OPACITY + '!important;',
+        'pointer-events:auto!important;',
         '}'
       );
+      if (mode === 'all') {
+        rules.push(
+          'html.header-chrome-dim #pageTitle,',
+          'html.header-chrome-dim .bannerTitle,',
+          'html.header-chrome-dim .bannerTitleEyebrow,',
+          'html.header-chrome-dim .bannerTitleMain,',
+          'html.header-chrome-dim .page-title,',
+          'html.header-chrome-dim .page-title-eyebrow,',
+          'html.header-chrome-dim .page-title-main{',
+          'opacity:' + CHROME_DIM_OPACITY + '!important;',
+          '}'
+        );
+      } else {
+        // title mode: keep title fully visible while controls dim
+        rules.push(
+          'html.header-chrome-dim #pageTitle,',
+          'html.header-chrome-dim .bannerTitle,',
+          'html.header-chrome-dim .bannerTitleEyebrow,',
+          'html.header-chrome-dim .bannerTitleMain,',
+          'html.header-chrome-dim .page-title,',
+          'html.header-chrome-dim .page-title-eyebrow,',
+          'html.header-chrome-dim .page-title-main{',
+          'opacity:1!important;',
+          '}'
+        );
+      }
     }
     rules.push(
       '@media (hover:hover) and (pointer:fine){',
@@ -1370,7 +1395,7 @@
     if (mode === 'off') dim = false;
     document.documentElement.classList.toggle('header-chrome-dim', !!dim);
     getHeaderTitleEls().forEach(function (el) {
-      if (dim && mode === 'all') {
+      if (dim && (mode === 'all' || mode === 'date')) {
         el.style.setProperty('opacity', CHROME_DIM_OPACITY, 'important');
       } else {
         el.style.removeProperty('opacity');
@@ -1437,6 +1462,8 @@
       '<input type="radio" name="bannerChromeFade" value="off" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">بدون إخفاء</label>' +
       '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
       '<input type="radio" name="bannerChromeFade" value="title" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إبقاء العنوان</label>' +
+      '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
+      '<input type="radio" name="bannerChromeFade" value="date" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إظهار التاريخ فقط</label>' +
       '<label style="display:flex;align-items:center;gap:5px;color:#d6c7a5;font-size:10px;font-weight:700;cursor:pointer;line-height:1.2;">' +
       '<input type="radio" name="bannerChromeFade" value="all" style="accent-color:#e0bd63;margin:0;flex-shrink:0;">إخفاء الكل</label>';
     grid.appendChild(cell);
