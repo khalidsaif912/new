@@ -238,6 +238,12 @@ def main() -> int:
     months = sorted({iso[:7] for iso, _ in pages})
     print(f"Merged {len(pages)} day pages across {len(months)} months: {', '.join(months)}")
     print(f"Wrote {written} schedule files")
+    try:
+        from project_off_months import main as project_off_main
+
+        project_off_main(["--import-only"])
+    except Exception as exc:
+        print(f"OFF month projection skipped: {exc}")
     return 0
 
 

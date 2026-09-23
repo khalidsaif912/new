@@ -80,7 +80,10 @@ LOAD_NEW = (
     "if(mr.ok)importMeta=await mr.json();}catch(e){}"
     "months=Object.keys(data.schedules||{}).sort();"
     "if(importMeta&&Array.isArray(importMeta.available_months)&&importMeta.available_months.length){"
-    "months=importMeta.available_months.slice().sort();"
+    "var monthSet={};"
+    "importMeta.available_months.forEach(function(m){monthSet[m]=1;});"
+    "months.forEach(function(m){monthSet[m]=1;});"
+    "months=Object.keys(monthSet).sort();"
     "var filtered={};months.forEach(function(m){filtered[m]=(data.schedules&&data.schedules[m])?data.schedules[m]:[];});"
     "data.schedules=filtered;"
     "}if(!months.length)"
@@ -122,6 +125,12 @@ def patch_apply_block(text: str) -> tuple[str, bool]:
 SCHED_DIR = IMPORT_ROOT / "schedules"
 
 
+def is_projected_month(rows) -> bool:
+    if not isinstance(rows, list) or not rows:
+        return False
+    return all(isinstance(r, dict) and r.get("projected") for r in rows)
+
+
 def filter_schedules_dir(allowed_months: list[str]) -> int:
     if not allowed_months:
         return 0
@@ -135,7 +144,12 @@ def filter_schedules_dir(allowed_months: list[str]) -> int:
         schedules = data.get("schedules") if isinstance(data.get("schedules"), dict) else {}
         if not schedules:
             continue
-        filtered = {ym: schedules[ym] for ym in schedules if ym in allowed}
+        # Keep published roster months + OFF-only projections for future months.
+        filtered = {
+            ym: schedules[ym]
+            for ym in schedules
+            if ym in allowed or is_projected_month(schedules[ym])
+        }
         if filtered == schedules:
             continue
         data["schedules"] = filtered
@@ -199,8 +213,38 @@ def main() -> int:
     my_path = IMPORT_ROOT / "my-schedules" / "index.html"
     if my_path.is_file():
         text = my_path.read_text(encoding="utf-8")
+        changed_my = False
         if LOAD_OLD in text and LOAD_NEW not in text:
-            my_path.write_text(text.replace(LOAD_OLD, LOAD_NEW, 1), encoding="utf-8", newline="\n")
+            text = text.replace(LOAD_OLD, LOAD_NEW, 1)
+            changed_my = True
+        # Upgrade older catalog-only filter so projected OFF months stay visible.
+        old_filter = (
+            "months=importMeta.available_months.slice().sort();"
+            "var filtered={};months.forEach(function(m){filtered[m]=(data.schedules&&data.schedules[m])?data.schedules[m]:[];});"
+            "data.schedules=filtered;"
+        )
+        old_filter2 = (
+            "months=importMeta.available_months.slice().sort();"
+            "var filtered={};months.forEach(function(m){filtered[m]=(data.schedules||{})[m]||[];});"
+            "data.schedules=filtered;"
+        )
+        new_filter = (
+            "var monthSet={};"
+            "importMeta.available_months.forEach(function(m){monthSet[m]=1;});"
+            "months.forEach(function(m){monthSet[m]=1;});"
+            "months=Object.keys(monthSet).sort();"
+            "var filtered={};months.forEach(function(m){filtered[m]=(data.schedules&&data.schedules[m])?data.schedules[m]:[];});"
+            "data.schedules=filtered;"
+        )
+        if "monthSet={}" not in text:
+            if old_filter in text:
+                text = text.replace(old_filter, new_filter, 1)
+                changed_my = True
+            elif old_filter2 in text:
+                text = text.replace(old_filter2, new_filter, 1)
+                changed_my = True
+        if changed_my:
+            my_path.write_text(text, encoding="utf-8", newline="\n")
             print("patched my-schedules loadSchedule")
 
     sched_changed = filter_schedules_dir(months)

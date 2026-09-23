@@ -1932,6 +1932,15 @@ def main() -> None:
         if sync_script.is_file():
             subprocess.run([sys.executable, str(sync_script)], check=False, cwd=str(repo_root))
 
+    # Re-project OFF-only future months after catalog sync (keeps Oct–Dec until official roster).
+    try:
+        sys.path.insert(0, str(repo_root / "scripts"))
+        from project_off_months import main as project_off_main
+
+        project_off_main(["--import-only"])
+    except Exception as e:
+        print(f"WARNING: OFF month projection skipped: {e}")
+
     write_legacy_roster_site_import_redirect(repo_root)
     try:
         from mantle_overlay_snapshot import snapshot_banner_overlay

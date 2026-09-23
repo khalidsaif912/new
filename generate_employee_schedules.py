@@ -12,9 +12,11 @@ generate_employee_schedules.py
 
 import os
 import re
+import sys
 import json
 import argparse
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 from io import BytesIO
 from collections import defaultdict
@@ -561,6 +563,15 @@ def main():
 
     generate_employee_schedules(wb, year, month)
     generate_schedule_index()
+    try:
+        _scripts = Path(__file__).resolve().parent / "scripts"
+        if str(_scripts) not in sys.path:
+            sys.path.insert(0, str(_scripts))
+        from project_off_months import main as project_off_main
+
+        project_off_main(["--export-only"])
+    except Exception as exc:
+        print(f"⚠️  OFF month projection skipped: {exc}")
 
     print("\n" + "=" * 60)
     print("✅ All done!")
