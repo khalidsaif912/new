@@ -34,7 +34,7 @@
     return '';
   }
   const BANNERS_PATH = (location.origin || '') + getSiteRootPath() + '/assets/banners/';
-  const BANNER_STORE_VER = '20260923b';
+  const BANNER_STORE_VER = '20260923c';
   const MANTLE_BANNERS_URL = 'https://mantledb.sh/v2/roster-site-visits/banners';
   const MANTLE_BANNERS_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   const CATALOG_BUMP_KEY = 'rosterBannerCatalogAt';
@@ -1049,79 +1049,118 @@
       'height:78px!important;',
       'pointer-events:none!important;',
       '}',
-      '#bannerChromeFadeSettings{',
-      'grid-column:1/-1!important;',
-      'min-height:0!important;',
-      'padding:10px 11px!important;',
+      '#bannerPickerHead{',
+      'display:flex!important;',
+      'align-items:center!important;',
+      'justify-content:space-between!important;',
       'gap:8px!important;',
-      'flex-direction:column!important;',
-      'flex-wrap:nowrap!important;',
-      'align-items:stretch!important;',
+      'margin-bottom:10px!important;',
       '}',
-      '#bannerChromeFadeSettings .bcf-head{',
+      '#bannerPickerHeadMain{',
       'display:flex!important;',
-      'flex-direction:column!important;',
-      'gap:2px!important;',
+      'align-items:center!important;',
+      'gap:8px!important;',
+      'min-width:0!important;',
+      'flex:1!important;',
       '}',
-      '#bannerChromeFadeSettings .bcf-title{',
-      'margin:0!important;',
+      '#bannerPickerTitle{',
       'color:#f5ead8!important;',
-      'font-size:12px!important;',
-      'font-weight:800!important;',
-      'line-height:1.25!important;',
+      'font-size:14px!important;',
+      'font-weight:700!important;',
+      'line-height:1.2!important;',
       '}',
-      '#bannerChromeFadeSettings .bcf-sub{',
-      'margin:0!important;',
-      'color:rgba(214,199,165,.78)!important;',
-      'font-size:10px!important;',
-      'font-weight:600!important;',
-      'line-height:1.35!important;',
-      '}',
-      '#bannerChromeFadeSettings .bcf-grid{',
-      'display:grid!important;',
-      'grid-template-columns:repeat(2,minmax(0,1fr))!important;',
-      'gap:7px!important;',
-      '}',
-      '#bannerChromeFadeSettings label.bcf-opt{',
-      'display:flex!important;',
-      'flex-direction:column!important;',
-      'align-items:flex-start!important;',
-      'justify-content:center!important;',
-      'gap:2px!important;',
-      'margin:0!important;',
-      'padding:9px 10px!important;',
-      'min-height:52px!important;',
-      'border-radius:11px!important;',
-      'border:1.5px solid rgba(224,189,99,.28)!important;',
-      'background:rgba(0,0,0,.22)!important;',
-      'color:#e8dcc4!important;',
-      'cursor:pointer!important;',
-      'box-sizing:border-box!important;',
-      'transition:border-color .15s ease,background .15s ease,box-shadow .15s ease!important;',
-      '-webkit-tap-highlight-color:transparent!important;',
-      '}',
-      '#bannerChromeFadeSettings label.bcf-opt:hover{',
-      'border-color:rgba(224,189,99,.55)!important;',
-      'background:rgba(224,189,99,.08)!important;',
-      '}',
-      '#bannerChromeFadeSettings label.bcf-opt.is-on{',
-      'border-color:#e0bd63!important;',
-      'background:rgba(224,189,99,.16)!important;',
-      'box-shadow:inset 0 0 0 1px rgba(224,189,99,.35)!important;',
-      '}',
-      '#bannerChromeFadeSettings label.bcf-opt .bcf-name{',
+      '#bannerChromeSettingsBtn{',
+      'display:inline-flex!important;',
+      'align-items:center!important;',
+      'gap:5px!important;',
+      'flex-shrink:0!important;',
+      'height:30px!important;',
+      'padding:0 10px!important;',
+      'border-radius:999px!important;',
+      'border:1px solid rgba(224,189,99,.4)!important;',
+      'background:rgba(224,189,99,.1)!important;',
+      'color:#f0e2c4!important;',
       'font-size:11px!important;',
       'font-weight:800!important;',
-      'line-height:1.2!important;',
+      'cursor:pointer!important;',
+      'line-height:1!important;',
+      '-webkit-tap-highlight-color:transparent!important;',
+      '}',
+      '#bannerChromeSettingsBtn[aria-expanded="true"]{',
+      'background:rgba(224,189,99,.22)!important;',
+      'border-color:#e0bd63!important;',
+      '}',
+      '#bannerChromeSettingsBtn .bcf-gear{',
+      'font-size:13px!important;',
+      'line-height:1!important;',
+      '}',
+      '#bannerChromeFadeMenu{',
+      'display:none!important;',
+      'margin:0 0 12px!important;',
+      'padding:12px!important;',
+      'border-radius:14px!important;',
+      'border:1px solid rgba(224,189,99,.35)!important;',
+      'background:rgba(0,0,0,.28)!important;',
+      'box-sizing:border-box!important;',
+      '}',
+      '#bannerChromeFadeMenu.is-open{',
+      'display:block!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-title{',
+      'margin:0 0 2px!important;',
+      'color:#f7efdf!important;',
+      'font-size:13px!important;',
+      'font-weight:800!important;',
+      'line-height:1.3!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-sub{',
+      'margin:0 0 10px!important;',
+      'color:rgba(214,199,165,.8)!important;',
+      'font-size:11px!important;',
+      'font-weight:600!important;',
+      'line-height:1.4!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-list{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'gap:6px!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-opt{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'align-items:stretch!important;',
+      'gap:2px!important;',
+      'margin:0!important;',
+      'padding:11px 12px!important;',
+      'border-radius:12px!important;',
+      'border:1.5px solid rgba(224,189,99,.22)!important;',
+      'background:rgba(255,255,255,.04)!important;',
+      'cursor:pointer!important;',
+      'box-sizing:border-box!important;',
+      'transition:border-color .15s ease,background .15s ease!important;',
+      '-webkit-tap-highlight-color:transparent!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-opt:hover{',
+      'border-color:rgba(224,189,99,.5)!important;',
+      'background:rgba(224,189,99,.08)!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-opt.is-on{',
+      'border-color:#e0bd63!important;',
+      'background:rgba(224,189,99,.16)!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-opt .bcf-name{',
+      'font-size:13px!important;',
+      'font-weight:800!important;',
+      'line-height:1.25!important;',
       'color:#f7efdf!important;',
       '}',
-      '#bannerChromeFadeSettings label.bcf-opt .bcf-hint{',
-      'font-size:9px!important;',
+      '#bannerChromeFadeMenu label.bcf-opt .bcf-hint{',
+      'font-size:11px!important;',
       'font-weight:600!important;',
-      'line-height:1.3!important;',
-      'color:rgba(214,199,165,.75)!important;',
+      'line-height:1.35!important;',
+      'color:rgba(214,199,165,.78)!important;',
       '}',
-      '#bannerChromeFadeSettings label.bcf-opt input{',
+      '#bannerChromeFadeMenu label.bcf-opt input{',
       'position:absolute!important;',
       'opacity:0!important;',
       'pointer-events:none!important;',
@@ -1219,10 +1258,16 @@
     const gesture = createBannerPickerGestureGuard(sheet);
 
     sheet.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
-        '<span style="color:#f5ead8;font-size:14px;font-weight:700;">اختر خلفية الهيدر</span>' +
-        '<button type="button" id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;">✕</button>' +
+      '<div id="bannerPickerHead">' +
+        '<div id="bannerPickerHeadMain">' +
+          '<span id="bannerPickerTitle">اختر خلفية الهيدر</span>' +
+          '<button type="button" id="bannerChromeSettingsBtn" aria-expanded="false" aria-controls="bannerChromeFadeMenu">' +
+            '<span class="bcf-gear" aria-hidden="true">⚙</span>إعدادات' +
+          '</button>' +
+        '</div>' +
+        '<button type="button" id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;flex-shrink:0;">✕</button>' +
       '</div>' +
+      '<div id="bannerChromeFadeMenu" role="region" aria-label="إعدادات إظهار البنر"></div>' +
       '<div id="bannerGrid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;"></div>' +
       '<button type="button" id="resetBanner" style="margin-top:10px;width:100%;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;color:#b8a57a;background:rgba(255,255,255,0.05);">إعادة الخلفية الافتراضية</button>';
 
@@ -1232,7 +1277,7 @@
     const grid = document.getElementById('bannerGrid');
     const lazyImgs = [];
 
-    buildChromeFadeSettingsCell(grid);
+    mountChromeFadeSettingsMenu();
 
     availableBanners.forEach(function (name) {
       const num = bannerNumberLabel(name);
@@ -1503,33 +1548,23 @@
     }, 400);
   }
 
-  function buildChromeFadeSettingsCell(grid) {
+  function mountChromeFadeSettingsMenu() {
+    var menu = document.getElementById('bannerChromeFadeMenu');
+    var btn = document.getElementById('bannerChromeSettingsBtn');
+    if (!menu || !btn) return;
+
     var mode = getChromeFadeMode();
-    var cell = document.createElement('div');
-    cell.id = 'bannerChromeFadeSettings';
-    cell.style.cssText = [
-      'grid-column:1/-1',
-      'border-radius:12px',
-      'border:1.5px solid rgba(224,189,99,.35)',
-      'background:rgba(255,255,255,.05)',
-      'padding:10px 11px',
-      'display:flex',
-      'flex-direction:column',
-      'gap:8px',
-      'box-sizing:border-box'
-    ].join(';');
     var options = [
       { value: 'off', name: 'بدون إخفاء', hint: 'كل العناصر تبقى ظاهرة' },
       { value: 'title', name: 'العنوان فقط', hint: 'يبقى العنوان ويخفى الباقي' },
       { value: 'date', name: 'التاريخ فقط', hint: 'يبقى التاريخ ويخفى الباقي' },
       { value: 'all', name: 'إخفاء الكل', hint: 'يخفى العنوان والتاريخ والأزرار' }
     ];
-    cell.innerHTML =
-      '<div class="bcf-head">' +
+
+    menu.innerHTML =
       '<div class="bcf-title">ماذا يظهر على البنر؟</div>' +
       '<div class="bcf-sub">بعد ثوانٍ بدون لمس، اختر ما يبقى واضحاً</div>' +
-      '</div>' +
-      '<div class="bcf-grid">' +
+      '<div class="bcf-list">' +
       options
         .map(function (opt) {
           return (
@@ -1550,17 +1585,27 @@
         })
         .join('') +
       '</div>';
-    grid.appendChild(cell);
 
     function syncSelected() {
       var current = getChromeFadeMode();
-      cell.querySelectorAll('label.bcf-opt').forEach(function (lab) {
+      menu.querySelectorAll('label.bcf-opt').forEach(function (lab) {
         var input = lab.querySelector('input');
         lab.classList.toggle('is-on', !!(input && input.value === current && input.checked));
       });
     }
 
-    cell.querySelectorAll('input[name="bannerChromeFade"]').forEach(function (input) {
+    function setOpen(open) {
+      menu.classList.toggle('is-open', !!open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(!menu.classList.contains('is-open'));
+    });
+
+    menu.querySelectorAll('input[name="bannerChromeFade"]').forEach(function (input) {
       if (input.value === mode) input.checked = true;
       input.addEventListener('change', function () {
         if (!input.checked) return;
@@ -1571,12 +1616,12 @@
         e.stopPropagation();
       });
     });
-    cell.querySelectorAll('label.bcf-opt').forEach(function (lab) {
+    menu.querySelectorAll('label.bcf-opt').forEach(function (lab) {
       lab.addEventListener('click', function (e) {
         e.stopPropagation();
       });
     });
-    cell.addEventListener('click', function (e) {
+    menu.addEventListener('click', function (e) {
       e.stopPropagation();
     });
     syncSelected();
