@@ -364,7 +364,7 @@
   }
 
   function bookListPageUrl() {
-    return 'https://book-list.158-220-106-38.sslip.io/';
+    return 'https://khalidsaif912.github.io/book-list/';
   }
 
   function alumniPageUrl() {
