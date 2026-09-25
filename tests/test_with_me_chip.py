@@ -100,7 +100,7 @@ def test_patch_chip_replaces_read_sign():
 def test_patch_apps_ver():
     text, changed = patch_apps_ver(SAMPLE)
     assert changed
-    assert "site-apps.js?v=20260912a" in text
+    assert "site-apps.js?v=20260925a" in text
     text2, changed2 = patch_apps_ver(text)
     assert not changed2
 
@@ -277,7 +277,7 @@ def test_site_apps_keeps_read_sign_in_window_not_banner():
     assert "ensureBookListAppLink" in src
     assert "siteAppsLink--booklist" in src
     assert "bookListPageUrl" in src
-    assert "https://khalidsaif912.github.io/book-list/" in src
+    assert "https://new-roster.netlify.app/book-list/" in src
     assert "book-list.158-220-106-38.sslip.io" in (ROOT / "docs" / "book-list" / "app.js").read_text(
         encoding="utf-8"
     )

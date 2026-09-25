@@ -364,7 +364,7 @@
   }
 
   function bookListPageUrl() {
-    return 'https://khalidsaif912.github.io/book-list/';
+    return 'https://new-roster.netlify.app/book-list/';
   }
 
   function alumniPageUrl() {
