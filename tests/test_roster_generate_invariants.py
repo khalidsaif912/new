@@ -89,6 +89,7 @@ def test_export_generator_owns_split_date_banner():
 def test_change_alert_popup_survives_generate():
     from generate_and_send import page_shell_html
     from roster_cta_snippets import (
+        ABSENCE_LIST_VER,
         CHANGE_ALERT_VER,
         LOAD_LOCAL_ENHANCEMENTS_EXPORT,
         LOAD_LOCAL_ENHANCEMENTS_IMPORT,
@@ -131,6 +132,14 @@ def test_change_alert_popup_survives_generate():
     assert LOAD_LOCAL_ENHANCEMENTS_EXPORT.count("change-alert.js") == 1
     assert LOAD_LOCAL_ENHANCEMENTS_IMPORT.count("change-alert.js") == 1
 
+    abs_tag = "absence-list.js?v=" + ABSENCE_LIST_VER
+    assert abs_tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
+    assert abs_tag in (ROOT / "docs" / "change-alert.js").read_text(encoding="utf-8")
+    assert abs_tag in (ROOT / "docs" / "absences" / "index.html").read_text(encoding="utf-8")
+    alert_js = (ROOT / "docs" / "absence-alert.js").read_text(encoding="utf-8")
+    assert "PATH_ROSTER" not in alert_js
+    assert "nameFromRecords" in alert_js
+
     gen = (ROOT / "generate_and_send.py").read_text(encoding="utf-8")
     imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
     assert "LOAD_LOCAL_ENHANCEMENTS_EXPORT" in gen
@@ -149,6 +158,9 @@ def test_change_alert_popup_survives_generate():
         max_date="2026-10-31",
     )
     assert tag in html
+    assert abs_tag in html
+    assert 'id="absencesChipBtn"' in html
+    assert "/absences/" in html
 
 
 def test_mantle_clients_survive_generate():

@@ -452,6 +452,20 @@
     return common >= 2;
   }
 
+  function nameFromAbsenceData(empId, absData) {
+    var wantId = normalizeEmpId(empId);
+    if (!wantId) return '';
+    var records = (absData && absData.records) || [];
+    for (var r = 0; r < records.length; r++) {
+      var nums = (records[r] && records[r].empNos) || [];
+      var names = (records[r] && records[r].names) || [];
+      for (var n = 0; n < nums.length; n++) {
+        if (normalizeEmpId(nums[n]) === wantId) return String(names[n] || '');
+      }
+    }
+    return '';
+  }
+
   function findAbsenceDates(empId, empName, absData) {
     var records = (absData && absData.records) || [];
     if (!records.length) return [];
@@ -1823,10 +1837,16 @@ function renderForEmployee(empId) {
         return jsonAlert ? attachRosterMeta(jsonAlert, diffData) : null;
       }).catch(function () { return jsonAlert; });
       var absPromise = fetchJson(base + 'absence-data.json', { fresh: true })
-        .then(function (absData) { return findAbsenceDates(empId, empName, absData); })
-        .catch(function () { return []; });
+        .then(function (absData) {
+          return {
+            dates: findAbsenceDates(empId, empName, absData),
+            name: empName || nameFromAbsenceData(empId, absData)
+          };
+        })
+        .catch(function () { return { dates: [], name: empName }; });
       return Promise.all([diffPromise, absPromise]).then(function (arr) {
-        return { alert: arr[0], absences: arr[1], empName: empName, lang: lang };
+        var abs = arr[1] || { dates: [], name: empName };
+        return { alert: arr[0], absences: abs.dates || [], empName: abs.name || empName, lang: lang };
       });
     })
     .then(function (result) {
@@ -1917,6 +1937,17 @@ function boot() {
     } catch (err) {}
   }
 
+  function loadAbsenceList() {
+    try {
+      if (document.querySelector('script[data-absence-list="1"]')) return;
+      var s = document.createElement('script');
+      s.src = getBase() + 'absence-list.js?v=20260928a';
+      s.async = true;
+      s.setAttribute('data-absence-list', '1');
+      document.body.appendChild(s);
+    } catch (err) {}
+  }
+
   function loadAlertSound() {
     try {
       if (window.rosterAlertSound) return;
@@ -1930,6 +1961,7 @@ function boot() {
   }
 
   function start() {
+    loadAbsenceList();
     loadAlertSound();
     // Force homepage feedback UI even if index shell is an older cache.
     try {

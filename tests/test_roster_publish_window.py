@@ -31,7 +31,7 @@ class PublishMonthKeysTests(unittest.TestCase):
 
 
 class ExtraDeptSheetTests(unittest.TestCase):
-    def test_includes_security_and_absences_after_known_depts(self):
+    def test_includes_security_but_skips_absence_report_sheets(self):
         names = [
             "Setting ",
             "master",
@@ -55,7 +55,8 @@ class ExtraDeptSheetTests(unittest.TestCase):
             "Export Checker",
             "Export Operators",
         ])
-        self.assertIn("Absences", depts)
+        self.assertNotIn("Absences", depts)
+        self.assertNotIn("الغيابات", depts)
         self.assertIn("الأمن", depts)
         self.assertNotIn("Full staffs as per JD", depts)
         self.assertNotIn("Acceptance", depts)

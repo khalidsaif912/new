@@ -15,9 +15,10 @@ This file documents where each major local site feature is implemented.
 - Import my-schedule UI: `docs/import/my-schedules/index.html`
 
 ## Absence Alert (Recorded Absence Modal)
-- Frontend script: `docs/absence-alert.js`
+- Frontend script: `docs/absence-alert.js` (matches by employee ID even when that person is missing from the current roster)
+- Public list (Absences + Security): `docs/absence-list.js` + `docs/absences/index.html`. Loaded on export roster pages and via `change-alert.js`. Independent of the current roster month because the SharePoint file is usually previous months.
 - Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
-- Data builder script: `process_absence.py`
+- Data builder script: `process_absence.py` — does not filter records to the current roster month
 - CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. Download tries the original guest link first (often `?ga=1`), then `download=1`, and follows file URLs found in HTML preview pages. The live site only updates when parsed records change. Power Automate should POST `absence-report-updated` after overwriting the file.
 - Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC)
 

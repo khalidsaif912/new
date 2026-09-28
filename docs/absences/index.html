@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Absences / الغيابات</title>
+  <style>
+    :root { --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    .wrap { max-width: 680px; margin: 0 auto; padding: calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+    .header {
+      background: linear-gradient(135deg, #991b1b 0%, #dc2626 55%, #f97316 100%);
+      color: #fff;
+      padding: 22px 18px 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(153, 27, 27, .14);
+    }
+    .header a { color: #fee2e2; font-weight: 800; text-decoration: none; font-size: 13px; }
+    .header h1 { margin: 10px 0 4px; font-size: 22px; letter-spacing: -.3px; }
+    .header p { margin: 0; font-size: 12px; opacity: .9; line-height: 1.5; }
+    .langToggle {
+      position: absolute; top: 12px; inset-inline-end: 12px;
+      border: 0; border-radius: 999px; padding: 6px 10px; font-weight: 800; cursor: pointer;
+      background: rgba(255,255,255,.18); color: #fff;
+    }
+    .header { position: relative; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <button class="langToggle" id="langToggle" type="button">ع</button>
+      <a id="backHome" href="../">Duty Roster</a>
+      <h1 id="pageTitle">Absences</h1>
+      <p id="pageSub">Independent of the current roster month. Source: absence-data.json</p>
+    </div>
+    <div id="absence-list-host"></div>
+  </div>
+  <script>
+    (function () {
+      function getLang() {
+        var s = localStorage.getItem('rosterLang') || localStorage.getItem('appLang');
+        return s === 'ar' ? 'ar' : 'en';
+      }
+      function apply() {
+        var ar = getLang() === 'ar';
+        document.documentElement.lang = ar ? 'ar' : 'en';
+        document.documentElement.dir = ar ? 'rtl' : 'ltr';
+        document.getElementById('pageTitle').textContent = ar ? 'الغيابات والأمن' : 'Absences & Security';
+        document.getElementById('pageSub').textContent = ar
+          ? 'ملف الغيابات مستقل عن روستر الشهر الحالي. المصدر: absence-data.json'
+          : 'Independent of the current roster month. Source: absence-data.json';
+        document.getElementById('backHome').textContent = ar ? 'جدول المناوبات' : 'Duty Roster';
+        document.getElementById('langToggle').textContent = ar ? 'EN' : 'ع';
+      }
+      document.getElementById('langToggle').onclick = function () {
+        var next = getLang() === 'ar' ? 'en' : 'ar';
+        localStorage.setItem('rosterLang', next);
+        localStorage.setItem('appLang', next);
+        apply();
+        document.dispatchEvent(new CustomEvent('rosterLangChanged', { detail: { lang: next } }));
+      };
+      var home = document.getElementById('backHome');
+      var path = location.pathname || '';
+      if (path.indexOf('/docs/') !== -1) home.href = path.replace(/\/absences\/?.*$/, '/');
+      apply();
+    })();
+  </script>
+  <script defer src="../absence-list.js?v=20260928a"></script>
+</body>
+</html>

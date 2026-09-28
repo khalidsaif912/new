@@ -33,14 +33,39 @@ SKIP_ROSTER_SHEETS = frozenset({
     "full staffs as per jd",
 })
 
+# Unauthorised-leave / absences workbooks are a separate SharePoint file (usually
+# previous months). Never treat those tabs as current-roster department cards.
+ABSENCE_REPORT_SHEET_MARKERS = (
+    "absence",
+    "absences",
+    "غياب",
+    "الغيابات",
+    "unauthorized leave",
+    "unauthorise leave",
+    "unauthorize leave",
+    "leave report",
+)
+
+
+def is_absence_report_sheet(name: str) -> bool:
+    key = (name or "").strip().lower()
+    if not key:
+        return False
+    return any(marker in key for marker in ABSENCE_REPORT_SHEET_MARKERS)
+
 
 def is_skipped_roster_sheet(name: str) -> bool:
     key = (name or "").strip().lower()
-    return (not key) or key in SKIP_ROSTER_SHEETS or key.startswith("setting")
+    return (
+        (not key)
+        or key in SKIP_ROSTER_SHEETS
+        or key.startswith("setting")
+        or is_absence_report_sheet(name)
+    )
 
 
 def ordered_department_sheets(sheetnames, hidden=None):
-    """Known export depts first, then any extra visible roster sheets (Security, Absences, …)."""
+    """Known export depts first, then extra visible shift sheets (e.g. Security)."""
     names = list(sheetnames or [])
     hidden = set(hidden or [])
     out: list[tuple[str, str]] = []

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from process_absence import (  # noqa: E402
+    build_absence_groups,
     clean_date,
     existing_records_match,
     extract_sheet_rows,
@@ -62,6 +63,23 @@ class HeaderAndParseTests(unittest.TestCase):
         self.assertEqual(by_date["2026-09-01"]["empNos"], ["81034"])
         self.assertEqual(by_date["2026-09-02"]["sections"], ["Cargo - Security"])
         self.assertEqual(by_date["2026-09-03"]["sections"], ["الأمن"])
+        groups = build_absence_groups(records)
+        ids = [g["id"] for g in groups]
+        self.assertEqual(ids, ["absences", "security"])
+        cargo = [p for p in groups[0]["employees"] if p["empNo"] == "81034"][0]
+        self.assertEqual(cargo["dates"], ["2026-09-01"])
+        sec = [p for p in groups[1]["employees"] if p["empNo"] == "80235"][0]
+        self.assertEqual(sec["dates"], ["2026-09-02", "2026-09-03"])
+
+    def test_keeps_previous_month_dates_when_roster_is_later(self):
+        rows = [
+            [None, "Employee No", "Name", "Section", "Request Date"],
+            [None, 81034, "Mr. Abid Al Zadjali", "Cargo - Exp/Imp Operation", "05-MAY-2026"],
+            [None, 81034, "Mr. Abid Al Zadjali", "Cargo - Exp/Imp Operation", "31-JUL-2026"],
+        ]
+        processed, records = parse_absence_sheets([("Sheet1", rows)])
+        self.assertEqual(processed, 2)
+        self.assertEqual([r["date"] for r in records], ["2026-05-05", "2026-07-31"])
 
     def test_existing_archive_xlsb_range(self):
         path = ROOT / "absence-archive" / "absence-report.xlsb"
@@ -91,6 +109,24 @@ class UnchangedJsonTests(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "absence-data.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            self.assertFalse(existing_records_match(str(path), 1, records))
+            payload["groups"] = [
+                {
+                    "id": "absences",
+                    "title_en": "Absences",
+                    "title_ar": "الغيابات",
+                    "employees": [
+                        {
+                            "empNo": "81034",
+                            "name": "Abid Al Zadjali",
+                            "section": "Cargo - Exp/Imp Operation",
+                            "dates": ["2026-09-01"],
+                        }
+                    ],
+                }
+            ]
+            payload["date_range"] = {"from": "2026-09-01", "to": "2026-09-01"}
             path.write_text(json.dumps(payload), encoding="utf-8")
             self.assertTrue(existing_records_match(str(path), 1, records))
             self.assertFalse(existing_records_match(str(path), 2, records))

@@ -254,7 +254,7 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 
 Without this HTTP action, same-name overwrites wait for GitHub’s delayed schedule (often hours).
 
-Publishing a **future month** (October file while today is still September) must **not** rewrite “today” to the 1st of that file. The site always redirects `/docs/` to Muscat today; faking today as 1 October made GitHub look updated while visitors landed on the previous month’s list. Extra visible Excel sheets (Security / Absences / الغيابات / الأمن) are published as department cards automatically.
+Publishing a **future month** (October file while today is still September) must **not** rewrite “today” to the 1st of that file. The site always redirects `/docs/` to Muscat today; faking today as 1 October made GitHub look updated while visitors landed on the previous month’s list. Extra visible **shift** sheets (for example Security / الأمن) are published as department cards. The SharePoint absences file is **not** a roster sheet: it is usually previous months and is shown from `docs/absence-data.json` on `/docs/absences/` and on export roster pages, independent of the current roster month.
 
 ## Same roster filename but content changed
 - CI compares **SHA-256** of the Excel bytes and a **logical content fingerprint**

@@ -182,6 +182,19 @@
     return wa.length && wb.length && wa.filter(w => wb.indexOf(w) !== -1).length >= 2;
   }
 
+  function nameFromRecords(empId, records) {
+    const want = String(empId || "");
+    if (!want) return "";
+    for (const rec of records || []) {
+      const nums = rec.empNos || [];
+      const names = rec.names || [];
+      for (let i = 0; i < nums.length; i++) {
+        if (String(nums[i]) === want) return names[i] || "";
+      }
+    }
+    return "";
+  }
+
   function findAbsences(empId, empName, records) {
     const results = [];
     const cleanName = (empName || "").replace(/-\s*\d+\s*$/, "").trim();
@@ -844,22 +857,22 @@
     const empId = localStorage.getItem(STORAGE_EMP_ID) || (PAGE_KEY === "export" ? localStorage.getItem("savedEmpId") : "");
     if (!empId) return;
 
-    const base = location.pathname.includes(PATH_ROSTER)
-      ? location.origin + PATH_ROSTER
-      : location.origin + "/";
-
+    const origin = location.origin;
+    const p = deployBasePath();
+    const base = origin + p + (p && p.charAt(p.length - 1) !== "/" ? "/" : "");
     const scheduleUrl = PAGE_KEY === "import"
       ? `${base}import/schedules/${empId}.json`
       : `${base}schedules/${empId}.json`;
 
     Promise.all([
-      fetch(scheduleUrl).then(r => r.ok ? r.json() : null),
+      fetch(scheduleUrl).then(r => r.ok ? r.json() : null).catch(() => null),
       fetch(`${DATA_URL}?v=${Date.now()}`).then(r => r.ok ? r.json() : null),
     ]).then(([emp, absData]) => {
-      if (!emp || !emp.name || !absData || !absData.records) return;
-      const absences = findAbsences(empId, emp.name, absData.records);
+      if (!absData || !absData.records) return;
+      const empName = (emp && emp.name) || nameFromRecords(empId, absData.records) || empId;
+      const absences = findAbsences(empId, empName, absData.records);
       if (!absences.length) return;
-      mState = { empName: emp.name, absences, empId, hash: absences.map(a => a.date).join("|") };
+      mState = { empName, absences, empId, hash: absences.map(a => a.date).join("|") };
       injectStyles();
       buildUI();
     }).catch(err => {

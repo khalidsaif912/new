@@ -3,6 +3,9 @@ process_absence.py
 ------------------
 Loads absence Excel from ABSENCE_EXCEL_FILE when set, otherwise downloads
 ABSENCE_EXCEL_URL, then regenerates docs/absence-data.json.
+
+The SharePoint report is usually for previous months, not the current roster
+month. Parsing never filters by today's roster window.
 """
 
 from __future__ import annotations
@@ -296,6 +299,77 @@ def parse_absence_sheets(sheets: list[tuple[str, list[list]]]) -> tuple[int, lis
     return processed, records
 
 
+def is_security_section(section: str) -> bool:
+    raw = str(section or "")
+    low = raw.strip().lower()
+    if "security" in low:
+        return True
+    return "الأمن" in raw or "امن" in low.replace("أ", "ا").replace("إ", "ا")
+
+
+def absence_group_id(section: str) -> str:
+    return "security" if is_security_section(section) else "absences"
+
+
+def build_absence_groups(records: list[dict]) -> list[dict]:
+    """People grouped by Absences vs Security. Dates stay as in the file (past months OK)."""
+    buckets: dict[str, dict[str, dict]] = {"absences": {}, "security": {}}
+    for rec in records or []:
+        date = str(rec.get("date") or "").strip()
+        names = rec.get("names") or []
+        emp_nos = rec.get("empNos") or []
+        sections = rec.get("sections") or []
+        for i, emp_no in enumerate(emp_nos):
+            emp_id = str(emp_no or "").strip()
+            if not emp_id:
+                continue
+            section = str(sections[i] if i < len(sections) else "")
+            gid = absence_group_id(section)
+            person = buckets[gid].setdefault(
+                emp_id,
+                {
+                    "empNo": emp_id,
+                    "name": str(names[i] if i < len(names) else "").strip(),
+                    "section": section.strip(),
+                    "dates": [],
+                },
+            )
+            if date and date not in person["dates"]:
+                person["dates"].append(date)
+            if not person["name"] and i < len(names):
+                person["name"] = str(names[i] or "").strip()
+
+    titles = (
+        ("absences", "Absences", "الغيابات"),
+        ("security", "Security", "الأمن"),
+    )
+    groups: list[dict] = []
+    for gid, title_en, title_ar in titles:
+        people = sorted(
+            buckets[gid].values(),
+            key=lambda p: ((p.get("name") or "").lower(), p.get("empNo") or ""),
+        )
+        for person in people:
+            person["dates"] = sorted(person.get("dates") or [])
+        if people:
+            groups.append(
+                {
+                    "id": gid,
+                    "title_en": title_en,
+                    "title_ar": title_ar,
+                    "employees": people,
+                }
+            )
+    return groups
+
+
+def date_range_from_records(records: list[dict]) -> dict[str, str]:
+    dates = [str(r.get("date") or "") for r in (records or []) if r.get("date")]
+    if not dates:
+        return {"from": "", "to": ""}
+    return {"from": min(dates), "to": max(dates)}
+
+
 def existing_records_match(path: str, processed: int, records: list[dict]) -> bool:
     p = Path(path)
     if not p.is_file():
@@ -304,7 +378,10 @@ def existing_records_match(path: str, processed: int, records: list[dict]) -> bo
         current = json.loads(p.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return False
-    return current.get("total_records") == processed and current.get("records") == records
+    if current.get("total_records") != processed or current.get("records") != records:
+        return False
+    # Force a rewrite when older JSON is missing the independent list payload.
+    return bool(current.get("groups")) and isinstance(current.get("date_range"), dict)
 
 
 def write_absence_json(processed: int, records: list[dict], path: str = OUTPUT_PATH) -> None:
@@ -314,6 +391,8 @@ def write_absence_json(processed: int, records: list[dict], path: str = OUTPUT_P
             {
                 "generated_at": datetime.now().isoformat(),
                 "total_records": processed,
+                "date_range": date_range_from_records(records),
+                "groups": build_absence_groups(records),
                 "records": records,
             },
             f,

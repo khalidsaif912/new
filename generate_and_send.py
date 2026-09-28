@@ -15,6 +15,7 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_AFTERNOON_HTML,
     CHIP_ALL_HTML,
     CHIP_DIFF_HTML,
+    CHIP_ABSENCES_HTML,
     CHIP_FLIGHT_HTML,
     CHIP_ICON_CSS,
     CHIP_MORNING_HTML,
@@ -1077,6 +1078,8 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     a.summaryChip.importChip:hover {{ box-shadow:0 8px 20px rgba(14,165,233,.18); }}
     a.summaryChip.trainingChip .chipVal {{ color:#7c3aed; }}
     a.summaryChip.trainingChip:hover {{ box-shadow:0 8px 20px rgba(124,58,237,.18); }}
+    a.summaryChip.absencesChip .chipVal {{ color:#991b1b; }}
+    a.summaryChip.absencesChip:hover {{ box-shadow:0 8px 20px rgba(153,27,27,.18); }}
     a.summaryChip.diffChip .chipVal {{ color:#ef4444; }}
     a.summaryChip.diffChip:hover {{ box-shadow:0 8px 20px rgba(239,68,68,.18); }}
     a.summaryChip.readSignChip .chipVal {{ color:#0f766e; }}
@@ -1696,6 +1699,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     <a href="{pages_base}/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       {CHIP_TRAINING_HTML}
       <div class="chipLabel" data-key="trainingPage">TRG</div>
+    </a>
+    <a href="{pages_base}/absences/" id="absencesChipBtn" class="summaryChip absencesChip" title="Absences" aria-label="Absences" style="text-decoration:none;">
+      {CHIP_ABSENCES_HTML}
+      <div class="chipLabel" data-key="absencesPage">Absences</div>
     </a>
     <a href="{pages_base}/roster-diff/index.html" id="diffChipBtn" class="summaryChip diffChip" style="text-decoration:none;">
       {CHIP_DIFF_HTML}
@@ -2688,7 +2695,7 @@ var T = {{
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
-    security:'Security', absences:'Absences',
+    security:'Security', absences:'Absences', absencesPage:'Absences',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
@@ -2703,7 +2710,7 @@ var T = {{
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
-    security:'الأمن', absences:'الغيابات',
+    security:'الأمن', absences:'الغيابات', absencesPage:'الغيابات',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }}
@@ -2757,6 +2764,7 @@ function applyLang(lang) {{
     else if(k==='mySchedule') el.textContent=t.mySchedule;
     else if(k==='importRoster') el.textContent=t.importRoster;
     else if(k==='trainingPage') el.textContent=t.trainingPage;
+    else if(k==='absencesPage') el.textContent=t.absencesPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
     else if(k==='withMePage') el.textContent=t.withMePage;
@@ -2857,6 +2865,7 @@ function setSummaryChipHrefs() {{
   var my = document.getElementById('myScheduleBtn');
   var imp = document.getElementById('importBtn');
   var trn = document.getElementById('trainingBtn');
+  var absences = document.getElementById('absencesChipBtn');
   var diff = document.getElementById('diffChipBtn');
   var readSign = document.getElementById('readSignChipBtn');
   var withMe = document.getElementById('withMeChipBtn');
@@ -2864,6 +2873,7 @@ function setSummaryChipHrefs() {{
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
   if (trn) trn.href = base + '/training/';
+  if (absences) absences.href = base + '/absences/';
   if (diff) diff.href = base + '/roster-diff/index.html';
   if (readSign) readSign.href = base + '/read-and-sign/';
   if (withMe) withMe.href = base + '/with-me/';
