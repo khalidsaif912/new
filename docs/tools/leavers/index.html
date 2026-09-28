@@ -60,7 +60,7 @@ body{margin:0;min-height:100dvh;background:var(--bg);color:var(--text);font-fami
 <div class="wrap" id="app" hidden>
   <header class="hero">
     <h1>مراجعة المغادرين</h1>
-    <p id="sub">من ليس لهم شهر حالي في الروستر — أكّد من غادر فعلاً لإضافتهم إلى زملاء سابقون.</p>
+    <p id="sub">مقارنة الروستر بين شهرين — أكّد من غادر فعلاً قبل إضافتهم إلى زملاء سابقون.</p>
     <div class="stats" id="stats"></div>
   </header>
   <div class="toolbar">
@@ -129,12 +129,14 @@ function rows(){
 
 function render(){
   const s=DATA.summary||{};
+  const from=DATA.compareFrom||DATA.allMonths&&DATA.allMonths[0]||'';
+  const to=DATA.compareTo||DATA.currentMonth||'';
   document.getElementById('stats').innerHTML=`
-    <div class="stat"><b>${esc(DATA.currentMonth)}</b><span>الشهر الحالي</span></div>
+    <div class="stat"><b>${esc(from)} → ${esc(to)}</b><span>المقارنة</span></div>
     <div class="stat"><b>${s.candidatesNotInAlumni||0}</b><span>بانتظار التأكيد</span></div>
     <div class="stat"><b>${s.alreadyAlumni||0}</b><span>في الزملاء السابقين</span></div>`;
   document.getElementById('sub').textContent=
-    `من ليس لهم بيانات في ${DATA.currentMonth}. أكّد المغادرين فقط (ليس المنتقلين مؤقتاً).`;
+    `موجودون في ${from} وغير موجودين في ${to}. حدّد من أحيل للتقاعد/غادر ثم اضغط «حفظ التأكيد» — لن يظهروا في زملاء سابقون إلا بعد تأكيدك.`;
 
   const list=document.getElementById('list');
   const rs=rows();
@@ -147,13 +149,14 @@ function render(){
     const cls=['row', c.inAlumni?'inAlumni':'', selected.has(c.id)?'checked':''].filter(Boolean).join(' ');
     const badge=c.inAlumni
       ? '<span class="badge ok">مسجّل في السابقين</span>'
-      : `<span class="badge warn">آخر شهر: ${esc(c.lastMonth)}</span>`;
+      : `<span class="badge warn">بانتظارك · آخر شهر: ${esc(c.lastMonth||from)}</span>`;
+    const kindLabel=c.kind==='import'?'وارد':'صادر';
     return `<label class="${cls}">
       <input type="checkbox" data-id="${esc(c.id)}"${checked}${c.inAlumni?' disabled':''}/>
       <div>
         <div class="name">${esc(c.en)}</div>
         <div class="ar">${esc(c.ar||'—')}</div>
-        <div class="meta">#${esc(c.id)} · ${esc(c.dept)} · أشهر: ${(c.months||[]).join(', ')}</div>
+        <div class="meta">#${esc(c.id)} · ${esc(kindLabel)} · ${esc(c.dept)} · غاب عن ${esc(c.compareTo||to)}</div>
       </div>
       ${badge}
     </label>`;
