@@ -104,13 +104,18 @@ Trigger:
 - **Manual:** `workflow_dispatch`
 
 Core logic:
-1. Downloads `ABSENCE_EXCEL_URL` with several SharePoint URL variants (original guest link first; `download=1` last). HTML preview/auth pages are scraped for a real `.xlsb` URL.
+1. Seeds a guest session from the working roster share (`EXPORT_EXCEL_URL` → `ROSTER_UPLOADS/latest.xlsx?ga=1`) when the dedicated `:x:` absence link returns HTML/error.aspx. Then downloads `absence-report.xlsb` from that same shared folder, `AbsenceReports/`, or `ABSENCE_UPLOADS/`. `download.aspx` variants of `:x:/p/` links are tried before `download=1` (which currently yields “cannot access this document”).
 2. Parses **all sheets** and detects the header row (`Employee No` / `Name` / `Section` / `Request Date`, including Security/الأمن sections).
-3. Regenerates `docs/absence-data.json` only when records actually change (not on `generated_at` alone).
+3. Regenerates `docs/absence-data.json` only when records actually change (not on `generated_at` alone). Dates are never filtered by the current roster month.
 4. The job **fails** when SharePoint returns HTML/login instead of Excel — a green run with no new dates is not success.
 5. Commits via `scripts/ci_commit_and_push.sh` on concurrency group `docs-main`.
 
-After overwriting the SharePoint absence file, POST `{"event_type":"absence-report-updated"}` to the same dispatches URL as export/import.
+After the monthly Unauthorize Leave Report is ready on OneDrive, **overwrite the same shared file** (do not Create a new UniqueId):
+
+- Preferred: `/Documents/ROSTER_UPLOADS/absence-report.xlsb` (same guest folder as `latest.xlsx`)
+- Also OK: `/Documents/AbsenceReports/absence-report.xlsb` if that share still works
+
+Then POST `{"event_type":"absence-report-updated"}` to the same dispatches URL as export/import. A new August (or any month) file that is only uploaded under a new name is invisible to CI.
 
 ---
 
@@ -248,7 +253,7 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 3. Body:
    - Export: `{"event_type":"export-roster-updated"}`
    - Import: `{"event_type":"import-roster-updated"}`
-   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `absence-report.xlsb`
+   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `ROSTER_UPLOADS/absence-report.xlsb` (same shared folder as `latest.xlsx`) or `AbsenceReports/absence-report.xlsb`. Do not upload a new uniquely-named file — that kills the guest UniqueId the secret still points at.
 4. PAT: classic `repo` scope, **or** fine-grained **Contents: Read and write** on `khalidsaif912/new`
 5. GitHub Actions regenerates and pushes immediately. Cron is only a backup.
 
