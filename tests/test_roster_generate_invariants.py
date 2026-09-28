@@ -124,6 +124,11 @@ def test_change_alert_popup_survives_generate():
     assert ">SN</span>" in js
     assert "function buildOrgWideAlertFromDiff" in js
     assert "changesPage" in js
+    assert "function maybeShowUpdatePopup" in js
+    assert "function absenceListFingerprint" in js
+    assert "chg-update-overlay" in js
+    assert "newAbsencesList" in js
+    assert "chgUpdatePopupSeen_v2" in js
 
     tag = "change-alert.js?v=" + CHANGE_ALERT_VER
     assert tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
