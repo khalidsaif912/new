@@ -486,24 +486,10 @@
     if (!rows.length && !newFile) return null;
     var n = Number(diffData.total_changes);
     if (!n || n !== n) n = rows.length;
-    var fileChanged = !!(newFile && (!oldFile || newFile !== oldFile));
-    var arParts = [];
-    var enParts = [];
-    if (fileChanged) {
-      arParts.push(t('publishedRoster', 'ar'));
-      enParts.push(t('publishedRoster', 'en'));
-    }
-    if (n > 0) {
-      arParts.push(t('orgUpdate', 'ar', n));
-      enParts.push(t('orgUpdate', 'en', n));
-      arParts.push(t('rosterDiffSummary', 'ar', n));
-      enParts.push(t('rosterDiffSummary', 'en', n));
-    }
-    if (!arParts.length && newFile) {
-      arParts.push(t('publishedRoster', 'ar'));
-      enParts.push(t('publishedRoster', 'en'));
-    }
-    if (!arParts.length) return null;
+    // Keep the card text short like the original design — one line only.
+    var summaryAr = newFile ? t('publishedRoster', 'ar') : t('orgUpdate', 'ar', n || 0);
+    var summaryEn = newFile ? t('publishedRoster', 'en') : t('orgUpdate', 'en', n || 0);
+    if (!newFile && !n) return null;
     return attachRosterMeta({
       is_active: true,
       force_show: true,
@@ -518,8 +504,8 @@
       ].join('_'),
       total_changed_days: 0,
       summary: {
-        ar: arParts.join('\n'),
-        en: enParts.join('\n')
+        ar: summaryAr,
+        en: summaryEn
       },
       days: []
     }, diffData);
@@ -1683,29 +1669,9 @@
   function enrichAlertSummary(alert, absences, updateMeta) {
     if (!alert) return alert;
     var meta = normalizeUpdateMeta(updateMeta);
-    var sources = listUpdateSources(alert, absences, meta);
-    var linesAr = String((alert.summary && alert.summary.ar) || '').split('\n').filter(Boolean);
-    var linesEn = String((alert.summary && alert.summary.en) || '').split('\n').filter(Boolean);
-
-    if (sources.indexOf('training') !== -1 && alert.kind !== 'training') {
-      var monthId = String((meta.trainData && meta.trainData.month_id) || '');
-      var trainAr = t('newTrainingList', 'ar') + (monthId ? ' — ' + monthId : '');
-      var trainEn = t('newTrainingList', 'en') + (monthId ? ' — ' + monthId : '');
-      if (linesAr.indexOf(trainAr) === -1) linesAr.push(trainAr);
-      if (linesEn.indexOf(trainEn) === -1) linesEn.push(trainEn);
-    }
-    if (sources.length > 1) {
-      var labelsAr = t('updateSourcesLabel', 'ar') + ' ' + sources.map(function (s) { return sourceLabel(s, 'ar'); }).join(' · ');
-      var labelsEn = t('updateSourcesLabel', 'en') + ' ' + sources.map(function (s) { return sourceLabel(s, 'en'); }).join(' · ');
-      if (linesAr.indexOf(labelsAr) === -1) linesAr.push(labelsAr);
-      if (linesEn.indexOf(labelsEn) === -1) linesEn.push(labelsEn);
-    }
-    alert.summary = {
-      ar: linesAr.join('\n'),
-      en: linesEn.join('\n')
-    };
-    alert.update_sources = sources;
-    if (meta.trainData && meta.trainData.month_id) {
+    // Do not dump multi-source prose into the card text — keep the original short summary.
+    alert.update_sources = listUpdateSources(alert, absences, meta);
+    if (alert.kind === 'training' && meta.trainData && meta.trainData.month_id) {
       alert.training_month = String(meta.trainData.month_id);
     }
     return alert;
@@ -1795,17 +1761,15 @@
     var hasAbsenceTab = !!(absences && absences.length);
     var isOrg = isOrgAlert(alert);
     var defaultTab = hasAbsenceTab ? 'absence' : 'shift';
-    var titleText = sources.length > 1
-      ? t('updatePopupTitle', lang)
-      : (isOrg
-          ? t('newRoster', lang)
-          : ((alert && alert.kind === 'absences-list')
-              ? t('newAbsencesList', lang)
-              : ((alert && alert.kind === 'training')
-                  ? t('newTrainingList', lang)
-                  : ((alert && alert.kind === 'site')
-                      ? t('updatePopupTitle', lang)
-                      : (hasAbsenceTab && !hasShiftTab ? t('recordedAbsence', lang) : t('changed', lang))))));
+    var titleText = isOrg
+      ? t('newRoster', lang)
+      : ((alert && alert.kind === 'absences-list')
+          ? t('newAbsencesList', lang)
+          : ((alert && alert.kind === 'training')
+              ? t('newTrainingList', lang)
+              : ((alert && alert.kind === 'site')
+                  ? t('updatePopupTitle', lang)
+                  : (hasAbsenceTab && !hasShiftTab ? t('recordedAbsence', lang) : t('changed', lang)))));
     var shiftContent = shortDaysHtml(alert, lang);
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
@@ -1823,15 +1787,18 @@
            '<span class="chg-roster-name-file">' + escapeHtml(rosterName) + '</span>' +
          '</div>')
       : '';
-    var trainMonth = (alert && alert.training_month) || (meta.trainData && meta.trainData.month_id) || '';
+    // Training box only for training-primary alerts — never dump it into roster cards.
+    var trainMonth = (alert && alert.kind === 'training')
+      ? ((alert.training_month) || (meta.trainData && meta.trainData.month_id) || '')
+      : '';
     var trainingHtml = trainMonth
       ? ('<div class="chg-roster-name">' +
            '<span class="chg-roster-name-label">' + escapeHtml(t('newTrainingList', lang)) + '</span>' +
            '<span class="chg-roster-name-file">' + escapeHtml(t('trainingMonth', lang, String(trainMonth))) + '</span>' +
          '</div>')
       : '';
-    var diffBtnClass = (isOrg || sources.indexOf('diff') !== -1) ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
-    var applyBtnClass = (isOrg || sources.indexOf('diff') !== -1) ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
+    var diffBtnClass = isOrg ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
+    var applyBtnClass = isOrg ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
     var showEmpId = !!(empId && empId !== GUEST_EMP_ID);
     var empSn = String(empId || '').replace(/^SN-/i, '');
     var empIdHtml = showEmpId
