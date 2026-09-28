@@ -1632,10 +1632,8 @@
       sources.push('absence');
     }
     if (trainingFingerprint(meta.trainData)) sources.push('training');
-    if (siteUpdateFingerprint(meta.siteData) && !sources.length) sources.push('site');
-    else if (siteUpdateFingerprint(meta.siteData) && sources.indexOf('roster') === -1 && sources.indexOf('diff') === -1 && sources.indexOf('absence') === -1 && sources.indexOf('training') === -1) {
-      sources.push('site');
-    }
+    // Site stamp alone still forces a popup for other publishes (banners, etc.).
+    if (!sources.length && siteUpdateFingerprint(meta.siteData)) sources.push('site');
     return sources;
   }
 
