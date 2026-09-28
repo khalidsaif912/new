@@ -1142,116 +1142,21 @@
         display: none;
       }
 
-      #chg-update-overlay {
+      /* Backdrop for the existing centered chg-card only — never a second modal. */
+      #chg-card-backdrop {
         position: fixed;
         inset: 0;
-        z-index: 100080;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
-        background: rgba(15, 23, 42, .55);
-        backdrop-filter: blur(3px);
-        -webkit-backdrop-filter: blur(3px);
-        animation: chgUpdateIn .22s ease-out;
+        z-index: 100035;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        opacity: 0;
+        animation: chgBackdropIn 0.22s ease forwards;
       }
-      #chg-update-overlay[hidden] { display: none !important; }
-      #chg-update-modal {
-        width: min(420px, 100%);
-        max-height: min(86vh, 640px);
-        overflow: auto;
-        border-radius: 20px;
-        background: #fff;
-        box-shadow: 0 24px 60px rgba(15, 23, 42, .35);
-        border: 1px solid rgba(15, 23, 42, .08);
-        font-family: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
-      }
-      #chg-update-modal .chg-up-head {
-        padding: 18px 18px 12px;
-        background: linear-gradient(135deg, #b71c1c 0%, #c62828 55%, #ad1457 100%);
-        color: #fff;
-      }
-      #chg-update-modal .chg-up-title {
-        margin: 0;
-        font-size: 1.15rem;
-        font-weight: 900;
-        line-height: 1.3;
-      }
-      #chg-update-modal .chg-up-sub {
-        margin: 6px 0 0;
-        font-size: .86rem;
-        font-weight: 600;
-        opacity: .95;
-        line-height: 1.45;
-      }
-      #chg-update-modal .chg-up-body {
-        padding: 14px 18px 8px;
-        display: grid;
-        gap: 10px;
-      }
-      #chg-update-modal .chg-up-chip {
-        display: grid;
-        gap: 4px;
-        padding: 12px 12px;
-        border-radius: 14px;
-        border: 1px solid rgba(15, 23, 42, .08);
-        background: #f8fafc;
-      }
-      #chg-update-modal .chg-up-chip strong {
-        font-size: .92rem;
-        font-weight: 900;
-        color: #0f172a;
-      }
-      #chg-update-modal .chg-up-chip span {
-        font-size: .8rem;
-        font-weight: 600;
-        color: #475569;
-        line-height: 1.4;
-      }
-      #chg-update-modal .chg-up-chip.roster {
-        border-color: rgba(27, 94, 32, .22);
-        background: linear-gradient(180deg, #f1f8f2, #fff);
-      }
-      #chg-update-modal .chg-up-chip.abs {
-        border-color: rgba(198, 40, 40, .22);
-        background: linear-gradient(180deg, #fff5f5, #fff);
-      }
-      #chg-update-modal .chg-up-hint {
-        margin: 0;
-        padding: 0 18px;
-        font-size: .72rem;
-        color: #64748b;
-        font-weight: 600;
-        line-height: 1.4;
-      }
-      #chg-update-modal .chg-up-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 14px 18px 18px;
-      }
-      #chg-update-modal .chg-up-actions .chg-btn {
-        flex: 1 1 140px;
-        min-height: 42px;
-        border-radius: 12px;
-        font-weight: 800;
-        cursor: pointer;
-        border: 0;
-      }
-      #chg-update-modal .chg-up-actions .chg-btn-primary {
-        background: #c62828;
-        color: #fff;
-      }
-      #chg-update-modal .chg-up-actions .chg-btn-muted {
-        background: #e2e8f0;
-        color: #0f172a;
-      }
-      @keyframes chgUpdateIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
+      #chg-card-backdrop[hidden] { display: none !important; }
+      @keyframes chgBackdropIn { to { opacity: 1; } }
       @media (prefers-reduced-motion: reduce) {
-        #chg-update-overlay { animation: none !important; }
+        #chg-card-backdrop { animation: none !important; opacity: 1; }
       }
 
       @media print {
@@ -1350,16 +1255,22 @@
   }
 
   function clearHomeUI() {
+    removeCardBackdrop();
     var icon = document.getElementById(HOME_ICON_ID);
     var card = document.getElementById(HOME_CARD_ID);
     if (icon) icon.hidden = true;
-    if (card) card.hidden = true;
+    if (card) {
+      card.hidden = true;
+      card.removeAttribute('role');
+      card.removeAttribute('aria-modal');
+    }
   }
 
   function clearAlertState() {
     lastAlertPayload = null;
     lastRenderedEmpId = '';
     lastRenderedHash = '';
+    lastUpdateFingerprint = '';
     clearHomeUI();
   }
 
@@ -1553,8 +1464,9 @@
       });
   }
 
-  var UPDATE_POPUP_ID = 'chg-update-overlay';
+  var CARD_BACKDROP_ID = 'chg-card-backdrop';
   var UPDATE_SEEN_KEY = 'chgUpdatePopupSeen_v2';
+  var lastUpdateFingerprint = '';
 
   function siteKind() {
     return (window.location.pathname || '').indexOf('/import/') !== -1 ? 'import' : 'export';
@@ -1597,141 +1509,41 @@
     } catch (e) {}
   }
 
-  function formatAbsRange(absData, lang) {
-    var dr = (absData && absData.date_range) || {};
-    if (!dr.from && !dr.to) return '';
-    if (dr.from && dr.to && dr.from !== dr.to) return dr.from + ' → ' + dr.to;
-    return dr.from || dr.to || '';
+  function removeCardBackdrop() {
+    var bd = document.getElementById(CARD_BACKDROP_ID);
+    if (!bd) return;
+    bd.hidden = true;
+    if (bd.parentNode) bd.parentNode.removeChild(bd);
   }
 
-  function closeUpdatePopup(overlay) {
-    if (!overlay) return;
-    overlay.style.opacity = '0';
-    setTimeout(function () {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    }, 180);
-  }
-
-  function showUpdatePopupModal(opts) {
-    opts = opts || {};
-    var lang = opts.lang || getLang();
-    var alert = opts.alert;
-    var absences = opts.absences || [];
-    var absData = opts.absData;
-    var empId = opts.empId || '';
-    var fp = opts.fingerprint || buildUpdateFingerprint(alert, absData, absences);
-    var existing = document.getElementById(UPDATE_POPUP_ID);
-    if (existing) existing.remove();
-
-    var hasRoster = !!(alert && alert.is_active);
-    var hasAbsList = !!(absData && Number(absData.total_records) > 0);
-    var hasPersonalAbs = absences.length > 0;
-    if (!hasRoster && !hasAbsList) return;
-
-    var chips = [];
-    if (hasRoster) {
-      var rosterTitle = isOrgAlert(alert) ? t('newRoster', lang) : t('rosterChangedTitle', lang);
-      var rosterBody = alertSummaryText(alert, lang) || t('publishedRoster', lang);
-      var rosterName = (alert && alert.roster_name) ? String(alert.roster_name).trim() : '';
-      if (rosterName) {
-        rosterBody = rosterBody + (rosterBody ? '\n' : '') + t('newRosterName', lang) + ': ' + rosterName;
-      }
-      chips.push(
-        '<div class="chg-up-chip roster">' +
-          '<strong>' + escapeHtml(rosterTitle) + '</strong>' +
-          '<span>' + escapeHtml(rosterBody) + '</span>' +
-        '</div>'
-      );
-    }
-    if (hasAbsList) {
-      var range = formatAbsRange(absData, lang);
-      var absBody = t('absencesListCount', lang, Number(absData.total_records) || 0);
-      if (range) absBody = absBody + '\n' + t('absencesListRange', lang, range);
-      if (hasPersonalAbs) {
-        absBody = absBody + '\n' + t('absenceSummary', lang, absences.length);
-      }
-      chips.push(
-        '<div class="chg-up-chip abs">' +
-          '<strong>' + escapeHtml(t('newAbsencesList', lang)) + '</strong>' +
-          '<span>' + escapeHtml(absBody) + '</span>' +
-        '</div>'
-      );
-    }
-
-    var ov = document.createElement('div');
-    ov.id = UPDATE_POPUP_ID;
-    ov.setAttribute('role', 'dialog');
-    ov.setAttribute('aria-modal', 'true');
-    ov.setAttribute('aria-label', t('updatePopupTitle', lang));
-    ov.innerHTML =
-      '<div id="chg-update-modal">' +
-        '<div class="chg-up-head">' +
-          '<p class="chg-up-title">' + escapeHtml(t('updatePopupTitle', lang)) + '</p>' +
-          '<p class="chg-up-sub">' + escapeHtml(t('updatePopupHint', lang)) + '</p>' +
-        '</div>' +
-        '<div class="chg-up-body">' + chips.join('') + '</div>' +
-        '<div class="chg-up-actions">' +
-          '<button type="button" class="chg-btn chg-btn-primary" data-act="ok">' +
-            escapeHtml(t('updatePopupOk', lang)) +
-          '</button>' +
-          '<button type="button" class="chg-btn chg-btn-muted" data-act="details">' +
-            escapeHtml(t('updatePopupDetails', lang)) +
-          '</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(ov);
-
-    function finish(openDetails) {
-      markUpdatePopupSeen(fp);
-      closeUpdatePopup(ov);
-      if (openDetails) {
-        if (onHomePage() && empId) {
-          clearMinimized(empId, alert || { change_hash: fp });
-          var card = document.getElementById(HOME_CARD_ID);
-          if (card) card.hidden = false;
-        }
-        if (hasAbsList && !hasRoster) {
-          window.location.href = getBase() + 'roster-diff/index.html?tab=absence';
-          return;
-        }
-        if (hasRoster && !(alert && alert.days && alert.days.length) && !hasPersonalAbs) {
-          window.location.href = getBase() + 'roster-diff/index.html' + (hasAbsList ? '?tab=absence' : '');
-        }
-      }
-    }
-
-    ov.addEventListener('click', function (e) {
-      if (e.target === ov) finish(false);
+  function ensureCardBackdrop(empId, alert) {
+    removeCardBackdrop();
+    var bd = document.createElement('div');
+    bd.id = CARD_BACKDROP_ID;
+    bd.setAttribute('aria-hidden', 'true');
+    bd.addEventListener('click', function () {
+      markUpdatePopupSeen(lastUpdateFingerprint);
+      markMinimized(empId, alert);
+      var card = document.getElementById(HOME_CARD_ID);
+      if (card) card.hidden = true;
+      removeCardBackdrop();
+      var icon = document.getElementById(HOME_ICON_ID);
+      if (icon) icon.hidden = false;
     });
-    var okBtn = ov.querySelector('[data-act="ok"]');
-    var detailsBtn = ov.querySelector('[data-act="details"]');
-    if (okBtn) okBtn.onclick = function () { finish(false); };
-    if (detailsBtn) detailsBtn.onclick = function () { finish(true); };
+    document.body.appendChild(bd);
   }
 
-  function maybeShowUpdatePopup(opts) {
-    opts = opts || {};
-    if (!onHomePage()) return;
-    var alert = opts.alert;
-    var absData = opts.absData;
-    var absences = opts.absences || [];
+  /** Force the existing striped chg-card open for new roster/absences — no second modal. */
+  function shouldForceExistingCard(alert, absData, absences) {
     var hasRoster = !!(alert && alert.is_active);
     var hasAbsList = !!(absData && Number(absData.total_records) > 0);
-    if (!hasRoster && !hasAbsList) return;
+    if (!hasRoster && !hasAbsList && !(absences && absences.length)) return false;
     var fp = buildUpdateFingerprint(alert, absData, absences);
-    if (!fp || isUpdatePopupSeen(fp)) return;
-    maybePlayAlertSound(opts.empId || GUEST_EMP_ID, alert || { change_hash: fp });
-    showUpdatePopupModal({
-      empId: opts.empId,
-      alert: alert,
-      absences: absences,
-      absData: absData,
-      lang: opts.lang || getLang(),
-      fingerprint: fp
-    });
+    lastUpdateFingerprint = fp;
+    return !isUpdatePopupSeen(fp);
   }
 
-  function ensureHomeUI(empId, alert, lang, absences, empName) {
+  function ensureHomeUI(empId, alert, lang, absences, empName, absData) {
     var icon = document.getElementById(HOME_ICON_ID);
     if (!icon) {
       icon = document.createElement('button');
@@ -1817,19 +1629,41 @@
         '<button class="' + applyBtnClass + '" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
       '</div></div></div>';
 
+    var forceOpen = shouldForceExistingCard(alert, absData, absences);
+    if (forceOpen) {
+      clearMinimized(empId, alert);
+      ensureCardBackdrop(empId, alert);
+    } else {
+      removeCardBackdrop();
+    }
+
     icon.hidden = false;
-    card.hidden = isMinimized(empId, alert);
+    card.hidden = forceOpen ? false : isMinimized(empId, alert);
+    if (forceOpen) {
+      card.setAttribute('role', 'dialog');
+      card.setAttribute('aria-modal', 'true');
+    }
 
     var optMin = card.querySelector('#chgOptMin');
     var tabBody = card.querySelector('#chg-tab-body');
-    if (optMin) optMin.checked = isMinimized(empId, alert);
+    if (optMin) optMin.checked = !forceOpen && isMinimized(empId, alert);
 
     icon.onclick = function () {
       clearMinimized(empId, alert);
       card.hidden = false;
+      ensureCardBackdrop(empId, alert);
     };
 
-    setLastAlertPayload(empId, alert, absences, empName);
+    setLastAlertPayload(empId, alert, absences, empName, absData);
+
+    function dismissExistingCard(minimize) {
+      markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, absData, absences));
+      if (minimize) markMinimized(empId, alert);
+      else clearMinimized(empId, alert);
+      card.hidden = !!minimize;
+      removeCardBackdrop();
+      icon.hidden = false;
+    }
 
     card.onclick = function (e) {
       var btn = e.target && e.target.closest ? e.target.closest('[data-act]') : e.target;
@@ -1838,20 +1672,11 @@
 
       if (act === 'apply') {
         var doMin = !!(optMin && optMin.checked);
-        if (doMin) {
-          markMinimized(empId, alert);
-          card.hidden = true;
-        } else {
-          clearMinimized(empId, alert);
-          card.hidden = false;
-        }
-        icon.hidden = false;
+        dismissExistingCard(doMin);
         return;
       }
       if (act === 'close') {
-        markMinimized(empId, alert);
-        card.hidden = true;
-        icon.hidden = false;
+        dismissExistingCard(true);
         return;
       }
       if (act === 'saveImg') {
@@ -1863,6 +1688,8 @@
         return;
       }
       if (act === 'openDiff') {
+        markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, absData, absences));
+        removeCardBackdrop();
         window.location.href = getBase() + 'roster-diff/index.html' + (absences && absences.length ? '?tab=absence' : '');
         return;
       }
@@ -1977,12 +1804,13 @@ var lastRenderedHash = '';
 var lastAlertPayload = null;
 var GUEST_EMP_ID = 'guest';
 
-function setLastAlertPayload(empId, alert, absences, empName) {
+function setLastAlertPayload(empId, alert, absences, empName, absData) {
   lastAlertPayload = {
     empId: empId,
     alert: alert,
     absences: absences || [],
-    empName: empName || ''
+    empName: empName || '',
+    absData: absData || null
   };
 }
 
@@ -1995,10 +1823,12 @@ function onAppLangChange() {
   var p = lastAlertPayload;
   var card = document.getElementById(HOME_CARD_ID);
   var wasCardHidden = card ? card.hidden : true;
+  var hadBackdrop = !!document.getElementById(CARD_BACKDROP_ID);
   if (onHomePage()) {
-    ensureHomeUI(p.empId, p.alert, lang, p.absences, p.empName);
+    ensureHomeUI(p.empId, p.alert, lang, p.absences, p.empName, p.absData);
     card = document.getElementById(HOME_CARD_ID);
     if (card) card.hidden = wasCardHidden;
+    if (wasCardHidden || !hadBackdrop) removeCardBackdrop();
   }
   if (onMySchedulePage() && document.getElementById(PAGE_BANNER_ID)) {
     ensurePageBanner(p.alert, lang, p.absences);
@@ -2109,14 +1939,7 @@ function renderGlobalGuestAlerts() {
     }
     lastRenderedEmpId = GUEST_EMP_ID;
     lastRenderedHash = alert.change_hash || '';
-    ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '');
-    maybeShowUpdatePopup({
-      empId: GUEST_EMP_ID,
-      alert: alert,
-      absences: [],
-      absData: absData,
-      lang: lang
-    });
+    ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '', absData);
   }).catch(function (err) {
     console.warn('change-alert guest fetch failed:', err);
   });
@@ -2218,6 +2041,19 @@ function renderForEmployee(empId) {
         };
       } else if ((!alert || !alert.is_active) && hasAbsList) {
         // Site-wide new absences list even when this employee has no personal rows.
+        var dr = (absData && absData.date_range) || {};
+        var range = [dr.from, dr.to].filter(Boolean).join(' — ');
+        var nRec = Number(absData.total_records) || 0;
+        var arLines = [t('newAbsencesList', 'ar')];
+        var enLines = [t('newAbsencesList', 'en')];
+        if (range) {
+          arLines.push(t('absencesListRange', 'ar', range));
+          enLines.push(t('absencesListRange', 'en', range));
+        }
+        if (nRec) {
+          arLines.push(t('absencesListCount', 'ar', nRec));
+          enLines.push(t('absencesListCount', 'en', nRec));
+        }
         alert = {
           is_active: true,
           force_show: true,
@@ -2225,8 +2061,8 @@ function renderForEmployee(empId) {
           change_hash: 'abslist_' + absenceListFingerprint(absData),
           total_changed_days: 0,
           summary: {
-            ar: t('newAbsencesList', 'ar'),
-            en: t('newAbsencesList', 'en')
+            ar: arLines.join('\n'),
+            en: enLines.join('\n')
           },
           days: []
         };
@@ -2240,14 +2076,7 @@ function renderForEmployee(empId) {
       maybePlayAlertSound(empId, alert);
 
       if (onHomePage()) {
-        ensureHomeUI(empId, alert, lang, absences, empName);
-        maybeShowUpdatePopup({
-          empId: empId,
-          alert: alert,
-          absences: absences,
-          absData: absData,
-          lang: lang
-        });
+        ensureHomeUI(empId, alert, lang, absences, empName, absData);
       }
 
       if (onMySchedulePage()) {
