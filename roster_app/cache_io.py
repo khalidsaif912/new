@@ -36,14 +36,10 @@ _PERSONAL_FILE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Only stable overwrite names — PA must not invent a new filename each month.
 ABSENCE_FILE_NAMES = (
     "absence-report.xlsb",
     "absence-report.xlsx",
-    "latest.xlsb",
-    "Unauthorize Leave Report.xlsb",
-    "Unauthorize Leave Report.xlsx",
-    "Unauthorized Leave Report.xlsb",
-    "Unauthorized Leave Report.xlsx",
 )
 ABSENCE_FOLDER_NAMES = (
     "AbsenceReports",
@@ -56,10 +52,7 @@ _ABSENCE_NAME_MARKERS = (
     "unauthor",
     "leave report",
     "غيابات",
-    "august",
-    "aug-",
-    "aug_",
-    "أغسطس",
+    "غياب",
 )
 _ROSTER_NAME_MARKERS = ("roster", "export", "import")
 
@@ -413,9 +406,10 @@ def download_excel_with_meta(
     *,
     session_seed_url: str | None = None,
     allow_sibling_absence_files: bool = False,
+    preferred_urls: list[str] | None = None,
 ) -> tuple[bytes, dict[str, str]]:
     """Download Excel bytes and return response metadata useful for change detection."""
-    if not url and not (allow_sibling_absence_files and session_seed_url):
+    if not url and not (allow_sibling_absence_files and session_seed_url) and not preferred_urls:
         raise ValueError("EXCEL_URL is empty")
     session = requests.Session()
     headers = {
@@ -450,6 +444,7 @@ def download_excel_with_meta(
             to_try.append(candidate)
 
     seed = (session_seed_url or "").strip()
+    seed_ok = False
     if allow_sibling_absence_files and seed:
         print(f"  Seeding guest session from roster share: {seed[:120]}")
         try:
@@ -460,6 +455,7 @@ def download_excel_with_meta(
             if "login.microsoftonline.com" in seed_host:
                 print("  Roster seed reached login; continuing with absence URL only.")
             else:
+                seed_ok = True
                 # Prefer stable paths next to latest.xlsx over a dead ABSENCE_EXCEL_URL UniqueId.
                 for sib in reversed(absence_sibling_urls(seed_resp.url)):
                     enqueue(sib, front=True)
@@ -486,10 +482,14 @@ def download_excel_with_meta(
         except requests.RequestException as exc:
             print(f"  Roster seed failed: {exc}")
 
-    # Dead :x: UniqueId links last — siblings / folder listing already preferred above.
+    # Caller-supplied stable paths / payload URL (front of queue when seed worked).
+    for pref in reversed(preferred_urls or []):
+        enqueue(pref, front=seed_ok)
+
+    # :x: / direct URL variants — after stable paths when seed is healthy.
     for candidate in sharepoint_download_candidates(url):
         enqueue(candidate)
-    if allow_sibling_absence_files:
+    if allow_sibling_absence_files and seed_ok:
         personal = _personal_site_from_share(url or seed)
         if personal:
             for path in (
@@ -498,7 +498,7 @@ def download_excel_with_meta(
                 f"{personal}/Documents/ABSENCE_UPLOADS/latest.xlsb?ga=1",
                 f"{personal}/Documents/ABSENCE_UPLOADS/absence-report.xlsb?ga=1",
             ):
-                enqueue(path, front=bool(seed and not url))
+                enqueue(path, front=True)
 
     for attempt, candidate in enumerate(to_try):
         if candidate in tried:

@@ -39,7 +39,7 @@ The script reads these variables:
 - `MAIL_FROM` (required): sender address
 - `MAIL_TO` (optional fallback): fallback recipient when subscribers are unavailable
 - `PAGES_BASE_URL` (optional): base URL for generated page links
-- `ABSENCE_EXCEL_URL` (optional, for CI / `process_absence.py`): sharing link for the absence `.xlsb`. Current guest link (August report): [link](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQDsn8FeioaWS55ycDGlq5jfAWp1ICnnJcO9-zViFHc-hBs?e=1lJHHv). Code keeps that URL as fallback when the Actions secret still points at a dead UniqueId. Prefer overwriting `ROSTER_UPLOADS/absence-report.xlsb` / `AbsenceReports/absence-report.xlsb` for stable automation. The live site only reads static `docs/absence-data.json`.
+- `ABSENCE_EXCEL_URL` (optional secondary): `:x:` guest share for the absence `.xlsb` (`download.aspx`). **Primary automation** overwrites a stable path next to the roster — `ROSTER_UPLOADS/absence-report.xlsb` or `AbsenceReports/absence-report.xlsb` — derived from `EXPORT_EXCEL_URL` (see `roster_app/absence_source.py`). Do not Create a new UniqueId each month. Live site reads only `docs/absence-data.json`.
 
 ## Local Run
 

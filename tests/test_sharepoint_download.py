@@ -69,12 +69,13 @@ class AbsenceSiblingTests(unittest.TestCase):
         sibs = absence_sibling_urls(url)
         self.assertTrue(any("ROSTER_UPLOADS/absence-report.xlsb" in u for u in sibs))
         self.assertTrue(any("AbsenceReports/absence-report.xlsb" in u for u in sibs))
-        self.assertTrue(any("ABSENCE_UPLOADS/latest.xlsb" in u for u in sibs))
+        self.assertTrue(any("ABSENCE_UPLOADS/absence-report.xlsb" in u for u in sibs))
 
     def test_absence_filename_filter(self):
         self.assertTrue(looks_like_absence_filename("absence-report.xlsb"))
-        self.assertTrue(looks_like_absence_filename("Unauthorize Leave Report August.xlsx"))
+        self.assertTrue(looks_like_absence_filename("Unauthorize Leave Report.xlsx"))
         self.assertTrue(looks_like_absence_filename("report.xlsb"))
+        self.assertTrue(looks_like_absence_filename("absence-report.xlsb"))
         self.assertFalse(looks_like_absence_filename("latest.xlsx"))
         self.assertFalse(looks_like_absence_filename("Export New Roster OCTOBER 2026.xlsx"))
 

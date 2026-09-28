@@ -13,7 +13,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from process_absence import (  # noqa: E402
-    ABSENCE_URL_FALLBACK,
     _absence_download_urls,
     build_absence_groups,
     clean_date,
@@ -22,18 +21,37 @@ from process_absence import (  # noqa: E402
     find_header_columns,
     parse_absence_sheets,
 )
+from roster_app.absence_source import resolve_absence_source_urls  # noqa: E402
 
 
 class DownloadUrlTests(unittest.TestCase):
-    def test_fallback_url_is_tried_after_primary(self):
-        urls = _absence_download_urls("https://example.com/old-dead-share")
-        self.assertEqual(urls[0], "https://example.com/old-dead-share")
-        self.assertIn(ABSENCE_URL_FALLBACK, urls)
-        self.assertGreaterEqual(len(urls), 2)
+    def test_stable_paths_beat_secret_when_export_set(self):
+        import os
 
-    def test_fallback_alone_when_primary_empty(self):
-        urls = _absence_download_urls("")
-        self.assertEqual(urls, [ABSENCE_URL_FALLBACK])
+        os.environ["EXPORT_EXCEL_URL"] = (
+            "https://omanair-my.sharepoint.com/personal/8715_hq_omanair_com/"
+            "Documents/ROSTER_UPLOADS/latest.xlsx?ga=1"
+        )
+        os.environ["ABSENCE_EXCEL_URL"] = (
+            "https://omanair-my.sharepoint.com/:x:/p/8715_hq/OLDUNIQUE?e=x"
+        )
+        os.environ.pop("ABSENCE_PAYLOAD_URL", None)
+        urls = _absence_download_urls()
+        self.assertTrue(urls)
+        self.assertIn("absence-report.xlsb", urls[0])
+        self.assertNotIn(":x:", urls[0])
+
+    def test_secret_alone_when_no_export(self):
+        import os
+
+        os.environ.pop("EXPORT_EXCEL_URL", None)
+        os.environ.pop("EXCEL_URL", None)
+        os.environ.pop("ABSENCE_SESSION_URL", None)
+        os.environ.pop("ABSENCE_PAYLOAD_URL", None)
+        secret = "https://omanair-my.sharepoint.com/:x:/p/8715_hq/ONLY?e=1"
+        os.environ["ABSENCE_EXCEL_URL"] = secret
+        urls = resolve_absence_source_urls(absence_url=secret, export_url="", payload_url="")
+        self.assertEqual(urls, [secret])
 
 
 class CleanDateTests(unittest.TestCase):
@@ -121,31 +139,23 @@ class UnchangedJsonTests(unittest.TestCase):
         payload = {
             "generated_at": "2026-09-01T00:00:00",
             "total_records": 1,
+            "date_range": {"from": "2026-09-01", "to": "2026-09-01"},
+            "groups": build_absence_groups(records),
             "records": records,
         }
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "absence-data.json"
             path.write_text(json.dumps(payload), encoding="utf-8")
-            self.assertFalse(existing_records_match(str(path), 1, records))
-            payload["groups"] = [
+            self.assertTrue(existing_records_match(str(path), 1, records))
+            changed = [
                 {
-                    "id": "absences",
-                    "title_en": "Absences",
-                    "title_ar": "الغيابات",
-                    "employees": [
-                        {
-                            "empNo": "81034",
-                            "name": "Abid Al Zadjali",
-                            "section": "Cargo - Exp/Imp Operation",
-                            "dates": ["2026-09-01"],
-                        }
-                    ],
+                    "date": "2026-09-02",
+                    "names": ["Abid Al Zadjali"],
+                    "empNos": ["81034"],
+                    "sections": ["Cargo - Exp/Imp Operation"],
                 }
             ]
-            payload["date_range"] = {"from": "2026-09-01", "to": "2026-09-01"}
-            path.write_text(json.dumps(payload), encoding="utf-8")
-            self.assertTrue(existing_records_match(str(path), 1, records))
-            self.assertFalse(existing_records_match(str(path), 2, records))
+            self.assertFalse(existing_records_match(str(path), 1, changed))
 
 
 if __name__ == "__main__":

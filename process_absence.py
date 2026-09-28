@@ -1,8 +1,14 @@
 """
 process_absence.py
 ------------------
-Loads absence Excel from ABSENCE_EXCEL_FILE when set, otherwise downloads
-ABSENCE_EXCEL_URL, then regenerates docs/absence-data.json.
+Loads absence Excel from ABSENCE_EXCEL_FILE when set, otherwise downloads from
+stable OneDrive paths (same pattern as ROSTER_UPLOADS/latest.xlsx), then
+regenerates docs/absence-data.json.
+
+Root source order (see roster_app/absence_source.py):
+  1. Stable paths derived from EXPORT_EXCEL_URL
+  2. client_payload.absence_url (one-shot new share)
+  3. ABSENCE_EXCEL_URL secret (:x: guest link — secondary only)
 
 The SharePoint report is usually for previous months, not the current roster
 month. Parsing never filters by today's roster window.
@@ -21,6 +27,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from roster_app.absence_source import resolve_absence_source_urls
 from roster_app.cache_io import download_excel_with_meta
 
 try:
@@ -29,23 +36,40 @@ except ImportError:
     open_workbook = None
 
 
-ABSENCE_URL = os.environ.get("ABSENCE_EXCEL_URL", "").strip()
-ABSENCE_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
-ABSENCE_SESSION_URL = (
-    os.environ.get("ABSENCE_SESSION_URL", "").strip()
-    or os.environ.get("EXPORT_EXCEL_URL", "").strip()
-    or os.environ.get("EXCEL_URL", "").strip()
-)
-# Anyone-with-the-link guest share for AbsenceReports/absence-report.xlsb.
-# Kept as fallback so a stale Actions secret (old UniqueId) cannot block publish.
-ABSENCE_URL_FALLBACK = (
-    os.environ.get("ABSENCE_EXCEL_URL_FALLBACK", "").strip()
-    or "https://omanair-my.sharepoint.com/:x:/p/8715_hq/"
-    "IQDsn8FeioaWS55ycDGlq5jfAWp1ICnnJcO9-zViFHc-hBs?e=1lJHHv"
-)
 OUTPUT_PATH = "docs/absence-data.json"
 ARCHIVE_PATH = Path("absence-archive") / "absence-report.xlsb"
 HASH_FILE = Path("last_absence_hash.txt")
+
+
+def _env(name: str) -> str:
+    return (os.environ.get(name) or "").strip()
+
+
+def _absence_file() -> str:
+    return _env("ABSENCE_EXCEL_FILE")
+
+
+def _absence_url() -> str:
+    return _env("ABSENCE_EXCEL_URL")
+
+
+def _absence_payload_url() -> str:
+    return _env("ABSENCE_PAYLOAD_URL")
+
+
+def _absence_session_url() -> str:
+    return (
+        _env("ABSENCE_SESSION_URL")
+        or _env("EXPORT_EXCEL_URL")
+        or _env("EXCEL_URL")
+    )
+
+
+# Back-compat aliases for tests / importers that read module attributes.
+ABSENCE_URL = _absence_url()
+ABSENCE_FILE = _absence_file()
+ABSENCE_PAYLOAD_URL = _absence_payload_url()
+ABSENCE_SESSION_URL = _absence_session_url()
 
 # Legacy column indexes when no header row is found (col 0 is often empty).
 FALLBACK_COL_EMP_NO = 1
@@ -92,35 +116,46 @@ def _is_excel_signature(data: bytes) -> bool:
     return data.startswith(b"PK") or head8.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
 
 
-def _absence_download_urls(primary: str) -> list[str]:
-    urls: list[str] = []
-    for candidate in (primary, ABSENCE_URL_FALLBACK):
-        c = (candidate or "").strip()
-        if c and c not in urls:
-            urls.append(c)
-    return urls
+def _absence_download_urls(primary: str | None = None) -> list[str]:
+    return resolve_absence_source_urls(
+        absence_url=(primary if primary is not None else _absence_url()),
+        export_url=_absence_session_url(),
+        payload_url=_absence_payload_url(),
+    )
 
 
-def download_xlsb(url: str) -> tuple[bytes, str, str]:
-    urls = _absence_download_urls(url)
-    if not urls and not ABSENCE_SESSION_URL:
-        raise ValueError("ABSENCE_EXCEL_URL is empty")
-    last_error: Exception | None = None
-    for idx, candidate in enumerate(urls or [""]):
-        try:
-            data, meta = download_excel_with_meta(
-                candidate,
-                session_seed_url=ABSENCE_SESSION_URL or None,
-                allow_sibling_absence_files=True,
-            )
-            return data, (meta.get("content_type") or ""), meta.get("final_url") or candidate
-        except Exception as exc:
-            last_error = exc
-            print(f"Absence download candidate {idx + 1} failed: {exc}")
-            continue
-    if last_error:
-        raise last_error
-    raise ValueError("ABSENCE_EXCEL_URL is empty")
+def download_xlsb(url: str | None = None) -> tuple[bytes, str, str]:
+    """Download absence Excel using stable OneDrive paths first, then shares."""
+    seed = _absence_session_url()
+    primary = url if url is not None else _absence_url()
+    payload = _absence_payload_url()
+    urls = _absence_download_urls(primary)
+    if not urls and not seed:
+        raise ValueError(
+            "No absence source: set EXPORT_EXCEL_URL (stable ROSTER_UPLOADS paths) "
+            "and/or ABSENCE_EXCEL_URL, and overwrite absence-report.xlsb in place."
+        )
+    print("Absence source candidates (stable paths first):")
+    for i, candidate in enumerate(urls, 1):
+        print(f"  {i}. {candidate[:140]}")
+    # One download pass: preferred stable/payload URLs + :x: secret variants.
+    share_url = payload or primary or (urls[0] if urls else "")
+    try:
+        data, meta = download_excel_with_meta(
+            share_url,
+            session_seed_url=seed or None,
+            allow_sibling_absence_files=True,
+            preferred_urls=urls,
+        )
+        return data, (meta.get("content_type") or ""), meta.get("final_url") or share_url
+    except Exception as exc:
+        raise ValueError(
+            f"{exc} | Root fix: overwrite "
+            "/Documents/ROSTER_UPLOADS/absence-report.xlsb or "
+            "/Documents/AbsenceReports/absence-report.xlsb (same name every month), "
+            "keep ABSENCE_EXCEL_URL on a working guest share, then POST "
+            "absence-report-updated."
+        ) from exc
 
 
 def load_absence_from_file(file_path: str) -> tuple[bytes, str, str]:
@@ -440,13 +475,16 @@ def write_absence_json(processed: int, records: list[dict], path: str = OUTPUT_P
 def main():
     print("Loading absence report...")
     try:
-        if ABSENCE_FILE:
-            data, content_type, source = load_absence_from_file(ABSENCE_FILE)
+        local_file = _absence_file()
+        if local_file:
+            data, content_type, source = load_absence_from_file(local_file)
             print(f"Using local file: {source}")
         else:
-            if not ABSENCE_URL and not ABSENCE_URL_FALLBACK and not ABSENCE_SESSION_URL:
-                raise ValueError("ABSENCE_EXCEL_URL is empty")
-            data, content_type, source = download_xlsb(ABSENCE_URL)
+            if not _absence_download_urls() and not _absence_session_url():
+                raise ValueError(
+                    "No absence source URL. Set EXPORT_EXCEL_URL and/or ABSENCE_EXCEL_URL."
+                )
+            data, content_type, source = download_xlsb()
             print(f"Download succeeded from: {source}")
         archive_absence_file(data)
     except Exception as e:

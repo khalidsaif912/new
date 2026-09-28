@@ -7,7 +7,7 @@ on:
   schedule:
     # Backup only. GitHub often delays public-repo cron; Power Automate
     # must fire repository_dispatch as soon as absence-report.xlsb is overwritten.
-    - cron: "0 3 * * *"
+    - cron: "0 */4 * * *"
 
 concurrency:
   group: docs-main
@@ -38,17 +38,19 @@ jobs:
 
       - name: Process absence report
         env:
-          # Prefer a fresh share URL from Power Automate client_payload when the
-          # saved ABSENCE_EXCEL_URL secret still points at a dead UniqueId.
-          ABSENCE_EXCEL_URL: ${{ github.event.client_payload.absence_url || secrets.ABSENCE_EXCEL_URL }}
+          # Stable paths come from EXPORT_EXCEL_URL (ROSTER_UPLOADS / AbsenceReports).
+          # ABSENCE_EXCEL_URL is a secondary :x: guest share only.
+          # client_payload.absence_url overrides the secret for one dispatch.
+          ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
+          ABSENCE_PAYLOAD_URL: ${{ github.event.client_payload.absence_url }}
           ABSENCE_EXCEL_FILE: ""
           EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
         run: |
-          if [ -n "${{ github.event.client_payload.absence_url }}" ]; then
+          if [ -n "${ABSENCE_PAYLOAD_URL}" ]; then
             echo "Using absence_url from repository_dispatch client_payload"
           fi
-          if [ -z "${ABSENCE_EXCEL_URL}" ] && [ -z "${EXPORT_EXCEL_URL}" ]; then
-            echo "::error::Missing secret ABSENCE_EXCEL_URL (and no EXPORT_EXCEL_URL fallback)"
+          if [ -z "${ABSENCE_EXCEL_URL}" ] && [ -z "${EXPORT_EXCEL_URL}" ] && [ -z "${ABSENCE_PAYLOAD_URL}" ]; then
+            echo "::error::Need EXPORT_EXCEL_URL (stable paths) and/or ABSENCE_EXCEL_URL"
             exit 1
           fi
           python process_absence.py
