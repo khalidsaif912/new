@@ -336,6 +336,10 @@ def employee_id_from_name(name: str) -> str:
     return m.group(1) if m else ""
 
 
+def is_inventory_employee(name: str) -> bool:
+    return employee_id_from_name(name) in INVENTORY_EMP_IDS
+
+
 def department_sheets_from_wb(wb) -> list:
     hidden = set()
     for name in wb.sheetnames:
