@@ -133,10 +133,12 @@ jobs:
           import os
           import sys
           from pathlib import Path
-          from roster_app.cache_io import download_excel_with_meta
+          from process_absence import download_xlsb
 
           url = (os.getenv("ABSENCE_EXCEL_URL") or "").strip()
           seed = (os.getenv("EXPORT_EXCEL_URL") or os.getenv("EXCEL_URL") or "").strip()
+          if seed and not os.getenv("EXPORT_EXCEL_URL"):
+              os.environ["EXPORT_EXCEL_URL"] = seed
           if not url and not seed:
               print("ABSENCE_EXCEL_URL is empty; skipping prefetch.")
               with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
@@ -145,22 +147,18 @@ jobs:
 
           out_path = Path("tmp") / "absence-report.xlsb"
           out_path.parent.mkdir(parents=True, exist_ok=True)
-          print(f"Prefetching absence report from: {(url or seed)[:80]}...")
+          print(f"Prefetching absence report from: {(url or 'fallback share')[:80]}...")
           try:
-              data, meta = download_excel_with_meta(
-                  url,
-                  session_seed_url=seed or None,
-                  allow_sibling_absence_files=True,
-              )
+              data, _ctype, source = download_xlsb(url)
               suffix = ".xlsb"
-              name = (meta.get("final_url") or "").rsplit("/", 1)[-1].split("?")[0].lower()
+              name = (source or "").rsplit("/", 1)[-1].split("?")[0].lower()
               if name.endswith(".xlsx"):
                   suffix = ".xlsx"
               elif name.endswith(".xls"):
                   suffix = ".xls"
               out_path = Path("tmp") / f"absence-report{suffix}"
               out_path.write_bytes(data)
-              print(f"Saved local absence file: {out_path} ({len(data):,} bytes)")
+              print(f"Saved local absence file: {out_path} ({len(data):,} bytes) from {source[:120]}")
               with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
                   f.write("absence_ready=true\n")
                   f.write(f"absence_file={out_path.as_posix()}\n")

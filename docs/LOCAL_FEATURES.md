@@ -20,7 +20,7 @@ This file documents where each major local site feature is implemented.
 - Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
 - Data builder script: `process_absence.py` — does not filter records to the current roster month
 - CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. The old Excel Online `:x:` guest link now returns “cannot access this document”; CI seeds a guest session from the working `EXPORT_EXCEL_URL` (`ROSTER_UPLOADS/latest.xlsx`) and looks for `absence-report.xlsb` in that same shared folder, plus `AbsenceReports/` and `ABSENCE_UPLOADS/`. Power Automate must **overwrite** `ROSTER_UPLOADS/absence-report.xlsb` (or `AbsenceReports/absence-report.xlsb`) — creating a new uniquely-named file breaks the share — then POST `absence-report-updated`. If a new share link is unavoidable, include `client_payload.absence_url` in that dispatch.
-- Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC)
+- Current absence guest download link: [Unauthorize Leave Report](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQDsn8FeioaWS55ycDGlq5jfAWp1ICnnJcO9-zViFHc-hBs?e=1lJHHv)
 
 ## Floating alert icons (optional)
 - Preference key (localStorage): `rosterFloatingAlertDots` — value `"0"` hides the floating envelope (`absence-alert.js`) and the floating change icon (`change-alert.js`) on roster home pages. Any other value or unset = show.

@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from process_absence import (  # noqa: E402
+    ABSENCE_URL_FALLBACK,
+    _absence_download_urls,
     build_absence_groups,
     clean_date,
     existing_records_match,
@@ -20,6 +22,18 @@ from process_absence import (  # noqa: E402
     find_header_columns,
     parse_absence_sheets,
 )
+
+
+class DownloadUrlTests(unittest.TestCase):
+    def test_fallback_url_is_tried_after_primary(self):
+        urls = _absence_download_urls("https://example.com/old-dead-share")
+        self.assertEqual(urls[0], "https://example.com/old-dead-share")
+        self.assertIn(ABSENCE_URL_FALLBACK, urls)
+        self.assertGreaterEqual(len(urls), 2)
+
+    def test_fallback_alone_when_primary_empty(self):
+        urls = _absence_download_urls("")
+        self.assertEqual(urls, [ABSENCE_URL_FALLBACK])
 
 
 class CleanDateTests(unittest.TestCase):
@@ -88,8 +102,10 @@ class HeaderAndParseTests(unittest.TestCase):
         sheets = extract_sheet_rows(path.read_bytes(), "application/vnd.ms-excel.sheet.binary.spreadsheetml.sheet")
         processed, records = parse_absence_sheets(sheets)
         self.assertGreaterEqual(processed, 1)
-        self.assertEqual(records[0]["date"], "2026-05-05")
-        self.assertEqual(records[-1]["date"], "2026-07-31")
+        # Current shared AbsenceReports/absence-report.xlsb is the August 2026 report.
+        self.assertEqual(records[0]["date"], "2026-08-01")
+        self.assertEqual(records[-1]["date"], "2026-08-31")
+        self.assertGreaterEqual(processed, 100)
 
 
 class UnchangedJsonTests(unittest.TestCase):
