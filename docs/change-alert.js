@@ -173,9 +173,23 @@
           return n + ' سجل غياب منشور';
         },
         rosterChangedTitle: 'تغييرات في الروستر',
+        newTrainingList: 'قائمة تدريب جديدة',
+        trainingMonth: function (monthId) {
+          return 'شهر التدريب: ' + monthId;
+        },
+        rosterDiffSummary: function (n) {
+          return 'فروقات الروستر: ' + n + ' تغييراً منشوراً.';
+        },
+        siteUpdated: 'تم نشر تحديث جديد على الموقع.',
+        updateSourcesLabel: 'يشمل التحديث:',
+        sourceRoster: 'روستر',
+        sourceAbsence: 'غياب',
+        sourceTraining: 'تدريب',
+        sourceDiff: 'فروقات الروستر',
+        sourceSite: 'تحديث الموقع',
         updatePopupOk: 'حسناً، فهمت',
         updatePopupDetails: 'عرض التفاصيل',
-        updatePopupHint: 'ستظهر هذه النافذة تلقائياً عند كل روستر جديد أو قائمة غيابات جديدة.'
+        updatePopupHint: 'ستظهر هذه النافذة تلقائياً عند كل روستر أو غياب أو تدريب أو فروقات جديدة.'
       },
       en: {
         changed: 'Your schedule changed',
@@ -228,9 +242,23 @@
           return n + ' published absence records';
         },
         rosterChangedTitle: 'Roster changes',
+        newTrainingList: 'New training list',
+        trainingMonth: function (monthId) {
+          return 'Training month: ' + monthId;
+        },
+        rosterDiffSummary: function (n) {
+          return 'Roster differences: ' + n + ' published change(s).';
+        },
+        siteUpdated: 'A new site update was published.',
+        updateSourcesLabel: 'This update includes:',
+        sourceRoster: 'Roster',
+        sourceAbsence: 'Absences',
+        sourceTraining: 'Training',
+        sourceDiff: 'Roster differences',
+        sourceSite: 'Site update',
         updatePopupOk: 'OK, got it',
         updatePopupDetails: 'View details',
-        updatePopupHint: 'This window opens automatically for every new roster or absences list.'
+        updatePopupHint: 'This window opens automatically for every new roster, absences, training, or differences update.'
       }
     };
     var bucket = dict[lang] || dict.en;
@@ -433,6 +461,16 @@
     if (!alert) return alert;
     var name = prettyRosterName(diffData && diffData.new_file);
     if (name) alert.roster_name = name;
+    if (diffData) {
+      alert.diff_meta = {
+        kind: String(diffData.kind || ''),
+        month: String(diffData.month || ''),
+        generated_at: String(diffData.generated_at || ''),
+        old_file: prettyRosterName(diffData.old_file),
+        new_file: prettyRosterName(diffData.new_file),
+        total_changes: Number(diffData.total_changes) || ((diffData.changes || []).length || 0)
+      };
+    }
     return alert;
   }
 
@@ -444,22 +482,47 @@
   function buildOrgWideAlertFromDiff(diffData, lang) {
     var rows = (diffData && diffData.changes) || [];
     var newFile = prettyRosterName(diffData && diffData.new_file);
+    var oldFile = prettyRosterName(diffData && diffData.old_file);
     if (!rows.length && !newFile) return null;
     var n = Number(diffData.total_changes);
     if (!n || n !== n) n = rows.length;
-    return {
+    var fileChanged = !!(newFile && (!oldFile || newFile !== oldFile));
+    var arParts = [];
+    var enParts = [];
+    if (fileChanged) {
+      arParts.push(t('publishedRoster', 'ar'));
+      enParts.push(t('publishedRoster', 'en'));
+    }
+    if (n > 0) {
+      arParts.push(t('orgUpdate', 'ar', n));
+      enParts.push(t('orgUpdate', 'en', n));
+      arParts.push(t('rosterDiffSummary', 'ar', n));
+      enParts.push(t('rosterDiffSummary', 'en', n));
+    }
+    if (!arParts.length && newFile) {
+      arParts.push(t('publishedRoster', 'ar'));
+      enParts.push(t('publishedRoster', 'en'));
+    }
+    if (!arParts.length) return null;
+    return attachRosterMeta({
       is_active: true,
       force_show: true,
       kind: 'org',
       roster_name: newFile,
-      change_hash: 'orgdiff_' + String((diffData && diffData.generated_at) || '') + '_' + n + '_' + newFile,
+      change_hash: 'orgdiff_' + [
+        String((diffData && diffData.generated_at) || ''),
+        String((diffData && diffData.month) || ''),
+        oldFile,
+        newFile,
+        String(n)
+      ].join('_'),
       total_changed_days: 0,
       summary: {
-        ar: newFile ? t('publishedRoster', 'ar') : t('orgUpdate', 'ar', n),
-        en: newFile ? t('publishedRoster', 'en') : t('orgUpdate', 'en', n)
+        ar: arParts.join('\n'),
+        en: enParts.join('\n')
       },
       days: []
-    };
+    }, diffData);
   }
 
   function normName(s) {
@@ -1465,17 +1528,63 @@
   }
 
   var CARD_BACKDROP_ID = 'chg-card-backdrop';
-  var UPDATE_SEEN_KEY = 'chgUpdatePopupSeen_v2';
+  var UPDATE_SEEN_KEY = 'chgUpdatePopupSeen_v3';
   var lastUpdateFingerprint = '';
 
   function siteKind() {
     return (window.location.pathname || '').indexOf('/import/') !== -1 ? 'import' : 'export';
   }
 
+  function fetchUpdateSources(base, kind) {
+    return Promise.all([
+      fetchJson(base + 'roster-diff/data/' + kind + '-latest.json').catch(function () { return null; }),
+      fetchJson(base + 'absence-data.json', { fresh: true }).catch(function () { return null; }),
+      fetchJson(base + 'training/new-list.json', { fresh: true }).catch(function () { return null; }),
+      fetchJson(base + 'site-last-updated.json', { fresh: true }).catch(function () { return null; })
+    ]).then(function (arr) {
+      return {
+        diffData: arr[0],
+        absData: arr[1],
+        trainData: arr[2],
+        siteData: arr[3]
+      };
+    });
+  }
+
   function absenceListFingerprint(absData) {
     if (!absData) return '';
     var dr = absData.date_range || {};
-    return [dr.from || '', dr.to || '', String(absData.total_records || 0)].join('|');
+    return [
+      String(absData.generated_at || ''),
+      dr.from || '',
+      dr.to || '',
+      String(absData.total_records || 0)
+    ].join('|');
+  }
+
+  function diffFingerprint(diffData) {
+    if (!diffData) return '';
+    var n = Number(diffData.total_changes);
+    if (!n || n !== n) n = ((diffData.changes || []).length || 0);
+    return [
+      String(diffData.kind || ''),
+      String(diffData.month || ''),
+      String(diffData.generated_at || ''),
+      prettyRosterName(diffData.old_file),
+      prettyRosterName(diffData.new_file),
+      String(n)
+    ].join('|');
+  }
+
+  function trainingFingerprint(trainData) {
+    if (!trainData) return '';
+    var stamp = [String(trainData.month_id || ''), String(trainData.published || '')].join('|');
+    return stamp === '|' ? '' : stamp;
+  }
+
+  function siteUpdateFingerprint(siteData) {
+    if (!siteData) return '';
+    return String(siteData.updated_at || '');
   }
 
   function rosterUpdateFingerprint(alert) {
@@ -1483,14 +1592,125 @@
     return String(alert.change_hash || alert.roster_name || 'roster');
   }
 
-  function buildUpdateFingerprint(alert, absData, personalAbsences) {
-    var personal = (personalAbsences || []).join(',');
+  function normalizeUpdateMeta(meta) {
+    meta = meta || {};
+    return {
+      absData: meta.absData || null,
+      diffData: meta.diffData || null,
+      trainData: meta.trainData || null,
+      siteData: meta.siteData || null,
+      personalAbsences: meta.personalAbsences || meta.absences || []
+    };
+  }
+
+  function buildUpdateFingerprint(alert, updateMeta) {
+    var meta = normalizeUpdateMeta(updateMeta);
+    var personal = (meta.personalAbsences || []).join(',');
     return [
       siteKind(),
       rosterUpdateFingerprint(alert) || '-',
-      absenceListFingerprint(absData) || '-',
-      personal || '-'
+      diffFingerprint(meta.diffData) || '-',
+      absenceListFingerprint(meta.absData) || '-',
+      personal || '-',
+      trainingFingerprint(meta.trainData) || '-',
+      siteUpdateFingerprint(meta.siteData) || '-'
     ].join('::');
+  }
+
+  function listUpdateSources(alert, absences, updateMeta) {
+    var meta = normalizeUpdateMeta(updateMeta);
+    var sources = [];
+    var hasPersonalShift = !!(alert && alert.days && alert.days.length);
+    var isOrg = isOrgAlert(alert);
+    var hasDiff = !!(meta.diffData && diffFingerprint(meta.diffData));
+    var nDiff = hasDiff
+      ? (Number(meta.diffData.total_changes) || ((meta.diffData.changes || []).length || 0))
+      : 0;
+    if (isOrg || hasPersonalShift || (alert && alert.roster_name)) sources.push('roster');
+    if (hasDiff && nDiff > 0) sources.push('diff');
+    if ((absences && absences.length) || (meta.absData && Number(meta.absData.total_records) > 0)) {
+      sources.push('absence');
+    }
+    if (trainingFingerprint(meta.trainData)) sources.push('training');
+    if (siteUpdateFingerprint(meta.siteData) && !sources.length) sources.push('site');
+    else if (siteUpdateFingerprint(meta.siteData) && sources.indexOf('roster') === -1 && sources.indexOf('diff') === -1 && sources.indexOf('absence') === -1 && sources.indexOf('training') === -1) {
+      sources.push('site');
+    }
+    return sources;
+  }
+
+  function sourceLabel(key, lang) {
+    if (key === 'roster') return t('sourceRoster', lang);
+    if (key === 'diff') return t('sourceDiff', lang);
+    if (key === 'absence') return t('sourceAbsence', lang);
+    if (key === 'training') return t('sourceTraining', lang);
+    if (key === 'site') return t('sourceSite', lang);
+    return key;
+  }
+
+  function buildTrainingAlert(trainData) {
+    if (!trainingFingerprint(trainData)) return null;
+    var monthId = String((trainData && trainData.month_id) || '');
+    return {
+      is_active: true,
+      force_show: true,
+      kind: 'training',
+      change_hash: 'train_' + trainingFingerprint(trainData),
+      total_changed_days: 0,
+      summary: {
+        ar: t('newTrainingList', 'ar') + (monthId ? '\n' + t('trainingMonth', 'ar', monthId) : ''),
+        en: t('newTrainingList', 'en') + (monthId ? '\n' + t('trainingMonth', 'en', monthId) : '')
+      },
+      days: [],
+      training_month: monthId
+    };
+  }
+
+  function buildSiteAlert(siteData) {
+    if (!siteUpdateFingerprint(siteData)) return null;
+    return {
+      is_active: true,
+      force_show: true,
+      kind: 'site',
+      change_hash: 'site_' + siteUpdateFingerprint(siteData),
+      total_changed_days: 0,
+      summary: {
+        ar: t('siteUpdated', 'ar'),
+        en: t('siteUpdated', 'en')
+      },
+      days: []
+    };
+  }
+
+  function enrichAlertSummary(alert, absences, updateMeta) {
+    if (!alert) return alert;
+    var meta = normalizeUpdateMeta(updateMeta);
+    var sources = listUpdateSources(alert, absences, meta);
+    var linesAr = String((alert.summary && alert.summary.ar) || '').split('\n').filter(Boolean);
+    var linesEn = String((alert.summary && alert.summary.en) || '').split('\n').filter(Boolean);
+
+    if (sources.indexOf('training') !== -1 && alert.kind !== 'training') {
+      var monthId = String((meta.trainData && meta.trainData.month_id) || '');
+      var trainAr = t('newTrainingList', 'ar') + (monthId ? ' — ' + monthId : '');
+      var trainEn = t('newTrainingList', 'en') + (monthId ? ' — ' + monthId : '');
+      if (linesAr.indexOf(trainAr) === -1) linesAr.push(trainAr);
+      if (linesEn.indexOf(trainEn) === -1) linesEn.push(trainEn);
+    }
+    if (sources.length > 1) {
+      var labelsAr = t('updateSourcesLabel', 'ar') + ' ' + sources.map(function (s) { return sourceLabel(s, 'ar'); }).join(' · ');
+      var labelsEn = t('updateSourcesLabel', 'en') + ' ' + sources.map(function (s) { return sourceLabel(s, 'en'); }).join(' · ');
+      if (linesAr.indexOf(labelsAr) === -1) linesAr.push(labelsAr);
+      if (linesEn.indexOf(labelsEn) === -1) linesEn.push(labelsEn);
+    }
+    alert.summary = {
+      ar: linesAr.join('\n'),
+      en: linesEn.join('\n')
+    };
+    alert.update_sources = sources;
+    if (meta.trainData && meta.trainData.month_id) {
+      alert.training_month = String(meta.trainData.month_id);
+    }
+    return alert;
   }
 
   function isUpdatePopupSeen(fp) {
@@ -1533,17 +1753,25 @@
     document.body.appendChild(bd);
   }
 
-  /** Force the existing striped chg-card open for new roster/absences — no second modal. */
-  function shouldForceExistingCard(alert, absData, absences) {
-    var hasRoster = !!(alert && alert.is_active);
-    var hasAbsList = !!(absData && Number(absData.total_records) > 0);
-    if (!hasRoster && !hasAbsList && !(absences && absences.length)) return false;
-    var fp = buildUpdateFingerprint(alert, absData, absences);
+  /** Force the existing striped chg-card open for any new/changed update source. */
+  function shouldForceExistingCard(alert, updateMeta) {
+    var meta = normalizeUpdateMeta(updateMeta);
+    var hasAny =
+      !!(alert && alert.is_active) ||
+      !!(meta.absData && Number(meta.absData.total_records) > 0) ||
+      !!(meta.personalAbsences && meta.personalAbsences.length) ||
+      !!trainingFingerprint(meta.trainData) ||
+      !!diffFingerprint(meta.diffData) ||
+      !!siteUpdateFingerprint(meta.siteData);
+    if (!hasAny) return false;
+    var fp = buildUpdateFingerprint(alert, meta);
     lastUpdateFingerprint = fp;
     return !isUpdatePopupSeen(fp);
   }
 
-  function ensureHomeUI(empId, alert, lang, absences, empName, absData) {
+  function ensureHomeUI(empId, alert, lang, absences, empName, updateMeta) {
+    var meta = normalizeUpdateMeta(updateMeta);
+    meta.personalAbsences = absences || meta.personalAbsences || [];
     var icon = document.getElementById(HOME_ICON_ID);
     if (!icon) {
       icon = document.createElement('button');
@@ -1563,16 +1791,23 @@
       document.body.appendChild(card);
     }
 
+    var sources = listUpdateSources(alert, absences, meta);
     var summaryText = alertSummaryText(alert, lang);
     var hasShiftTab = !!(alert && alert.days && alert.days.length);
     var hasAbsenceTab = !!(absences && absences.length);
     var isOrg = isOrgAlert(alert);
     var defaultTab = hasAbsenceTab ? 'absence' : 'shift';
-    var titleText = isOrg
-      ? t('newRoster', lang)
-      : ((alert && alert.kind === 'absences-list')
-          ? t('newAbsencesList', lang)
-          : (hasAbsenceTab && !hasShiftTab ? t('recordedAbsence', lang) : t('changed', lang)));
+    var titleText = sources.length > 1
+      ? t('updatePopupTitle', lang)
+      : (isOrg
+          ? t('newRoster', lang)
+          : ((alert && alert.kind === 'absences-list')
+              ? t('newAbsencesList', lang)
+              : ((alert && alert.kind === 'training')
+                  ? t('newTrainingList', lang)
+                  : ((alert && alert.kind === 'site')
+                      ? t('updatePopupTitle', lang)
+                      : (hasAbsenceTab && !hasShiftTab ? t('recordedAbsence', lang) : t('changed', lang))))));
     var shiftContent = shortDaysHtml(alert, lang);
     var absenceContent = absenceDaysHtml(absences || [], lang);
     var tabsHtml = (hasShiftTab && hasAbsenceTab)
@@ -1590,8 +1825,15 @@
            '<span class="chg-roster-name-file">' + escapeHtml(rosterName) + '</span>' +
          '</div>')
       : '';
-    var diffBtnClass = isOrg ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
-    var applyBtnClass = isOrg ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
+    var trainMonth = (alert && alert.training_month) || (meta.trainData && meta.trainData.month_id) || '';
+    var trainingHtml = trainMonth
+      ? ('<div class="chg-roster-name">' +
+           '<span class="chg-roster-name-label">' + escapeHtml(t('newTrainingList', lang)) + '</span>' +
+           '<span class="chg-roster-name-file">' + escapeHtml(t('trainingMonth', lang, String(trainMonth))) + '</span>' +
+         '</div>')
+      : '';
+    var diffBtnClass = (isOrg || sources.indexOf('diff') !== -1) ? 'chg-btn chg-btn-primary' : 'chg-btn chg-btn-muted';
+    var applyBtnClass = (isOrg || sources.indexOf('diff') !== -1) ? 'chg-btn chg-btn-muted' : 'chg-btn chg-btn-primary';
     var showEmpId = !!(empId && empId !== GUEST_EMP_ID);
     var empSn = String(empId || '').replace(/^SN-/i, '');
     var empIdHtml = showEmpId
@@ -1616,6 +1858,7 @@
         '<div class="chg-card-title">' + escapeHtml(titleText) + '</div>' +
         '<p class="chg-card-text">' + escapeHtml(summaryText || fallbackText) + '</p>' +
         rosterHtml +
+        trainingHtml +
       '</div>' +
       tabsHtml +
       '<div class="chg-card-body">' +
@@ -1629,7 +1872,7 @@
         '<button class="' + applyBtnClass + '" data-act="apply">' + escapeHtml(t('apply', lang)) + '</button>' +
       '</div></div></div>';
 
-    var forceOpen = shouldForceExistingCard(alert, absData, absences);
+    var forceOpen = shouldForceExistingCard(alert, meta);
     if (forceOpen) {
       clearMinimized(empId, alert);
       ensureCardBackdrop(empId, alert);
@@ -1654,10 +1897,10 @@
       ensureCardBackdrop(empId, alert);
     };
 
-    setLastAlertPayload(empId, alert, absences, empName, absData);
+    setLastAlertPayload(empId, alert, absences, empName, meta);
 
     function dismissExistingCard(minimize) {
-      markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, absData, absences));
+      markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, meta));
       if (minimize) markMinimized(empId, alert);
       else clearMinimized(empId, alert);
       card.hidden = !!minimize;
@@ -1688,9 +1931,15 @@
         return;
       }
       if (act === 'openDiff') {
-        markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, absData, absences));
+        markUpdatePopupSeen(lastUpdateFingerprint || buildUpdateFingerprint(alert, meta));
         removeCardBackdrop();
-        window.location.href = getBase() + 'roster-diff/index.html' + (absences && absences.length ? '?tab=absence' : '');
+        var diffTarget = getBase() + 'roster-diff/index.html';
+        if (absences && absences.length) diffTarget += '?tab=absence';
+        else if (sources.indexOf('training') !== -1 && sources.indexOf('diff') === -1 && sources.indexOf('roster') === -1) {
+          window.location.href = getBase() + 'training/';
+          return;
+        }
+        window.location.href = diffTarget;
         return;
       }
       if (act === 'tab:shift' || act === 'tab:absence') {
@@ -1804,13 +2053,13 @@ var lastRenderedHash = '';
 var lastAlertPayload = null;
 var GUEST_EMP_ID = 'guest';
 
-function setLastAlertPayload(empId, alert, absences, empName, absData) {
+function setLastAlertPayload(empId, alert, absences, empName, updateMeta) {
   lastAlertPayload = {
     empId: empId,
     alert: alert,
     absences: absences || [],
     empName: empName || '',
-    absData: absData || null
+    updateMeta: normalizeUpdateMeta(updateMeta)
   };
 }
 
@@ -1825,7 +2074,7 @@ function onAppLangChange() {
   var wasCardHidden = card ? card.hidden : true;
   var hadBackdrop = !!document.getElementById(CARD_BACKDROP_ID);
   if (onHomePage()) {
-    ensureHomeUI(p.empId, p.alert, lang, p.absences, p.empName, p.absData);
+    ensureHomeUI(p.empId, p.alert, lang, p.absences, p.empName, p.updateMeta);
     card = document.getElementById(HOME_CARD_ID);
     if (card) card.hidden = wasCardHidden;
     if (wasCardHidden || !hadBackdrop) removeCardBackdrop();
@@ -1891,23 +2140,30 @@ function renderGlobalGuestAlerts() {
   var isImport = path.indexOf('/import/') !== -1;
   var kind = isImport ? 'import' : 'export';
   var base = getBase();
-  var diffUrl = base + 'roster-diff/data/' + kind + '-latest.json';
 
-  Promise.all([
-    fetchJson(diffUrl).catch(function () { return null; }),
-    fetchJson(base + 'absence-data.json', { fresh: true }).catch(function () { return null; })
-  ]).then(function (arr) {
+  fetchUpdateSources(base, kind).then(function (sources) {
     if (getEmployeeId()) return;
-    var diffData = arr[0];
-    var absData = arr[1];
+    var diffData = sources.diffData;
+    var absData = sources.absData;
+    var trainData = sources.trainData;
+    var siteData = sources.siteData;
+    var updateMeta = {
+      absData: absData,
+      diffData: diffData,
+      trainData: trainData,
+      siteData: siteData,
+      personalAbsences: []
+    };
     var orgAlert = buildOrgWideAlertFromDiff(diffData, lang);
-    var absCount = (absData && absData.records && absData.records.length) || 0;
+    var absCount = Number((absData && absData.total_records) || 0) ||
+      ((absData && absData.records && absData.records.length) || 0);
     var guestAbsAlert = null;
     if (absCount) {
       guestAbsAlert = {
         is_active: true,
         force_show: true,
-        change_hash: 'guestabs_' + String((absData && absData.generated_at) || absCount),
+        kind: 'absences-list',
+        change_hash: 'guestabs_' + absenceListFingerprint(absData),
         total_changed_days: 0,
         summary: {
           ar: t('guestAbsenceSummary', 'ar'),
@@ -1916,6 +2172,7 @@ function renderGlobalGuestAlerts() {
         days: []
       };
     }
+    var trainAlert = buildTrainingAlert(trainData);
     var alert = null;
     if (orgAlert && guestAbsAlert) {
       var merged = mergeGuestSummary(orgAlert, guestAbsAlert);
@@ -1927,11 +2184,16 @@ function renderGlobalGuestAlerts() {
         change_hash: 'guestcombo_' + orgAlert.change_hash + '_' + guestAbsAlert.change_hash,
         total_changed_days: 0,
         summary: merged,
-        days: []
+        days: [],
+        diff_meta: orgAlert.diff_meta || null
       };
     } else {
-      alert = orgAlert || guestAbsAlert;
+      alert = orgAlert || guestAbsAlert || trainAlert || buildSiteAlert(siteData);
     }
+    if (alert && trainAlert && alert !== trainAlert) {
+      alert.change_hash = String(alert.change_hash || '') + '|train|' + trainAlert.change_hash;
+    }
+    if (alert) alert = enrichAlertSummary(alert, [], updateMeta);
 
     if (!alert || !alert.is_active) {
       clearAlertState();
@@ -1939,7 +2201,7 @@ function renderGlobalGuestAlerts() {
     }
     lastRenderedEmpId = GUEST_EMP_ID;
     lastRenderedHash = alert.change_hash || '';
-    ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '', absData);
+    ensureHomeUI(GUEST_EMP_ID, alert, lang, [], '', updateMeta);
   }).catch(function (err) {
     console.warn('change-alert guest fetch failed:', err);
   });
@@ -1967,38 +2229,29 @@ function renderForEmployee(empId) {
       var alert = data ? activeAlert(data) : null;
       var empName = data && data.name ? data.name : '';
 
-      // Always load the latest roster-diff so a new roster still pops up
-      // even when this employee's own days did not change.
+      // Always load latest roster-diff / absences / training / site stamp so
+      // every new or changed source can force the existing striped card open.
       var isImport = path.indexOf('/import/') !== -1;
       var kind = isImport ? 'import' : 'export';
       var base = getBase();
-      var diffUrl = base + 'roster-diff/data/' + kind + '-latest.json';
       var jsonAlert = alert && alert.is_active ? alert : null;
       var jsonHasDays = !!(jsonAlert && jsonAlert.days && jsonAlert.days.length);
-      var diffPromise = fetchJson(diffUrl).then(function (diffData) {
-        var personal = buildAlertFromDiff(empId, diffData, lang);
-        if (personal) return personal;
-        if (jsonHasDays) return attachRosterMeta(jsonAlert, diffData);
-        var org = buildOrgWideAlertFromDiff(diffData, lang);
-        if (org) return org;
-        return jsonAlert ? attachRosterMeta(jsonAlert, diffData) : null;
-      }).catch(function () { return jsonAlert; });
-      var absPromise = fetchJson(base + 'absence-data.json', { fresh: true })
-        .then(function (absData) {
-          return {
-            dates: findAbsenceDates(empId, empName, absData),
-            name: empName || nameFromAbsenceData(empId, absData),
-            absData: absData
-          };
-        })
-        .catch(function () { return { dates: [], name: empName, absData: null }; });
-      return Promise.all([diffPromise, absPromise]).then(function (arr) {
-        var abs = arr[1] || { dates: [], name: empName, absData: null };
+      return fetchUpdateSources(base, kind).then(function (sources) {
+        var diffData = sources.diffData;
+        var personal = diffData ? buildAlertFromDiff(empId, diffData, lang) : null;
+        var resolvedAlert = personal;
+        if (!resolvedAlert && jsonHasDays) resolvedAlert = attachRosterMeta(jsonAlert, diffData);
+        if (!resolvedAlert) resolvedAlert = buildOrgWideAlertFromDiff(diffData, lang);
+        if (!resolvedAlert && jsonAlert) resolvedAlert = attachRosterMeta(jsonAlert, diffData);
+        var absData = sources.absData;
         return {
-          alert: arr[0],
-          absences: abs.dates || [],
-          empName: abs.name || empName,
-          absData: abs.absData,
+          alert: resolvedAlert,
+          absences: findAbsenceDates(empId, empName, absData),
+          empName: empName || nameFromAbsenceData(empId, absData),
+          absData: absData,
+          diffData: diffData,
+          trainData: sources.trainData,
+          siteData: sources.siteData,
           lang: lang
         };
       });
@@ -2011,9 +2264,18 @@ function renderForEmployee(empId) {
       var absences = result.absences || [];
       var empName = result.empName || '';
       var absData = result.absData || null;
+      var updateMeta = {
+        absData: absData,
+        diffData: result.diffData || null,
+        trainData: result.trainData || null,
+        siteData: result.siteData || null,
+        personalAbsences: absences
+      };
       var hasAbsList = !!(absData && Number(absData.total_records) > 0);
+      var trainAlert = buildTrainingAlert(updateMeta.trainData);
+      var siteAlert = buildSiteAlert(updateMeta.siteData);
 
-      if ((!alert || !alert.is_active) && !absences.length && !hasAbsList) {
+      if ((!alert || !alert.is_active) && !absences.length && !hasAbsList && !trainAlert && !siteAlert) {
         if (currentEmpId === empId) {
           clearAlertState();
         }
@@ -2037,7 +2299,8 @@ function renderForEmployee(empId) {
                 ar: t('absenceSummary', 'ar', absences.length),
                 en: t('absenceSummary', 'en', absences.length)
               },
-          days: hasShiftDays ? alert.days : []
+          days: hasShiftDays ? alert.days : [],
+          diff_meta: (alert && alert.diff_meta) || null
         };
       } else if ((!alert || !alert.is_active) && hasAbsList) {
         // Site-wide new absences list even when this employee has no personal rows.
@@ -2067,16 +2330,25 @@ function renderForEmployee(empId) {
           days: []
         };
       } else if (!alert || !alert.is_active) {
+        alert = trainAlert || siteAlert;
+      }
+
+      if (!alert || !alert.is_active) {
         if (currentEmpId === empId) clearAlertState();
         return;
       }
+
+      if (trainAlert && alert.kind !== 'training') {
+        alert.change_hash = String(alert.change_hash || '') + '|train|' + trainAlert.change_hash;
+      }
+      alert = enrichAlertSummary(alert, absences, updateMeta);
 
       lastRenderedEmpId = empId;
       lastRenderedHash = alert.change_hash || '';
       maybePlayAlertSound(empId, alert);
 
       if (onHomePage()) {
-        ensureHomeUI(empId, alert, lang, absences, empName, absData);
+        ensureHomeUI(empId, alert, lang, absences, empName, updateMeta);
       }
 
       if (onMySchedulePage()) {
