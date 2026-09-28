@@ -38,10 +38,15 @@ jobs:
 
       - name: Process absence report
         env:
-          ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
+          # Prefer a fresh share URL from Power Automate client_payload when the
+          # saved ABSENCE_EXCEL_URL secret still points at a dead UniqueId.
+          ABSENCE_EXCEL_URL: ${{ github.event.client_payload.absence_url || secrets.ABSENCE_EXCEL_URL }}
           ABSENCE_EXCEL_FILE: ""
           EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
         run: |
+          if [ -n "${{ github.event.client_payload.absence_url }}" ]; then
+            echo "Using absence_url from repository_dispatch client_payload"
+          fi
           if [ -z "${ABSENCE_EXCEL_URL}" ] && [ -z "${EXPORT_EXCEL_URL}" ]; then
             echo "::error::Missing secret ABSENCE_EXCEL_URL (and no EXPORT_EXCEL_URL fallback)"
             exit 1

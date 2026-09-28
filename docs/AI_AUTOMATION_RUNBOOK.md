@@ -115,7 +115,19 @@ After the monthly Unauthorize Leave Report is ready on OneDrive, **overwrite the
 - Preferred: `/Documents/ROSTER_UPLOADS/absence-report.xlsb` (same guest folder as `latest.xlsx`)
 - Also OK: `/Documents/AbsenceReports/absence-report.xlsb` if that share still works
 
-Then POST `{"event_type":"absence-report-updated"}` to the same dispatches URL as export/import. A new August (or any month) file that is only uploaded under a new name is invisible to CI.
+Then POST to the same dispatches URL as export/import:
+
+```json
+{"event_type":"absence-report-updated"}
+```
+
+If you must Create a **new** share (new UniqueId), pass its guest link in the payload so CI does not keep using the dead secret:
+
+```json
+{"event_type":"absence-report-updated","client_payload":{"absence_url":"https://omanair-my.sharepoint.com/:x:/p/8715_hq/NEWID?e=..."}}
+```
+
+A new August (or any month) file that is only uploaded under a new name **without** that payload (and not under `ROSTER_UPLOADS/absence-report.xlsb`) stays invisible to CI.
 
 ---
 
@@ -253,7 +265,7 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 3. Body:
    - Export: `{"event_type":"export-roster-updated"}`
    - Import: `{"event_type":"import-roster-updated"}`
-   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `ROSTER_UPLOADS/absence-report.xlsb` (same shared folder as `latest.xlsx`) or `AbsenceReports/absence-report.xlsb`. Do not upload a new uniquely-named file — that kills the guest UniqueId the secret still points at.
+   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `ROSTER_UPLOADS/absence-report.xlsb` (same shared folder as `latest.xlsx`) or `AbsenceReports/absence-report.xlsb`. Prefer overwrite of that stable name. If a brand-new share UniqueId is unavoidable, include `"client_payload":{"absence_url":"<guest link>"}` so CI does not keep hitting the dead secret.
 4. PAT: classic `repo` scope, **or** fine-grained **Contents: Read and write** on `khalidsaif912/new`
 5. GitHub Actions regenerates and pushes immediately. Cron is only a backup.
 

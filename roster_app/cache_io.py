@@ -460,8 +460,9 @@ def download_excel_with_meta(
             if "login.microsoftonline.com" in seed_host:
                 print("  Roster seed reached login; continuing with absence URL only.")
             else:
-                for sib in absence_sibling_urls(seed_resp.url):
-                    enqueue(sib)
+                # Prefer stable paths next to latest.xlsx over a dead ABSENCE_EXCEL_URL UniqueId.
+                for sib in reversed(absence_sibling_urls(seed_resp.url)):
+                    enqueue(sib, front=True)
                 parent = (urlparse(seed_resp.url).path or "").rsplit("/", 1)[0]
                 origin = _sharepoint_origin(seed_resp.url)
                 if parent and origin:
@@ -485,15 +486,19 @@ def download_excel_with_meta(
         except requests.RequestException as exc:
             print(f"  Roster seed failed: {exc}")
 
+    # Dead :x: UniqueId links last — siblings / folder listing already preferred above.
     for candidate in sharepoint_download_candidates(url):
         enqueue(candidate)
     if allow_sibling_absence_files:
         personal = _personal_site_from_share(url or seed)
         if personal:
-            enqueue(f"{personal}/Documents/AbsenceReports/absence-report.xlsb?ga=1")
-            enqueue(f"{personal}/Documents/ROSTER_UPLOADS/absence-report.xlsb?ga=1")
-            enqueue(f"{personal}/Documents/ABSENCE_UPLOADS/latest.xlsb?ga=1")
-            enqueue(f"{personal}/Documents/ROSTER_UPLOADS/latest.xlsb?ga=1")
+            for path in (
+                f"{personal}/Documents/ROSTER_UPLOADS/absence-report.xlsb?ga=1",
+                f"{personal}/Documents/AbsenceReports/absence-report.xlsb?ga=1",
+                f"{personal}/Documents/ABSENCE_UPLOADS/latest.xlsb?ga=1",
+                f"{personal}/Documents/ABSENCE_UPLOADS/absence-report.xlsb?ga=1",
+            ):
+                enqueue(path, front=bool(seed and not url))
 
     for attempt, candidate in enumerate(to_try):
         if candidate in tried:
