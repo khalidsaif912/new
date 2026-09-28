@@ -55,6 +55,7 @@ from roster_app.cache_io import (
     infer_pages_base_url,
     looks_like_roster_month_filename,
     month_key_from_filename,
+    publish_month_keys,
     try_load_cached_workbook,
     write_bytes,
     write_json,
@@ -68,6 +69,7 @@ from roster_app.settings import (
     PAGES_BASE_URL,
     SHIFT_MAP,
     TZ,
+    ordered_department_sheets,
 )
 from roster_app.text_utils import (
     append_range_suffix,
@@ -334,8 +336,13 @@ def employee_id_from_name(name: str) -> str:
     return m.group(1) if m else ""
 
 
-def is_inventory_employee(name: str) -> bool:
-    return employee_id_from_name(name) in INVENTORY_EMP_IDS
+def department_sheets_from_wb(wb) -> list:
+    hidden = set()
+    for name in wb.sheetnames:
+        state = str(getattr(wb[name], "sheet_state", "visible") or "visible").lower()
+        if state != "visible":
+            hidden.add(name)
+    return ordered_department_sheets(wb.sheetnames, hidden=hidden)
 
 
 def empty_shift_buckets() -> dict:
@@ -2681,6 +2688,7 @@ var T = {{
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
+    security:'Security', absences:'Absences',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
@@ -2695,6 +2703,7 @@ var T = {{
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
+    security:'الأمن', absences:'الغيابات',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }}
@@ -2756,7 +2765,8 @@ function applyLang(lang) {{
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
     'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
-    'Unassigned':t.unassigned}};
+    'Unassigned':t.unassigned,'Security':t.security,'Absences':t.absences,
+    'الأمن':t.security,'الغيابات':t.absences}};
   document.querySelectorAll('.deptTitle').forEach(function(el) {{
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
@@ -3401,7 +3411,7 @@ def generate_date_pages_for_month(
                     "⚠️ لا يوجد روستر لهذا الشهر بعد.</div>"
                 )
             else:
-                for idx, (sheet_name, dept_name) in enumerate(DEPARTMENTS):
+                for idx, (sheet_name, dept_name) in enumerate(department_sheets_from_wb(wb)):
                     if sheet_name not in wb.sheetnames:
                         continue
 
@@ -3951,19 +3961,6 @@ def main():
             "Fix month_key_from_filename before publishing."
         )
 
-    # Anchor calendar window to the roster file month (e.g. June file while today is still May).
-    if incoming_key and not args.date and (args.excel_file or data):
-        try:
-            ay, am = [int(x) for x in incoming_key.split("-")]
-            if (ay, am) != (now.year, now.month):
-                now = datetime(ay, am, 1, now.hour, now.minute, tzinfo=TZ)
-                today_dow = (now.weekday() + 1) % 7
-                today_day = now.day
-                active_group = current_shift_key(now)
-                print(f"📅 Anchored publish month to file: {incoming_key}")
-        except Exception:
-            pass
-
     site_last_updated = format_site_last_updated(now)
     write_site_last_updated_json(now)
 
@@ -3983,70 +3980,39 @@ def main():
     elif not incoming_key:
         print("⚠️ Could not detect month from filename; cache skipped for this run.")
 
-    # حساب الأشهر الثلاثة
-    prev_y, prev_m = add_months(now.year, now.month, -1)
-    next_y, next_m = add_months(now.year, now.month, +1)
-
-    prev_key = f"{prev_y:04d}-{prev_m:02d}"
+    month_keys = publish_month_keys(now.year, now.month, incoming_key)
     curr_key = f"{now.year:04d}-{now.month:02d}"
-    next_key = f"{next_y:04d}-{next_m:02d}"
+    first_y, first_m = [int(x) for x in month_keys[0].split("-")]
+    last_y, last_m = [int(x) for x in month_keys[-1].split("-")]
+    min_date = f"{first_y:04d}-{first_m:02d}-01"
+    max_date = f"{last_y:04d}-{last_m:02d}-{calendar.monthrange(last_y, last_m)[1]:02d}"
+    print(f"📅 Month range: {' → '.join(month_keys)}")
 
-    # نطاق الـ date picker: من أول الشهر السابق إلى آخر الشهر القادم
-    min_date = f"{prev_y:04d}-{prev_m:02d}-01"
-    max_date = f"{next_y:04d}-{next_m:02d}-{calendar.monthrange(next_y, next_m)[1]:02d}"
-
-    print(f"📅 Month range: {prev_key} → {curr_key} → {next_key}")
-
-    # تحميل الكاش لكل شهر
-    wb_prev = try_load_cached_workbook(prev_key)
-    wb_curr = try_load_cached_workbook(curr_key)
-    wb_next = try_load_cached_workbook(next_key)
-
-    # FIX #4: استخدام البيانات المحملة للشهر المطابق (تجاوز الكاش القديم)
-    if data:
+    wbs = {key: try_load_cached_workbook(key) for key in month_keys}
+    if data and incoming_key:
         wb_data = load_workbook(BytesIO(data), data_only=True)
-        if incoming_key == prev_key:
-            wb_prev = wb_data
-            print(f"✅ Using downloaded data for {prev_key}")
-        if incoming_key == curr_key:
-            wb_curr = wb_data
-            print(f"✅ Using downloaded data for {curr_key}")
-        if incoming_key == next_key:
-            wb_next = wb_data
-            print(f"✅ Using downloaded data for {next_key}")
+        wbs[incoming_key] = wb_data
+        print(f"✅ Using downloaded data for {incoming_key}")
 
-    print(f"📦 Cache status: prev={'✅' if wb_prev else '❌'} | curr={'✅' if wb_curr else '❌'} | next={'✅' if wb_next else '❌'}")
+    print("📦 Cache status: " + " | ".join(f"{k}={'✅' if wbs.get(k) else '❌'}" for k in month_keys))
 
-    # توليد صفحات الأشهر الثلاثة
-    generate_date_pages_for_month(
-        wb_prev, prev_y, prev_m, pages_base,
-        source_name=cached_source_name(prev_key) or source_name,
-        min_date=min_date, max_date=max_date,
-        site_last_updated=site_last_updated,
-    )
-    generate_date_pages_for_month(
-        wb_curr, now.year, now.month, pages_base,
-        source_name=cached_source_name(curr_key) or source_name,
-        min_date=min_date, max_date=max_date,
-        site_last_updated=site_last_updated,
-    )
-    generate_date_pages_for_month(
-        wb_next, next_y, next_m, pages_base,
-        source_name=cached_source_name(next_key) or source_name,
-        min_date=min_date, max_date=max_date,
-        site_last_updated=site_last_updated,
-    )
+    for key in month_keys:
+        y, m = [int(x) for x in key.split("-")]
+        generate_date_pages_for_month(
+            wbs.get(key), y, m, pages_base,
+            source_name=cached_source_name(key) or source_name,
+            min_date=min_date, max_date=max_date,
+            site_last_updated=site_last_updated,
+        )
 
-    if incoming_key and data:
-        slot_wb = {prev_key: wb_prev, curr_key: wb_curr, next_key: wb_next}.get(incoming_key)
-        if slot_wb is None:
-            raise RuntimeError(
-                f"Roster data downloaded for {incoming_key} but no workbook was bound "
-                f"to the publish window ({prev_key}, {curr_key}, {next_key})."
-            )
+    if incoming_key and data and wbs.get(incoming_key) is None:
+        raise RuntimeError(
+            f"Roster data downloaded for {incoming_key} but no workbook was bound "
+            f"to the publish window ({', '.join(month_keys)})."
+        )
 
-    # الصفحة الرئيسية تستخدم الشهر الحالي
-    wb = wb_curr
+    # الصفحة الرئيسية تستخدم اليوم الحقيقي (Muscat)، لا يوم 1 من ملف الشهر الجديد
+    wb = wbs.get(curr_key)
 
     # ─────────────────────────────────────────────────────────────
     # من هنا: توليد الصفحة الرئيسية docs/index.html و docs/now/
@@ -4126,7 +4092,7 @@ def main():
     inventory_buckets = empty_shift_buckets()
     inventory_buckets_now = empty_shift_buckets()
 
-    for idx, (sheet_name, dept_name) in enumerate(DEPARTMENTS):
+    for idx, (sheet_name, dept_name) in enumerate(department_sheets_from_wb(wb)):
         if sheet_name not in wb.sheetnames:
             continue
 

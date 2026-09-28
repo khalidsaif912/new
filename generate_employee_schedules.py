@@ -24,6 +24,7 @@ from collections import defaultdict
 import requests
 from openpyxl import load_workbook
 from roster_app.cache_io import download_excel as shared_download_excel
+from roster_app.settings import ordered_department_sheets
 
 
 # =========================
@@ -262,7 +263,7 @@ def generate_employee_schedules(wb, year: int, month: int):
     })
     
     # معالجة كل قسم
-    for sheet_name, dept_name in DEPARTMENTS:
+    for sheet_name, dept_name in ordered_department_sheets(wb.sheetnames):
         if sheet_name not in wb.sheetnames:
             continue
         
@@ -447,7 +448,7 @@ def detect_month_from_wb(wb):
 
     # جمع أرقام الأيام من أول sheet متاح
     all_day_nums = set()
-    for sheet_name, _ in DEPARTMENTS:
+    for sheet_name, _ in ordered_department_sheets(wb.sheetnames):
         if sheet_name not in wb.sheetnames:
             continue
         ws = wb[sheet_name]

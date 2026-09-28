@@ -26,6 +26,36 @@ DEPARTMENTS = [
     ("Unassigned", "Unassigned"),
 ]
 
+# Combined/settings tabs are not department cards (would duplicate or be empty).
+SKIP_ROSTER_SHEETS = frozenset({
+    "setting",
+    "master",
+    "full staffs as per jd",
+})
+
+
+def is_skipped_roster_sheet(name: str) -> bool:
+    key = (name or "").strip().lower()
+    return (not key) or key in SKIP_ROSTER_SHEETS or key.startswith("setting")
+
+
+def ordered_department_sheets(sheetnames, hidden=None):
+    """Known export depts first, then any extra visible roster sheets (Security, Absences, …)."""
+    names = list(sheetnames or [])
+    hidden = set(hidden or [])
+    out: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for sheet_name, dept_name in DEPARTMENTS:
+        if sheet_name in names and sheet_name not in hidden:
+            out.append((sheet_name, dept_name))
+            seen.add(sheet_name)
+    for name in names:
+        if name in seen or name in hidden or is_skipped_roster_sheet(name):
+            continue
+        out.append((name, (name or "").strip() or name))
+        seen.add(name)
+    return out
+
 # For day-row matching only
 DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 

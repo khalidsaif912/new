@@ -370,6 +370,35 @@ def add_months(year: int, month: int, delta: int) -> tuple[int, int]:
     return y, m
 
 
+def publish_month_keys(today_year: int, today_month: int, incoming_key: str | None = None) -> list[str]:
+    """Months to generate: today±1, plus the incoming file month±1.
+
+    Do not move "today" to the file's day-1. A late-September publish of
+    October must still render 28 September from the September workbook, while
+    still generating October pages from the new file.
+    """
+    keys: list[str] = []
+
+    def add(year: int, month: int) -> None:
+        key = f"{year:04d}-{month:02d}"
+        if key not in keys:
+            keys.append(key)
+
+    prev_y, prev_m = add_months(today_year, today_month, -1)
+    next_y, next_m = add_months(today_year, today_month, 1)
+    add(prev_y, prev_m)
+    add(today_year, today_month)
+    add(next_y, next_m)
+    if incoming_key and re.fullmatch(r"\d{4}-\d{2}", incoming_key.strip()):
+        iy, im = int(incoming_key[:4]), int(incoming_key[5:7])
+        ipy, ipm = add_months(iy, im, -1)
+        iny, inm = add_months(iy, im, 1)
+        add(ipy, ipm)
+        add(iy, im)
+        add(iny, inm)
+    return sorted(keys)
+
+
 def cache_paths(month_key: str) -> tuple[str, str]:
     os.makedirs(ROSTERS_DIR, exist_ok=True)
     return (

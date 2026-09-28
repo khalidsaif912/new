@@ -254,6 +254,8 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 
 Without this HTTP action, same-name overwrites wait for GitHub’s delayed schedule (often hours).
 
+Publishing a **future month** (October file while today is still September) must **not** rewrite “today” to the 1st of that file. The site always redirects `/docs/` to Muscat today; faking today as 1 October made GitHub look updated while visitors landed on the previous month’s list. Extra visible Excel sheets (Security / Absences / الغيابات / الأمن) are published as department cards automatically.
+
 ## Same roster filename but content changed
 - CI compares **SHA-256** of the Excel bytes and a **logical content fingerprint**
   (cell values) under `rosters/.versions/{YYYY-MM}/`.
