@@ -1721,9 +1721,10 @@
         const root = getSiteRootPath();
         const savedEmpId = getSavedEmpIdForKind(kind);
 
-        const absRes = await fetch(`${root}/absence-data.json?ts=${Date.now()}`);
+        const absRes = await fetch(`${root}/absence-data.json?ts=${Date.now()}`, { cache: 'no-store' });
         if (!absRes.ok) throw new Error('Could not load absence data.');
         const absData = await absRes.json();
+        // SharePoint absence file is usually previous months — never filter by current roster.
         const records = (absData && absData.records) || [];
         if (!records.length) {
           err.textContent = t('noAbsenceAll');

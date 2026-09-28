@@ -1546,7 +1546,7 @@
         return;
       }
       if (act === 'openDiff') {
-        window.location.href = getBase() + 'roster-diff/index.html';
+        window.location.href = getBase() + 'roster-diff/index.html' + (absences && absences.length ? '?tab=absence' : '');
         return;
       }
       if (act === 'tab:shift' || act === 'tab:absence') {
@@ -1562,7 +1562,7 @@
     };
   }
 
-  function ensurePageBanner(alert, lang) {
+  function ensurePageBanner(alert, lang, absences) {
     var holder =
       document.querySelector('.wrap') ||
       document.querySelector('main') ||
@@ -1613,7 +1613,7 @@
         return;
       }
       if (act === 'openDiff') {
-        window.location.href = getBase() + 'roster-diff/index.html';
+        window.location.href = getBase() + 'roster-diff/index.html' + (absences && absences.length ? '?tab=absence' : '');
       }
     };
   }
@@ -1684,7 +1684,7 @@ function onAppLangChange() {
     if (card) card.hidden = wasCardHidden;
   }
   if (onMySchedulePage() && document.getElementById(PAGE_BANNER_ID)) {
-    ensurePageBanner(p.alert, lang);
+    ensurePageBanner(p.alert, lang, p.absences);
   }
 }
 
@@ -1899,7 +1899,7 @@ function renderForEmployee(empId) {
       if (onMySchedulePage()) {
         clearHomeUI();
         if (!isPageDismissed(empId, alert)) {
-          ensurePageBanner(alert, lang);
+          ensurePageBanner(alert, lang, absences);
         }
         setTimeout(function () { highlightChangedDays(alert); }, 300);
         setTimeout(function () { highlightChangedDays(alert); }, 1200);
@@ -1937,17 +1937,6 @@ function boot() {
     } catch (err) {}
   }
 
-  function loadAbsenceList() {
-    try {
-      if (document.querySelector('script[data-absence-list="1"]')) return;
-      var s = document.createElement('script');
-      s.src = getBase() + 'absence-list.js?v=20260928a';
-      s.async = true;
-      s.setAttribute('data-absence-list', '1');
-      document.body.appendChild(s);
-    } catch (err) {}
-  }
-
   function loadAlertSound() {
     try {
       if (window.rosterAlertSound) return;
@@ -1961,7 +1950,6 @@ function boot() {
   }
 
   function start() {
-    loadAbsenceList();
     loadAlertSound();
     // Force homepage feedback UI even if index shell is an older cache.
     try {

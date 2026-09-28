@@ -203,20 +203,12 @@ SVG_CHIP_WITH_ME = _chip_svg(
     stroke="#4f46e5",
 )
 
-SVG_CHIP_ABSENCES = _chip_svg(
-    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>'
-    '<circle cx="9" cy="7" r="4"/>'
-    '<path d="M17 8l5 5M22 8l-5 5"/>',
-    stroke="#991b1b",
-)
-
 CHIP_SCHEDULE_HTML = _chip_val(SVG_CHIP_SCHEDULE)
 CHIP_FLIGHT_HTML = _chip_val(SVG_CHIP_FLIGHT)
 CHIP_EXPORT_HTML = _chip_val(SVG_CHIP_EXPORT)
 CHIP_WAVE_HTML = _chip_val(f'<span class="waveHand">{SVG_CHIP_WAVE}</span>')
 CHIP_TRAINING_HTML = _chip_val(SVG_CHIP_TRAINING)
 CHIP_DIFF_HTML = _chip_val(SVG_CHIP_DIFF)
-CHIP_ABSENCES_HTML = _chip_val(SVG_CHIP_ABSENCES)
 CHIP_MORNING_HTML = _chip_val(SVG_CHIP_SUN)
 CHIP_AFTERNOON_HTML = _chip_val(SVG_CHIP_CLOUD_SUN)
 CHIP_NIGHT_HTML = _chip_val(SVG_CHIP_MOON)
@@ -1273,9 +1265,7 @@ I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§�
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
 IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
-CHANGE_ALERT_VER = "20260928a"
-# Public absences/security list (independent of current roster month).
-ABSENCE_LIST_VER = "20260928a"
+CHANGE_ALERT_VER = "20260928b"
 # Ticker + banners + visit counts (Mantle backoff/cache). Bump when those JS files change.
 MANTLE_CLIENT_VER = "20260923d"
 
@@ -1310,7 +1300,6 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
-    addScript(root + '/absence-list.js?v=""" + ABSENCE_LIST_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
@@ -1355,7 +1344,6 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
-    addScript(root + '/absence-list.js?v=""" + ABSENCE_LIST_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
