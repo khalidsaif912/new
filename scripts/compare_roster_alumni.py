@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Compare oldest vs current export/import rosters to find people who left."""
+"""Compare two roster months and stage leavers for alumni confirmation.
+
+People present in the older month but missing from the newer month are written
+to docs/tools/leavers/data.json as pending candidates. They are NOT added to
+docs/alumni.json until confirmed in the leavers review tool (Mantle).
+"""
 from __future__ import annotations
 
+import argparse
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -96,65 +103,167 @@ def extract_import(path: Path) -> dict:
     return out
 
 
-def main() -> None:
-    old_exp = extract_export(ROOT / "rosters" / "2026-02.xlsx")
-    new_exp = extract_export(ROOT / "rosters" / "2026-07.xlsx")
-    old_imp = extract_import(ROOT / "import-rosters" / "2026-03.xlsx")
-    new_imp = extract_import(ROOT / "import-rosters" / "2026-07.xlsx")
+def resolve_month_file(folder: Path, month: str) -> Path:
+    path = folder / f"{month}.xlsx"
+    if not path.is_file():
+        raise FileNotFoundError(f"Missing roster file: {path}")
+    return path
 
-    left_exp = []
-    for eid, e in sorted(old_exp.items(), key=lambda x: x[1]["name"].lower()):
-        if eid not in new_exp:
-            status = "moved_to_import" if eid in new_imp else "left"
-            left_exp.append({**e, "status": status, "nameAr": ar_for(e["name"])})
 
-    left_imp = []
-    for eid, e in sorted(old_imp.items(), key=lambda x: x[1]["name"].lower()):
-        if eid not in new_imp:
-            status = "moved_to_export" if eid in new_exp else "left"
-            left_imp.append({**e, "status": status, "nameAr": ar_for(e["name"])})
+def classify_left(
+    old: dict,
+    new: dict,
+    other_new: dict,
+    moved_label: str,
+) -> tuple[list[dict], list[dict]]:
+    left: list[dict] = []
+    moved: list[dict] = []
+    for eid, e in sorted(old.items(), key=lambda x: x[1]["name"].lower()):
+        if eid in new:
+            continue
+        row = {
+            **e,
+            "nameAr": ar_for(e["name"]),
+            "lastMonth": "",  # filled by caller
+            "reason": "missing_from_newer_month",
+        }
+        if eid in other_new:
+            row["status"] = moved_label
+            moved.append(row)
+        else:
+            row["status"] = "left"
+            left.append(row)
+    return left, moved
 
-    print(f"EXPORT old={len(old_exp)} new={len(new_exp)}")
-    print(f"IMPORT old={len(old_imp)} new={len(new_imp)}")
-    print("\n=== EXPORT not in current export ===")
-    for e in left_exp:
-        tag = " [MOVED IMPORT]" if e["status"] != "left" else ""
-        print(f"{e['id']:>8}  {e['name']:<35}  {e['department']:<20}  {e['nameAr']}{tag}")
-    print(
-        "total",
-        len(left_exp),
-        "truly left",
-        sum(1 for e in left_exp if e["status"] == "left"),
-    )
 
-    print("\n=== IMPORT not in current import ===")
-    for e in left_imp:
-        tag = " [MOVED EXPORT]" if e["status"] != "left" else ""
-        print(f"{e['id']:>8}  {e['name']:<35}  {e['department']:<28}  {e['nameAr']}{tag}")
-    print(
-        "total",
-        len(left_imp),
-        "truly left",
-        sum(1 for e in left_imp if e["status"] == "left"),
-    )
+def build_payload(old_month: str, new_month: str) -> dict:
+    old_exp_path = resolve_month_file(ROOT / "rosters", old_month)
+    new_exp_path = resolve_month_file(ROOT / "rosters", new_month)
+    old_imp_path = resolve_month_file(ROOT / "import-rosters", old_month)
+    new_imp_path = resolve_month_file(ROOT / "import-rosters", new_month)
 
-    payload = {
+    old_exp = extract_export(old_exp_path)
+    new_exp = extract_export(new_exp_path)
+    old_imp = extract_import(old_imp_path)
+    new_imp = extract_import(new_imp_path)
+
+    left_exp, moved_exp = classify_left(old_exp, new_exp, new_imp, "moved_to_import")
+    left_imp, moved_imp = classify_left(old_imp, new_imp, new_exp, "moved_to_export")
+    for row in left_exp + moved_exp + left_imp + moved_imp:
+        row["lastMonth"] = old_month
+        row["compareFrom"] = old_month
+        row["compareTo"] = new_month
+
+    alumni = json.loads((ROOT / "docs" / "alumni.json").read_text(encoding="utf-8"))
+    alumni_ids = {str(p.get("id")) for p in (alumni.get("people") or []) if p.get("id")}
+
+    candidates: list[dict] = []
+    for e in left_exp + left_imp:
+        eid = str(e["id"])
+        candidates.append(
+            {
+                "id": eid,
+                "en": e["name"],
+                "ar": e.get("nameAr") or "",
+                "dept": e.get("department") or "",
+                "months": [old_month],
+                "lastMonth": old_month,
+                "inAlumni": eid in alumni_ids,
+                "kind": e.get("kind") or "export",
+                "reason": "missing_from_" + new_month,
+                "compareFrom": old_month,
+                "compareTo": new_month,
+            }
+        )
+    candidates.sort(key=lambda x: (x["kind"], x["en"].lower()))
+
+    compare_audit = {
         "export": {
-            "old_file": "rosters/2026-02.xlsx",
-            "new_file": "rosters/2026-07.xlsx",
-            "left": [e for e in left_exp if e["status"] == "left"],
-            "moved": [e for e in left_exp if e["status"] != "left"],
+            "old_file": str(old_exp_path.relative_to(ROOT)),
+            "new_file": str(new_exp_path.relative_to(ROOT)),
+            "old_count": len(old_exp),
+            "new_count": len(new_exp),
+            "left": left_exp,
+            "moved": moved_exp,
         },
         "import": {
-            "old_file": "import-rosters/2026-03.xlsx",
-            "new_file": "import-rosters/2026-07.xlsx",
-            "left": [e for e in left_imp if e["status"] == "left"],
-            "moved": [e for e in left_imp if e["status"] != "left"],
+            "old_file": str(old_imp_path.relative_to(ROOT)),
+            "new_file": str(new_imp_path.relative_to(ROOT)),
+            "old_count": len(old_imp),
+            "new_count": len(new_imp),
+            "left": left_imp,
+            "moved": moved_imp,
         },
     }
-    out = ROOT / "docs" / "_alumni_compare.json"
-    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("wrote", out)
+
+    leavers_payload = {
+        "generatedAt": datetime.now().isoformat(timespec="seconds"),
+        "compareFrom": old_month,
+        "compareTo": new_month,
+        "currentMonth": new_month,
+        "allMonths": [old_month, new_month],
+        "summary": {
+            "activeExport": len(new_exp),
+            "activeImport": len(new_imp),
+            "candidates": len(candidates),
+            "candidatesNotInAlumni": sum(1 for c in candidates if not c["inAlumni"]),
+            "alreadyAlumni": sum(1 for c in candidates if c["inAlumni"]),
+            "movedExport": len(moved_exp),
+            "movedImport": len(moved_imp),
+        },
+        "candidates": candidates,
+        "moved": {
+            "export": moved_exp,
+            "import": moved_imp,
+        },
+        "alumniIds": sorted(alumni_ids),
+        "note": (
+            "Candidates are pending confirmation only. "
+            "Confirm in docs/tools/leavers/ before they appear under Former Colleagues."
+        ),
+    }
+    return leavers_payload, compare_audit
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--old", default="2026-09", help="Older month YYYY-MM (default: 2026-09)")
+    ap.add_argument("--new", default="2026-10", help="Newer month YYYY-MM (default: 2026-10)")
+    args = ap.parse_args()
+
+    leavers_payload, compare_audit = build_payload(args.old, args.new)
+
+    leavers_dir = ROOT / "docs" / "tools" / "leavers"
+    leavers_dir.mkdir(parents=True, exist_ok=True)
+    leavers_path = leavers_dir / "data.json"
+    leavers_path.write_text(
+        json.dumps(leavers_payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    audit_path = ROOT / "docs" / "_alumni_compare.json"
+    audit_path.write_text(
+        json.dumps(compare_audit, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    s = leavers_payload["summary"]
+    print(f"compare {args.old} -> {args.new}")
+    print(
+        f"export {compare_audit['export']['old_count']} -> {compare_audit['export']['new_count']} "
+        f"| import {compare_audit['import']['old_count']} -> {compare_audit['import']['new_count']}"
+    )
+    print(
+        f"pending leavers: {s['candidatesNotInAlumni']} "
+        f"(already alumni: {s['alreadyAlumni']}, moved skipped: "
+        f"{s['movedExport'] + s['movedImport']})"
+    )
+    for c in leavers_payload["candidates"]:
+        flag = " [already alumni]" if c["inAlumni"] else " [PENDING CONFIRM]"
+        print(f"  {c['id']:>8}  {c['en']:<35}  {c['kind']:<7}  {c['dept']}{flag}")
+    print("wrote", leavers_path)
+    print("wrote", audit_path)
+    print("alumni.json NOT modified — confirm via tools/leavers/")
 
 
 if __name__ == "__main__":

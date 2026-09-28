@@ -1,0 +1,70 @@
+{
+  "export": {
+    "old_file": "rosters/2026-09.xlsx",
+    "new_file": "rosters/2026-10.xlsx",
+    "old_count": 70,
+    "new_count": 69,
+    "left": [
+      {
+        "id": "80270",
+        "name": "Marlon Esmilla",
+        "department": "Export Checker",
+        "kind": "export",
+        "nameAr": "مارلون إسميلا",
+        "lastMonth": "2026-09",
+        "reason": "missing_from_newer_month",
+        "status": "left",
+        "compareFrom": "2026-09",
+        "compareTo": "2026-10"
+      },
+      {
+        "id": "8899",
+        "name": "Rajaram",
+        "department": "Officers",
+        "kind": "export",
+        "nameAr": "راجارام",
+        "lastMonth": "2026-09",
+        "reason": "missing_from_newer_month",
+        "status": "left",
+        "compareFrom": "2026-09",
+        "compareTo": "2026-10"
+      }
+    ],
+    "moved": []
+  },
+  "import": {
+    "old_file": "import-rosters/2026-09.xlsx",
+    "new_file": "import-rosters/2026-10.xlsx",
+    "old_count": 68,
+    "new_count": 68,
+    "left": [
+      {
+        "id": "82590",
+        "name": "Nasser Al Mamari",
+        "department": "CHKR",
+        "kind": "import",
+        "jd": "CHKR",
+        "nameAr": "ناصر ال ماماري",
+        "lastMonth": "2026-09",
+        "reason": "missing_from_newer_month",
+        "status": "left",
+        "compareFrom": "2026-09",
+        "compareTo": "2026-10"
+      },
+      {
+        "id": "8901",
+        "name": "Udugama",
+        "department": "Supervisors",
+        "kind": "import",
+        "jd": "SUPV",
+        "nameAr": "أودوجاما",
+        "lastMonth": "2026-09",
+        "reason": "missing_from_newer_month",
+        "status": "left",
+        "compareFrom": "2026-09",
+        "compareTo": "2026-10"
+      }
+    ],
+    "moved": []
+  }
+}
