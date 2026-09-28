@@ -164,6 +164,9 @@ def test_change_alert_popup_survives_generate():
     assert 'id="absencesChipBtn"' not in html
     assert "/absences/" not in html
     assert "roster-diff/index.html" in html
+    published = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+    assert tag in published
+    assert "change-alert.js?v=20260909j" not in published
 
 
 def test_mantle_clients_survive_generate():

@@ -1949,7 +1949,18 @@ function boot() {
     } catch (err) {}
   }
 
+  function stripInjectedAbsenceList() {
+    ['absence-list-root', 'absencesChipBtn', 'absence-list-styles'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    document.querySelectorAll('script[data-absence-list="1"], a.absencesChip, .abs-list-card, .abs-list-note, .abs-list-search').forEach(function (el) {
+      el.remove();
+    });
+  }
+
   function start() {
+    stripInjectedAbsenceList();
     loadAlertSound();
     // Force homepage feedback UI even if index shell is an older cache.
     try {
