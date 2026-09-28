@@ -128,10 +128,16 @@ def test_change_alert_popup_survives_generate():
     assert "chg-update-overlay" not in js
     assert "function shouldForceExistingCard" in js
     assert "function absenceListFingerprint" in js
+    assert "function trainingFingerprint" in js
+    assert "function diffFingerprint" in js
+    assert "function fetchUpdateSources" in js
     assert "chg-card-backdrop" in js
     assert "newAbsencesList" in js
-    assert "chgUpdatePopupSeen_v2" in js
-    assert "ensureHomeUI(empId, alert, lang, absences, empName, absData)" in js
+    assert "newTrainingList" in js
+    assert "chgUpdatePopupSeen_v3" in js
+    assert "training/new-list.json" in js
+    assert "site-last-updated.json" in js
+    assert "ensureHomeUI(empId, alert, lang, absences, empName, updateMeta)" in js
 
     tag = "change-alert.js?v=" + CHANGE_ALERT_VER
     assert tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
