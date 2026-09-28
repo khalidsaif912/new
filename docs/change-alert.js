@@ -270,9 +270,24 @@
   function alertSummaryText(alert, lang) {
     var s = alert && alert.summary;
     if (!s) return t('noDetails', lang);
-    if (typeof s === 'string') return s;
-    var text = lang === 'ar' ? (s.ar || s.en || '') : (s.en || s.ar || '');
-    return String(text).trim() || t('noDetails', lang);
+    var text = typeof s === 'string'
+      ? s
+      : (lang === 'ar' ? (s.ar || s.en || '') : (s.en || s.ar || ''));
+    text = String(text || '').replace(/\r/g, '').trim();
+    if (!text) return t('noDetails', lang);
+    // Never show the old multi-source dump in the card paragraph.
+    var first = text.split(/\n+/)[0].trim();
+    if (
+      /This update includes/i.test(text) ||
+      /يشمل التحديث/i.test(text) ||
+      /Roster differences:/i.test(text) ||
+      /فروقات الروستر:/i.test(text) ||
+      /New training list/i.test(text) ||
+      /قائمة تدريب جديدة/i.test(text)
+    ) {
+      return first || t('noDetails', lang);
+    }
+    return first || text;
   }
 
   function escapeHtml(value) {
