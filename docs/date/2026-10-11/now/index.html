@@ -1314,7 +1314,7 @@
           </span>
         </span>
       </label>
-      <input id="datePicker" type="date" value="2026-10-11" min="2026-09-01" max="2026-11-30" aria-label="Select roster date" />
+      <input id="datePicker" type="date" value="2026-10-11" min="2026-08-01" max="2026-11-30" aria-label="Select roster date" />
     </div>
   </div>
 
@@ -1635,8 +1635,8 @@
      </div><div class="empRow empRowAlt" data-emp-name="Riyadh Al Jabri - 82555" role="button" tabindex="0">
       <span class="empName" data-name-ar="رياض الجابري - 82555">Riyadh Al Jabri - 82555</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="Rashid Shayai" role="button" tabindex="0">
-      <span class="empName" data-name-ar="راشد شاياي">Rashid Shayai</span>
+     </div><div class="empRow" data-emp-name="Rashid AL Shayai - 82677" role="button" tabindex="0">
+      <span class="empName" data-name-ar="راشد ال شاياي - 82677">Rashid AL Shayai - 82677</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt" data-emp-name="Adil Al Zadjali - 8584" role="button" tabindex="0">
       <span class="empName" data-name-ar="عادل الزدجالي - 8584">Adil Al Zadjali - 8584</span>
@@ -2053,7 +2053,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">1 October 2026 / 08:08</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">28 September 2026 / 13:36</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export New Roster OCTOBER 2026.xlsx</strong>
   </div>
 
@@ -3163,6 +3163,7 @@ var T = {
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
+    security:'Security', absences:'Absences',
     morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
@@ -3177,6 +3178,7 @@ var T = {
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
+    security:'الأمن', absences:'الغيابات',
     morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
@@ -3240,7 +3242,8 @@ function applyLang(lang) {
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
     'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
-    'Unassigned':t.unassigned};
+    'Unassigned':t.unassigned,'Security':t.security,'Absences':t.absences,
+    'الأمن':t.security,'الغيابات':t.absences};
   document.querySelectorAll('.deptTitle').forEach(function(el) {
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
