@@ -138,6 +138,11 @@ def test_change_alert_popup_survives_generate():
     assert "training/new-list.json" in js
     assert "site-last-updated.json" in js
     assert "ensureHomeUI(empId, alert, lang, absences, empName, updateMeta)" in js
+    # Card text must stay short — no multi-source dump in the summary paragraph.
+    enrich = js.split("function enrichAlertSummary", 1)[1].split("function isUpdatePopupSeen", 1)[0]
+    assert "updateSourcesLabel" not in enrich
+    assert "newTrainingList" not in enrich
+    assert "Do not dump multi-source prose" in enrich
 
     tag = "change-alert.js?v=" + CHANGE_ALERT_VER
     assert tag in LOAD_LOCAL_ENHANCEMENTS_EXPORT
