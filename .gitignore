@@ -38,5 +38,6 @@ _local_abacus_admin_key.txt
 
 # SharePoint download debug payload
 debug_sharepoint_response.png
+debug_sharepoint_response.html
 tmp-*.bin
 

@@ -39,7 +39,7 @@ The script reads these variables:
 - `MAIL_FROM` (required): sender address
 - `MAIL_TO` (optional fallback): fallback recipient when subscribers are unavailable
 - `PAGES_BASE_URL` (optional): base URL for generated page links
-- `ABSENCE_EXCEL_URL` (optional, for CI / `process_absence.py`): direct-download URL for the absence `.xlsb` report. The live site only reads static `docs/absence-data.json`; that JSON is regenerated when the processing script runs against the Excel source. The team workbook on SharePoint (reference): [link](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC).
+- `ABSENCE_EXCEL_URL` (optional, for CI / `process_absence.py`): sharing link for the absence `.xlsb`. If that `:x:` link is expired, CI uses the working `EXPORT_EXCEL_URL` guest session and reads `ROSTER_UPLOADS/absence-report.xlsb` (overwrite that name — do not upload a new UniqueId). The live site only reads static `docs/absence-data.json`. Team workbook (reference only): [link](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC).
 
 ## Local Run
 

@@ -40,9 +40,10 @@ jobs:
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
           ABSENCE_EXCEL_FILE: ""
+          EXPORT_EXCEL_URL: ${{ secrets.EXPORT_EXCEL_URL || secrets.EXCEL_URL }}
         run: |
-          if [ -z "${ABSENCE_EXCEL_URL}" ]; then
-            echo "::error::Missing secret ABSENCE_EXCEL_URL"
+          if [ -z "${ABSENCE_EXCEL_URL}" ] && [ -z "${EXPORT_EXCEL_URL}" ]; then
+            echo "::error::Missing secret ABSENCE_EXCEL_URL (and no EXPORT_EXCEL_URL fallback)"
             exit 1
           fi
           python process_absence.py
