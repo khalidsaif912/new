@@ -146,10 +146,13 @@ jobs:
           print(f"Prefetching absence report from: {url[:80]}...")
           try:
               data = download_excel(url)
+              suffix = ".xlsx" if data.startswith(b"PK") else ".xlsb"
+              out_path = Path("tmp") / f"absence-report{suffix}"
               out_path.write_bytes(data)
               print(f"Saved local absence file: {out_path} ({len(data):,} bytes)")
               with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
                   f.write("absence_ready=true\n")
+                  f.write(f"absence_file={out_path.as_posix()}\n")
           except Exception as e:
               print(f"::warning::Absence prefetch failed, skipping absence processing in this run: {e}")
               with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
@@ -160,7 +163,7 @@ jobs:
         if: success() && steps.prefetch_absence.outputs.absence_ready == 'true'
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
-          ABSENCE_EXCEL_FILE: tmp/absence-report.xlsb
+          ABSENCE_EXCEL_FILE: ${{ steps.prefetch_absence.outputs.absence_file || 'tmp/absence-report.xlsb' }}
         run: python process_absence.py
 
       - name: Skip absence report (unavailable)

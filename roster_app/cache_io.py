@@ -12,6 +12,20 @@ from openpyxl import load_workbook
 from roster_app.settings import ROSTERS_DIR, SOURCE_NAME_FALLBACK, SOURCE_NAME_URL
 
 DEBUG_SHAREPOINT_RESPONSE_PATH = "debug_sharepoint_response.png"
+DEBUG_SHAREPOINT_HTML_PATH = "debug_sharepoint_response.html"
+
+_EXCEL_URL_RE = re.compile(
+    r"https?://[^\"'\s<>]+?\.(?:xlsx|xlsb|xls)(?:\?[^\"'\s<>]*)?",
+    re.IGNORECASE,
+)
+_JSON_DOWNLOAD_URL_RE = re.compile(
+    r'"(?:downloadUrl|DownloadUrl|@content\.downloadUrl)"\s*:\s*"([^"]+)"',
+    re.IGNORECASE,
+)
+_RELATIVE_FILE_RE = re.compile(
+    r'(?:href|src)=["\']([^"\']+\.(?:xlsx|xlsb|xls)(?:\?[^"\']*)?)["\']',
+    re.IGNORECASE,
+)
 
 
 def _add_or_replace_query_param(url: str, key: str, value: str) -> str:
@@ -35,6 +49,72 @@ def _normalize_sharepoint_download_url(url: str, *, cache_bust: bool = True) -> 
     if cache_bust:
         out = _add_or_replace_query_param(out, "_cb", str(int(time.time() * 1000)))
     return out
+
+
+def _unescape_extracted_url(raw: str) -> str:
+    s = (raw or "").strip()
+    if not s:
+        return ""
+    s = s.replace("\\/", "/").replace("\\u002f", "/").replace("\\u002F", "/")
+    return s
+
+
+def sharepoint_download_candidates(url: str, *, now_ms: int | None = None) -> list[str]:
+    """URL variants for the same SharePoint/OneDrive sharing link.
+
+    Guest links often redirect to the real ``.xlsb?ga=1`` file only when the
+    original sharing URL is requested *without* ``download=1``. Forcing
+    ``download=1`` can return an HTML auth/preview wall instead of Excel.
+    """
+    if not url:
+        return []
+    ts = str(now_ms if now_ms is not None else int(time.time() * 1000))
+    out: list[str] = []
+
+    def add(candidate: str) -> None:
+        if candidate and candidate not in out:
+            out.append(candidate)
+
+    add(url)
+    add(_add_or_replace_query_param(url, "ga", "1"))
+    add(_add_or_replace_query_param(url, "download", "1"))
+    add(_add_or_replace_query_param(_add_or_replace_query_param(url, "download", "1"), "web", "0"))
+    for base in list(out):
+        add(_add_or_replace_query_param(base, "_cb", ts))
+    return out
+
+
+def extract_sharepoint_file_urls(html: str, base_url: str = "") -> list[str]:
+    """Pull Excel file URLs out of a SharePoint HTML interstitial / preview page."""
+    if not html:
+        return []
+    found: list[str] = []
+
+    def add(raw: str) -> None:
+        candidate = _unescape_extracted_url(raw)
+        if not candidate:
+            return
+        if candidate.startswith("//"):
+            candidate = "https:" + candidate
+        elif candidate.startswith("/") and base_url:
+            origin = urlparse(base_url)
+            candidate = urlunparse((origin.scheme or "https", origin.netloc, candidate, "", "", ""))
+        if not candidate.lower().startswith("http"):
+            return
+        path = (urlparse(candidate).path or "").lower()
+        if not path.endswith((".xlsx", ".xlsb", ".xls")) and "download.aspx" not in path.lower() and "guestaccess.aspx" not in path.lower():
+            if ".xls" not in candidate.lower() and "download.aspx" not in candidate.lower():
+                return
+        if candidate not in found:
+            found.append(candidate)
+
+    for match in _JSON_DOWNLOAD_URL_RE.finditer(html):
+        add(match.group(1))
+    for match in _EXCEL_URL_RE.finditer(html):
+        add(match.group(0).rstrip(").,;"))
+    for match in _RELATIVE_FILE_RE.finditer(html):
+        add(match.group(1))
+    return found
 
 
 def workbook_content_fingerprint(data: bytes) -> str:
@@ -87,6 +167,41 @@ def download_excel(url: str) -> bytes:
     return data
 
 
+def _response_meta(response: requests.Response, data: bytes) -> dict[str, str]:
+    ctype = (response.headers.get("Content-Type") or "").lower()
+    return {
+        "etag": (response.headers.get("ETag") or response.headers.get("Etag") or "").strip(),
+        "last_modified": (response.headers.get("Last-Modified") or "").strip(),
+        "content_length": str(len(data)),
+        "content_type": ctype,
+        "final_url": response.url,
+    }
+
+
+def _log_download_attempt(response: requests.Response, data: bytes) -> None:
+    redirect_urls = [resp.url for resp in response.history] + [response.url]
+    meta = _response_meta(response, data)
+    print(f"  Final URL: {response.url}")
+    print("  Redirect chain:")
+    for idx, u in enumerate(redirect_urls, start=1):
+        print(f"    {idx}. {u}")
+    print(f"  Content-Type: {meta['content_type'] or 'unknown'}")
+    print(f"  Last-Modified: {meta['last_modified'] or 'n/a'}")
+    print(f"  ETag: {meta['etag'] or 'n/a'}")
+    print(f"  First 16 bytes hex: {_file_signature_hex16(data)}")
+    print(f"  File size: {len(data):,} bytes")
+
+
+def _save_non_excel_debug(data: bytes) -> None:
+    if _is_png_signature(data):
+        with open(DEBUG_SHAREPOINT_RESPONSE_PATH, "wb") as f:
+            f.write(data)
+        return
+    if data:
+        with open(DEBUG_SHAREPOINT_HTML_PATH, "wb") as f:
+            f.write(data)
+
+
 def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
     """Download Excel bytes and return response metadata useful for change detection."""
     if not url:
@@ -106,52 +221,51 @@ def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
         "Pragma": "no-cache",
     }
 
-    warmup_url = _normalize_sharepoint_download_url(url, cache_bust=True)
-    warmup = session.get(warmup_url, headers=headers, allow_redirects=True, timeout=30)
-    warmup.raise_for_status()
+    to_try = sharepoint_download_candidates(url)
+    tried: set[str] = set()
+    last_error = "Downloaded file is not recognized as Excel payload"
+    last_data = b""
+    last_ctype = ""
+    last_sig = ""
 
-    requested_url = _normalize_sharepoint_download_url(url, cache_bust=True)
-    r = session.get(requested_url, headers=headers, allow_redirects=True, timeout=60)
-    r.raise_for_status()
+    for attempt, candidate in enumerate(to_try):
+        if candidate in tried:
+            continue
+        tried.add(candidate)
+        print(f"  Attempt {attempt + 1}: {candidate[:140]}")
+        response = session.get(candidate, headers=headers, allow_redirects=True, timeout=60)
+        response.raise_for_status()
+        data = response.content or b""
+        _log_download_attempt(response, data)
 
-    redirect_urls = [resp.url for resp in r.history] + [r.url]
-    final_host = (urlparse(r.url).netloc or "").lower()
+        final_host = (urlparse(response.url).netloc or "").lower()
+        if "login.microsoftonline.com" in final_host:
+            raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
 
-    data = r.content or b""
-    ctype = (r.headers.get("Content-Type") or "").lower()
-    sig16 = _file_signature_hex16(data)
-    meta = {
-        "etag": (r.headers.get("ETag") or r.headers.get("Etag") or "").strip(),
-        "last_modified": (r.headers.get("Last-Modified") or "").strip(),
-        "content_length": str(len(data)),
-        "content_type": ctype,
-    }
+        if _is_excel_signature(data):
+            return data, _response_meta(response, data)
 
-    print(f"  Requested URL: {requested_url}")
-    print(f"  Final URL: {r.url}")
-    print("  Redirect chain:")
-    for idx, u in enumerate(redirect_urls, start=1):
-        print(f"    {idx}. {u}")
-    print(f"  Content-Type: {ctype or 'unknown'}")
-    print(f"  Last-Modified: {meta['last_modified'] or 'n/a'}")
-    print(f"  ETag: {meta['etag'] or 'n/a'}")
-    print(f"  First 16 bytes hex: {sig16}")
-    print(f"  File size: {len(data):,} bytes")
-
-    if "login.microsoftonline.com" in final_host:
-        raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
-
-    if _is_png_signature(data):
-        with open(DEBUG_SHAREPOINT_RESPONSE_PATH, "wb") as f:
-            f.write(data)
-        raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
-
-    if not _is_excel_signature(data):
-        raise ValueError(
-            f"Downloaded file is not recognized as Excel payload (Content-Type: {ctype or 'unknown'}; signature: {sig16})"
+        last_data = data
+        last_ctype = (response.headers.get("Content-Type") or "").lower()
+        last_sig = _file_signature_hex16(data)
+        last_error = (
+            f"Downloaded file is not recognized as Excel payload "
+            f"(Content-Type: {last_ctype or 'unknown'}; signature: {last_sig})"
         )
 
-    return data, meta
+        if _is_png_signature(data):
+            continue
+
+        html = data.decode("utf-8", errors="replace")
+        for extra in extract_sharepoint_file_urls(html, response.url):
+            if extra not in tried and extra not in to_try and len(to_try) < 16:
+                print(f"  Found file URL in HTML: {extra[:140]}")
+                to_try.append(extra)
+
+    _save_non_excel_debug(last_data)
+    if _is_png_signature(last_data):
+        raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
+    raise ValueError(last_error)
 
 
 def download_text(url: str) -> str:

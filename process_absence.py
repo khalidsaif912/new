@@ -5,12 +5,14 @@ Loads absence Excel from ABSENCE_EXCEL_FILE when set, otherwise downloads
 ABSENCE_EXCEL_URL, then regenerates docs/absence-data.json.
 """
 
+from __future__ import annotations
+
 import hashlib
 import json
 import os
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 
@@ -29,10 +31,45 @@ ABSENCE_FILE = os.environ.get("ABSENCE_EXCEL_FILE", "").strip()
 OUTPUT_PATH = "docs/absence-data.json"
 ARCHIVE_PATH = Path("absence-archive") / "absence-report.xlsb"
 HASH_FILE = Path("last_absence_hash.txt")
-COL_EMP_NO = 1
-COL_NAME = 2
-COL_SECTION = 3
-COL_DATE = 4
+
+# Legacy column indexes when no header row is found (col 0 is often empty).
+FALLBACK_COL_EMP_NO = 1
+FALLBACK_COL_NAME = 2
+FALLBACK_COL_SECTION = 3
+FALLBACK_COL_DATE = 4
+
+HEADER_EMP = {
+    "employee no",
+    "emp no",
+    "empno",
+    "employee number",
+    "emp. no",
+    "رقم الموظف",
+}
+HEADER_NAME = {
+    "name",
+    "employee name",
+    "الاسم",
+    "اسم الموظف",
+}
+HEADER_SECTION = {
+    "section",
+    "department",
+    "dept",
+    "unit",
+    "القسم",
+    "الإدارة",
+    "security",
+}
+HEADER_DATE = {
+    "request date",
+    "date",
+    "absence date",
+    "leave date",
+    "التاريخ",
+    "تاريخ الطلب",
+}
+HEADER_SKIP_EMP = {"employee no", "emp no", "empno", "employee number", "رقم الموظف"}
 
 
 def _is_excel_signature(data: bytes) -> bool:
@@ -79,16 +116,57 @@ def archive_absence_file(data: bytes) -> None:
     print(f"Archived {len(data):,} bytes -> {ARCHIVE_PATH} | hash={digest[:12]}")
 
 
+def _norm_header(value) -> str:
+    s = str(value or "").replace("\xa0", " ").strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    s = s.replace(".", "")
+    return s
+
+
+def find_header_columns(row: list) -> dict[str, int] | None:
+    """Return emp/name/section/date indexes when this row looks like a header."""
+    labels = [_norm_header(v) for v in row]
+    found: dict[str, int] = {}
+    for idx, label in enumerate(labels):
+        if not label:
+            continue
+        if label in HEADER_EMP and "emp" not in found:
+            found["emp"] = idx
+        elif label in HEADER_NAME and "name" not in found:
+            found["name"] = idx
+        elif label in HEADER_SECTION and "section" not in found:
+            found["section"] = idx
+        elif label in HEADER_DATE and "date" not in found:
+            found["date"] = idx
+    if "emp" in found and "name" in found and "date" in found:
+        found.setdefault("section", found["emp"])
+        return found
+    return None
+
+
 def clean_date(raw):
-    if not raw:
+    if raw is None or raw == "":
         return None
-    s = str(raw).strip().replace("\xa0", "").strip()
-    for fmt in ("%d-%b-%Y", "%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+    if isinstance(raw, datetime):
+        return raw.strftime("%Y-%m-%d")
+    if isinstance(raw, (int, float)) and not isinstance(raw, bool):
+        # Excel serial date (1900 date system).
+        try:
+            serial = float(raw)
+            if 20000 <= serial <= 80000:
+                return (datetime(1899, 12, 30) + timedelta(days=serial)).strftime("%Y-%m-%d")
+        except (OverflowError, ValueError, OSError):
+            pass
+    s = str(raw).replace("\xa0", " ").strip()
+    s = re.sub(r"\s+", " ", s)
+    if not s:
+        return None
+    for fmt in ("%d-%b-%Y", "%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y", "%d %b %Y", "%d-%b-%y"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
         except ValueError:
             continue
-    return s
+    return None
 
 
 def clean_name(raw):
@@ -113,24 +191,26 @@ def _normalize_cell(value):
     return value
 
 
-def _extract_rows_with_pandas(data, engine):
-    df = pd.read_excel(BytesIO(data), sheet_name=0, header=None, engine=engine)
+def _extract_rows_with_pandas(data, engine, sheet_name=0):
+    df = pd.read_excel(BytesIO(data), sheet_name=sheet_name, header=None, engine=engine)
     return [[_normalize_cell(v) for v in row] for row in df.itertuples(index=False, name=None)]
 
 
-def _extract_rows(data, content_type):
-    rows = []
-    errors = []
+def extract_sheet_rows(data: bytes, content_type: str) -> list[tuple[str, list[list]]]:
+    """Return [(sheet_name, rows), ...] for every readable sheet."""
+    errors: list[str] = []
 
     if open_workbook is not None:
         try:
+            sheets: list[tuple[str, list[list]]] = []
             with open_workbook(BytesIO(data)) as wb:
-                sheet_name = wb.sheets[0]
-                with wb.get_sheet(sheet_name) as ws:
-                    for row in ws.rows():
-                        rows.append([c.v for c in row])
-            if rows:
-                return rows
+                for sheet_name in wb.sheets:
+                    with wb.get_sheet(sheet_name) as ws:
+                        rows = [[c.v for c in row] for row in ws.rows()]
+                    if rows:
+                        sheets.append((str(sheet_name), rows))
+            if sheets:
+                return sheets
         except Exception as e:
             errors.append(f"pyxlsb: {e}")
     else:
@@ -138,9 +218,14 @@ def _extract_rows(data, content_type):
 
     for engine in ("openpyxl", "pyxlsb"):
         try:
-            rows = _extract_rows_with_pandas(data, engine=engine)
-            if rows:
-                return rows
+            xls = pd.ExcelFile(BytesIO(data), engine=engine)
+            sheets = []
+            for sheet_name in xls.sheet_names:
+                rows = _extract_rows_with_pandas(data, engine=engine, sheet_name=sheet_name)
+                if rows:
+                    sheets.append((str(sheet_name), rows))
+            if sheets:
+                return sheets
         except Exception as e:
             errors.append(f"pandas[{engine}]: {e}")
 
@@ -149,6 +234,92 @@ def _extract_rows(data, content_type):
         f"unable to parse downloaded file; content-type={content_type or 'unknown'}; "
         f"signature={signature}; attempts={'; '.join(errors)}"
     )
+
+
+def parse_absence_sheets(sheets: list[tuple[str, list[list]]]) -> tuple[int, list[dict]]:
+    records_by_date: dict[str, dict[str, list[str]]] = {}
+    processed = 0
+
+    for sheet_name, rows in sheets:
+        cols = None
+        start_idx = 0
+        for i, vals in enumerate(rows):
+            header = find_header_columns(vals)
+            if header:
+                cols = header
+                start_idx = i + 1
+                break
+        if cols is None:
+            cols = {
+                "emp": FALLBACK_COL_EMP_NO,
+                "name": FALLBACK_COL_NAME,
+                "section": FALLBACK_COL_SECTION,
+                "date": FALLBACK_COL_DATE,
+            }
+            start_idx = 2
+
+        for vals in rows[start_idx:]:
+            if len(vals) <= max(cols.values()):
+                continue
+            raw_emp_no = vals[cols["emp"]]
+            if raw_emp_no is None:
+                continue
+            if _norm_header(raw_emp_no) in HEADER_SKIP_EMP:
+                continue
+            try:
+                emp_no = str(int(raw_emp_no)) if raw_emp_no else None
+            except Exception:
+                emp_text = str(raw_emp_no).strip()
+                emp_no = emp_text if emp_text.isdigit() else None
+            if not emp_no:
+                continue
+
+            date = clean_date(vals[cols["date"]])
+            name = clean_name(vals[cols["name"]])
+            section = str(vals[cols["section"]] or "").strip() if cols["section"] < len(vals) else ""
+            if not date or not name:
+                continue
+
+            bucket = records_by_date.setdefault(date, {"names": [], "empNos": [], "sections": []})
+            if emp_no not in bucket["empNos"]:
+                bucket["names"].append(name)
+                bucket["empNos"].append(emp_no)
+                bucket["sections"].append(section)
+                processed += 1
+        print(f"Sheet {sheet_name!r}: using columns {cols}")
+
+    records = [
+        {"date": date, "names": d["names"], "empNos": d["empNos"], "sections": d["sections"]}
+        for date in sorted(records_by_date.keys())
+        for d in [records_by_date[date]]
+    ]
+    return processed, records
+
+
+def existing_records_match(path: str, processed: int, records: list[dict]) -> bool:
+    p = Path(path)
+    if not p.is_file():
+        return False
+    try:
+        current = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return current.get("total_records") == processed and current.get("records") == records
+
+
+def write_absence_json(processed: int, records: list[dict], path: str = OUTPUT_PATH) -> None:
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "generated_at": datetime.now().isoformat(),
+                "total_records": processed,
+                "records": records,
+            },
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
 
 
 def main():
@@ -165,65 +336,27 @@ def main():
         print(f"Failed to load absence file: {e}")
         sys.exit(1)
 
-    records_by_date = {}
-    processed = 0
-
     try:
-        rows = _extract_rows(data, content_type)
-
-        for i, vals in enumerate(rows):
-            if i < 2:
-                continue
-            if len(vals) < 5 or vals[COL_EMP_NO] is None:
-                continue
-            if str(vals[COL_EMP_NO]).strip().lower() in ("employee no", "emp no", "empno"):
-                continue
-
-            raw_emp_no = vals[COL_EMP_NO]
-            try:
-                emp_no = str(int(raw_emp_no)) if raw_emp_no else None
-            except Exception:
-                continue
-
-            date = clean_date(vals[COL_DATE])
-            name = clean_name(vals[COL_NAME])
-            section = str(vals[COL_SECTION] or "").strip()
-            if not date or not name:
-                continue
-
-            if date not in records_by_date:
-                records_by_date[date] = {"names": [], "empNos": [], "sections": []}
-            if emp_no not in records_by_date[date]["empNos"]:
-                records_by_date[date]["names"].append(name)
-                records_by_date[date]["empNos"].append(emp_no)
-                records_by_date[date]["sections"].append(section)
-                processed += 1
+        sheets = extract_sheet_rows(data, content_type)
+        processed, records = parse_absence_sheets(sheets)
     except Exception as e:
         print(f"Failed to parse xlsb: {e}")
         sys.exit(1)
 
-    records = [
-        {"date": date, "names": d["names"], "empNos": d["empNos"], "sections": d["sections"]}
-        for date in sorted(records_by_date.keys())
-        for d in [records_by_date[date]]
-    ]
+    if processed == 0:
+        print("Failed to parse absence file: 0 records (header/date format not recognized)")
+        sys.exit(1)
 
-    os.makedirs("docs", exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "generated_at": datetime.now().isoformat(),
-                "total_records": processed,
-                "records": records,
-            },
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
-
-    print(f"{processed} records | {len(records)} unique dates -> {OUTPUT_PATH}")
+    print(f"{processed} records | {len(records)} unique dates")
     if records:
         print(f"Range: {records[0]['date']} -> {records[-1]['date']}")
+
+    if existing_records_match(OUTPUT_PATH, processed, records):
+        print(f"Absence records unchanged; not rewriting {OUTPUT_PATH}")
+        return
+
+    write_absence_json(processed, records)
+    print(f"Wrote {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

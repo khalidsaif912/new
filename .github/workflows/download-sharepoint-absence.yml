@@ -2,7 +2,11 @@ name: Download SharePoint Absence File
 
 on:
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [absence-report-updated]
   schedule:
+    # Backup only. GitHub often delays public-repo cron; Power Automate
+    # must fire repository_dispatch as soon as absence-report.xlsb is overwritten.
     - cron: "0 3 * * *"
 
 concurrency:
@@ -32,8 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Process absence report (SharePoint with archive fallback)
-        id: process_absence
+      - name: Process absence report
         env:
           ABSENCE_EXCEL_URL: ${{ secrets.ABSENCE_EXCEL_URL }}
           ABSENCE_EXCEL_FILE: ""
@@ -42,17 +45,7 @@ jobs:
             echo "::error::Missing secret ABSENCE_EXCEL_URL"
             exit 1
           fi
-          if python process_absence.py; then
-            echo "process_status=success" >> "$GITHUB_OUTPUT"
-          else
-            echo "process_status=failed" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Warn when SharePoint download is blocked
-        if: steps.process_absence.outputs.process_status == 'failed'
-        run: |
-          echo "::warning::Absence processing failed because SharePoint returned non-Excel payload (preview/auth wall)."
-          echo "::warning::No new absence data was generated in this run."
+          python process_absence.py
 
       - name: Commit and push absence updates
         run: |
@@ -69,14 +62,17 @@ jobs:
           path: absence-archive/absence-report.xlsb
 
       - name: Upload SharePoint debug payload
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: sharepoint-debug-response
-          path: debug_sharepoint_response.png
+          path: |
+            debug_sharepoint_response.png
+            debug_sharepoint_response.html
           if-no-files-found: ignore
 
       - name: Upload generated absence JSON
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: absence-data-json

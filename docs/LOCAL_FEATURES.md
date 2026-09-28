@@ -18,7 +18,7 @@ This file documents where each major local site feature is implemented.
 - Frontend script: `docs/absence-alert.js`
 - Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
 - Data builder script: `process_absence.py`
-- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. `process_absence.py` downloads it with the same session/warmup flow as the roster Excel (`download=1&web=0`).
+- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. Download tries the original guest link first (often `?ga=1`), then `download=1`, and follows file URLs found in HTML preview pages. The live site only updates when parsed records change. Power Automate should POST `absence-report-updated` after overwriting the file.
 - Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC)
 
 ## Floating alert icons (optional)

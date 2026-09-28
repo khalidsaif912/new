@@ -94,7 +94,27 @@ Core logic:
 
 ---
 
-## 4.3 Training Workflow
+## 4.3 Absence Workflow
+
+File: `.github/workflows/download-sharepoint-absence.yml`
+
+Trigger:
+- **Primary:** `repository_dispatch` type `absence-report-updated` (Power Automate HTTP after `absence-report.xlsb` is overwritten)
+- **Backup:** export workflow also prefetches the same file; daily cron is last resort
+- **Manual:** `workflow_dispatch`
+
+Core logic:
+1. Downloads `ABSENCE_EXCEL_URL` with several SharePoint URL variants (original guest link first; `download=1` last). HTML preview/auth pages are scraped for a real `.xlsb` URL.
+2. Parses **all sheets** and detects the header row (`Employee No` / `Name` / `Section` / `Request Date`, including Security/الأمن sections).
+3. Regenerates `docs/absence-data.json` only when records actually change (not on `generated_at` alone).
+4. The job **fails** when SharePoint returns HTML/login instead of Excel — a green run with no new dates is not success.
+5. Commits via `scripts/ci_commit_and_push.sh` on concurrency group `docs-main`.
+
+After overwriting the SharePoint absence file, POST `{"event_type":"absence-report-updated"}` to the same dispatches URL as export/import.
+
+---
+
+## 4.4 Training Workflow
 
 File: `.github/workflows/update-training-root-folder.yml`
 
@@ -110,7 +130,7 @@ Core logic:
 
 ---
 
-## 4.4 A Cup of Book Workflow
+## 4.5 A Cup of Book Workflow
 
 File: `.github/workflows/update-a-cup-of-book-page.yml`
 
@@ -228,6 +248,7 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 3. Body:
    - Export: `{"event_type":"export-roster-updated"}`
    - Import: `{"event_type":"import-roster-updated"}`
+   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `absence-report.xlsb`
 4. PAT: classic `repo` scope, **or** fine-grained **Contents: Read and write** on `khalidsaif912/new`
 5. GitHub Actions regenerates and pushes immediately. Cron is only a backup.
 
