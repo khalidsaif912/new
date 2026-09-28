@@ -1,10 +1,11 @@
+import base64
 import hashlib
 import json
 import os
 import re
 import time
 from io import BytesIO
-from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import requests
 from openpyxl import load_workbook
@@ -26,6 +27,34 @@ _RELATIVE_FILE_RE = re.compile(
     r'(?:href|src)=["\']([^"\']+\.(?:xlsx|xlsb|xls)(?:\?[^"\']*)?)["\']',
     re.IGNORECASE,
 )
+_SHARE_LINK_RE = re.compile(
+    r"(https://[^/]+\.sharepoint\.com)/:(?P<kind>[a-z]):/(?:p|(?:g/personal))/(?P<user>[^/]+)/(?P<item>[^/?#]+)",
+    re.IGNORECASE,
+)
+_PERSONAL_FILE_RE = re.compile(
+    r"(https://[^/]+\.sharepoint\.com)/personal/([^/]+)/(.+)",
+    re.IGNORECASE,
+)
+
+# Only stable overwrite names — PA must not invent a new filename each month.
+ABSENCE_FILE_NAMES = (
+    "absence-report.xlsb",
+    "absence-report.xlsx",
+)
+ABSENCE_FOLDER_NAMES = (
+    "AbsenceReports",
+    "ABSENCE_UPLOADS",
+    "Absence_UPLOADS",
+    "Absences",
+)
+_ABSENCE_NAME_MARKERS = (
+    "absence",
+    "unauthor",
+    "leave report",
+    "غيابات",
+    "غياب",
+)
+_ROSTER_NAME_MARKERS = ("roster", "export", "import")
 
 
 def _add_or_replace_query_param(url: str, key: str, value: str) -> str:
@@ -59,12 +88,116 @@ def _unescape_extracted_url(raw: str) -> str:
     return s
 
 
+def _sharepoint_origin(url: str) -> str:
+    u = urlparse(url)
+    if not u.netloc:
+        return ""
+    return f"{u.scheme or 'https'}://{u.netloc}"
+
+
+def _personal_site_from_share(url: str) -> str:
+    """Map :x:/p/8715_hq/... to https://tenant-my.sharepoint.com/personal/8715_hq_tenant_com."""
+    m = _SHARE_LINK_RE.match(url or "")
+    if not m:
+        m2 = _PERSONAL_FILE_RE.match(url or "")
+        if not m2:
+            return ""
+        return f"{m2.group(1)}/personal/{m2.group(2)}"
+    origin = m.group(1)
+    user = m.group("user")
+    if "/personal/" in (url or "").lower() or user.lower().endswith("_com"):
+        return f"{origin}/personal/{user}"
+    host = urlparse(origin).netloc or ""
+    tenant = host.split("-my.")[0].split(".")[0]
+    return f"{origin}/personal/{user}_{tenant}_com"
+
+
+def encode_sharing_url(url: str) -> str:
+    raw = base64.urlsafe_b64encode((url or "").encode("utf-8")).decode("ascii").rstrip("=")
+    return "u!" + raw
+
+
+def sharepoint_download_aspx_candidates(url: str) -> list[str]:
+    """download.aspx / :u: variants for Excel Online (:x:) guest links."""
+    if not url:
+        return []
+    m = _SHARE_LINK_RE.match(url)
+    personal = _personal_site_from_share(url)
+    out: list[str] = []
+    if m and personal:
+        item = m.group("item")
+        enc_full = quote(url, safe="")
+        out.append(f"{personal}/_layouts/15/download.aspx?share={item}")
+        out.append(f"{personal}/_layouts/15/download.aspx?share={enc_full}")
+        out.append(f"{personal}/_layouts/15/guestaccess.aspx?share={item}&ga=1")
+        kind = (m.group("kind") or "x").lower()
+        user = m.group("user")
+        origin = m.group(1)
+        if kind == "x":
+            e = dict(parse_qsl(urlparse(url).query)).get("e", "")
+            as_file = f"{origin}/:u:/p/{user}/{item}"
+            if e:
+                as_file = f"{as_file}?e={e}"
+            out.append(as_file)
+    if personal:
+        enc_full = quote(url, safe="")
+        out.append(f"{personal}/_layouts/15/download.aspx?share={enc_full}")
+    return [u for u in out if u]
+
+
+def looks_like_absence_filename(name: str) -> bool:
+    n = (name or "").strip().lower()
+    if not n.endswith((".xlsx", ".xlsb", ".xls")):
+        return False
+    if any(marker in n for marker in _ROSTER_NAME_MARKERS):
+        return False
+    if n in {x.lower() for x in ABSENCE_FILE_NAMES}:
+        return True
+    if n.endswith(".xlsb"):
+        return True
+    return any(marker in n for marker in _ABSENCE_NAME_MARKERS)
+
+
+def absence_sibling_urls(file_url: str) -> list[str]:
+    """Guess absence report paths next to a working roster guest file URL."""
+    if not file_url:
+        return []
+    u = urlparse(file_url)
+    path = u.path or ""
+    if not path:
+        return []
+    parent = path.rsplit("/", 1)[0]
+    docs_idx = path.lower().find("/documents/")
+    documents = path[: docs_idx + len("/Documents")] if docs_idx >= 0 else ""
+    origin = _sharepoint_origin(file_url)
+    if not origin:
+        return []
+
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(server_path: str) -> None:
+        candidate = _add_or_replace_query_param(origin + server_path, "ga", "1")
+        if candidate not in seen:
+            seen.add(candidate)
+            out.append(candidate)
+
+    for name in ABSENCE_FILE_NAMES:
+        add(f"{parent}/{quote(name)}")
+    if documents:
+        for folder in ABSENCE_FOLDER_NAMES:
+            for name in ABSENCE_FILE_NAMES[:4]:
+                add(f"{documents}/{folder}/{quote(name)}")
+    return out
+
+
 def sharepoint_download_candidates(url: str, *, now_ms: int | None = None) -> list[str]:
     """URL variants for the same SharePoint/OneDrive sharing link.
 
     Guest links often redirect to the real ``.xlsb?ga=1`` file only when the
     original sharing URL is requested *without* ``download=1``. Forcing
-    ``download=1`` can return an HTML auth/preview wall instead of Excel.
+    ``download=1`` on an Excel Online ``:x:`` link can return error.aspx
+    ("you cannot access this document") instead of Excel.
     """
     if not url:
         return []
@@ -77,9 +210,14 @@ def sharepoint_download_candidates(url: str, *, now_ms: int | None = None) -> li
 
     add(url)
     add(_add_or_replace_query_param(url, "ga", "1"))
-    add(_add_or_replace_query_param(url, "download", "1"))
-    add(_add_or_replace_query_param(_add_or_replace_query_param(url, "download", "1"), "web", "0"))
-    for base in list(out):
+    for aspx in sharepoint_download_aspx_candidates(url):
+        add(aspx)
+    # download=1 last: it currently turns the team :x: workbook link into error.aspx.
+    download_one = _add_or_replace_query_param(url, "download", "1")
+    download_web = _add_or_replace_query_param(download_one, "web", "0")
+    add(download_one)
+    add(download_web)
+    for base in (url, _add_or_replace_query_param(url, "ga", "1"), download_one, download_web):
         add(_add_or_replace_query_param(base, "_cb", ts))
     return out
 
@@ -202,9 +340,76 @@ def _save_non_excel_debug(data: bytes) -> None:
             f.write(data)
 
 
-def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
+def _html_access_denied(html: str) -> bool:
+    low = (html or "").lower()
+    return (
+        "لا يمكنك الوصول" in (html or "")
+        or "you cannot access this document" in low
+        or "sorry, you cannot access" in low
+        or 'id="ms-error-body"' in low
+        or "error.aspx" in low
+    )
+
+
+def _list_sharepoint_folder_files(session: requests.Session, folder_url: str, headers: dict[str, str]) -> list[str]:
+    """List Excel files in a SharePoint folder using the current guest session."""
+    u = urlparse(folder_url)
+    path = (u.path or "").rstrip("/")
+    if not path:
+        return []
+    if path.lower().endswith((".xlsx", ".xlsb", ".xls")):
+        path = path.rsplit("/", 1)[0]
+    personal = _personal_site_from_share(folder_url)
+    if not personal:
+        origin = _sharepoint_origin(folder_url)
+        m = _PERSONAL_FILE_RE.match(folder_url)
+        personal = f"{m.group(1)}/personal/{m.group(2)}" if m else origin
+    if not personal:
+        return []
+    api = (
+        f"{personal}/_api/web/GetFolderByServerRelativeUrl('{path}')"
+        "/Files?$select=Name,ServerRelativeUrl,TimeLastModified"
+    )
+    try:
+        response = session.get(
+            api,
+            headers={**headers, "Accept": "application/json;odata=nometadata"},
+            timeout=45,
+        )
+    except requests.RequestException as exc:
+        print(f"  Folder list failed: {exc}")
+        return []
+    if response.status_code >= 400:
+        print(f"  Folder list HTTP {response.status_code} for {path}")
+        return []
+    try:
+        payload = response.json()
+    except ValueError:
+        return []
+    rows = payload.get("value") if isinstance(payload, dict) else None
+    if rows is None and isinstance(payload, dict):
+        rows = (payload.get("d") or {}).get("results")
+    files: list[tuple[str, str]] = []
+    origin = _sharepoint_origin(folder_url)
+    for row in rows or []:
+        name = str(row.get("Name") or "")
+        rel = str(row.get("ServerRelativeUrl") or "")
+        if not looks_like_absence_filename(name) or not rel:
+            continue
+        files.append((str(row.get("TimeLastModified") or ""), origin + rel))
+    files.sort(reverse=True)
+    return [_add_or_replace_query_param(item_url, "ga", "1") for _ts, item_url in files]
+
+
+def download_excel_with_meta(
+    url: str,
+    *,
+    session_seed_url: str | None = None,
+    allow_sibling_absence_files: bool = False,
+    preferred_urls: list[str] | None = None,
+) -> tuple[bytes, dict[str, str]]:
     """Download Excel bytes and return response metadata useful for change detection."""
-    if not url:
+    if not url and not (allow_sibling_absence_files and session_seed_url) and not preferred_urls:
         raise ValueError("EXCEL_URL is empty")
     session = requests.Session()
     headers = {
@@ -213,41 +418,135 @@ def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
             "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
         ),
         "Accept": (
-            "text/html,application/xhtml+xml,application/xml;q=0.9,"
-            "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*;q=0.8"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
+            "application/vnd.ms-excel,application/octet-stream,"
+            "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"
         ),
         "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
     }
 
-    to_try = sharepoint_download_candidates(url)
+    to_try: list[str] = []
     tried: set[str] = set()
     last_error = "Downloaded file is not recognized as Excel payload"
     last_data = b""
-    last_ctype = ""
-    last_sig = ""
+    saw_login = False
+    saw_denied = False
+    max_candidates = 40 if allow_sibling_absence_files else 20
+
+    def enqueue(candidate: str, *, front: bool = False) -> None:
+        if not candidate or candidate in tried or candidate in to_try:
+            return
+        if front:
+            to_try.insert(0, candidate)
+        else:
+            to_try.append(candidate)
+
+    seed = (session_seed_url or "").strip()
+    seed_ok = False
+    if allow_sibling_absence_files and seed:
+        print(f"  Seeding guest session from roster share: {seed[:120]}")
+        try:
+            seed_resp = session.get(seed, headers=headers, allow_redirects=True, timeout=60)
+            seed_data = seed_resp.content or b""
+            _log_download_attempt(seed_resp, seed_data)
+            seed_host = (urlparse(seed_resp.url).netloc or "").lower()
+            if "login.microsoftonline.com" in seed_host:
+                print("  Roster seed reached login; continuing with absence URL only.")
+            else:
+                seed_ok = True
+                # Prefer stable paths next to latest.xlsx over a dead ABSENCE_EXCEL_URL UniqueId.
+                for sib in reversed(absence_sibling_urls(seed_resp.url)):
+                    enqueue(sib, front=True)
+                parent = (urlparse(seed_resp.url).path or "").rsplit("/", 1)[0]
+                origin = _sharepoint_origin(seed_resp.url)
+                if parent and origin:
+                    listed = _list_sharepoint_folder_files(session, seed_resp.url, headers)
+                    for item in reversed(listed):
+                        print(f"  Found absence candidate in shared folder: {item[:140]}")
+                        enqueue(item, front=True)
+                    docs_idx = parent.lower().find("/documents/")
+                    if docs_idx >= 0:
+                        documents = parent[: docs_idx + len("/Documents")]
+                        extra_listed: list[str] = []
+                        for folder in ABSENCE_FOLDER_NAMES:
+                            extra_listed.extend(
+                                _list_sharepoint_folder_files(
+                                    session, origin + documents + "/" + folder + "/", headers
+                                )
+                            )
+                        for item in reversed(extra_listed):
+                            print(f"  Found absence candidate in extra folder: {item[:140]}")
+                            enqueue(item, front=True)
+        except requests.RequestException as exc:
+            print(f"  Roster seed failed: {exc}")
+
+    # Caller-supplied stable paths / payload URL (front of queue when seed worked).
+    for pref in reversed(preferred_urls or []):
+        enqueue(pref, front=seed_ok)
+
+    # :x: / direct URL variants — after stable paths when seed is healthy.
+    for candidate in sharepoint_download_candidates(url):
+        enqueue(candidate)
+    if allow_sibling_absence_files and seed_ok:
+        personal = _personal_site_from_share(url or seed)
+        if personal:
+            for path in (
+                f"{personal}/Documents/ROSTER_UPLOADS/absence-report.xlsb?ga=1",
+                f"{personal}/Documents/AbsenceReports/absence-report.xlsb?ga=1",
+                f"{personal}/Documents/ABSENCE_UPLOADS/latest.xlsb?ga=1",
+                f"{personal}/Documents/ABSENCE_UPLOADS/absence-report.xlsb?ga=1",
+            ):
+                enqueue(path, front=True)
 
     for attempt, candidate in enumerate(to_try):
         if candidate in tried:
             continue
         tried.add(candidate)
         print(f"  Attempt {attempt + 1}: {candidate[:140]}")
-        response = session.get(candidate, headers=headers, allow_redirects=True, timeout=60)
-        response.raise_for_status()
+        try:
+            response = session.get(candidate, headers=headers, allow_redirects=True, timeout=30)
+        except requests.RequestException as exc:
+            last_error = f"Download request failed: {exc}"
+            print(f"  {last_error}")
+            continue
+        if response.status_code >= 400:
+            last_error = f"HTTP {response.status_code} for {candidate[:120]}"
+            print(f"  {last_error}")
+            continue
         data = response.content or b""
         _log_download_attempt(response, data)
 
         final_host = (urlparse(response.url).netloc or "").lower()
         if "login.microsoftonline.com" in final_host:
-            raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
+            saw_login = True
+            last_error = "Reached login.microsoftonline.com for one candidate; trying remaining URLs."
+            continue
 
         if _is_excel_signature(data):
+            final_name = (urlparse(response.url).path or "").rsplit("/", 1)[-1].lower()
+            if allow_sibling_absence_files and any(marker in final_name for marker in _ROSTER_NAME_MARKERS):
+                print(f"  Skipping roster workbook {final_name!r}; looking for absence report.")
+                continue
+            if allow_sibling_absence_files and final_name == "latest.xlsx":
+                print("  Skipping latest.xlsx roster file; looking for absence report.")
+                continue
             return data, _response_meta(response, data)
 
         last_data = data
         last_ctype = (response.headers.get("Content-Type") or "").lower()
         last_sig = _file_signature_hex16(data)
+        html = data.decode("utf-8", errors="replace") if not _is_png_signature(data) else ""
+        if _html_access_denied(html):
+            saw_denied = True
+            last_error = (
+                "SharePoint sharing link is denied or expired "
+                "(error.aspx / cannot access this document). "
+                "Overwrite AbsenceReports/absence-report.xlsb or "
+                "ROSTER_UPLOADS/absence-report.xlsb instead of creating a new file."
+            )
+            continue
         last_error = (
             f"Downloaded file is not recognized as Excel payload "
             f"(Content-Type: {last_ctype or 'unknown'}; signature: {last_sig})"
@@ -256,15 +555,18 @@ def download_excel_with_meta(url: str) -> tuple[bytes, dict[str, str]]:
         if _is_png_signature(data):
             continue
 
-        html = data.decode("utf-8", errors="replace")
         for extra in extract_sharepoint_file_urls(html, response.url):
-            if extra not in tried and extra not in to_try and len(to_try) < 16:
+            if extra not in tried and extra not in to_try and len(to_try) < max_candidates:
                 print(f"  Found file URL in HTML: {extra[:140]}")
                 to_try.append(extra)
 
     _save_non_excel_debug(last_data)
     if _is_png_signature(last_data):
         raise ValueError("SharePoint returned a preview image, not the Excel file. Use a direct download link.")
+    if saw_denied:
+        raise ValueError(last_error)
+    if saw_login and "Excel payload" in last_error:
+        raise ValueError("Reached login.microsoftonline.com. Check sharing link and direct download URL.")
     raise ValueError(last_error)
 
 

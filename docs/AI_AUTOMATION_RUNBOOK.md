@@ -98,21 +98,41 @@ Core logic:
 
 File: `.github/workflows/download-sharepoint-absence.yml`
 
+### Root contract (same idea as the roster)
+
+Power Automate must **overwrite one stable OneDrive path every month** — never Create a new uniquely-named workbook (that issues a new UniqueId and kills the old guest link).
+
+Preferred stable paths (tried first by CI, derived from `EXPORT_EXCEL_URL`):
+
+1. `/Documents/ROSTER_UPLOADS/absence-report.xlsb`  ← same guest folder as `latest.xlsx`
+2. `/Documents/AbsenceReports/absence-report.xlsb`
+3. `/Documents/ABSENCE_UPLOADS/absence-report.xlsb`
+
+Then POST:
+
+```json
+{"event_type":"absence-report-updated"}
+```
+
+`ABSENCE_EXCEL_URL` (repo secret) is **secondary** — a working `:x:` Anyone-link is fine as backup / for `download.aspx`, but stable path overwrite is what keeps months automatic without editing secrets.
+
+If you truly must Create a new share, pass it once:
+
+```json
+{"event_type":"absence-report-updated","client_payload":{"absence_url":"https://omanair-my.sharepoint.com/:x:/p/8715_hq/NEWID?e=..."}}
+```
+
 Trigger:
-- **Primary:** `repository_dispatch` type `absence-report-updated` (Power Automate HTTP after `absence-report.xlsb` is overwritten)
-- **Backup:** export workflow also prefetches the same file; daily cron is last resort
+- **Primary:** `repository_dispatch` `absence-report-updated`
+- **Backup:** export workflow prefetches the same stable paths; cron every 4 hours
 - **Manual:** `workflow_dispatch`
 
 Core logic:
-1. Downloads `ABSENCE_EXCEL_URL` with several SharePoint URL variants (original guest link first; `download=1` last). HTML preview/auth pages are scraped for a real `.xlsb` URL.
-2. Parses **all sheets** and detects the header row (`Employee No` / `Name` / `Section` / `Request Date`, including Security/الأمن sections).
-3. Regenerates `docs/absence-data.json` only when records actually change (not on `generated_at` alone).
-4. The job **fails** when SharePoint returns HTML/login instead of Excel — a green run with no new dates is not success.
-5. Commits via `scripts/ci_commit_and_push.sh` on concurrency group `docs-main`.
-
-After overwriting the SharePoint absence file, POST `{"event_type":"absence-report-updated"}` to the same dispatches URL as export/import.
-
----
+1. Resolve sources via `roster_app/absence_source.py` — stable paths first, then payload URL, then `ABSENCE_EXCEL_URL`.
+2. Seed guest session from `EXPORT_EXCEL_URL` when needed; use `download.aspx` before `download=1` on `:x:` links.
+3. Parse **all sheets**; rewrite `docs/absence-data.json` only when records change.
+4. Job **fails** on HTML/login (never green with stale data).
+5. Commit via `scripts/ci_commit_and_push.sh` on concurrency group `docs-main`.
 
 ## 4.4 Training Workflow
 
@@ -248,7 +268,7 @@ After **Create file** succeeds (`/ROSTER_UPLOADS/latest.xlsx` + source-name text
 3. Body:
    - Export: `{"event_type":"export-roster-updated"}`
    - Import: `{"event_type":"import-roster-updated"}`
-   - Absence: `{"event_type":"absence-report-updated"}` after overwriting `absence-report.xlsb`
+   - Absence: overwrite stable `ROSTER_UPLOADS/absence-report.xlsb` (or `AbsenceReports/absence-report.xlsb`), then `{"event_type":"absence-report-updated"}`. Optional one-shot: `"client_payload":{"absence_url":"<guest link>"}`. Do not Create a new UniqueId each month.
 4. PAT: classic `repo` scope, **or** fine-grained **Contents: Read and write** on `khalidsaif912/new`
 5. GitHub Actions regenerates and pushes immediately. Cron is only a backup.
 

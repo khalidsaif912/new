@@ -19,8 +19,7 @@ This file documents where each major local site feature is implemented.
 - Independent list page (already exists): `docs/roster-diff/index.html` tab **Absence** / الغياب. It reads `absence-data.json` for all dates in the SharePoint file (usually previous months), not the current roster month. Homepage shows absences only as the floating alert, not as a list.
 - Data source JSON: `docs/absence-data.json` (this is what the browser fetches; it is **not** Excel in the browser)
 - Data builder script: `process_absence.py` — does not filter records to the current roster month
-- CI / automation download URL (secret): `ABSENCE_EXCEL_URL` — SharePoint sharing link for the `.xlsb` absence report. Download tries the original guest link first (often `?ga=1`), then `download=1`, and follows file URLs found in HTML preview pages. The live site only updates when parsed records change. Power Automate should POST `absence-report-updated` after overwriting the file.
-- Team reference workbook on SharePoint (human link, same data family as the report): [absence / attendance workbook](https://omanair-my.sharepoint.com/:x:/p/8715_hq/IQCur1yjH3NDSJQ2rsFRsbeEARX8F5eqo8p7d3wxlGeeoao?e=lY4drC)
+- CI source order (`roster_app/absence_source.py`): stable OneDrive paths from `EXPORT_EXCEL_URL` → optional `client_payload.absence_url` → secret `ABSENCE_EXCEL_URL` (`:x:` share). Power Automate must **overwrite** `ROSTER_UPLOADS/absence-report.xlsb` or `AbsenceReports/absence-report.xlsb` every month, then POST `absence-report-updated`. Creating a new UniqueId each month breaks automation.
 
 ## Floating alert icons (optional)
 - Preference key (localStorage): `rosterFloatingAlertDots` — value `"0"` hides the floating envelope (`absence-alert.js`) and the floating change icon (`change-alert.js`) on roster home pages. Any other value or unset = show.
