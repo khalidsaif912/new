@@ -1327,7 +1327,7 @@
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
     <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">40</div>
+      <div class="chipVal" id="summarySwitchVal">36</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
     <a href="https://khalidsaif912.github.io/roster-site/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
@@ -2009,7 +2009,7 @@
 
   <!-- ════ FOOTER ════ -->
   <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">30 September 2026 / 20:36</strong><br>
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">30 September 2026 / 22:40</strong><br>
     <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export New Roster SEPTEMBER 2026 Version 2-1.xlsx</strong>
   </div>
 
@@ -3105,7 +3105,7 @@ function goToEmployeeSchedule(empName) {
 // Language Toggle
 // ══════════════════════════════════════════════════
 var LANG = localStorage.getItem('rosterLang') || 'en';
-window.__summaryCounts = window.__summaryCounts || { employees: 40, departments: 6 };
+window.__summaryCounts = window.__summaryCounts || { employees: 36, departments: 6 };
 window.__summarySwitchMode = 'employees';
 var T = {
   en: {
@@ -3154,7 +3154,7 @@ function updateSummarySwitchChip() {
     lbl.dataset.key = 'departments';
   } else {
     val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 40;
+    val.textContent = counts.employees != null ? counts.employees : 36;
     lbl.textContent = t.employees;
     lbl.dataset.key = 'employees';
   }
