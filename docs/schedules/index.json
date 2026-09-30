@@ -494,16 +494,6 @@
       ]
     },
     {
-      "id": "82677",
-      "name": "Rashid AL Shayai",
-      "department": "Export Checker",
-      "months": [
-        "2026-10",
-        "2026-11",
-        "2026-12"
-      ]
-    },
-    {
       "id": "82615",
       "name": "Rashid Al Farsi",
       "department": "Export Checker",
@@ -515,6 +505,16 @@
         "2026-05",
         "2026-06",
         "2026-07",
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82677",
+      "name": "Rashid Al Shayai",
+      "department": "Export Checker",
+      "months": [
         "2026-10",
         "2026-11",
         "2026-12"
@@ -1531,5 +1531,5 @@
       ]
     }
   ],
-  "last_updated": "2026-09-30T17:29:51.996377+04:00"
+  "last_updated": "2026-09-30T20:36:41.430126+04:00"
 }
