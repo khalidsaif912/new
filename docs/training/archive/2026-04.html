@@ -885,7 +885,7 @@ html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
     </div>
   </summary>
   <div class="courseBody">
-    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82496</span><span class="empName">Mr. ANWAR NASSER HAMID AL HABSI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81032</span><span class="empName">Mr. MOHAMMED SAID FADHIL AL BALUSHI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">81409</span><span class="empName">Mr. QASIM SALIM QASIM AL MUQBALI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81258</span><span class="empName">Mr. JAAFAR IBRAHIM HASSAN AL BALUSHI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82485</span><span class="empName">MISS.MARWA MOHSIN SALEH AL ISMAILI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82612</span><span class="empName">Mr. AHMED SAID IBRAHIM AL FARSI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82600</span><span class="empName">Mr. HABIB MOHAMMED JANJAN AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">81301</span><span class="empName">Mr. HAYAN HAMED KHALFAN AL GHANNAMI</span></div></div>
+    <div class="rowsWrap"><div class="empRow"><span class="empNo">1</span><span class="empCode">82496</span><span class="empName" data-name-en="Mr. ANWAR NASSER HAMID AL HABSI" data-name-ar="السيد أنور ناصر حمد الحبسي">Mr. ANWAR NASSER HAMID AL HABSI</span></div><div class="empRow empRowAlt"><span class="empNo">2</span><span class="empCode">81032</span><span class="empName" data-name-en="Mr. MOHAMMED SAID FADHIL AL BALUSHI" data-name-ar="السيد محمد سعيد فاضل البلوشي">Mr. MOHAMMED SAID FADHIL AL BALUSHI</span></div><div class="empRow"><span class="empNo">3</span><span class="empCode">81409</span><span class="empName" data-name-en="Mr. QASIM SALIM QASIM AL MUQBALI" data-name-ar="السيد قاسم سالم قاسم المقبالي">Mr. QASIM SALIM QASIM AL MUQBALI</span></div><div class="empRow empRowAlt"><span class="empNo">4</span><span class="empCode">81258</span><span class="empName" data-name-en="Mr. JAAFAR IBRAHIM HASSAN AL BALUSHI" data-name-ar="السيد جعفر إبراهيم حسن البلوشي">Mr. JAAFAR IBRAHIM HASSAN AL BALUSHI</span></div><div class="empRow"><span class="empNo">5</span><span class="empCode">82485</span><span class="empName" data-name-en="MISS.MARWA MOHSIN SALEH AL ISMAILI" data-name-ar="الآنسة مروة محسن صالح الإسماعيلي">MISS.MARWA MOHSIN SALEH AL ISMAILI</span></div><div class="empRow empRowAlt"><span class="empNo">6</span><span class="empCode">82612</span><span class="empName" data-name-en="Mr. AHMED SAID IBRAHIM AL FARSI" data-name-ar="السيد أحمد سعيد إبراهيم الفارسي">Mr. AHMED SAID IBRAHIM AL FARSI</span></div><div class="empRow"><span class="empNo">7</span><span class="empCode">82600</span><span class="empName" data-name-en="Mr. HABIB MOHAMMED JANJAN AL BALUSHI" data-name-ar="السيد حبيب محمد جانجان البلوشي">Mr. HABIB MOHAMMED JANJAN AL BALUSHI</span></div><div class="empRow empRowAlt"><span class="empNo">8</span><span class="empCode">81301</span><span class="empName" data-name-en="Mr. HAYAN HAMED KHALFAN AL GHANNAMI" data-name-ar="السيد حيان حمد خلفان الغانمي">Mr. HAYAN HAMED KHALFAN AL GHANNAMI</span></div></div>
   </div>
 </details>
 </div>
@@ -1497,7 +1497,7 @@ html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
 
   function nameTranslationsUrl(){
     const path = window.location.pathname || '';
-    const ver = '20260725b';
+    const ver = '20261001a';
     if(path.includes('/training/archive/')) return '../../name_translations.json?v=' + ver;
     if(path.includes('/training/')) return '../name_translations.json?v=' + ver;
     return '../name_translations.json?v=' + ver;
@@ -1505,6 +1505,37 @@ html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
 
   function normalizeNameKey(name){
     return String(name || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  }
+
+  function titleArFromEnglish(en){
+    const u = normalizeNameKey(en);
+    if(/^MRS\.?\b/.test(u)) return 'السيدة';
+    if(/^MISS\.?\b/.test(u) || /^MS\.?\b/.test(u)) return 'الآنسة';
+    if(/^MR\.?\b/.test(u)) return 'السيد';
+    return '';
+  }
+
+  function withHonorific(en, ar){
+    if(!ar) return '';
+    if(/^(السيد|السيدة|الآنسة)\s/.test(ar)) return ar;
+    const t = titleArFromEnglish(en);
+    return t ? (t + ' ' + ar) : ar;
+  }
+
+  function shortFormKeys(strippedUpper){
+    const parts = String(strippedUpper || '').replace(/\bAL-/g, 'AL ').split(/\s+/).filter(Boolean);
+    if(parts.length < 2) return [];
+    const keys = [];
+    let lastAl = -1;
+    for(let i = 0; i < parts.length; i++){ if(parts[i] === 'AL') lastAl = i; }
+    if(lastAl > 0 && lastAl < parts.length - 1){
+      const family = parts.slice(lastAl + 1).join(' ');
+      keys.push(parts[0] + ' AL ' + family);
+      keys.push(parts[0] + ' ' + family);
+    } else {
+      keys.push(parts[0] + ' ' + parts[parts.length - 1]);
+    }
+    return keys;
   }
 
   function arabicForEnglishName(en){
@@ -1517,9 +1548,15 @@ html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
       const k = (p + stripped).trim();
       if(NAME_AR_MAP[k]) return NAME_AR_MAP[k];
     }
-    const compact = stripped.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    const compact = stripped.replace(/[^A-Z0-9 -]/g, ' ').replace(/\bAL-/g, 'AL ').replace(/\s+/g, ' ').trim();
     if(NAME_AR_MAP[compact]) return NAME_AR_MAP[compact];
     if(NAME_AR_MAP['MR. ' + compact]) return NAME_AR_MAP['MR. ' + compact];
+    for(const sk of shortFormKeys(compact)){
+      if(NAME_AR_MAP[sk]) return withHonorific(en, NAME_AR_MAP[sk]);
+      if(NAME_AR_MAP['MR. ' + sk]) return NAME_AR_MAP['MR. ' + sk];
+      if(NAME_AR_MAP['MISS. ' + sk]) return NAME_AR_MAP['MISS. ' + sk];
+      if(NAME_AR_MAP['MRS. ' + sk]) return NAME_AR_MAP['MRS. ' + sk];
+    }
     return '';
   }
 
@@ -1543,15 +1580,31 @@ html[lang="ar"] .gamesGrid,body.ar .gamesGrid{direction:rtl}
 
   function applyEmployeeNames(isAr){
     document.querySelectorAll('.empName').forEach(el => {
-      const current = (el.textContent || '').trim();
+      const badge = el.querySelector('.favBadge');
+      const textOnly = badge
+        ? Array.from(el.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent || '').join('').trim()
+        : (el.textContent || '').trim();
       if(!el.dataset.nameEn){
         // Keep English original only; ignore already-translated Arabic text.
-        if(current && !/[\u0600-\u06FF]/.test(current)) el.dataset.nameEn = current;
+        if(textOnly && !/[\u0600-\u06FF]/.test(textOnly)) el.dataset.nameEn = textOnly;
       }
-      const en = el.dataset.nameEn || current;
-      const ar = arabicForEnglishName(en);
+      const en = el.dataset.nameEn || textOnly;
+      const embedded = (el.getAttribute('data-name-ar') || '').trim();
+      const ar = embedded || arabicForEnglishName(en);
       if(ar) el.setAttribute('data-name-ar', ar);
-      el.textContent = (isAr && ar) ? ar : en;
+      const display = (isAr && ar) ? ar : en;
+      if(badge){
+        let wrote = false;
+        el.childNodes.forEach(n => {
+          if(n.nodeType === 3){
+            if(!wrote){ n.textContent = display + ' '; wrote = true; }
+            else n.textContent = '';
+          }
+        });
+        if(!wrote) el.insertBefore(document.createTextNode(display + ' '), badge);
+      } else {
+        el.textContent = display;
+      }
     });
   }
 

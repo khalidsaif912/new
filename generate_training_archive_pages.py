@@ -22,6 +22,10 @@ from training_page_icons import (  # noqa: E402
     dock_cup_inner,
 )
 
+# Ensure training staff names enter docs/name_translations.json (same map as roster).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from roster_app import name_i18n  # noqa: E402
+
 MONTH_NAMES_AR = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 MONTH_SHORT_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 IOS_TOUCH_VER = "20260729c"
@@ -1535,7 +1539,7 @@ PAGE_JS = r"""
 
   function nameTranslationsUrl(){
     const path = window.location.pathname || '';
-    const ver = '20260725b';
+    const ver = '20261001a';
     if(path.includes('/training/archive/')) return '../../name_translations.json?v=' + ver;
     if(path.includes('/training/')) return '../name_translations.json?v=' + ver;
     return '../name_translations.json?v=' + ver;
@@ -1543,6 +1547,37 @@ PAGE_JS = r"""
 
   function normalizeNameKey(name){
     return String(name || '').replace(/\s+/g, ' ').trim().toUpperCase();
+  }
+
+  function titleArFromEnglish(en){
+    const u = normalizeNameKey(en);
+    if(/^MRS\.?\b/.test(u)) return 'السيدة';
+    if(/^MISS\.?\b/.test(u) || /^MS\.?\b/.test(u)) return 'الآنسة';
+    if(/^MR\.?\b/.test(u)) return 'السيد';
+    return '';
+  }
+
+  function withHonorific(en, ar){
+    if(!ar) return '';
+    if(/^(السيد|السيدة|الآنسة)\s/.test(ar)) return ar;
+    const t = titleArFromEnglish(en);
+    return t ? (t + ' ' + ar) : ar;
+  }
+
+  function shortFormKeys(strippedUpper){
+    const parts = String(strippedUpper || '').replace(/\bAL-/g, 'AL ').split(/\s+/).filter(Boolean);
+    if(parts.length < 2) return [];
+    const keys = [];
+    let lastAl = -1;
+    for(let i = 0; i < parts.length; i++){ if(parts[i] === 'AL') lastAl = i; }
+    if(lastAl > 0 && lastAl < parts.length - 1){
+      const family = parts.slice(lastAl + 1).join(' ');
+      keys.push(parts[0] + ' AL ' + family);
+      keys.push(parts[0] + ' ' + family);
+    } else {
+      keys.push(parts[0] + ' ' + parts[parts.length - 1]);
+    }
+    return keys;
   }
 
   function arabicForEnglishName(en){
@@ -1555,9 +1590,15 @@ PAGE_JS = r"""
       const k = (p + stripped).trim();
       if(NAME_AR_MAP[k]) return NAME_AR_MAP[k];
     }
-    const compact = stripped.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    const compact = stripped.replace(/[^A-Z0-9 -]/g, ' ').replace(/\bAL-/g, 'AL ').replace(/\s+/g, ' ').trim();
     if(NAME_AR_MAP[compact]) return NAME_AR_MAP[compact];
     if(NAME_AR_MAP['MR. ' + compact]) return NAME_AR_MAP['MR. ' + compact];
+    for(const sk of shortFormKeys(compact)){
+      if(NAME_AR_MAP[sk]) return withHonorific(en, NAME_AR_MAP[sk]);
+      if(NAME_AR_MAP['MR. ' + sk]) return NAME_AR_MAP['MR. ' + sk];
+      if(NAME_AR_MAP['MISS. ' + sk]) return NAME_AR_MAP['MISS. ' + sk];
+      if(NAME_AR_MAP['MRS. ' + sk]) return NAME_AR_MAP['MRS. ' + sk];
+    }
     return '';
   }
 
@@ -1581,15 +1622,31 @@ PAGE_JS = r"""
 
   function applyEmployeeNames(isAr){
     document.querySelectorAll('.empName').forEach(el => {
-      const current = (el.textContent || '').trim();
+      const badge = el.querySelector('.favBadge');
+      const textOnly = badge
+        ? Array.from(el.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent || '').join('').trim()
+        : (el.textContent || '').trim();
       if(!el.dataset.nameEn){
         // Keep English original only; ignore already-translated Arabic text.
-        if(current && !/[\u0600-\u06FF]/.test(current)) el.dataset.nameEn = current;
+        if(textOnly && !/[\u0600-\u06FF]/.test(textOnly)) el.dataset.nameEn = textOnly;
       }
-      const en = el.dataset.nameEn || current;
-      const ar = arabicForEnglishName(en);
+      const en = el.dataset.nameEn || textOnly;
+      const embedded = (el.getAttribute('data-name-ar') || '').trim();
+      const ar = embedded || arabicForEnglishName(en);
       if(ar) el.setAttribute('data-name-ar', ar);
-      el.textContent = (isAr && ar) ? ar : en;
+      const display = (isAr && ar) ? ar : en;
+      if(badge){
+        let wrote = false;
+        el.childNodes.forEach(n => {
+          if(n.nodeType === 3){
+            if(!wrote){ n.textContent = display + ' '; wrote = true; }
+            else n.textContent = '';
+          }
+        });
+        if(!wrote) el.insertBefore(document.createTextNode(display + ' '), badge);
+      } else {
+        el.textContent = display;
+      }
     });
   }
 
@@ -1944,8 +2001,14 @@ def render_course(course: dict, today_iso: str, theme_idx: int = 0, in_archive: 
     rows = []
     for i, member in enumerate(course.get("staff", []), start=1):
         alt = " empRowAlt" if i % 2 == 0 else ""
+        en_name = str(member.get("name") or "").strip()
+        ar_name = name_i18n.arabic_display(en_name) if en_name else ""
+        en_attr = html_module.escape(en_name, quote=True)
+        ar_attr = html_module.escape(ar_name, quote=True)
+        en_html = html_module.escape(en_name)
         rows.append(
-            f'<div class="empRow{alt}"><span class="empNo">{i}</span><span class="empCode">{member["no"]}</span><span class="empName">{member["name"]}</span></div>'
+            f'<div class="empRow{alt}"><span class="empNo">{i}</span><span class="empCode">{html_module.escape(str(member.get("no") or ""))}</span>'
+            f'<span class="empName" data-name-en="{en_attr}" data-name-ar="{ar_attr}">{en_html}</span></div>'
         )
     course_end = course.get("date_end", course["date"])
     is_today = course["date"] <= today_iso <= course_end
@@ -2494,7 +2557,19 @@ def update_new_list_stamp(out_dir: Path, latest: str) -> None:
     stamp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def register_training_names(data: dict) -> None:
+    """Ensure every training staff name has an Arabic entry in name_translations.json."""
+    for month in data.get("months") or []:
+        for course in month.get("courses") or []:
+            for member in course.get("staff") or []:
+                name = str(member.get("name") or "").strip()
+                if name:
+                    name_i18n.arabic_display(name)
+    name_i18n.flush()
+
+
 def build_site(data: dict, out_dir: Path) -> None:
+    register_training_names(data)
     out_dir.mkdir(parents=True, exist_ok=True)
     archive = out_dir / "archive"
     archive.mkdir(parents=True, exist_ok=True)

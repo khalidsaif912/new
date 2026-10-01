@@ -56,16 +56,21 @@ _COMMON_TOKENS: Dict[str, str] = {
     "ABDULHAKIM": "عبدالحكيم",
     "ABDULQADIR": "عبدالقادر",
     "ABID": "عابد",
+    "ADIL": "عادل",
     "AHMED": "أحمد",
     "AHMAD": "أحمد",
+    "AJMI": "عجمي",
     "AKRAM": "أكرم",
     "ALI": "علي",
     "AL": "ال",
+    "ALVAREZ": "ألفاريز",
     "AMER": "عامر",
     "AMIR": "أمير",
     "AMIRA": "أميرة",
     "AMIN": "أمين",
     "AMNA": "آمنة",
+    "AMOUR": "عامر",
+    "AMRI": "عامري",
     "ANWAR": "أنور",
     "ARIF": "عارف",
     "ASHRAF": "أشرف",
@@ -76,13 +81,19 @@ _COMMON_TOKENS: Dict[str, str] = {
     "BADAR": "بدر",
     "BADR": "بدر",
     "BAKR": "بكر",
+    "BALUSHI": "بلوشي",
+    "BALUCHI": "بلوشي",
     "BASIM": "باسم",
     "BASMA": "بسمة",
     "BILAL": "بلال",
     "BIN": "بن",
     "BINT": "بنت",
+    "BURTAMANI": "برطماني",
+    "BURTUMANI": "برطماني",
+    "BUSAIDI": "بوسعيدي",
     "DAWOOD": "داوود",
     "DAUD": "داوود",
+    "DOMINGO": "دومينغو",
     "FADHIL": "فاضل",
     "FADHEL": "فاضل",
     "FAHAD": "فهد",
@@ -93,13 +104,19 @@ _COMMON_TOKENS: Dict[str, str] = {
     "FATIMA": "فاطمة",
     "FATMA": "فاطمة",
     "FAWAZ": "فواز",
+    "FROILAN": "فرويلان",
     "GHALIB": "غالب",
     "HABIB": "حبيب",
+    "HADABI": "هدابي",
+    "HADDABI": "هدابي",
     "HAMAD": "حمد",
     "HAMDAN": "حمدان",
     "HAMED": "حامد",
     "HAMID": "حامد",
+    "HAMOOD": "حمود",
+    "HAMUD": "حمود",
     "HAMZA": "حمزة",
+    "HANAN": "حنان",
     "HANI": "هاني",
     "HAITHAM": "هيثم",
     "HARITH": "حارث",
@@ -127,20 +144,26 @@ _COMMON_TOKENS: Dict[str, str] = {
     "JUMAA": "جمعة",
     "KAMAL": "كمال",
     "KARIM": "كريم",
+    "KHADHURI": "خضوري",
     "KHALID": "خالد",
     "KHALED": "خالد",
     "KHALFAN": "خلفان",
     "KHAMIS": "خميس",
+    "KHARUSI": "خروصي",
     "LATIFA": "لطيفة",
     "LAYLA": "ليلى",
     "LEENA": "لينا",
+    "LUWAIHI": "لويهي",
+    "MAAWALI": "معولي",
     "MAHER": "ماهر",
+    "MAHARBI": "محاربي",
     "MAHMOUD": "محمود",
     "MAHMUD": "محمود",
     "MAJID": "ماجد",
     "MALIK": "مالك",
     "MANSOOR": "منصور",
     "MANSUR": "منصور",
+    "MARHOON": "مرهون",
     "MARIAM": "مريم",
     "MARYAM": "مريم",
     "MARWAN": "مروان",
@@ -157,6 +180,9 @@ _COMMON_TOKENS: Dict[str, str] = {
     "MUNIR": "منير",
     "MURAD": "مراد",
     "MUSTAFA": "مصطفى",
+    "MUZDALIFA": "مزدلفة",
+    "NAAMAANI": "نعماني",
+    "NAAMANI": "نعماني",
     "NABIL": "نبيل",
     "NADER": "نادر",
     "NADIR": "نادر",
@@ -169,19 +195,26 @@ _COMMON_TOKENS: Dict[str, str] = {
     "NIZAR": "نزار",
     "NOOR": "نور",
     "NOURA": "نورة",
+    "OBAID": "عبيد",
+    "UBAID": "عبيد",
     "OMAR": "عمر",
+    "ORAIMI": "عريمي",
     "OSAMA": "أسامة",
     "OTHMAN": "عثمان",
     "QAIS": "قيس",
     "QASIM": "قاسم",
     "RAKAN": "راكان",
+    "RAQADI": "رقادي",
     "RASHID": "راشد",
     "RASHED": "راشد",
+    "RAWAHI": "رواحي",
     "RAYAN": "ريان",
     "RIYADH": "رياض",
     "RIYAD": "رياض",
+    "RUQADI": "رقادي",
     "SAAD": "سعد",
     "SABAH": "صباح",
+    "SABEET": "سبيت",
     "SAEED": "سعيد",
     "SAID": "سعيد",
     "SAIF": "سيف",
@@ -200,16 +233,21 @@ _COMMON_TOKENS: Dict[str, str] = {
     "SHADI": "شادي",
     "SHAKIR": "شاكر",
     "SHARIF": "شريف",
+    "SHAYAI": "شايعي",
     "SIF": "سيف",
+    "SIHAM": "سهام",
+    "SIYABI": "سيابي",
     "SULAIMAN": "سليمان",
     "SULAYMAN": "سليمان",
     "SULTAN": "سلطان",
+    "SUWAID": "سويد",
     "TALAL": "طلال",
     "TALIB": "طالب",
     "TARIQ": "طارق",
     "TAREK": "طارق",
     "TAHA": "طه",
     "THAMER": "ثامر",
+    "TOUQI": "توقي",
     "UMAR": "عمر",
     "USAMA": "أسامة",
     "WAEL": "وائل",
@@ -224,6 +262,7 @@ _COMMON_TOKENS: Dict[str, str] = {
     "YOUSEF": "يوسف",
     "YOUSUF": "يوسف",
     "YUSUF": "يوسف",
+    "YUNIS": "يونس",
     "YUNUS": "يونس",
     "ZAHRA": "زهراء",
     "ZAID": "زيد",
@@ -232,6 +271,15 @@ _COMMON_TOKENS: Dict[str, str] = {
     "ZAKARIYA": "زكريا",
     "ZIYAD": "زياد",
 }
+
+# English honorifics → Arabic (training lists use Mr./Miss./Mrs.)
+_TITLE_AR = {
+    "MR": "السيد",
+    "MRS": "السيدة",
+    "MISS": "الآنسة",
+    "MS": "الآنسة",
+}
+_TITLE_RE = re.compile(r"^(MRS\.?|MISS\.?|MS\.?|MR\.?)\s*", re.IGNORECASE)
 
 # Multi-character digraphs handled before single letters.
 _DIGRAPHS = [
@@ -348,10 +396,68 @@ def _translit_token(token: str) -> str:
     return "".join(out)
 
 
+def split_title(base_name: str) -> tuple[str, str]:
+    """Return ``(title_ar, remainder_english)`` for Mr./Miss./Mrs./Ms. prefixes."""
+    raw = (base_name or "").strip()
+    if not raw:
+        return "", ""
+    m = _TITLE_RE.match(raw)
+    if not m:
+        return "", raw
+    kind = re.sub(r"\.", "", m.group(1)).upper()
+    return _TITLE_AR.get(kind, ""), raw[m.end() :].strip()
+
+
+def short_form_keys(base_without_title: str) -> List[str]:
+    """Candidate short roster keys: ``FIRST AL FAMILY`` / ``FIRST FAMILY``."""
+    text = re.sub(r"\bAL-", "AL ", (base_without_title or ""), flags=re.IGNORECASE)
+    tokens = [t for t in re.split(r"\s+", text.strip()) if t]
+    if len(tokens) < 2:
+        return []
+    keys: List[str] = []
+    upper = [t.upper() for t in tokens]
+    al_idxs = [i for i, t in enumerate(upper) if t == "AL"]
+    if al_idxs:
+        last_al = al_idxs[-1]
+        family = " ".join(upper[last_al + 1 :])
+        if family:
+            keys.append(f"{upper[0]} AL {family}")
+            keys.append(f"{upper[0]} {family}")
+    else:
+        keys.append(f"{upper[0]} {upper[-1]}")
+    # de-dupe preserve order
+    seen = set()
+    out: List[str] = []
+    for k in keys:
+        if k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
+
+
 def transliterate_name(base_name: str) -> str:
     """Transliterate a full (multi-token) English name to Arabic."""
-    tokens = [t for t in re.split(r"\s+", base_name.strip()) if t]
-    return " ".join(_translit_token(t) for t in tokens).strip()
+    title_ar, rest = split_title(base_name)
+    rest = re.sub(r"\bAL-", "AL ", rest or "", flags=re.IGNORECASE)
+    tokens = [t for t in re.split(r"\s+", rest.strip()) if t]
+    out: List[str] = []
+    i = 0
+    while i < len(tokens):
+        up = tokens[i].upper().rstrip(".")
+        if up == "AL" and i + 1 < len(tokens):
+            nxt = _translit_token(tokens[i + 1])
+            if nxt.startswith("ال"):
+                out.append(nxt)
+            else:
+                out.append("ال" + nxt)
+            i += 2
+            continue
+        out.append(_translit_token(tokens[i]))
+        i += 1
+    body = " ".join(out).strip()
+    if title_ar and body:
+        return f"{title_ar} {body}"
+    return title_ar or body
 
 
 class NameTranslator:
@@ -378,13 +484,35 @@ class NameTranslator:
         if isinstance(auto, list):
             self.auto_generated = [str(x) for x in auto]
 
+    def _lookup_existing(self, key: str) -> Optional[str]:
+        if not key:
+            return None
+        if key in self.names:
+            return self.names[key]
+        title_ar, rest = split_title(key)
+        rest_key = _key_for(rest)
+        if rest_key and rest_key in self.names:
+            ar = self.names[rest_key]
+            if title_ar and ar and not ar.startswith(("السيد", "السيدة", "الآنسة")):
+                return f"{title_ar} {ar}"
+            return ar
+        # Title punctuation variants: "MR.X" vs "MR. X"
+        compact = re.sub(r"\.\s*", ". ", key)
+        compact = re.sub(r"\s+", " ", compact).strip()
+        if compact != key and compact in self.names:
+            return self.names[compact]
+        no_space_title = re.sub(r"^(MR|MRS|MISS|MS)\.\s+", r"\1.", key)
+        if no_space_title != key and no_space_title in self.names:
+            return self.names[no_space_title]
+        return None
+
     def arabic_display(self, full_name: str) -> str:
         """Return the Arabic display string (with the ``- id`` suffix kept)."""
         base, emp_id = split_name_id(full_name)
         key = _key_for(base)
         if not key:
             return full_name
-        ar_base = self.names.get(key)
+        ar_base = self._lookup_existing(key)
         if not ar_base:
             ar_base = transliterate_name(base)
             self.names[key] = ar_base
