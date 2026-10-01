@@ -44,6 +44,7 @@ if (-not (Test-Path $backupDir)) {
 }
 $oldSnapshot = Join-Path $backupDir "previous.xlsx"
 $newSnapshot = Join-Path $backupDir "current.xlsx"
+$baselineSnapshot = Join-Path $backupDir "baseline.xlsx"
 $lastIngestedSnapshot = Join-Path $backupDir "last_ingested.xlsx"
 $lastHashFile = Join-Path $backupDir "last_hash.txt"
 
@@ -54,6 +55,14 @@ if (Test-Path $lastIngestedSnapshot) {
 } elseif (Test-Path $targetXlsx) {
     # Fallback for old setup before last_ingested snapshot existed.
     Copy-Item -LiteralPath $targetXlsx -Destination $oldSnapshot -Force
+}
+
+# Freeze first edition once; published auto-diff is always baseline → latest.
+if (-not (Test-Path -LiteralPath $baselineSnapshot)) {
+    if (Test-Path -LiteralPath $oldSnapshot) {
+        Copy-Item -LiteralPath $oldSnapshot -Destination $baselineSnapshot -Force
+        Write-Host "[EXPORT] Froze previous ingest as baseline.xlsx (first edition)"
+    }
 }
 $srcResolved = (Resolve-Path -LiteralPath $ExcelFilePath).Path
 $dstResolved = $targetXlsx
@@ -75,13 +84,22 @@ if (-not $RosterDate) { $RosterDate = "$MonthKey-01" }
 Write-Host "[EXPORT] Local month loaded into rosters: $MonthKey"
 powershell -ExecutionPolicy Bypass -File ".\scripts\export\run.ps1" -Date $RosterDate -NoEmail -ExcelFilePath $ExcelFilePath -SourceName ([System.IO.Path]::GetFileName($ExcelFilePath))
 
-if (Test-Path $oldSnapshot) {
+if (-not (Test-Path -LiteralPath $baselineSnapshot)) {
+    Copy-Item -LiteralPath $newSnapshot -Destination $baselineSnapshot -Force
+    Write-Host "[EXPORT] Froze current file as baseline.xlsx (first edition)"
+}
+
+$diffOld = $baselineSnapshot
+if (Test-Path -LiteralPath $diffOld) {
     $sameAsLast = (Test-Path $lastHashFile) -and ((Get-Content -LiteralPath $lastHashFile -Raw).Trim() -eq $incomingHash)
+    $baselineHash = Get-ContentFingerprint -Path $diffOld
     if ($sameAsLast) {
         Write-Host "[EXPORT] Incoming file content matches last ingested version (same hash). Keeping previous auto-diff result."
+    } elseif ($baselineHash -eq $incomingHash) {
+        Write-Host "[EXPORT] First version for $MonthKey detected; diff will start from next update."
     } else {
-        Write-Host "[EXPORT] Building auto diff for month: $MonthKey (content-based snapshots)"
-        python ".\scripts\build_roster_diff.py" --old "$oldSnapshot" --new "$newSnapshot" --kind export --month "$MonthKey" --out-dir "docs/roster-diff/data"
+        Write-Host "[EXPORT] Building auto diff for month: $MonthKey (baseline → latest)"
+        python ".\scripts\build_roster_diff.py" --old "$diffOld" --new "$newSnapshot" --kind export --month "$MonthKey" --out-dir "docs/roster-diff/data"
     }
 } else {
     Write-Host "[EXPORT] First version for $MonthKey detected; diff will start from next update."

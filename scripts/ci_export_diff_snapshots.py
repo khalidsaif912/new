@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
 Stage export roster snapshots on Linux CI so build_roster_diff can run like
-scripts/export/load_local_month.ps1 (previous vs current for the same YYYY-MM).
+scripts/export/load_local_month.ps1.
+
+Published month diff is always **first edition (baseline) → latest**, so a later
+hotfix (e.g. missing employee id) cannot wipe the meaningful first→second delta
+by overwriting export-YYYY-MM.json with an empty previous→current compare.
 
 Env:
   ROSTER_FILENAME — same body as EXPORT source_name.txt (used to detect month).
@@ -14,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -29,6 +34,8 @@ from roster_app.cache_io import month_key_from_filename, workbook_content_finger
 PRE_RUN_OLD = "_pre_run_old.xlsx"
 PRE_RUN_OLD_SOURCE_NAME = "_pre_run_old_source_name.txt"
 LAST_SOURCE_NAME = "last_source_name.txt"
+BASELINE_XLSX = "baseline.xlsx"
+BASELINE_SOURCE_NAME = "baseline_source_name.txt"
 
 
 def _month_key() -> str | None:
@@ -60,6 +67,17 @@ def _sha256_file(path: Path) -> str:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _existing_diff_payload(kind: str, month: str) -> dict | None:
+    path = ROOT / "docs" / "roster-diff" / "data" / f"{kind}-{month}.json"
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
 
 
 def before_generate() -> int:
@@ -120,33 +138,83 @@ def after_generate() -> int:
             same_as_last = True
             print("[ci_export_diff] after: hash unchanged — keep existing export-latest.json")
 
-    if pre_old.is_file() and not same_as_last:
-        build_py = ROOT / "scripts" / "build_roster_diff.py"
-        out_dir = ROOT / "docs" / "roster-diff" / "data"
-        old_source_label = ""
-        if pre_old_source_name_file.is_file():
-            old_source_label = pre_old_source_name_file.read_text(encoding="utf-8").strip()
-        cmd = [
-            sys.executable,
-            str(build_py),
-            "--old",
-            str(pre_old),
-            "--new",
-            str(new_path),
-            "--old-label",
-            old_source_label or pre_old.name,
-            "--new-label",
-            current_source_name or new_path.name,
-            "--kind",
-            "export",
-            "--month",
-            month,
-            "--out-dir",
-            str(out_dir),
-        ]
-        print("[ci_export_diff] after: build_roster_diff.py ...")
-        subprocess.run(cmd, check=True)
-    elif not pre_old.is_file():
+    baseline = backup / BASELINE_XLSX
+    baseline_name_file = backup / BASELINE_SOURCE_NAME
+
+    # Freeze the first edition of the month; later hotfixes must not replace it.
+    if not baseline.is_file():
+        if pre_old.is_file():
+            shutil.copy2(pre_old, baseline)
+            if pre_old_source_name_file.is_file():
+                baseline_name_file.write_text(
+                    pre_old_source_name_file.read_text(encoding="utf-8").strip(),
+                    encoding="utf-8",
+                )
+            print("[ci_export_diff] after: froze previous ingest as baseline.xlsx (first edition)")
+        else:
+            shutil.copy2(new_path, baseline)
+            if current_source_name:
+                baseline_name_file.write_text(current_source_name, encoding="utf-8")
+            print("[ci_export_diff] after: froze current file as baseline.xlsx (first edition)")
+
+    if not same_as_last and baseline.is_file() and baseline.resolve() != new_path.resolve():
+        # Skip building when this is still the first edition (baseline == new bytes).
+        if _sha256_file(baseline) == incoming_hash:
+            print("[ci_export_diff] after: first version only — diff starts on next update")
+        else:
+            build_py = ROOT / "scripts" / "build_roster_diff.py"
+            out_dir = ROOT / "docs" / "roster-diff" / "data"
+            old_source_label = ""
+            if baseline_name_file.is_file():
+                old_source_label = baseline_name_file.read_text(encoding="utf-8").strip()
+            if not old_source_label and pre_old_source_name_file.is_file():
+                old_source_label = pre_old_source_name_file.read_text(encoding="utf-8").strip()
+            cmd = [
+                sys.executable,
+                str(build_py),
+                "--old",
+                str(baseline),
+                "--new",
+                str(new_path),
+                "--old-label",
+                old_source_label or "first edition",
+                "--new-label",
+                current_source_name or new_path.name,
+                "--kind",
+                "export",
+                "--month",
+                month,
+                "--out-dir",
+                str(out_dir),
+            ]
+            print("[ci_export_diff] after: build_roster_diff.py (baseline → latest) ...")
+            subprocess.run(cmd, check=True)
+
+            # Safety: never publish an empty overwrite over a non-empty month diff.
+            existing = _existing_diff_payload("export", month)
+            month_file = out_dir / f"export-{month}.json"
+            if month_file.is_file():
+                try:
+                    fresh = json.loads(month_file.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    fresh = {}
+                fresh_n = int(fresh.get("total_changes") or 0) if isinstance(fresh, dict) else 0
+                old_n = int(existing.get("total_changes") or 0) if existing else 0
+                if fresh_n == 0 and old_n > 0:
+                    print(
+                        f"[ci_export_diff] after: refusing empty diff overwrite "
+                        f"(kept existing {old_n} changes)"
+                    )
+                    month_file.write_text(
+                        json.dumps(existing, ensure_ascii=False, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
+                    latest = out_dir / "export-latest.json"
+                    latest.write_text(
+                        json.dumps(existing, ensure_ascii=False, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
+    elif not baseline.is_file():
         print("[ci_export_diff] after: first version — diff starts on next update")
 
     shutil.copy2(new_path, backup / "current.xlsx")

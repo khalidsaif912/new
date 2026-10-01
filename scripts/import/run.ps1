@@ -57,6 +57,7 @@ if ($ExcelFilePath) {
         if (-not (Test-Path $backupDir)) { New-Item -ItemType Directory -Path $backupDir -Force | Out-Null }
         $oldSnapshot = Join-Path $backupDir "previous.xlsx"
         $newSnapshot = Join-Path $backupDir "current.xlsx"
+        $baselineSnapshot = Join-Path $backupDir "baseline.xlsx"
         $lastIngestedSnapshot = Join-Path $backupDir "last_ingested.xlsx"
         $lastHashFile = Join-Path $backupDir "last_hash.txt"
         $incomingHash = Get-ContentFingerprint -Path $ExcelFilePath
@@ -67,6 +68,10 @@ if ($ExcelFilePath) {
             # Fallback for old setup before last_ingested snapshot existed.
             Copy-Item -LiteralPath $targetXlsx -Destination $oldSnapshot -Force
         }
+        if (-not (Test-Path -LiteralPath $baselineSnapshot) -and (Test-Path -LiteralPath $oldSnapshot)) {
+            Copy-Item -LiteralPath $oldSnapshot -Destination $baselineSnapshot -Force
+            Write-Host "[IMPORT] Froze previous ingest as baseline.xlsx (first edition)"
+        }
         $srcResolved = (Resolve-Path -LiteralPath $ExcelFilePath).Path
         $dstResolved = $targetXlsx
         if ($srcResolved -ne $dstResolved) {
@@ -74,13 +79,22 @@ if ($ExcelFilePath) {
         }
         Copy-Item -LiteralPath $targetXlsx -Destination $newSnapshot -Force
 
-        if (Test-Path $oldSnapshot) {
+        if (-not (Test-Path -LiteralPath $baselineSnapshot)) {
+            Copy-Item -LiteralPath $newSnapshot -Destination $baselineSnapshot -Force
+            Write-Host "[IMPORT] Froze current file as baseline.xlsx (first edition)"
+        }
+
+        $diffOld = $baselineSnapshot
+        if (Test-Path -LiteralPath $diffOld) {
             $sameAsLast = (Test-Path $lastHashFile) -and ((Get-Content -LiteralPath $lastHashFile -Raw).Trim() -eq $incomingHash)
+            $baselineHash = Get-ContentFingerprint -Path $diffOld
             if ($sameAsLast) {
                 Write-Host "[IMPORT] Incoming file content matches last ingested version (same hash). Keeping previous auto-diff result."
+            } elseif ($baselineHash -eq $incomingHash) {
+                Write-Host "[IMPORT] First version for $MonthKey detected; diff will start from next update."
             } else {
-                Write-Host "[IMPORT] Building auto diff for month: $MonthKey (content-based snapshots)"
-                python ".\scripts\build_roster_diff.py" --old "$oldSnapshot" --new "$newSnapshot" --kind import --month "$MonthKey" --out-dir "docs/roster-diff/data"
+                Write-Host "[IMPORT] Building auto diff for month: $MonthKey (baseline → latest)"
+                python ".\scripts\build_roster_diff.py" --old "$diffOld" --new "$newSnapshot" --kind import --month "$MonthKey" --out-dir "docs/roster-diff/data"
             }
         } else {
             Write-Host "[IMPORT] First version for $MonthKey detected; diff will start from next update."
