@@ -1539,7 +1539,7 @@ PAGE_JS = r"""
 
   function nameTranslationsUrl(){
     const path = window.location.pathname || '';
-    const ver = '20261001a';
+    const ver = '20261001c';
     if(path.includes('/training/archive/')) return '../../name_translations.json?v=' + ver;
     if(path.includes('/training/')) return '../name_translations.json?v=' + ver;
     return '../name_translations.json?v=' + ver;

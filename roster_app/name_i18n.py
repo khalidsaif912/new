@@ -233,7 +233,7 @@ _COMMON_TOKENS: Dict[str, str] = {
     "SHADI": "شادي",
     "SHAKIR": "شاكر",
     "SHARIF": "شريف",
-    "SHAYAI": "شايعي",
+    "SHAYAI": "شائعي",
     "SIF": "سيف",
     "SIHAM": "سهام",
     "SIYABI": "سيابي",
