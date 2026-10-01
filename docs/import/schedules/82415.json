@@ -1,80 +1,95 @@
 {
   "id": "82415",
   "name": "AHMED ALBALUSHI",
-  "department": "Flight Dispatch (Export)",
+  "department": "Flight Dispatch",
   "schedules": {
     "2026-07": [
       {
+        "date": "2026-07-17",
         "day": 17,
         "shift_code": "AE14",
         "shift_group": "Afternoon"
       },
       {
+        "date": "2026-07-18",
         "day": 18,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-19",
         "day": 19,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-20",
         "day": 20,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-21",
         "day": 21,
         "shift_code": "NE22",
         "shift_group": "Night"
       },
       {
+        "date": "2026-07-22",
         "day": 22,
         "shift_code": "O",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-07-23",
         "day": 23,
         "shift_code": "O",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-07-24",
         "day": 24,
         "shift_code": "AE14",
         "shift_group": "Afternoon"
       },
       {
+        "date": "2026-07-25",
         "day": 25,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-26",
         "day": 26,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-27",
         "day": 27,
         "shift_code": "ME06",
         "shift_group": "Morning"
       },
       {
+        "date": "2026-07-28",
         "day": 28,
         "shift_code": "NE22",
         "shift_group": "Night"
       },
       {
+        "date": "2026-07-29",
         "day": 29,
         "shift_code": "O",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-07-30",
         "day": 30,
         "shift_code": "O",
         "shift_group": "Off Day"
       },
       {
+        "date": "2026-07-31",
         "day": 31,
         "shift_code": "AE14",
         "shift_group": "Afternoon"

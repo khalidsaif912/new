@@ -1,6 +1,6 @@
 {
   "sheet": "OCTOBER 2026",
-  "generated_for": "2026-09-23",
+  "generated_for": "2026-10-01",
   "employees_total": 68,
   "excel_sha256": "d273f03580c27adf229d0d5d88260744e73fec491be11f1e2bc318b036f86f4f",
   "date_min": "2026-03-01",
@@ -16,13 +16,13 @@
     "2026-10"
   ],
   "month_sources": {
-    "2026-03": "MARCH ROSTER MID.xlsx",
-    "2026-04": "Sheet1",
+    "2026-03": "MARCH 2026 IMP OPS ROSTER.xlsx",
+    "2026-04": "APRIL 2026 IMP OPS ROSTER.xlsx",
     "2026-05": "IMPORT OPS MAY 2026 REVISED.xlsx",
-    "2026-06": "2026-06.xlsx",
-    "2026-07": "JULY 2026 IMPORT OPS ROSTER revised3.xlsx",
-    "2026-08": "AUG 2026 IMPORT OPS ROSTER AUG revised.xlsx",
-    "2026-09": "SEPTEMBER 2026 ROSTER IMPORT OPERATIONS.xlsx",
+    "2026-06": "JUNE 2026 IMP OPS ROSTER.xlsx",
+    "2026-07": "JULY 2026 IMP OPS ROSTER.xlsx",
+    "2026-08": "AUGUST 2026 IMP OPS ROSTER.xlsx",
+    "2026-09": "SEPTEMBER 2026 IMP OPS ROSTER.xlsx",
     "2026-10": "OCTOBER 2026 IMP OPS ROSTER.xlsx"
   },
   "published_dates": [

@@ -7,7 +7,8 @@ Key points:
 - Reads Excel from env: IMPORT_EXCEL_URL (SharePoint/OneDrive share link is OK).
 - DOES NOT touch Export outputs (docs/*), only docs/import/*.
 - Treats each month as a sheet, and departments are in the first column (JD codes).
-- Uses an editable mapping dict (DEPT_FULL) to show full department names.
+- Merges letter-split JD codes (CHKA/DOCA/FLTA/…) into organized section titles
+  via DEPT_PREFIX_GROUPS / dept_display_name().
 
 Outputs:
 - docs/import/index.html         (today, Muscat time)
@@ -173,20 +174,43 @@ IMPORT_PWA_HEAD_SNIPPET = """
 # =========================
 MUSCAT_UTC_OFFSET_HOURS = 4
 
-# Department code -> full name (EDIT THIS)
+# Exact department code -> display name (fallback / legacy codes).
 DEPT_FULL: Dict[str, str] = {
     "SUPV": "Supervisors",
-    "FLTI": "Flight Dispatch (Import)",
+    "FLTI": "Flight Dispatch",
     "FLTE": "Flight Dispatch",
-    "FLTA": "FLTA",
+    "FLTA": "Flight Dispatch",
     "CHKR": "Import Checkers",
     "OPTR": "Import Operators",
     "DOCS": "Documentation",
     "RELC": "Release Control",
 }
 
+# Letter-split Excel codes (CHKA/CHKB, DOCA, OPTA, …) merge into one section each.
+# Longer prefixes first so future codes like "CHK" stay unambiguous.
+DEPT_PREFIX_GROUPS: List[Tuple[str, str]] = [
+    ("CH", "Import Checkers"),
+    ("DO", "Documentation"),
+    ("FL", "Flight Dispatch"),
+    ("OP", "Import Operators"),
+    ("RE", "Release Control"),
+    ("SU", "Supervisors"),
+]
+
 # If you want Arabic display names too, you can extend this dict later.
 # DEPT_FULL_AR = {...}
+
+
+def dept_display_name(dept_code: str) -> str:
+    """Map Excel JD codes to one organized Import section title."""
+    code = (dept_code or "").strip()
+    if not code:
+        return code
+    up = code.upper()
+    for prefix, title in DEPT_PREFIX_GROUPS:
+        if up.startswith(prefix):
+            return title
+    return DEPT_FULL.get(up, code)
 
 
 # =========================
@@ -509,7 +533,7 @@ def parse_month_sheet(xlsx_path: str, sheet_name: str) -> Dict[str, Any]:
 
         employees.append({
             "dept_code": dept_s,
-            "dept_name": DEPT_FULL.get(dept_s, dept_s),
+            "dept_name": dept_display_name(dept_s),
             "name": str(name).strip(),
             "id": emp_id,
             "shifts": shifts,
@@ -957,8 +981,25 @@ def build_duty_html(
         bucket, icon, accent, bg, text = shift_bucket(code)
         dept_map.setdefault(dept, {}).setdefault(bucket, {"icon": icon, "accent": accent, "bg": bg, "text": text, "rows": []})
         dept_map[dept][bucket]["rows"].append(
-            {"name": emp["name"], "id": emp["id"], "code": code, "shifts": emp["shifts"]}
+            {
+                "name": emp["name"],
+                "id": emp["id"],
+                "code": code,
+                "shifts": emp["shifts"],
+                "dept_code": emp.get("dept_code") or "",
+            }
         )
+
+    # Keep teams tidy inside each merged section (CHKA… then CHKB…).
+    for _dept, buckets in dept_map.items():
+        for _bucket, info in buckets.items():
+            info["rows"].sort(
+                key=lambda r: (
+                    str(r.get("dept_code") or "").upper(),
+                    str(r.get("name") or "").upper(),
+                    str(r.get("id") or ""),
+                )
+            )
 
     # Strict Import department order requested by product owner.
     import_order = [
@@ -967,8 +1008,7 @@ def build_duty_html(
         "import checkers",
         "release control",
         "import operators",
-        "flight dispatch (import)",
-        "flight dispatch (export)",
+        "flight dispatch",
     ]
     order_idx = {name: i for i, name in enumerate(import_order)}
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../../ios-tap-fix.js?v=20260728c"></script>
+  <script defer src="../../ios-tap-fix.js?v=20260903c"></script>
   <title>Import Duty Roster</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,13 +154,32 @@
       #banner-changer-btn { padding:2px; min-width:0; min-height:0; }
       #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
     }
-@media (max-width:720px) {
-      .langToggle { padding:2px; }
-      .langToggle-icon svg { width:13px; height:13px; }
-      .langToggle-label { font-size:8px; }
-      #banner-changer-btn { padding:2px; }
-      #banner-changer-btn .banner-changer-icon svg { width:13px; height:13px; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      position:relative !important;
+      inset:auto !important;
+      bottom:auto !important;
+      top:auto !important;
+      left:auto !important;
+      right:auto !important;
+      justify-self:center;
+      align-self:center;
+      transform:none !important;
     }
+    .header.homeDateSplit #banner-changer-btn { grid-column:1; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle { grid-column:3; grid-row:2; }
+    .header.homeDateSplit .langToggle,
+    .header.homeDateSplit #langToggle,
+    .header.homeDateSplit #banner-changer-btn {
+      padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+    }
+    .header.homeDateSplit .langToggle-icon svg,
+    .header.homeDateSplit #banner-changer-btn .banner-changer-icon svg {
+      width:13px; height:13px;
+    }
+    .header.homeDateSplit .langToggle-label { font-size:8px; }
 
     body.ar { direction:rtl; font-family:'Segoe UI',Tahoma,Arial,sans-serif; }
     .empStatus, .empStatusHit { direction:ltr; unicode-bidi:isolate; }
@@ -216,7 +235,8 @@
       40% { transform:rotate(-6deg); }
     }
 
-    /* Date — with-me split layout (homepage trial) */
+
+    /* Date — with-me split layout */
     .header.homeDateSplit {
       display:grid;
       grid-template-columns:28px minmax(0,1fr) 28px;
@@ -466,6 +486,7 @@
       z-index:10000;
     }
 
+
     a.summaryChip, button.summaryChip, .langToggle, .roster-cta-btn, button.shiftFilterBtn {
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
@@ -481,7 +502,7 @@
       display:flex; 
       justify-content:center; 
       align-items:stretch;
-      gap:12px; 
+      gap:10px; 
       margin-top:14px;
       flex-wrap:wrap;
       position:relative;
@@ -515,7 +536,8 @@
     a.summaryChip.diffChip:hover { box-shadow:0 8px 20px rgba(239,68,68,.18); }
     a.summaryChip.readSignChip .chipVal { color:#0f766e; }
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
-
+    a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
+    a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -555,8 +577,6 @@
       position:relative;
     }
     a.summaryChip.trainingChip .trainingNewPill{display:none!important}
-    50%{opacity:.4}
-    }
     a.summaryChip.trainingChip .chipLabel::after{
       content:none !important;
       display:none !important;
@@ -567,18 +587,25 @@
     #myScheduleBtn .feature-new-badge{
       display:none !important;
     }
-    /* Emp/Depts count: always visible on import (no Read&Sign chip) */
-    #summarySwitchChip {
-      display:flex !important;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
+    /* Emp/Depts count: large screens only on export (Read&Sign keeps the mobile slot).
+       Import pages override this to always show the chip. */
+    #summarySwitchChip { display:none !important; }
+    @media (min-width:1024px){
+      #summarySwitchChip {
+        display:flex !important;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+      }
     }
-#summarySwitchChip .chipVal { transition:opacity .2s ease; }
+
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
-      font-size:11px;      font-weight:800;      color:#334155;
-      text-transform:uppercase;
+      font-size:11px;
+      font-weight:800; 
+      color:#334155; 
+      text-transform:uppercase; 
       letter-spacing:.2px; 
       margin-top:4px;
       line-height:1.1;
@@ -639,7 +666,7 @@
     button.shiftFilterBtn.all .chipVal { color:#1e40af; }
     button.shiftFilterBtn.all .chipLabel { color:#1e40af; }
     
-                        /* موبايل: صف واحد — الشكل الأصلي المتوازن بدون فرض مربع */
+    /* موبايل: صف واحد — الشكل الأصلي المتوازن بدون فرض مربع */
     @media (max-width:900px){
       .summaryBar { flex-wrap: wrap; justify-content: center; }
     }
@@ -659,7 +686,8 @@
       .summaryChip .chipLabel { font-size: 10px; letter-spacing: .15px; font-weight:800; }
     }
 
-/* ═══════ DEPARTMENT CARD ═══════ */
+
+    /* ═══════ DEPARTMENT CARD ═══════ */
     .deptCard {
       margin-top:18px;
       background:#fff;
@@ -849,19 +877,33 @@
       margin-top: 4px;
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
-      --cta-max: min(100%, 680px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: var(--cta-gap);
       width: 100%;
-      max-width: var(--cta-max);
+      max-width: 100%;
       margin-inline: auto;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
     }
     .roster-cta-btn {
       display: inline-flex;
@@ -898,7 +940,6 @@
       line-height: 0;
     }
     .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
-    .roster-cta-icon .roster-icon { width: 18px; height: 18px; }
     .roster-cta-label {
       white-space: nowrap;
       overflow: hidden;
@@ -908,6 +949,21 @@
       background: #e8f1ff;
       border-color: #b8c9f5;
       color: #1e3a8a;
+    }
+    .roster-cta-btn--subscribe {
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }
+    .roster-cta-btn--compare {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }
+    .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
     }
     .roster-cta-btn--share {
       background: #ecfdf5;
@@ -924,14 +980,8 @@
       border-color: #c4b5fd;
       color: #5b21b6;
     }
-    .roster-cta-btn--muted {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-      color: #475569;
-    }
     .roster-cta--import {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      max-width: var(--cta-max);
+      grid-template-columns: 1fr 1fr;
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -939,6 +989,8 @@
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
+      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
+      .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--texture:hover { background: #ede9fe; }
@@ -959,532 +1011,78 @@
         gap: 5px;
         min-height: 40px;
       }
-      .roster-cta-icon { width: 16px; height: 16px; }
-      .roster-cta-icon svg { width: 16px; height: 16px; }
-      .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
+      .roster-cta-icon { font-size: 16px; }
     }
-    .quickActions.secondaryBar,
-    .quickActions.rosterCopyBar,
-    .quickActions.alumniBar {
-      margin-top: 10px;
-      padding: 0 2px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--cta-gap, 10px);
-      width: 100%;
-      max-width: var(--cta-max, min(100%, 440px));
-      margin-inline: auto;
-    }
-    .quickActions.secondaryBar:not(:has(> :nth-child(2))),
-    .quickActions.rosterCopyBar:not(:has(> :nth-child(2))),
-    .quickActions.alumniBar:not(:has(> :nth-child(2))) {
-      grid-template-columns: 1fr;
-    }
-    .secondaryBar .roster-cta-btn,
-    .rosterCopyBar .roster-cta-btn,
-    .alumniBar .roster-cta-btn {
-      width: 100%;
-      min-width: 0;
-    }
-    .roster-cta-btn--alumni {
-      background: #f0fdfa;
-      border-color: #99f6e4;
-      color: #0f766e;
-    }
-    @media (hover: hover) {
-      .roster-cta-btn--alumni:hover { background: #ccfbf1; }
-    }
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+
+    /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-    }
-    .siteShareUrl {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      direction: ltr;
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
-    .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
-    }
-    .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-    }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
-    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-    }
-    .siteShareUrl {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      direction: ltr;
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
-    }
-    .siteShareCloseWrap {
-      margin-top: 4px;
-    }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
-    .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-      text-align: start;
-    }
-    .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
-    }
-    .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-    }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.25;
-      text-align: center;
-      color: #0f172a;
-    }
-    .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
-    }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
-    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
-    }
-    @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
-      }
-    }
-    @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
-    }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
-    }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
-    }
-
-    /* ═══════ FOOTER ═══════ */
-    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
-    .footer strong { color:#64748b; }
-
-    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
-    .captureSheet {
       position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(15,23,42,.45); z-index:9999; padding:12px 10px;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
       pointer-events:none; visibility:hidden;
     }
-    .captureSheet.open { display:flex; pointer-events:auto; visibility:visible; }
-    .captureSheetCard {
-      width:min(100%,420px); max-height:min(92dvh, 900px);
-      display:flex; flex-direction:column; overflow:hidden;
-      background:#fff; border-radius:16px; padding:12px;
-      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteShareCard {
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
     }
-    .captureSheetTitle {
-      flex-shrink:0; font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px;
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteShareQr {
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
     }
-    .capturePreviewWrap {
-      flex:1 1 auto; min-height:0;
-      max-height:min(58dvh, 520px); overflow-y:auto; overflow-x:hidden;
-      margin:0 0 10px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc;
-      -webkit-overflow-scrolling:touch;
+    .siteShareUrl {
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
     }
-    .capturePreviewImg {
-      display:block; width:100%; max-width:100%; height:auto; margin:0;
-      border:none; border-radius:0; background:transparent;
+    .siteShareActions {
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
     }
-    .captureSheetActions {
-      flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
-    }
-    .captureSheetBtn {
-      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
-    }
-    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
-    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
-    .captureCancelBtn {
-      flex-shrink:0; margin-top:8px; width:100%; background:#f1f5f9; color:#475569;
-    }
-    .captureBusy {
-      position:fixed; top:12px; left:50%; transform:translateX(-50%);
-      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
-      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
-      pointer-events:none;
-    }
-    .captureBusy.open { display:block; }
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
 
-    /* ═══════ MOBILE ═══════ */
-    @media (max-width:480px){
-      .wrap            { padding:12px 10px 22px; }
-      .deptTitle       { font-size:16px; }
-      .empName         { font-size:14px; }
-      .empStatus       { font-size:12px; }
-      .shiftLabel      { font-size:14px; }
-            .summaryChip .chipVal { font-size:19px; }
-}
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
+    }
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteAppsCard {
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
+    }
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
+    .siteAppsLink {
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .siteAppsLink-icon {
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+    }
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
+    .siteAppsLink--games {
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
+    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
 
-      /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15,23,42,.45); z-index: 10003; padding: 16px;
@@ -1556,6 +1154,65 @@
       .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
+    /* ═══════ FOOTER ═══════ */
+    .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
+    .footer strong { color:#64748b; }
+
+    /* ═══════ SHARE/SAVE CAPTURE SHEET ═══════ */
+    .captureSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:9999; padding:12px 10px;
+      pointer-events:none; visibility:hidden;
+    }
+    .captureSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .captureSheetCard {
+      width:min(100%,420px); max-height:min(92dvh, 900px);
+      display:flex; flex-direction:column; overflow:hidden;
+      background:#fff; border-radius:16px; padding:12px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 16px 40px rgba(15,23,42,.24);
+    }
+    .captureSheetTitle {
+      flex-shrink:0; font-size:13px; font-weight:800; color:#334155; padding:4px 6px 10px;
+    }
+    .capturePreviewWrap {
+      flex:1 1 auto; min-height:0;
+      max-height:min(58dvh, 520px); overflow-y:auto; overflow-x:hidden;
+      margin:0 0 10px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc;
+      -webkit-overflow-scrolling:touch;
+    }
+    .capturePreviewImg {
+      display:block; width:100%; max-width:100%; height:auto; margin:0;
+      border:none; border-radius:0; background:transparent;
+    }
+    .captureSheetActions {
+      flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
+    .captureSheetBtn {
+      border:none; border-radius:12px; padding:11px 10px; cursor:pointer; font:800 12px/1 'Segoe UI',sans-serif;
+    }
+    .captureShareBtn { background:linear-gradient(135deg,#1e40af,#1976d2); color:#fff; }
+    .captureSaveBtn { background:#e8eefc; color:#1e40af; }
+    .captureCancelBtn {
+      flex-shrink:0; margin-top:8px; width:100%; background:#f1f5f9; color:#475569;
+    }
+    .captureBusy {
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      background:#0f172a; color:#fff; font-size:12px; font-weight:700;
+      border-radius:999px; padding:8px 12px; z-index:10000; display:none;
+      pointer-events:none;
+    }
+    .captureBusy.open { display:block; }
+
+    /* ═══════ MOBILE ═══════ */
+    @media (max-width:480px){
+      .wrap            { padding:12px 10px 22px; }
+      .deptTitle       { font-size:16px; }
+      .empName         { font-size:14px; }
+      .empStatus       { font-size:12px; }
+      .shiftLabel      { font-size:14px; }
+      .summaryChip .chipVal { font-size:19px; }
+    }
+
   </style>
   <style>
     html, body { min-height: 100%; width:100%; overflow-x:hidden; }
@@ -1616,8 +1273,6 @@
       position:relative;
     }
     a.summaryChip.trainingChip .trainingNewPill{display:none!important}
-    50%{opacity:.4}
-    }
     a.summaryChip.trainingChip .chipLabel::after{
       content:none !important;
       display:none !important;
@@ -1627,6 +1282,17 @@
     #welcomeChip .feature-new-badge,
     #myScheduleBtn .feature-new-badge{
       display:none !important;
+    }
+    /* Emp/Depts count: large screens only on export (Read&Sign keeps the mobile slot).
+       Import pages override this to always show the chip. */
+    #summarySwitchChip { display:none !important; }
+    @media (min-width:1024px){
+      #summarySwitchChip {
+        display:flex !important;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+      }
     }
 
     .summaryBar .summaryChip .chipLabel {
@@ -1650,6 +1316,14 @@
       overflow: hidden;
       text-overflow: ellipsis;
       transition: opacity .28s ease, color .28s ease;
+    }
+    .welcomeShiftEmoji {
+      display: none;
+      font-size: 22px;
+      line-height: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .welcomeChip .chipLabel { transition: none; }
     }
     .waveHand {
       display: inline-block;
@@ -1730,32 +1404,17 @@
       }}
     }} catch (swIosErr) {{}}
     try {{
-      var bn = localStorage.getItem('roster_banner_choice');
-      var paintRe = /^(banner\d+\.jpg|custom:[a-z0-9]{{8,32}})$/i;
-      if (bn && paintRe.test(bn)) {{
-        var bUrl = '';
-        var bPos = '62% center';
-        try {{
-          var cached = JSON.parse(sessionStorage.getItem('roster_banner_paint_cache') || 'null');
-          if (!(cached && cached.name === bn && cached.url)) {{
-            cached = JSON.parse(localStorage.getItem('roster_banner_paint_cache') || 'null');
-          }}
-          if (cached && cached.name === bn && cached.url) {{
-            bUrl = cached.url;
-            if (cached.pos) bPos = cached.pos;
-          }}
-        }} catch (cacheErr) {{}}
-        if (!bUrl && /^banner\d+\.jpg$/i.test(bn)) {{
-          bUrl = base + 'assets/banners/' + bn;
-        }}
-        if (bUrl) {{
+      var pathNow = location.pathname || '';
+      if (pathNow.indexOf('/my-schedules') === -1) {{
+        var bn = localStorage.getItem('roster_banner_choice');
+        if (bn && /^banner\d+\.jpg$/i.test(bn)) {{
+          var bUrl = base + 'assets/banners/' + bn;
           if (!document.getElementById('banner-early-style')) {{
             var bes = document.createElement('style');
             bes.id = 'banner-early-style';
             bes.textContent =
-              'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:' + bPos + '!important;background-repeat:no-repeat!important}}' +
-              'html.roster-banner-early .header::before,html.roster-banner-early .header::after,html.roster-banner-early .topbar::before,html.roster-banner-early .topbar::after{{content:none!important;opacity:0!important;display:none!important}}' +
-              'html.roster-banner-early .header.homeDateSplit{{padding:26px 18px 52px!important}}';
+              'html.roster-banner-early .header,html.roster-banner-early .topbar{{background-image:url("' + bUrl.replace(/"/g, '') + '")!important;background-size:cover!important;background-position:62% center!important;background-repeat:no-repeat!important}}' +
+              'html.roster-banner-early .header::before,html.roster-banner-early .header::after{{opacity:0!important}}';
             document.head.appendChild(bes);
           }}
           if (!document.querySelector('link[data-banner-preload="1"]')) {{
@@ -1809,7 +1468,7 @@
       <div class="chipVal" id="summarySwitchVal">68</div>
       <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
     </div>
-<a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
+    <a href="{{BASE}}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
     </a>
@@ -1821,7 +1480,7 @@
       <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
       <div class="chipLabel" id="welcomeName"></div>
     </a>
-    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" style="text-decoration:none;">
+    <a href="{{BASE}}/training/" id="trainingBtn" class="summaryChip trainingChip" title="Training" aria-label="Training" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="chipLabel" data-key="trainingPage">TRG</div>
     </a>
@@ -1829,7 +1488,7 @@
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 14l-2 2 2 2"/><path d="M16 14l2 2-2 2"/></svg></div>
       <div class="chipLabel" data-key="diffPage">Diff</div>
     </a>
-</div>
+  </div>
 
 
   
@@ -1942,11 +1601,11 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
-       <span class="empName" data-name-ar="وفاء سالم - 81021">WAFAA SALIM - 81021</span>
-       <span class="empStatus" style="color:#92400e;">ME06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
        <span class="empName" data-name-ar="آلاء الوهيبي - 82473">ALA AL WAHAIBI - 82473</span>
+       <span class="empStatus" style="color:#92400e;">ME06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
+       <span class="empName" data-name-ar="وفاء سالم - 81021">WAFAA SALIM - 81021</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div><div class="empRow" data-emp-name="YOUSUF AL WAHEEDI - 82100" role="button" tabindex="0">
        <span class="empName" data-name-ar="يوسف الوحيدي - 82100">YOUSUF AL WAHEEDI - 82100</span>
@@ -1965,11 +1624,11 @@
         <div class="empRow" data-emp-name="GLENDO - 80215" role="button" tabindex="0">
        <span class="empName" data-name-ar="جليندو - 80215">GLENDO - 80215</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL HADIDI - 82452" role="button" tabindex="0">
-       <span class="empName" data-name-ar="محمود الحديدي - 82452">MAHMOOD AL HADIDI - 82452</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
        <span class="empName" data-name-ar="جمال السناني - 81399">JAMAL AL SINANI - 81399</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow" data-emp-name="MAHMOOD AL HADIDI - 82452" role="button" tabindex="0">
+       <span class="empName" data-name-ar="محمود الحديدي - 82452">MAHMOOD AL HADIDI - 82452</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -2067,14 +1726,14 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
-       <span class="empName" data-name-ar="وهب البريدعي - 82470">WAHEB AL BARAIDAI - 82470</span>
+        <div class="empRow" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
+       <span class="empName" data-name-ar="أحمد الفارسي - 82456">AHMED AL FARSI - 82456</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div><div class="empRow empRowAlt" data-emp-name="IBRAHIM AL HADHRAMI - 82668" role="button" tabindex="0">
        <span class="empName" data-name-ar="إبراهيم الحضرمي - 82668">IBRAHIM AL HADHRAMI - 82668</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
-       <span class="empName" data-name-ar="أحمد الفارسي - 82456">AHMED AL FARSI - 82456</span>
+     </div><div class="empRow" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
+       <span class="empName" data-name-ar="وهب البريدعي - 82470">WAHEB AL BARAIDAI - 82470</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -2087,17 +1746,17 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
-       <span class="empName" data-name-ar="ناصر المعمري - 82590">NASSER AL MAAMARI - 82590</span>
+        <div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
+       <span class="empName" data-name-ar="عبدالله السناوي - 82663">ABDULLAH AL SINAWI - 82663</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt" data-emp-name="BADAR AL SHEHHI - 82583" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر الشحي - 82583">BADAR AL SHEHHI - 82583</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
-       <span class="empName" data-name-ar="عبدالله السناوي - 82663">ABDULLAH AL SINAWI - 82663</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
        <span class="empName" data-name-ar="هشام المحاربي - 82454">HISHAM AL MAHARBI - 82454</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt" data-emp-name="NASSER AL MAAMARI - 82590" role="button" tabindex="0">
+       <span class="empName" data-name-ar="ناصر المعمري - 82590">NASSER AL MAAMARI - 82590</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -2110,17 +1769,17 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
+       <span class="empName" data-name-ar="هشام السيابي - 82434">HISHAM AL SIYABI - 82434</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
+       <span class="empName" data-name-ar="محمد المعولي - 82614">MOHAMMED AL MAWALI - 82614</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
        <span class="empName" data-name-ar="عمر الفطيسي - 82107">OMAR AL FUTAISI - 82107</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt" data-emp-name="QAIS AL RASHDI - 82409" role="button" tabindex="0">
        <span class="empName" data-name-ar="قيس الراشدي - 82409">QAIS AL RASHDI - 82409</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
-       <span class="empName" data-name-ar="محمد المعولي - 82614">MOHAMMED AL MAWALI - 82614</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
-       <span class="empName" data-name-ar="هشام السيابي - 82434">HISHAM AL SIYABI - 82434</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -2133,20 +1792,20 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
-       <span class="empName" data-name-ar="سليمان المحاربي - 80833">SULEIMAN AL MAHARBI - 80833</span>
+        <div class="empRow" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
+       <span class="empName" data-name-ar="عادل البلوشي - 82457">ADIL AL BULUSHI - 82457</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد الحسيني - 82455">AHMED AL HUSAINI - 82455</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
-       <span class="empName" data-name-ar="موسى البلوشي - 82667">MOOSA AL BALUSHI - 82667</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
-       <span class="empName" data-name-ar="عادل البلوشي - 82457">ADIL AL BULUSHI - 82457</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
      </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
        <span class="empName" data-name-ar="هلال الشماخي - 81991">HILAL AL SHAMAKHI - 81991</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
+       <span class="empName" data-name-ar="موسى البلوشي - 82667">MOOSA AL BALUSHI - 82667</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
+       <span class="empName" data-name-ar="سليمان المحاربي - 80833">SULEIMAN AL MAHARBI - 80833</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -2159,12 +1818,12 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
-       <span class="empName" data-name-ar="محمود الشامسي - 82286">MAHMOOD AL SHAMSI - 82286</span>
-       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 22 <span class="shiftRangeLabel">TO</span> 26</span>)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
        <span class="empName" data-name-ar="جابر الجلنداني - 81983">JABER AL JULANDANI - 81983</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 26 <span class="shiftRangeLabel">TO</span> 30</span>)</span>
+     </div><div class="empRow empRowAlt" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
+       <span class="empName" data-name-ar="محمود الشامسي - 82286">MAHMOOD AL SHAMSI - 82286</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 22 <span class="shiftRangeLabel">TO</span> 26</span>)</span>
      </div>
       </div>
     </details>
@@ -2241,12 +1900,12 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
-       <span class="empName" data-name-ar="قاسم الغريبي - 82412">QASIM AL GHARIBI - 82412</span>
-       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 26 <span class="shiftRangeLabel">TO</span> 30</span>)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
        <span class="empName" data-name-ar="ماهر البلوشي - 82422">MAHIR AL BALUSHI - 82422</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 23 <span class="shiftRangeLabel">TO</span> 27</span>)</span>
+     </div><div class="empRow empRowAlt" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
+       <span class="empName" data-name-ar="قاسم الغريبي - 82412">QASIM AL GHARIBI - 82412</span>
+       <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 26 <span class="shiftRangeLabel">TO</span> 30</span>)</span>
      </div>
       </div>
     </details>
@@ -2298,17 +1957,17 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
-       <span class="empName" data-name-ar="سعيد العامري - 80834">SAID AL AMRI - 80834</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
-       <span class="empName" data-name-ar="محمد الهدابي - 990895">MOHD AL HADDABI - 990895</span>
-       <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="FARIS AL BALUSHI - 80478" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="FARIS AL BALUSHI - 80478" role="button" tabindex="0">
        <span class="empName" data-name-ar="فارس البلوشي - 80478">FARIS AL BALUSHI - 80478</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow empRowAlt" data-emp-name="KHAMIS AL KASBI - 990751" role="button" tabindex="0">
        <span class="empName" data-name-ar="خميس الكاسبي - 990751">KHAMIS AL KASBI - 990751</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
+       <span class="empName" data-name-ar="محمد الهدابي - 990895">MOHD AL HADDABI - 990895</span>
+       <span class="empStatus" style="color:#9a3412;">AN13</span>
+     </div><div class="empRow empRowAlt" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
+       <span class="empName" data-name-ar="سعيد العامري - 80834">SAID AL AMRI - 80834</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -2321,11 +1980,11 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
-       <span class="empName" data-name-ar="خالد الزدجالي - 82458">KHALID AL ZADJALI - 82458</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
        <span class="empName" data-name-ar="جمعة الحبسي - 81151">JUMA AL HABSI - 81151</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
+       <span class="empName" data-name-ar="خالد الزدجالي - 82458">KHALID AL ZADJALI - 82458</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow" data-emp-name="YASIR AL GHARABI - 990786" role="button" tabindex="0">
        <span class="empName" data-name-ar="ياسر الغاربي - 990786">YASIR AL GHARABI - 990786</span>
@@ -2344,11 +2003,11 @@
         <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" role="button" tabindex="0">
        <span class="empName" data-name-ar="علي الريامي - 82459">ALI AL RIYAMI - 82459</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
-       <span class="empName" data-name-ar="قيس المخيني - 82435">QAIS AL MUKHAINI - 82435</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد المعولي - 82535">MOHAMED AL MAAWALI - 82535</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
+       <span class="empName" data-name-ar="قيس المخيني - 82435">QAIS AL MUKHAINI - 82435</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -2382,7 +2041,7 @@
             <rect x="13" y="14" width="2" height="3"/>
           </svg>
         </div>
-        <div class="deptTitle">Flight Dispatch (Export)</div>
+        <div class="deptTitle">Flight Dispatch</div>
         <div class="deptBadge" style="background:#f59e0b15; color:#f59e0b; border:1px solid #f59e0b18;">
           <span style="font-size:10px;opacity:.7;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px;">Total</span>
           <span style="font-size:17px;font-weight:900;">15</span>
@@ -2398,17 +2057,17 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
+       <span class="empName" data-name-ar="أحمد الهادي - 82654">AHMED AL HADI - 82654</span>
+       <span class="empStatus" style="color:#92400e;">MN06</span>
+     </div><div class="empRow empRowAlt" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
        <span class="empName" data-name-ar="هيثم البلوشي - 82419">HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
        <span class="empName" data-name-ar="سعيد السعدي - 82410">SAID AL SADI - 82410</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
        <span class="empName" data-name-ar="طلال الحسيني - 82417">TALAL AL HUSEINI - 82417</span>
-       <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
-       <span class="empName" data-name-ar="أحمد الهادي - 82654">AHMED AL HADI - 82654</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
       </div>
@@ -2424,14 +2083,14 @@
         <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" role="button" tabindex="0">
        <span class="empName" data-name-ar="علي الشامسي - 82425">ALI AL SHAMSI - 82425</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
-       <span class="empName" data-name-ar="ناصر العميري - 82416">NASSER AL OMAIRI - 82416</span>
+     </div><div class="empRow empRowAlt" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
+       <span class="empName" data-name-ar="أنور العامري - 82566">ANWAR ALAMRI - 82566</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div><div class="empRow" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
        <span class="empName" data-name-ar="إسماعيل المحاربي - 82331">ISMAIL AL MAHARBI - 82331</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
-       <span class="empName" data-name-ar="أنور العامري - 82566">ANWAR ALAMRI - 82566</span>
+     </div><div class="empRow empRowAlt" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
+       <span class="empName" data-name-ar="ناصر العميري - 82416">NASSER AL OMAIRI - 82416</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
       </div>
@@ -2444,17 +2103,17 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
+       <span class="empName" data-name-ar="بدر البرطماني - 82423">BADAR AL BURTAMANI - 82423</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر البوسعيدي - 82414">BADAR AL BUSAIDI - 82414</span>
+       <span class="empStatus" style="color:#5b21b6;">NN21</span>
+     </div><div class="empRow" data-emp-name="KHALIFA AL SAADI - 82537" role="button" tabindex="0">
+       <span class="empName" data-name-ar="خليفة السعدي - 82537">KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL SAADI - 82420" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد السعدي - 82420">MOHAMMED AL SAADI - 82420</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
-       <span class="empName" data-name-ar="بدر البرطماني - 82423">BADAR AL BURTAMANI - 82423</span>
-       <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="KHALIFA AL SAADI - 82537" role="button" tabindex="0">
-       <span class="empName" data-name-ar="خليفة السعدي - 82537">KHALIFA AL SAADI - 82537</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
       </div>
@@ -2467,14 +2126,14 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
+       <span class="empName" data-name-ar="سامي الهدابي - 80479">SAMI AL HADABI - 80479</span>
+       <span class="empStatus" style="color:#3730a3;">O</span>
+     </div><div class="empRow empRowAlt" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
        <span class="empName" data-name-ar="يعرب الرقادي - 82571">YAARAB AL RAQADI - 82571</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow empRowAlt" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
        <span class="empName" data-name-ar="يونس السيابي - 80480">YOUNIS AL SIYABI - 80480</span>
-       <span class="empStatus" style="color:#3730a3;">O</span>
-     </div><div class="empRow" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
-       <span class="empName" data-name-ar="سامي الهدابي - 80479">SAMI AL HADABI - 80479</span>
        <span class="empStatus" style="color:#3730a3;">O</span>
      </div>
       </div>
@@ -2500,8 +2159,7 @@
   </button>
 </nav>
 
-  <!-- ════ SECONDARY ACTIONS ════ -->
-<nav class="quickActions secondaryBar" aria-label="More actions">
+    <nav class="quickActions secondaryBar" aria-label="More actions">
   <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
     <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M11.5 13h5M11.5 16h3"/></svg></span>
     <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
@@ -2512,10 +2170,11 @@
   </a>
 </nav>
 
-<div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">30JUL2026 / 18:11</strong>
+    
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">01OCT2026 / 08:46</strong>
     <br>Total: <strong id="importTotalEmployees">68 employees</strong>
-     &nbsp;·&nbsp; Source: <strong id="importSourceName">AUG 2026 IMPORT OPS ROSTER AUG revised.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">AUGUST 2026 IMP OPS ROSTER.xlsx</strong>
   </div>
 
   </div>
@@ -2573,10 +2232,13 @@
     <div class="siteAppsGrid" id="siteAppsGrid">
       <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/><path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/><path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/><path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
       </a>
       <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/><path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><circle cx="40" cy="34" r="2.2" fill="#fff"/></svg></span>
@@ -2605,17 +2267,13 @@
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/><path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/><rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/></svg></span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon"><img class="siteAppsFlatImg" src="https://khalidsaif912.github.io/new/docs/assets/icons/app-games.png" width="30" height="30" alt="" decoding="async"></span>
-        <span class="siteAppsLink-text">
-          <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
-          <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
-        </span>
+        <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
       </a>
     </div>
     <div class="siteAppsCloseWrap">
@@ -2728,8 +2386,7 @@ function ensureHtml2Canvas() {
     'import checkers',
     'release control',
     'import operators',
-    'flight dispatch (import)',
-    'flight dispatch (export)'
+    'flight dispatch'
   ];
 
   function deptTitleNorm(card) {
@@ -3419,58 +3076,53 @@ function goToEmployeeSchedule(empName) {
       String(muscatTime.getDate()).padStart(2, '0');
   }
 
-  var MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
-  function formatIsoLabel(iso) {
-    var d = new Date(iso + 'T00:00:00');
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
-  function weekdayLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
-    var names = lang === 'ar' ? DAYS_AR : DAYS_EN;
-    return names[d.getUTCDay()] || '';
-  }
-
-  function dayNumLabel(iso) {
-    var p = (iso || '').split('-');
-    return p.length === 3 ? String(parseInt(p[2], 10)) : '';
-  }
-
-  function monthNameLabel(iso, lang) {
-    var p = (iso || '').split('-');
-    if (p.length !== 3) return '';
-    var mo = parseInt(p[1], 10);
-    var months = lang === 'ar' ? MONTHS_AR : MONTHS_EN;
-    return months[mo - 1] || '';
-  }
-
-  function syncHeaderDate(iso, langOverride) {
+  function formatIsoLabel(iso, langOverride) {
     var lang = langOverride
       || (typeof LANG !== 'undefined' && LANG)
       || document.documentElement.getAttribute('lang')
       || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return iso;
+    var months = ar
+      ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var mo = parseInt(p[1], 10);
+    var day = String(parseInt(p[2], 10));
+    return day + ' ' + (months[mo - 1] || p[1]) + ' ' + p[0];
+  }
+
+  function syncHeaderDate(iso, langOverride) {
+    if (window.rosterPaintHeaderDate) {
+      window.rosterPaintHeaderDate(iso, langOverride);
+      return;
+    }
+    var lang = langOverride
+      || (typeof LANG !== 'undefined' && LANG)
+      || document.documentElement.getAttribute('lang')
+      || (localStorage.getItem('rosterLang') || 'en');
+    var ar = String(lang).toLowerCase().indexOf('ar') === 0;
     var dateWeek = document.getElementById('dateTagWeek');
     var dateDay = document.getElementById('dateTagDay');
     var dateMonth = document.getElementById('dateTagMonth');
-    if (dateDay) {
-      if (dateWeek) dateWeek.textContent = weekdayLabel(iso, lang);
-      dateDay.textContent = dayNumLabel(iso);
-      if (dateMonth) dateMonth.textContent = monthNameLabel(iso, lang);
+    var p = String(iso || '').split('-');
+    if (dateDay && p.length === 3) {
+      var d = new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)));
+      var days = ar
+        ? ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+        : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var months = ar
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      if (dateWeek) dateWeek.textContent = days[d.getUTCDay()] || '';
+      dateDay.textContent = String(parseInt(p[2], 10));
+      if (dateMonth) dateMonth.textContent = months[parseInt(p[1], 10) - 1] || '';
       return;
     }
     var tag = document.getElementById('dateTag');
     if (tag) {
       var dateLbl = document.getElementById('dateTagLabel');
-      var dateText = formatIsoLabel(iso);
+      var dateText = formatIsoLabel(iso, lang);
       if (dateLbl) dateLbl.textContent = dateText;
       else tag.textContent = dateText;
     }
@@ -3662,13 +3314,6 @@ function goToEmployeeSchedule(empName) {
     window.location.href = target;
   });
 
-  (function loadDateBannerNav() {
-    var root = typeof getSiteRootPath === 'function' ? getSiteRootPath() : '';
-    var s = document.createElement('script');
-    s.src = (root || '') + '/date-banner-nav.js?v=20260902a';
-    document.head.appendChild(s);
-  })();
-
 })();
 
 // ═══════════════════════════════════════════════════
@@ -3815,8 +3460,10 @@ var T = {
     from:'FROM', to:'TO',
     viewFull:'Full Roster', subscribe:'Subscribe', compare:'Compare', shareSite:'Share Site', moreApps:'Apps',
     officers:'Officers', supervisors:'Supervisors', loadControl:'Load Control',
-    exportChecker:'Export Checker', exportOps:'Export Operators', unassigned:'Unassigned',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign',
+    exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
+    flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
+    security:'Security', absences:'Absences',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
@@ -3828,8 +3475,10 @@ var T = {
     from:'من', to:'إلى',
     viewFull:'الجدول الكامل', subscribe:'اشتراك', compare:'مقارنة', shareSite:'مشاركة الموقع', moreApps:'تطبيقات',
     officers:'الضباط', supervisors:'المشرفون', loadControl:'مراقبة الحمولة',
-    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', unassigned:'غير مُعيَّن',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار',
+    exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
+    flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
+    security:'الأمن', absences:'الغيابات',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
 };
@@ -3886,10 +3535,14 @@ function applyLang(lang) {
     else if(k==='trainingPage') el.textContent=t.trainingPage;
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
+    else if(k==='withMePage') el.textContent=t.withMePage;
   });
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
-    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Unassigned':t.unassigned};
+    'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
+    'Flight Dispatch':t.flightDispatch,'FLTA':t.flta,'Flight Dispatch (Export)':t.flightDispatch,
+    'Unassigned':t.unassigned,'Security':t.security,'Absences':t.absences,
+    'الأمن':t.security,'الغيابات':t.absences};
   document.querySelectorAll('.deptTitle').forEach(function(el) {
     if(!el.dataset.key) el.dataset.key=el.textContent.trim();
     if(deptMap[el.dataset.key]) el.textContent=deptMap[el.dataset.key];
@@ -3919,6 +3572,8 @@ function applyLang(lang) {
     else el.textContent = text;
   }
   setCtaLabel('ctaBtn', t.viewFull);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
   setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
@@ -3968,7 +3623,9 @@ function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 function setLocalCtaLinks() {
   var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
 }
 
 function goToTraining(e) {
@@ -3991,7 +3648,7 @@ startSummarySwitchLoop();
     if (document.getElementById('bgTextureShuffleBtn')) return;
     try {
       var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260803i';
+      var src = root + '/bg-texture-shuffle.js?v=20260903c';
       if (document.querySelector('script[data-local-src="' + src + '"]')) return;
       var s = document.createElement('script');
       s.src = src;
@@ -4044,13 +3701,20 @@ startSummarySwitchLoop();
     var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
     if(!shiftCards.length) return;
     shiftCards.forEach(function(shiftCard){
-      shiftCard.removeAttribute('open');
+      var key = shiftCard.dataset.shift || '';
+      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
+        shiftCard.open = false;
+        shiftCard.removeAttribute('open');
+      }
     });
     var currentShift = getCurrentShiftForMuscat();
     var target = shiftCards.find(function(shiftCard){
       return shiftCard.dataset.shift === currentShift;
-    }) || shiftCards[0];
-    if(target) target.setAttribute('open', '');
+    });
+    if(target) {
+      target.open = true;
+      target.setAttribute('open', '');
+    }
   }
 
   function cardHasSavedEmployee(card){
@@ -4229,13 +3893,9 @@ function goToImport(event) {
     });
 }
 
-function goToWithMe(event) {
-  if (event) event.preventDefault();
-  location.href = _importBase() + '/with-me/';
-}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
-  var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
+  var target = getSiteRootUrl() + '/roster-diff/index.html';
   location.href = target;
 }
 
@@ -4634,26 +4294,33 @@ function goToExport(event) {
   location.href = root + '/date/' + iso + '/';
 }
 
-function goToWithMe(event) {
-  if (event) event.preventDefault();
-  location.href = _importBase() + '/with-me/';
-}
 function goToRosterDiff(event) {
   if (event) event.preventDefault();
   var target = getSiteRootUrl() + '/roster-diff/index.html?source=import';
   location.href = target;
 }
 
+function goToWithMe(event) {
+  if (event) event.preventDefault();
+  location.href = _importBase() + '/with-me/';
+}
+
+(function bindFlightSwitchIcons() {
+  var root = getSiteRootUrl();
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
+    img.src = iconUrl;
+  });
+})();
+
 function setSummaryChipHrefs() {
   var importBase = _importBase() + '/my-schedules/index.html';
   var root = getSiteRootUrl();
   var my = document.getElementById('myScheduleBtn');
   var exp = document.getElementById('exportBtn');
-var welcome = document.getElementById('welcomeChip');
+  var welcome = document.getElementById('welcomeChip');
   var trn = document.getElementById('trainingBtn');
   var diff = document.getElementById('diffChipBtn');
-  var withMe = document.getElementById('withMeChipBtn');
-  if (withMe) withMe.href = _importBase() + '/with-me/';
   if (my) my.href = importBase;
   if (exp) {
     var iso = '';
@@ -4690,6 +4357,8 @@ setSummaryChipHrefs();
     s.setAttribute('data-local-src', src);
     document.body.appendChild(s);
   }
+  addScript(root + '/welcome-emoji-early.js?v=20260903a');
+  addScript(root + '/open-current-shift.js?v=20260908s');
   addScript(root + '/emp-contact.js?v=20260902c');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
@@ -4699,7 +4368,6 @@ setSummaryChipHrefs();
   addScript(root + '/banner-store.js?v=20260923d');
   addScript(root + '/banner-changer.js?v=20260923d');
   addScript(root + '/date-banner-nav.js?v=20260902a');
-  addScript(root + '/welcome-emoji-early.js?v=20260903a');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);

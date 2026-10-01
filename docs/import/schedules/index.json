@@ -3,27 +3,27 @@
     {
       "id": "82428",
       "name": "ABDULLAH AL MAHARBI",
-      "department": "Flight Dispatch (Import)"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82663",
       "name": "ABDULLAH AL SINAWI",
-      "department": "CHKB"
+      "department": "Import Checkers"
     },
     {
       "id": "82457",
       "name": "ADIL AL BULUSHI",
-      "department": "CHKD"
+      "department": "Import Checkers"
     },
     {
       "id": "81080",
       "name": "AHMED AL AMRI",
-      "department": "OPTC"
+      "department": "Import Operators"
     },
     {
       "id": "82456",
       "name": "AHMED AL FARSI",
-      "department": "CHKC"
+      "department": "Import Checkers"
     },
     {
       "id": "82654",
@@ -33,22 +33,22 @@
     {
       "id": "82455",
       "name": "AHMED AL HUSAINI",
-      "department": "CHKD"
+      "department": "Import Checkers"
     },
     {
       "id": "82427",
       "name": "AHMED AL ORAIMI",
-      "department": "Flight Dispatch (Export)"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82476",
       "name": "AHMED AL RUJAIBI",
-      "department": "DOCE"
+      "department": "Documentation"
     },
     {
       "id": "82415",
       "name": "AHMED ALBALUSHI",
-      "department": "Flight Dispatch (Export)"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82473",
@@ -58,12 +58,12 @@
     {
       "id": "82459",
       "name": "ALI AL RIYAMI",
-      "department": "OPTB"
+      "department": "Import Operators"
     },
     {
       "id": "82425",
       "name": "ALI AL SHAMSI",
-      "department": "FLTB"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82496",
@@ -73,17 +73,17 @@
     {
       "id": "82566",
       "name": "ANWAR ALAMRI",
-      "department": "FLTB"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82423",
       "name": "BADAR AL BURTAMANI",
-      "department": "FLTA"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82414",
       "name": "BADAR AL BUSAIDI",
-      "department": "FLTC"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82559",
@@ -93,7 +93,7 @@
     {
       "id": "82468",
       "name": "BADAR AL FULAITI",
-      "department": "FLTB"
+      "department": "Flight Dispatch"
     },
     {
       "id": "8608",
@@ -103,27 +103,27 @@
     {
       "id": "82583",
       "name": "BADAR AL SHEHHI",
-      "department": "CHKC"
+      "department": "Import Checkers"
     },
     {
       "id": "80478",
       "name": "FARIS AL BALUSHI",
-      "department": "OPTC"
+      "department": "Import Operators"
     },
     {
       "id": "80269",
       "name": "FRITZ",
-      "department": "SUPB"
+      "department": "Supervisors"
     },
     {
       "id": "80535",
       "name": "FROILAN",
-      "department": "SUPD"
+      "department": "Supervisors"
     },
     {
       "id": "80215",
       "name": "GLENDO",
-      "department": "DOCB"
+      "department": "Documentation"
     },
     {
       "id": "82664",
@@ -133,57 +133,57 @@
     {
       "id": "82419",
       "name": "HAITHAM AL BALUSHI",
-      "department": "FLTD"
+      "department": "Flight Dispatch"
     },
     {
       "id": "8836",
       "name": "HAMED AL FAKHRI",
-      "department": "OPTE"
+      "department": "Import Operators"
     },
     {
       "id": "81991",
       "name": "HILAL AL SHAMAKHI",
-      "department": "CHKC"
+      "department": "Import Checkers"
     },
     {
       "id": "82454",
       "name": "HISHAM AL MAHARBI",
-      "department": "CHKE"
+      "department": "Import Checkers"
     },
     {
       "id": "82434",
       "name": "HISHAM AL SIYABI",
-      "department": "CHKA"
+      "department": "Import Checkers"
     },
     {
       "id": "82668",
       "name": "IBRAHIM AL HADHRAMI",
-      "department": "CHKC"
+      "department": "Import Checkers"
     },
     {
       "id": "81351",
       "name": "IBRAHIM AL QUTAITI",
-      "department": "DOCA"
+      "department": "Documentation"
     },
     {
       "id": "82331",
       "name": "ISMAIL AL MAHARBI",
-      "department": "FLTB"
+      "department": "Flight Dispatch"
     },
     {
       "id": "81983",
       "name": "JABER AL JULANDANI",
-      "department": "CHKB"
+      "department": "Import Checkers"
     },
     {
       "id": "81399",
       "name": "JAMAL AL SINANI",
-      "department": "CHKB"
+      "department": "Import Checkers"
     },
     {
       "id": "81151",
       "name": "JUMA AL HABSI",
-      "department": "OPTA"
+      "department": "Import Operators"
     },
     {
       "id": "8336",
@@ -193,47 +193,47 @@
     {
       "id": "82458",
       "name": "KHALID AL ZADJALI",
-      "department": "OPTA"
+      "department": "Import Operators"
     },
     {
       "id": "82537",
       "name": "KHALIFA AL SAADI",
-      "department": "Flight Dispatch (Export)"
+      "department": "Flight Dispatch"
     },
     {
       "id": "990751",
       "name": "KHAMIS AL KASBI",
-      "department": "OPTD"
+      "department": "Import Operators"
     },
     {
       "id": "82460",
       "name": "MAHAMAD AL MAHARBI",
-      "department": "DOCD"
+      "department": "Documentation"
     },
     {
       "id": "82665",
       "name": "MAHANAD AL HADI",
-      "department": "DOCD"
+      "department": "Documentation"
     },
     {
       "id": "82422",
       "name": "MAHIR AL BALUSHI",
-      "department": "RELE"
+      "department": "Release Control"
     },
     {
       "id": "82431",
       "name": "MAHMOOD AL BALUSHI",
-      "department": "Flight Dispatch (Export)"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82452",
       "name": "MAHMOOD AL HADIDI",
-      "department": "DOCC"
+      "department": "Documentation"
     },
     {
       "id": "82286",
       "name": "MAHMOOD AL SHAMSI",
-      "department": "CHKB"
+      "department": "Import Checkers"
     },
     {
       "id": "82049",
@@ -243,12 +243,12 @@
     {
       "id": "82535",
       "name": "MOHAMED AL MAAWALI",
-      "department": "OPTD"
+      "department": "Import Operators"
     },
     {
       "id": "82330",
       "name": "MOHAMMED AL BALUCHI",
-      "department": "OPTE"
+      "department": "Import Operators"
     },
     {
       "id": "81079",
@@ -258,7 +258,7 @@
     {
       "id": "82614",
       "name": "MOHAMMED AL MAWALI",
-      "department": "CHKE"
+      "department": "Import Checkers"
     },
     {
       "id": "82420",
@@ -268,37 +268,37 @@
     {
       "id": "82541",
       "name": "MOHAMMED AL WAHAIBI",
-      "department": "DOCA"
+      "department": "Documentation"
     },
     {
       "id": "82444",
       "name": "MOHAMMED AL YAARUBI",
-      "department": "DOCC"
+      "department": "Documentation"
     },
     {
       "id": "81259",
       "name": "MOHAMMED AL ZADJALI",
-      "department": "SUPC"
+      "department": "Supervisors"
     },
     {
       "id": "81032",
       "name": "MOHAMMED SAID",
-      "department": "SUPE"
+      "department": "Supervisors"
     },
     {
       "id": "990895",
       "name": "MOHD AL HADDABI",
-      "department": "FLTC"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82667",
       "name": "MOOSA AL BALUSHI",
-      "department": "CHKA"
+      "department": "Import Checkers"
     },
     {
       "id": "82536",
       "name": "MOOSA AL HADI",
-      "department": "RELD"
+      "department": "Release Control"
     },
     {
       "id": "82590",
@@ -308,42 +308,42 @@
     {
       "id": "82416",
       "name": "NASSER AL OMAIRI",
-      "department": "FLTC"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82107",
       "name": "OMAR AL FUTAISI",
-      "department": "CHKA"
+      "department": "Import Checkers"
     },
     {
       "id": "82435",
       "name": "QAIS AL MUKHAINI",
-      "department": "OPTB"
+      "department": "Import Operators"
     },
     {
       "id": "82409",
       "name": "QAIS AL RASHDI",
-      "department": "CHKE"
+      "department": "Import Checkers"
     },
     {
       "id": "82412",
       "name": "QASIM AL GHARIBI",
-      "department": "RELB"
+      "department": "Release Control"
     },
     {
       "id": "80834",
       "name": "SAID AL AMRI",
-      "department": "OPTB"
+      "department": "Import Operators"
     },
     {
       "id": "81152",
       "name": "SAID AL HADI",
-      "department": "RELA"
+      "department": "Release Control"
     },
     {
       "id": "82410",
       "name": "SAID AL SADI",
-      "department": "FLTA"
+      "department": "Flight Dispatch"
     },
     {
       "id": "80481",
@@ -353,12 +353,12 @@
     {
       "id": "990896",
       "name": "SAMEER MAHMOOD",
-      "department": "SUPA"
+      "department": "Supervisors"
     },
     {
       "id": "80479",
       "name": "SAMI AL HADABI",
-      "department": "FLTD"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82642",
@@ -368,7 +368,7 @@
     {
       "id": "80833",
       "name": "SULEIMAN AL MAHARBI",
-      "department": "CHKD"
+      "department": "Import Checkers"
     },
     {
       "id": "82417",
@@ -378,7 +378,7 @@
     {
       "id": "82675",
       "name": "TARIQ AL BARWANI",
-      "department": "DOCB"
+      "department": "Documentation"
     },
     {
       "id": "8901",
@@ -393,27 +393,27 @@
     {
       "id": "82470",
       "name": "WAHEB AL BARAIDAI",
-      "department": "CHKE"
+      "department": "Import Checkers"
     },
     {
       "id": "82571",
       "name": "YAARAB AL RAQADI",
-      "department": "FLTD"
+      "department": "Flight Dispatch"
     },
     {
       "id": "990786",
       "name": "YASIR AL GHARABI",
-      "department": "OPTC"
+      "department": "Import Operators"
     },
     {
       "id": "80480",
       "name": "YOUNIS AL SIYABI",
-      "department": "FLTA"
+      "department": "Flight Dispatch"
     },
     {
       "id": "82100",
       "name": "YOUSUF AL WAHEEDI",
-      "department": "DOCE"
+      "department": "Documentation"
     }
   ]
 }

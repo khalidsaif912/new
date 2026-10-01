@@ -6,8 +6,7 @@
     'import checkers',
     'release control',
     'import operators',
-    'flight dispatch (import)',
-    'flight dispatch (export)'
+    'flight dispatch'
   ];
 
   function deptTitleNorm(card) {
