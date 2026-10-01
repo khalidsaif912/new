@@ -99,7 +99,11 @@ if (Test-Path -LiteralPath $diffOld) {
         Write-Host "[EXPORT] First version for $MonthKey detected; diff will start from next update."
     } else {
         Write-Host "[EXPORT] Building auto diff for month: $MonthKey (baseline → latest)"
-        python ".\scripts\build_roster_diff.py" --old "$diffOld" --new "$newSnapshot" --kind export --month "$MonthKey" --out-dir "docs/roster-diff/data"
+        $skipArg = @()
+        if (Test-Path -LiteralPath $oldSnapshot) {
+            $skipArg = @("--skip-if-same-shifts-as", "$oldSnapshot")
+        }
+        python ".\scripts\build_roster_diff.py" --old "$diffOld" --new "$newSnapshot" --kind export --month "$MonthKey" --out-dir "docs/roster-diff/data" @skipArg
     }
 } else {
     Write-Host "[EXPORT] First version for $MonthKey detected; diff will start from next update."

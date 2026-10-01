@@ -18,7 +18,6 @@ Usage:
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import shutil
 import subprocess
@@ -67,17 +66,6 @@ def _sha256_file(path: Path) -> str:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
-
-
-def _existing_diff_payload(kind: str, month: str) -> dict | None:
-    path = ROOT / "docs" / "roster-diff" / "data" / f"{kind}-{month}.json"
-    if not path.is_file():
-        return None
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    return data if isinstance(data, dict) else None
 
 
 def before_generate() -> int:
@@ -187,33 +175,11 @@ def after_generate() -> int:
                 "--out-dir",
                 str(out_dir),
             ]
+            # Cosmetic hotfix (same shifts as last ingest): do not rewrite published diff.
+            if pre_old.is_file():
+                cmd.extend(["--skip-if-same-shifts-as", str(pre_old)])
             print("[ci_export_diff] after: build_roster_diff.py (baseline → latest) ...")
             subprocess.run(cmd, check=True)
-
-            # Safety: never publish an empty overwrite over a non-empty month diff.
-            existing = _existing_diff_payload("export", month)
-            month_file = out_dir / f"export-{month}.json"
-            if month_file.is_file():
-                try:
-                    fresh = json.loads(month_file.read_text(encoding="utf-8"))
-                except (OSError, json.JSONDecodeError):
-                    fresh = {}
-                fresh_n = int(fresh.get("total_changes") or 0) if isinstance(fresh, dict) else 0
-                old_n = int(existing.get("total_changes") or 0) if existing else 0
-                if fresh_n == 0 and old_n > 0:
-                    print(
-                        f"[ci_export_diff] after: refusing empty diff overwrite "
-                        f"(kept existing {old_n} changes)"
-                    )
-                    month_file.write_text(
-                        json.dumps(existing, ensure_ascii=False, indent=2) + "\n",
-                        encoding="utf-8",
-                    )
-                    latest = out_dir / "export-latest.json"
-                    latest.write_text(
-                        json.dumps(existing, ensure_ascii=False, indent=2) + "\n",
-                        encoding="utf-8",
-                    )
     elif not baseline.is_file():
         print("[ci_export_diff] after: first version — diff starts on next update")
 
