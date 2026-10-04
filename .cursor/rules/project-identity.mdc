@@ -18,3 +18,7 @@ When asked to open the site locally: reuse port 8011 if it already serves `docs/
 Do not push unless explicitly asked. Prefer archive over delete for legacy files.
 
 Ticker/banners/visits: edit shared `docs/*.js` and `MANTLE_CLIENT_VER` in `scripts/roster_cta_snippets.py` so new generate runs keep the fix. See `.cursor/rules/mantle-and-generate.mdc`.
+
+**PC folder (Windows):** `C:\Users\PC\Documents\GitHub\roster-site`  
+**GitHub / Pages:** `khalidsaif912/new` → `docs/`  
+**Apps modal:** `docs/site-apps.js` — Charge Screen (`chargeScreen`) replaced Read and Sign. APK + `version.json` live under `docs/charge-screen/`. Handoff: agent store `android-apps-list-handoff.md`.
