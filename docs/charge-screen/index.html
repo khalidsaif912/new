@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>شاشة الشحن — تنزيل التطبيق</title>
+  <meta name="theme-color" content="#0b0f1a" />
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #162033;
+      --text: #f2f5fa;
+      --muted: #9aa3b5;
+      --charge: #5ee89a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(94,232,154,.18), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(440px, 100%);
+      background: color-mix(in srgb, var(--card) 88%, transparent);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 28px 22px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.8rem; color: var(--charge); }
+    p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
+    .ver {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(94,232,154,.12);
+      color: var(--charge);
+      font-size: .95rem;
+    }
+    a.btn {
+      display: block;
+      width: 100%;
+      text-decoration: none;
+      background: var(--charge);
+      color: #0b0f1a;
+      font-weight: 700;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-top: 10px;
+    }
+    .notes {
+      margin-top: 18px;
+      text-align: right;
+      color: var(--muted);
+      font-size: .92rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>شاشة الشحن</h1>
+    <p>تطبيق أندرويد لعرض البطارية ومناوبة الروستر عند الشحن.</p>
+    <div class="ver" id="ver">الإصدار …</div>
+    <a class="btn" id="download" href="./ChargeScreen.apk">تنزيل التطبيق (APK)</a>
+    <div class="notes" id="notes"></div>
+  </main>
+  <script>
+    fetch('./version.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(v => {
+        document.getElementById('ver').textContent = 'الإصدار ' + v.versionName;
+        document.getElementById('download').href = v.apkUrl || './ChargeScreen.apk';
+        document.getElementById('notes').textContent = v.notes || '';
+      })
+      .catch(() => {
+        document.getElementById('ver').textContent = 'الإصدار الحالي';
+      });
+  </script>
+</body>
+</html>
