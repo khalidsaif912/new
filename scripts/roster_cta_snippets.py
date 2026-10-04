@@ -1265,7 +1265,7 @@ I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§�
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
 IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
-CHANGE_ALERT_VER = "20260928t"
+CHANGE_ALERT_VER = "20260909j"
 # Ticker + banners + visit counts (Mantle backoff/cache). Bump when those JS files change.
 MANTLE_CLIENT_VER = "20260923d"
 
@@ -1294,7 +1294,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260925a');
+    addScript(root + '/site-apps.js?v=20261004a');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
@@ -1338,7 +1338,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20260925a');
+    addScript(root + '/site-apps.js?v=20261004a');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
