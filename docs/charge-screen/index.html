@@ -3,86 +3,339 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>شاشة الشحن — تنزيل التطبيق</title>
+  <title>شاشة الشحن — Charge Screen</title>
+  <meta name="description" content="تطبيق أندرويد يعرض البطارية ومناوبة الروستر تلقائياً عند الشحن، مع ودجت للشاشة الرئيسية." />
   <meta name="theme-color" content="#0b0f1a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0b0f1a;
-      --card: #162033;
+      --bg2: #111827;
+      --card: rgba(22, 32, 51, 0.72);
+      --line: rgba(255, 255, 255, 0.08);
       --text: #f2f5fa;
       --muted: #9aa3b5;
       --charge: #5ee89a;
+      --charge-dim: rgba(94, 232, 154, 0.14);
     }
+
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100dvh;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(94,232,154,.18), transparent 45%),
-        var(--bg);
+      font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
       color: var(--text);
-      display: grid;
-      place-items: center;
-      padding: 24px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(94, 232, 154, 0.18), transparent 55%),
+        radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.08), transparent 40%),
+        linear-gradient(180deg, #0b0f1a 0%, #0e1524 100%);
     }
-    main {
-      width: min(440px, 100%);
-      background: color-mix(in srgb, var(--card) 88%, transparent);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      padding: 28px 22px;
+
+    .wrap {
+      width: min(920px, 100%);
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+
+    .hero {
       text-align: center;
-      backdrop-filter: blur(10px);
+      padding: 18px 0 8px;
+      animation: rise 0.55s ease-out both;
     }
-    h1 { margin: 0 0 8px; font-size: 1.8rem; color: var(--charge); }
-    p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
-    .ver {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 6px 12px;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
       border-radius: 999px;
-      background: rgba(94,232,154,.12);
+      background: var(--charge-dim);
       color: var(--charge);
-      font-size: .95rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 14px;
     }
+
+    .badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--charge);
+      box-shadow: 0 0 0 4px rgba(94, 232, 154, 0.18);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--charge);
+      line-height: 1.15;
+    }
+
+    .lead {
+      margin: 0 auto 18px;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.75;
+      font-weight: 400;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
     a.btn {
-      display: block;
-      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 200px;
       text-decoration: none;
+      border-radius: 16px;
+      padding: 13px 20px;
+      font-weight: 800;
+      font-size: 1.02rem;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    a.btn:hover { transform: translateY(-1px); }
+
+    a.btn-primary {
       background: var(--charge);
       color: #0b0f1a;
-      font-weight: 700;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-top: 10px;
+      box-shadow: 0 10px 28px rgba(94, 232, 154, 0.22);
     }
-    .notes {
-      margin-top: 18px;
-      text-align: right;
+
+    a.btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .ver {
+      margin: 12px 0 0;
       color: var(--muted);
-      font-size: .92rem;
+      font-size: 0.92rem;
+    }
+
+    .panel {
+      margin-top: 28px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px 20px;
+      backdrop-filter: blur(12px);
+      animation: rise 0.65s ease-out 0.08s both;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .panel > p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .features li {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .features strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--charge);
+      font-size: 1rem;
+    }
+
+    .features span {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .gallery {
+      margin-top: 28px;
+      animation: rise 0.7s ease-out 0.14s both;
+    }
+
+    .gallery h2 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .gallery-hint {
+      margin: 0 0 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .shots {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 14px;
+      align-items: end;
+    }
+
+    figure {
+      margin: 0;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 10px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    figure:hover {
+      transform: translateY(-3px);
+      border-color: rgba(94, 232, 154, 0.35);
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+      background: #0b0f1a;
+    }
+
+    figcaption {
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .notes {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
       white-space: pre-wrap;
+    }
+
+    .foot {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .foot a { color: var(--charge); text-decoration: none; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 760px) {
+      .features { grid-template-columns: 1fr; }
+      .shots { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
+      figure:nth-child(2) { order: -1; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>شاشة الشحن</h1>
-    <p>تطبيق أندرويد لعرض البطارية ومناوبة الروستر عند الشحن.</p>
-    <div class="ver" id="ver">الإصدار …</div>
-    <a class="btn" id="download" href="./ChargeScreen.apk">تنزيل التطبيق (APK)</a>
-    <div class="notes" id="notes"></div>
-  </main>
+  <div class="wrap">
+    <header class="hero">
+      <div class="badge">تطبيق أندرويد</div>
+      <h1>شاشة الشحن</h1>
+      <p class="lead">
+        تفتح تلقائياً عند توصيل الشاحن، وتعرض نسبة البطارية مع مناوبة اليوم من الروستر — بواجهة هادئة وواضحة.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" id="download" href="./ChargeScreen.apk">تنزيل التطبيق (APK)</a>
+        <a class="btn btn-ghost" href="#gallery">شاهد الشاشات</a>
+      </div>
+      <p class="ver" id="ver">الإصدار …</p>
+      <div class="notes" id="notes"></div>
+    </header>
+
+    <section class="panel" aria-labelledby="summary-title">
+      <h2 id="summary-title">ملخص بسيط</h2>
+      <p>
+        شاشة الشحن تربط لحظة الشحن بروسترك اليومي: ساعة كبيرة، حلقة بطارية حية، ومناوبة اليوم مع اسمك وجدول الأيام القادمة. ويمكنك إضافة ودجت على الشاشة الرئيسية لمتابعة الأسبوع دون فتح التطبيق.
+      </p>
+      <ul class="features">
+        <li>
+          <strong>عند الشحن</strong>
+          <span>تفتح الشاشة تلقائياً وتبقى واضحة أثناء التعبئة.</span>
+        </li>
+        <li>
+          <strong>مع الروستر</strong>
+          <span>مناوبة اليوم والأيام القادمة من جدول الصادر/الوارد.</span>
+        </li>
+        <li>
+          <strong>ودجت سريع</strong>
+          <span>ملخص أسبوعي ملون على الشاشة الرئيسية.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="gallery" id="gallery" aria-labelledby="gallery-title">
+      <h2 id="gallery-title">من داخل التطبيق</h2>
+      <p class="gallery-hint">وضع أفقي · ودجت الشاشة الرئيسية · وضع عمودي</p>
+      <div class="shots">
+        <figure>
+          <img src="./shot-portrait.jpg" alt="شاشة الشحن في الوضع العمودي مع البطارية ومناوبة اليوم" width="720" height="1280" loading="lazy" />
+          <figcaption>الوضع العمودي</figcaption>
+        </figure>
+        <figure>
+          <img src="./shot-landscape.jpg" alt="شاشة الشحن في الوضع الأفقي: البطارية يساراً والروستر يميناً" width="1280" height="720" loading="eager" />
+          <figcaption>الوضع الأفقي</figcaption>
+        </figure>
+        <figure>
+          <img src="./shot-widget.jpg" alt="ودجت الروستر على الشاشة الرئيسية مع جدول الأيام" width="720" height="1280" loading="lazy" />
+          <figcaption>ودجت الشاشة الرئيسية</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <p class="foot">
+      مرتبط بموقع الروستر ·
+      <a href="../">العودة للروستر</a>
+    </p>
+  </div>
+
   <script>
     fetch('./version.json?t=' + Date.now())
-      .then(r => r.json())
-      .then(v => {
-        document.getElementById('ver').textContent = 'الإصدار ' + v.versionName;
+      .then(function (r) { return r.json(); })
+      .then(function (v) {
+        document.getElementById('ver').textContent = 'الإصدار ' + (v.versionName || '');
         document.getElementById('download').href = v.apkUrl || './ChargeScreen.apk';
-        document.getElementById('notes').textContent = v.notes || '';
+        if (v.notes) document.getElementById('notes').textContent = v.notes;
       })
-      .catch(() => {
+      .catch(function () {
         document.getElementById('ver').textContent = 'الإصدار الحالي';
       });
   </script>
