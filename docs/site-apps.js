@@ -41,8 +41,11 @@
       alumni: 'Former Colleagues',
       ideas: 'Ideas & suggestions',
       ideasSub: 'Share ideas and rate the site',
-      readSign: 'Read and Sign',
-      readSignSub: 'Circulars & acknowledgements',
+      chargeScreen: 'Charge Screen',
+      chargeScreenSub: 'Battery & roster on charge',
+      chargeScreenVisit: 'Visit app page',
+      chargeScreenInstall: 'Install app',
+      chargeScreenDialogHint: 'Open the page or download the APK',
       spotlightBtn: 'Surprise me',
       spotlightBtnSub: 'A quick pick from the site',
       spotlightTitle: 'For you',
@@ -94,8 +97,11 @@
       alumni: 'زملاء سابقون',
       ideas: 'اقتراحات وأفكار',
       ideasSub: 'شارك فكرتك وقيّم الموقع',
-      readSign: 'إقرار',
-      readSignSub: 'التعميمات والإقرار',
+      chargeScreen: 'شاشة الشحن',
+      chargeScreenSub: 'البطارية والمناوبة عند الشحن',
+      chargeScreenVisit: 'زيارة صفحة التطبيق',
+      chargeScreenInstall: 'تثبيت التطبيق',
+      chargeScreenDialogHint: 'افتح الصفحة أو نزّل ملف التثبيت',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'اقتراح لك',
@@ -203,11 +209,12 @@
       '<path d="M26 48h12M28 54h8" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
       '<path d="M28 22h8M30 28h4" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/>' +
       '</svg>',
-    readSign:
+    chargeScreen:
       '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
-      '<rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/>' +
-      '<path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/>' +
-      '<path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<rect x="20" y="8" width="24" height="48" rx="6" fill="#86efac" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<rect x="26" y="4" width="12" height="6" rx="2" fill="#bbf7d0" stroke="#0f172a" stroke-width="2"/>' +
+      '<rect x="25" y="18" width="14" height="28" rx="3" fill="#22c55e"/>' +
+      '<path d="M32 24v10M27 29h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>' +
       '</svg>',
     games: null
   };
@@ -287,7 +294,7 @@
     ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    ensureReadSignAppLink();
+    ensureChargeScreenAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
@@ -309,7 +316,7 @@
     ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    ensureReadSignAppLink();
+    ensureChargeScreenAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     sheet.classList.add('open');
@@ -377,9 +384,13 @@
     return 'https://khalidsaif912.github.io/new/docs/ideas/';
   }
 
-  function readSignPageUrl() {
-    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/read-and-sign/';
-    return 'https://khalidsaif912.github.io/roster-site/read-and-sign/';
+  function chargeScreenPageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/charge-screen/';
+    return 'https://khalidsaif912.github.io/new/docs/charge-screen/';
+  }
+
+  function chargeScreenApkUrl() {
+    return chargeScreenPageUrl().replace(/\/?$/, '/') + 'ChargeScreen.apk';
   }
 
   function withMePageUrl() {
@@ -719,26 +730,34 @@
     if (ico) ico.innerHTML = iconForApp('ideas');
   }
 
-  function ensureReadSignAppLink() {
+  function ensureChargeScreenAppLink() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
-    var href = readSignPageUrl();
-    var existing = grid.querySelector('a.siteAppsLink[data-app-id="readSign"], .siteAppsLink--readSign');
+    // Replace Read and Sign tile with Charge Screen.
+    grid.querySelectorAll(
+      'a.siteAppsLink[data-app-id="readSign"], a.siteAppsLink--readSign'
+    ).forEach(function (el) {
+      el.parentNode && el.parentNode.removeChild(el);
+    });
+    var href = chargeScreenPageUrl();
+    var existing = grid.querySelector(
+      'a.siteAppsLink[data-app-id="chargeScreen"], .siteAppsLink--chargeScreen'
+    );
     if (!existing) {
       var card = document.createElement('a');
-      card.className = 'siteAppsLink siteAppsLink--readSign';
+      card.className = 'siteAppsLink siteAppsLink--chargeScreen';
       card.href = href;
-      card.setAttribute('data-app-id', 'readSign');
-      card.setAttribute('data-open-same', '1');
+      card.setAttribute('data-app-id', 'chargeScreen');
+      card.setAttribute('data-charge-actions', '1');
       card.innerHTML =
         '<span class="siteAppsLink-icon">' +
-        iconForApp('readSign') +
+        iconForApp('chargeScreen') +
         '</span>' +
-        '<span class="siteAppsLink-title" data-i18n="readSign">' +
-        t('readSign') +
+        '<span class="siteAppsLink-title" data-i18n="chargeScreen">' +
+        t('chargeScreen') +
         '</span>' +
-        '<span class="siteAppsLink-sub" data-i18n-sub="readSign">' +
-        t('readSignSub') +
+        '<span class="siteAppsLink-sub" data-i18n-sub="chargeScreen">' +
+        t('chargeScreenSub') +
         '</span>';
       var wa = grid.querySelector('[data-app-id="wa"]');
       if (wa && wa.nextSibling) grid.insertBefore(card, wa.nextSibling);
@@ -751,15 +770,89 @@
       existing = card;
     }
     existing.href = href;
-    existing.setAttribute('data-open-same', '1');
+    existing.className = 'siteAppsLink siteAppsLink--chargeScreen';
+    existing.setAttribute('data-app-id', 'chargeScreen');
+    existing.setAttribute('data-charge-actions', '1');
+    existing.removeAttribute('data-open-same');
     existing.removeAttribute('target');
     existing.removeAttribute('rel');
-    var tEl = existing.querySelector('[data-i18n="readSign"]');
-    var sEl = existing.querySelector('[data-i18n-sub="readSign"]');
-    if (tEl) tEl.textContent = t('readSign');
-    if (sEl) sEl.textContent = t('readSignSub');
+    var tEl = existing.querySelector('[data-i18n="chargeScreen"], [data-i18n="readSign"]');
+    var sEl = existing.querySelector('[data-i18n-sub="chargeScreen"], [data-i18n-sub="readSign"]');
+    if (tEl) {
+      tEl.setAttribute('data-i18n', 'chargeScreen');
+      tEl.textContent = t('chargeScreen');
+    }
+    if (sEl) {
+      sEl.setAttribute('data-i18n-sub', 'chargeScreen');
+      sEl.textContent = t('chargeScreenSub');
+    }
     var ico = existing.querySelector('.siteAppsLink-icon');
-    if (ico) ico.innerHTML = iconForApp('readSign');
+    if (ico) ico.innerHTML = iconForApp('chargeScreen');
+  }
+
+  function ensureChargeScreenDialog() {
+    var sheet = document.getElementById('chargeScreenActionSheet');
+    if (sheet) return sheet;
+    sheet = document.createElement('div');
+    sheet.id = 'chargeScreenActionSheet';
+    sheet.className = 'chargeScreenActionSheet';
+    sheet.setAttribute('aria-hidden', 'true');
+    sheet.innerHTML =
+      '<div class="chargeScreenActionCard" role="dialog" aria-labelledby="chargeScreenActionTitle">' +
+      '<button type="button" class="chargeScreenActionCloseX" id="chargeScreenActionCloseX" aria-label="Close">×</button>' +
+      '<div class="chargeScreenActionIcon" id="chargeScreenActionIcon"></div>' +
+      '<h2 class="chargeScreenActionTitle" id="chargeScreenActionTitle"></h2>' +
+      '<p class="chargeScreenActionHint" id="chargeScreenActionHint"></p>' +
+      '<a class="chargeScreenActionBtn chargeScreenActionBtn--visit" id="chargeScreenVisitBtn" href="#"></a>' +
+      '<a class="chargeScreenActionBtn chargeScreenActionBtn--install" id="chargeScreenInstallBtn" href="#" download></a>' +
+      '</div>';
+    document.body.appendChild(sheet);
+    sheet.addEventListener('click', function (e) {
+      if (e.target === sheet) closeChargeScreenDialog();
+    });
+    document.getElementById('chargeScreenActionCloseX').addEventListener('click', closeChargeScreenDialog);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sheet.classList.contains('open')) closeChargeScreenDialog();
+    });
+    return sheet;
+  }
+
+  function paintChargeScreenDialog() {
+    ensureChargeScreenDialog();
+    var icon = document.getElementById('chargeScreenActionIcon');
+    if (icon) icon.innerHTML = iconForApp('chargeScreen');
+    document.getElementById('chargeScreenActionTitle').textContent = t('chargeScreen');
+    document.getElementById('chargeScreenActionHint').textContent = t('chargeScreenDialogHint');
+    var visit = document.getElementById('chargeScreenVisitBtn');
+    var install = document.getElementById('chargeScreenInstallBtn');
+    if (visit) {
+      visit.textContent = t('chargeScreenVisit');
+      visit.href = chargeScreenPageUrl();
+      visit.target = '_blank';
+      visit.rel = 'noopener noreferrer';
+    }
+    if (install) {
+      install.textContent = t('chargeScreenInstall');
+      install.href = chargeScreenApkUrl();
+      install.setAttribute('download', 'ChargeScreen.apk');
+    }
+    var sheet = document.getElementById('chargeScreenActionSheet');
+    if (sheet) sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
+  }
+
+  function openChargeScreenDialog() {
+    paintChargeScreenDialog();
+    var sheet = document.getElementById('chargeScreenActionSheet');
+    if (!sheet) return;
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeChargeScreenDialog() {
+    var sheet = document.getElementById('chargeScreenActionSheet');
+    if (!sheet) return;
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
   }
 
   function withMeChipHtml() {
@@ -841,7 +934,7 @@
       );
     }
 
-    var order = ['wa', 'readSign', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var order = ['wa', 'chargeScreen', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -903,10 +996,18 @@
     ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    ensureReadSignAppLink();
+    ensureChargeScreenAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     grid.addEventListener('click', function (e) {
+      var chargeLink = e.target.closest(
+        'a.siteAppsLink[data-app-id="chargeScreen"], a.siteAppsLink--chargeScreen'
+      );
+      if (chargeLink) {
+        e.preventDefault();
+        openChargeScreenDialog();
+        return;
+      }
       if (e.target.closest('a.siteAppsLink--calc')) {
         rememberCalcReturnUrl();
         openCalcFromPwa(e);
@@ -991,7 +1092,7 @@
       '.siteAppsLink-text{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;min-width:0!important;width:100%!important;}',
       '.siteAppsLink-title,.siteAppsLink-sub{text-align:center!important;}',
       '.siteAppsLink--wa .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
-      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--chargeScreen .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#86efac)!important;border-color:#4ade80!important;}',
       '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
       '.siteAppsLink--flights .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
@@ -1029,9 +1130,20 @@
       '.siteAppsLink--book .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
       '.siteAppsLink--booklist .siteAppsLink-icon{background:linear-gradient(160deg,#fff7ed,#fdba74)!important;border-color:#fb923c!important;}',
       '.siteAppsLink--ideas .siteAppsLink-icon{background:linear-gradient(160deg,#fffbeb,#fde68a)!important;border-color:#fbbf24!important;}',
-      '.siteAppsLink--readSign .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#99f6e4)!important;border-color:#5eead4!important;}',
+      '.siteAppsLink--chargeScreen .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#86efac)!important;border-color:#4ade80!important;}',
       'a.summaryChip.withMeChip .chipVal{color:#4f46e5;}',
       'a.summaryChip.readSignChip .chipVal{color:#0f766e;}',
+      '.chargeScreenActionSheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:100140;pointer-events:none;visibility:hidden;}',
+      '.chargeScreenActionSheet.open{display:flex;pointer-events:auto;visibility:visible;}',
+      '.chargeScreenActionCard{width:min(100%,340px);background:linear-gradient(180deg,#ffffff 0%,#f5f9ff 100%);border:1px solid rgba(148,163,184,.22);border-radius:20px;padding:18px 16px 14px;box-shadow:0 22px 56px rgba(15,23,42,.28);text-align:center;position:relative;animation:spotlightPop .22s ease-out;}',
+      '.chargeScreenActionCloseX{position:absolute;top:8px;inset-inline-end:8px;width:28px;height:28px;border:none;border-radius:999px;background:rgba(15,23,42,.06);color:#64748b;font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;}',
+      '.chargeScreenActionIcon{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;margin:0 auto 10px;background:linear-gradient(160deg,#ecfdf5,#86efac);border:1px solid #4ade80;box-shadow:0 6px 14px rgba(15,23,42,.08);}',
+      '.chargeScreenActionIcon svg{width:32px;height:32px;display:block;}',
+      '.chargeScreenActionTitle{margin:0 0 4px;font-size:17px;font-weight:900;color:#0f172a;}',
+      '.chargeScreenActionHint{margin:0 0 14px;font-size:12px;line-height:1.45;color:#64748b;}',
+      '.chargeScreenActionBtn{display:block;width:100%;text-decoration:none;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:800;margin-top:8px;box-sizing:border-box;}',
+      '.chargeScreenActionBtn--visit{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}',
+      '.chargeScreenActionBtn--install{background:#22c55e;color:#052e16;border:1px solid #16a34a;}',
       '.siteAppsCloseWrap{margin-top:4px!important;flex-shrink:0;}',
       '.siteAppsCloseWrap .roster-cta-btn{width:100%;min-height:42px;padding-top:9px;padding-bottom:9px;border-radius:14px!important;}',
       '@media (hover:hover){.siteAppsLink:hover{transform:translateY(-2px)!important;box-shadow:0 10px 22px rgba(15,23,42,.1)!important;}}',
@@ -1312,9 +1424,10 @@
     ensureBookListAppLink();
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
-    ensureReadSignAppLink();
+    ensureChargeScreenAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
+    ensureChargeScreenDialog();
     if (!SPOTLIGHT_AUTO_POPUP) return;
     try {
       if (!sessionStorage.getItem('spotlightShown')) {
