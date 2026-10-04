@@ -1,6 +1,6 @@
 {
-  "versionCode": 8,
-  "versionName": "1.6.0",
-  "apkUrl": "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-  "notes": "In-app update + download page"
+    "versionCode":  9,
+    "versionName":  "1.7.0",
+    "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
+    "notes":  "Update 1.7.0 - battery, roster, in-app update"
 }
