@@ -390,7 +390,8 @@
   }
 
   function chargeScreenApkUrl() {
-    return chargeScreenPageUrl().replace(/\/?$/, '/') + 'ChargeScreen.apk';
+    // Always absolute — relative/`download` breaks APK install inside the PWA/WebView.
+    return 'https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk';
   }
 
   function withMePageUrl() {
@@ -804,13 +805,24 @@
       '<h2 class="chargeScreenActionTitle" id="chargeScreenActionTitle"></h2>' +
       '<p class="chargeScreenActionHint" id="chargeScreenActionHint"></p>' +
       '<a class="chargeScreenActionBtn chargeScreenActionBtn--visit" id="chargeScreenVisitBtn" href="#"></a>' +
-      '<a class="chargeScreenActionBtn chargeScreenActionBtn--install" id="chargeScreenInstallBtn" href="#" download></a>' +
+      '<a class="chargeScreenActionBtn chargeScreenActionBtn--install" id="chargeScreenInstallBtn" href="#"></a>' +
       '</div>';
     document.body.appendChild(sheet);
     sheet.addEventListener('click', function (e) {
       if (e.target === sheet) closeChargeScreenDialog();
     });
     document.getElementById('chargeScreenActionCloseX').addEventListener('click', closeChargeScreenDialog);
+    document.getElementById('chargeScreenInstallBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var url = chargeScreenApkUrl();
+      closeChargeScreenDialog();
+      // `download` is ignored/broken for APK on many Android browsers/PWAs —
+      // navigating to the file triggers the system package installer prompt.
+      window.setTimeout(function () {
+        window.location.assign(url);
+      }, 60);
+    });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && sheet.classList.contains('open')) closeChargeScreenDialog();
     });
@@ -834,7 +846,8 @@
     if (install) {
       install.textContent = t('chargeScreenInstall');
       install.href = chargeScreenApkUrl();
-      install.setAttribute('download', 'ChargeScreen.apk');
+      install.removeAttribute('download');
+      install.removeAttribute('target');
     }
     var sheet = document.getElementById('chargeScreenActionSheet');
     if (sheet) sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
