@@ -1,6 +1,6 @@
 {
-    "versionCode":  58,
-    "versionName":  "1.13.9",
+    "versionCode":  59,
+    "versionName":  "1.14.0",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.9 - fix crash dialog + widget toggle bottom-right"
+    "notes":  "Update 1.14.0 - widget clock + day/date with du\\\u0027a mode"
 }
