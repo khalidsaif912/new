@@ -1,6 +1,6 @@
 {
-    "versionCode":  50,
-    "versionName":  "1.13.1",
+    "versionCode":  51,
+    "versionName":  "1.13.2",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.1 - large translucent day numbers behind shifts on widget"
+    "notes":  "Update 1.13.2 - clearer day cards: large tinted date + shift pill"
 }
