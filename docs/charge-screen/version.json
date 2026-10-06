@@ -1,6 +1,6 @@
 {
-    "versionCode":  48,
-    "versionName":  "1.12.9",
+    "versionCode":  49,
+    "versionName":  "1.13.0",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.12.9 - battery, roster, in-app update"
+    "notes":  "Update 1.13.0 - notify when update available + settings tip"
 }
