@@ -1,6 +1,6 @@
 {
-    "versionCode":  60,
-    "versionName":  "1.14.1",
+    "versionCode":  61,
+    "versionName":  "1.14.2",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.14.1 - settings website link + share button"
+    "notes":  "Update 1.14.2 - widget shows full day rows only (no clipped bottom)"
 }
