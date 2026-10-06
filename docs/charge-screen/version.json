@@ -1,6 +1,6 @@
 {
-    "versionCode":  57,
-    "versionName":  "1.13.8",
+    "versionCode":  58,
+    "versionName":  "1.13.9",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.8 - English date picker + charge button under flip"
+    "notes":  "Update 1.13.9 - fix crash dialog + widget toggle bottom-right"
 }
