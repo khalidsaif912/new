@@ -1,6 +1,6 @@
 {
-    "versionCode":  52,
-    "versionName":  "1.13.3",
+    "versionCode":  53,
+    "versionName":  "1.13.4",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.3 - unified widget background + clearer Arabic fonts"
+    "notes":  "Update 1.13.4 - fix crash from widget fonts; keep clear Arabic text"
 }
