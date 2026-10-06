@@ -1,6 +1,6 @@
 {
-    "versionCode":  53,
-    "versionName":  "1.13.4",
+    "versionCode":  54,
+    "versionName":  "1.13.5",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.4 - fix crash from widget fonts; keep clear Arabic text"
+    "notes":  "Update 1.13.5 - random duas from Drive file toggle"
 }
