@@ -1,6 +1,6 @@
 {
-    "versionCode":  55,
-    "versionName":  "1.13.6",
+    "versionCode":  56,
+    "versionName":  "1.13.7",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.13.6 - highlight open settings section"
+    "notes":  "Update 1.13.7 - widget mode button: shifts / dua+grid / dua only"
 }
