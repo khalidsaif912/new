@@ -1,6 +1,8 @@
 {
-    "versionCode":  62,
-    "versionName":  "1.14.3",
+    "versionCode":  63,
+    "versionName":  "1.15.0",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.14.3 - fix topic reminders + 1-minute test"
+    "notes":  "Update 1.15.0 - anonymous real-user install counting",
+    "statsWebhook":  "",
+    "statsDashboard":  ""
 }
