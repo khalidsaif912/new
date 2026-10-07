@@ -198,8 +198,10 @@ def test_mantle_clients_survive_generate():
 
     ticker = (ROOT / "docs" / "holiday-ticker.js").read_text(encoding="utf-8")
     store = (ROOT / "docs" / "banner-store.js").read_text(encoding="utf-8")
+    announce = (ROOT / "docs" / "announce-popup.js").read_text(encoding="utf-8")
     visits = (ROOT / "docs" / "site-visits.js").read_text(encoding="utf-8")
     overlay = (ROOT / "docs" / "assets" / "banners" / "overlay.json").read_text(encoding="utf-8")
+    popups = (ROOT / "docs" / "assets" / "announce" / "popups.json").read_text(encoding="utf-8")
     snippets = (ROOT / "scripts" / "roster_cta_snippets.py").read_text(encoding="utf-8")
     gen = (ROOT / "generate_and_send.py").read_text(encoding="utf-8")
     imp = (ROOT / "generate_and_send_import.py").read_text(encoding="utf-8")
@@ -211,20 +213,28 @@ def test_mantle_clients_survive_generate():
     assert "rosterTickerStoreV1" in ticker
     assert "overlay.json" in store
     assert "rosterBannerOverlayV1" in store
+    assert "rosterAnnouncePopupsV1" in announce
+    assert "RosterAnnouncePopups" in announce
     assert "rosterMantleBackoffUntil" in visits
     assert '"removed"' in overlay
+    assert '"items"' in popups
     assert "MANTLE_CLIENT_VER" in snippets
     assert "snapshot_banner_overlay" in gen
     assert "snapshot_banner_overlay" in imp
+    assert "snapshot_announce_popups" in gen
+    assert "snapshot_announce_popups" in imp
 
     tag_ticker = "holiday-ticker.js?v=" + MANTLE_CLIENT_VER
     tag_store = "banner-store.js?v=" + MANTLE_CLIENT_VER
     tag_visits = "site-visits.js?v=" + MANTLE_CLIENT_VER
+    tag_announce = "announce-popup.js?v=" + MANTLE_CLIENT_VER
     for blob in (LOAD_LOCAL_ENHANCEMENTS_EXPORT, LOAD_LOCAL_ENHANCEMENTS_IMPORT):
         assert tag_ticker in blob
         assert tag_store in blob
         assert tag_visits in blob
+        assert tag_announce in blob
         assert blob.count("holiday-ticker.js") == 1
+        assert blob.count("announce-popup.js") == 1
 
     html = page_shell_html(
         date_label="8 September 2026",
@@ -241,4 +251,5 @@ def test_mantle_clients_survive_generate():
     assert tag_ticker in html
     assert tag_store in html
     assert tag_visits in html
+    assert tag_announce in html
 

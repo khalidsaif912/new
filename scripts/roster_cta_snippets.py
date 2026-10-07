@@ -1266,8 +1266,8 @@ I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§�
 IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
 CHANGE_ALERT_VER = "20260909j"
-# Ticker + banners + visit counts (Mantle backoff/cache). Bump when those JS files change.
-MANTLE_CLIENT_VER = "20260923d"
+# Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
+MANTLE_CLIENT_VER = "20261007a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1301,6 +1301,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
+    addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
@@ -1345,6 +1346,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
+    addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);

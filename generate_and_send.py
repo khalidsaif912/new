@@ -4078,8 +4078,9 @@ def main():
             f.write(html_now)
 
         try:
-            from mantle_overlay_snapshot import snapshot_banner_overlay
+            from mantle_overlay_snapshot import snapshot_banner_overlay, snapshot_announce_popups
             snapshot_banner_overlay(Path("docs"))
+            snapshot_announce_popups(Path("docs"))
         except Exception as e:
             print(f"WARNING: banner overlay snapshot skipped: {e}")
 
@@ -4233,8 +4234,9 @@ def main():
     write_site_last_updated_json(datetime.now(TZ))
 
     try:
-        from mantle_overlay_snapshot import snapshot_banner_overlay
+        from mantle_overlay_snapshot import snapshot_banner_overlay, snapshot_announce_popups
         snapshot_banner_overlay(Path("docs"))
+        snapshot_announce_popups(Path("docs"))
     except Exception as e:
         print(f"WARNING: banner overlay snapshot skipped: {e}")
 
