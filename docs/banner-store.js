@@ -594,7 +594,7 @@
         var href = scripts[si].src || '';
         var hm = href.match(/^(.*\/)banner-store\.js(?:\?|$)/i);
         if (hm) {
-          announceSrc = hm[1] + 'announce-popup.js?v=20261007c';
+          announceSrc = hm[1] + 'announce-popup.js?v=20261007d';
           break;
         }
       }
@@ -605,7 +605,7 @@
           var rm = path.match(/^(.*?\/(?:docs|new\/docs)\/)/);
           root = rm ? rm[1].replace(/\/$/, '') : '';
         } catch (e0) {}
-        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261007c';
+        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261007d';
       }
       var as = document.createElement('script');
       as.src = announceSrc;

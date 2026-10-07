@@ -161,6 +161,28 @@
     return 'text';
   }
 
+  function normalizeLinkUrl(u) {
+    u = String(u || '').trim();
+    if (!u) return '';
+    if (!/^https?:\/\//i.test(u)) {
+      if (/^[\w.-]+\.[\w.-]+/.test(u)) u = 'https://' + u;
+      else return '';
+    }
+    try {
+      var parsed = new URL(u);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+      return parsed.href;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function normalizeLinkLabel(label, hasUrl) {
+    label = String(label || '').trim().slice(0, 40);
+    if (label) return label;
+    return hasUrl ? 'افتح الرابط' : '';
+  }
+
   function newId() {
     var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     var out = 'a';
@@ -181,6 +203,8 @@
     if (mode === 'image' && !imageId && !safeImageData(raw._preview)) return null;
     if (mode === 'both' && !text && !title) return null;
     if (mode === 'text' && !text && !title) return null;
+    var linkUrl = normalizeLinkUrl(raw.linkUrl || raw.url || '');
+    var linkLabel = normalizeLinkLabel(raw.linkLabel || raw.buttonText || '', !!linkUrl);
     var startAt = Number(raw.startAt || raw.at || Date.now()) || Date.now();
     return {
       id: id,
@@ -188,6 +212,8 @@
       text: text,
       mode: mode,
       imageId: imageId || (mode !== 'text' ? id : ''),
+      linkUrl: linkUrl,
+      linkLabel: linkLabel,
       days: clampDays(raw.days),
       durationSec: clampDuration(raw.durationSec),
       startAt: startAt,
@@ -470,12 +496,17 @@
       '#' + ROOT_ID + ' .rap-body{padding:18px 18px 16px}',
       '#' + ROOT_ID + ' .rap-title{margin:0 0 8px;font-size:18px;font-weight:800;color:#0f172a;line-height:1.35}',
       '#' + ROOT_ID + ' .rap-text{margin:0;font-size:14px;font-weight:600;color:#334155;line-height:1.65;white-space:pre-wrap}',
-      '#' + ROOT_ID + ' .rap-actions{display:flex;gap:8px;padding:0 18px 16px;justify-content:flex-end}',
+      '#' + ROOT_ID + ' .rap-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 16px;justify-content:flex-end}',
       '#' + ROOT_ID + ' .rap-ok{border:0;border-radius:12px;min-height:40px;padding:0 16px;background:#1d4ed8;color:#fff;',
       'font:inherit;font-size:13px;font-weight:800;cursor:pointer}',
+      '#' + ROOT_ID + ' .rap-link{display:inline-flex;align-items:center;justify-content:center;border-radius:12px;min-height:40px;padding:0 16px;',
+      'background:#0f766e;color:#fff;font:inherit;font-size:13px;font-weight:800;text-decoration:none}',
+      '#' + ROOT_ID + ' .rap-card{touch-action:manipulation;-webkit-user-select:none;user-select:none}',
+      '#' + ROOT_ID + ' .rap-card.rap-paused{outline:2px solid #93c5fd}',
       '#' + ROOT_ID + ' .rap-timer{height:3px;background:#e2e8f0;overflow:hidden}',
       '#' + ROOT_ID + ' .rap-timer > i{display:block;height:100%;width:100%;background:#3b82f6;transform-origin:inline-start;',
       'animation:rapDrain linear forwards}',
+      '#' + ROOT_ID + ' .rap-timer > i.paused{animation-play-state:paused}',
       '@keyframes rapDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}',
       'body.ar #' + ROOT_ID + ' .rap-card{direction:rtl;text-align:right}',
       '@media (prefers-reduced-motion:reduce){#' + ROOT_ID + ',#' + ROOT_ID + ' .rap-card{transition:none}#' + ROOT_ID + ' .rap-timer>i{animation:none}}'
@@ -519,19 +550,65 @@
       : '';
 
     var dur = clampDuration(item.durationSec);
+    var linkUrl = normalizeLinkUrl(item.linkUrl);
+    var linkLabel = normalizeLinkLabel(item.linkLabel, !!linkUrl);
+    var linkHtml = linkUrl
+      ? '<a class="rap-link" href="' + escapeHtml(linkUrl) + '" target="_blank" rel="noopener noreferrer">' +
+          escapeHtml(linkLabel) +
+        '</a>'
+      : '';
     root.innerHTML =
       '<div class="rap-card">' +
         '<button type="button" class="rap-close" aria-label="إغلاق">×</button>' +
         imgHtml +
         bodyHtml +
-        '<div class="rap-actions"><button type="button" class="rap-ok">حسناً</button></div>' +
+        '<div class="rap-actions">' + linkHtml + '<button type="button" class="rap-ok">حسناً</button></div>' +
         '<div class="rap-timer" aria-hidden="true"><i style="animation-duration:' + dur + 's"></i></div>' +
       '</div>';
 
     var closed = false;
+    var paused = false;
+    var remainingMs = dur * 1000;
+    var endsAt = Date.now() + remainingMs;
+    var timerId = 0;
+    var card = root.querySelector('.rap-card');
+    var timerBar = root.querySelector('.rap-timer > i');
+
+    function clearAutoClose() {
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = 0;
+      }
+    }
+
+    function armAutoClose() {
+      clearAutoClose();
+      if (closed || paused) return;
+      endsAt = Date.now() + remainingMs;
+      timerId = setTimeout(function () { close(false); }, remainingMs);
+    }
+
+    function pauseTimer() {
+      if (closed || paused) return;
+      paused = true;
+      remainingMs = Math.max(0, endsAt - Date.now());
+      clearAutoClose();
+      if (card) card.classList.add('rap-paused');
+      if (timerBar) timerBar.classList.add('paused');
+    }
+
+    function resumeTimer() {
+      if (closed || !paused) return;
+      paused = false;
+      if (card) card.classList.remove('rap-paused');
+      if (timerBar) timerBar.classList.remove('paused');
+      armAutoClose();
+    }
+
     function close(fromUser) {
       if (closed) return;
       closed = true;
+      clearAutoClose();
       // Only suppress for this browser session after an explicit dismiss.
       // Auto-timeout must not hide the ad on the next page entry.
       if (fromUser) markSeen(item.id);
@@ -541,13 +618,37 @@
 
     root.querySelector('.rap-close').addEventListener('click', function () { close(true); });
     root.querySelector('.rap-ok').addEventListener('click', function () { close(true); });
+    var linkEl = root.querySelector('.rap-link');
+    if (linkEl) {
+      linkEl.addEventListener('click', function () {
+        // Visiting the link counts as interacting with the ad.
+        markSeen(item.id);
+      });
+    }
     root.addEventListener('click', function (e) {
       if (e.target === root) close(true);
     });
 
+    // Hold on the popup to pause the countdown; release to continue.
+    if (card) {
+      card.addEventListener('pointerdown', function (e) {
+        if (e.target && (e.target.closest('.rap-close') || e.target.closest('.rap-ok') || e.target.closest('.rap-link'))) {
+          return;
+        }
+        pauseTimer();
+      });
+      ['pointerup', 'pointercancel', 'pointerleave', 'lostpointercapture'].forEach(function (evt) {
+        card.addEventListener(evt, resumeTimer);
+      });
+      window.addEventListener('pointerup', resumeTimer);
+      window.addEventListener('blur', resumeTimer);
+    }
+
     document.body.appendChild(root);
-    requestAnimationFrame(function () { root.classList.add('show'); });
-    setTimeout(function () { close(false); }, dur * 1000);
+    requestAnimationFrame(function () {
+      root.classList.add('show');
+      armAutoClose();
+    });
   }
 
   async function maybeDisplay() {
@@ -587,6 +688,8 @@
       text: opts.text,
       mode: mode,
       imageId: imageId,
+      linkUrl: opts.linkUrl,
+      linkLabel: opts.linkLabel,
       days: opts.days,
       durationSec: opts.durationSec,
       startAt: Date.now(),
