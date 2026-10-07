@@ -23,7 +23,7 @@ def announce_path(docs_dir: Path) -> Path:
 def _mantle_get(url: str) -> tuple[int, str] | tuple[None, Exception]:
     req = urllib.request.Request(
         url + "?ts=generate",
-        headers={"Accept": "application/json", "X-Mantle-Key": MANTLE_KEY},
+        headers={"Accept": "application/json", "X-Mantle-Key": MANTLE_KEY, "User-Agent": "roster-site-generate/1.0"},
         method="GET",
     )
     try:
