@@ -923,7 +923,7 @@
       <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
     </div>
     <div id="popupsPanel" hidden>
-      <p class="bannerAdminIntro">نوافذ منبثقة للإعلان تظهر لزوار الموقع. اختر نصاً فقط، صورة فقط، أو نصاً مع صورة — وحدّد عدد أيام الظهور ومدة بقاء النافذة بالثواني.</p>
+      <p class="bannerAdminIntro">نوافذ منبثقة للإعلان تظهر فوراً عند الدخول. يمكن إضافة رابط يتحول إلى زر، والضغط المستمر على النافذة يوقف العدّاد حتى رفع الإصبع.</p>
       <div class="popupAdminForm" id="popupAdminForm">
         <p class="bannerUploadTitle">إضافة نافذة منبثقة</p>
         <div class="popupModeRow" role="radiogroup" aria-label="نوع المحتوى">
@@ -937,6 +937,14 @@
         <label id="popupTextWrap">النص
           <textarea id="popupText" maxlength="800" placeholder="اكتب نص الإعلان هنا"></textarea>
         </label>
+        <div class="popupAdminRow">
+          <label>رابط الزر (اختياري)
+            <input type="url" id="popupLinkUrl" maxlength="500" placeholder="https://example.com">
+          </label>
+          <label>نص زر الرابط
+            <input type="text" id="popupLinkLabel" maxlength="40" placeholder="افتح الرابط">
+          </label>
+        </div>
         <div class="popupAdminRow">
           <label>عدد أيام الظهور
             <input type="number" id="popupDays" min="1" max="90" value="3">
@@ -971,8 +979,8 @@
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20261007c"></script>
-  <script src="../announce-popup.js?v=20261007c"></script>
+  <script src="../banner-store.js?v=20261007d"></script>
+  <script src="../announce-popup.js?v=20261007d"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1535,6 +1543,7 @@
                   '<span>' + escapeHtml(popupModeLabel(it.mode)) + '</span>' +
                   '<span>' + escapeHtml(String(it.days)) + ' يوم</span>' +
                   '<span>' + escapeHtml(String(it.durationSec)) + ' ث</span>' +
+                  (it.linkUrl ? ('<span>زر: ' + escapeHtml(it.linkLabel || 'رابط') + '</span>') : '') +
                   '<span>' + (active ? ('متبقي ' + left + ' يوم') : (it.enabled ? 'منتهية' : 'متوقفة')) + '</span>' +
                 '</div>' +
                 '<div class="popupCardActions">' +
@@ -1597,6 +1606,8 @@
         const mode = selectedPopupMode();
         const title = (document.getElementById('popupTitle').value || '').trim();
         const text = (document.getElementById('popupText').value || '').trim();
+        const linkUrl = (document.getElementById('popupLinkUrl').value || '').trim();
+        const linkLabel = (document.getElementById('popupLinkLabel').value || '').trim();
         const days = Number(document.getElementById('popupDays').value || 3);
         const durationSec = Number(document.getElementById('popupDuration').value || 12);
         if (mode !== 'image' && !title && !text) {
@@ -1607,6 +1618,10 @@
           setPopupStatus('أرفق صورة للإعلان', true);
           return;
         }
+        if (linkUrl && !/^https?:\/\//i.test(linkUrl) && !/^[\w.-]+\.[\w.-]+/.test(linkUrl)) {
+          setPopupStatus('رابط الزر غير صالح', true);
+          return;
+        }
         const btn = document.getElementById('popupSaveBtn');
         if (btn) btn.disabled = true;
         setPopupStatus('جاري النشر…');
@@ -1615,12 +1630,16 @@
             mode: mode,
             title: title,
             text: text,
+            linkUrl: linkUrl,
+            linkLabel: linkLabel,
             days: days,
             durationSec: durationSec,
             file: pendingPopupFile || null
           });
           document.getElementById('popupTitle').value = '';
           document.getElementById('popupText').value = '';
+          document.getElementById('popupLinkUrl').value = '';
+          document.getElementById('popupLinkLabel').value = '';
           document.getElementById('popupDays').value = '3';
           document.getElementById('popupDuration').value = '12';
           clearPopupUploadPreview();
