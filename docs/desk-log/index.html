@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="desk-log-build" content="20260806tabs2">
+  <meta name="desk-log-build" content="20261007popups">
   <title>·</title>
   <style>
     :root {
@@ -651,10 +651,134 @@
       margin-bottom: 8px;
     }
     .bannerStatus.err { color: #fca5a5; }
+    .popupAdminForm {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed #a855f7aa;
+      background: linear-gradient(165deg, #4c1d9533, #0f172aee);
+    }
+    .popupAdminForm label {
+      display: grid;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #c4b5fd;
+    }
+    .popupAdminForm input[type="text"],
+    .popupAdminForm input[type="number"],
+    .popupAdminForm textarea,
+    .popupAdminForm select {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #e2e8f0;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
+    }
+    .popupAdminForm textarea { min-height: 78px; resize: vertical; }
+    .popupAdminRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .popupModeRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .popupModeRow label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .popupModeRow input { accent-color: #a855f7; }
+    .popupList {
+      display: grid;
+      gap: 10px;
+    }
+    .popupCard {
+      border-radius: 14px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      overflow: hidden;
+    }
+    .popupCard img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      background: #1e293b;
+    }
+    .popupCardBody {
+      padding: 10px 12px 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .popupCardBody b {
+      font-size: 13px;
+      color: #e2e8f0;
+    }
+    .popupCardBody p {
+      margin: 0;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .popupMeta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .popupMeta span {
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: #0f172a88;
+    }
+    .popupCardActions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .popupToggleBtn {
+      border: 0;
+      border-radius: 10px;
+      min-height: 32px;
+      padding: 0 10px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #1e3a8a;
+      color: #dbeafe;
+    }
+    .popupToggleBtn.off {
+      background: #334155;
+      color: #cbd5e1;
+    }
     @media (max-width: 520px) {
       .toolbar.mainTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .toolCard { grid-template-columns: 1fr; }
       .toolGo { width: 100%; }
+      .popupAdminRow { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -692,6 +816,7 @@
       <button type="button" class="chip" data-view="gaps" id="tabGaps">نواقص</button>
       <button type="button" class="chip" data-view="tools" id="tabTools">أدوات</button>
       <button type="button" class="chip" data-view="banners" id="tabBanners">بنرات</button>
+      <button type="button" class="chip" data-view="popups" id="tabPopups">إعلانات</button>
     </div>
     <div id="visitsChrome">
       <div class="toolbar">
@@ -797,9 +922,57 @@
       <div class="bannerStatus" id="bannerAdminStatus"></div>
       <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
     </div>
+    <div id="popupsPanel" hidden>
+      <p class="bannerAdminIntro">نوافذ منبثقة للإعلان تظهر لزوار الموقع. اختر نصاً فقط، صورة فقط، أو نصاً مع صورة — وحدّد عدد أيام الظهور ومدة بقاء النافذة بالثواني.</p>
+      <div class="popupAdminForm" id="popupAdminForm">
+        <p class="bannerUploadTitle">إضافة نافذة منبثقة</p>
+        <div class="popupModeRow" role="radiogroup" aria-label="نوع المحتوى">
+          <label><input type="radio" name="popupMode" value="text" checked> نص فقط</label>
+          <label><input type="radio" name="popupMode" value="image"> صورة فقط</label>
+          <label><input type="radio" name="popupMode" value="both"> نص وصورة</label>
+        </div>
+        <label>العنوان (اختياري)
+          <input type="text" id="popupTitle" maxlength="120" placeholder="مثال: تنويه مهم">
+        </label>
+        <label id="popupTextWrap">النص
+          <textarea id="popupText" maxlength="800" placeholder="اكتب نص الإعلان هنا"></textarea>
+        </label>
+        <div class="popupAdminRow">
+          <label>عدد أيام الظهور
+            <input type="number" id="popupDays" min="1" max="90" value="3">
+          </label>
+          <label>مدة الظهور (ثوانٍ)
+            <input type="number" id="popupDuration" min="3" max="300" value="12">
+          </label>
+        </div>
+        <div id="popupImageWrap" hidden>
+          <p class="bannerUploadHint">أرفق صورة (JPG / PNG / WebP). تُضغط تلقائياً قبل الرفع.</p>
+          <div class="bannerUploadActions">
+            <label class="bannerAddLabel">
+              <input type="file" id="popupAddInput" accept="image/jpeg,image/png,image/webp,image/*">
+              📁 اختيار صورة
+            </label>
+            <label class="bannerAddLabel secondary">
+              <input type="file" id="popupCameraInput" accept="image/*" capture="environment">
+              📷 كاميرا
+            </label>
+          </div>
+          <div class="bannerUploadPreview" id="popupUploadPreview">
+            <img id="popupUploadPreviewImg" alt="معاينة الإعلان">
+          </div>
+        </div>
+        <div class="bannerUploadActions">
+          <button type="button" class="bannerUploadConfirm" id="popupSaveBtn">نشر الإعلان</button>
+          <button type="button" class="chip" id="refreshPopupsBtn">تحديث القائمة</button>
+        </div>
+      </div>
+      <div class="bannerStatus" id="popupAdminStatus"></div>
+      <div class="popupList" id="popupAdminList"></div>
+    </div>
   </div>
 
-  <script src="../banner-store.js?v=20260923d"></script>
+  <script src="../banner-store.js?v=20261007a"></script>
+  <script src="../announce-popup.js?v=20261007a"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1237,7 +1410,7 @@
       }
 
       function setView(next) {
-        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1, banners: 1 };
+        const allowed = { visits: 1, devices: 1, pages: 1, phones: 1, gaps: 1, tools: 1, banners: 1, popups: 1 };
         view = allowed[next] ? next : 'visits';
         const visitRelated = view === 'visits' || view === 'devices' || view === 'pages';
         const chrome = document.getElementById('visitsChrome');
@@ -1249,6 +1422,7 @@
         document.getElementById('gapsPanel').hidden = view !== 'gaps';
         document.getElementById('toolsPanel').hidden = view !== 'tools';
         document.getElementById('bannersPanel').hidden = view !== 'banners';
+        document.getElementById('popupsPanel').hidden = view !== 'popups';
         document.querySelectorAll('#mainTabs .chip[data-view]').forEach((c) => {
           c.classList.toggle('active', c.getAttribute('data-view') === view);
         });
@@ -1256,6 +1430,7 @@
         else if (view === 'tools') loadTools();
         else if (view === 'gaps') loadGaps();
         else if (view === 'banners') loadBanners();
+        else if (view === 'popups') loadPopups();
         else loadLog();
       }
 
@@ -1264,6 +1439,206 @@
         if (!el) return;
         el.textContent = text || '';
         el.classList.toggle('err', !!isErr);
+      }
+
+      function setPopupStatus(text, isErr) {
+        const el = document.getElementById('popupAdminStatus');
+        if (!el) return;
+        el.textContent = text || '';
+        el.classList.toggle('err', !!isErr);
+      }
+
+      function selectedPopupMode() {
+        const el = document.querySelector('input[name="popupMode"]:checked');
+        return (el && el.value) || 'text';
+      }
+
+      function syncPopupModeUi() {
+        const mode = selectedPopupMode();
+        const textWrap = document.getElementById('popupTextWrap');
+        const imageWrap = document.getElementById('popupImageWrap');
+        if (textWrap) textWrap.hidden = mode === 'image';
+        if (imageWrap) imageWrap.hidden = mode === 'text';
+        if (mode === 'text') clearPopupUploadPreview();
+      }
+
+      var pendingPopupFile = null;
+
+      function clearPopupUploadPreview() {
+        pendingPopupFile = null;
+        var preview = document.getElementById('popupUploadPreview');
+        var img = document.getElementById('popupUploadPreviewImg');
+        if (preview) preview.classList.remove('show');
+        if (img) img.removeAttribute('src');
+      }
+
+      function stagePopupFile(file) {
+        if (!file) return;
+        if (!/^image\//i.test(file.type || '') && !/\.(jpe?g|png|webp)$/i.test(file.name || '')) {
+          setPopupStatus('الملف ليس صورة صالحة', true);
+          return;
+        }
+        pendingPopupFile = file;
+        var preview = document.getElementById('popupUploadPreview');
+        var img = document.getElementById('popupUploadPreviewImg');
+        if (img) img.src = URL.createObjectURL(file);
+        if (preview) preview.classList.add('show');
+        setPopupStatus('معاينة الصورة جاهزة');
+      }
+
+      async function loadPopups() {
+        const list = document.getElementById('popupAdminList');
+        if (!list || !window.RosterAnnouncePopups) {
+          if (list) list.innerHTML = '<div class="error">تعذر تحميل مدير الإعلانات</div>';
+          return;
+        }
+        list.innerHTML = '<div class="empty">جاري التحميل…</div>';
+        setPopupStatus('');
+        syncPopupModeUi();
+        try {
+          RosterAnnouncePopups.invalidateCache();
+          await RosterAnnouncePopups.loadStore(true);
+          renderPopups();
+        } catch (e) {
+          list.innerHTML = '<div class="error">تعذر تحميل الإعلانات</div>';
+          setPopupStatus('حدث خطأ أثناء التحميل', true);
+        }
+      }
+
+      function popupModeLabel(mode) {
+        if (mode === 'image') return 'صورة';
+        if (mode === 'both') return 'نص وصورة';
+        return 'نص';
+      }
+
+      function renderPopups() {
+        const api = window.RosterAnnouncePopups;
+        const list = document.getElementById('popupAdminList');
+        if (!api || !list) return;
+        const items = api.getItems();
+        if (!items.length) {
+          list.innerHTML = '<div class="empty">لا توجد نوافذ منبثقة بعد.</div>';
+          return;
+        }
+        list.innerHTML = items.map(function (it) {
+          const active = api.isActiveItem(it);
+          const left = api.remainingDays(it);
+          const title = it.title || (it.text ? it.text.slice(0, 48) : 'إعلان');
+          const body = it.text && it.title ? escapeHtml(it.text) : (!it.title && it.text ? '' : escapeHtml(it.text || ''));
+          return (
+            '<article class="popupCard" data-popup-id="' + escapeHtml(it.id) + '">' +
+              (it.mode !== 'text' ? '<img alt="" data-popup-thumb="' + escapeHtml(it.id) + '">' : '') +
+              '<div class="popupCardBody">' +
+                '<b>' + escapeHtml(title) + '</b>' +
+                (body ? '<p>' + body + '</p>' : '') +
+                '<div class="popupMeta">' +
+                  '<span>' + escapeHtml(popupModeLabel(it.mode)) + '</span>' +
+                  '<span>' + escapeHtml(String(it.days)) + ' يوم</span>' +
+                  '<span>' + escapeHtml(String(it.durationSec)) + ' ث</span>' +
+                  '<span>' + (active ? ('متبقي ' + left + ' يوم') : (it.enabled ? 'منتهية' : 'متوقفة')) + '</span>' +
+                '</div>' +
+                '<div class="popupCardActions">' +
+                  '<button type="button" class="popupToggleBtn' + (it.enabled ? '' : ' off') + '" data-toggle-popup="' + escapeHtml(it.id) + '">' +
+                    (it.enabled ? 'إيقاف' : 'تفعيل') +
+                  '</button>' +
+                  '<button type="button" class="bannerDelBtn" data-del-popup="' + escapeHtml(it.id) + '">حذف</button>' +
+                '</div>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+        bindPopupAdminActions();
+      }
+
+      function bindPopupAdminActions() {
+        document.querySelectorAll('[data-popup-thumb]').forEach(function (img) {
+          const id = img.getAttribute('data-popup-thumb');
+          if (!id || !window.RosterAnnouncePopups) return;
+          const item = RosterAnnouncePopups.getItems().find(function (it) { return it.id === id; });
+          if (!item || !item.imageId) return;
+          RosterAnnouncePopups.loadImage(item.imageId).then(function (url) {
+            if (url) img.src = url;
+          });
+        });
+        document.querySelectorAll('[data-del-popup]').forEach(function (btn) {
+          btn.onclick = async function () {
+            const id = btn.getAttribute('data-del-popup');
+            if (!id || !confirm('حذف هذا الإعلان نهائياً؟')) return;
+            setPopupStatus('جاري الحذف…');
+            try {
+              await RosterAnnouncePopups.removePopup(id);
+              setPopupStatus('تم الحذف');
+              renderPopups();
+            } catch (e) {
+              setPopupStatus('تعذر الحذف', true);
+            }
+          };
+        });
+        document.querySelectorAll('[data-toggle-popup]').forEach(function (btn) {
+          btn.onclick = async function () {
+            const id = btn.getAttribute('data-toggle-popup');
+            if (!id || !window.RosterAnnouncePopups) return;
+            const item = RosterAnnouncePopups.getItems().find(function (it) { return it.id === id; });
+            if (!item) return;
+            setPopupStatus('جاري التحديث…');
+            try {
+              await RosterAnnouncePopups.setEnabled(id, !item.enabled);
+              setPopupStatus(item.enabled ? 'تم الإيقاف' : 'تم التفعيل');
+              renderPopups();
+            } catch (e) {
+              setPopupStatus('تعذر التحديث', true);
+            }
+          };
+        });
+      }
+
+      async function savePopupFromForm() {
+        if (!window.RosterAnnouncePopups) return;
+        const mode = selectedPopupMode();
+        const title = (document.getElementById('popupTitle').value || '').trim();
+        const text = (document.getElementById('popupText').value || '').trim();
+        const days = Number(document.getElementById('popupDays').value || 3);
+        const durationSec = Number(document.getElementById('popupDuration').value || 12);
+        if (mode !== 'image' && !title && !text) {
+          setPopupStatus('أدخل عنواناً أو نصاً للإعلان', true);
+          return;
+        }
+        if (mode !== 'text' && !pendingPopupFile) {
+          setPopupStatus('أرفق صورة للإعلان', true);
+          return;
+        }
+        const btn = document.getElementById('popupSaveBtn');
+        if (btn) btn.disabled = true;
+        setPopupStatus('جاري النشر…');
+        try {
+          await RosterAnnouncePopups.addPopup({
+            mode: mode,
+            title: title,
+            text: text,
+            days: days,
+            durationSec: durationSec,
+            file: pendingPopupFile || null
+          });
+          document.getElementById('popupTitle').value = '';
+          document.getElementById('popupText').value = '';
+          document.getElementById('popupDays').value = '3';
+          document.getElementById('popupDuration').value = '12';
+          clearPopupUploadPreview();
+          setPopupStatus('تم نشر الإعلان');
+          renderPopups();
+        } catch (e) {
+          var msg = 'تعذر نشر الإعلان';
+          if (e && e.message === 'large') msg = 'الصورة كبيرة جداً حتى بعد الضغط — جرّب صورة أصغر';
+          else if (e && e.message === 'imgwrite') msg = 'فشل حفظ الصورة على السيرفر';
+          else if (e && e.message === 'save') msg = 'فشل حفظ قائمة الإعلانات';
+          else if (e && (e.message === 'store-offline' || e.code === 'rate' || e.code === 'backoff')) {
+            msg = 'الخادم مشغول الآن. أعد المحاولة بعد قليل.';
+          } else if (e && e.message === 'need-image') msg = 'أرفق صورة للإعلان';
+          else if (e && e.message === 'invalid') msg = 'بيانات الإعلان غير مكتملة';
+          setPopupStatus(msg, true);
+        } finally {
+          if (btn) btn.disabled = false;
+        }
       }
 
       async function loadBanners() {
@@ -1903,6 +2278,23 @@
       document.getElementById('refreshPhonesBtn').addEventListener('click', loadPhones);
       document.getElementById('refreshGapsBtn').addEventListener('click', loadGaps);
       document.getElementById('refreshBannersBtn').addEventListener('click', loadBanners);
+      document.getElementById('refreshPopupsBtn').addEventListener('click', loadPopups);
+      document.getElementById('popupSaveBtn').addEventListener('click', savePopupFromForm);
+      document.querySelectorAll('input[name="popupMode"]').forEach(function (r) {
+        r.addEventListener('change', syncPopupModeUi);
+      });
+      function bindPopupFileInput(id) {
+        var input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener('change', function () {
+          var file = input.files && input.files[0];
+          input.value = '';
+          stagePopupFile(file);
+        });
+      }
+      bindPopupFileInput('popupAddInput');
+      bindPopupFileInput('popupCameraInput');
+      syncPopupModeUi();
 
       var pendingBannerFile = null;
 
