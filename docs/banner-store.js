@@ -579,4 +579,39 @@
     bannersAssetPath: bannersAssetPath,
     CATALOG_BUMP_KEY: CATALOG_BUMP_KEY,
   };
+
+  // Load announcement popups on every roster page that already has banner-store.
+  try {
+    if (
+      typeof document !== 'undefined' &&
+      !/\/desk-log(\/|$)/.test(String(location.pathname || '')) &&
+      !global.RosterAnnouncePopups &&
+      !document.querySelector('script[data-announce-popup="1"]')
+    ) {
+      var announceSrc = '';
+      var scripts = document.getElementsByTagName('script');
+      for (var si = 0; si < scripts.length; si++) {
+        var href = scripts[si].src || '';
+        var hm = href.match(/^(.*\/)banner-store\.js(?:\?|$)/i);
+        if (hm) {
+          announceSrc = hm[1] + 'announce-popup.js?v=20261007c';
+          break;
+        }
+      }
+      if (!announceSrc) {
+        var root = '';
+        try {
+          var path = String(location.pathname || '');
+          var rm = path.match(/^(.*?\/(?:docs|new\/docs)\/)/);
+          root = rm ? rm[1].replace(/\/$/, '') : '';
+        } catch (e0) {}
+        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261007c';
+      }
+      var as = document.createElement('script');
+      as.src = announceSrc;
+      as.defer = true;
+      as.setAttribute('data-announce-popup', '1');
+      (document.body || document.documentElement).appendChild(as);
+    }
+  } catch (announceLoadErr) {}
 })(typeof window !== 'undefined' ? window : globalThis);

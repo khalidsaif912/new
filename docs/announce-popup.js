@@ -5,6 +5,10 @@
 (function (global) {
   'use strict';
 
+  // Avoid double-boot if HTML + banner-store both load this file.
+  if (global.__rosterAnnouncePopupBooted) return;
+  global.__rosterAnnouncePopupBooted = true;
+
   (function attachRosterMantle(g) {
     if (!g || g.RosterMantle) return;
     var BACKOFF_KEY = 'rosterMantleBackoffUntil';
@@ -251,15 +255,18 @@
       if (cached && typeof cached === 'object') store = normalizeStore(cached);
       else if (staticOv && staticOv.items.length) store = staticOv;
 
-      if (mantle().backingOff && mantle().backingOff()) {
-        storeFetchOk = !!(cached || (staticOv && staticOv.items));
+      // Prefer a live Mantle read for display even during shared backoff.
+      var mustNetwork = !!force || !(store.items && store.items.length);
+
+      if (mantle().backingOff && mantle().backingOff() && !mustNetwork) {
+        storeFetchOk = !!(cached || (staticOv && staticOv.items && staticOv.items.length));
         return store;
       }
 
       try {
         var res = await mantle().fetchRes(MANTLE_URL + '?ts=' + Date.now(), {
           headers: mantleHeaders(false),
-          force: !!force
+          force: true
         });
         if (res.status === 404) {
           store = (staticOv && staticOv.items.length) ? staticOv : { items: [], at: 0 };
@@ -522,23 +529,25 @@
       '</div>';
 
     var closed = false;
-    function close() {
+    function close(fromUser) {
       if (closed) return;
       closed = true;
-      markSeen(item.id);
+      // Only suppress for this browser session after an explicit dismiss.
+      // Auto-timeout must not hide the ad on the next page entry.
+      if (fromUser) markSeen(item.id);
       root.classList.remove('show');
       setTimeout(removeRoot, 220);
     }
 
-    root.querySelector('.rap-close').addEventListener('click', close);
-    root.querySelector('.rap-ok').addEventListener('click', close);
+    root.querySelector('.rap-close').addEventListener('click', function () { close(true); });
+    root.querySelector('.rap-ok').addEventListener('click', function () { close(true); });
     root.addEventListener('click', function (e) {
-      if (e.target === root) close();
+      if (e.target === root) close(true);
     });
 
     document.body.appendChild(root);
     requestAnimationFrame(function () { root.classList.add('show'); });
-    setTimeout(close, dur * 1000);
+    setTimeout(function () { close(false); }, dur * 1000);
   }
 
   async function maybeDisplay() {
@@ -547,7 +556,8 @@
     try {
       if (/\/desk-log(\/|$)/.test(location.pathname || '')) return;
       if (/\/ticker-board(\/|$)/.test(location.pathname || '')) return;
-      await loadStore(false);
+      // Force network so a fresh publish appears even if local cache is empty.
+      await loadStore(true);
       var active = store.items.filter(function (it) {
         return isActiveItem(it) && !wasSeenThisVisit(it.id);
       });
