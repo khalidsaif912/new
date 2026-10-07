@@ -1267,7 +1267,7 @@ IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
 CHANGE_ALERT_VER = "20260909j"
 # Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
-MANTLE_CLIENT_VER = "20261007a"
+MANTLE_CLIENT_VER = "20261007b"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1292,6 +1292,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
+  addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=20261005a');
@@ -1301,7 +1302,6 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
-    addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);
@@ -1335,6 +1335,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
   addScript(root + '/banner-store.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/banner-changer.js?v=""" + MANTLE_CLIENT_VER + """');
+  addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
   addScript(root + '/date-banner-nav.js?v=20260902a');
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
@@ -1346,7 +1347,6 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/alert-sound.js?v=20260814t');
     addScript(root + '/change-alert.js?v=""" + CHANGE_ALERT_VER + """');
     addScript(root + '/holiday-ticker.js?v=""" + MANTLE_CLIENT_VER + """');
-    addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
     addScript(root + '/feature-update-badge.js?v=20260814k');
     addScript(root + '/training-new-badge.js?v=20260819n');
     addScript(root + '/shift-swap.js?v=' + ver);

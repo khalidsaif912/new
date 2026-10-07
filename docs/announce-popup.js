@@ -85,7 +85,7 @@
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var STORE_CACHE_KEY = 'rosterAnnouncePopupsV1';
   var IMG_DISK_KEY = 'rosterAnnounceImgCacheV1';
-  var SEEN_KEY = 'rosterAnnounceSeenV1';
+  var SEEN_KEY = 'rosterAnnounceSeenSessionV1';
   var STYLE_ID = 'rosterAnnouncePopupCss';
   var ROOT_ID = 'rosterAnnouncePopupRoot';
   var ID_RE = /^a[a-z0-9]{7,31}$/i;
@@ -418,19 +418,9 @@
     return nowTs >= Number(item.startAt || 0) && nowTs < end;
   }
 
-  function muscatDayIso() {
-    var n = new Date();
-    var t = n.getTime() + n.getTimezoneOffset() * 60000 + 4 * 3600000;
-    var d = new Date(t);
-    var y = d.getUTCFullYear();
-    var mo = ('0' + (d.getUTCMonth() + 1)).slice(-2);
-    var day = ('0' + d.getUTCDate()).slice(-2);
-    return y + '-' + mo + '-' + day;
-  }
-
   function readSeen() {
     try {
-      var raw = localStorage.getItem(SEEN_KEY);
+      var raw = sessionStorage.getItem(SEEN_KEY);
       return raw ? JSON.parse(raw) : {};
     } catch (e) { return {}; }
   }
@@ -438,14 +428,14 @@
   function markSeen(id) {
     try {
       var all = readSeen();
-      all[id] = muscatDayIso();
-      localStorage.setItem(SEEN_KEY, JSON.stringify(all));
+      all[id] = 1;
+      sessionStorage.setItem(SEEN_KEY, JSON.stringify(all));
     } catch (e) {}
   }
 
-  function wasSeenToday(id) {
+  function wasSeenThisVisit(id) {
     var all = readSeen();
-    return all[id] === muscatDayIso();
+    return !!all[id];
   }
 
   function escapeHtml(s) {
@@ -559,10 +549,10 @@
       if (/\/ticker-board(\/|$)/.test(location.pathname || '')) return;
       await loadStore(false);
       var active = store.items.filter(function (it) {
-        return isActiveItem(it) && !wasSeenToday(it.id);
+        return isActiveItem(it) && !wasSeenThisVisit(it.id);
       });
       if (!active.length) return;
-      // Show newest active popup first.
+      // Show newest active popup immediately on entry.
       await showPopup(active[0]);
     } catch (e) {}
   }
@@ -651,10 +641,14 @@
 
   function bootDisplay() {
     var run = function () { maybeDisplay(); };
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(run, 900);
+    if (document.body) {
+      run();
+      return;
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
     } else {
-      document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 900); }, { once: true });
+      run();
     }
   }
 
