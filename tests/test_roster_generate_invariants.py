@@ -253,3 +253,19 @@ def test_mantle_clients_survive_generate():
     assert tag_visits in html
     assert tag_announce in html
 
+
+
+def test_roster_diff_pages_boot_and_script_tail_intact():
+    for name, boot in (
+        ("index.html", "(async function bootRosterDiff()"),
+        ("index2.html", "loadDiff(currentDiffKind);"),
+    ):
+        html = (ROOT / "docs" / "roster-diff" / name).read_text(encoding="utf-8")
+        assert boot in html, name
+        assert "banner-changer.js?v=" + "20" in html
+        for line in html.splitlines():
+            if "banner-changer.js?v=" in line:
+                assert line.rstrip().endswith("`;"), (name, line)
+        last_script = html.rsplit("<script>", 1)[-1].split("</script>", 1)[0]
+        assert last_script.count("{") == last_script.count("}"), name
+        assert last_script.count("(") == last_script.count(")"), name

@@ -1181,6 +1181,13 @@
     (function loadBannerChanger(){
       const root = getSiteRootPath();
       const s = document.createElement('script');
-      s.src = `${root}/banner-changer.js?v=20261007c"../site-visits.js?v=20261007c"></script>
+      s.src = `${root}/banner-changer.js?v=20261007d`;
+      s.defer = true;
+      document.body.appendChild(s);
+    })();
+
+    loadDiff(currentDiffKind);
+  </script>
+<script defer src="../site-visits.js?v=20261007d"></script>
 </body>
 </html>
