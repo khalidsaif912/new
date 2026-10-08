@@ -1881,13 +1881,22 @@
     (function loadBannerChanger(){
       const root = getSiteRootPath();
       const s = document.createElement('script');
-      s.src = `${root}/banner-changer.js?v=20261007c'import') {
+      s.src = `${root}/banner-changer.js?v=20261007d`;
+      s.defer = true;
+      document.body.appendChild(s);
+    })();
+
+    (async function bootRosterDiff() {
+      currentPanel = await resolveStartPanel(currentDiffKind);
+      applyDiffModeUi(currentDiffKind);
+      await loadDiff(currentDiffKind);
+      if (currentDiffKind === 'import') {
         const expBtn = document.getElementById('exportBtn');
         const impBtn = document.getElementById('importBtn');
         if (expBtn && impBtn) { expBtn.classList.add('importChip'); impBtn.classList.remove('importChip'); }
       }
     })();
   </script>
-<script defer src="../site-visits.js?v=20261007c"></script>
+<script defer src="../site-visits.js?v=20261007d"></script>
 </body>
 </html>
