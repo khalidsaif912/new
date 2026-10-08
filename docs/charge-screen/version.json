@@ -1,8 +1,8 @@
 {
-    "versionCode":  64,
-    "versionName":  "1.15.1",
+    "versionCode":  65,
+    "versionName":  "1.15.2",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.1 - simpler reminders with 24h clock",
+    "notes":  "Update 1.15.2 - fix charge-screen crash and widget mode button",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
