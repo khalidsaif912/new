@@ -1,8 +1,8 @@
 {
-    "versionCode":  68,
-    "versionName":  "1.15.5",
+    "versionCode":  69,
+    "versionName":  "1.15.6",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.5 - stop charge screen crash dialog",
+    "notes":  "Update 1.15.6 - charging notification shows once per plug-in",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
