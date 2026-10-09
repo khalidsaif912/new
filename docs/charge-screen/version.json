@@ -1,8 +1,8 @@
 {
-    "versionCode":  66,
-    "versionName":  "1.15.3",
+    "versionCode":  67,
+    "versionName":  "1.15.4",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.3 - charge buttons stay put when language changes",
+    "notes":  "Update 1.15.4 - dua button cycles dua, dua with charge, and roster with charge",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
