@@ -1,8 +1,8 @@
 {
-    "versionCode":  70,
-    "versionName":  "1.15.7",
+    "versionCode":  71,
+    "versionName":  "1.15.8",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.7 - offline duas and a charge-screen internet stop button",
+    "notes":  "Update 1.15.8 - offline button blocks only this app",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
