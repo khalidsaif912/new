@@ -1,5 +1,63 @@
 {
-  "removed": [],
-  "custom": [],
-  "at": 0
+  "removed": [
+    "banner32.jpg",
+    "banner34.jpg",
+    "banner36.jpg",
+    "banner11.jpg",
+    "banner37.jpg",
+    "banner6.jpg"
+  ],
+  "custom": [
+    {
+      "id": "b3o7tpsgz",
+      "key": "custom:b3o7tpsgz",
+      "label": "",
+      "at": 1788193301664,
+      "layout": {
+        "position": "50% 50%",
+        "positionMobile": "50% 50%"
+      }
+    },
+    {
+      "id": "bylksbjmq",
+      "key": "custom:bylksbjmq",
+      "label": "",
+      "at": 1788193311915,
+      "layout": {
+        "position": "50% 50%",
+        "positionMobile": "50% 50%"
+      }
+    },
+    {
+      "id": "by411jhlz",
+      "key": "custom:by411jhlz",
+      "label": "",
+      "at": 1788194693799,
+      "layout": {
+        "position": "50% 50%",
+        "positionMobile": "50% 50%"
+      }
+    },
+    {
+      "id": "b274vmtgh",
+      "key": "custom:b274vmtgh",
+      "label": "",
+      "at": 1788773587855,
+      "layout": {
+        "position": "50% 50%",
+        "positionMobile": "50% 50%"
+      }
+    },
+    {
+      "id": "b3uumylp8",
+      "key": "custom:b3uumylp8",
+      "label": "",
+      "at": 1788978977766,
+      "layout": {
+        "position": "50% 50%",
+        "positionMobile": "50% 50%"
+      }
+    }
+  ],
+  "at": 1788978977766
 }
