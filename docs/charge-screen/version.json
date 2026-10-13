@@ -1,8 +1,8 @@
 {
-    "versionCode":  71,
-    "versionName":  "1.15.8",
+    "versionCode":  72,
+    "versionName":  "1.15.9",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.8 - offline button blocks only this app",
+    "notes":  "Update 1.15.9 - open the charge screen when the charger is connected",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
