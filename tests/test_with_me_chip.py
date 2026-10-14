@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20261014stats5" in html
+    assert "with-me.js?v=20261014stats6" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -170,6 +170,11 @@ def test_with_me_page_exists():
     assert "rgba(255, 255, 255, .28)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
+    assert "selectStatsDept" in src
+    assert "keepStats" in src
+    assert "deptCountTone" in src
+    assert "count-green-dark" in src
+    assert "clearStatsDeptSelection" in src
     assert "parseRosterHtml" in src
     assert "ensureCoShiftStats" in src
     assert "togetherRatio" in src

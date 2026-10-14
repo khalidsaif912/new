@@ -99,7 +99,7 @@
       statsBtn: 'Department stats',
       statsBtnTitle: 'Show department counts for upcoming days',
       listBtnTitle: 'Back to colleagues list',
-      statsHint: 'Swipe for the next 5 days',
+      statsHint: 'Swipe for more days',
       statsLoading: 'Loading department counts…',
       statsEmpty: 'No department data for these days.',
       statsDept: 'Department'
@@ -153,7 +153,7 @@
       statsBtn: 'إحصائيات الأقسام',
       statsBtnTitle: 'عرض عدد الموظفين في الأقسام للأيام القادمة',
       listBtnTitle: 'العودة لقائمة الزملاء',
-      statsHint: 'اسحب لعرض 5 أيام أخرى',
+      statsHint: 'اسحب لعرض المزيد من الأيام',
       statsLoading: 'جاري تحميل أعداد الأقسام…',
       statsEmpty: 'لا توجد بيانات أقسام لهذه الأيام.',
       statsDept: 'القسم'
@@ -1549,8 +1549,15 @@
     return out;
   }
 
+  function statsWindowSize() {
+    try {
+      if (window.matchMedia && window.matchMedia('(min-width: 640px)').matches) return 7;
+    } catch (e) {}
+    return 5;
+  }
+
   function statsWindowsForDate(iso) {
-    return chunkDays(monthDayList(iso || state.date), 5);
+    return chunkDays(monthDayList(iso || state.date), statsWindowSize());
   }
 
   function statsWindowIndexForDate(iso) {
@@ -1739,6 +1746,16 @@
       if (count <= 4) return 'count-red';
       if (count === 5) return 'count-orange';
       if (count === 6) return 'count-green';
+      return 'count-green-dark';
+    }
+    if (d === 'Export Operators') {
+      if (count <= 2) return 'count-red';
+      if (count === 3) return 'count-green';
+      return 'count-green-dark';
+    }
+    if (d === 'Officers') {
+      if (count <= 1) return 'count-red';
+      if (count === 2) return 'count-green';
       return 'count-green-dark';
     }
     return '';
@@ -2282,6 +2299,15 @@
       if (t.closest('.crewCard.is-stats')) return;
       clearStatsDeptSelection();
     }, true);
+    var statsResizeTimer = null;
+    window.addEventListener('resize', function () {
+      if (!state.statsMode) return;
+      if (statsResizeTimer) window.clearTimeout(statsResizeTimer);
+      statsResizeTimer = window.setTimeout(function () {
+        state.statsWindowIndex = statsWindowIndexForDate(state.date);
+        paintStatsView();
+      }, 160);
+    });
     document.addEventListener('rosterBgTextureChange', function (e) {
       syncBannerTexture(e && e.detail ? e.detail : null);
     });
