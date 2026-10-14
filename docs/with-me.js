@@ -1542,6 +1542,20 @@
     return days;
   }
 
+  /** Selected day + upcoming days only (no past dates in the stats matrix). */
+  function statsForwardDayList(iso) {
+    var anchor = iso || state.date || muscatToday();
+    var monthDays = monthDayList(anchor);
+    if (!monthDays.length) return [];
+    var start = anchor;
+    // Never start before "today" when the selected day is in the past.
+    var today = muscatToday();
+    if (start < today) start = today;
+    if (state.minDate && start < state.minDate) start = state.minDate;
+    if (state.maxDate && start > state.maxDate) return [];
+    return monthDays.filter(function (d) { return d >= start; });
+  }
+
   function chunkDays(days, size) {
     var out = [];
     var n = size || 5;
@@ -1557,13 +1571,16 @@
   }
 
   function statsWindowsForDate(iso) {
-    return chunkDays(monthDayList(iso || state.date), statsWindowSize());
+    return chunkDays(statsForwardDayList(iso || state.date), statsWindowSize());
   }
 
   function statsWindowIndexForDate(iso) {
     var windows = statsWindowsForDate(iso);
+    var needle = iso || state.date;
+    var today = muscatToday();
+    if (needle && needle < today) needle = today;
     for (var i = 0; i < windows.length; i++) {
-      if (windows[i].indexOf(iso) !== -1) return i;
+      if (windows[i].indexOf(needle) !== -1) return i;
     }
     return 0;
   }
