@@ -1509,7 +1509,6 @@
       ' aria-label="' + escapeHtml(statsOn ? t('listBtnTitle') : t('statsBtn')) + '">';
     html += statsOn ? listIconSvg() : statsIconSvg();
     html += '</button>';
-    html += '<span class="shiftDot" aria-hidden="true"></span>';
     html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
     html += '</div>';
     if (statsOn) {
@@ -2081,10 +2080,12 @@
     style.id = 'withMeExtrasCss';
     style.textContent = [
       '.shiftChip{gap:7px;}',
-      '.shiftStatsBtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0;padding:0;border:1px solid var(--border);border-radius:999px;background:var(--surface-muted);color:var(--text-secondary);cursor:pointer;flex-shrink:0;box-shadow:none;transition:transform .15s ease,background .15s ease,border-color .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
-      '.shiftStatsBtn:hover{background:#fff;border-color:#cbd5e1;color:var(--text);}',
+      '.shiftChip .shiftDot{display:none!important;}',
+      '.shiftStatsBtn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin:0;padding:0;border:none;border-radius:999px;background:color-mix(in srgb,var(--shift-accent,#64748b) 18%,transparent);color:var(--shift-accent,#64748b);cursor:pointer;flex-shrink:0;box-shadow:none;transition:transform .15s ease,background .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
+      '.shiftStatsBtn svg{width:13px;height:13px;display:block;}',
+      '.shiftStatsBtn:hover{background:color-mix(in srgb,var(--shift-accent,#64748b) 28%,transparent);color:var(--text);}',
       '.shiftStatsBtn:active{transform:scale(.96);}',
-      '.shiftStatsBtn.is-active{background:var(--brand-soft);border-color:#93c5fd;color:var(--brand);}',
+      '.shiftStatsBtn.is-active{background:var(--brand-soft);color:var(--brand);}',
       '.deptHead{gap:8px;}',
       '.deptCount{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin:0;border-radius:999px;background:color-mix(in srgb,var(--text-muted) 14%,transparent);color:var(--text-secondary);font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;flex-shrink:0;}',
       '.deptHead .roleDot{display:none!important;}',
