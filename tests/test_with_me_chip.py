@@ -122,9 +122,13 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20261014stats4" in html
-    assert "selectStatsDept" in (ROOT / "docs" / "with-me.js").read_text(encoding="utf-8")
-    assert "keepStats" in (ROOT / "docs" / "with-me.js").read_text(encoding="utf-8")
+    assert "with-me.js?v=20261014stats5" in html
+    js = (ROOT / "docs" / "with-me.js").read_text(encoding="utf-8")
+    assert "selectStatsDept" in js
+    assert "keepStats" in js
+    assert "deptCountTone" in js
+    assert "count-green-dark" in js
+    assert "clearStatsDeptSelection" in js
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html

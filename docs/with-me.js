@@ -1596,8 +1596,10 @@
       html += '</th>';
       days.forEach(function (iso, di) {
         var n = (columns[di] && columns[di].counts && columns[di].counts[dept]) || 0;
+        var toneCls = deptCountTone(dept, n);
         var zero = n ? '' : ' is-zero';
-        html += '<td class="deptStatsCell' + zero + '"><span class="deptStatsNum">' + n + '</span></td>';
+        html += '<td class="deptStatsCell' + zero + '"><span class="deptStatsNum' +
+          (toneCls ? ' ' + toneCls : '') + '">' + n + '</span></td>';
       });
       html += '</tr>';
     });
@@ -1719,15 +1721,49 @@
     paintStatsView();
   }
 
+  function deptCountTone(dept, n) {
+    var count = parseInt(n, 10);
+    if (!isFinite(count) || count < 0) count = 0;
+    var d = String(dept || '');
+    if (d === 'Supervisors' || d === 'Inventory') {
+      if (count <= 0) return 'count-red';
+      if (count === 1) return 'count-green';
+      return 'count-green-dark';
+    }
+    if (d === 'Load Control') {
+      if (count <= 1) return 'count-red';
+      if (count === 2) return 'count-green';
+      return 'count-green-dark';
+    }
+    if (d === 'Export Checker') {
+      if (count <= 4) return 'count-red';
+      if (count === 5) return 'count-orange';
+      if (count === 6) return 'count-green';
+      return 'count-green-dark';
+    }
+    return '';
+  }
+
+  function paintStatsDeptSelection() {
+    var selected = state.statsSelectedDept || '';
+    var table = document.querySelector('#crewTrack .deptStatsTable tbody');
+    if (!table) return;
+    Array.prototype.forEach.call(table.querySelectorAll('tr[data-dept]'), function (tr) {
+      tr.classList.toggle('is-selected', !!selected && tr.getAttribute('data-dept') === selected);
+    });
+  }
+
   function selectStatsDept(dept) {
     var next = String(dept || '').trim();
     if (!next) return;
     state.statsSelectedDept = next;
-    var table = document.querySelector('#crewTrack .deptStatsTable tbody');
-    if (!table) return;
-    Array.prototype.forEach.call(table.querySelectorAll('tr[data-dept]'), function (tr) {
-      tr.classList.toggle('is-selected', tr.getAttribute('data-dept') === next);
-    });
+    paintStatsDeptSelection();
+  }
+
+  function clearStatsDeptSelection() {
+    if (!state.statsSelectedDept) return;
+    state.statsSelectedDept = '';
+    paintStatsDeptSelection();
   }
 
   function syncUrlDate(iso) {
@@ -1756,7 +1792,9 @@
       var tone = (deptIndex % 2 === 0) ? 'tone-a' : 'tone-b';
       deptIndex += 1;
       html += '<div class="deptHead ' + tone + '" data-dept="' + escapeHtml(g.dept) + '">';
-      html += '<span class="deptCount" aria-label="' + escapeHtml(String(list.length)) + '">' + list.length + '</span>';
+      var countTone = deptCountTone(g.dept, list.length);
+      html += '<span class="deptCount' + (countTone ? ' ' + countTone : '') + '" aria-label="' +
+        escapeHtml(String(list.length)) + '">' + list.length + '</span>';
       html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
       html += '</div>';
       list.forEach(function (p) {
@@ -2129,13 +2167,10 @@
       '.deptHead{gap:8px;}',
       '.deptCount{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin:0;border-radius:999px;background:color-mix(in srgb,var(--text-muted) 14%,transparent);color:var(--text-secondary);font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;flex-shrink:0;}',
       '.deptHead .roleDot{display:none!important;}',
-      '.deptHead[data-dept="Supervisors"] .deptCount{background:color-mix(in srgb,var(--dept-supervisors) 16%,transparent);color:var(--dept-supervisors);}',
-      '.deptHead[data-dept="Load Control"] .deptCount{background:color-mix(in srgb,var(--dept-load) 16%,transparent);color:var(--dept-load);}',
-      '.deptHead[data-dept="Export Checker"] .deptCount{background:color-mix(in srgb,var(--dept-checker) 16%,transparent);color:var(--dept-checker);}',
-      '.deptHead[data-dept="Export Operators"] .deptCount{background:color-mix(in srgb,var(--dept-ops) 16%,transparent);color:var(--dept-ops);}',
-      '.deptHead[data-dept="Officers"] .deptCount{background:color-mix(in srgb,var(--dept-officers) 16%,transparent);color:var(--dept-officers);}',
-      '.deptHead[data-dept="Flight Dispatch"] .deptCount,.deptHead[data-dept="Flight Dispatch (Export)"] .deptCount,.deptHead[data-dept="Flight Dispatch (Import)"] .deptCount{background:color-mix(in srgb,var(--dept-flight) 16%,transparent);color:var(--dept-flight);}',
-      '.deptHead[data-dept="FLTA"] .deptCount{background:color-mix(in srgb,var(--dept-flta) 16%,transparent);color:var(--dept-flta);}',
+      '.deptCount.count-red,.deptStatsNum.count-red{background:#fecaca!important;color:#b91c1c!important;}',
+      '.deptCount.count-orange,.deptStatsNum.count-orange{background:#ffedd5!important;color:#c2410c!important;}',
+      '.deptCount.count-green,.deptStatsNum.count-green{background:#bbf7d0!important;color:#15803d!important;}',
+      '.deptCount.count-green-dark,.deptStatsNum.count-green-dark{background:#15803d!important;color:#fff!important;}',
       '.deptStatsPanel{padding:10px 10px 12px;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);}',
       '.deptStatsHint{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;}',
       '.deptStatsRange{margin:0 0 10px;font-size:12px;font-weight:800;color:var(--text);text-align:center;letter-spacing:-.01em;}',
@@ -2147,10 +2182,9 @@
       '.deptStatsDeptCol{width:34%;text-align:start!important;padding-inline:10px 6px!important;}',
       '.deptStatsTable tbody tr{cursor:pointer;transition:background .15s ease,box-shadow .15s ease;}',
       '.deptStatsTable tbody tr.tone-b{background:#fafbfc;}',
-      '.deptStatsTable tbody tr:hover{background:color-mix(in srgb,var(--shift-accent,#64748b) 8%,#fff);}',
-      '.deptStatsTable tbody tr.is-selected,.deptStatsTable tbody tr.tone-a.is-selected,.deptStatsTable tbody tr.tone-b.is-selected{background:color-mix(in srgb,var(--shift-accent,#64748b) 18%,#fff)!important;box-shadow:inset 3px 0 0 var(--shift-accent,#64748b);}',
-      '.deptStatsTable tbody tr.is-selected .deptStatsDeptLabel{color:var(--text);font-weight:800;}',
-      '.deptStatsTable tbody tr.is-selected .deptStatsNum{background:color-mix(in srgb,var(--shift-accent,#64748b) 26%,transparent);color:var(--text);}',
+      '.deptStatsTable tbody tr:hover:not(.is-selected){background:color-mix(in srgb,var(--shift-accent,#64748b) 8%,#fff);}',
+      '.deptStatsTable tbody tr.is-selected,.deptStatsTable tbody tr.tone-a.is-selected,.deptStatsTable tbody tr.tone-b.is-selected{background:#dbeafe!important;box-shadow:inset 3px 0 0 #2563eb;}',
+      '.deptStatsTable tbody tr.is-selected .deptStatsDeptLabel{color:#1e3a8a;font-weight:800;}',
       '.deptStatsDayName{display:block;font-size:10px;font-weight:700;color:var(--text-muted);line-height:1.1;}',
       '.deptStatsDayNum{display:block;margin-top:2px;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;}',
       '.deptStatsDeptCol .roleDot{display:inline-block;width:6px;height:6px;border-radius:999px;margin-inline-end:6px;vertical-align:middle;background:var(--dept-default);}',
@@ -2167,7 +2201,7 @@
       'tr[data-dept="Release Control"] .roleDot{background:#0891b2;}',
       '.deptStatsDeptLabel{display:inline;font-size:11px;font-weight:700;color:var(--text-secondary);line-height:1.25;vertical-align:middle;}',
       '.deptStatsNum{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--shift-accent,#64748b) 14%,transparent);color:var(--text);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;}',
-      '.deptStatsCell.is-zero .deptStatsNum{background:#f1f5f9;color:#94a3b8;}',
+      '.deptStatsCell.is-zero .deptStatsNum:not([class*="count-"]){background:#f1f5f9;color:#94a3b8;}',
       '.deptStatsDots{display:flex;justify-content:center;gap:6px;margin-top:10px;}',
       '.deptStatsDot{width:6px;height:6px;border-radius:999px;background:#cbd5e1;}',
       '.deptStatsDot.is-active{background:var(--brand);width:16px;}',
@@ -2240,6 +2274,14 @@
         selectStatsDept(deptRow.getAttribute('data-dept') || '');
       }
     });
+    document.addEventListener('pointerdown', function (e) {
+      if (!state.statsMode || !state.statsSelectedDept) return;
+      var t = e.target;
+      if (!t || !t.closest) return;
+      // Keep highlight while interacting inside the stats card; clear only outside.
+      if (t.closest('.crewCard.is-stats')) return;
+      clearStatsDeptSelection();
+    }, true);
     document.addEventListener('rosterBgTextureChange', function (e) {
       syncBannerTexture(e && e.detail ? e.detail : null);
     });
