@@ -1502,8 +1502,6 @@
     var html = '';
     html += '<div class="crewSummary ' + shiftClass + '" data-shift="' + escapeHtml(shiftKey) + '">';
     html += '<div class="shiftChip">';
-    html += '<span class="shiftDot" aria-hidden="true"></span>';
-    html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
     html += '<button type="button" class="shiftStatsBtn' + (statsOn ? ' is-active' : '') + '"' +
       ' data-shift="' + escapeHtml(shiftKey) + '"' +
       ' aria-pressed="' + (statsOn ? 'true' : 'false') + '"' +
@@ -1511,6 +1509,8 @@
       ' aria-label="' + escapeHtml(statsOn ? t('listBtnTitle') : t('statsBtn')) + '">';
     html += statsOn ? listIconSvg() : statsIconSvg();
     html += '</button>';
+    html += '<span class="shiftDot" aria-hidden="true"></span>';
+    html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
     html += '</div>';
     if (statsOn) {
       html += '<span class="crewCount">' + escapeHtml(t('statsBtn')) + '</span>';
@@ -1733,9 +1733,8 @@
       var tone = (deptIndex % 2 === 0) ? 'tone-a' : 'tone-b';
       deptIndex += 1;
       html += '<div class="deptHead ' + tone + '" data-dept="' + escapeHtml(g.dept) + '">';
-      html += '<span class="roleDot" aria-hidden="true"></span>';
-      html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
       html += '<span class="deptCount" aria-label="' + escapeHtml(String(list.length)) + '">' + list.length + '</span>';
+      html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
       html += '</div>';
       list.forEach(function (p) {
         var id = personDisplayId(p);
@@ -2087,7 +2086,8 @@
       '.shiftStatsBtn:active{transform:scale(.96);}',
       '.shiftStatsBtn.is-active{background:var(--brand-soft);border-color:#93c5fd;color:var(--brand);}',
       '.deptHead{gap:8px;}',
-      '.deptCount{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-inline-start:2px;border-radius:999px;background:color-mix(in srgb,var(--text-muted) 14%,transparent);color:var(--text-secondary);font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;flex-shrink:0;}',
+      '.deptCount{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin:0;border-radius:999px;background:color-mix(in srgb,var(--text-muted) 14%,transparent);color:var(--text-secondary);font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;flex-shrink:0;}',
+      '.deptHead .roleDot{display:none!important;}',
       '.deptHead[data-dept="Supervisors"] .deptCount{background:color-mix(in srgb,var(--dept-supervisors) 16%,transparent);color:var(--dept-supervisors);}',
       '.deptHead[data-dept="Load Control"] .deptCount{background:color-mix(in srgb,var(--dept-load) 16%,transparent);color:var(--dept-load);}',
       '.deptHead[data-dept="Export Checker"] .deptCount{background:color-mix(in srgb,var(--dept-checker) 16%,transparent);color:var(--dept-checker);}',
