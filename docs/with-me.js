@@ -1865,10 +1865,9 @@
     var row = dayFromSchedule(iso);
     var shiftKey = row && row.shift_group ? row.shift_group : '';
 
-    // Stay in stats mode when the date changes; refresh the matrix for the new day.
-    if (keepStats) {
-      if (shiftKey && !REST_GROUPS[shiftKey]) state.statsShiftKey = shiftKey;
-      else if (keepShift) state.statsShiftKey = keepShift;
+    // Stay in stats only on work days. Off / leave must leave the stats table.
+    if (keepStats && shiftKey && !REST_GROUPS[shiftKey]) {
+      state.statsShiftKey = shiftKey || keepShift;
       state.statsMode = !!state.statsShiftKey;
       if (state.statsMode) {
         state.statsWindowIndex = statsWindowIndexForDate(iso);
