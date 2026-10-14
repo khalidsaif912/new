@@ -265,7 +265,8 @@
     statsMode: false,
     statsShiftKey: '',
     statsWindowIndex: 0,
-    statsToken: 0
+    statsToken: 0,
+    statsSelectedDept: ''
   };
 
   var namesArPromise = null;
@@ -1587,7 +1588,8 @@
     html += '</tr></thead><tbody>';
     depts.forEach(function (dept, idx) {
       var tone = idx % 2 === 0 ? 'tone-a' : 'tone-b';
-      html += '<tr class="' + tone + '" data-dept="' + escapeHtml(dept) + '">';
+      var selected = state.statsSelectedDept && state.statsSelectedDept === dept ? ' is-selected' : '';
+      html += '<tr class="' + tone + selected + '" data-dept="' + escapeHtml(dept) + '">';
       html += '<th scope="row" class="deptStatsDeptCol">';
       html += '<span class="roleDot" aria-hidden="true"></span>';
       html += '<span class="deptStatsDeptLabel">' + escapeHtml(deptLabel(dept)) + '</span>';
@@ -1705,14 +1707,36 @@
     if (state.statsMode) {
       state.statsMode = false;
       state.statsShiftKey = '';
+      state.statsSelectedDept = '';
       renderDay(state.date, '');
       return;
     }
     if (!shiftKey || REST_GROUPS[shiftKey]) return;
     state.statsMode = true;
     state.statsShiftKey = shiftKey;
+    state.statsSelectedDept = '';
     state.statsWindowIndex = statsWindowIndexForDate(state.date);
     paintStatsView();
+  }
+
+  function selectStatsDept(dept) {
+    var next = String(dept || '').trim();
+    if (!next) return;
+    state.statsSelectedDept = next;
+    var table = document.querySelector('#crewTrack .deptStatsTable tbody');
+    if (!table) return;
+    Array.prototype.forEach.call(table.querySelectorAll('tr[data-dept]'), function (tr) {
+      tr.classList.toggle('is-selected', tr.getAttribute('data-dept') === next);
+    });
+  }
+
+  function syncUrlDate(iso) {
+    try {
+      var url = new URL(location.href);
+      url.searchParams.set('date', iso);
+      if (state.empId) url.searchParams.set('emp', state.empId);
+      history.replaceState({ date: iso }, '', url);
+    } catch (e) {}
   }
 
   function renderGroups(groups, shiftKey, selfId) {
@@ -1759,15 +1783,35 @@
   }
 
   function renderDay(iso, anim) {
+    var keepStats = state.statsMode;
+    var keepShift = state.statsShiftKey;
     state.date = iso;
-    state.statsMode = false;
-    state.statsShiftKey = '';
     paintChrome();
     syncShiftStrip(iso, anim !== '');
     var track = document.getElementById('crewTrack');
     if (!track) return;
     var row = dayFromSchedule(iso);
     var shiftKey = row && row.shift_group ? row.shift_group : '';
+
+    // Stay in stats mode when the date changes; refresh the matrix for the new day.
+    if (keepStats) {
+      if (shiftKey && !REST_GROUPS[shiftKey]) state.statsShiftKey = shiftKey;
+      else if (keepShift) state.statsShiftKey = keepShift;
+      state.statsMode = !!state.statsShiftKey;
+      if (state.statsMode) {
+        state.statsWindowIndex = statsWindowIndexForDate(iso);
+        setLoading(false);
+        var emptyKeep = document.getElementById('crewEmpty');
+        if (emptyKeep) emptyKeep.hidden = true;
+        paintStatsView();
+        prefetch(iso);
+        syncUrlDate(iso);
+        return;
+      }
+    }
+
+    state.statsMode = false;
+    state.statsShiftKey = '';
     setLoading(true);
     document.getElementById('crewEmpty').hidden = true;
 
@@ -1786,12 +1830,7 @@
         stretchArabicNames();
       }
       prefetch(iso);
-      try {
-        var url = new URL(location.href);
-        url.searchParams.set('date', iso);
-        if (state.empId) url.searchParams.set('emp', state.empId);
-        history.replaceState({ date: iso }, '', url);
-      } catch (e) {}
+      syncUrlDate(iso);
     }
 
     if (!shiftKey) {
@@ -2035,6 +2074,7 @@
     state.statsMode = false;
     state.statsShiftKey = '';
     state.statsWindowIndex = 0;
+    state.statsSelectedDept = '';
     state.coShift = {
       token: '',
       workDays: 0,
@@ -2105,7 +2145,12 @@
       '.deptStatsTable th,.deptStatsTable td{padding:8px 4px;text-align:center;border-block-end:1px solid #eef2f7;vertical-align:middle;}',
       '.deptStatsTable thead th{background:#f8fafc;padding-block:8px 7px;}',
       '.deptStatsDeptCol{width:34%;text-align:start!important;padding-inline:10px 6px!important;}',
+      '.deptStatsTable tbody tr{cursor:pointer;transition:background .15s ease,box-shadow .15s ease;}',
       '.deptStatsTable tbody tr.tone-b{background:#fafbfc;}',
+      '.deptStatsTable tbody tr:hover{background:color-mix(in srgb,var(--shift-accent,#64748b) 8%,#fff);}',
+      '.deptStatsTable tbody tr.is-selected,.deptStatsTable tbody tr.tone-a.is-selected,.deptStatsTable tbody tr.tone-b.is-selected{background:color-mix(in srgb,var(--shift-accent,#64748b) 18%,#fff)!important;box-shadow:inset 3px 0 0 var(--shift-accent,#64748b);}',
+      '.deptStatsTable tbody tr.is-selected .deptStatsDeptLabel{color:var(--text);font-weight:800;}',
+      '.deptStatsTable tbody tr.is-selected .deptStatsNum{background:color-mix(in srgb,var(--shift-accent,#64748b) 26%,transparent);color:var(--text);}',
       '.deptStatsDayName{display:block;font-size:10px;font-weight:700;color:var(--text-muted);line-height:1.1;}',
       '.deptStatsDayNum{display:block;margin-top:2px;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;}',
       '.deptStatsDeptCol .roleDot{display:inline-block;width:6px;height:6px;border-radius:999px;margin-inline-end:6px;vertical-align:middle;background:var(--dept-default);}',
@@ -2182,10 +2227,18 @@
     });
     document.getElementById('crewTrack')?.addEventListener('click', function (e) {
       var btn = e.target.closest('.shiftStatsBtn');
-      if (!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      toggleStatsMode(btn.getAttribute('data-shift') || state.statsShiftKey || '');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleStatsMode(btn.getAttribute('data-shift') || state.statsShiftKey || '');
+        return;
+      }
+      var deptRow = e.target.closest('.deptStatsTable tbody tr[data-dept]');
+      if (deptRow) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectStatsDept(deptRow.getAttribute('data-dept') || '');
+      }
     });
     document.addEventListener('rosterBgTextureChange', function (e) {
       syncBannerTexture(e && e.detail ? e.detail : null);
