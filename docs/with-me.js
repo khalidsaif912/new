@@ -1883,6 +1883,7 @@
 
     state.statsMode = false;
     state.statsShiftKey = '';
+    state.statsSelectedDept = '';
     setLoading(true);
     document.getElementById('crewEmpty').hidden = true;
 
