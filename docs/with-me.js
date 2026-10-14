@@ -99,10 +99,12 @@
       statsBtn: 'Department stats',
       statsBtnTitle: 'Show department counts for upcoming days',
       listBtnTitle: 'Back to colleagues list',
-      statsHint: 'Swipe for more days',
+      statsHint: 'Swipe or use arrows for more days',
       statsLoading: 'Loading department counts…',
       statsEmpty: 'No department data for these days.',
-      statsDept: 'Department'
+      statsDept: 'Department',
+      statsPrev: 'Previous days',
+      statsNext: 'Next days'
     },
     ar: {
       titleMain: 'معي',
@@ -153,10 +155,12 @@
       statsBtn: 'إحصائيات الأقسام',
       statsBtnTitle: 'عرض عدد الموظفين في الأقسام للأيام القادمة',
       listBtnTitle: 'العودة لقائمة الزملاء',
-      statsHint: 'اسحب لعرض المزيد من الأيام',
+      statsHint: 'اسحب أو استخدم الأسهم للمزيد من الأيام',
       statsLoading: 'جاري تحميل أعداد الأقسام…',
       statsEmpty: 'لا توجد بيانات أقسام لهذه الأيام.',
-      statsDept: 'القسم'
+      statsDept: 'القسم',
+      statsPrev: 'الأيام السابقة',
+      statsNext: 'الأيام التالية'
     }
   };
 
@@ -1641,6 +1645,29 @@
     return html;
   }
 
+  function renderStatsNavWrap(bodyHtml, meta) {
+    var count = (meta && meta.windowCount) || 0;
+    var idx = (meta && meta.windowIndex) || 0;
+    var canPrev = count > 1 && idx > 0;
+    var canNext = count > 1 && idx < count - 1;
+    var html = '<div class="deptStatsNav">';
+    html += '<button type="button" class="deptStatsNavBtn deptStatsNavBtn--prev"' +
+      ' data-stats-nav="-1"' +
+      (canPrev ? '' : ' disabled') +
+      ' aria-label="' + escapeHtml(t('statsPrev')) + '" title="' + escapeHtml(t('statsPrev')) + '">' +
+      '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>' +
+      '</button>';
+    html += '<div class="deptStatsNavMain">' + bodyHtml + '</div>';
+    html += '<button type="button" class="deptStatsNavBtn deptStatsNavBtn--next"' +
+      ' data-stats-nav="1"' +
+      (canNext ? '' : ' disabled') +
+      ' aria-label="' + escapeHtml(t('statsNext')) + '" title="' + escapeHtml(t('statsNext')) + '">' +
+      '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>' +
+      '</button>';
+    html += '</div>';
+    return html;
+  }
+
   function renderStatsShell(shiftKey, bodyHtml, meta) {
     var shiftClass = shiftCssClass(shiftKey);
     var html = '<div class="crewCard ' + shiftClass + ' is-stats">';
@@ -1650,7 +1677,7 @@
     if (meta && meta.rangeLabel) {
       html += '<p class="deptStatsRange">' + escapeHtml(meta.rangeLabel) + '</p>';
     }
-    html += bodyHtml;
+    html += renderStatsNavWrap(bodyHtml, meta || {});
     html += renderStatsDots(meta && meta.windowCount, meta && meta.windowIndex);
     html += '</div></div>';
     return html;
@@ -2209,6 +2236,15 @@
       '.deptStatsHint{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;}',
       '.deptStatsRange{margin:0 0 10px;font-size:12px;font-weight:800;color:var(--text);text-align:center;letter-spacing:-.01em;}',
       '.deptStatsLoading,.deptStatsEmpty{margin:8px 4px 4px;padding:18px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);}',
+      '.deptStatsNav{position:relative;display:block;width:100%;}',
+      '.deptStatsNavMain{width:100%;min-width:0;}',
+      '.deptStatsNavBtn{position:absolute;top:50%;z-index:3;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:0;padding:0;border:1px solid #e2e8f0;border-radius:999px;background:rgba(255,255,255,.92);color:#475569;box-shadow:0 1px 4px rgba(15,23,42,.08);cursor:pointer;transform:translateY(-50%);-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
+      '.deptStatsNavBtn--prev{left:2px;}',
+      '.deptStatsNavBtn--next{right:2px;}',
+      '.deptStatsNavBtn:hover:not(:disabled){background:#fff;color:#0f172a;border-color:#cbd5e1;}',
+      '.deptStatsNavBtn:active:not(:disabled){transform:translateY(-50%) scale(.96);}',
+      '.deptStatsNavBtn:disabled{opacity:.28;cursor:default;box-shadow:none;}',
+      '.deptStatsNavBtn svg{display:block;pointer-events:none;}',
       '.deptStatsScroll{width:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:#fff;}',
       '.deptStatsTable{width:100%;border-collapse:collapse;table-layout:fixed;}',
       '.deptStatsTable th,.deptStatsTable td{padding:8px 4px;text-align:center;border-block-end:1px solid #eef2f7;vertical-align:middle;}',
@@ -2294,6 +2330,15 @@
       if (e.key === 'Escape') closePicker();
     });
     document.getElementById('crewTrack')?.addEventListener('click', function (e) {
+      var navBtn = e.target.closest('.deptStatsNavBtn');
+      if (navBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (navBtn.disabled) return;
+        var delta = parseInt(navBtn.getAttribute('data-stats-nav') || '0', 10);
+        if (delta) shiftStatsWindow(delta);
+        return;
+      }
       var btn = e.target.closest('.shiftStatsBtn');
       if (btn) {
         e.preventDefault();
