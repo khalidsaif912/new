@@ -122,7 +122,7 @@ def test_with_me_page_exists():
     assert "shiftStrip" in html
     assert "shiftStripWrap" in html
     assert "with-me.js" in html
-    assert "with-me.js?v=20260902wash" in html
+    assert "with-me.js?v=20261014stats6" in html
     assert "bg-texture-shuffle.js" in html
     assert "rosterBgTextureV1" in html
     assert "rosterWithMeBannerTextureV1" in html
@@ -170,6 +170,11 @@ def test_with_me_page_exists():
     assert "rgba(255, 255, 255, .28)" in html
     assert "-webkit-box-reflect" not in html
     src = js.read_text(encoding="utf-8")
+    assert "selectStatsDept" in src
+    assert "keepStats" in src
+    assert "deptCountTone" in src
+    assert "count-green-dark" in src
+    assert "clearStatsDeptSelection" in src
     assert "parseRosterHtml" in src
     assert "ensureCoShiftStats" in src
     assert "togetherRatio" in src
@@ -234,11 +239,15 @@ def test_with_me_page_exists():
     assert "status" not in flatten
     render = src[src.find("function renderGroups") : src.find("function renderDay")]
     assert "crewCard" in render
-    assert "crewSummary" in render
-    assert "shiftDot" in render
-    assert "shiftCssClass(shiftKey)" in render
+    assert "crewSummary" in render or "renderShiftSummary" in src
+    assert "shiftDot" in src
+    assert "shiftCssClass(shiftKey)" in src
     assert 'class="crewCard \' + shiftClass + \'"' in render
     assert "deptHead" in render
+    assert "deptCount" in render
+    assert "shiftStatsBtn" in src
+    assert "paintStatsView" in src
+    assert "deptStatsTable" in src
     assert "empRow" in render
     assert "empTogetherTrack" not in render
     assert "togetherRatio" in render or "togetherRatio" in src
@@ -271,9 +280,9 @@ def test_with_me_page_exists():
     )
 
 
-def test_site_apps_keeps_read_sign_in_window_not_banner():
+def test_site_apps_keeps_charge_screen_in_window_not_banner():
     src = (ROOT / "docs" / "site-apps.js").read_text(encoding="utf-8")
-    assert "ensureReadSignAppLink" in src
+    assert "ensureChargeScreenAppLink" in src
     assert "ensureBookListAppLink" in src
     assert "siteAppsLink--booklist" in src
     assert "bookListPageUrl" in src
@@ -283,7 +292,8 @@ def test_site_apps_keeps_read_sign_in_window_not_banner():
     )
     assert "ensureWithMeChip" in src
     assert "ensureReadSignSummaryChip" not in src
-    assert "siteAppsLink--readSign" in src
+    assert "siteAppsLink--chargeScreen" in src
+    assert "/charge-screen/" in src
     assert "/with-me/" in src
 
 
@@ -345,7 +355,7 @@ if __name__ == "__main__":
     test_patch_apps_ver()
     test_live_date_page_has_morning_officers()
     test_with_me_page_exists()
-    test_site_apps_keeps_read_sign_in_window_not_banner()
+    test_site_apps_keeps_charge_screen_in_window_not_banner()
     test_generator_uses_with_me_chip()
     test_roster_fragment_morning_only()
     print("ok")
