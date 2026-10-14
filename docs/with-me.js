@@ -95,7 +95,14 @@
       secretBad: 'Incorrect secret PIN.',
       togetherYou: 'You — every day this month',
       togetherOne: '1 day with you this month',
-      togetherMany: ' days with you this month'
+      togetherMany: ' days with you this month',
+      statsBtn: 'Department stats',
+      statsBtnTitle: 'Show department counts for upcoming days',
+      listBtnTitle: 'Back to colleagues list',
+      statsHint: 'Swipe for the next 5 days',
+      statsLoading: 'Loading department counts…',
+      statsEmpty: 'No department data for these days.',
+      statsDept: 'Department'
     },
     ar: {
       titleMain: 'معي',
@@ -142,7 +149,14 @@
       secretBad: 'الرقم السري غير صحيح.',
       togetherYou: 'أنت — طوال أيام الشهر',
       togetherOne: 'يوم واحد معك هذا الشهر',
-      togetherMany: ' أيام معك هذا الشهر'
+      togetherMany: ' أيام معك هذا الشهر',
+      statsBtn: 'إحصائيات الأقسام',
+      statsBtnTitle: 'عرض عدد الموظفين في الأقسام للأيام القادمة',
+      listBtnTitle: 'العودة لقائمة الزملاء',
+      statsHint: 'اسحب لعرض 5 أيام أخرى',
+      statsLoading: 'جاري تحميل أعداد الأقسام…',
+      statsEmpty: 'لا توجد بيانات أقسام لهذه الأيام.',
+      statsDept: 'القسم'
     }
   };
 
@@ -247,7 +261,11 @@
       counts: Object.create(null),
       ready: false,
       promise: null
-    }
+    },
+    statsMode: false,
+    statsShiftKey: '',
+    statsWindowIndex: 0,
+    statsToken: 0
   };
 
   var namesArPromise = null;
@@ -1461,18 +1479,249 @@
     });
   }
 
+  function statsIconSvg() {
+    return (
+      '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M4 19V5"/><path d="M4 19h16"/>' +
+      '<path d="M8 16V10"/><path d="M12 16V7"/><path d="M16 16v-5"/>' +
+      '</svg>'
+    );
+  }
+
+  function listIconSvg() {
+    return (
+      '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M8 7h12M8 12h12M8 17h12"/>' +
+      '<path d="M4 7h.01M4 12h.01M4 17h.01"/>' +
+      '</svg>'
+    );
+  }
+
+  function renderShiftSummary(shiftKey, peopleCount, statsOn) {
+    var shiftClass = shiftCssClass(shiftKey);
+    var html = '';
+    html += '<div class="crewSummary ' + shiftClass + '" data-shift="' + escapeHtml(shiftKey) + '">';
+    html += '<div class="shiftChip">';
+    html += '<span class="shiftDot" aria-hidden="true"></span>';
+    html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
+    html += '<button type="button" class="shiftStatsBtn' + (statsOn ? ' is-active' : '') + '"' +
+      ' data-shift="' + escapeHtml(shiftKey) + '"' +
+      ' aria-pressed="' + (statsOn ? 'true' : 'false') + '"' +
+      ' title="' + escapeHtml(statsOn ? t('listBtnTitle') : t('statsBtnTitle')) + '"' +
+      ' aria-label="' + escapeHtml(statsOn ? t('listBtnTitle') : t('statsBtn')) + '">';
+    html += statsOn ? listIconSvg() : statsIconSvg();
+    html += '</button>';
+    html += '</div>';
+    if (statsOn) {
+      html += '<span class="crewCount">' + escapeHtml(t('statsBtn')) + '</span>';
+    } else {
+      html += '<span class="crewCount">' + peopleCount + ' ' + escapeHtml(t('people')) + '</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function monthDayList(iso) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return [];
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    if (!y || !m) return [];
+    var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+    var start = y + '-' + pad(m) + '-01';
+    var last = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    var end = y + '-' + pad(m) + '-' + pad(last);
+    if (state.minDate && start < state.minDate) start = state.minDate;
+    if (state.maxDate && end > state.maxDate) end = state.maxDate;
+    if (!start || !end || start > end) return [];
+    var days = [];
+    for (var d = start; d <= end; d = addDays(d, 1)) {
+      if (!d) break;
+      days.push(d);
+    }
+    return days;
+  }
+
+  function chunkDays(days, size) {
+    var out = [];
+    var n = size || 5;
+    for (var i = 0; i < days.length; i += n) out.push(days.slice(i, i + n));
+    return out;
+  }
+
+  function statsWindowsForDate(iso) {
+    return chunkDays(monthDayList(iso || state.date), 5);
+  }
+
+  function statsWindowIndexForDate(iso) {
+    var windows = statsWindowsForDate(iso);
+    for (var i = 0; i < windows.length; i++) {
+      if (windows[i].indexOf(iso) !== -1) return i;
+    }
+    return 0;
+  }
+
+  function renderStatsTable(shiftKey, days, columns) {
+    var deptSet = {};
+    (columns || []).forEach(function (col) {
+      Object.keys(col.counts || {}).forEach(function (dept) {
+        if ((col.counts[dept] || 0) > 0) deptSet[dept] = 1;
+      });
+    });
+    var depts = DEPT_ORDER.filter(function (d) { return deptSet[d]; });
+    Object.keys(deptSet).forEach(function (d) {
+      if (depts.indexOf(d) === -1) depts.push(d);
+    });
+    if (!depts.length) {
+      return '<div class="deptStatsEmpty">' + escapeHtml(t('statsEmpty')) + '</div>';
+    }
+    var html = '<div class="deptStatsScroll" data-stats-panel="1">';
+    html += '<table class="deptStatsTable" role="table">';
+    html += '<thead><tr>';
+    html += '<th scope="col" class="deptStatsDeptCol">' + escapeHtml(t('statsDept')) + '</th>';
+    days.forEach(function (iso) {
+      html += '<th scope="col">';
+      html += '<span class="deptStatsDayName">' + escapeHtml(weekdayShort(iso)) + '</span>';
+      html += '<span class="deptStatsDayNum">' + escapeHtml(dayNum(iso)) + '</span>';
+      html += '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    depts.forEach(function (dept, idx) {
+      var tone = idx % 2 === 0 ? 'tone-a' : 'tone-b';
+      html += '<tr class="' + tone + '" data-dept="' + escapeHtml(dept) + '">';
+      html += '<th scope="row" class="deptStatsDeptCol">';
+      html += '<span class="roleDot" aria-hidden="true"></span>';
+      html += '<span class="deptStatsDeptLabel">' + escapeHtml(deptLabel(dept)) + '</span>';
+      html += '</th>';
+      days.forEach(function (iso, di) {
+        var n = (columns[di] && columns[di].counts && columns[di].counts[dept]) || 0;
+        var zero = n ? '' : ' is-zero';
+        html += '<td class="deptStatsCell' + zero + '"><span class="deptStatsNum">' + n + '</span></td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function renderStatsDots(windowCount, activeIndex) {
+    if (windowCount <= 1) return '';
+    var html = '<div class="deptStatsDots" aria-hidden="true">';
+    for (var i = 0; i < windowCount; i++) {
+      html += '<span class="deptStatsDot' + (i === activeIndex ? ' is-active' : '') + '"></span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderStatsShell(shiftKey, bodyHtml, meta) {
+    var shiftClass = shiftCssClass(shiftKey);
+    var html = '<div class="crewCard ' + shiftClass + ' is-stats">';
+    html += renderShiftSummary(shiftKey, 0, true);
+    html += '<div class="deptStatsPanel">';
+    html += '<p class="deptStatsHint">' + escapeHtml(t('statsHint')) + '</p>';
+    if (meta && meta.rangeLabel) {
+      html += '<p class="deptStatsRange">' + escapeHtml(meta.rangeLabel) + '</p>';
+    }
+    html += bodyHtml;
+    html += renderStatsDots(meta && meta.windowCount, meta && meta.windowIndex);
+    html += '</div></div>';
+    return html;
+  }
+
+  function statsRangeLabel(days) {
+    if (!days || !days.length) return '';
+    var a = days[0];
+    var b = days[days.length - 1];
+    if (a === b) return dayNum(a) + ' ' + monthName(a);
+    if (a.slice(0, 7) === b.slice(0, 7)) {
+      return dayNum(a) + '–' + dayNum(b) + ' ' + monthName(a);
+    }
+    return dayNum(a) + ' ' + monthName(a) + ' – ' + dayNum(b) + ' ' + monthName(b);
+  }
+
+  function loadStatsColumns(shiftKey, days) {
+    return Promise.all((days || []).map(function (iso) {
+      return loadRoster(iso).then(function (pack) {
+        var counts = Object.create(null);
+        if (pack && pack.ok) {
+          groupsFromPack(pack, shiftKey).forEach(function (g) {
+            counts[g.dept] = (g.people || []).length;
+          });
+        }
+        return { iso: iso, counts: counts };
+      });
+    }));
+  }
+
+  function paintStatsView() {
+    var shiftKey = state.statsShiftKey;
+    var track = document.getElementById('crewTrack');
+    if (!track || !shiftKey || !state.statsMode) return;
+    var windows = statsWindowsForDate(state.date);
+    if (!windows.length) {
+      track.innerHTML = renderStatsShell(shiftKey, '<div class="deptStatsEmpty">' + escapeHtml(t('statsEmpty')) + '</div>', {
+        windowCount: 0,
+        windowIndex: 0,
+        rangeLabel: ''
+      });
+      return;
+    }
+    if (state.statsWindowIndex < 0) state.statsWindowIndex = 0;
+    if (state.statsWindowIndex >= windows.length) state.statsWindowIndex = windows.length - 1;
+    var days = windows[state.statsWindowIndex];
+    var token = ++state.statsToken;
+    var meta = {
+      windowCount: windows.length,
+      windowIndex: state.statsWindowIndex,
+      rangeLabel: statsRangeLabel(days)
+    };
+    track.innerHTML = renderStatsShell(
+      shiftKey,
+      '<div class="deptStatsLoading">' + escapeHtml(t('statsLoading')) + '</div>',
+      meta
+    );
+    loadStatsColumns(shiftKey, days).then(function (columns) {
+      if (!state.statsMode || state.statsToken !== token) return;
+      var body = renderStatsTable(shiftKey, days, columns);
+      track.innerHTML = renderStatsShell(shiftKey, body, meta);
+      // Prefetch neighboring windows.
+      [state.statsWindowIndex - 1, state.statsWindowIndex + 1].forEach(function (wi) {
+        if (wi >= 0 && wi < windows.length) loadStatsColumns(shiftKey, windows[wi]);
+      });
+    });
+  }
+
+  function shiftStatsWindow(delta) {
+    if (!state.statsMode) return;
+    var windows = statsWindowsForDate(state.date);
+    if (!windows.length) return;
+    var next = state.statsWindowIndex + delta;
+    if (next < 0 || next >= windows.length) return;
+    state.statsWindowIndex = next;
+    paintStatsView();
+  }
+
+  function toggleStatsMode(shiftKey) {
+    if (state.statsMode) {
+      state.statsMode = false;
+      state.statsShiftKey = '';
+      renderDay(state.date, '');
+      return;
+    }
+    if (!shiftKey || REST_GROUPS[shiftKey]) return;
+    state.statsMode = true;
+    state.statsShiftKey = shiftKey;
+    state.statsWindowIndex = statsWindowIndexForDate(state.date);
+    paintStatsView();
+  }
+
   function renderGroups(groups, shiftKey, selfId) {
     var people = flattenPeople(groups);
     var html = '';
     var shiftClass = shiftCssClass(shiftKey);
     html += '<div class="crewCard ' + shiftClass + '">';
-    html += '<div class="crewSummary ' + shiftClass + '" data-shift="' + escapeHtml(shiftKey) + '">';
-    html += '<div class="shiftChip">';
-    html += '<span class="shiftDot" aria-hidden="true"></span>';
-    html += '<span class="shiftChipLabel">' + escapeHtml(shiftLabel(shiftKey)) + '</span>';
-    html += '</div>';
-    html += '<span class="crewCount">' + people.length + ' ' + escapeHtml(t('people')) + '</span>';
-    html += '</div>';
+    html += renderShiftSummary(shiftKey, people.length, false);
     html += '<div class="empList">';
     var deptIndex = 0;
     (groups || []).forEach(function (g) {
@@ -1486,6 +1735,7 @@
       html += '<div class="deptHead ' + tone + '" data-dept="' + escapeHtml(g.dept) + '">';
       html += '<span class="roleDot" aria-hidden="true"></span>';
       html += '<span class="deptHeadLabel">' + escapeHtml(deptLabel(g.dept)) + '</span>';
+      html += '<span class="deptCount" aria-label="' + escapeHtml(String(list.length)) + '">' + list.length + '</span>';
       html += '</div>';
       list.forEach(function (p) {
         var id = personDisplayId(p);
@@ -1512,6 +1762,8 @@
 
   function renderDay(iso, anim) {
     state.date = iso;
+    state.statsMode = false;
+    state.statsShiftKey = '';
     paintChrome();
     syncShiftStrip(iso, anim !== '');
     var track = document.getElementById('crewTrack');
@@ -1605,7 +1857,7 @@
 
     function ignoreTarget(target) {
       return !!(target && target.closest && target.closest(
-        'a, button, input, select, textarea, .datePickerWrapper, .pickSheet, .shiftStripWrap'
+        'a, button, input, select, textarea, .datePickerWrapper, .pickSheet, .shiftStripWrap, .shiftStatsBtn'
       ));
     }
 
@@ -1622,6 +1874,11 @@
       if (axis === 'v') return;
       if (Math.abs(dx) < 36) return;
       if (Math.abs(dx) < Math.abs(dy) * 1.05) return;
+      // Stats mode: swipe moves 5-day windows. Otherwise move by day.
+      if (state.statsMode) {
+        shiftStatsWindow(dx < 0 ? 1 : -1);
+        return;
+      }
       // Swipe left → next day, swipe right → previous day (same in AR/EN)
       go(dx < 0 ? 1 : -1);
     }
@@ -1777,6 +2034,9 @@
   function startForEmployee(empId) {
     state.empId = empId;
     state.index = null;
+    state.statsMode = false;
+    state.statsShiftKey = '';
+    state.statsWindowIndex = 0;
     state.coShift = {
       token: '',
       workDays: 0,
@@ -1816,8 +2076,63 @@
     });
   }
 
+  function injectExtrasCss() {
+    if (document.getElementById('withMeExtrasCss')) return;
+    var style = document.createElement('style');
+    style.id = 'withMeExtrasCss';
+    style.textContent = [
+      '.shiftChip{gap:7px;}',
+      '.shiftStatsBtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0;padding:0;border:1px solid var(--border);border-radius:999px;background:var(--surface-muted);color:var(--text-secondary);cursor:pointer;flex-shrink:0;box-shadow:none;transition:transform .15s ease,background .15s ease,border-color .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
+      '.shiftStatsBtn:hover{background:#fff;border-color:#cbd5e1;color:var(--text);}',
+      '.shiftStatsBtn:active{transform:scale(.96);}',
+      '.shiftStatsBtn.is-active{background:var(--brand-soft);border-color:#93c5fd;color:var(--brand);}',
+      '.deptHead{gap:8px;}',
+      '.deptCount{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-inline-start:2px;border-radius:999px;background:color-mix(in srgb,var(--text-muted) 14%,transparent);color:var(--text-secondary);font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;flex-shrink:0;}',
+      '.deptHead[data-dept="Supervisors"] .deptCount{background:color-mix(in srgb,var(--dept-supervisors) 16%,transparent);color:var(--dept-supervisors);}',
+      '.deptHead[data-dept="Load Control"] .deptCount{background:color-mix(in srgb,var(--dept-load) 16%,transparent);color:var(--dept-load);}',
+      '.deptHead[data-dept="Export Checker"] .deptCount{background:color-mix(in srgb,var(--dept-checker) 16%,transparent);color:var(--dept-checker);}',
+      '.deptHead[data-dept="Export Operators"] .deptCount{background:color-mix(in srgb,var(--dept-ops) 16%,transparent);color:var(--dept-ops);}',
+      '.deptHead[data-dept="Officers"] .deptCount{background:color-mix(in srgb,var(--dept-officers) 16%,transparent);color:var(--dept-officers);}',
+      '.deptHead[data-dept="Flight Dispatch"] .deptCount,.deptHead[data-dept="Flight Dispatch (Export)"] .deptCount,.deptHead[data-dept="Flight Dispatch (Import)"] .deptCount{background:color-mix(in srgb,var(--dept-flight) 16%,transparent);color:var(--dept-flight);}',
+      '.deptHead[data-dept="FLTA"] .deptCount{background:color-mix(in srgb,var(--dept-flta) 16%,transparent);color:var(--dept-flta);}',
+      '.deptStatsPanel{padding:10px 10px 12px;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);}',
+      '.deptStatsHint{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;}',
+      '.deptStatsRange{margin:0 0 10px;font-size:12px;font-weight:800;color:var(--text);text-align:center;letter-spacing:-.01em;}',
+      '.deptStatsLoading,.deptStatsEmpty{margin:8px 4px 4px;padding:18px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);}',
+      '.deptStatsScroll{width:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:#fff;}',
+      '.deptStatsTable{width:100%;border-collapse:collapse;table-layout:fixed;}',
+      '.deptStatsTable th,.deptStatsTable td{padding:8px 4px;text-align:center;border-block-end:1px solid #eef2f7;vertical-align:middle;}',
+      '.deptStatsTable thead th{background:#f8fafc;padding-block:8px 7px;}',
+      '.deptStatsDeptCol{width:34%;text-align:start!important;padding-inline:10px 6px!important;}',
+      '.deptStatsTable tbody tr.tone-b{background:#fafbfc;}',
+      '.deptStatsDayName{display:block;font-size:10px;font-weight:700;color:var(--text-muted);line-height:1.1;}',
+      '.deptStatsDayNum{display:block;margin-top:2px;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;}',
+      '.deptStatsDeptCol .roleDot{display:inline-block;width:6px;height:6px;border-radius:999px;margin-inline-end:6px;vertical-align:middle;background:var(--dept-default);}',
+      'tr[data-dept="Supervisors"] .roleDot{background:var(--dept-supervisors);}',
+      'tr[data-dept="Load Control"] .roleDot{background:var(--dept-load);}',
+      'tr[data-dept="Export Checker"] .roleDot{background:var(--dept-checker);}',
+      'tr[data-dept="Export Operators"] .roleDot{background:var(--dept-ops);}',
+      'tr[data-dept="Officers"] .roleDot{background:var(--dept-officers);}',
+      'tr[data-dept="Flight Dispatch"] .roleDot,tr[data-dept="Flight Dispatch (Export)"] .roleDot,tr[data-dept="Flight Dispatch (Import)"] .roleDot{background:var(--dept-flight);}',
+      'tr[data-dept="FLTA"] .roleDot{background:var(--dept-flta);}',
+      'tr[data-dept="Documentation"] .roleDot{background:#64748b;}',
+      'tr[data-dept="Import Checkers"] .roleDot{background:#6366f1;}',
+      'tr[data-dept="Import Operators"] .roleDot{background:#7c3aed;}',
+      'tr[data-dept="Release Control"] .roleDot{background:#0891b2;}',
+      '.deptStatsDeptLabel{display:inline;font-size:11px;font-weight:700;color:var(--text-secondary);line-height:1.25;vertical-align:middle;}',
+      '.deptStatsNum{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--shift-accent,#64748b) 14%,transparent);color:var(--text);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;}',
+      '.deptStatsCell.is-zero .deptStatsNum{background:#f1f5f9;color:#94a3b8;}',
+      '.deptStatsDots{display:flex;justify-content:center;gap:6px;margin-top:10px;}',
+      '.deptStatsDot{width:6px;height:6px;border-radius:999px;background:#cbd5e1;}',
+      '.deptStatsDot.is-active{background:var(--brand);width:16px;}',
+      '@media (max-width:420px){.deptStatsDeptLabel{font-size:10px;}.deptStatsNum{min-width:20px;height:20px;font-size:10px;}.deptStatsDeptCol{width:36%;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
   function init() {
     if (pageIsImport()) setRosterKind('import');
+    injectExtrasCss();
     syncBannerTexture();
     loadNamesAr();
     state.lang = readLang();
@@ -1853,9 +2168,23 @@
       startForEmployee(id);
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') go(state.lang === 'ar' ? 1 : -1);
-      if (e.key === 'ArrowRight') go(state.lang === 'ar' ? -1 : 1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        var dir = e.key === 'ArrowLeft' ? -1 : 1;
+        // Keep physical left/right the same in AR/EN for stats windows & days.
+        if (state.statsMode) {
+          shiftStatsWindow(dir > 0 ? 1 : -1);
+          return;
+        }
+        go(state.lang === 'ar' ? -dir : dir);
+      }
       if (e.key === 'Escape') closePicker();
+    });
+    document.getElementById('crewTrack')?.addEventListener('click', function (e) {
+      var btn = e.target.closest('.shiftStatsBtn');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      toggleStatsMode(btn.getAttribute('data-shift') || state.statsShiftKey || '');
     });
     document.addEventListener('rosterBgTextureChange', function (e) {
       syncBannerTexture(e && e.detail ? e.detail : null);
