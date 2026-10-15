@@ -1645,19 +1645,19 @@
     return html;
   }
 
-  function renderStatsNavWrap(bodyHtml, meta) {
+  function renderStatsBottomNav(meta) {
     var count = (meta && meta.windowCount) || 0;
     var idx = (meta && meta.windowIndex) || 0;
     var canPrev = count > 1 && idx > 0;
     var canNext = count > 1 && idx < count - 1;
-    var html = '<div class="deptStatsNav">';
+    var html = '<div class="deptStatsNavBar">';
     html += '<button type="button" class="deptStatsNavBtn deptStatsNavBtn--prev"' +
       ' data-stats-nav="-1"' +
       (canPrev ? '' : ' disabled') +
       ' aria-label="' + escapeHtml(t('statsPrev')) + '" title="' + escapeHtml(t('statsPrev')) + '">' +
       '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>' +
       '</button>';
-    html += '<div class="deptStatsNavMain">' + bodyHtml + '</div>';
+    html += renderStatsDots(count, idx) || '<span class="deptStatsDotsSpacer" aria-hidden="true"></span>';
     html += '<button type="button" class="deptStatsNavBtn deptStatsNavBtn--next"' +
       ' data-stats-nav="1"' +
       (canNext ? '' : ' disabled') +
@@ -1677,8 +1677,8 @@
     if (meta && meta.rangeLabel) {
       html += '<p class="deptStatsRange">' + escapeHtml(meta.rangeLabel) + '</p>';
     }
-    html += renderStatsNavWrap(bodyHtml, meta || {});
-    html += renderStatsDots(meta && meta.windowCount, meta && meta.windowIndex);
+    html += bodyHtml;
+    html += renderStatsBottomNav(meta || {});
     html += '</div></div>';
     return html;
   }
@@ -2236,13 +2236,10 @@
       '.deptStatsHint{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;}',
       '.deptStatsRange{margin:0 0 10px;font-size:12px;font-weight:800;color:var(--text);text-align:center;letter-spacing:-.01em;}',
       '.deptStatsLoading,.deptStatsEmpty{margin:8px 4px 4px;padding:18px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);}',
-      '.deptStatsNav{position:relative;display:block;width:100%;}',
-      '.deptStatsNavMain{width:100%;min-width:0;}',
-      '.deptStatsNavBtn{position:absolute;top:50%;z-index:3;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:0;padding:0;border:1px solid #e2e8f0;border-radius:999px;background:rgba(255,255,255,.92);color:#475569;box-shadow:0 1px 4px rgba(15,23,42,.08);cursor:pointer;transform:translateY(-50%);-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
-      '.deptStatsNavBtn--prev{left:2px;}',
-      '.deptStatsNavBtn--next{right:2px;}',
-      '.deptStatsNavBtn:hover:not(:disabled){background:#fff;color:#0f172a;border-color:#cbd5e1;}',
-      '.deptStatsNavBtn:active:not(:disabled){transform:translateY(-50%) scale(.96);}',
+      '.deptStatsNavBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;min-height:22px;}',
+      '.deptStatsNavBtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:0;padding:0;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#475569;box-shadow:0 1px 3px rgba(15,23,42,.06);cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
+      '.deptStatsNavBtn:hover:not(:disabled){background:#f8fafc;color:#0f172a;border-color:#cbd5e1;}',
+      '.deptStatsNavBtn:active:not(:disabled){transform:scale(.96);}',
       '.deptStatsNavBtn:disabled{opacity:.28;cursor:default;box-shadow:none;}',
       '.deptStatsNavBtn svg{display:block;pointer-events:none;}',
       '.deptStatsScroll{width:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:#fff;}',
@@ -2272,7 +2269,8 @@
       '.deptStatsDeptLabel{display:inline;font-size:11px;font-weight:700;color:var(--text-secondary);line-height:1.25;vertical-align:middle;}',
       '.deptStatsNum{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--shift-accent,#64748b) 14%,transparent);color:var(--text);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;}',
       '.deptStatsCell.is-zero .deptStatsNum:not([class*="count-"]){background:#f1f5f9;color:#94a3b8;}',
-      '.deptStatsDots{display:flex;justify-content:center;gap:6px;margin-top:10px;}',
+      '.deptStatsDots{display:flex;justify-content:center;align-items:center;gap:6px;margin:0;flex:1 1 auto;min-height:6px;}',
+      '.deptStatsDotsSpacer{flex:1 1 auto;}',
       '.deptStatsDot{width:6px;height:6px;border-radius:999px;background:#cbd5e1;}',
       '.deptStatsDot.is-active{background:var(--brand);width:16px;}',
       '@media (max-width:420px){.deptStatsDeptLabel{font-size:10px;}.deptStatsNum{min-width:20px;height:20px;font-size:10px;}.deptStatsDeptCol{width:36%;}}'
