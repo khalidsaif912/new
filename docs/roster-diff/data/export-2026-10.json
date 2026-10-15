@@ -1,11 +1,25 @@
 {
   "kind": "export",
   "month": "2026-10",
-  "generated_at": "2026-10-05T10:53:35.484473Z",
+  "generated_at": "2026-10-15T08:23:04.257672Z",
   "old_file": "first edition",
-  "new_file": "Export New Roster OCTOBER 2026 Version 2.xlsx",
-  "total_changes": 74,
+  "new_file": "Export New Roster OCTOBER 2026 Version 3.xlsx",
+  "total_changes": 114,
   "changes": [
+    {
+      "emp_id": "80482",
+      "name": "Waleed Al Hadabi - 80482",
+      "day": 24,
+      "v1": "MN06",
+      "v2": "AN13"
+    },
+    {
+      "emp_id": "80482",
+      "name": "Waleed Al Hadabi - 80482",
+      "day": 25,
+      "v1": "AN13",
+      "v2": "NN21"
+    },
     {
       "emp_id": "81223",
       "name": "Mazin Al Siyabi - 81223",
@@ -42,6 +56,69 @@
       "v2": "OTN"
     },
     {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 16,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 17,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 18,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 19,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 20,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 21,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 22,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81300",
+      "name": "Talal Al Balushi - 81300",
+      "day": 23,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81307",
+      "name": "Badar Al Hamadani - 81307",
+      "day": 15,
+      "v1": "OFF",
+      "v2": "OTN"
+    },
+    {
       "emp_id": "81307",
       "name": "Badar Al Hamadani - 81307",
       "day": 23,
@@ -54,6 +131,55 @@
       "day": 31,
       "v1": "OFF",
       "v2": "OTN"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 18,
+      "v1": "LV",
+      "v2": "MN06"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 19,
+      "v1": "LV",
+      "v2": "MN06"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 20,
+      "v1": "LV",
+      "v2": "AN13"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 21,
+      "v1": "LV",
+      "v2": "NN21"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 22,
+      "v1": "LV",
+      "v2": "NN21"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 23,
+      "v1": "LV",
+      "v2": "OFF"
+    },
+    {
+      "emp_id": "82415",
+      "name": "Ahmed Al Balushi - 82415",
+      "day": 26,
+      "v1": "AN13",
+      "v2": "LV"
     },
     {
       "emp_id": "82424",
@@ -75,6 +201,41 @@
       "day": 6,
       "v1": "OFF",
       "v2": "OTN"
+    },
+    {
+      "emp_id": "82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 12,
+      "v1": "MN06",
+      "v2": "SL"
+    },
+    {
+      "emp_id": "82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 13,
+      "v1": "MN06",
+      "v2": "SL"
+    },
+    {
+      "emp_id": "82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 14,
+      "v1": "AN13",
+      "v2": "SL"
+    },
+    {
+      "emp_id": "82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 15,
+      "v1": "NN21",
+      "v2": "SL"
+    },
+    {
+      "emp_id": "82429",
+      "name": "Zakariya Al Balushi - 82429",
+      "day": 16,
+      "v1": "NN21",
+      "v2": "SL"
     },
     {
       "emp_id": "82429",
@@ -280,6 +441,13 @@
       "v2": "LV"
     },
     {
+      "emp_id": "82548",
+      "name": "Ahmed Al Muqaini - 82548",
+      "day": 14,
+      "v1": "OFF",
+      "v2": "OTN"
+    },
+    {
       "emp_id": "82555",
       "name": "Riyadh Al Jabri - 82555",
       "day": 7,
@@ -294,9 +462,23 @@
       "v2": "OTM"
     },
     {
+      "emp_id": "82575",
+      "name": "Ahmed Al Kharusi - 82575",
+      "day": 21,
+      "v1": "OFF",
+      "v2": "OTN"
+    },
+    {
       "emp_id": "82577",
       "name": "Ali Al Marjubi - 82577",
       "day": 11,
+      "v1": "OFF",
+      "v2": "OTN"
+    },
+    {
+      "emp_id": "82578",
+      "name": "Raad Al Farsi - 82578",
+      "day": 15,
       "v1": "OFF",
       "v2": "OTN"
     },
@@ -315,6 +497,13 @@
       "v2": "OTN"
     },
     {
+      "emp_id": "82596",
+      "name": "Hamed Al Fulaiti - 82596",
+      "day": 21,
+      "v1": "OTN",
+      "v2": "OFF"
+    },
+    {
       "emp_id": "82656",
       "name": "Faisal Al Balushi - 82656",
       "day": 4,
@@ -327,6 +516,13 @@
       "day": 12,
       "v1": "OFF",
       "v2": "OTA"
+    },
+    {
+      "emp_id": "82656",
+      "name": "Faisal Al Balushi - 82656",
+      "day": 13,
+      "v1": "OFF",
+      "v2": "OTM"
     },
     {
       "emp_id": "82656",
@@ -364,6 +560,13 @@
       "v2": "OTN"
     },
     {
+      "emp_id": "82661",
+      "name": "Mohamed Al Maskari - 82661",
+      "day": 25,
+      "v1": "MN06",
+      "v2": "AN13"
+    },
+    {
       "emp_id": "82673",
       "name": "Khalifa Al Maqbali - 82673",
       "day": 9,
@@ -376,6 +579,83 @@
       "day": 4,
       "v1": "OFF",
       "v2": "OTA"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 23,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 24,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 25,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 26,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 27,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8762",
+      "name": "Mohamed Al Falahi - 8762",
+      "day": 14,
+      "v1": "OFF",
+      "v2": "OTA"
+    },
+    {
+      "emp_id": "8926",
+      "name": "Salim Al Masroori - 8926",
+      "day": 13,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8926",
+      "name": "Salim Al Masroori - 8926",
+      "day": 14,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8926",
+      "name": "Salim Al Masroori - 8926",
+      "day": 15,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8926",
+      "name": "Salim Al Masroori - 8926",
+      "day": 16,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "8926",
+      "name": "Salim Al Masroori - 8926",
+      "day": 17,
+      "v1": "AN13",
+      "v2": "LV"
     },
     {
       "emp_id": "8930",
