@@ -2214,9 +2214,12 @@
   }
 
   function injectExtrasCss() {
-    if (document.getElementById('withMeExtrasCss')) return;
-    var style = document.createElement('style');
-    style.id = 'withMeExtrasCss';
+    var style = document.getElementById('withMeExtrasCss');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'withMeExtrasCss';
+      document.head.appendChild(style);
+    }
     style.textContent = [
       '.shiftChip{gap:7px;}',
       '.shiftChip .shiftDot{display:none!important;}',
@@ -2236,13 +2239,16 @@
       '.deptStatsHint{margin:0 0 4px;font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;}',
       '.deptStatsRange{margin:0 0 10px;font-size:12px;font-weight:800;color:var(--text);text-align:center;letter-spacing:-.01em;}',
       '.deptStatsLoading,.deptStatsEmpty{margin:8px 4px 4px;padding:18px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);}',
-      '.deptStatsNavBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;min-height:22px;}',
-      '.deptStatsNavBtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:0;padding:0;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#475569;box-shadow:0 1px 3px rgba(15,23,42,.06);cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
+      '.deptStatsNavBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:2px;min-height:22px;position:static!important;}',
+      '.deptStatsNavBtn{position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin:0;padding:0;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#475569;box-shadow:0 1px 3px rgba(15,23,42,.06);cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}',
       '.deptStatsNavBtn:hover:not(:disabled){background:#f8fafc;color:#0f172a;border-color:#cbd5e1;}',
-      '.deptStatsNavBtn:active:not(:disabled){transform:scale(.96);}',
+      '.deptStatsNavBtn:active:not(:disabled){transform:scale(.96)!important;}',
       '.deptStatsNavBtn:disabled{opacity:.28;cursor:default;box-shadow:none;}',
       '.deptStatsNavBtn svg{display:block;pointer-events:none;}',
       '.deptStatsScroll{width:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:#fff;}',
+      /* Kill any leftover middle-overlay rules from older cached CSS. */
+      '.deptStatsNav{position:static!important;}',
+      '.deptStatsNavBtn--prev,.deptStatsNavBtn--next{position:static!important;top:auto!important;transform:none!important;}',
       '.deptStatsTable{width:100%;border-collapse:collapse;table-layout:fixed;}',
       '.deptStatsTable th,.deptStatsTable td{padding:8px 4px;text-align:center;border-block-end:1px solid #eef2f7;vertical-align:middle;}',
       '.deptStatsTable thead th{background:#f8fafc;padding-block:8px 7px;}',
@@ -2275,7 +2281,6 @@
       '.deptStatsDot.is-active{background:var(--brand);width:16px;}',
       '@media (max-width:420px){.deptStatsDeptLabel{font-size:10px;}.deptStatsNum{min-width:20px;height:20px;font-size:10px;}.deptStatsDeptCol{width:36%;}}'
     ].join('');
-    document.head.appendChild(style);
   }
 
   function init() {
