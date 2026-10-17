@@ -1,6 +1,7 @@
 /**
  * Announcement popups — Mantle-backed ads from desk-log.
- * Modes: text | image | both. Campaign days + on-screen duration (seconds).
+ * Modes: text | image | both | slides (multi-image notes with Next → home).
+ * Campaign days + on-screen duration (seconds; slides advance manually).
  */
 (function (global) {
   'use strict';
@@ -157,8 +158,26 @@
 
   function normalizeMode(m) {
     m = String(m || '').trim();
-    if (m === 'text' || m === 'image' || m === 'both') return m;
+    if (m === 'text' || m === 'image' || m === 'both' || m === 'slides') return m;
     return 'text';
+  }
+
+  function normalizeImageIds(raw, fallbackId) {
+    var out = [];
+    var seen = Object.create(null);
+    function pushId(id) {
+      id = String(id || '').trim();
+      if (!ID_RE.test(id) || seen[id]) return;
+      seen[id] = 1;
+      out.push(id);
+    }
+    if (Array.isArray(raw)) {
+      raw.forEach(pushId);
+    } else if (raw) {
+      pushId(raw);
+    }
+    if (!out.length && fallbackId) pushId(fallbackId);
+    return out.slice(0, 12);
   }
 
   function normalizeLinkUrl(u) {
@@ -199,10 +218,25 @@
     var title = String(raw.title || '').trim().slice(0, 120);
     var imageId = String(raw.imageId || '').trim();
     if (imageId && !ID_RE.test(imageId)) imageId = '';
-    if (mode === 'text') imageId = '';
-    if (mode === 'image' && !imageId && !safeImageData(raw._preview)) return null;
-    if (mode === 'both' && !text && !title) return null;
-    if (mode === 'text' && !text && !title) return null;
+    var imageIds = normalizeImageIds(raw.imageIds, imageId || (mode === 'slides' || mode === 'image' || mode === 'both' ? id : ''));
+    if (mode === 'text') {
+      imageId = '';
+      imageIds = [];
+    }
+    if (mode === 'slides') {
+      if (!imageIds.length && !safeImageData(raw._preview)) return null;
+      imageId = imageIds[0] || imageId || id;
+    } else if (mode === 'image') {
+      if (!imageIds.length && !imageId && !safeImageData(raw._preview)) return null;
+      imageId = imageIds[0] || imageId || id;
+      imageIds = imageId ? [imageId] : [];
+    } else if (mode === 'both') {
+      if (!text && !title) return null;
+      imageId = imageIds[0] || imageId || (imageIds.length ? imageIds[0] : id);
+      if (imageId && !imageIds.length) imageIds = [imageId];
+    } else if (mode === 'text' && !text && !title) {
+      return null;
+    }
     var linkUrl = normalizeLinkUrl(raw.linkUrl || raw.url || '');
     var linkLabel = normalizeLinkLabel(raw.linkLabel || raw.buttonText || '', !!linkUrl);
     var startAt = Number(raw.startAt || raw.at || Date.now()) || Date.now();
@@ -211,7 +245,8 @@
       title: title,
       text: text,
       mode: mode,
-      imageId: imageId || (mode !== 'text' ? id : ''),
+      imageId: imageId || '',
+      imageIds: imageIds,
       linkUrl: linkUrl,
       linkLabel: linkLabel,
       days: clampDays(raw.days),
@@ -246,8 +281,8 @@
       if (typeof all !== 'object' || !all) all = {};
       all[id] = dataUrl;
       var keys = Object.keys(all);
-      if (keys.length > 12) {
-        keys.slice(0, keys.length - 12).forEach(function (k) { delete all[k]; });
+      if (keys.length > 24) {
+        keys.slice(0, keys.length - 24).forEach(function (k) { delete all[k]; });
       }
       mantle().writeCache(IMG_DISK_KEY, all);
     } catch (e) {}
@@ -508,6 +543,15 @@
       'animation:rapDrain linear forwards}',
       '#' + ROOT_ID + ' .rap-timer > i.paused{animation-play-state:paused}',
       '@keyframes rapDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}',
+      '#' + ROOT_ID + ' .rap-card.rap-slides{width:min(460px,100%);max-height:min(92vh,820px);overflow:hidden;display:flex;flex-direction:column}',
+      '#' + ROOT_ID + ' .rap-slides-frame{position:relative;background:#0f172a;min-height:220px;flex:1 1 auto}',
+      '#' + ROOT_ID + ' .rap-slides-frame .rap-img{max-height:min(62vh,560px);object-fit:contain;background:#0f172a}',
+      '#' + ROOT_ID + ' .rap-slides-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;',
+      'padding:10px 16px 0;font-size:12px;font-weight:700;color:#64748b}',
+      '#' + ROOT_ID + ' .rap-dots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:8px 16px 0}',
+      '#' + ROOT_ID + ' .rap-dots i{width:7px;height:7px;border-radius:999px;background:#cbd5e1}',
+      '#' + ROOT_ID + ' .rap-dots i.on{background:#2563eb;transform:scale(1.15)}',
+      '#' + ROOT_ID + ' .rap-next{min-width:120px}',
       'body.ar #' + ROOT_ID + ' .rap-card{direction:rtl;text-align:right}',
       '@media (prefers-reduced-motion:reduce){#' + ROOT_ID + ',#' + ROOT_ID + ' .rap-card{transition:none}#' + ROOT_ID + ' .rap-timer>i{animation:none}}'
     ].join('');
@@ -519,10 +563,116 @@
     if (el && el.parentNode) el.parentNode.removeChild(el);
   }
 
+  async function showSlidesPopup(item) {
+    if (!item || document.getElementById(ROOT_ID)) return;
+    ensureStyles();
+    var ids = normalizeImageIds(item.imageIds, item.imageId);
+    if (!ids.length) return;
+
+    var urls = [];
+    var i;
+    for (i = 0; i < ids.length; i++) {
+      var url = await loadImage(ids[i]);
+      if (url) urls.push(url);
+    }
+    if (!urls.length) return;
+
+    var root = document.createElement('div');
+    root.id = ROOT_ID;
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', item.title || 'ملاحظات مصورة');
+
+    var titleHtml = item.title
+      ? '<h2 class="rap-title">' + escapeHtml(item.title) + '</h2>'
+      : '';
+    var textHtml = item.text
+      ? '<p class="rap-text">' + escapeHtml(item.text) + '</p>'
+      : '';
+    var bodyHtml = (titleHtml || textHtml)
+      ? '<div class="rap-body">' + titleHtml + textHtml + '</div>'
+      : '';
+
+    var dots = '';
+    for (i = 0; i < urls.length; i++) {
+      dots += '<i' + (i === 0 ? ' class="on"' : '') + '></i>';
+    }
+
+    root.innerHTML =
+      '<div class="rap-card rap-slides">' +
+        '<button type="button" class="rap-close" aria-label="إغلاق">×</button>' +
+        '<div class="rap-slides-meta">' +
+          '<span class="rap-slide-count">1 / ' + urls.length + '</span>' +
+          '<span>ملاحظات مصورة</span>' +
+        '</div>' +
+        '<div class="rap-slides-frame">' +
+          '<img class="rap-img" alt="" src="' + urls[0].replace(/"/g, '') + '">' +
+        '</div>' +
+        '<div class="rap-dots" aria-hidden="true">' + dots + '</div>' +
+        bodyHtml +
+        '<div class="rap-actions">' +
+          '<button type="button" class="rap-ok rap-next">' +
+            (urls.length > 1 ? 'التالي' : 'الصفحة الرئيسية') +
+          '</button>' +
+        '</div>' +
+      '</div>';
+
+    var closed = false;
+    var index = 0;
+    var imgEl = root.querySelector('.rap-slides-frame .rap-img');
+    var countEl = root.querySelector('.rap-slide-count');
+    var nextBtn = root.querySelector('.rap-next');
+    var dotNodes = root.querySelectorAll('.rap-dots i');
+
+    function close(fromUser) {
+      if (closed) return;
+      closed = true;
+      if (fromUser) markSeen(item.id);
+      root.classList.remove('show');
+      setTimeout(removeRoot, 220);
+    }
+
+    function paint() {
+      if (!imgEl) return;
+      imgEl.src = urls[index].replace(/"/g, '');
+      if (countEl) countEl.textContent = (index + 1) + ' / ' + urls.length;
+      for (var d = 0; d < dotNodes.length; d++) {
+        if (d === index) dotNodes[d].classList.add('on');
+        else dotNodes[d].classList.remove('on');
+      }
+      if (nextBtn) {
+        nextBtn.textContent = index >= urls.length - 1 ? 'الصفحة الرئيسية' : 'التالي';
+      }
+    }
+
+    function advance() {
+      if (closed) return;
+      if (index >= urls.length - 1) {
+        close(true);
+        return;
+      }
+      index += 1;
+      paint();
+    }
+
+    root.querySelector('.rap-close').addEventListener('click', function () { close(true); });
+    if (nextBtn) nextBtn.addEventListener('click', advance);
+    root.addEventListener('click', function (e) {
+      if (e.target === root) close(true);
+    });
+
+    document.body.appendChild(root);
+    requestAnimationFrame(function () { root.classList.add('show'); });
+  }
+
   async function showPopup(item) {
     if (!item || document.getElementById(ROOT_ID)) return;
     ensureStyles();
     var mode = normalizeMode(item.mode);
+    if (mode === 'slides') {
+      await showSlidesPopup(item);
+      return;
+    }
     var imgUrl = '';
     if (mode !== 'text' && item.imageId) {
       imgUrl = await loadImage(item.imageId);
@@ -668,6 +818,23 @@
     } catch (e) {}
   }
 
+  function collectUploadFiles(opts) {
+    var files = [];
+    if (Array.isArray(opts.files) && opts.files.length) {
+      opts.files.forEach(function (f) { if (f) files.push(f); });
+    } else if (opts.file) {
+      files.push(opts.file);
+    }
+    if (Array.isArray(opts.dataUrls) && opts.dataUrls.length) {
+      opts.dataUrls.forEach(function (d) {
+        if (safeImageData(d)) files.push({ __dataUrl: d });
+      });
+    } else if (!files.length && opts.dataUrl && safeImageData(opts.dataUrl)) {
+      files.push({ __dataUrl: opts.dataUrl });
+    }
+    return files.slice(0, 12);
+  }
+
   async function addPopup(opts) {
     opts = opts || {};
     await loadStore(true);
@@ -676,11 +843,28 @@
     var id = newId();
     while (store.items.some(function (it) { return it.id === id; })) id = newId();
     var imageId = '';
+    var imageIds = [];
     if (mode !== 'text') {
-      if (!opts.file && !opts.dataUrl) throw new Error('need-image');
-      var dataUrl = opts.dataUrl || await compressImageFile(opts.file);
-      imageId = id;
-      await writeImage(imageId, dataUrl);
+      var uploads = collectUploadFiles(opts);
+      if (!uploads.length) throw new Error('need-image');
+      if (mode !== 'slides') uploads = uploads.slice(0, 1);
+      var used = Object.create(null);
+      used[id] = 1;
+      for (var i = 0; i < uploads.length; i++) {
+        var dataUrl = uploads[i].__dataUrl
+          ? uploads[i].__dataUrl
+          : await compressImageFile(uploads[i]);
+        var imgId = i === 0 ? id : newId();
+        while (used[imgId] || store.items.some(function (it) {
+          return it.id === imgId || (it.imageIds && it.imageIds.indexOf(imgId) >= 0);
+        })) {
+          imgId = newId();
+        }
+        used[imgId] = 1;
+        await writeImage(imgId, dataUrl);
+        imageIds.push(imgId);
+      }
+      imageId = imageIds[0] || '';
     }
     var item = normalizeItem({
       id: id,
@@ -688,6 +872,7 @@
       text: opts.text,
       mode: mode,
       imageId: imageId,
+      imageIds: imageIds,
       linkUrl: opts.linkUrl,
       linkLabel: opts.linkLabel,
       days: opts.days,
@@ -709,7 +894,12 @@
     var found = store.items.find(function (it) { return it.id === id; });
     store.items = store.items.filter(function (it) { return it.id !== id; });
     await saveStore(store);
-    if (found && found.imageId) await deleteImage(found.imageId);
+    if (found) {
+      var ids = normalizeImageIds(found.imageIds, found.imageId);
+      for (var i = 0; i < ids.length; i++) {
+        await deleteImage(ids[i]);
+      }
+    }
     return store;
   }
 

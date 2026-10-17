@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="desk-log-build" content="20261007popups">
+  <meta name="desk-log-build" content="20261017slides">
   <title>·</title>
   <style>
     :root {
@@ -653,22 +653,39 @@
     .bannerStatus.err { color: #fca5a5; }
     .popupAdminForm {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
+    }
+    .popupSection {
+      display: grid;
+      gap: 10px;
       padding: 14px;
-      border-radius: 16px;
-      border: 1px dashed #a855f7aa;
-      background: linear-gradient(165deg, #4c1d9533, #0f172aee);
+      border-radius: 14px;
+      border: 1px solid #334155;
+      background: #111827;
+    }
+    .popupSectionTitle {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .popupSectionHint {
+      margin: -4px 0 0;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.45;
     }
     .popupAdminForm label {
       display: grid;
       gap: 4px;
       font-size: 11px;
       font-weight: 700;
-      color: #c4b5fd;
+      color: #93c5fd;
     }
     .popupAdminForm input[type="text"],
     .popupAdminForm input[type="number"],
+    .popupAdminForm input[type="url"],
     .popupAdminForm textarea,
     .popupAdminForm select {
       width: 100%;
@@ -689,23 +706,70 @@
       gap: 10px;
     }
     .popupModeRow {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
     .popupModeRow label {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
       border: 1px solid #334155;
-      background: #1e293b;
+      background: #0f172a;
       color: #e2e8f0;
       font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
     }
-    .popupModeRow input { accent-color: #a855f7; }
+    .popupModeRow label.on {
+      border-color: #3b82f6;
+      background: #1e3a8a55;
+      color: #dbeafe;
+    }
+    .popupModeRow input { accent-color: #3b82f6; margin: 0; }
+    .popupSlidesPreview {
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .popupSlidesPreview.show { display: grid; }
+    .popupSlideThumb {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      background: #0f172a;
+      aspect-ratio: 1;
+    }
+    .popupSlideThumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .popupSlideThumb button {
+      position: absolute;
+      top: 4px;
+      inset-inline-end: 4px;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(127, 29, 29, .92);
+      color: #fecaca;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .popupSlideCount {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
     .popupList {
       display: grid;
       gap: 10px;
@@ -774,11 +838,19 @@
       background: #334155;
       color: #cbd5e1;
     }
+    .popupFormActions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
     @media (max-width: 520px) {
       .toolbar.mainTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .toolCard { grid-template-columns: 1fr; }
       .toolGo { width: 100%; }
       .popupAdminRow { grid-template-columns: 1fr; }
+      .popupModeRow { grid-template-columns: 1fr; }
+      .popupSlidesPreview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -923,53 +995,71 @@
       <div class="bannerAdminGrid" id="bannerAdminGrid"></div>
     </div>
     <div id="popupsPanel" hidden>
-      <p class="bannerAdminIntro">نوافذ منبثقة للإعلان تظهر فوراً عند الدخول. يمكن إضافة رابط يتحول إلى زر، والضغط المستمر على النافذة يوقف العدّاد حتى رفع الإصبع.</p>
+      <p class="bannerAdminIntro">إعلانات تظهر عند دخول الموقع. استخدم «شرائح صور» للملاحظات المصورة: الصورة الأولى ثم «التالي» حتى آخر صورة ثم العودة للصفحة الرئيسية.</p>
       <div class="popupAdminForm" id="popupAdminForm">
-        <p class="bannerUploadTitle">إضافة نافذة منبثقة</p>
-        <div class="popupModeRow" role="radiogroup" aria-label="نوع المحتوى">
-          <label><input type="radio" name="popupMode" value="text" checked> نص فقط</label>
-          <label><input type="radio" name="popupMode" value="image"> صورة فقط</label>
-          <label><input type="radio" name="popupMode" value="both"> نص وصورة</label>
-        </div>
-        <label>العنوان (اختياري)
-          <input type="text" id="popupTitle" maxlength="120" placeholder="مثال: تنويه مهم">
-        </label>
-        <label id="popupTextWrap">النص
-          <textarea id="popupText" maxlength="800" placeholder="اكتب نص الإعلان هنا"></textarea>
-        </label>
-        <div class="popupAdminRow">
-          <label>رابط الزر (اختياري)
-            <input type="url" id="popupLinkUrl" maxlength="500" placeholder="https://example.com">
+        <section class="popupSection">
+          <p class="popupSectionTitle">نوع الإعلان</p>
+          <p class="popupSectionHint">اختر الشكل المناسب ثم أكمل الحقول الظاهرة فقط.</p>
+          <div class="popupModeRow" role="radiogroup" aria-label="نوع المحتوى">
+            <label><input type="radio" name="popupMode" value="text" checked> نص فقط</label>
+            <label><input type="radio" name="popupMode" value="image"> صورة فقط</label>
+            <label><input type="radio" name="popupMode" value="both"> نص وصورة</label>
+            <label><input type="radio" name="popupMode" value="slides"> شرائح صور</label>
+          </div>
+        </section>
+
+        <section class="popupSection" id="popupContentSection">
+          <p class="popupSectionTitle">المحتوى</p>
+          <label>العنوان (اختياري)
+            <input type="text" id="popupTitle" maxlength="120" placeholder="مثال: تنويه مهم / ملاحظات الوردية">
           </label>
-          <label>نص زر الرابط
-            <input type="text" id="popupLinkLabel" maxlength="40" placeholder="افتح الرابط">
+          <label id="popupTextWrap">النص
+            <textarea id="popupText" maxlength="800" placeholder="اكتب نص الإعلان هنا"></textarea>
           </label>
-        </div>
-        <div class="popupAdminRow">
-          <label>عدد أيام الظهور
-            <input type="number" id="popupDays" min="1" max="90" value="3">
-          </label>
-          <label>مدة الظهور (ثوانٍ)
-            <input type="number" id="popupDuration" min="3" max="300" value="12">
-          </label>
-        </div>
-        <div id="popupImageWrap" hidden>
-          <p class="bannerUploadHint">أرفق صورة (JPG / PNG / WebP). تُضغط تلقائياً قبل الرفع.</p>
+          <div class="popupAdminRow" id="popupLinkRow">
+            <label>رابط الزر (اختياري)
+              <input type="url" id="popupLinkUrl" maxlength="500" placeholder="https://example.com">
+            </label>
+            <label>نص زر الرابط
+              <input type="text" id="popupLinkLabel" maxlength="40" placeholder="افتح الرابط">
+            </label>
+          </div>
+        </section>
+
+        <section class="popupSection">
+          <p class="popupSectionTitle">الظهور</p>
+          <div class="popupAdminRow">
+            <label>عدد أيام الظهور
+              <input type="number" id="popupDays" min="1" max="90" value="3">
+            </label>
+            <label id="popupDurationWrap">مدة الظهور (ثوانٍ)
+              <input type="number" id="popupDuration" min="3" max="300" value="12">
+            </label>
+          </div>
+          <p class="popupSectionHint" id="popupSlidesHint" hidden>شرائح الصور تنتقل يدوياً بزر «التالي» — لا يوجد مؤقت تلقائي.</p>
+        </section>
+
+        <section class="popupSection" id="popupImageWrap" hidden>
+          <p class="popupSectionTitle" id="popupImageTitle">الصورة</p>
+          <p class="bannerUploadHint" id="popupImageHint">أرفق صورة (JPG / PNG / WebP). تُضغط تلقائياً قبل الرفع.</p>
           <div class="bannerUploadActions">
             <label class="bannerAddLabel">
               <input type="file" id="popupAddInput" accept="image/jpeg,image/png,image/webp,image/*">
-              📁 اختيار صورة
+              اختيار صورة
             </label>
-            <label class="bannerAddLabel secondary">
+            <label class="bannerAddLabel secondary" id="popupCameraLabel">
               <input type="file" id="popupCameraInput" accept="image/*" capture="environment">
-              📷 كاميرا
+              كاميرا
             </label>
           </div>
           <div class="bannerUploadPreview" id="popupUploadPreview">
             <img id="popupUploadPreviewImg" alt="معاينة الإعلان">
           </div>
-        </div>
-        <div class="bannerUploadActions">
+          <div class="popupSlideCount" id="popupSlideCount" hidden></div>
+          <div class="popupSlidesPreview" id="popupSlidesPreview" aria-live="polite"></div>
+        </section>
+
+        <div class="popupFormActions">
           <button type="button" class="bannerUploadConfirm" id="popupSaveBtn">نشر الإعلان</button>
           <button type="button" class="chip" id="refreshPopupsBtn">تحديث القائمة</button>
         </div>
@@ -979,8 +1069,8 @@
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20261007d"></script>
-  <script src="../announce-popup.js?v=20261007d"></script>
+  <script src="../banner-store.js?v=20261017a"></script>
+  <script src="../announce-popup.js?v=20261017a"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1465,19 +1555,101 @@
         const mode = selectedPopupMode();
         const textWrap = document.getElementById('popupTextWrap');
         const imageWrap = document.getElementById('popupImageWrap');
-        if (textWrap) textWrap.hidden = mode === 'image';
+        const linkRow = document.getElementById('popupLinkRow');
+        const durationWrap = document.getElementById('popupDurationWrap');
+        const slidesHint = document.getElementById('popupSlidesHint');
+        const imageTitle = document.getElementById('popupImageTitle');
+        const imageHint = document.getElementById('popupImageHint');
+        const addInput = document.getElementById('popupAddInput');
+        document.querySelectorAll('.popupModeRow label').forEach(function (lab) {
+          var input = lab.querySelector('input[name="popupMode"]');
+          lab.classList.toggle('on', !!(input && input.checked));
+        });
+        if (textWrap) textWrap.hidden = mode === 'image' || mode === 'slides';
         if (imageWrap) imageWrap.hidden = mode === 'text';
+        if (linkRow) linkRow.hidden = mode === 'slides';
+        if (durationWrap) durationWrap.hidden = mode === 'slides';
+        if (slidesHint) slidesHint.hidden = mode !== 'slides';
+        if (imageTitle) imageTitle.textContent = mode === 'slides' ? 'الصور (شرائح)' : 'الصورة';
+        if (imageHint) {
+          imageHint.textContent = mode === 'slides'
+            ? 'أرفق عدة صور بالترتيب (حتى 12). الزائر يضغط «التالي» حتى آخر صورة ثم يعود للصفحة الرئيسية.'
+            : 'أرفق صورة (JPG / PNG / WebP). تُضغط تلقائياً قبل الرفع.';
+        }
+        if (addInput) {
+          if (mode === 'slides') addInput.setAttribute('multiple', 'multiple');
+          else addInput.removeAttribute('multiple');
+        }
         if (mode === 'text') clearPopupUploadPreview();
+        else if (mode !== 'slides') {
+          // Keep only the first staged image for single-image modes.
+          if (pendingPopupFiles.length > 1) {
+            pendingPopupFiles = pendingPopupFiles.slice(0, 1);
+            renderPopupUploadPreview();
+          }
+        }
+        renderPopupUploadPreview();
       }
 
-      var pendingPopupFile = null;
+      var pendingPopupFiles = [];
 
       function clearPopupUploadPreview() {
-        pendingPopupFile = null;
-        var preview = document.getElementById('popupUploadPreview');
-        var img = document.getElementById('popupUploadPreviewImg');
-        if (preview) preview.classList.remove('show');
-        if (img) img.removeAttribute('src');
+        pendingPopupFiles = [];
+        renderPopupUploadPreview();
+      }
+
+      function renderPopupUploadPreview() {
+        var mode = selectedPopupMode();
+        var singlePreview = document.getElementById('popupUploadPreview');
+        var singleImg = document.getElementById('popupUploadPreviewImg');
+        var slidesPreview = document.getElementById('popupSlidesPreview');
+        var countEl = document.getElementById('popupSlideCount');
+        if (mode === 'slides') {
+          if (singlePreview) singlePreview.classList.remove('show');
+          if (singleImg) singleImg.removeAttribute('src');
+          if (countEl) {
+            countEl.hidden = !pendingPopupFiles.length;
+            countEl.textContent = pendingPopupFiles.length
+              ? (pendingPopupFiles.length + ' صورة جاهزة للنشر')
+              : '';
+          }
+          if (slidesPreview) {
+            slidesPreview.classList.toggle('show', pendingPopupFiles.length > 0);
+            slidesPreview.innerHTML = pendingPopupFiles.map(function (file, idx) {
+              return (
+                '<div class="popupSlideThumb">' +
+                  '<img alt="شريحة ' + (idx + 1) + '" src="' + URL.createObjectURL(file) + '">' +
+                  '<button type="button" data-remove-slide="' + idx + '" aria-label="حذف">×</button>' +
+                '</div>'
+              );
+            }).join('');
+            slidesPreview.querySelectorAll('[data-remove-slide]').forEach(function (btn) {
+              btn.onclick = function () {
+                var i = Number(btn.getAttribute('data-remove-slide'));
+                if (!isNaN(i)) {
+                  pendingPopupFiles.splice(i, 1);
+                  renderPopupUploadPreview();
+                }
+              };
+            });
+          }
+          return;
+        }
+        if (slidesPreview) {
+          slidesPreview.classList.remove('show');
+          slidesPreview.innerHTML = '';
+        }
+        if (countEl) {
+          countEl.hidden = true;
+          countEl.textContent = '';
+        }
+        if (!pendingPopupFiles.length) {
+          if (singlePreview) singlePreview.classList.remove('show');
+          if (singleImg) singleImg.removeAttribute('src');
+          return;
+        }
+        if (singleImg) singleImg.src = URL.createObjectURL(pendingPopupFiles[0]);
+        if (singlePreview) singlePreview.classList.add('show');
       }
 
       function stagePopupFile(file) {
@@ -1486,12 +1658,33 @@
           setPopupStatus('الملف ليس صورة صالحة', true);
           return;
         }
-        pendingPopupFile = file;
-        var preview = document.getElementById('popupUploadPreview');
-        var img = document.getElementById('popupUploadPreviewImg');
-        if (img) img.src = URL.createObjectURL(file);
-        if (preview) preview.classList.add('show');
-        setPopupStatus('معاينة الصورة جاهزة');
+        var mode = selectedPopupMode();
+        if (mode === 'slides') {
+          if (pendingPopupFiles.length >= 12) {
+            setPopupStatus('الحد الأقصى 12 صورة', true);
+            return;
+          }
+          pendingPopupFiles.push(file);
+          setPopupStatus('أُضيفت صورة (' + pendingPopupFiles.length + ')');
+        } else {
+          pendingPopupFiles = [file];
+          setPopupStatus('معاينة الصورة جاهزة');
+        }
+        renderPopupUploadPreview();
+      }
+
+      function stagePopupFiles(fileList) {
+        if (!fileList || !fileList.length) return;
+        var mode = selectedPopupMode();
+        var files = Array.prototype.slice.call(fileList);
+        if (mode === 'slides') {
+          files.forEach(function (f) {
+            if (pendingPopupFiles.length >= 12) return;
+            stagePopupFile(f);
+          });
+          return;
+        }
+        stagePopupFile(files[0]);
       }
 
       async function loadPopups() {
@@ -1516,6 +1709,7 @@
       function popupModeLabel(mode) {
         if (mode === 'image') return 'صورة';
         if (mode === 'both') return 'نص وصورة';
+        if (mode === 'slides') return 'شرائح صور';
         return 'نص';
       }
 
@@ -1525,13 +1719,16 @@
         if (!api || !list) return;
         const items = api.getItems();
         if (!items.length) {
-          list.innerHTML = '<div class="empty">لا توجد نوافذ منبثقة بعد.</div>';
+          list.innerHTML = '<div class="empty">لا توجد إعلانات بعد.</div>';
           return;
         }
         list.innerHTML = items.map(function (it) {
           const active = api.isActiveItem(it);
           const left = api.remainingDays(it);
-          const title = it.title || (it.text ? it.text.slice(0, 48) : 'إعلان');
+          const slideCount = (it.imageIds && it.imageIds.length) || (it.imageId ? 1 : 0);
+          const title = it.title || (it.mode === 'slides'
+            ? ('ملاحظات مصورة (' + slideCount + ')')
+            : (it.text ? it.text.slice(0, 48) : 'إعلان'));
           const body = it.text && it.title ? escapeHtml(it.text) : (!it.title && it.text ? '' : escapeHtml(it.text || ''));
           return (
             '<article class="popupCard" data-popup-id="' + escapeHtml(it.id) + '">' +
@@ -1541,8 +1738,11 @@
                 (body ? '<p>' + body + '</p>' : '') +
                 '<div class="popupMeta">' +
                   '<span>' + escapeHtml(popupModeLabel(it.mode)) + '</span>' +
+                  (it.mode === 'slides' ? ('<span>' + slideCount + ' صورة</span>') : '') +
                   '<span>' + escapeHtml(String(it.days)) + ' يوم</span>' +
-                  '<span>' + escapeHtml(String(it.durationSec)) + ' ث</span>' +
+                  (it.mode === 'slides'
+                    ? '<span>يدوي</span>'
+                    : ('<span>' + escapeHtml(String(it.durationSec)) + ' ث</span>')) +
                   (it.linkUrl ? ('<span>زر: ' + escapeHtml(it.linkLabel || 'رابط') + '</span>') : '') +
                   '<span>' + (active ? ('متبقي ' + left + ' يوم') : (it.enabled ? 'منتهية' : 'متوقفة')) + '</span>' +
                 '</div>' +
@@ -1610,31 +1810,32 @@
         const linkLabel = (document.getElementById('popupLinkLabel').value || '').trim();
         const days = Number(document.getElementById('popupDays').value || 3);
         const durationSec = Number(document.getElementById('popupDuration').value || 12);
-        if (mode !== 'image' && !title && !text) {
+        if (mode !== 'image' && mode !== 'slides' && !title && !text) {
           setPopupStatus('أدخل عنواناً أو نصاً للإعلان', true);
           return;
         }
-        if (mode !== 'text' && !pendingPopupFile) {
-          setPopupStatus('أرفق صورة للإعلان', true);
+        if (mode !== 'text' && !pendingPopupFiles.length) {
+          setPopupStatus(mode === 'slides' ? 'أرفق صورة واحدة على الأقل للشرائح' : 'أرفق صورة للإعلان', true);
           return;
         }
-        if (linkUrl && !/^https?:\/\//i.test(linkUrl) && !/^[\w.-]+\.[\w.-]+/.test(linkUrl)) {
+        if (mode !== 'slides' && linkUrl && !/^https?:\/\//i.test(linkUrl) && !/^[\w.-]+\.[\w.-]+/.test(linkUrl)) {
           setPopupStatus('رابط الزر غير صالح', true);
           return;
         }
         const btn = document.getElementById('popupSaveBtn');
         if (btn) btn.disabled = true;
-        setPopupStatus('جاري النشر…');
+        setPopupStatus(mode === 'slides' ? ('جاري نشر ' + pendingPopupFiles.length + ' صورة…') : 'جاري النشر…');
         try {
           await RosterAnnouncePopups.addPopup({
             mode: mode,
             title: title,
-            text: text,
-            linkUrl: linkUrl,
-            linkLabel: linkLabel,
+            text: mode === 'slides' ? '' : text,
+            linkUrl: mode === 'slides' ? '' : linkUrl,
+            linkLabel: mode === 'slides' ? '' : linkLabel,
             days: days,
-            durationSec: durationSec,
-            file: pendingPopupFile || null
+            durationSec: mode === 'slides' ? 12 : durationSec,
+            file: pendingPopupFiles[0] || null,
+            files: pendingPopupFiles.slice()
           });
           document.getElementById('popupTitle').value = '';
           document.getElementById('popupText').value = '';
@@ -2306,9 +2507,9 @@
         var input = document.getElementById(id);
         if (!input) return;
         input.addEventListener('change', function () {
-          var file = input.files && input.files[0];
+          var list = input.files;
           input.value = '';
-          stagePopupFile(file);
+          stagePopupFiles(list);
         });
       }
       bindPopupFileInput('popupAddInput');
