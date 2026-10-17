@@ -746,7 +746,7 @@
     .popupSlideThumb img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
     .popupSlideThumb button {
@@ -782,10 +782,16 @@
     }
     .popupCard img {
       width: 100%;
-      height: 120px;
-      object-fit: cover;
+      height: auto;
+      max-height: 260px;
+      object-fit: contain;
       display: block;
       background: #1e293b;
+    }
+    #popupUploadPreview img {
+      height: auto;
+      max-height: 280px;
+      object-fit: contain;
     }
     .popupCardBody {
       padding: 10px 12px 12px;
@@ -1069,8 +1075,8 @@
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20261017e"></script>
-  <script src="../announce-popup.js?v=20261017e"></script>
+  <script src="../banner-store.js?v=20261017f"></script>
+  <script src="../announce-popup.js?v=20261017f"></script>
   <script>
     (function () {
       const PIN = '912';
