@@ -591,8 +591,30 @@ _LOAD_ENHANCE_IIFE_RE = re.compile(
 )
 
 FLATTEN_FUTURE_SHIFTS_FN = """  function flattenFutureShifts(data, fromIso) {
+    /* schedules-first-preview: days[] is only the latest month snapshot */
     var out = [];
     if (!data) return out;
+    if (data.schedules && typeof data.schedules === 'object') {
+      Object.keys(data.schedules).forEach(function(monthKey) {
+        var mk = String(monthKey).match(/^(\\d{4})-(\\d{2})$/);
+        if (!mk) return;
+        var y = mk[1], mo = mk[2];
+        var rows = data.schedules[monthKey] || [];
+        rows.forEach(function(r) {
+          if (!r) return;
+          var iso = String(r.date || '').trim();
+          if (!iso && r.day != null && r.day !== '') {
+            iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+          }
+          if (!iso || iso < fromIso) return;
+          out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
+        });
+      });
+      if (out.length) {
+        out.sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); });
+        return out.slice(0, 5);
+      }
+    }
     if (Array.isArray(data.days) && data.month) {
       var mp = String(data.month).match(/^(\\d{4})-(\\d{2})$/);
       if (mp) {
@@ -606,26 +628,7 @@ FLATTEN_FUTURE_SHIFTS_FN = """  function flattenFutureShifts(data, fromIso) {
         return out.slice(0, 5);
       }
     }
-    if (!data.schedules) return out;
-    Object.keys(data.schedules).forEach(function(monthKey) {
-      var mk = String(monthKey).match(/^(\\d{4})-(\\d{2})$/);
-      if (!mk) return;
-      var y = mk[1], mo = mk[2];
-      var rows = data.schedules[monthKey] || [];
-      rows.forEach(function(r) {
-        if (!r) return;
-        var iso = String(r.date || '').trim();
-        if (!iso && r.day != null && r.day !== '') {
-          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
-        }
-        if (!iso || iso < fromIso) return;
-        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
-      });
-    });
-    out.sort(function(a, b) {
-      return String(a.date).localeCompare(String(b.date));
-    });
-    return out.slice(0, 5);
+    return out;
   }"""
 
 _FLATTEN_FUTURE_SHIFTS_RE = re.compile(
@@ -667,7 +670,7 @@ def inject_capture_sheet_css(style: str, repo_root: Path) -> str:
 
 
 def patch_flatten_future_shifts_js(script: str) -> str:
-    if "Array.isArray(data.days)" in script and "d.code || d.shift_code" in script:
+    if "schedules-first-preview" in script:
         return script
     return _FLATTEN_FUTURE_SHIFTS_RE.sub(lambda _m: FLATTEN_FUTURE_SHIFTS_FN, script, count=1)
 

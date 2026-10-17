@@ -1286,7 +1286,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=""" + MANTLE_CLIENT_VER + """');
-  addScript(root + '/emp-contact.js?v=20260902c');
+  addScript(root + '/emp-contact.js?v=20261017b');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/wc-final-celebrate.js?v=' + ver);
@@ -1327,7 +1327,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
   addScript(root + '/open-current-shift.js?v=20260908s');
-  addScript(root + '/emp-contact.js?v=20260902c');
+  addScript(root + '/emp-contact.js?v=20261017b');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
   addScript(root + '/site-last-updated.js?v=' + ver);
