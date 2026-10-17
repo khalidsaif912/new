@@ -95,6 +95,9 @@
   var ROOT_ID = 'rosterAnnouncePopupRoot';
   var ID_RE = /^a[a-z0-9]{7,31}$/i;
   var DAY_MS = 86400000;
+  var MAX_IMG_DATA_LEN = 180000;
+  // Animated GIFs are stored untouched (canvas would flatten them), so they need more room.
+  var MAX_GIF_DATA_LEN = 600000;
 
   var store = { items: [], at: 0 };
   var storeFetchOk = false;
@@ -137,8 +140,9 @@
 
   function safeImageData(d) {
     d = String(d || '');
-    if (!/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(d)) return '';
-    if (d.length > 180000) return '';
+    if (!/^data:image\/(jpeg|jpg|png|webp|gif);base64,/i.test(d)) return '';
+    var cap = /^data:image\/gif;/i.test(d) ? MAX_GIF_DATA_LEN : MAX_IMG_DATA_LEN;
+    if (d.length > cap) return '';
     return d;
   }
 
@@ -277,6 +281,7 @@
 
   function writeImgDisk(id, dataUrl) {
     try {
+      if (dataUrl.length > MAX_IMG_DATA_LEN) return;
       var all = mantle().readCache(IMG_DISK_KEY) || {};
       if (typeof all !== 'object' || !all) all = {};
       all[id] = dataUrl;
@@ -435,7 +440,32 @@
     }
   }
 
+  function isGifFile(file) {
+    return !!file && (/^image\/gif$/i.test(file.type || '') || /\.gif$/i.test(file.name || ''));
+  }
+
+  function readGifFile(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var d = String(reader.result || '').replace(/^data:[^;,]*/i, 'data:image/gif');
+        if (d.length > MAX_GIF_DATA_LEN) {
+          reject(new Error('gif-large'));
+          return;
+        }
+        if (!safeImageData(d)) {
+          reject(new Error('img'));
+          return;
+        }
+        resolve(d);
+      };
+      reader.onerror = function () { reject(new Error('read')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function compressImageFile(file, maxW, quality, maxBytes) {
+    if (isGifFile(file)) return readGifFile(file);
     maxW = maxW || 900;
     quality = quality == null ? 0.78 : quality;
     maxBytes = maxBytes || 90000;
