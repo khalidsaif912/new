@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="desk-log-build" content="20261017gif">
+  <meta name="desk-log-build" content="20261017mantle64k">
   <title>·</title>
   <style>
     :root {
@@ -1041,7 +1041,7 @@
 
         <section class="popupSection" id="popupImageWrap" hidden>
           <p class="popupSectionTitle" id="popupImageTitle">الصورة</p>
-          <p class="bannerUploadHint" id="popupImageHint">أرفق صورة (JPG / PNG / WebP / GIF). الصور تُضغط تلقائياً، وملفات GIF تُرفع كما هي (حتى نحو 400 ك.ب).</p>
+          <p class="bannerUploadHint" id="popupImageHint">أرفق صورة (JPG / PNG / WebP / GIF). الصور تُضغط تلقائياً، وملفات GIF تُرفع كما هي (حتى نحو 160 ك.ب).</p>
           <div class="bannerUploadActions">
             <label class="bannerAddLabel">
               <input type="file" id="popupAddInput" accept="image/jpeg,image/png,image/webp,image/gif,image/*">
@@ -1069,8 +1069,8 @@
     </div>
   </div>
 
-  <script src="../banner-store.js?v=20261017c"></script>
-  <script src="../announce-popup.js?v=20261017c"></script>
+  <script src="../banner-store.js?v=20261017d"></script>
+  <script src="../announce-popup.js?v=20261017d"></script>
   <script>
     (function () {
       const PIN = '912';
@@ -1574,7 +1574,7 @@
         if (imageHint) {
           imageHint.textContent = mode === 'slides'
             ? 'أرفق عدة صور أو GIF بالترتيب (حتى 12). الزائر يضغط «التالي» حتى آخر شريحة ثم يعود للصفحة الرئيسية.'
-            : 'أرفق صورة (JPG / PNG / WebP / GIF). الصور تُضغط تلقائياً، وملفات GIF تُرفع كما هي (حتى نحو 400 ك.ب).';
+            : 'أرفق صورة (JPG / PNG / WebP / GIF). الصور تُضغط تلقائياً، وملفات GIF تُرفع كما هي (حتى نحو 160 ك.ب).';
         }
         if (addInput) {
           if (mode === 'slides') addInput.setAttribute('multiple', 'multiple');
@@ -1849,7 +1849,7 @@
         } catch (e) {
           var msg = 'تعذر نشر الإعلان';
           if (e && e.message === 'large') msg = 'الصورة كبيرة جداً حتى بعد الضغط — جرّب صورة أصغر';
-          else if (e && e.message === 'gif-large') msg = 'ملف GIF كبير جداً (الحد نحو 400 ك.ب) — صغّر حجمه أو قلّل عدد الإطارات';
+          else if (e && e.message === 'gif-large') msg = 'ملف GIF كبير جداً (الحد نحو 160 ك.ب) — صغّر حجمه أو قلّل عدد الإطارات';
           else if (e && e.message === 'imgwrite') msg = 'فشل حفظ الصورة على السيرفر';
           else if (e && e.message === 'save') msg = 'فشل حفظ قائمة الإعلانات';
           else if (e && (e.message === 'store-offline' || e.code === 'rate' || e.code === 'backoff')) {

@@ -95,9 +95,13 @@
   var ROOT_ID = 'rosterAnnouncePopupRoot';
   var ID_RE = /^a[a-z0-9]{7,31}$/i;
   var DAY_MS = 86400000;
-  var MAX_IMG_DATA_LEN = 180000;
-  // Animated GIFs are stored untouched (canvas would flatten them), so they need more room.
-  var MAX_GIF_DATA_LEN = 600000;
+  // MantleDB entries are capped at 64 KB (JSON body included) on this namespace.
+  var MANTLE_CHUNK_LEN = 56000;
+  var MAX_IMG_DATA_LEN = 56000;
+  // Animated GIFs are stored untouched (canvas would flatten them) and split across entries.
+  var MAX_GIF_PARTS = 4;
+  var MAX_GIF_DATA_LEN = MANTLE_CHUNK_LEN * MAX_GIF_PARTS;
+  var DISK_CACHE_MAX_CHARS = 1500000;
 
   var store = { items: [], at: 0 };
   var storeFetchOk = false;
@@ -281,13 +285,18 @@
 
   function writeImgDisk(id, dataUrl) {
     try {
-      if (dataUrl.length > MAX_IMG_DATA_LEN) return;
+      if (dataUrl.length > DISK_CACHE_MAX_CHARS) return;
       var all = mantle().readCache(IMG_DISK_KEY) || {};
       if (typeof all !== 'object' || !all) all = {};
+      delete all[id];
       all[id] = dataUrl;
       var keys = Object.keys(all);
-      if (keys.length > 24) {
-        keys.slice(0, keys.length - 24).forEach(function (k) { delete all[k]; });
+      var total = 0;
+      keys.forEach(function (k) { total += String(all[k] || '').length; });
+      while (keys.length > 1 && (keys.length > 24 || total > DISK_CACHE_MAX_CHARS)) {
+        var oldest = keys.shift();
+        total -= String(all[oldest] || '').length;
+        delete all[oldest];
       }
       mantle().writeCache(IMG_DISK_KEY, all);
     } catch (e) {}
@@ -380,21 +389,48 @@
     return store;
   }
 
+  function partUrl(id, i) {
+    return MANTLE_IMG_NS + encodeURIComponent(id) + (i > 0 ? '-p' + i : '');
+  }
+
+  async function postImagePart(id, i, body) {
+    var res = await mantle().fetchRes(partUrl(id, i), {
+      method: 'POST',
+      headers: mantleHeaders(true),
+      body: JSON.stringify(body),
+      force: true
+    });
+    if (!res.ok) throw new Error('imgwrite');
+  }
+
   async function writeImage(id, dataUrl) {
     id = String(id || '').trim();
     if (!ID_RE.test(id)) throw new Error('id');
     var safe = safeImageData(dataUrl);
     if (!safe) throw new Error('img');
-    var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id), {
-      method: 'POST',
-      headers: mantleHeaders(true),
-      body: JSON.stringify({ d: safe, at: Date.now() }),
-      force: true
-    });
-    if (!res.ok) throw new Error('imgwrite');
+    var parts = [];
+    for (var pos = 0; pos < safe.length; pos += MANTLE_CHUNK_LEN) {
+      parts.push(safe.slice(pos, pos + MANTLE_CHUNK_LEN));
+    }
+    var at = Date.now();
+    // Extra parts first so the main entry never points at missing data.
+    for (var i = 1; i < parts.length; i++) {
+      await postImagePart(id, i, { d: parts[i], at: at });
+    }
+    var main = { d: parts[0], at: at };
+    if (parts.length > 1) main.n = parts.length;
+    await postImagePart(id, 0, main);
     imgCache[id] = safe;
     writeImgDisk(id, safe);
     return safe;
+  }
+
+  async function readImagePart(id, i) {
+    var res = await mantle().fetchRes(partUrl(id, i) + '?ts=' + Date.now(), {
+      headers: mantleHeaders(false)
+    });
+    if (!res.ok) return null;
+    return res.json();
   }
 
   async function deleteImage(id) {
@@ -402,14 +438,16 @@
     if (!ID_RE.test(id)) return;
     delete imgCache[id];
     deleteImgDisk(id);
+    var parts = 1;
     try {
-      await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id), {
-        method: 'POST',
-        headers: mantleHeaders(true),
-        body: JSON.stringify({ d: '', deleted: true, at: Date.now() }),
-        force: true
-      });
+      var head = await readImagePart(id, 0);
+      if (head && head.n > 1) parts = Math.min(Number(head.n) || 1, MAX_GIF_PARTS);
     } catch (e) {}
+    for (var i = 0; i < parts; i++) {
+      try {
+        await postImagePart(id, i, { d: '', deleted: true, at: Date.now() });
+      } catch (e) {}
+    }
   }
 
   async function loadImage(id) {
@@ -423,13 +461,20 @@
     }
     if (mantle().backingOff && mantle().backingOff()) return '';
     try {
-      var res = await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id) + '?ts=' + Date.now(), {
-        headers: mantleHeaders(false)
-      });
-      if (!res.ok) return '';
-      var json = await res.json();
-      if (json && json.deleted) return '';
-      var safe = safeImageData(json && json.d);
+      var head = await readImagePart(id, 0);
+      if (!head || head.deleted) return '';
+      var data = String(head.d || '');
+      var n = Math.min(Math.max(Number(head.n) || 1, 1), MAX_GIF_PARTS);
+      if (n > 1) {
+        var rest = [];
+        for (var i = 1; i < n; i++) rest.push(readImagePart(id, i));
+        var others = await Promise.all(rest);
+        for (var j = 0; j < others.length; j++) {
+          if (!others[j] || others[j].deleted) return '';
+          data += String(others[j].d || '');
+        }
+      }
+      var safe = safeImageData(data);
       if (safe) {
         imgCache[id] = safe;
         writeImgDisk(id, safe);
@@ -468,7 +513,7 @@
     if (isGifFile(file)) return readGifFile(file);
     maxW = maxW || 900;
     quality = quality == null ? 0.78 : quality;
-    maxBytes = maxBytes || 90000;
+    maxBytes = maxBytes || MAX_IMG_DATA_LEN - 200;
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
       reader.onload = function () {
