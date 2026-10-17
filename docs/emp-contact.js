@@ -687,8 +687,33 @@
   }
 
   function flattenFutureShifts(data, fromIso) {
+    /* schedules-first-preview: days[] is only the latest month snapshot */
     var out = [];
     if (!data) return out;
+    if (data.schedules && typeof data.schedules === 'object') {
+      Object.keys(data.schedules).forEach(function (monthKey) {
+        var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
+        if (!mk) return;
+        var y = mk[1];
+        var mo = mk[2];
+        var rows = data.schedules[monthKey] || [];
+        rows.forEach(function (r) {
+          if (!r) return;
+          var iso = String(r.date || '').trim();
+          if (!iso && r.day != null && r.day !== '') {
+            iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
+          }
+          if (!iso || iso < fromIso) return;
+          out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
+        });
+      });
+      if (out.length) {
+        out.sort(function (a, b) {
+          return String(a.date).localeCompare(String(b.date));
+        });
+        return out.slice(0, 5);
+      }
+    }
     if (Array.isArray(data.days) && data.month) {
       var mp = String(data.month).match(/^(\d{4})-(\d{2})$/);
       if (mp) {
@@ -707,27 +732,7 @@
         return out.slice(0, 5);
       }
     }
-    if (!data.schedules) return out;
-    Object.keys(data.schedules).forEach(function (monthKey) {
-      var mk = String(monthKey).match(/^(\d{4})-(\d{2})$/);
-      if (!mk) return;
-      var y = mk[1];
-      var mo = mk[2];
-      var rows = data.schedules[monthKey] || [];
-      rows.forEach(function (r) {
-        if (!r) return;
-        var iso = String(r.date || '').trim();
-        if (!iso && r.day != null && r.day !== '') {
-          iso = y + '-' + mo + '-' + String(r.day).padStart(2, '0');
-        }
-        if (!iso || iso < fromIso) return;
-        out.push({ date: iso, shift_code: String(r.shift_code || r.code || '').trim() });
-      });
-    });
-    out.sort(function (a, b) {
-      return String(a.date).localeCompare(String(b.date));
-    });
-    return out.slice(0, 5);
+    return out;
   }
 
   function formatShortDateParts(isoDate) {
