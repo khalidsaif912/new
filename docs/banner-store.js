@@ -589,12 +589,15 @@
       !document.querySelector('script[data-announce-popup="1"]')
     ) {
       var announceSrc = '';
+      var announceVer = '';
       var scripts = document.getElementsByTagName('script');
       for (var si = 0; si < scripts.length; si++) {
         var href = scripts[si].src || '';
         var hm = href.match(/^(.*\/)banner-store\.js(?:\?|$)/i);
         if (hm) {
-          announceSrc = hm[1] + 'announce-popup.js?v=20261007d';
+          var vm = href.match(/[?&]v=([0-9A-Za-z]+)/);
+          announceVer = vm ? vm[1] : '';
+          announceSrc = hm[1] + 'announce-popup.js' + (announceVer ? '?v=' + announceVer : '');
           break;
         }
       }
@@ -605,7 +608,7 @@
           var rm = path.match(/^(.*?\/(?:docs|new\/docs)\/)/);
           root = rm ? rm[1].replace(/\/$/, '') : '';
         } catch (e0) {}
-        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261007d';
+        announceSrc = (root ? root + '/' : '') + 'announce-popup.js';
       }
       var as = document.createElement('script');
       as.src = announceSrc;
