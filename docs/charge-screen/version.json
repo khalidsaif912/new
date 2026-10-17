@@ -1,8 +1,8 @@
 {
-    "versionCode":  74,
-    "versionName":  "1.15.11",
+    "versionCode":  75,
+    "versionName":  "1.15.12",
     "apkUrl":  "https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk",
-    "notes":  "Update 1.15.11 - the charge screen opens when the charger is connected, and the full-screen alert stays until the screen is on",
+    "notes":  "Update 1.15.12 - open the charge screen when the charger is connected",
     "statsWebhook":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec",
     "statsDashboard":  "https://script.google.com/macros/s/AKfycbxOp_CufY-crXprlxdQj3GYa8K4dQGOSTYa9jD58UT_6sRmAJUbCjrkQi0nfekm40ow/exec"
 }
