@@ -602,7 +602,7 @@
       '#' + ROOT_ID + '.show .rap-card{transform:none}',
       '#' + ROOT_ID + ' .rap-close{position:absolute;top:10px;inset-inline-end:10px;width:34px;height:34px;border:0;border-radius:999px;',
       'background:rgba(15,23,42,.72);color:#fff;font-size:18px;line-height:1;cursor:pointer;z-index:2}',
-      '#' + ROOT_ID + ' .rap-img{display:block;width:100%;max-height:280px;object-fit:cover;background:#e2e8f0}',
+      '#' + ROOT_ID + ' .rap-img{display:block;width:100%;height:auto;max-height:min(60vh,520px);object-fit:contain;background:#0f172a}',
       '#' + ROOT_ID + ' .rap-body{padding:18px 18px 16px}',
       '#' + ROOT_ID + ' .rap-title{margin:0 0 8px;font-size:18px;font-weight:800;color:#0f172a;line-height:1.35}',
       '#' + ROOT_ID + ' .rap-text{margin:0;font-size:14px;font-weight:600;color:#334155;line-height:1.65;white-space:pre-wrap}',
