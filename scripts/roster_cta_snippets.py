@@ -56,14 +56,6 @@ SVG_APPS_BTN = (
     '<rect x="14" y="14" width="7" height="7" rx="1.5"/>'
     '</svg>'
 )
-SVG_APP_FLIGHT = (
-    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
-    '<ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/>'
-    '<path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
-    '<path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>'
-    '<circle cx="40" cy="34" r="2.2" fill="#fff"/>'
-    '</svg>'
-)
 SVG_APP_LABEL = (
     '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
     '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
@@ -763,7 +755,6 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
       line-height: 1.3;
       text-align: center;
     }
-    .siteAppsLink--flights .siteAppsLink-icon { background: #e0f2fe; border-color: #bae6fd; }
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
     .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
@@ -815,11 +806,6 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
         <span class="siteAppsLink-icon">{SVG_APP_READ_SIGN}</span>
         <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
         <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
-      </a>
-      <a class="siteAppsLink siteAppsLink--flights" href="https://khalidsaif912.github.io/live-flights/" target="_blank" rel="noopener noreferrer" data-app-id="flights">
-        <span class="siteAppsLink-icon">{SVG_APP_FLIGHT}</span>
-        <span class="siteAppsLink-title" data-i18n="flights">Muscat Flights</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="flights">Airport board</span>
       </a>
       <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
         <span class="siteAppsLink-icon">{SVG_APP_LABEL}</span>
@@ -1295,7 +1281,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261005a');
+    addScript(root + '/site-apps.js?v=20261018a');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
@@ -1340,7 +1326,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261005a');
+    addScript(root + '/site-apps.js?v=20261018a');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
