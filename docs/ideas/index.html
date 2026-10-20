@@ -739,19 +739,35 @@
       }).join('');
     }
 
-    function markIdeasSeen() {
+    // Baseline = ideas present when the list first loaded this visit.
+    // Submits in this session stay "new" on the home star until the next ideas visit.
+    var seenBaselineAt = 0;
+
+    function markIdeasSeen(useFullState) {
       try {
         var maxAt = Date.now();
-        (state.ideas || []).forEach(function (idea) {
-          var at = Number(idea && idea.at) || 0;
-          if (at > maxAt) maxAt = at;
-        });
+        if (useFullState) {
+          (state.ideas || []).forEach(function (idea) {
+            var at = Number(idea && idea.at) || 0;
+            if (at > maxAt) maxAt = at;
+          });
+        } else if (seenBaselineAt > 0) {
+          maxAt = seenBaselineAt;
+        } else {
+          (state.ideas || []).forEach(function (idea) {
+            var at = Number(idea && idea.at) || 0;
+            if (at > maxAt) maxAt = at;
+          });
+        }
         localStorage.setItem('rosterIdeasSeenAt', String(maxAt));
         sessionStorage.removeItem('rosterIdeasNewCountCacheV1');
+        sessionStorage.removeItem('rosterIdeasNewCountCacheV2');
       } catch (e) {}
       try {
         if (window.rosterIdeasPrompt && window.rosterIdeasPrompt.markSeen) {
-          window.rosterIdeasPrompt.markSeen();
+          window.rosterIdeasPrompt.markSeen(
+            Number(localStorage.getItem('rosterIdeasSeenAt') || 0) || Date.now()
+          );
         }
       } catch (e2) {}
     }
@@ -759,8 +775,14 @@
     async function reload() {
       try {
         state = await fetchDoc();
+        var maxAt = 0;
+        (state.ideas || []).forEach(function (idea) {
+          var at = Number(idea && idea.at) || 0;
+          if (at > maxAt) maxAt = at;
+        });
+        seenBaselineAt = maxAt || Date.now();
         render();
-        markIdeasSeen();
+        markIdeasSeen(false);
       } catch (e) {
         document.getElementById('ideasHost').innerHTML =
           '<div class="empty">تعذر تحميل الأفكار. حاول مرة أخرى.</div>';
@@ -780,6 +802,7 @@
       msg.className = 'msg';
       msg.textContent = 'جاري النشر…';
       try {
+        var postedAt = Date.now();
         await withDoc(function (doc) {
           doc.ideas.unshift({
             id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
@@ -787,7 +810,7 @@
             anonymous: anon,
             name: anon ? '' : displayName(),
             empId: anon ? '' : empId(),
-            at: Date.now(),
+            at: postedAt,
             pinned: false,
             ratingSum: 0,
             ratingCount: 0,
@@ -798,7 +821,11 @@
         document.getElementById('ideaText').value = '';
         msg.className = 'msg ok';
         msg.textContent = 'تم نشر فكرتك ✓';
-        markIdeasSeen();
+        // Keep home-star badge: do not advance seenAt past this new post.
+        try {
+          state = await fetchDoc();
+          render();
+        } catch (eReload) {}
       } catch (e) {
         msg.className = 'msg err';
         msg.textContent = 'تعذر النشر. أعد المحاولة.';

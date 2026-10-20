@@ -12,11 +12,11 @@
   var CSS_ID = 'rosterIdeasStarCssV3';
   var FAB_ID = 'ideasFab';
   var BADGE_ID = 'ideasFabBadge';
-  var VER = '20261020c';
+  var VER = '20261020d';
   var PREF_KEY = 'rosterFabIdeasVisible';
   var ALERT_PREF_KEY = 'rosterFabAlertVisible';
   var SEEN_KEY = 'rosterIdeasSeenAt';
-  var CACHE_KEY = 'rosterIdeasNewCountCacheV1';
+  var CACHE_KEY = 'rosterIdeasNewCountCacheV2';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var CACHE_TTL_MS = 5 * 60 * 1000;
@@ -263,9 +263,9 @@
   function refreshNewCount() {
     var seenAt = readSeenAt();
     var cached = readCache();
+    // Cache is paint-only — always refetch so posts from others show up.
     if (cached && cached.seenAt === seenAt) {
       paintBadge(cached.count);
-      return Promise.resolve(cached.count);
     }
 
     return fetchIdeasDoc()
@@ -318,9 +318,8 @@
     a.addEventListener('click', function (ev) {
       if (ev.defaultPrevented || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
       try {
-        // Visiting clears the badge baseline; ideas page also marks seen.
-        writeSeenAt(Date.now());
-        writeCache(0, readSeenAt());
+        // Don't advance seenAt here — ideas page marks after the list loads.
+        // Clearing early hid the badge for a self-test post-then-home flow.
         paintBadge(0);
         ev.preventDefault();
         location.href = ideasHref();
@@ -377,8 +376,9 @@
     close: function () {},
     syncPrefs: syncHideClasses,
     refreshBadge: refreshNewCount,
-    markSeen: function () {
-      writeSeenAt(Date.now());
+    markSeen: function (ts) {
+      var n = Number(ts);
+      writeSeenAt(n > 0 ? n : Date.now());
       writeCache(0, readSeenAt());
       paintBadge(0);
     }
