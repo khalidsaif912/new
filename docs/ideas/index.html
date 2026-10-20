@@ -739,10 +739,28 @@
       }).join('');
     }
 
+    function markIdeasSeen() {
+      try {
+        var maxAt = Date.now();
+        (state.ideas || []).forEach(function (idea) {
+          var at = Number(idea && idea.at) || 0;
+          if (at > maxAt) maxAt = at;
+        });
+        localStorage.setItem('rosterIdeasSeenAt', String(maxAt));
+        sessionStorage.removeItem('rosterIdeasNewCountCacheV1');
+      } catch (e) {}
+      try {
+        if (window.rosterIdeasPrompt && window.rosterIdeasPrompt.markSeen) {
+          window.rosterIdeasPrompt.markSeen();
+        }
+      } catch (e2) {}
+    }
+
     async function reload() {
       try {
         state = await fetchDoc();
         render();
+        markIdeasSeen();
       } catch (e) {
         document.getElementById('ideasHost').innerHTML =
           '<div class="empty">تعذر تحميل الأفكار. حاول مرة أخرى.</div>';
@@ -780,6 +798,7 @@
         document.getElementById('ideaText').value = '';
         msg.className = 'msg ok';
         msg.textContent = 'تم نشر فكرتك ✓';
+        markIdeasSeen();
       } catch (e) {
         msg.className = 'msg err';
         msg.textContent = 'تعذر النشر. أعد المحاولة.';
