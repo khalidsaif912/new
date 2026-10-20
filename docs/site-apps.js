@@ -10,8 +10,6 @@
       title: 'Related apps',
       hint: 'Quick links to other tools',
       close: 'Close',
-      flights: 'Muscat Flights',
-      flightsSub: 'Airport board',
       labels: 'SATS Labels',
       labelsSub: 'Cargo labels',
       calc: 'Quantities',
@@ -66,8 +64,6 @@
       title: 'تطبيقات مرتبطة',
       hint: 'روابط سريعة لأدوات أخرى',
       close: 'إغلاق',
-      flights: 'رحلات مسقط',
-      flightsSub: 'لوحة المطار',
       labels: 'ملصقات SATS',
       labelsSub: 'ملصقات الشحن',
       calc: 'حساب الكميات',
@@ -140,13 +136,6 @@
 
   /* Flat illustrated icons (Flaticon-like: bold outline + color fills) */
   var APP_ICONS = {
-    flights:
-      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
-      '<ellipse cx="32" cy="56" rx="18" ry="4" fill="#bae6fd" opacity=".55"/>' +
-      '<path d="M10 36c8-2 18-14 22-22 1.2-2.4 4.8-2.2 5.6.4L42 30l14 4c2.2.6 2.2 3.6 0 4.2L42 42l-4.4 15.2c-.8 2.6-4.4 2.8-5.6.4C28 50 16 40 10 38c-2-.6-2-1.8 0-2z" fill="#38bdf8" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
-      '<path d="M28 34 16 28" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/>' +
-      '<circle cx="40" cy="34" r="2.2" fill="#fff"/>' +
-      '</svg>',
     labels:
       '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
       '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>' +
@@ -1108,7 +1097,6 @@
       '.siteAppsLink--chargeScreen .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#86efac)!important;border-color:#4ade80!important;}',
       '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
-      '.siteAppsLink--flights .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
       '#spotlightEmojiBtn img{width:22px;height:22px;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));pointer-events:none;}',
