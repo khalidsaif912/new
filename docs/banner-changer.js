@@ -1167,6 +1167,87 @@
       'width:0!important;',
       'height:0!important;',
       '}',
+      '#bannerChromeFadeMenu .bcf-fabs{',
+      'margin-top:14px!important;',
+      'padding-top:14px!important;',
+      'border-top:1px solid rgba(224,189,99,.28)!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-fabs .bcf-title{',
+      'margin-bottom:8px!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-fabs .bcf-sub{',
+      'margin-bottom:10px!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle{',
+      'display:flex!important;',
+      'align-items:center!important;',
+      'justify-content:space-between!important;',
+      'gap:12px!important;',
+      'margin:0 0 8px!important;',
+      'padding:12px 14px!important;',
+      'border-radius:12px!important;',
+      'border:1.5px solid rgba(224,189,99,.22)!important;',
+      'background:rgba(255,255,255,.04)!important;',
+      'cursor:pointer!important;',
+      'box-sizing:border-box!important;',
+      '-webkit-tap-highlight-color:transparent!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle:last-child{',
+      'margin-bottom:0!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle .bcf-toggle-text{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'gap:2px!important;',
+      'min-width:0!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle .bcf-name{',
+      'font-size:15px!important;',
+      'font-weight:800!important;',
+      'color:#fff8ea!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle .bcf-hint{',
+      'font-size:12px!important;',
+      'font-weight:600!important;',
+      'color:rgba(245,234,216,.82)!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle input{',
+      'appearance:none!important;',
+      '-webkit-appearance:none!important;',
+      'width:46px!important;',
+      'height:28px!important;',
+      'flex-shrink:0!important;',
+      'margin:0!important;',
+      'border-radius:999px!important;',
+      'border:1px solid rgba(255,255,255,.25)!important;',
+      'background:rgba(255,255,255,.12)!important;',
+      'position:relative!important;',
+      'cursor:pointer!important;',
+      'transition:background .15s ease,border-color .15s ease!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle input::after{',
+      'content:""!important;',
+      'position:absolute!important;',
+      'top:2px!important;',
+      'inset-inline-start:2px!important;',
+      'width:22px!important;',
+      'height:22px!important;',
+      'border-radius:50%!important;',
+      'background:#fff!important;',
+      'box-shadow:0 1px 4px rgba(0,0,0,.35)!important;',
+      'transition:transform .15s ease!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle input:checked{',
+      'background:rgba(224,189,99,.85)!important;',
+      'border-color:#e0bd63!important;',
+      '}',
+      '#bannerChromeFadeMenu label.bcf-toggle input:checked::after{',
+      'transform:translateX(18px)!important;',
+      '}',
+      'html[dir="rtl"] #bannerChromeFadeMenu label.bcf-toggle input:checked::after,',
+      'body.ar #bannerChromeFadeMenu label.bcf-toggle input:checked::after{',
+      'transform:translateX(-18px)!important;',
+      '}',
     ].join('');
     document.head.appendChild(style);
   }
@@ -1267,7 +1348,7 @@
         '</div>' +
         '<button type="button" id="closePicker" style="background:rgba(255,255,255,0.06);border:none;color:#b8a57a;width:28px;height:28px;border-radius:8px;font-size:15px;cursor:pointer;flex-shrink:0;">✕</button>' +
       '</div>' +
-      '<div id="bannerChromeFadeMenu" role="region" aria-label="إعدادات إظهار البنر"></div>' +
+      '<div id="bannerChromeFadeMenu" role="region" aria-label="إعدادات البنر والأزرار"></div>' +
       '<div id="bannerGrid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;"></div>' +
       '<button type="button" id="resetBanner" style="margin-top:10px;width:100%;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;color:#b8a57a;background:rgba(255,255,255,0.05);">إعادة الخلفية الافتراضية</button>';
 
@@ -1548,6 +1629,29 @@
     }, 400);
   }
 
+  function fabPrefOn(key) {
+    try {
+      return localStorage.getItem(key) !== '0';
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function setFabPref(key, on) {
+    try {
+      localStorage.setItem(key, on ? '1' : '0');
+    } catch (e) {}
+    try {
+      document.documentElement.classList.toggle(
+        key === 'rosterFabAlertVisible' ? 'roster-hide-alert-fab' : 'roster-hide-ideas-fab',
+        !on
+      );
+    } catch (e2) {}
+    try {
+      window.dispatchEvent(new CustomEvent('rosterFabPrefsChange'));
+    } catch (e3) {}
+  }
+
   function mountChromeFadeSettingsMenu() {
     var menu = document.getElementById('bannerChromeFadeMenu');
     var btn = document.getElementById('bannerChromeSettingsBtn');
@@ -1560,6 +1664,8 @@
       { value: 'date', name: 'التاريخ فقط', hint: 'يبقى التاريخ ويخفى الباقي' },
       { value: 'all', name: 'إخفاء الكل', hint: 'يخفى العنوان والتاريخ والأزرار' }
     ];
+    var alertOn = fabPrefOn('rosterFabAlertVisible');
+    var ideasOn = fabPrefOn('rosterFabIdeasVisible');
 
     menu.innerHTML =
       '<div class="bcf-title">ماذا يظهر على البنر؟</div>' +
@@ -1584,6 +1690,28 @@
           );
         })
         .join('') +
+      '</div>' +
+      '<div class="bcf-fabs">' +
+      '<div class="bcf-title">أزرار الصفحة</div>' +
+      '<div class="bcf-sub">إظهار أو إخفاء الأزرار العائمة</div>' +
+      '<label class="bcf-toggle">' +
+      '<span class="bcf-toggle-text">' +
+      '<span class="bcf-name">زر التنبيه</span>' +
+      '<span class="bcf-hint">جرس التغييرات والإجازات</span>' +
+      '</span>' +
+      '<input type="checkbox" id="bcfToggleAlertFab"' +
+      (alertOn ? ' checked' : '') +
+      '>' +
+      '</label>' +
+      '<label class="bcf-toggle">' +
+      '<span class="bcf-toggle-text">' +
+      '<span class="bcf-name">نجمة الاقتراحات</span>' +
+      '<span class="bcf-hint">فتح صفحة الاقتراحات والأفكار</span>' +
+      '</span>' +
+      '<input type="checkbox" id="bcfToggleIdeasFab"' +
+      (ideasOn ? ' checked' : '') +
+      '>' +
+      '</label>' +
       '</div>';
 
     function syncSelected() {
@@ -1621,6 +1749,31 @@
         e.stopPropagation();
       });
     });
+
+    var alertToggle = document.getElementById('bcfToggleAlertFab');
+    var ideasToggle = document.getElementById('bcfToggleIdeasFab');
+    if (alertToggle) {
+      alertToggle.addEventListener('change', function () {
+        setFabPref('rosterFabAlertVisible', !!alertToggle.checked);
+      });
+      alertToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+    if (ideasToggle) {
+      ideasToggle.addEventListener('change', function () {
+        setFabPref('rosterFabIdeasVisible', !!ideasToggle.checked);
+      });
+      ideasToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+    menu.querySelectorAll('label.bcf-toggle').forEach(function (lab) {
+      lab.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    });
+
     menu.addEventListener('click', function (e) {
       e.stopPropagation();
     });
@@ -1629,6 +1782,16 @@
 
   function init() {
     injectReadabilityStyles();
+    try {
+      document.documentElement.classList.toggle(
+        'roster-hide-alert-fab',
+        localStorage.getItem('rosterFabAlertVisible') === '0'
+      );
+      document.documentElement.classList.toggle(
+        'roster-hide-ideas-fab',
+        localStorage.getItem('rosterFabIdeasVisible') === '0'
+      );
+    } catch (prefErr) {}
     // Restore from localStorage immediately (before catalog) so a refresh
     // never flashes the default header while the catalog loads.
     try {

@@ -5,6 +5,21 @@
   var HOME_CARD_ID = 'chg-card';
   var PAGE_BANNER_ID = 'chg-page-banner';
   var STYLE_ID = 'chg-styles';
+  var FAB_ALERT_PREF = 'rosterFabAlertVisible';
+  var FAB_IDEAS_PREF = 'rosterFabIdeasVisible';
+
+  function syncFabPrefClasses() {
+    try {
+      document.documentElement.classList.toggle(
+        'roster-hide-alert-fab',
+        localStorage.getItem(FAB_ALERT_PREF) === '0'
+      );
+      document.documentElement.classList.toggle(
+        'roster-hide-ideas-fab',
+        localStorage.getItem(FAB_IDEAS_PREF) === '0'
+      );
+    } catch (e) {}
+  }
 
   function chgClockIco() {
     return (
@@ -658,6 +673,10 @@
       }
 
       #${HOME_ICON_ID}[hidden] {
+        display: none !important;
+      }
+
+      html.roster-hide-alert-fab #${HOME_ICON_ID} {
         display: none !important;
       }
 
@@ -2397,6 +2416,11 @@ function boot() {
   function start() {
     stripInjectedAbsenceList();
     loadAlertSound();
+    syncFabPrefClasses();
+    window.addEventListener('rosterFabPrefsChange', syncFabPrefClasses);
+    window.addEventListener('storage', function (e) {
+      if (e.key === FAB_ALERT_PREF || e.key === FAB_IDEAS_PREF) syncFabPrefClasses();
+    });
     // Force homepage feedback UI even if index shell is an older cache.
     try {
       if (typeof window.rosterForceHomeUI === 'function') window.rosterForceHomeUI();
