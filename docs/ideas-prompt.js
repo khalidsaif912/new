@@ -12,14 +12,16 @@
   var CSS_ID = 'rosterIdeasStarCssV5';
   var FAB_ID = 'ideasFab';
   var BADGE_ID = 'ideasFabBadge';
-  var VER = '20261020f';
+  var VER = '20261020g';
   var PREF_KEY = 'rosterFabIdeasVisible';
   var ALERT_PREF_KEY = 'rosterFabAlertVisible';
-  var SEEN_KEY = 'rosterIdeasSeenAt';
-  var CACHE_KEY = 'rosterIdeasNewCountCacheV2';
+  // V2: first visit must NOT baseline to latest idea (that hid badges for everyone except the author).
+  var SEEN_KEY = 'rosterIdeasSeenAtV2';
+  var CACHE_KEY = 'rosterIdeasNewCountCacheV3';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var CACHE_TTL_MS = 5 * 60 * 1000;
+  var FIRST_SEEN_WINDOW_MS = 72 * 60 * 60 * 1000;
 
   function isRosterLanding() {
     var p = (location.pathname || '').toLowerCase();
@@ -221,12 +223,29 @@
     fab.title = label;
   }
 
+  function myEmpId() {
+    try {
+      return String(
+        localStorage.getItem('exportSavedEmpId') ||
+          localStorage.getItem('savedEmpId') ||
+          localStorage.getItem('importSavedEmpId') ||
+          ''
+      ).trim();
+    } catch (e) {
+      return '';
+    }
+  }
+
   function countNewIdeas(ideas, seenAt) {
     if (!seenAt) return 0;
+    var mine = myEmpId();
     var n = 0;
     (ideas || []).forEach(function (idea) {
       var at = Number(idea && idea.at) || 0;
-      if (at > seenAt) n += 1;
+      if (at <= seenAt) return;
+      // Own named posts never badge the author; others still see them.
+      if (mine && idea && idea.empId && String(idea.empId).trim() === mine) return;
+      n += 1;
     });
     return n;
   }
@@ -276,16 +295,10 @@
       .then(function (doc) {
         var ideas = Array.isArray(doc && doc.ideas) ? doc.ideas : [];
         if (!seenAt) {
-          // First visit: baseline only — don't badge existing archive.
-          var maxAt = 0;
-          ideas.forEach(function (idea) {
-            var at = Number(idea && idea.at) || 0;
-            if (at > maxAt) maxAt = at;
-          });
-          writeSeenAt(maxAt || Date.now());
-          writeCache(0, readSeenAt());
-          paintBadge(0);
-          return 0;
+          // First visit: keep a short lookback so recent posts still badge for
+          // other devices (old logic set seenAt=maxAt and hid them for everyone).
+          seenAt = Date.now() - FIRST_SEEN_WINDOW_MS;
+          writeSeenAt(seenAt);
         }
         var count = countNewIdeas(ideas, seenAt);
         writeCache(count, seenAt);

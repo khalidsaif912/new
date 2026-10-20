@@ -739,34 +739,26 @@
       }).join('');
     }
 
-    // Baseline = ideas present when the list first loaded this visit.
-    // Submits in this session stay "new" on the home star until the next ideas visit.
-    var seenBaselineAt = 0;
+    var IDEAS_SEEN_KEY = 'rosterIdeasSeenAtV2';
 
-    function markIdeasSeen(useFullState) {
+    function markIdeasSeen() {
       try {
         var maxAt = Date.now();
-        if (useFullState) {
-          (state.ideas || []).forEach(function (idea) {
-            var at = Number(idea && idea.at) || 0;
-            if (at > maxAt) maxAt = at;
-          });
-        } else if (seenBaselineAt > 0) {
-          maxAt = seenBaselineAt;
-        } else {
-          (state.ideas || []).forEach(function (idea) {
-            var at = Number(idea && idea.at) || 0;
-            if (at > maxAt) maxAt = at;
-          });
-        }
-        localStorage.setItem('rosterIdeasSeenAt', String(maxAt));
+        (state.ideas || []).forEach(function (idea) {
+          var at = Number(idea && idea.at) || 0;
+          if (at > maxAt) maxAt = at;
+        });
+        localStorage.setItem(IDEAS_SEEN_KEY, String(maxAt));
+        // Drop legacy + cache keys so home star refetches.
+        localStorage.removeItem('rosterIdeasSeenAt');
         sessionStorage.removeItem('rosterIdeasNewCountCacheV1');
         sessionStorage.removeItem('rosterIdeasNewCountCacheV2');
+        sessionStorage.removeItem('rosterIdeasNewCountCacheV3');
       } catch (e) {}
       try {
         if (window.rosterIdeasPrompt && window.rosterIdeasPrompt.markSeen) {
           window.rosterIdeasPrompt.markSeen(
-            Number(localStorage.getItem('rosterIdeasSeenAt') || 0) || Date.now()
+            Number(localStorage.getItem(IDEAS_SEEN_KEY) || 0) || Date.now()
           );
         }
       } catch (e2) {}
@@ -775,14 +767,8 @@
     async function reload() {
       try {
         state = await fetchDoc();
-        var maxAt = 0;
-        (state.ideas || []).forEach(function (idea) {
-          var at = Number(idea && idea.at) || 0;
-          if (at > maxAt) maxAt = at;
-        });
-        seenBaselineAt = maxAt || Date.now();
         render();
-        markIdeasSeen(false);
+        markIdeasSeen();
       } catch (e) {
         document.getElementById('ideasHost').innerHTML =
           '<div class="empty">تعذر تحميل الأفكار. حاول مرة أخرى.</div>';
@@ -821,11 +807,12 @@
         document.getElementById('ideaText').value = '';
         msg.className = 'msg ok';
         msg.textContent = 'تم نشر فكرتك ✓';
-        // Keep home-star badge: do not advance seenAt past this new post.
         try {
           state = await fetchDoc();
           render();
         } catch (eReload) {}
+        // Author has already seen their own post; others keep their older seenAt.
+        markIdeasSeen();
       } catch (e) {
         msg.className = 'msg err';
         msg.textContent = 'تعذر النشر. أعد المحاولة.';
