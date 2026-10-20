@@ -1120,10 +1120,78 @@
       'font-weight:600!important;',
       'line-height:1.45!important;',
       '}',
+      '#bannerChromeFadeMenu .bcf-select{',
+      'position:relative!important;',
+      'margin:0 0 2px!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-btn{',
+      'width:100%!important;',
+      'display:flex!important;',
+      'align-items:center!important;',
+      'justify-content:space-between!important;',
+      'gap:12px!important;',
+      'margin:0!important;',
+      'padding:13px 14px!important;',
+      'border-radius:12px!important;',
+      'border:1.5px solid rgba(224,189,99,.35)!important;',
+      'background:rgba(224,189,99,.12)!important;',
+      'color:#fff8ea!important;',
+      'cursor:pointer!important;',
+      'box-sizing:border-box!important;',
+      'font:inherit!important;',
+      'text-align:start!important;',
+      'transition:border-color .15s ease,background .15s ease!important;',
+      '-webkit-tap-highlight-color:transparent!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-btn:hover,',
+      '#bannerChromeFadeMenu .bcf-select.is-open .bcf-select-btn{',
+      'border-color:#e0bd63!important;',
+      'background:rgba(224,189,99,.18)!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-main{',
+      'display:flex!important;',
+      'flex-direction:column!important;',
+      'gap:2px!important;',
+      'min-width:0!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-name{',
+      'font-size:15px!important;',
+      'font-weight:800!important;',
+      'line-height:1.3!important;',
+      'color:#fff8ea!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-hint{',
+      'font-size:12px!important;',
+      'font-weight:600!important;',
+      'line-height:1.35!important;',
+      'color:rgba(245,234,216,.82)!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select-chev{',
+      'width:18px!important;',
+      'height:18px!important;',
+      'flex-shrink:0!important;',
+      'opacity:.9!important;',
+      'transition:transform .18s ease!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select.is-open .bcf-select-chev{',
+      'transform:rotate(180deg)!important;',
+      '}',
       '#bannerChromeFadeMenu .bcf-list{',
       'display:flex!important;',
       'flex-direction:column!important;',
       'gap:8px!important;',
+      'margin-top:0!important;',
+      'max-height:0!important;',
+      'overflow:hidden!important;',
+      'opacity:0!important;',
+      'pointer-events:none!important;',
+      'transition:max-height .22s ease,opacity .18s ease,margin .18s ease!important;',
+      '}',
+      '#bannerChromeFadeMenu .bcf-select.is-open .bcf-list{',
+      'margin-top:8px!important;',
+      'max-height:420px!important;',
+      'opacity:1!important;',
+      'pointer-events:auto!important;',
       '}',
       '#bannerChromeFadeMenu label.bcf-opt{',
       'display:flex!important;',
@@ -1674,19 +1742,44 @@
     var alertOn = fabPrefOn('rosterFabAlertVisible');
     var ideasOn = fabPrefOn('rosterFabIdeasVisible');
 
+    function optionByValue(v) {
+      for (var i = 0; i < options.length; i++) {
+        if (options[i].value === v) return options[i];
+      }
+      return options[0];
+    }
+
+    var currentOpt = optionByValue(mode);
+
     menu.innerHTML =
       '<div class="bcf-title">ماذا يظهر على البنر؟</div>' +
-      '<div class="bcf-sub">بعد ثوانٍ بدون لمس، اختر ما يبقى واضحاً</div>' +
-      '<div class="bcf-list">' +
+      '<div class="bcf-sub">اضغط للاختيار — القائمة تنطوي بعد التحديد</div>' +
+      '<div class="bcf-select" id="bcfFadeSelect">' +
+      '<button type="button" class="bcf-select-btn" id="bcfSelectBtn" aria-expanded="false" aria-controls="bcfFadeList">' +
+      '<span class="bcf-select-main">' +
+      '<span class="bcf-select-name" id="bcfSelectName">' +
+      currentOpt.name +
+      '</span>' +
+      '<span class="bcf-select-hint" id="bcfSelectHint">' +
+      currentOpt.hint +
+      '</span>' +
+      '</span>' +
+      '<svg class="bcf-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>' +
+      '</button>' +
+      '<div class="bcf-list" id="bcfFadeList" role="listbox">' +
       options
         .map(function (opt) {
           return (
             '<label class="bcf-opt' +
             (opt.value === mode ? ' is-on' : '') +
+            '" role="option" aria-selected="' +
+            (opt.value === mode ? 'true' : 'false') +
             '">' +
             '<input type="radio" name="bannerChromeFade" value="' +
             opt.value +
-            '">' +
+            '"' +
+            (opt.value === mode ? ' checked' : '') +
+            '>' +
             '<span class="bcf-name">' +
             opt.name +
             '</span>' +
@@ -1697,6 +1790,7 @@
           );
         })
         .join('') +
+      '</div>' +
       '</div>' +
       '<div class="bcf-fabs">' +
       '<div class="bcf-title">أزرار الصفحة</div>' +
@@ -1721,17 +1815,35 @@
       '</label>' +
       '</div>';
 
+    var selectWrap = document.getElementById('bcfFadeSelect');
+    var selectBtn = document.getElementById('bcfSelectBtn');
+    var selectName = document.getElementById('bcfSelectName');
+    var selectHint = document.getElementById('bcfSelectHint');
+
     function syncSelected() {
       var current = getChromeFadeMode();
+      var opt = optionByValue(current);
+      if (selectName) selectName.textContent = opt.name;
+      if (selectHint) selectHint.textContent = opt.hint;
       menu.querySelectorAll('label.bcf-opt').forEach(function (lab) {
         var input = lab.querySelector('input');
-        lab.classList.toggle('is-on', !!(input && input.value === current && input.checked));
+        var on = !!(input && input.value === current);
+        if (input) input.checked = on;
+        lab.classList.toggle('is-on', on);
+        lab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
+    }
+
+    function setSelectOpen(open) {
+      if (!selectWrap || !selectBtn) return;
+      selectWrap.classList.toggle('is-open', !!open);
+      selectBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
     function setOpen(open) {
       menu.classList.toggle('is-open', !!open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) setSelectOpen(false);
     }
 
     btn.addEventListener('click', function (e) {
@@ -1740,12 +1852,21 @@
       setOpen(!menu.classList.contains('is-open'));
     });
 
+    if (selectBtn) {
+      selectBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectOpen(!selectWrap.classList.contains('is-open'));
+      });
+    }
+
     menu.querySelectorAll('input[name="bannerChromeFade"]').forEach(function (input) {
-      if (input.value === mode) input.checked = true;
       input.addEventListener('change', function () {
         if (!input.checked) return;
         setChromeFadeMode(input.value);
         syncSelected();
+        // Fold after choose so the closed control shows the selection.
+        setSelectOpen(false);
       });
       input.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -1754,6 +1875,14 @@
     menu.querySelectorAll('label.bcf-opt').forEach(function (lab) {
       lab.addEventListener('click', function (e) {
         e.stopPropagation();
+        var input = lab.querySelector('input');
+        if (!input) return;
+        if (!input.checked) {
+          input.checked = true;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+          setSelectOpen(false);
+        }
       });
     });
 
@@ -1785,6 +1914,7 @@
       e.stopPropagation();
     });
     syncSelected();
+    setSelectOpen(false);
   }
 
   function init() {

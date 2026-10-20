@@ -1253,7 +1253,7 @@ IOS_PERF_VER = "20260903c"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
 CHANGE_ALERT_VER = "20261020a"
 # Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
-MANTLE_CLIENT_VER = "20261020f"
+MANTLE_CLIENT_VER = "20261020i"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
