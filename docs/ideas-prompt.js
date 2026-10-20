@@ -9,10 +9,10 @@
   if (window.__rosterIdeasPromptBooted) return;
   window.__rosterIdeasPromptBooted = true;
 
-  var CSS_ID = 'rosterIdeasStarCssV4';
+  var CSS_ID = 'rosterIdeasStarCssV5';
   var FAB_ID = 'ideasFab';
   var BADGE_ID = 'ideasFabBadge';
-  var VER = '20261020e';
+  var VER = '20261020f';
   var PREF_KEY = 'rosterFabIdeasVisible';
   var ALERT_PREF_KEY = 'rosterFabAlertVisible';
   var SEEN_KEY = 'rosterIdeasSeenAt';
@@ -153,16 +153,15 @@
     var st = document.createElement('style');
     st.id = CSS_ID;
     st.textContent =
-      '@keyframes ideasStarTwinkle{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 2px 4px rgba(234,179,8,.35))}40%{transform:scale(1.08) rotate(-6deg);filter:drop-shadow(0 3px 8px rgba(245,158,11,.55))}70%{transform:scale(1.04) rotate(5deg);filter:drop-shadow(0 2px 6px rgba(250,204,21,.5))}}' +
       '@keyframes ideasBadgePop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}' +
       '#' +
       FAB_ID +
-      '{position:fixed;left:16px;right:auto;bottom:calc(12px + 56px + 10px);width:48px;height:48px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:1px solid rgba(15,23,42,.1);border-radius:16px;background:linear-gradient(180deg,#fff 0%,#fffbeb 100%);box-shadow:0 8px 24px rgba(15,23,42,.14);z-index:100031;cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:visible;text-decoration:none;color:inherit;transition:box-shadow .2s ease,border-color .2s ease,transform .15s ease}' +
+      '{position:fixed;left:16px;right:auto;bottom:calc(12px + 48px + 3px);width:48px;height:48px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:1px solid rgba(15,23,42,.1);border-radius:16px;background:rgba(255,255,255,.92);box-shadow:0 8px 24px rgba(15,23,42,.14);z-index:100031;cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:visible;text-decoration:none;color:inherit}' +
       'html.has-news-ticker #' +
       FAB_ID +
       ',html.has-float-dock #' +
       FAB_ID +
-      '{bottom:calc(48px + env(safe-area-inset-bottom,0px) + 56px + 10px)!important;left:16px!important;right:auto!important}' +
+      '{bottom:calc(48px + env(safe-area-inset-bottom,0px) + 48px + 3px)!important;left:16px!important;right:auto!important}' +
       'html.roster-hide-alert-fab #' +
       FAB_ID +
       '{bottom:12px!important}' +
@@ -176,13 +175,13 @@
       '{display:none!important}' +
       '#' +
       FAB_ID +
-      ' img{width:36px;height:36px;display:block;object-fit:contain;pointer-events:none;animation:ideasStarTwinkle 2.4s ease-in-out infinite;transform-origin:50% 55%}' +
+      ' img{width:30px;height:30px;display:block;object-fit:contain;pointer-events:none}' +
       '#' +
       FAB_ID +
       ':active{transform:scale(.96)}' +
       '#' +
       FAB_ID +
-      '.has-new{border-color:rgba(245,158,11,.35);box-shadow:0 8px 24px rgba(245,158,11,.22),0 0 0 2px rgba(250,204,21,.2)}' +
+      '.has-new{box-shadow:0 8px 24px rgba(15,23,42,.14),0 0 0 2px rgba(220,38,38,.18)}' +
       '#' +
       BADGE_ID +
       '{position:absolute;top:-6px;inset-inline-end:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%);color:#fff;font-size:11px;font-weight:800;line-height:16px;text-align:center;letter-spacing:0;box-shadow:0 2px 8px rgba(220,38,38,.4);border:2px solid #fff;pointer-events:none;font-family:system-ui,-apple-system,\"Segoe UI\",sans-serif;box-sizing:border-box;display:none}' +
@@ -190,8 +189,6 @@
       BADGE_ID +
       '.is-on{display:inline-flex;align-items:center;justify-content:center;animation:ideasBadgePop .35s ease-out}' +
       '@media (prefers-reduced-motion:reduce){#' +
-      FAB_ID +
-      ' img,#' +
       BADGE_ID +
       '.is-on{animation:none!important}}';
     (document.head || document.documentElement).appendChild(st);
@@ -316,7 +313,7 @@
     a.setAttribute('aria-label', isAr() ? 'اقتراحات وأفكار' : 'Ideas & suggestions');
     a.title = isAr() ? 'اقتراحات وأفكار' : 'Ideas & suggestions';
     a.innerHTML =
-      '<img alt="" width="36" height="36" decoding="async" src="' +
+      '<img alt="" width="30" height="30" decoding="async" src="' +
       starUrl() +
       '">' +
       '<span id="' +

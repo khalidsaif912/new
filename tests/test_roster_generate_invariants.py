@@ -149,8 +149,8 @@ def test_change_alert_popup_survives_generate():
     assert tag in LOAD_LOCAL_ENHANCEMENTS_IMPORT
     assert LOAD_LOCAL_ENHANCEMENTS_EXPORT.count("change-alert.js") == 1
     assert LOAD_LOCAL_ENHANCEMENTS_IMPORT.count("change-alert.js") == 1
-    assert "ideas-prompt.js?v=20261020e" in LOAD_LOCAL_ENHANCEMENTS_EXPORT
-    assert "ideas-prompt.js?v=20261020e" in LOAD_LOCAL_ENHANCEMENTS_IMPORT
+    assert "ideas-prompt.js?v=20261020f" in LOAD_LOCAL_ENHANCEMENTS_EXPORT
+    assert "ideas-prompt.js?v=20261020f" in LOAD_LOCAL_ENHANCEMENTS_IMPORT
     assert LOAD_LOCAL_ENHANCEMENTS_EXPORT.count("ideas-prompt.js") == 1
     assert LOAD_LOCAL_ENHANCEMENTS_IMPORT.count("ideas-prompt.js") == 1
 
