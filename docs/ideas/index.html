@@ -739,21 +739,25 @@
       }).join('');
     }
 
-    var IDEAS_SEEN_KEY = 'rosterIdeasSeenAtV2';
+    var IDEAS_SEEN_KEY = 'rosterIdeasSeenAtV3';
 
     function markIdeasSeen() {
       try {
-        var maxAt = Date.now();
+        // Use latest idea time only (not Date.now()), so a post made moments
+        // later on another device can still badge this one until ideas is opened.
+        var maxAt = 0;
         (state.ideas || []).forEach(function (idea) {
           var at = Number(idea && idea.at) || 0;
           if (at > maxAt) maxAt = at;
         });
+        if (!maxAt) maxAt = Date.now();
         localStorage.setItem(IDEAS_SEEN_KEY, String(maxAt));
-        // Drop legacy + cache keys so home star refetches.
         localStorage.removeItem('rosterIdeasSeenAt');
+        localStorage.removeItem('rosterIdeasSeenAtV2');
         sessionStorage.removeItem('rosterIdeasNewCountCacheV1');
         sessionStorage.removeItem('rosterIdeasNewCountCacheV2');
         sessionStorage.removeItem('rosterIdeasNewCountCacheV3');
+        sessionStorage.removeItem('rosterIdeasNewCountCacheV4');
       } catch (e) {}
       try {
         if (window.rosterIdeasPrompt && window.rosterIdeasPrompt.markSeen) {

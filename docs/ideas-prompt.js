@@ -12,12 +12,12 @@
   var CSS_ID = 'rosterIdeasStarCssV5';
   var FAB_ID = 'ideasFab';
   var BADGE_ID = 'ideasFabBadge';
-  var VER = '20261020g';
+  var VER = '20261020h';
   var PREF_KEY = 'rosterFabIdeasVisible';
   var ALERT_PREF_KEY = 'rosterFabAlertVisible';
-  // V2: first visit must NOT baseline to latest idea (that hid badges for everyone except the author).
-  var SEEN_KEY = 'rosterIdeasSeenAtV2';
-  var CACHE_KEY = 'rosterIdeasNewCountCacheV3';
+  // V3: first visit uses lookback window (never baseline to latest idea).
+  var SEEN_KEY = 'rosterIdeasSeenAtV3';
+  var CACHE_KEY = 'rosterIdeasNewCountCacheV4';
   var MANTLE_URL = 'https://mantledb.sh/v2/roster-site-visits/ideas';
   var MANTLE_KEY = '8bb6b7c45e0e18fef1b758bc6dc85d7b1bac11b42e2e53faab3b88595572189d';
   var CACHE_TTL_MS = 5 * 60 * 1000;
@@ -223,29 +223,12 @@
     fab.title = label;
   }
 
-  function myEmpId() {
-    try {
-      return String(
-        localStorage.getItem('exportSavedEmpId') ||
-          localStorage.getItem('savedEmpId') ||
-          localStorage.getItem('importSavedEmpId') ||
-          ''
-      ).trim();
-    } catch (e) {
-      return '';
-    }
-  }
-
   function countNewIdeas(ideas, seenAt) {
     if (!seenAt) return 0;
-    var mine = myEmpId();
     var n = 0;
     (ideas || []).forEach(function (idea) {
       var at = Number(idea && idea.at) || 0;
-      if (at <= seenAt) return;
-      // Own named posts never badge the author; others still see them.
-      if (mine && idea && idea.empId && String(idea.empId).trim() === mine) return;
-      n += 1;
+      if (at > seenAt) n += 1;
     });
     return n;
   }
