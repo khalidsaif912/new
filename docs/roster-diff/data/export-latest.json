@@ -1,10 +1,10 @@
 {
   "kind": "export",
   "month": "2026-10",
-  "generated_at": "2026-10-15T08:23:04.257672Z",
+  "generated_at": "2026-10-21T08:28:01.802358Z",
   "old_file": "first edition",
   "new_file": "Export New Roster OCTOBER 2026 Version 3.xlsx",
-  "total_changes": 114,
+  "total_changes": 131,
   "changes": [
     {
       "emp_id": "80482",
@@ -133,6 +133,76 @@
       "v2": "OTN"
     },
     {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 22,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 23,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 24,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 25,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 26,
+      "v1": "NN21",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 27,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 28,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 29,
+      "v1": "OFF",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 30,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81402",
+      "name": "Mohamed Al Siyabi - 81402",
+      "day": 31,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
       "emp_id": "81409",
       "name": "Qasim Al Maqbali - 81409",
       "day": 18,
@@ -144,7 +214,7 @@
       "name": "Qasim Al Maqbali - 81409",
       "day": 19,
       "v1": "LV",
-      "v2": "MN06"
+      "v2": "AN13"
     },
     {
       "emp_id": "81409",
@@ -173,6 +243,20 @@
       "day": 23,
       "v1": "LV",
       "v2": "OFF"
+    },
+    {
+      "emp_id": "82114",
+      "name": "Mubarak Al Nofli - 82114",
+      "day": 23,
+      "v1": "MN06",
+      "v2": "AN13"
+    },
+    {
+      "emp_id": "82114",
+      "name": "Mubarak Al Nofli - 82114",
+      "day": 31,
+      "v1": "MN06",
+      "v2": "AN13"
     },
     {
       "emp_id": "82415",
@@ -322,6 +406,20 @@
       "v2": "LV"
     },
     {
+      "emp_id": "82441",
+      "name": "Mudathir Al Hajri - 82441",
+      "day": 22,
+      "v1": "AN13",
+      "v2": "MN06"
+    },
+    {
+      "emp_id": "82441",
+      "name": "Mudathir Al Hajri - 82441",
+      "day": 30,
+      "v1": "AN13",
+      "v2": "MN06"
+    },
+    {
       "emp_id": "82464",
       "name": "Wissam Al Kharusi - 82464",
       "day": 2,
@@ -446,6 +544,20 @@
       "day": 14,
       "v1": "OFF",
       "v2": "OTN"
+    },
+    {
+      "emp_id": "82551",
+      "name": "Omar Al Obaidi - 82551",
+      "day": 22,
+      "v1": "NN21",
+      "v2": "AN13"
+    },
+    {
+      "emp_id": "82551",
+      "name": "Omar Al Obaidi - 82551",
+      "day": 30,
+      "v1": "NN21",
+      "v2": "AN13"
     },
     {
       "emp_id": "82555",
@@ -579,6 +691,13 @@
       "day": 4,
       "v1": "OFF",
       "v2": "OTA"
+    },
+    {
+      "emp_id": "8715",
+      "name": "Khalid Al Raqadi - 8715",
+      "day": 22,
+      "v1": "MN06",
+      "v2": "LV"
     },
     {
       "emp_id": "8715",
