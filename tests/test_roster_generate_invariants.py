@@ -260,16 +260,48 @@ def test_mantle_clients_survive_generate():
 
 
 def test_roster_diff_pages_boot_and_script_tail_intact():
+    """Banner script must stay outside the boot script.
+
+    A version bump that eats a template-literal closer used to stop the whole
+    inline script from parsing, so the page stayed on "No diff loaded yet."
+    """
+    import re
+
     for name, boot in (
         ("index.html", "(async function bootRosterDiff()"),
         ("index2.html", "loadDiff(currentDiffKind);"),
     ):
         html = (ROOT / "docs" / "roster-diff" / name).read_text(encoding="utf-8")
         assert boot in html, name
-        assert "banner-changer.js?v=" + "20" in html
-        for line in html.splitlines():
-            if "banner-changer.js?v=" in line:
-                assert line.rstrip().endswith("`;"), (name, line)
+        assert re.search(
+            r'<script defer src="\.\./banner-changer\.js\?v=[0-9A-Za-z]+"></script>',
+            html,
+        ), name
         last_script = html.rsplit("<script>", 1)[-1].split("</script>", 1)[0]
+        assert "banner-changer.js" not in last_script, name
+        assert "loadBannerChanger" not in last_script, name
+        assert last_script.count("`") % 2 == 0, name
         assert last_script.count("{") == last_script.count("}"), name
         assert last_script.count("(") == last_script.count(")"), name
+
+
+def test_mantle_version_rewrite_keeps_roster_diff_script_parseable():
+    import sys
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from sync_mantle_client_ver import rewrite_mantle_versions
+
+    broken = (
+        "      s.src = `${root}/banner-changer.js?v=20261017d\n"
+        "      s.defer = true;\n"
+    )
+    healed = rewrite_mantle_versions(broken, "20261020i")
+    assert healed == (
+        "      s.src = `${root}/banner-changer.js?v=20261020i`;\n"
+        "      s.defer = true;\n"
+    )
+
+    quoted = "addScript(root + '/banner-changer.js?v=20261017d');\n"
+    assert rewrite_mantle_versions(quoted, "20261020i") == (
+        "addScript(root + '/banner-changer.js?v=20261020i');\n"
+    )

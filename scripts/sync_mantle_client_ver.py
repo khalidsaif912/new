@@ -16,20 +16,42 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from roster_cta_snippets import MANTLE_CLIENT_VER  # noqa: E402
 
-PATTERN = re.compile(
-    r"((?:site-visits|banner-store|banner-changer|announce-popup|holiday-ticker)\.js\?v=)[0-9A-Za-z]+"
+# Keep this class alphanumeric. A greedy .+ eats a closing quote or backtick
+# and can leave a <script> that fails to parse. roster-diff used to embed
+# banner-changer inside its boot script that way; the page then stayed on
+# "No diff loaded yet." The loader is now a normal script tag. This check
+# still refuses to write any page whose ?v= token is left unclosed.
+_JS = r"(?:site-visits|banner-store|banner-changer|announce-popup|holiday-ticker)"
+PATTERN = re.compile(rf"(({_JS})\.js\?v=)[0-9A-Za-z]+")
+TOKEN = re.compile(rf"{_JS}\.js\?v=[0-9A-Za-z]+")
+CLOSED = re.compile(rf"{_JS}\.js\?v=[0-9A-Za-z]+[`'\"]")
+# Broken roster-diff loader: version, then newline, then `s.defer`.
+HEAL_TEMPLATE = re.compile(
+    rf"({_JS}\.js\?v=[0-9A-Za-z]+)(\s*\n\s*s\.defer\b)"
 )
 
 
+def rewrite_mantle_versions(text: str, version: str) -> str:
+    updated = PATTERN.sub(lambda m: m.group(1) + version, text)
+    updated = HEAL_TEMPLATE.sub(r"\1`;\2", updated)
+    if len(TOKEN.findall(updated)) != len(CLOSED.findall(updated)):
+        raise SystemExit(
+            "Mantle ?v= token is not closed by a quote or backtick; "
+            "refusing to write a page whose script would fail to parse"
+        )
+    return updated
+
+
 def main() -> int:
-    changed = 0
+    pending: list[tuple[Path, str]] = []
     for path in (ROOT / "docs").rglob("*.html"):
         text = path.read_text(encoding="utf-8")
-        updated = PATTERN.sub(lambda m: m.group(1) + MANTLE_CLIENT_VER, text)
+        updated = rewrite_mantle_versions(text, MANTLE_CLIENT_VER)
         if updated != text:
-            path.write_text(updated, encoding="utf-8", newline="\n")
-            changed += 1
-    print(f"MANTLE_CLIENT_VER={MANTLE_CLIENT_VER}: updated {changed} html files")
+            pending.append((path, updated))
+    for path, updated in pending:
+        path.write_text(updated, encoding="utf-8", newline="\n")
+    print(f"MANTLE_CLIENT_VER={MANTLE_CLIENT_VER}: updated {len(pending)} html files")
     return 0
 
 
