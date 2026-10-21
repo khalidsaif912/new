@@ -1,19 +1,37 @@
 {
   "items": [
     {
-      "id": "alzfru1uj",
-      "title": "التطبيق للاندرويد!!!",
-      "text": "",
-      "mode": "image",
-      "imageId": "alzfru1uj",
-      "linkUrl": "https://khalidsaif912.github.io/new/docs/charge-screen/",
-      "linkLabel": "صفحة التطبيق",
-      "days": 3,
+      "id": "aumilk2uc",
+      "title": "الضغط على الاعلان ضغطه مستمره يخلي الاعلان ما يختفي  حتى تقراء براحتك",
+      "text": "اذا كان الروستر الجديد ما مرسول في الايميل التحديث راح يتأخر في الغالب\nوغالبا التغير ما يكون كبير ...",
+      "mode": "text",
+      "imageId": "",
+      "imageIds": [],
+      "linkUrl": "",
+      "linkLabel": "",
+      "days": 1,
       "durationSec": 12,
-      "startAt": 1791566613002,
+      "startAt": 1792570744519,
       "enabled": true,
-      "at": 1791566613002
+      "at": 1792570744519
+    },
+    {
+      "id": "aiydkonoo",
+      "title": "كاميرا داخلية",
+      "text": "7 ريال فقط",
+      "mode": "both",
+      "imageId": "axct7ps57",
+      "imageIds": [
+        "axct7ps57"
+      ],
+      "linkUrl": "",
+      "linkLabel": "",
+      "days": 1,
+      "durationSec": 6,
+      "startAt": 1792517961656,
+      "enabled": true,
+      "at": 1792517961656
     }
   ],
-  "at": 1791566618747
+  "at": 1792570748528
 }
