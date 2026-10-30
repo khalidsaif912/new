@@ -1,10 +1,10 @@
 {
   "kind": "export",
   "month": "2026-10",
-  "generated_at": "2026-10-21T08:28:01.802358Z",
+  "generated_at": "2026-10-30T09:07:35.449743Z",
   "old_file": "first edition",
   "new_file": "Export New Roster OCTOBER 2026 Version 3.xlsx",
-  "total_changes": 131,
+  "total_changes": 142,
   "changes": [
     {
       "emp_id": "80482",
@@ -243,6 +243,20 @@
       "day": 23,
       "v1": "LV",
       "v2": "OFF"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 26,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "81409",
+      "name": "Qasim Al Maqbali - 81409",
+      "day": 27,
+      "v1": "MN06",
+      "v2": "LV"
     },
     {
       "emp_id": "82114",
@@ -602,6 +616,13 @@
       "v2": "MN06"
     },
     {
+      "emp_id": "82587",
+      "name": "Yousuf Al Balushi - 82587",
+      "day": 30,
+      "v1": "NN21",
+      "v2": "AN13"
+    },
+    {
       "emp_id": "82588",
       "name": "Ghassan Al Tarsi - 82588",
       "day": 14,
@@ -614,6 +635,20 @@
       "day": 21,
       "v1": "OTN",
       "v2": "OFF"
+    },
+    {
+      "emp_id": "82645",
+      "name": "Abdullah Al Shukeili - 82645",
+      "day": 30,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "82645",
+      "name": "Abdullah Al Shukeili - 82645",
+      "day": 31,
+      "v1": "AN13",
+      "v2": "LV"
     },
     {
       "emp_id": "82656",
@@ -665,6 +700,13 @@
       "v2": "AN13"
     },
     {
+      "emp_id": "82659",
+      "name": "Ammar Al Hashmi - 82659",
+      "day": 30,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
       "emp_id": "82661",
       "name": "Mohamed Al Maskari - 82661",
       "day": 5,
@@ -679,11 +721,25 @@
       "v2": "AN13"
     },
     {
+      "emp_id": "82672",
+      "name": "Dawood Al Siyabi - 82672",
+      "day": 30,
+      "v1": "OFF",
+      "v2": "OTM"
+    },
+    {
       "emp_id": "82673",
       "name": "Khalifa Al Maqbali - 82673",
       "day": 9,
       "v1": "AN13",
       "v2": "MN06"
+    },
+    {
+      "emp_id": "8584",
+      "name": "Adil Al Zadjali - 8584",
+      "day": 30,
+      "v1": "OFF",
+      "v2": "OTA"
     },
     {
       "emp_id": "8715",
@@ -920,6 +976,27 @@
       "emp_id": "990752",
       "name": "Ali Yousuf Al Balushi - 990752",
       "day": 20,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
+      "day": 26,
+      "v1": "MN06",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
+      "day": 27,
+      "v1": "AN13",
+      "v2": "LV"
+    },
+    {
+      "emp_id": "990752",
+      "name": "Ali Yousuf Al Balushi - 990752",
+      "day": 28,
       "v1": "AN13",
       "v2": "LV"
     }

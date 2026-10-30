@@ -1,24 +1,9 @@
 {
   "items": [
     {
-      "id": "ad73dxmpb",
-      "title": "الروستر مُحدث الآن",
-      "text": "آخر روستر الحين محدث في الموقع\n\nشكرا",
-      "mode": "text",
-      "imageId": "",
-      "imageIds": [],
-      "linkUrl": "https://mystore-96d8e.web.app/",
-      "linkLabel": "متجر مبهر",
-      "days": 1,
-      "durationSec": 12,
-      "startAt": 1792571622719,
-      "enabled": true,
-      "at": 1792571622719
-    },
-    {
-      "id": "aumilk2uc",
-      "title": "الضغط على الاعلان ضغطه مستمره يخلي الاعلان ما يختفي  حتى تقراء براحتك",
-      "text": "اذا كان الروستر الجديد ما مرسول في الايميل التحديث راح يتأخر في الغالب\nوغالبا التغير ما يكون كبير ...",
+      "id": "a1lvtj9hf",
+      "title": "",
+      "text": "صباح الخير",
       "mode": "text",
       "imageId": "",
       "imageIds": [],
@@ -26,27 +11,10 @@
       "linkLabel": "",
       "days": 1,
       "durationSec": 12,
-      "startAt": 1792570744519,
+      "startAt": 1793329395820,
       "enabled": true,
-      "at": 1792570744519
-    },
-    {
-      "id": "aiydkonoo",
-      "title": "كاميرا داخلية",
-      "text": "7 ريال فقط",
-      "mode": "both",
-      "imageId": "axct7ps57",
-      "imageIds": [
-        "axct7ps57"
-      ],
-      "linkUrl": "",
-      "linkLabel": "",
-      "days": 1,
-      "durationSec": 6,
-      "startAt": 1792517961656,
-      "enabled": true,
-      "at": 1792517961656
+      "at": 1793329395820
     }
   ],
-  "at": 1792571622720
+  "at": 1793329395820
 }
