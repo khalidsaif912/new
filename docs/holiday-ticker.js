@@ -151,7 +151,7 @@
 
   function pruneExpired(store) {
     var hours = normalizeExpireHours(store && store.expireHours);
-    if (!hours) return 0;
+    if (!hours) return [];
     var cutoff = Date.now() - hours * 3600 * 1000;
     function keep(m) {
       var t = messageTime(m);
@@ -161,7 +161,8 @@
     var approved = Array.isArray(store.approved) ? store.approved : [];
     var nextPending = pending.filter(keep);
     var nextApproved = approved.filter(keep);
-    var removed = pending.length - nextPending.length + (approved.length - nextApproved.length);
+    var removed = pending.filter(function (m) { return !keep(m); })
+      .concat(approved.filter(function (m) { return !keep(m); }));
     store.pending = nextPending;
     store.approved = nextApproved;
     return removed;
@@ -467,10 +468,13 @@
 
   async function writeFullStore(store) {
     var payload = normalizeStore(store);
-    payload.pending = (payload.pending || []).slice(0, 80);
-    payload.approved = (payload.approved || []).slice(0, 40);
-    while (JSON.stringify(payload).length > 50000 && payload.pending.length > 1) payload.pending.pop();
-    while (JSON.stringify(payload).length > 50000 && payload.approved.length > 1) payload.approved.pop();
+    var pendingAll = payload.pending || [];
+    var approvedAll = payload.approved || [];
+    payload.pending = pendingAll.slice(0, 80);
+    payload.approved = approvedAll.slice(0, 40);
+    var dropped = pendingAll.slice(80).concat(approvedAll.slice(40));
+    while (JSON.stringify(payload).length > 50000 && payload.pending.length > 1) dropped.push(payload.pending.pop());
+    while (JSON.stringify(payload).length > 50000 && payload.approved.length > 1) dropped.push(payload.approved.pop());
     var res = await mantle().fetchRes(MANTLE_URL, {
       method: 'POST',
       headers: mantleHeaders(),
@@ -481,6 +485,7 @@
     writeCachedStore(payload);
     markPolled();
     lastStoreFromNetwork = true;
+    cleanupRemovedImages(dropped);
   }
 
   function validTickerId(id) {
@@ -540,6 +545,34 @@
     } catch (e) {
       return '';
     }
+  }
+
+  function forgetTickerImage(id) {
+    delete imageCache[id];
+    var all = mantle().readCache(IMG_DISK_KEY);
+    if (all && typeof all === 'object' && Object.prototype.hasOwnProperty.call(all, id)) {
+      delete all[id];
+      mantle().writeCache(IMG_DISK_KEY, all);
+    }
+  }
+
+  async function deleteTickerImage(id) {
+    id = String(id || '');
+    if (!validTickerId(id)) return;
+    forgetTickerImage(id);
+    try {
+      await mantle().fetchRes(imageDocUrl(id), {
+        method: 'DELETE',
+        headers: { 'X-Mantle-Key': MANTLE_KEY },
+        force: true
+      });
+    } catch (e) {}
+  }
+
+  function cleanupRemovedImages(list) {
+    (list || []).forEach(function (m) {
+      if (messageHasImage(m)) deleteTickerImage(m && m.id);
+    });
   }
 
   function blobToImage(file) {
@@ -1603,10 +1636,10 @@
             await writeTickerImage(row.id, pendingImage);
           }
           if (needApproval) {
-            store.pending = [row].concat(store.pending || []).slice(0, 80);
+            store.pending = [row].concat(store.pending || []);
           } else {
             row.approvedAt = Date.now();
-            store.approved = [row].concat(store.approved || []).slice(0, 40);
+            store.approved = [row].concat(store.approved || []);
           }
           await writeFullStore(store);
           markLocalSend(row.id);
@@ -1952,8 +1985,10 @@
       showModeCache = store.showMode;
       scrollSpeedCache = store.scrollSpeed;
       var removed = pruneExpired(store);
-      if (removed && lastStoreFromNetwork) {
-        writeFullStore(store).catch(function () {});
+      if (removed.length && lastStoreFromNetwork) {
+        writeFullStore(store).then(function () {
+          cleanupRemovedImages(removed);
+        }).catch(function () {});
       }
       noticeIncoming(store);
       if (store.hidden) {

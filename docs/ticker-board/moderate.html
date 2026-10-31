@@ -423,7 +423,7 @@
 
     function pruneExpired(next) {
       var hours = normalizeExpireHours(next.expireHours);
-      if (!hours) return 0;
+      if (!hours) return [];
       var cutoff = Date.now() - hours * 3600 * 1000;
       function keep(m) {
         var t = messageTime(m);
@@ -431,9 +431,11 @@
       }
       var p = next.pending || [];
       var a = next.approved || [];
+      var removed = p.filter(function (m) { return !keep(m); })
+        .concat(a.filter(function (m) { return !keep(m); }));
       next.pending = p.filter(keep);
       next.approved = a.filter(keep);
-      return p.length - next.pending.length + (a.length - next.approved.length);
+      return removed;
     }
 
     function headers() {
@@ -532,6 +534,36 @@
       }
     }
 
+    function forgetTickerImage(id) {
+      delete imageCache[id];
+      try {
+        var all = JSON.parse(localStorage.getItem(IMG_DISK_KEY) || '{}');
+        if (all && Object.prototype.hasOwnProperty.call(all, id)) {
+          delete all[id];
+          localStorage.setItem(IMG_DISK_KEY, JSON.stringify(all));
+        }
+      } catch (e) {}
+    }
+
+    async function deleteTickerImage(id) {
+      id = String(id || '');
+      if (!/^t[a-z0-9]{8,32}$/i.test(id)) return;
+      forgetTickerImage(id);
+      try {
+        var res = await fetch(MANTLE_IMG_NS + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: headers()
+        });
+        if (res.status === 429) mark429(res);
+      } catch (e) {}
+    }
+
+    function cleanupRemovedImages(list) {
+      (list || []).forEach(function (m) {
+        if (messageHasImage(m)) deleteTickerImage(m && m.id);
+      });
+    }
+
     function normalizeLoaded(json) {
       return {
         pending: Array.isArray(json.pending) ? json.pending.slice() : [],
@@ -563,15 +595,18 @@
     }
 
     async function writeStore(next) {
-      next.pending = (next.pending || []).slice(0, 80);
-      next.approved = (next.approved || []).slice(0, 40);
+      var pendingAll = next.pending || [];
+      var approvedAll = next.approved || [];
+      next.pending = pendingAll.slice(0, 80);
+      next.approved = approvedAll.slice(0, 40);
+      var dropped = pendingAll.slice(80).concat(approvedAll.slice(40));
       next.showMode = normalizeMode(next.showMode);
       next.hidden = !!next.hidden;
       next.requireApproval = normalizeRequireApproval(next.requireApproval);
       next.scrollSpeed = normalizeScrollSpeed(next.scrollSpeed);
       next.expireHours = normalizeExpireHours(next.expireHours);
-      while (JSON.stringify(next).length > 50000 && next.pending.length > 1) next.pending.pop();
-      while (JSON.stringify(next).length > 50000 && next.approved.length > 1) next.approved.pop();
+      while (JSON.stringify(next).length > 50000 && next.pending.length > 1) dropped.push(next.pending.pop());
+      while (JSON.stringify(next).length > 50000 && next.approved.length > 1) dropped.push(next.approved.pop());
       var res = await fetch(MANTLE_URL, {
         method: 'POST',
         headers: headers(),
@@ -583,6 +618,7 @@
       }
       if (!res.ok) throw new Error('write');
       writeCachedStore(next);
+      cleanupRemovedImages(dropped);
     }
 
     function setStatus(text, isErr) {
@@ -630,8 +666,9 @@
       try {
         store = await readStore(true);
         Object.keys(patch).forEach(function (k) { store[k] = patch[k]; });
-        pruneExpired(store);
+        var removed = pruneExpired(store);
         await writeStore(store);
+        cleanupRemovedImages(removed);
         store = await readStore(true);
         paintSettings();
         paintList();
@@ -772,8 +809,9 @@
       try {
         store = await readStore();
         var removed = pruneExpired(store);
-        if (removed && !backingOff()) {
+        if (removed.length && !backingOff()) {
           await writeStore(store);
+          cleanupRemovedImages(removed);
           store = await readStore(true);
         }
         render();
@@ -791,9 +829,22 @@
     async function mutate(fn) {
       try {
         store = await readStore(true);
+        var before = new Map();
+        (store.pending || []).concat(store.approved || []).forEach(function (m) {
+          if (m && m.id) before.set(m.id, m);
+        });
         fn(store);
         pruneExpired(store);
+        var after = new Set();
+        (store.pending || []).concat(store.approved || []).forEach(function (m) {
+          if (m && m.id) after.add(m.id);
+        });
+        var removed = [];
+        before.forEach(function (m, id) {
+          if (!after.has(id)) removed.push(m);
+        });
         await writeStore(store);
+        cleanupRemovedImages(removed);
         store = await readStore(true);
         render();
         return true;

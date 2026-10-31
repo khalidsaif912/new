@@ -445,9 +445,8 @@
     deleteImgDisk(id);
     try {
       await mantle().fetchRes(MANTLE_IMG_NS + encodeURIComponent(id), {
-        method: 'POST',
-        headers: mantleHeaders(true),
-        body: JSON.stringify({ d: '', deleted: true, at: Date.now() }),
+        method: 'DELETE',
+        headers: mantleHeaders(false),
         force: true,
       });
     } catch (e) {}
@@ -543,14 +542,16 @@
     await loadCatalog(true);
     if (!overlayFetchOk) throw new Error('overlay-offline');
     clearSavedBannerChoice(name);
+    var removedImageId = '';
     if (isStaticName(name)) {
       if (overlay.removed.indexOf(name) === -1) overlay.removed.push(name);
     } else {
       var id = customIdFromName(name);
       overlay.custom = overlay.custom.filter(function (c) { return c.id !== id; });
-      await deleteCustomImage(id);
+      removedImageId = id;
     }
     await saveOverlay(overlay);
+    if (removedImageId) await deleteCustomImage(removedImageId);
     return merged;
   }
 
@@ -594,7 +595,7 @@
         var href = scripts[si].src || '';
         var hm = href.match(/^(.*\/)banner-store\.js(?:\?|$)/i);
         if (hm) {
-          announceSrc = hm[1] + 'announce-popup.js?v=20261007d';
+          announceSrc = hm[1] + 'announce-popup.js?v=20261031a';
           break;
         }
       }
@@ -605,7 +606,7 @@
           var rm = path.match(/^(.*?\/(?:docs|new\/docs)\/)/);
           root = rm ? rm[1].replace(/\/$/, '') : '';
         } catch (e0) {}
-        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261007d';
+        announceSrc = (root ? root + '/' : '') + 'announce-popup.js?v=20261031a';
       }
       var as = document.createElement('script');
       as.src = announceSrc;

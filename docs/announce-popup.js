@@ -438,14 +438,18 @@
     if (!ID_RE.test(id)) return;
     delete imgCache[id];
     deleteImgDisk(id);
-    var parts = 1;
+    var parts = MAX_GIF_PARTS;
     try {
       var head = await readImagePart(id, 0);
-      if (head && head.n > 1) parts = Math.min(Number(head.n) || 1, MAX_GIF_PARTS);
+      if (head) parts = Math.min(Math.max(Number(head.n) || 1, 1), MAX_GIF_PARTS);
     } catch (e) {}
     for (var i = 0; i < parts; i++) {
       try {
-        await postImagePart(id, i, { d: '', deleted: true, at: Date.now() });
+        await mantle().fetchRes(partUrl(id, i), {
+          method: 'DELETE',
+          headers: mantleHeaders(false),
+          force: true
+        });
       } catch (e) {}
     }
   }
