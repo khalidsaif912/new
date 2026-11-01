@@ -38,12 +38,15 @@ def load_records():
     return records
 
 
-def segments(dates):
-    count = 1
-    for prev, curr in zip(dates, dates[1:]):
-        if (dt.date.fromisoformat(curr) - dt.date.fromisoformat(prev)).days > 1:
-            count += 1
-    return count
+def date_ranges(dates):
+    ranges = []
+    for date in dates:
+        if ranges and (dt.date.fromisoformat(date) - dt.date.fromisoformat(ranges[-1]["to"])).days == 1:
+            ranges[-1]["to"] = date
+            ranges[-1]["days"] += 1
+        else:
+            ranges.append({"from": date, "to": date, "days": 1})
+    return ranges
 
 
 def build():
@@ -87,6 +90,7 @@ def build():
             dates = sorted({date for date, _ in items})
             record = items[0][1]
             actual_to = max(run_end[((emp_id, leave_type), day)] for day in dates)
+            ranges = date_ranges(dates)
             entries.append(
                 {
                     "id": emp_id,
@@ -98,7 +102,8 @@ def build():
                     "from": dates[0],
                     "to": dates[-1],
                     "actual_to": actual_to,
-                    "segments": segments(dates),
+                    "segments": len(ranges),
+                    "ranges": ranges,
                 }
             )
         entries.sort(key=lambda e: (TYPE_ORDER[e["type"]], -e["days"], e["name"].lower()))

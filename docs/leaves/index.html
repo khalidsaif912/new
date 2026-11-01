@@ -479,6 +479,36 @@
       line-height: 1.6;
       white-space: nowrap;
     }
+    .periods {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 6px;
+      margin-top: 4px;
+    }
+    .periodChip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+      padding: 1px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      background: var(--surface-muted);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+    .periodChip bdi {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+    .empRow.is-expired .periodChip {
+      border-color: #eef2f7;
+      background: #f8fafc;
+      color: #94a3b8;
+    }
     .sep { color: #cbd5e1; }
     .range bdi {
       color: var(--text-secondary);
@@ -670,6 +700,7 @@
       var DATA = null;
       var activeMonth = '';
       var renderedDay = todayIso();
+      var renderedSavedId = '';
 
       function span(className, text) {
         var el = document.createElement('span');
@@ -704,20 +735,21 @@
         return name;
       }
 
-      function readSavedId() {
-        try {
-          var fromUrl = new URLSearchParams(location.search).get('emp');
-          if (fromUrl && /^\d+$/.test(fromUrl.trim())) return fromUrl.trim();
-        } catch (e) {}
-
-        var keys = ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'];
-        for (var i = 0; i < keys.length; i++) {
-          try {
-            var stored = localStorage.getItem(keys[i]);
-            if (stored && /^\d+$/.test(stored.trim())) return stored.trim();
-          } catch (e) {}
+      function readSavedIds() {
+        var ids = [];
+        function push(value) {
+          var id = String(value || '').trim();
+          if (/^\d+$/.test(id) && ids.indexOf(id) === -1) ids.push(id);
         }
-        return '';
+        try {
+          push(new URLSearchParams(location.search).get('emp'));
+        } catch (e) {}
+        ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'].forEach(function (key) {
+          try {
+            push(localStorage.getItem(key));
+          } catch (e) {}
+        });
+        return ids;
       }
 
       function todayIso() {
@@ -758,6 +790,31 @@
         if (count === 2) return 'فترتان';
         if (count <= 10) return count + ' فترات';
         return count + ' فترة';
+      }
+
+      function periodText(fromDay, toDay, monthKey) {
+        var chip = span('periodChip');
+        chip.appendChild(numEl(fromDay));
+        if (fromDay !== toDay) {
+          chip.appendChild(document.createTextNode(' – '));
+          chip.appendChild(numEl(toDay));
+        }
+        chip.appendChild(document.createTextNode(' ' + monthName(monthKey)));
+        return chip;
+      }
+
+      function periodsEl(entry, monthKey) {
+        var periods = entry.ranges || [];
+        if (periods.length < 2) return null;
+        var wrap = div('periods');
+        periods.forEach(function (range) {
+          wrap.appendChild(periodText(
+            parseInt(range.from.slice(8, 10), 10),
+            parseInt(range.to.slice(8, 10), 10),
+            monthKey
+          ));
+        });
+        return wrap;
       }
 
       function rangeEl(entry, monthKey) {
@@ -818,18 +875,32 @@
         meta.appendChild(span('dept', entry.dept));
         if (entry.kind === 'import') meta.appendChild(span('kindTag', 'وارد'));
         meta.appendChild(span('sep', '·'));
-        meta.appendChild(rangeEl(entry, monthKey));
+        if (entry.segments > 1) {
+          meta.appendChild(span('range', segmentsLabel(entry.segments)));
+        } else {
+          meta.appendChild(rangeEl(entry, monthKey));
+        }
         if (expired) meta.appendChild(span('expiredTag', 'منقضية'));
 
         row.appendChild(top);
         row.appendChild(meta);
+        var periods = periodsEl(entry, monthKey);
+        if (periods) row.appendChild(periods);
         return row;
       }
 
       function renderList(month, monthKey) {
         var entries = month.entries || [];
         var today = todayIso();
-        var savedId = readSavedId();
+        var savedIds = readSavedIds();
+        var savedId = '';
+        for (var i = 0; i < savedIds.length; i++) {
+          if (entries.some(function (entry) { return String(entry.id) === savedIds[i]; })) {
+            savedId = savedIds[i];
+            break;
+          }
+        }
+        if (!savedId) savedId = savedIds[0] || '';
         var frag = document.createDocumentFragment();
 
         function isSelfEntry(entry) {
@@ -913,6 +984,7 @@
 
         activeMonth = monthKey;
         renderedDay = todayIso();
+        renderedSavedId = readSavedIds().join(',');
         var entries = month.entries || [];
         var unique = {};
         entries.forEach(function (entry) { unique[entry.id] = true; });
@@ -1047,16 +1119,27 @@
         renderMonth(activeMonth, { updateHash: false, announce: false });
       }
 
+      function refreshIfNeeded(force) {
+        if (!DATA || !activeMonth) return;
+        if (
+          force ||
+          todayIso() !== renderedDay ||
+          readSavedIds().join(',') !== renderedSavedId
+        ) {
+          refreshView();
+        }
+      }
+
       window.addEventListener('storage', function (e) {
         if (e && ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'].indexOf(e.key) !== -1) {
-          refreshView();
+          refreshIfNeeded(true);
         }
       });
       document.addEventListener('visibilitychange', function () {
-        if (!document.hidden && DATA && todayIso() !== renderedDay) refreshView();
+        if (!document.hidden) refreshIfNeeded(false);
       });
-      window.addEventListener('pageshow', function () {
-        if (DATA && todayIso() !== renderedDay) refreshView();
+      window.addEventListener('pageshow', function (e) {
+        if (e && e.persisted) refreshIfNeeded(true);
       });
 
       load();
