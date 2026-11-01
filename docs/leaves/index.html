@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e40af">
+  <title>الإجازات</title>
+  <link rel="icon" href="../favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-ar: 'IBM Plex Sans Arabic', Cairo, Tahoma, sans-serif;
+      --font-en: 'IBM Plex Sans', Inter, system-ui, -apple-system, sans-serif;
+      --brand: #1e40af;
+      --brand-2: #1976d2;
+      --brand-3: #0ea5e9;
+      --surface: #ffffff;
+      --surface-muted: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #eef1f7;
+      color: var(--text);
+      font-family: var(--font-ar);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button { font-family: inherit; }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding:
+        calc(10px + var(--safe-top))
+        14px
+        calc(22px + var(--safe-bottom));
+    }
+
+    .srOnly {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 168px;
+      padding: 10px 14px 14px;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 52%, var(--brand-3) 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(30, 64, 175, .16);
+    }
+    .header::after {
+      content: "";
+      position: absolute;
+      inset-inline-end: -46px;
+      bottom: -76px;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
+    }
+    .headerTop {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .backBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, .24);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .14);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, .12);
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .backBtn:hover {
+      background: rgba(255, 255, 255, .22);
+      border-color: rgba(255, 255, 255, .34);
+    }
+    .backBtn:active { transform: scale(.97); }
+    .backBtn svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .pageTitle {
+      flex: 1 1 auto;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-align: center;
+      text-shadow: 0 1px 8px rgba(15, 23, 42, .22);
+    }
+    .headerSpacer {
+      flex: 0 0 auto;
+      width: 68px;
+      height: 1px;
+    }
+
+    .headerBody {
+      position: relative;
+      z-index: 1;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: min(4vw, 18px);
+      padding-top: 4px;
+    }
+    .heroNum {
+      font-family: var(--font-en);
+      font-size: clamp(66px, 24vw, 104px);
+      font-weight: 800;
+      line-height: .82;
+      letter-spacing: -.045em;
+      color: rgba(255, 255, 255, .34);
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 18px rgba(15, 23, 42, .10);
+    }
+    .heroSide {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      padding-inline-start: min(2.5vw, 12px);
+      border-inline-start: 1px solid rgba(255, 255, 255, .16);
+    }
+    .heroLabel {
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, .92);
+    }
+    .heroMonth {
+      font-size: clamp(15px, 4.4vw, 19px);
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    /* ── Month strip ── */
+    .monthStripWrap { margin: 10px 0; }
+    .monthStrip {
+      display: flex;
+      gap: 6px;
+      padding: 2px 2px 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+    .monthStrip::-webkit-scrollbar { display: none; }
+    .monthChip {
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      min-width: 64px;
+      padding: 7px 10px 6px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+      transition:
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .15s ease,
+        color .2s ease,
+        opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .monthChip:active { transform: scale(.97); }
+    .chipMonth { font-size: 12px; font-weight: 800; line-height: 1.15; }
+    .chipCount {
+      font-family: var(--font-en);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .monthChip.is-empty { opacity: .5; }
+    .monthChip.is-active {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      border-color: transparent;
+      color: #fff;
+      opacity: 1;
+      box-shadow: 0 5px 12px -4px rgba(30, 64, 175, .5);
+    }
+    .monthChip.is-active .chipCount { color: rgba(255, 255, 255, .8); }
+
+    /* ── Leave list ── */
+    .listCard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+    }
+    .leaveGroup {
+      --accent: #059669;
+      --accent-fade: rgba(5, 150, 105, 0);
+      --accent-soft: rgba(5, 150, 105, .45);
+      --pill-bg: #ecfdf5;
+      --pill-text: #047857;
+      --pill-border: #a7f3d0;
+      --head-bg: linear-gradient(180deg, #f0fdf4, #ffffff);
+      --head-border: #dcfce7;
+    }
+    .leaveGroup.sick {
+      --accent: #e11d48;
+      --accent-fade: rgba(225, 29, 72, 0);
+      --accent-soft: rgba(225, 29, 72, .42);
+      --pill-bg: #fff1f2;
+      --pill-text: #be123c;
+      --pill-border: #fecdd3;
+      --head-bg: linear-gradient(180deg, #fff1f2, #ffffff);
+      --head-border: #ffe4e6;
+    }
+    .leaveGroup + .leaveGroup { border-top: 1px solid var(--border); }
+    .groupHead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px 9px;
+      background: var(--head-bg);
+      border-bottom: 1px solid var(--head-border);
+    }
+    .groupDot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--pill-bg);
+    }
+    .groupTitle {
+      margin: 0;
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+    }
+    .groupCount {
+      margin-inline-start: auto;
+      padding: 2px 8px;
+      border: 1px solid var(--pill-border);
+      border-radius: var(--radius-pill);
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      font-family: var(--font-en);
+      font-size: 10.5px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .groupEmpty {
+      padding: 18px 14px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .expiredSeparator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px 6px;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .expiredSeparator::before,
+    .expiredSeparator::after {
+      content: "";
+      flex: 1 1 auto;
+      height: 1px;
+      background: #eef2f7;
+    }
+
+    .empRow { position: relative; padding: 10px 14px 11px; }
+    .empRow + .empRow { border-top: 1px solid #f1f5f9; }
+    .empRow.is-self {
+      background: linear-gradient(to left, rgba(30, 64, 175, .065), rgba(30, 64, 175, .015));
+    }
+    .empRow.is-self::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: 3px;
+      background: var(--brand);
+    }
+    .empRow.is-expired {
+      --accent: #94a3b8;
+      --accent-fade: rgba(148, 163, 184, 0);
+      --accent-soft: rgba(148, 163, 184, .28);
+      --pill-bg: #f8fafc;
+      --pill-text: #64748b;
+      --pill-border: #e2e8f0;
+    }
+    .empRow.is-expired .empName { color: #64748b; }
+    .empTop {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .empNameWrap { flex: 1 1 auto; min-width: 0; }
+    .empNameLine {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      min-width: 0;
+    }
+    .empName {
+      min-width: 0;
+      overflow: hidden;
+      font-family: var(--font-en);
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -.005em;
+      color: var(--text);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    .empId {
+      flex: 0 0 auto;
+      padding: 1px 5px;
+      border-radius: var(--radius-pill);
+      background: #f1f5f9;
+      color: #94a3b8;
+      font-family: var(--font-en);
+      font-size: 9.5px;
+      font-weight: 700;
+      line-height: 1.4;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    .selfBadge {
+      flex: 0 0 auto;
+      padding: 1px 7px;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-pill);
+      background: #eff6ff;
+      color: var(--brand);
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    /* Proportional shadow under the name: width = leave days / days in month. */
+    .shadowTrack {
+      position: relative;
+      height: 9px;
+      margin-top: 4px;
+    }
+    .shadowBar {
+      position: absolute;
+      inset-inline-start: 0;
+      top: 2px;
+      width: var(--w, 0%);
+      min-width: 8px;
+      height: 5px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(to left, var(--accent) 0%, var(--accent-fade) 100%);
+      box-shadow: 0 6px 12px -3px var(--accent-soft);
+      opacity: .85;
+      transform-origin: right center;
+      animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
+      animation-delay: calc(var(--i, 0) * 30ms);
+    }
+    @keyframes stretch {
+      from { transform: scaleX(0); opacity: .2; }
+      to { transform: scaleX(1); opacity: .85; }
+    }
+
+    .daysPill {
+      flex: 0 0 auto;
+      margin-top: 1px;
+      padding: 4px 9px;
+      border: 1px solid var(--pill-border);
+      border-radius: var(--radius-pill);
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      font-size: 11.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .empMeta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 7px;
+      margin-top: 5px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .dept {
+      color: var(--text-secondary);
+      font-family: var(--font-en);
+      font-size: 10.5px;
+      font-weight: 700;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    .kindTag {
+      padding: 0 5px;
+      border: 1px solid #ccfbf1;
+      border-radius: var(--radius-pill);
+      background: #f0fdfa;
+      color: #0f766e;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+    .expiredTag {
+      padding: 0 6px;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-pill);
+      background: #f8fafc;
+      color: #94a3b8;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+    .sep { color: #cbd5e1; }
+    .range bdi {
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── States ── */
+    .stateCard {
+      padding: 28px 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+    }
+    .stateIcon {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 10px;
+      color: #94a3b8;
+    }
+    .stateTitle {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .stateBody {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .retryBtn {
+      margin-top: 14px;
+      padding: 10px 22px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--brand);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .retryBtn:active { transform: scale(.98); background: var(--surface-muted); }
+
+    .skeleton {
+      padding: 6px 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+    }
+    .skRow { padding: 12px 14px; }
+    .skRow + .skRow { border-top: 1px solid #f1f5f9; }
+    .skLine {
+      height: 10px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, #f1f5f9 25%, #e8eef6 37%, #f1f5f9 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+    .skLine + .skLine { margin-top: 7px; }
+    .skLine.w55 { width: 55%; }
+    .skLine.w30 { width: 30%; }
+    @keyframes shimmer {
+      from { background-position: 100% 0; }
+      to { background-position: 0 0; }
+    }
+
+    .pageFoot {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      margin: 10px 2px 0;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 380px) {
+      .backBtnLabel { display: none; }
+      .backBtn { min-width: 40px; padding: 0 9px; }
+      .headerSpacer { width: 40px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="headerTop">
+        <a class="backBtn" href="../" aria-label="رجوع">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+          <span class="backBtnLabel">رجوع</span>
+        </a>
+        <h1 class="pageTitle">الإجازات</h1>
+        <span class="headerSpacer" aria-hidden="true"></span>
+      </div>
+      <div class="headerBody">
+        <div class="heroNum" id="heroNum">—</div>
+        <div class="heroSide">
+          <span class="heroLabel" id="heroLabel">جارٍ التحميل…</span>
+          <span class="heroMonth" id="heroMonth"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="monthStripWrap">
+      <div class="monthStrip" id="monthStrip" role="group" aria-label="اختيار الشهر"></div>
+    </div>
+
+    <p class="srOnly" id="statusText" role="status" aria-live="polite"></p>
+
+    <div class="skeleton" id="skeleton" aria-hidden="true">
+      <div class="skRow"><div class="skLine w55"></div><div class="skLine w30"></div></div>
+      <div class="skRow"><div class="skLine w55"></div><div class="skLine w30"></div></div>
+      <div class="skRow"><div class="skLine w55"></div><div class="skLine w30"></div></div>
+      <div class="skRow"><div class="skLine w55"></div><div class="skLine w30"></div></div>
+    </div>
+
+    <main class="listCard" id="listCard" hidden></main>
+
+    <section class="stateCard" id="emptyState" hidden>
+      <svg class="stateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="16" rx="3"/>
+        <path d="M8 3v4M16 3v4M3 10h18"/>
+        <path d="M9 15h6"/>
+      </svg>
+      <h2 class="stateTitle">لا توجد إجازات مسجّلة</h2>
+      <p class="stateBody" id="emptyBody">لا توجد إجازات سنوية أو مرضية في هذا الشهر.</p>
+    </section>
+
+    <section class="stateCard" id="errorState" hidden>
+      <svg class="stateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v5"/>
+        <path d="M12 16.5h.01"/>
+      </svg>
+      <h2 class="stateTitle">تعذّر تحميل البيانات</h2>
+      <p class="stateBody">تأكد من اتصالك بالإنترنت ثم أعد المحاولة.</p>
+      <button type="button" class="retryBtn" id="retryBtn">إعادة المحاولة</button>
+    </section>
+
+    <footer class="pageFoot">
+      <span>المصدر: جداول الموظفين</span>
+      <span id="updatedText"></span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+      var TYPE_TITLES = { annual: 'الإجازة السنوية', sick: 'الإجازة المرضية' };
+      var TYPE_EMPTY = {
+        annual: 'لا توجد إجازات سنوية مسجّلة في هذا الشهر.',
+        sick: 'لا توجد إجازات مرضية مسجّلة في هذا الشهر.'
+      };
+
+      var els = {
+        heroNum: document.getElementById('heroNum'),
+        heroLabel: document.getElementById('heroLabel'),
+        heroMonth: document.getElementById('heroMonth'),
+        strip: document.getElementById('monthStrip'),
+        skeleton: document.getElementById('skeleton'),
+        listCard: document.getElementById('listCard'),
+        emptyState: document.getElementById('emptyState'),
+        emptyBody: document.getElementById('emptyBody'),
+        errorState: document.getElementById('errorState'),
+        retryBtn: document.getElementById('retryBtn'),
+        updatedText: document.getElementById('updatedText'),
+        status: document.getElementById('statusText')
+      };
+
+      var DATA = null;
+      var activeMonth = '';
+      var renderedDay = todayIso();
+
+      function span(className, text) {
+        var el = document.createElement('span');
+        el.className = className;
+        if (text != null) el.textContent = text;
+        return el;
+      }
+
+      function div(className) {
+        var el = document.createElement('div');
+        el.className = className;
+        return el;
+      }
+
+      function numEl(value) {
+        var el = document.createElement('bdi');
+        el.textContent = String(value);
+        return el;
+      }
+
+      function monthName(key) {
+        return MONTHS_AR[parseInt(key.slice(5, 7), 10) - 1] || key;
+      }
+
+      function displayName(raw) {
+        var name = String(raw || '').trim();
+        if (name && name === name.toUpperCase() && /[A-Z]/.test(name)) {
+          return name.toLowerCase().replace(/(^|[\s\-'])([a-z])/g, function (match, prefix, letter) {
+            return prefix + letter.toUpperCase();
+          });
+        }
+        return name;
+      }
+
+      function readSavedId() {
+        try {
+          var fromUrl = new URLSearchParams(location.search).get('emp');
+          if (fromUrl && /^\d+$/.test(fromUrl.trim())) return fromUrl.trim();
+        } catch (e) {}
+
+        var keys = ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'];
+        for (var i = 0; i < keys.length; i++) {
+          try {
+            var stored = localStorage.getItem(keys[i]);
+            if (stored && /^\d+$/.test(stored.trim())) return stored.trim();
+          } catch (e) {}
+        }
+        return '';
+      }
+
+      function todayIso() {
+        var now = new Date();
+        return now.getFullYear() + '-' +
+          String(now.getMonth() + 1).padStart(2, '0') + '-' +
+          String(now.getDate()).padStart(2, '0');
+      }
+
+      function isExpired(entry, today) {
+        return (entry.actual_to || entry.to) < today;
+      }
+
+      function employeesPhrase(count) {
+        if (!count) return 'لا أحد على إجازة';
+        if (count === 1) return 'موظف واحد على إجازة';
+        if (count === 2) return 'موظفان على إجازة';
+        if (count <= 10) return count + ' موظفين على إجازة';
+        return count + ' موظفًا على إجازة';
+      }
+
+      function heroLabelFor(count) {
+        if (!count) return 'لا توجد إجازات';
+        if (count === 1) return 'موظف على إجازة';
+        if (count === 2) return 'موظفان على إجازة';
+        if (count <= 10) return 'موظفين على إجازة';
+        return 'موظفًا على إجازة';
+      }
+
+      function daysLabel(count) {
+        if (count === 1) return 'يوم واحد';
+        if (count === 2) return 'يومان';
+        if (count <= 10) return count + ' أيام';
+        return count + ' يومًا';
+      }
+
+      function segmentsLabel(count) {
+        if (count === 2) return 'فترتان';
+        if (count <= 10) return count + ' فترات';
+        return count + ' فترة';
+      }
+
+      function rangeEl(entry, monthKey) {
+        var wrap = span('range');
+        var fromDay = parseInt(entry.from.slice(8, 10), 10);
+        var toDay = parseInt(entry.to.slice(8, 10), 10);
+        var name = monthName(monthKey);
+
+        if (fromDay === toDay) {
+          wrap.appendChild(document.createTextNode('يوم '));
+          wrap.appendChild(numEl(fromDay));
+          wrap.appendChild(document.createTextNode(' ' + name));
+        } else {
+          wrap.appendChild(document.createTextNode('من '));
+          wrap.appendChild(numEl(fromDay));
+          wrap.appendChild(document.createTextNode(' إلى '));
+          wrap.appendChild(numEl(toDay));
+          wrap.appendChild(document.createTextNode(' ' + name));
+        }
+
+        if (entry.segments > 1) {
+          wrap.appendChild(document.createTextNode(' · ' + segmentsLabel(entry.segments)));
+        }
+        return wrap;
+      }
+
+      function buildRow(entry, index, monthDays, monthKey, isSelf, expired) {
+        var row = document.createElement('article');
+        row.className = 'empRow';
+        if (isSelf) row.classList.add('is-self');
+        if (expired) row.classList.add('is-expired');
+        row.setAttribute('data-id', entry.id);
+        row.style.setProperty('--w', Math.min(100, (entry.days / monthDays) * 100).toFixed(1) + '%');
+        row.style.setProperty('--i', String(Math.min(index, 14)));
+
+        var top = div('empTop');
+        var nameWrap = div('empNameWrap');
+        var nameLine = div('empNameLine');
+
+        var name = span('empName', displayName(entry.name));
+        name.title = displayName(entry.name);
+        var id = span('empId', entry.id);
+        nameLine.appendChild(name);
+        if (isSelf) nameLine.appendChild(span('selfBadge', 'أنت'));
+        nameLine.appendChild(id);
+
+        var track = div('shadowTrack');
+        track.setAttribute('aria-hidden', 'true');
+        track.appendChild(div('shadowBar'));
+
+        nameWrap.appendChild(nameLine);
+        nameWrap.appendChild(track);
+
+        top.appendChild(nameWrap);
+        top.appendChild(span('daysPill', daysLabel(entry.days)));
+
+        var meta = div('empMeta');
+        meta.appendChild(span('dept', entry.dept));
+        if (entry.kind === 'import') meta.appendChild(span('kindTag', 'وارد'));
+        meta.appendChild(span('sep', '·'));
+        meta.appendChild(rangeEl(entry, monthKey));
+        if (expired) meta.appendChild(span('expiredTag', 'منقضية'));
+
+        row.appendChild(top);
+        row.appendChild(meta);
+        return row;
+      }
+
+      function renderList(month, monthKey) {
+        var entries = month.entries || [];
+        var today = todayIso();
+        var savedId = readSavedId();
+        var frag = document.createDocumentFragment();
+
+        function isSelfEntry(entry) {
+          return !!savedId && String(entry.id) === savedId;
+        }
+
+        var selfType = '';
+        entries.forEach(function (entry) {
+          if (isSelfEntry(entry)) selfType = entry.type;
+        });
+        var groupOrder = selfType === 'sick' ? ['sick', 'annual'] : ['annual', 'sick'];
+
+        groupOrder.forEach(function (type) {
+          var groupEntries = entries.filter(function (entry) { return entry.type === type; });
+          var selfEntries = groupEntries.filter(isSelfEntry);
+          var otherEntries = groupEntries.filter(function (entry) {
+            return !isSelfEntry(entry);
+          });
+          var activeOthers = otherEntries.filter(function (entry) {
+            return !isExpired(entry, today);
+          });
+          var expiredOthers = otherEntries.filter(function (entry) {
+            return isExpired(entry, today);
+          });
+          var ordered = selfEntries.concat(activeOthers, expiredOthers);
+
+          var section = document.createElement('section');
+          section.className = 'leaveGroup ' + type;
+          section.setAttribute('aria-label', TYPE_TITLES[type]);
+
+          var head = div('groupHead');
+          head.appendChild(div('groupDot'));
+          var title = document.createElement('h2');
+          title.className = 'groupTitle';
+          title.textContent = TYPE_TITLES[type];
+          head.appendChild(title);
+          head.appendChild(span('groupCount', String(groupEntries.length)));
+          section.appendChild(head);
+
+          if (!groupEntries.length) {
+            section.appendChild(div('groupEmpty')).textContent = TYPE_EMPTY[type];
+          } else {
+            var showedExpiredHead = false;
+            ordered.forEach(function (entry, index) {
+              var self = isSelfEntry(entry);
+              var expired = isExpired(entry, today);
+              if (expired && !self && activeOthers.length && !showedExpiredHead) {
+                section.appendChild(div('expiredSeparator')).textContent = 'إجازات منقضية';
+                showedExpiredHead = true;
+              }
+              section.appendChild(buildRow(entry, index, month.days, monthKey, self, expired));
+            });
+          }
+          frag.appendChild(section);
+        });
+
+        els.listCard.innerHTML = '';
+        els.listCard.appendChild(frag);
+      }
+
+      function updateStripActive() {
+        var chips = els.strip.querySelectorAll('.monthChip');
+        for (var i = 0; i < chips.length; i++) {
+          var isActive = chips[i].getAttribute('data-month') === activeMonth;
+          chips[i].classList.toggle('is-active', isActive);
+          chips[i].setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        }
+        var activeChip = els.strip.querySelector('.monthChip.is-active');
+        if (activeChip) {
+          try {
+            activeChip.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+          } catch (e) {
+            activeChip.scrollIntoView();
+          }
+        }
+      }
+
+      function renderMonth(monthKey, options) {
+        var month = DATA && DATA.months && DATA.months[monthKey];
+        if (!month) return;
+
+        activeMonth = monthKey;
+        renderedDay = todayIso();
+        var entries = month.entries || [];
+        var unique = {};
+        entries.forEach(function (entry) { unique[entry.id] = true; });
+        var people = Object.keys(unique).length;
+
+        els.heroNum.textContent = String(people);
+        els.heroLabel.textContent = heroLabelFor(people);
+        els.heroMonth.textContent = monthName(monthKey) + ' ' + monthKey.slice(0, 4);
+
+        updateStripActive();
+
+        var isEmpty = entries.length === 0;
+        els.emptyState.hidden = !isEmpty;
+        els.listCard.hidden = isEmpty;
+        if (isEmpty) {
+          els.emptyBody.textContent = 'لا توجد إجازات سنوية أو مرضية مسجّلة في ' + monthName(monthKey) + '.';
+        } else {
+          renderList(month, monthKey);
+        }
+
+        if (!options || options.updateHash !== false) {
+          try {
+            history.replaceState(null, '', '#' + monthKey);
+          } catch (e) {}
+        }
+        if (!options || options.announce !== false) {
+          els.status.textContent = 'شهر ' + monthName(monthKey) + ': ' + employeesPhrase(people) + '.';
+        }
+      }
+
+      function buildMonthStrip() {
+        els.strip.innerHTML = '';
+        Object.keys(DATA.months).sort().forEach(function (key) {
+          var month = DATA.months[key];
+          var unique = {};
+          (month.entries || []).forEach(function (entry) { unique[entry.id] = true; });
+          var people = Object.keys(unique).length;
+
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'monthChip';
+          chip.setAttribute('data-month', key);
+          chip.setAttribute('aria-label', monthName(key) + ': ' + employeesPhrase(people));
+          if (!people) chip.classList.add('is-empty');
+          chip.appendChild(span('chipMonth', monthName(key)));
+          chip.appendChild(span('chipCount', String(people)));
+          chip.addEventListener('click', function () {
+            if (key !== activeMonth) renderMonth(key);
+          });
+          els.strip.appendChild(chip);
+        });
+      }
+
+      function initialMonth() {
+        var hash = (location.hash || '').replace('#', '');
+        if (DATA.months[hash]) return hash;
+
+        var now = new Date();
+        var current = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        if (DATA.months[current]) return current;
+
+        var withEntries = Object.keys(DATA.months).sort().filter(function (key) {
+          return (DATA.months[key].entries || []).length > 0;
+        });
+        if (withEntries.length) return withEntries[withEntries.length - 1];
+        return Object.keys(DATA.months).sort().pop();
+      }
+
+      function setLoading(on) {
+        els.skeleton.hidden = !on;
+        els.errorState.hidden = true;
+        els.listCard.hidden = true;
+        els.emptyState.hidden = true;
+        els.heroNum.textContent = '—';
+        els.heroLabel.textContent = on ? 'جارٍ التحميل…' : '';
+        els.heroMonth.textContent = '';
+        if (on) els.status.textContent = 'جارٍ تحميل الإجازات…';
+      }
+
+      function showError() {
+        els.skeleton.hidden = true;
+        els.listCard.hidden = true;
+        els.emptyState.hidden = true;
+        els.errorState.hidden = false;
+        els.heroNum.textContent = '—';
+        els.heroLabel.textContent = 'تعذّر تحميل البيانات';
+        els.heroMonth.textContent = '';
+        els.status.textContent = 'تعذّر تحميل البيانات.';
+      }
+
+      function showUpdated(value) {
+        if (!value) return;
+        var date = new Date(value);
+        if (isNaN(date.getTime())) return;
+        els.updatedText.textContent = 'آخر تحديث: ' +
+          date.getDate() + ' ' + MONTHS_AR[date.getMonth()] + ' ' + date.getFullYear();
+      }
+
+      function load() {
+        setLoading(true);
+        fetch('leaves-data.json', { cache: 'no-cache' })
+          .then(function (response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+          })
+          .then(function (data) {
+            if (!data || !data.months || !Object.keys(data.months).length) {
+              throw new Error('No leave data');
+            }
+            DATA = data;
+            buildMonthStrip();
+            renderMonth(initialMonth(), { announce: false });
+            els.skeleton.hidden = true;
+            els.errorState.hidden = true;
+            showUpdated(data.generated_at);
+          })
+          .catch(function () {
+            showError();
+          });
+      }
+
+      els.retryBtn.addEventListener('click', load);
+      window.addEventListener('hashchange', function () {
+        var key = (location.hash || '').replace('#', '');
+        if (DATA && DATA.months[key] && key !== activeMonth) {
+          renderMonth(key, { updateHash: false });
+        }
+      });
+
+      function refreshView() {
+        if (!DATA || !activeMonth) return;
+        renderMonth(activeMonth, { updateHash: false, announce: false });
+      }
+
+      window.addEventListener('storage', function (e) {
+        if (e && ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'].indexOf(e.key) !== -1) {
+          refreshView();
+        }
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && DATA && todayIso() !== renderedDay) refreshView();
+      });
+      window.addEventListener('pageshow', function () {
+        if (DATA && todayIso() !== renderedDay) refreshView();
+      });
+
+      load();
+    })();
+  </script>
+</body>
+</html>
