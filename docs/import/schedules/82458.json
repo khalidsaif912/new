@@ -1303,64 +1303,184 @@
     ],
     "2026-11": [
       {
+        "date": "2026-11-01",
+        "day": 1,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-02",
+        "day": 2,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-03",
+        "day": 3,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-04",
+        "day": 4,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-05",
+        "day": 5,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "date": "2026-11-06",
         "day": 6,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-07",
         "day": 7,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-08",
         "day": 8,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-09",
+        "day": 9,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-10",
+        "day": 10,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-11",
+        "day": 11,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-12",
+        "day": 12,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-13",
+        "day": 13,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "date": "2026-11-14",
         "day": 14,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-15",
         "day": 15,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-16",
         "day": 16,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-17",
+        "day": 17,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-18",
+        "day": 18,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-19",
+        "day": 19,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-20",
+        "day": 20,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-21",
+        "day": 21,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "date": "2026-11-22",
         "day": 22,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-23",
         "day": 23,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-24",
         "day": 24,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       },
       {
+        "date": "2026-11-25",
+        "day": 25,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-26",
+        "day": 26,
+        "shift_code": "MN06",
+        "shift_group": "Morning"
+      },
+      {
+        "date": "2026-11-27",
+        "day": 27,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-28",
+        "day": 28,
+        "shift_code": "AN13",
+        "shift_group": "Afternoon"
+      },
+      {
+        "date": "2026-11-29",
+        "day": 29,
+        "shift_code": "NN21",
+        "shift_group": "Night"
+      },
+      {
+        "date": "2026-11-30",
         "day": 30,
-        "shift_code": "O",
-        "shift_group": "Off Day",
-        "projected": true
+        "shift_code": "OFF",
+        "shift_group": "Off Day"
       }
     ],
     "2026-12": [
@@ -1432,158 +1552,158 @@
       }
     ]
   },
-  "month": "2026-12",
-  "monthLabel": "2026-12",
+  "month": "2026-11",
+  "monthLabel": "November 2026",
   "days": [
     {
       "day": 1,
-      "weekday": "Tue",
-      "code": "AN13"
+      "weekday": "Sun",
+      "code": "MN06"
     },
     {
       "day": 2,
-      "weekday": "Wed",
-      "code": "NN21"
+      "weekday": "Mon",
+      "code": "MN06"
     },
     {
       "day": 3,
-      "weekday": "Thu",
-      "code": "OFF"
+      "weekday": "Tue",
+      "code": "AN13"
     },
     {
       "day": 4,
-      "weekday": "Fri",
-      "code": "OFF"
+      "weekday": "Wed",
+      "code": "AN13"
     },
     {
       "day": 5,
-      "weekday": "Sat",
-      "code": "OFF"
+      "weekday": "Thu",
+      "code": "NN21"
     },
     {
       "day": 6,
-      "weekday": "Sun",
-      "code": "MN06"
+      "weekday": "Fri",
+      "code": "OFF"
     },
     {
       "day": 7,
-      "weekday": "Mon",
-      "code": "MN06"
+      "weekday": "Sat",
+      "code": "OFF"
     },
     {
       "day": 8,
-      "weekday": "Tue",
-      "code": "AN13"
+      "weekday": "Sun",
+      "code": "OFF"
     },
     {
       "day": 9,
-      "weekday": "Wed",
-      "code": "AN13"
+      "weekday": "Mon",
+      "code": "MN06"
     },
     {
       "day": 10,
-      "weekday": "Thu",
-      "code": "NN21"
+      "weekday": "Tue",
+      "code": "MN06"
     },
     {
       "day": 11,
-      "weekday": "Fri",
-      "code": "OFF"
+      "weekday": "Wed",
+      "code": "AN13"
     },
     {
       "day": 12,
-      "weekday": "Sat",
-      "code": "OFF"
+      "weekday": "Thu",
+      "code": "AN13"
     },
     {
       "day": 13,
-      "weekday": "Sun",
-      "code": "OFF"
+      "weekday": "Fri",
+      "code": "NN21"
     },
     {
       "day": 14,
-      "weekday": "Mon",
-      "code": "MN06"
+      "weekday": "Sat",
+      "code": "OFF"
     },
     {
       "day": 15,
-      "weekday": "Tue",
-      "code": "AN13"
+      "weekday": "Sun",
+      "code": "OFF"
     },
     {
       "day": 16,
-      "weekday": "Wed",
-      "code": "AN13"
+      "weekday": "Mon",
+      "code": "OFF"
     },
     {
       "day": 17,
-      "weekday": "Thu",
-      "code": "NN21"
-    },
-    {
-      "day": 18,
-      "weekday": "Fri",
-      "code": "NN21"
-    },
-    {
-      "day": 19,
-      "weekday": "Sat",
-      "code": "OFF"
-    },
-    {
-      "day": 20,
-      "weekday": "Sun",
-      "code": "OFF"
-    },
-    {
-      "day": 21,
-      "weekday": "Mon",
-      "code": "OFF"
-    },
-    {
-      "day": 22,
       "weekday": "Tue",
       "code": "MN06"
     },
     {
-      "day": 23,
+      "day": 18,
       "weekday": "Wed",
       "code": "MN06"
     },
     {
-      "day": 24,
+      "day": 19,
       "weekday": "Thu",
       "code": "AN13"
     },
     {
-      "day": 25,
+      "day": 20,
       "weekday": "Fri",
-      "code": "NN21"
+      "code": "AN13"
     },
     {
-      "day": 26,
+      "day": 21,
       "weekday": "Sat",
       "code": "NN21"
     },
     {
-      "day": 27,
+      "day": 22,
       "weekday": "Sun",
       "code": "OFF"
     },
     {
-      "day": 28,
+      "day": 23,
       "weekday": "Mon",
       "code": "OFF"
     },
     {
-      "day": 29,
+      "day": 24,
       "weekday": "Tue",
       "code": "OFF"
     },
     {
-      "day": 30,
+      "day": 25,
       "weekday": "Wed",
       "code": "MN06"
+    },
+    {
+      "day": 26,
+      "weekday": "Thu",
+      "code": "MN06"
+    },
+    {
+      "day": 27,
+      "weekday": "Fri",
+      "code": "AN13"
+    },
+    {
+      "day": 28,
+      "weekday": "Sat",
+      "code": "AN13"
+    },
+    {
+      "day": 29,
+      "weekday": "Sun",
+      "code": "NN21"
+    },
+    {
+      "day": 30,
+      "weekday": "Mon",
+      "code": "OFF"
     }
   ]
 }
