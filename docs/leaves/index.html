@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1e40af">
   <title>الإجازات</title>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('rosterLang') === 'en') {
+          document.documentElement.setAttribute('lang', 'en');
+          document.documentElement.setAttribute('dir', 'ltr');
+          document.title = 'Leaves';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,6 +53,7 @@
       text-rendering: optimizeLegibility;
     }
     button { font-family: inherit; }
+    html[lang="en"] body { font-family: var(--font-en); }
 
     .wrap {
       max-width: 680px;
@@ -120,6 +132,7 @@
     }
     .backBtn:active { transform: scale(.97); }
     .backBtn svg { width: 17px; height: 17px; flex-shrink: 0; }
+    html[lang="en"] .backBtn svg { transform: scaleX(-1); }
     .pageTitle {
       flex: 1 1 auto;
       margin: 0;
@@ -287,7 +300,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .monthChip:active { transform: scale(.97); }
-    .chipMonth { font-size: 12px; font-weight: 800; line-height: 1.15; }
+    .chipMonth { font-size: 12px; font-weight: 800; line-height: 1.15; white-space: nowrap; }
     .chipCount {
       font-family: var(--font-en);
       font-size: 10px;
@@ -328,6 +341,9 @@
       background: var(--dept, #64748b);
       background: linear-gradient(to left, var(--dept, #64748b), color-mix(in srgb, var(--dept, #64748b) 35%, #fff));
     }
+    html[lang="en"] .deptCard::before {
+      background: linear-gradient(to right, var(--dept, #64748b), color-mix(in srgb, var(--dept, #64748b) 35%, #fff));
+    }
     .deptHead {
       display: flex;
       align-items: center;
@@ -363,11 +379,13 @@
       font-weight: 800;
       line-height: 1.25;
       letter-spacing: -.01em;
-      text-align: right;
+      text-align: start;
       text-overflow: ellipsis;
       white-space: nowrap;
-      direction: ltr;
-      unicode-bidi: isolate;
+    }
+    html[lang="ar"] .deptTitle {
+      font-family: var(--font-ar);
+      letter-spacing: 0;
     }
     .deptSelfBadge {
       flex: 0 0 auto;
@@ -457,6 +475,9 @@
     .empRow.is-self {
       background: linear-gradient(to left, rgba(30, 64, 175, .065), rgba(30, 64, 175, .015));
     }
+    html[lang="en"] .empRow.is-self {
+      background: linear-gradient(to right, rgba(30, 64, 175, .065), rgba(30, 64, 175, .015));
+    }
     .empRow.is-self::before {
       content: "";
       position: absolute;
@@ -510,6 +531,12 @@
       white-space: nowrap;
       direction: ltr;
       unicode-bidi: isolate;
+    }
+    html[lang="ar"] .empNameId { direction: rtl; }
+    html[lang="ar"] .empName {
+      font-family: var(--font-ar);
+      letter-spacing: 0;
+      direction: rtl;
     }
     .empId {
       flex: 0 0 auto;
@@ -609,6 +636,12 @@
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
     }
+    html[lang="en"] .trackSpan {
+      background: linear-gradient(to right, var(--accent) 0%, var(--accent-2, var(--accent)) 100%);
+    }
+    html[lang="en"] .trackSpan,
+    html[lang="en"] .trackGap,
+    html[lang="en"] .trackWork { transform-origin: left center; }
     /* Elapsed leave days use the deep tone, today's cell uses the accent amber. */
     .trackPast {
       position: absolute;
@@ -773,13 +806,13 @@
   <div class="wrap">
     <header class="header">
       <div class="headerTop">
-        <a class="backBtn" href="../" aria-label="رجوع">
+        <a class="backBtn" href="../" id="backBtn" aria-label="رجوع">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 18l6-6-6-6"/>
           </svg>
-          <span class="backBtnLabel">رجوع</span>
+          <span class="backBtnLabel" id="backLabel">رجوع</span>
         </a>
-        <h1 class="pageTitle">الإجازات</h1>
+        <h1 class="pageTitle" id="pageTitle">الإجازات</h1>
         <span class="headerSpacer" aria-hidden="true"></span>
       </div>
       <div class="headerBody">
@@ -797,11 +830,11 @@
 
     <div class="sourceTabs no-anim" id="sourceTabs" data-active="export" role="group" aria-label="مصدر الجدول">
       <button class="sourceTab is-active" type="button" data-source="export" aria-pressed="true">
-        <span>الصادر</span>
+        <span id="exportLabel">الصادر</span>
         <span class="sourceTabCount" data-count="export">0</span>
       </button>
       <button class="sourceTab" type="button" data-source="import" aria-pressed="false">
-        <span>الوارد</span>
+        <span id="importLabel">الوارد</span>
         <span class="sourceTabCount" data-count="import">0</span>
       </button>
     </div>
@@ -823,7 +856,7 @@
         <path d="M8 3v4M16 3v4M3 10h18"/>
         <path d="M9 15h6"/>
       </svg>
-      <h2 class="stateTitle">لا توجد إجازات مسجّلة</h2>
+      <h2 class="stateTitle" id="emptyTitle">لا توجد إجازات مسجّلة</h2>
       <p class="stateBody" id="emptyBody">لا توجد إجازات سنوية أو مرضية في هذا الشهر.</p>
     </section>
 
@@ -833,13 +866,13 @@
         <path d="M12 8v5"/>
         <path d="M12 16.5h.01"/>
       </svg>
-      <h2 class="stateTitle">تعذّر تحميل البيانات</h2>
-      <p class="stateBody">تأكد من اتصالك بالإنترنت ثم أعد المحاولة.</p>
+      <h2 class="stateTitle" id="errorTitle">تعذّر تحميل البيانات</h2>
+      <p class="stateBody" id="errorBody">تأكد من اتصالك بالإنترنت ثم أعد المحاولة.</p>
       <button type="button" class="retryBtn" id="retryBtn">إعادة المحاولة</button>
     </section>
 
     <footer class="pageFoot">
-      <span>المصدر: جداول الموظفين</span>
+      <span id="footSource">المصدر: جداول الموظفين</span>
       <span id="updatedText"></span>
     </footer>
   </div>
@@ -848,9 +881,78 @@
     (function () {
       'use strict';
 
-      var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-      var LEAVE_LABELS = { annual: 'سنوية', sick: 'مرضية' };
-      var SOURCE_LABELS = { export: 'الصادر', import: 'الوارد' };
+      var MONTHS = {
+        ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+        en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+      };
+      var LEAVE_LABELS = {
+        ar: { annual: 'سنوية', sick: 'مرضية' },
+        en: { annual: 'Annual', sick: 'Sick' }
+      };
+      var SOURCE_LABELS = {
+        ar: { export: 'الصادر', import: 'الوارد' },
+        en: { export: 'Export', import: 'Import' }
+      };
+      var T = {
+        ar: {
+          pageTitle: 'الإجازات',
+          back: 'رجوع',
+          monthGroup: 'اختيار الشهر',
+          sourceGroup: 'مصدر الجدول',
+          loading: 'جارٍ التحميل…',
+          loadingStatus: 'جارٍ تحميل الإجازات…',
+          emptyTitle: 'لا توجد إجازات مسجّلة',
+          emptyBody: 'لا توجد إجازات سنوية أو مرضية في هذا الشهر.',
+          errorTitle: 'تعذّر تحميل البيانات',
+          errorBody: 'تأكد من اتصالك بالإنترنت ثم أعد المحاولة.',
+          retry: 'إعادة المحاولة',
+          source: 'المصدر: جداول الموظفين',
+          updated: 'آخر تحديث: ',
+          self: 'أنت',
+          yourDept: 'قسمك',
+          expired: 'منقضية',
+          expiredGroup: 'إجازات منقضية',
+          rest: 'راحة',
+          backToWork: 'بداية الدوام'
+        },
+        en: {
+          pageTitle: 'Leaves',
+          back: 'Back',
+          monthGroup: 'Choose month',
+          sourceGroup: 'Roster source',
+          loading: 'Loading…',
+          loadingStatus: 'Loading leaves…',
+          emptyTitle: 'No recorded leaves',
+          emptyBody: 'No annual or sick leave in this month.',
+          errorTitle: 'Couldn\'t load the data',
+          errorBody: 'Check your internet connection and try again.',
+          retry: 'Try again',
+          source: 'Source: employee schedules',
+          updated: 'Last updated: ',
+          self: 'You',
+          yourDept: 'Your dept',
+          expired: 'Expired',
+          expiredGroup: 'Expired leaves',
+          rest: 'Rest',
+          backToWork: 'Back to work'
+        }
+      };
+      var DEPT_AR = {
+        'Supervisors': 'المشرفون',
+        'Load Control': 'مراقبة الحمولة',
+        'Export Checker': 'مدقق الصادرات',
+        'Export Operators': 'مشغلو الصادرات',
+        'Inventory': 'المخزون',
+        'Officers': 'الضباط',
+        'Documentation': 'المستندات',
+        'Import Checkers': 'مدققو الواردات',
+        'Release Control': 'مراقبة الإفراج',
+        'Import Operators': 'مشغلو الواردات',
+        'Flight Dispatch': 'تجهيز الرحلات',
+        'Flight Dispatch (Export)': 'تجهيز الرحلات (الصادر)',
+        'Flight Dispatch (Import)': 'تجهيز الرحلات (الوارد)',
+        'Other': 'أخرى'
+      };
       var DEPT_ORDER = [
         'supervisors',
         'load control',
@@ -879,22 +981,34 @@
       };
 
       var els = {
+        backBtn: document.getElementById('backBtn'),
+        backLabel: document.getElementById('backLabel'),
+        pageTitle: document.getElementById('pageTitle'),
         heroNum: document.getElementById('heroNum'),
         heroLabel: document.getElementById('heroLabel'),
         heroMonth: document.getElementById('heroMonth'),
         strip: document.getElementById('monthStrip'),
         sourceTabs: document.getElementById('sourceTabs'),
+        exportLabel: document.getElementById('exportLabel'),
+        importLabel: document.getElementById('importLabel'),
         skeleton: document.getElementById('skeleton'),
         listCard: document.getElementById('listCard'),
         emptyState: document.getElementById('emptyState'),
+        emptyTitle: document.getElementById('emptyTitle'),
         emptyBody: document.getElementById('emptyBody'),
         errorState: document.getElementById('errorState'),
+        errorTitle: document.getElementById('errorTitle'),
+        errorBody: document.getElementById('errorBody'),
         retryBtn: document.getElementById('retryBtn'),
+        footSource: document.getElementById('footSource'),
         updatedText: document.getElementById('updatedText'),
         status: document.getElementById('statusText')
       };
 
       var DATA = null;
+      var NAME_MAP = {};
+      var updatedValue = '';
+      var lang = 'ar';
       var activeMonth = '';
       var activeSource = 'export';
       var renderedDay = todayIso();
@@ -933,7 +1047,20 @@
       }
 
       function monthName(key) {
-        return MONTHS_AR[parseInt(key.slice(5, 7), 10) - 1] || key;
+        return MONTHS[lang][parseInt(key.slice(5, 7), 10) - 1] || key;
+      }
+
+      function t(key) {
+        return (T[lang] && T[lang][key]) || T.ar[key] || key;
+      }
+
+      function sourceLabel(kind) {
+        return SOURCE_LABELS[lang][kind] || kind;
+      }
+
+      function deptLabel(raw) {
+        var name = String(raw || '').trim() || 'Other';
+        return lang === 'ar' ? (DEPT_AR[name] || name) : name;
       }
 
       function deptKey(dept) {
@@ -957,6 +1084,24 @@
           });
         }
         return name;
+      }
+
+      function nameFor(entry) {
+        var raw = String(entry.name || '').trim();
+        if (lang === 'ar' && NAME_MAP) {
+          var key = raw.replace(/\s+/g, ' ').toUpperCase();
+          if (NAME_MAP[key]) return NAME_MAP[key];
+        }
+        return displayName(raw);
+      }
+
+      function buildNameMap(json) {
+        var map = {};
+        var names = (json && json.names) || {};
+        Object.keys(names).forEach(function (key) {
+          map[String(key).replace(/\s+/g, ' ').trim().toUpperCase()] = names[key];
+        });
+        return map;
       }
 
       function readSavedIds() {
@@ -1019,7 +1164,7 @@
           var on = kind === activeSource;
           button.classList.toggle('is-active', on);
           button.setAttribute('aria-pressed', on ? 'true' : 'false');
-          button.setAttribute('aria-label', SOURCE_LABELS[kind] + ': ' + employeesPhrase(counts[kind]));
+          button.setAttribute('aria-label', sourceLabel(kind) + ': ' + employeesPhrase(counts[kind]));
           if (sourceCounts[kind]) sourceCounts[kind].textContent = String(counts[kind]);
         });
       }
@@ -1046,6 +1191,10 @@
       }
 
       function employeesPhrase(count) {
+        if (lang === 'en') {
+          if (!count) return 'No one on leave';
+          return count + (count === 1 ? ' employee' : ' employees') + ' on leave';
+        }
         if (!count) return 'لا أحد في إجازة';
         if (count === 1) return 'موظف واحد في إجازة';
         if (count === 2) return 'موظفان في إجازة';
@@ -1054,6 +1203,10 @@
       }
 
       function heroLabelFor(count) {
+        if (lang === 'en') {
+          if (!count) return 'No leave';
+          return count === 1 ? 'employee on leave' : 'employees on leave';
+        }
         if (!count) return 'لا توجد إجازات';
         if (count === 1) return 'موظف في إجازة';
         if (count === 2) return 'موظفان في إجازة';
@@ -1062,6 +1215,7 @@
       }
 
       function daysLabel(count) {
+        if (lang === 'en') return count + (count === 1 ? ' day' : ' days');
         if (count === 1) return 'يوم واحد';
         if (count === 2) return 'يومان';
         if (count <= 10) return count + ' أيام';
@@ -1132,20 +1286,21 @@
         var nameLine = div('empNameLine');
         var nameId = div('empNameId');
 
-        var name = span('empName', displayName(entry.name));
-        name.title = displayName(entry.name);
+        var display = nameFor(entry);
+        var name = span('empName', display);
+        name.title = display;
         nameId.appendChild(name);
         nameId.appendChild(span('nameDash', '-'));
         nameId.appendChild(span('empId', entry.id));
         nameLine.appendChild(nameId);
-        if (isSelf) nameLine.appendChild(span('selfBadge', 'أنت'));
+        if (isSelf) nameLine.appendChild(span('selfBadge', t('self')));
         head.appendChild(nameLine);
 
         var facts = div('empFacts');
-        facts.appendChild(span('leaveTag ' + entry.type, LEAVE_LABELS[entry.type] || ''));
+        facts.appendChild(span('leaveTag ' + entry.type, LEAVE_LABELS[lang][entry.type] || ''));
         facts.appendChild(span('empDays', daysLabel(entry.days)));
         facts.appendChild(dateEl(entry, monthKey));
-        if (expired) facts.appendChild(span('expiredTag', 'منقضية'));
+        if (expired) facts.appendChild(span('expiredTag', t('expired')));
         head.appendChild(facts);
 
         row.appendChild(head);
@@ -1173,14 +1328,14 @@
             var gapTo = parseInt(ret.gap_to.slice(8, 10), 10);
             placeMark(
               ruler, 'trackGap', gapFrom, gapTo, monthDays, delay,
-              'راحة: ' + gapFrom + ' – ' + gapTo + ' ' + monthName(monthKey)
+              t('rest') + ': ' + gapFrom + ' – ' + gapTo + ' ' + monthName(monthKey)
             );
           }
           if (ret.work) {
             var workDay = parseInt(ret.work.slice(8, 10), 10);
             placeMark(
               ruler, 'trackWork', workDay, workDay, monthDays, delay,
-              'بداية الدوام: ' + workDay + ' ' + monthName(monthKey)
+              t('backToWork') + ': ' + workDay + ' ' + monthName(monthKey)
             );
           }
         });
@@ -1256,7 +1411,7 @@
           var unique = {};
           dept.entries.forEach(function (entry) { unique[entry.id] = true; });
           var people = Object.keys(unique).length;
-          section.setAttribute('aria-label', dept.name + '، ' + employeesPhrase(people));
+          section.setAttribute('aria-label', deptLabel(dept.name) + (lang === 'ar' ? '، ' : ', ') + employeesPhrase(people));
 
           var head = div('deptHead');
           var icon = div('deptIcon');
@@ -1271,14 +1426,16 @@
 
           var title = document.createElement('h2');
           title.className = 'deptTitle';
-          title.textContent = dept.name;
-          title.title = dept.name;
+          title.textContent = deptLabel(dept.name);
+          title.title = deptLabel(dept.name);
           head.appendChild(title);
 
-          if (dept.isSelf) head.appendChild(span('deptSelfBadge', 'قسمك'));
+          if (dept.isSelf) head.appendChild(span('deptSelfBadge', t('yourDept')));
 
           var count = span('deptCount', String(people));
-          count.title = people + ' موظف';
+          count.title = lang === 'en'
+            ? people + (people === 1 ? ' employee' : ' employees')
+            : people + ' موظف';
           head.appendChild(count);
 
           section.appendChild(head);
@@ -1288,7 +1445,7 @@
             var self = isSelfEntry(entry);
             var expired = isExpired(entry, today);
             if (expired && !self && dept.activeOthers && !showedExpiredHead) {
-              section.appendChild(div('expiredSeparator')).textContent = 'إجازات منقضية';
+              section.appendChild(div('expiredSeparator')).textContent = t('expiredGroup');
               showedExpiredHead = true;
             }
             section.appendChild(buildRow(entry, index, month.days, monthKey, self, expired));
@@ -1339,7 +1496,9 @@
         els.listCard.hidden = isEmpty;
         if (isEmpty) {
           els.listCard.innerHTML = '';
-          els.emptyBody.textContent = 'لا توجد إجازات مسجّلة في ' + SOURCE_LABELS[activeSource] + ' خلال ' + monthName(monthKey) + '.';
+          els.emptyBody.textContent = lang === 'en'
+            ? 'No leaves recorded in ' + sourceLabel(activeSource) + ' for ' + monthName(monthKey) + '.'
+            : 'لا توجد إجازات مسجّلة في ' + sourceLabel(activeSource) + ' خلال ' + monthName(monthKey) + '.';
         } else {
           renderList(month, monthKey);
         }
@@ -1350,7 +1509,9 @@
           } catch (e) {}
         }
         if (!options || options.announce !== false) {
-          els.status.textContent = 'شهر ' + monthName(monthKey) + '، ' + SOURCE_LABELS[activeSource] + ': ' + employeesPhrase(people) + '.';
+          els.status.textContent = lang === 'en'
+            ? monthName(monthKey) + ', ' + sourceLabel(activeSource) + ': ' + employeesPhrase(people) + '.'
+            : 'شهر ' + monthName(monthKey) + '، ' + sourceLabel(activeSource) + ': ' + employeesPhrase(people) + '.';
         }
       }
 
@@ -1364,7 +1525,7 @@
           chip.type = 'button';
           chip.className = 'monthChip';
           chip.setAttribute('data-month', key);
-          chip.setAttribute('aria-label', monthName(key) + '، ' + SOURCE_LABELS[activeSource] + ': ' + employeesPhrase(people));
+          chip.setAttribute('aria-label', monthName(key) + (lang === 'ar' ? '، ' : ', ') + sourceLabel(activeSource) + ': ' + employeesPhrase(people));
           if (!people) chip.classList.add('is-empty');
           chip.appendChild(span('chipMonth', monthName(key)));
           chip.appendChild(span('chipCount', String(people)));
@@ -1390,15 +1551,49 @@
         return Object.keys(DATA.months).sort().pop();
       }
 
+      function readStoredLang() {
+        try {
+          return localStorage.getItem('rosterLang') === 'en' ? 'en' : 'ar';
+        } catch (e) {
+          return 'ar';
+        }
+      }
+
+      function applyLanguage(next) {
+        lang = next === 'en' ? 'en' : 'ar';
+        document.documentElement.setAttribute('lang', lang);
+        document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        document.body.classList.toggle('ar', lang === 'ar');
+        document.title = t('pageTitle');
+        els.pageTitle.textContent = t('pageTitle');
+        els.backLabel.textContent = t('back');
+        els.backBtn.setAttribute('aria-label', t('back'));
+        els.exportLabel.textContent = SOURCE_LABELS[lang].export;
+        els.importLabel.textContent = SOURCE_LABELS[lang].import;
+        els.strip.setAttribute('aria-label', t('monthGroup'));
+        els.sourceTabs.setAttribute('aria-label', t('sourceGroup'));
+        els.emptyTitle.textContent = t('emptyTitle');
+        els.emptyBody.textContent = t('emptyBody');
+        els.errorTitle.textContent = t('errorTitle');
+        els.errorBody.textContent = t('errorBody');
+        els.retryBtn.textContent = t('retry');
+        els.footSource.textContent = t('source');
+        if (updatedValue) showUpdated(updatedValue);
+        if (DATA) {
+          buildMonthStrip();
+          renderMonth(DATA.months[activeMonth] ? activeMonth : initialMonth(), { updateHash: false, announce: false });
+        }
+      }
+
       function setLoading(on) {
         els.skeleton.hidden = !on;
         els.errorState.hidden = true;
         els.listCard.hidden = true;
         els.emptyState.hidden = true;
         els.heroNum.textContent = '—';
-        els.heroLabel.textContent = on ? 'جارٍ التحميل…' : '';
+        els.heroLabel.textContent = on ? t('loading') : '';
         els.heroMonth.textContent = '';
-        if (on) els.status.textContent = 'جارٍ تحميل الإجازات…';
+        if (on) els.status.textContent = t('loadingStatus');
       }
 
       function showError() {
@@ -1407,30 +1602,42 @@
         els.emptyState.hidden = true;
         els.errorState.hidden = false;
         els.heroNum.textContent = '—';
-        els.heroLabel.textContent = 'تعذّر تحميل البيانات';
+        els.heroLabel.textContent = t('errorTitle');
         els.heroMonth.textContent = '';
-        els.status.textContent = 'تعذّر تحميل البيانات.';
+        els.status.textContent = t('errorTitle') + '.';
       }
 
       function showUpdated(value) {
         if (!value) return;
         var date = new Date(value);
         if (isNaN(date.getTime())) return;
-        els.updatedText.textContent = 'آخر تحديث: ' +
-          date.getDate() + ' ' + MONTHS_AR[date.getMonth()] + ' ' + date.getFullYear();
+        updatedValue = value;
+        els.updatedText.textContent = t('updated') +
+          date.getDate() + ' ' + MONTHS[lang][date.getMonth()] + ' ' + date.getFullYear();
       }
 
       function load() {
         setLoading(true);
-        fetch('leaves-data.json', { cache: 'no-cache' })
-          .then(function (response) {
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.json();
-          })
-          .then(function (data) {
+        Promise.all([
+          fetch('leaves-data.json', { cache: 'no-cache' })
+            .then(function (response) {
+              if (!response.ok) throw new Error('HTTP ' + response.status);
+              return response.json();
+            }),
+          fetch('../name_translations.json', { cache: 'no-store' })
+            .then(function (response) {
+              return response.ok ? response.json() : null;
+            })
+            .catch(function () {
+              return null;
+            })
+        ])
+          .then(function (results) {
+            var data = results[0];
             if (!data || !data.months || !Object.keys(data.months).length) {
               throw new Error('No leave data');
             }
+            NAME_MAP = buildNameMap(results[1]);
             DATA = data;
             buildMonthStrip();
             renderMonth(initialMonth(), { announce: false });
@@ -1463,6 +1670,11 @@
 
       function refreshIfNeeded(force) {
         if (!DATA || !activeMonth) return;
+        var stored = readStoredLang();
+        if (stored !== lang) {
+          applyLanguage(stored);
+          return;
+        }
         if (
           force ||
           todayIso() !== renderedDay ||
@@ -1473,7 +1685,13 @@
       }
 
       window.addEventListener('storage', function (e) {
-        if (e && ['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'].indexOf(e.key) !== -1) {
+        if (!e) return;
+        if (e.key === 'rosterLang') {
+          var next = e.newValue === 'en' ? 'en' : 'ar';
+          if (next !== lang) applyLanguage(next);
+          return;
+        }
+        if (['exportSavedEmpId', 'savedEmpId', 'importSavedEmpId'].indexOf(e.key) !== -1) {
           refreshIfNeeded(true);
         }
       });
@@ -1484,6 +1702,7 @@
         if (e && e.persisted) refreshIfNeeded(true);
       });
 
+      applyLanguage(readStoredLang());
       load();
     })();
   </script>
