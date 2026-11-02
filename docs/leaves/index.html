@@ -330,11 +330,13 @@
       --accent: #059669;
       --accent-2: #34d399;
       --accent-soft: rgba(5, 150, 105, .45);
+      --accent-past: #065f46;
     }
     .empRow.type-sick {
       --accent: #e11d48;
       --accent-2: #fb7185;
       --accent-soft: rgba(225, 29, 72, .42);
+      --accent-past: #9f1239;
     }
     .leaveTag {
       padding: 0 6px;
@@ -530,9 +532,25 @@
       border-radius: var(--radius-pill);
       background: linear-gradient(to left, var(--accent) 0%, var(--accent-2, var(--accent)) 100%);
       box-shadow: 0 4px 10px -3px var(--accent-soft);
+      overflow: hidden;
       transform-origin: right center;
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
+    }
+    /* Elapsed leave days use the deep tone, today's cell uses the accent amber. */
+    .trackPast {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      background: var(--accent-past, #334155);
+    }
+    .trackToday {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: var(--tstart, 0%);
+      width: var(--tw, 0%);
+      background: #f59e0b;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55);
     }
     .trackGap,
     .trackWork {
@@ -929,6 +947,31 @@
         mark.style.setProperty('--i', String(Math.min(index, 14)));
         if (title) mark.title = title;
         ruler.appendChild(mark);
+        return mark;
+      }
+
+      function markLeaveProgress(mark, fromDay, toDay, monthKey, today) {
+        var todayMonth = today.slice(0, 7);
+        var todayDay = parseInt(today.slice(8, 10), 10);
+        var days = toDay - fromDay + 1;
+        var pastDays = 0;
+        if (monthKey < todayMonth) {
+          pastDays = days;
+        } else if (monthKey === todayMonth) {
+          if (toDay < todayDay) pastDays = days;
+          else if (fromDay < todayDay) pastDays = todayDay - fromDay;
+        }
+        if (pastDays > 0) {
+          var past = span('trackPast');
+          past.style.width = ((pastDays / days) * 100).toFixed(4) + '%';
+          mark.appendChild(past);
+        }
+        if (monthKey === todayMonth && todayDay >= fromDay && todayDay <= toDay) {
+          var now = span('trackToday');
+          now.style.setProperty('--tstart', (((todayDay - fromDay) / days) * 100).toFixed(4) + '%');
+          now.style.setProperty('--tw', ((100 / days)).toFixed(4) + '%');
+          mark.appendChild(now);
+        }
       }
 
       function buildRow(entry, index, monthDays, monthKey, isSelf, expired) {
@@ -969,10 +1012,12 @@
         var ranges = entry.ranges && entry.ranges.length
           ? entry.ranges
           : [{ from: entry.from, to: entry.to }];
+        var today = todayIso();
         ranges.forEach(function (range, rangeIndex) {
           var fromDay = parseInt(range.from.slice(8, 10), 10);
           var toDay = parseInt(range.to.slice(8, 10), 10);
-          placeMark(ruler, 'trackSpan', fromDay, toDay, monthDays, index + rangeIndex);
+          var mark = placeMark(ruler, 'trackSpan', fromDay, toDay, monthDays, index + rangeIndex);
+          if (!expired) markLeaveProgress(mark, fromDay, toDay, monthKey, today);
         });
 
         (entry.returns || []).forEach(function (ret, returnIndex) {
