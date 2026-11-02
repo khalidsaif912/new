@@ -124,6 +124,66 @@ def day_cols(ws, day_row: int) -> List[Tuple[int, int]]:
     return cols
 
 
+def parse_sheet(ws) -> Dict[str, Dict]:
+    """Return ``stable_key -> {id,name,shifts}`` for a single worksheet."""
+    out: Dict[str, Dict] = {}
+    try:
+        drow = find_day_row(ws)
+        dcols = day_cols(ws, drow)
+    except Exception:
+        return out
+
+    for r in range(drow + 1, ws.max_row + 1):
+        row_vals = [norm(ws.cell(row=r, column=c).value) for c in range(1, ws.max_column + 1)]
+        emp_id = ""
+        name = ""
+        for i, v in enumerate(row_vals):
+            if not emp_id and is_emp_id(v):
+                emp_id = v
+                left = row_vals[i - 1] if i - 1 >= 0 else ""
+                right = row_vals[i + 1] if i + 1 < len(row_vals) else ""
+                left_ok = looks_name(left)
+                right_ok = looks_name(right)
+                if left_ok and right_ok:
+                    name = left if len(left) >= len(right) else right
+                elif left_ok:
+                    name = left
+                elif right_ok:
+                    name = right
+                break
+        # Some local roster templates omit a dedicated id column.
+        if not name:
+            for v in row_vals:
+                if looks_name(v):
+                    name = v
+                    break
+        if not emp_id:
+            emp_id = extract_id_from_name(name)
+
+        shift_map: Dict[str, str] = {}
+        for day_num, col in dcols:
+            code = norm(ws.cell(row=r, column=col).value).upper()
+            if code:
+                shift_map[str(day_num)] = code
+
+        # Skip totals/summary rows that don't contain shift codes.
+        has_alpha_shift = any(any(ch.isalpha() for ch in code) for code in shift_map.values())
+        if not has_alpha_shift:
+            continue
+
+        key = stable_emp_key(emp_id, name)
+        if not key:
+            continue
+        rec = out.setdefault(key, {"id": emp_id, "name": name, "shifts": {}})
+        if emp_id and not rec.get("id"):
+            rec["id"] = emp_id
+        if name and (not rec.get("name") or len(name) > len(rec.get("name") or "")):
+            rec["name"] = name
+        rec["shifts"].update(shift_map)
+
+    return out
+
+
 def parse_file(path: Path) -> Dict[str, Dict]:
     """Return ``stable_key -> {id,name,shifts}``."""
     wb = load_workbook(path, data_only=True)
@@ -133,65 +193,82 @@ def parse_file(path: Path) -> Dict[str, Dict]:
     for sn in wb.sheetnames:
         if norm(sn).lower() in SKIP_SHEETS:
             continue
-        ws = wb[sn]
-        try:
-            drow = find_day_row(ws)
-            dcols = day_cols(ws, drow)
-        except Exception:
+        sheet_data = parse_sheet(wb[sn])
+        if not sheet_data:
             continue
         parsed_any_sheet = True
-
-        for r in range(drow + 1, ws.max_row + 1):
-            row_vals = [norm(ws.cell(row=r, column=c).value) for c in range(1, ws.max_column + 1)]
-            emp_id = ""
-            name = ""
-            for i, v in enumerate(row_vals):
-                if not emp_id and is_emp_id(v):
-                    emp_id = v
-                    left = row_vals[i - 1] if i - 1 >= 0 else ""
-                    right = row_vals[i + 1] if i + 1 < len(row_vals) else ""
-                    left_ok = looks_name(left)
-                    right_ok = looks_name(right)
-                    if left_ok and right_ok:
-                        name = left if len(left) >= len(right) else right
-                    elif left_ok:
-                        name = left
-                    elif right_ok:
-                        name = right
-                    break
-            # Some local roster templates omit a dedicated id column.
-            if not name:
-                for v in row_vals:
-                    if looks_name(v):
-                        name = v
-                        break
-            if not emp_id:
-                emp_id = extract_id_from_name(name)
-
-            shift_map: Dict[str, str] = {}
-            for day_num, col in dcols:
-                code = norm(ws.cell(row=r, column=col).value).upper()
-                if code:
-                    shift_map[str(day_num)] = code
-
-            # Skip totals/summary rows that don't contain shift codes.
-            has_alpha_shift = any(any(ch.isalpha() for ch in code) for code in shift_map.values())
-            if not has_alpha_shift:
-                continue
-
-            key = stable_emp_key(emp_id, name)
-            if not key:
-                continue
-            rec = out.setdefault(key, {"id": emp_id, "name": name, "shifts": {}})
-            if emp_id and not rec.get("id"):
-                rec["id"] = emp_id
-            if name and (not rec.get("name") or len(name) > len(rec.get("name") or "")):
-                rec["name"] = name
-            rec["shifts"].update(shift_map)
+        for key, rec in sheet_data.items():
+            merged = out.setdefault(key, {"id": "", "name": "", "shifts": {}})
+            if rec.get("id") and not merged.get("id"):
+                merged["id"] = rec["id"]
+            if rec.get("name") and (
+                not merged.get("name") or len(rec["name"]) > len(merged.get("name") or "")
+            ):
+                merged["name"] = rec["name"]
+            merged["shifts"].update(rec.get("shifts") or {})
 
     if not parsed_any_sheet:
         raise ValueError("Could not detect day header row in any sheet")
     return out
+
+
+MONTH_NAMES = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+]
+MONTH_SHEET_RE = re.compile(r"^([A-Za-z]+)\s+(\d{4})$")
+
+
+def sheet_month_key(sheet_name: str) -> str:
+    m = MONTH_SHEET_RE.match(norm(sheet_name))
+    if not m:
+        return ""
+    try:
+        idx = MONTH_NAMES.index(m.group(1).lower()) + 1
+    except ValueError:
+        return ""
+    return f"{m.group(2)}-{idx:02d}"
+
+
+def previous_month_key(month: str) -> str:
+    year, mon = (int(x) for x in month.split("-"))
+    return f"{year - 1}-12" if mon == 1 else f"{year}-{mon - 1:02d}"
+
+
+def month_sheet_diff(path: Path, month: str):
+    """Compare this month's sheet with the previous month's sheet in one workbook.
+
+    Used when a workbook carries several months for the same employees and the
+    previous ingest belongs to a different roster, so the months are the only
+    comparable snapshots.
+    """
+    wb = load_workbook(path, data_only=True)
+    sheets: Dict[str, str] = {}
+    for sn in wb.sheetnames:
+        key = sheet_month_key(sn)
+        if key:
+            sheets[key] = sn
+    cur_sheet = sheets.get(month)
+    prev_sheet = sheets.get(previous_month_key(month))
+    if not cur_sheet or not prev_sheet:
+        return None
+
+    old_data = parse_sheet(wb[prev_sheet])
+    new_data = parse_sheet(wb[cur_sheet])
+    if not (set(old_data) & set(new_data)):
+        return None
+    changes = build_diff_data(old_data, new_data, only_common=True)
+    return changes, prev_sheet, cur_sheet
 
 
 def _align_records(
@@ -239,11 +316,14 @@ def _align_records(
     return pairs
 
 
-def build_diff(old_path: Path, new_path: Path) -> List[Dict]:
-    old_data = parse_file(old_path)
-    new_data = parse_file(new_path)
+def build_diff_data(
+    old_data: Dict[str, Dict], new_data: Dict[str, Dict], only_common: bool = False
+) -> List[Dict]:
     changes: List[Dict] = []
+    common = set(old_data) & set(new_data) if only_common else None
     for emp_key, a, b in _align_records(old_data, new_data):
+        if common is not None and emp_key not in common:
+            continue
         days = sorted(set(a["shifts"].keys()) | set(b["shifts"].keys()), key=lambda x: int(x))
         display_id = b.get("id") or a.get("id") or emp_key
         display_name = b.get("name") or a.get("name") or ""
@@ -261,6 +341,10 @@ def build_diff(old_path: Path, new_path: Path) -> List[Dict]:
                     }
                 )
     return changes
+
+
+def build_diff(old_path: Path, new_path: Path) -> List[Dict]:
+    return build_diff_data(parse_file(old_path), parse_file(new_path))
 
 
 def shifts_fingerprint(path: Path) -> str:
@@ -320,13 +404,27 @@ def main() -> None:
         )
         return
 
-    changes = build_diff(old_path, new_path)
+    old_data = parse_file(old_path)
+    new_data = parse_file(new_path)
+    changes = build_diff_data(old_data, new_data)
+    old_label = (args.old_label or "").strip() or old_path.name
+    new_label = (args.new_label or "").strip() or new_path.name
+
+    # Different rosters (no shared employees): this month's sheet is only
+    # comparable with the previous month's sheet in the same workbook.
+    if not (set(old_data) & set(new_data)):
+        fallback = month_sheet_diff(new_path, args.month)
+        if fallback:
+            changes, old_sheet, new_sheet = fallback
+            old_label, new_label = old_sheet, new_sheet
+            print(f"FALLBACK month sheets: {old_sheet} -> {new_sheet}")
+
     payload = {
         "kind": args.kind,
         "month": args.month,
         "generated_at": datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z",
-        "old_file": (args.old_label or "").strip() or old_path.name,
-        "new_file": (args.new_label or "").strip() or new_path.name,
+        "old_file": old_label,
+        "new_file": new_label,
         "total_changes": len(changes),
         "changes": changes,
     }
