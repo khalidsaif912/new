@@ -1,20 +1,22 @@
 {
   "items": [
     {
-      "id": "a1lvtj9hf",
-      "title": "",
-      "text": "صباح الخير",
-      "mode": "text",
-      "imageId": "",
-      "imageIds": [],
-      "linkUrl": "",
-      "linkLabel": "",
-      "days": 1,
+      "id": "a2r4nvsuw",
+      "title": "جديد",
+      "text": "صفحة الإجازات تجريبية",
+      "mode": "both",
+      "imageId": "a990881f1",
+      "imageIds": [
+        "a990881f1"
+      ],
+      "linkUrl": "https://khalidsaif912.github.io/new/docs/leaves",
+      "linkLabel": "صفحة الإجازات",
+      "days": 3,
       "durationSec": 12,
-      "startAt": 1793329395820,
+      "startAt": 1793521092492,
       "enabled": true,
-      "at": 1793329395820
+      "at": 1793521092492
     }
   ],
-  "at": 1793329395820
+  "at": 1793521092492
 }

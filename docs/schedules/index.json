@@ -1,5 +1,5 @@
 {
-  "total": 84,
+  "total": 99,
   "employees": [
     {
       "id": "990465",
@@ -332,17 +332,6 @@
         "2026-07",
         "2026-08",
         "2026-09",
-        "2026-10",
-        "2026-11",
-        "2026-12"
-      ]
-    },
-    {
-      "id": "82598",
-      "name": "Khalil Al Mazruie",
-      "department": "Export Checker",
-      "months": [
-        "2026-04",
         "2026-10",
         "2026-11",
         "2026-12"
@@ -1436,6 +1425,167 @@
       ]
     },
     {
+      "id": "82451",
+      "name": "Ahmed Al Harrasi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82580",
+      "name": "Ahmed Al Quraini",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82479",
+      "name": "AlMuhannad Al Abri",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82474",
+      "name": "Ali Al Maqbali",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "8195",
+      "name": "Jayantha",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82579",
+      "name": "Jihad Al Sarmi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82598",
+      "name": "Khalil Al Mazroei",
+      "department": "September 2026",
+      "months": [
+        "2026-04",
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82651",
+      "name": "Mazin Al Houti",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82613",
+      "name": "Mohd Al Balushi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82670",
+      "name": "Mudrek Al Harthy",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "81026",
+      "name": "Muna Al Amri",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82469",
+      "name": "Nasma Al Farsi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82662",
+      "name": "Omar Al Harthy",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82446",
+      "name": "Said Al Luwaihi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82466",
+      "name": "Waleed Al Kharusi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
+      "id": "82475",
+      "name": "Zainab Al Hashimi",
+      "department": "September 2026",
+      "months": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ]
+    },
+    {
       "id": "80250",
       "name": "Jay Macalino",
       "department": "Supervisors",
@@ -1531,5 +1681,5 @@
       ]
     }
   ],
-  "last_updated": "2026-10-30T13:07:32.935826+04:00"
+  "last_updated": "2026-11-02T14:55:57.539452+04:00"
 }
