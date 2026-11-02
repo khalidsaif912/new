@@ -177,93 +177,65 @@
       white-space: nowrap;
     }
 
-    /* ── Tabs ── */
-    .pageNav {
+    /* ── Source tabs: white capsule matching the month chips ── */
+    .sourceTabs {
+      position: relative;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px;
-      margin-top: 10px;
+      margin: 0 0 10px;
       padding: 4px;
       border: 1px solid var(--border);
-      border-radius: 13px;
+      border-radius: 14px;
       background: var(--surface);
-      box-shadow: 0 1px 4px rgba(15, 23, 42, .05);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
     }
-    .pageNavTab {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      min-height: 32px;
-      padding: 0 8px;
+    .sourceTabs::before {
+      content: "";
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      inset-inline-start: 4px;
+      width: calc(50% - 4px);
       border-radius: 10px;
-      color: var(--text-secondary);
-      font-size: 11.5px;
-      font-weight: 800;
-      line-height: 1.2;
-      white-space: nowrap;
-      text-decoration: none;
-      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
-      -webkit-tap-highlight-color: transparent;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+      box-shadow: 0 3px 9px -3px rgba(30, 64, 175, .55);
+      transition: inset-inline-start .28s cubic-bezier(.22, 1, .36, 1);
+      pointer-events: none;
     }
-    .pageNavTab svg {
-      flex-shrink: 0;
-      width: 14px;
-      height: 14px;
-      opacity: .75;
-    }
-    .pageNavTab:hover {
-      background: #f1f5f9;
-      color: var(--text);
-    }
-    .pageNavTab.is-active {
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      color: #fff;
-      box-shadow: 0 3px 8px -3px rgba(30, 64, 175, .5);
-    }
-    .pageNavTab.is-active svg { opacity: 1; }
-
-    .sourceTabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      margin-top: 8px;
-      overflow: hidden;
-      border: 1px solid #5e71cf;
-      border-radius: 12px;
-      background: linear-gradient(180deg, #4457bb 0%, #3f51b5 100%);
-      box-shadow: 0 4px 12px rgba(63, 81, 181, .20);
-    }
+    .sourceTabs[data-active="import"]::before { inset-inline-start: 50%; }
+    /* First paint should snap to the URL's source instead of sliding in. */
+    .sourceTabs.no-anim::before,
+    .sourceTabs.no-anim .sourceTab,
+    .sourceTabs.no-anim .sourceTabCount { transition: none; }
     .sourceTab {
+      position: relative;
+      z-index: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      padding: 12px 8px 9px;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 8px;
       border: none;
-      border-bottom: 3px solid transparent;
+      border-radius: 10px;
       background: transparent;
-      color: rgba(255, 255, 255, .62);
-      font-size: 13px;
+      color: var(--text-secondary);
+      font-size: 12.5px;
       font-weight: 800;
       line-height: 1.2;
       white-space: nowrap;
       cursor: pointer;
-      transition: color .2s ease, background .2s ease, border-color .2s ease;
+      transition: color .2s ease;
       -webkit-tap-highlight-color: transparent;
     }
-    .sourceTab + .sourceTab { border-inline-start: 1px solid rgba(255, 255, 255, .12); }
-    .sourceTab:hover { color: rgba(255, 255, 255, .88); background: rgba(255, 255, 255, .06); }
-    .sourceTab.is-active {
-      color: #fff;
-      border-bottom-color: #29b6f6;
-      background: rgba(255, 255, 255, .07);
-    }
+    .sourceTab:hover { color: var(--text); }
+    .sourceTab.is-active { color: #fff; }
     .sourceTabCount {
       min-width: 20px;
       padding: 0 6px;
       border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, .16);
-      color: #fff;
+      background: #f1f5f9;
+      color: var(--text-secondary);
       font-family: var(--font-en);
       font-size: 10px;
       font-weight: 800;
@@ -273,8 +245,8 @@
       transition: background .2s ease, color .2s ease;
     }
     .sourceTab.is-active .sourceTabCount {
-      background: #29b6f6;
-      color: #082f49;
+      background: rgba(255, 255, 255, .22);
+      color: #fff;
     }
 
     /* ── Month strip ── */
@@ -819,28 +791,11 @@
       </div>
     </header>
 
-    <nav class="pageNav" aria-label="التنقل بين الصفحات">
-      <a class="pageNavTab" id="navRosterDiff" href="../roster-diff/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M8 3v4M16 3v4"/>
-          <rect x="3" y="5" width="18" height="16" rx="2"/>
-          <path d="M3 10h18"/>
-          <path d="M9 15h6"/>
-        </svg>
-        <span>فروقات الروستر</span>
-      </a>
-      <a class="pageNavTab is-active" href="./" aria-current="page">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M8 2v4M16 2v4"/>
-          <rect x="3" y="4" width="18" height="18" rx="3"/>
-          <path d="M3 10h18"/>
-          <path d="M12 14v4M10 16h4"/>
-        </svg>
-        <span>الغيابات</span>
-      </a>
-    </nav>
+    <div class="monthStripWrap">
+      <div class="monthStrip" id="monthStrip" role="group" aria-label="اختيار الشهر"></div>
+    </div>
 
-    <div class="sourceTabs" id="sourceTabs" role="group" aria-label="مصدر الجدول">
+    <div class="sourceTabs no-anim" id="sourceTabs" data-active="export" role="group" aria-label="مصدر الجدول">
       <button class="sourceTab is-active" type="button" data-source="export" aria-pressed="true">
         <span>الصادر</span>
         <span class="sourceTabCount" data-count="export">0</span>
@@ -849,10 +804,6 @@
         <span>الوارد</span>
         <span class="sourceTabCount" data-count="import">0</span>
       </button>
-    </div>
-
-    <div class="monthStripWrap">
-      <div class="monthStrip" id="monthStrip" role="group" aria-label="اختيار الشهر"></div>
     </div>
 
     <p class="srOnly" id="statusText" role="status" aria-live="polite"></p>
@@ -933,7 +884,6 @@
         heroMonth: document.getElementById('heroMonth'),
         strip: document.getElementById('monthStrip'),
         sourceTabs: document.getElementById('sourceTabs'),
-        navRosterDiff: document.getElementById('navRosterDiff'),
         skeleton: document.getElementById('skeleton'),
         listCard: document.getElementById('listCard'),
         emptyState: document.getElementById('emptyState'),
@@ -1063,6 +1013,7 @@
 
       function updateSourceTabs(month) {
         var counts = monthSourceCounts(month);
+        els.sourceTabs.setAttribute('data-active', activeSource);
         sourceButtons.forEach(function (button) {
           var kind = button.getAttribute('data-source') === 'import' ? 'import' : 'export';
           var on = kind === activeSource;
@@ -1071,9 +1022,6 @@
           button.setAttribute('aria-label', SOURCE_LABELS[kind] + ': ' + employeesPhrase(counts[kind]));
           if (sourceCounts[kind]) sourceCounts[kind].textContent = String(counts[kind]);
         });
-        if (els.navRosterDiff) {
-          els.navRosterDiff.href = '../roster-diff/' + (activeSource === 'import' ? '?source=import' : '');
-        }
       }
 
       function writeSourceUrl() {
@@ -1089,6 +1037,7 @@
       function setSource(source) {
         var next = source === 'import' ? 'import' : 'export';
         if (next === activeSource) return;
+        els.sourceTabs.classList.remove('no-anim');
         activeSource = next;
         writeSourceUrl();
         if (!DATA) return;
@@ -1097,19 +1046,19 @@
       }
 
       function employeesPhrase(count) {
-        if (!count) return 'لا أحد على إجازة';
-        if (count === 1) return 'موظف واحد على إجازة';
-        if (count === 2) return 'موظفان على إجازة';
-        if (count <= 10) return count + ' موظفين على إجازة';
-        return count + ' موظفًا على إجازة';
+        if (!count) return 'لا أحد في إجازة';
+        if (count === 1) return 'موظف واحد في إجازة';
+        if (count === 2) return 'موظفان في إجازة';
+        if (count <= 10) return count + ' موظفين في إجازة';
+        return count + ' موظفًا في إجازة';
       }
 
       function heroLabelFor(count) {
         if (!count) return 'لا توجد إجازات';
-        if (count === 1) return 'موظف على إجازة';
-        if (count === 2) return 'موظفان على إجازة';
-        if (count <= 10) return 'موظفين على إجازة';
-        return 'موظفًا على إجازة';
+        if (count === 1) return 'موظف في إجازة';
+        if (count === 2) return 'موظفان في إجازة';
+        if (count <= 10) return 'موظفين في إجازة';
+        return 'موظفًا في إجازة';
       }
 
       function daysLabel(count) {
