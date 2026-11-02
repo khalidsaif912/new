@@ -50,15 +50,19 @@ def date_ranges(dates):
 
 
 def build():
+    records = load_records()
     months = defaultdict(lambda: defaultdict(list))
     all_months = set()
     all_leave_dates = defaultdict(set)
-    for record in load_records():
+    day_group = {}
+    for record in records:
         for month, days in record["schedules"].items():
             all_months.add(month)
             for day in days:
-                leave_type = LEAVE_TYPES.get(day.get("shift_group"))
                 date = day.get("date")
+                if date:
+                    day_group[(record["id"], date)] = day.get("shift_group")
+                leave_type = LEAVE_TYPES.get(day.get("shift_group"))
                 if not leave_type or not date:
                     continue
                 key = (record["id"], leave_type)
@@ -68,16 +72,43 @@ def build():
     # Map every leave date to the end of its continuous run, so a leave that
     # continues into the next month is not considered expired mid-way.
     run_end = {}
+    runs = []
     for key, dates in all_leave_dates.items():
         run = []
         for current in sorted(dates):
             if run and (dt.date.fromisoformat(current) - dt.date.fromisoformat(run[-1])).days > 1:
+                runs.append((key, run))
                 for day in run:
                     run_end[(key, day)] = run[-1]
                 run = []
             run.append(current)
-        for day in run:
-            run_end[(key, day)] = run[-1]
+        if run:
+            runs.append((key, run))
+            for day in run:
+                run_end[(key, day)] = run[-1]
+
+    def return_after(key, last_leave):
+        """Off days then first working shift after a leave run, if it resumes."""
+        day = dt.date.fromisoformat(last_leave) + dt.timedelta(days=1)
+        gap = []
+        for _ in range(62):
+            group = day_group.get((key[0], day.isoformat()))
+            if group is None:
+                return None
+            if group == "Off Day":
+                gap.append(day)
+            elif group in LEAVE_TYPES:
+                return None
+            else:
+                return {"gap": gap, "work": day}
+            day += dt.timedelta(days=1)
+        return None
+
+    return_by_run = {}
+    for key, run in runs:
+        info = return_after(key, run[-1])
+        if info:
+            return_by_run[(key, run[-1])] = info
 
     for month in all_months:
         months.setdefault(month, defaultdict(list))
@@ -91,6 +122,21 @@ def build():
             record = items[0][1]
             actual_to = max(run_end[((emp_id, leave_type), day)] for day in dates)
             ranges = date_ranges(dates)
+            returns = []
+            for date_range in ranges:
+                info = return_by_run.get(((emp_id, leave_type), date_range["to"]))
+                if not info:
+                    continue
+                gap = [day for day in info["gap"] if day.strftime("%Y-%m") == month]
+                work = info["work"] if info["work"].strftime("%Y-%m") == month else None
+                if gap or work:
+                    returns.append(
+                        {
+                            "gap_from": gap[0].isoformat() if gap else None,
+                            "gap_to": gap[-1].isoformat() if gap else None,
+                            "work": work.isoformat() if work else None,
+                        }
+                    )
             entries.append(
                 {
                     "id": emp_id,
@@ -104,6 +150,7 @@ def build():
                     "actual_to": actual_to,
                     "segments": len(ranges),
                     "ranges": ranges,
+                    "returns": returns,
                 }
             )
         entries.sort(key=lambda e: (TYPE_ORDER[e["type"]], -e["days"], e["name"].lower()))

@@ -534,6 +534,30 @@
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
     }
+    .trackGap,
+    .trackWork {
+      position: absolute;
+      inset-inline-start: var(--start, 0%);
+      width: var(--w, 0%);
+      min-width: 2px;
+      border-radius: 3px;
+      transform-origin: right center;
+      animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
+      animation-delay: calc(var(--i, 0) * 30ms);
+    }
+    .trackGap {
+      top: 1.5px;
+      bottom: 1.5px;
+      background: #cbd5e1;
+    }
+    .trackWork {
+      top: 0;
+      bottom: 0;
+      background: #2563eb;
+      box-shadow: 0 4px 10px -4px rgba(37, 99, 235, .65);
+    }
+    .empRow.is-expired .trackGap { background: #e2e8f0; }
+    .empRow.is-expired .trackWork { background: #94a3b8; box-shadow: none; }
     @keyframes stretch {
       from { transform: scaleX(0); opacity: .2; }
       to { transform: scaleX(1); opacity: 1; }
@@ -898,6 +922,15 @@
         return wrap;
       }
 
+      function placeMark(ruler, className, fromDay, toDay, monthDays, index, title) {
+        var mark = div(className);
+        mark.style.setProperty('--start', (((fromDay - 1) / monthDays) * 100).toFixed(3) + '%');
+        mark.style.setProperty('--w', (((toDay - fromDay + 1) / monthDays) * 100).toFixed(3) + '%');
+        mark.style.setProperty('--i', String(Math.min(index, 14)));
+        if (title) mark.title = title;
+        ruler.appendChild(mark);
+      }
+
       function buildRow(entry, index, monthDays, monthKey, isSelf, expired) {
         var row = document.createElement('article');
         row.className = 'empRow type-' + entry.type;
@@ -939,12 +972,28 @@
         ranges.forEach(function (range, rangeIndex) {
           var fromDay = parseInt(range.from.slice(8, 10), 10);
           var toDay = parseInt(range.to.slice(8, 10), 10);
-          var mark = div('trackSpan');
-          mark.style.setProperty('--start', (((fromDay - 1) / monthDays) * 100).toFixed(3) + '%');
-          mark.style.setProperty('--w', (((toDay - fromDay + 1) / monthDays) * 100).toFixed(3) + '%');
-          mark.style.setProperty('--i', String(Math.min(index + rangeIndex, 14)));
-          ruler.appendChild(mark);
+          placeMark(ruler, 'trackSpan', fromDay, toDay, monthDays, index + rangeIndex);
         });
+
+        (entry.returns || []).forEach(function (ret, returnIndex) {
+          var delay = index + ranges.length + returnIndex;
+          if (ret.gap_from && ret.gap_to) {
+            var gapFrom = parseInt(ret.gap_from.slice(8, 10), 10);
+            var gapTo = parseInt(ret.gap_to.slice(8, 10), 10);
+            placeMark(
+              ruler, 'trackGap', gapFrom, gapTo, monthDays, delay,
+              'راحة: ' + gapFrom + ' – ' + gapTo + ' ' + monthName(monthKey)
+            );
+          }
+          if (ret.work) {
+            var workDay = parseInt(ret.work.slice(8, 10), 10);
+            placeMark(
+              ruler, 'trackWork', workDay, workDay, monthDays, delay,
+              'بداية الدوام: ' + workDay + ' ' + monthName(monthKey)
+            );
+          }
+        });
+
         track.appendChild(ruler);
 
         row.appendChild(track);
