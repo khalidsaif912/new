@@ -234,77 +234,131 @@
     }
     .monthChip.is-active .chipCount { color: rgba(255, 255, 255, .8); }
 
-    /* ── Leave list ── */
+    /* ── Leave list: department cards ── */
     .listCard {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .listCard[hidden] { display: none; }
+    .deptCard {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
     }
-    .leaveGroup {
-      --accent: #059669;
-      --accent-fade: rgba(5, 150, 105, 0);
-      --accent-soft: rgba(5, 150, 105, .45);
-      --pill-bg: #ecfdf5;
-      --pill-text: #047857;
-      --pill-border: #a7f3d0;
-      --head-bg: linear-gradient(180deg, #f0fdf4, #ffffff);
-      --head-border: #dcfce7;
+    .deptCard::before {
+      content: "";
+      display: block;
+      height: 4px;
+      background: var(--dept, #64748b);
+      background: linear-gradient(to left, var(--dept, #64748b), color-mix(in srgb, var(--dept, #64748b) 35%, #fff));
     }
-    .leaveGroup.sick {
-      --accent: #e11d48;
-      --accent-fade: rgba(225, 29, 72, 0);
-      --accent-soft: rgba(225, 29, 72, .42);
-      --pill-bg: #fff1f2;
-      --pill-text: #be123c;
-      --pill-border: #fecdd3;
-      --head-bg: linear-gradient(180deg, #fff1f2, #ffffff);
-      --head-border: #ffe4e6;
-    }
-    .leaveGroup + .leaveGroup { border-top: 1px solid var(--border); }
-    .groupHead {
+    .deptHead {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px 9px;
-      background: var(--head-bg);
-      border-bottom: 1px solid var(--head-border);
+      gap: 10px;
+      padding: 10px 13px;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .groupDot {
-      width: 8px;
-      height: 8px;
+    .deptIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex: 0 0 auto;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px var(--pill-bg);
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: var(--dept, #64748b);
+      color: #fff;
+      box-shadow: 0 4px 10px -4px var(--dept, #64748b);
     }
-    .groupTitle {
+    .deptIcon svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+    .deptTitle {
+      flex: 1 1 auto;
+      min-width: 0;
       margin: 0;
-      font-size: 12.5px;
-      font-weight: 800;
-      line-height: 1.2;
+      overflow: hidden;
       color: var(--text);
-    }
-    .groupCount {
-      margin-inline-start: auto;
-      padding: 2px 8px;
-      border: 1px solid var(--pill-border);
-      border-radius: var(--radius-pill);
-      background: var(--pill-bg);
-      color: var(--pill-text);
       font-family: var(--font-en);
-      font-size: 10.5px;
+      font-size: 14.5px;
       font-weight: 800;
-      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    .deptSelfBadge {
+      flex: 0 0 auto;
+      padding: 1px 7px;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-pill);
+      background: #eff6ff;
+      color: var(--brand);
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.6;
       white-space: nowrap;
     }
-    .groupEmpty {
-      padding: 18px 14px;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
+    .deptCount {
+      flex: 0 0 auto;
+      min-width: 30px;
+      padding: 3px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: var(--dept, #64748b);
+      font-family: var(--font-en);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.3;
       text-align: center;
+      font-variant-numeric: tabular-nums;
+      background: color-mix(in srgb, var(--dept, #64748b) 10%, #fff);
+      border-color: color-mix(in srgb, var(--dept, #64748b) 28%, #fff);
+    }
+    .empRow.type-annual {
+      --accent: #059669;
+      --accent-2: #34d399;
+      --accent-soft: rgba(5, 150, 105, .45);
+    }
+    .empRow.type-sick {
+      --accent: #e11d48;
+      --accent-2: #fb7185;
+      --accent-soft: rgba(225, 29, 72, .42);
+    }
+    .leaveTag {
+      padding: 0 6px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-pill);
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+    .leaveTag.annual {
+      border-color: #a7f3d0;
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .leaveTag.sick {
+      border-color: #fecdd3;
+      background: #fff1f2;
+      color: #be123c;
+    }
+    .empRow.is-expired .leaveTag {
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      color: #94a3b8;
     }
     .expiredSeparator {
       display: flex;
@@ -324,7 +378,7 @@
       background: #eef2f7;
     }
 
-    .empRow { position: relative; padding: 10px 14px 11px; }
+    .empRow { position: relative; padding: 8px 14px 9px; }
     .empRow + .empRow { border-top: 1px solid #f1f5f9; }
     .empRow.is-self {
       background: linear-gradient(to left, rgba(30, 64, 175, .065), rgba(30, 64, 175, .015));
@@ -339,26 +393,37 @@
     }
     .empRow.is-expired {
       --accent: #94a3b8;
-      --accent-fade: rgba(148, 163, 184, 0);
+      --accent-2: #cbd5e1;
       --accent-soft: rgba(148, 163, 184, .28);
-      --pill-bg: #f8fafc;
-      --pill-text: #64748b;
-      --pill-border: #e2e8f0;
     }
     .empRow.is-expired .empName { color: #64748b; }
-    .empTop {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+    .empHead {
+      display: block;
     }
-    .empNameWrap { flex: 1 1 auto; min-width: 0; }
     .empNameLine {
-      display: flex;
+      display: inline-flex;
       align-items: baseline;
       gap: 6px;
+      max-width: 100%;
+      vertical-align: baseline;
+    }
+    .empNameId {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      flex: 0 1 auto;
       min-width: 0;
+      direction: ltr;
+    }
+    .nameDash {
+      flex: 0 0 auto;
+      color: #cbd5e1;
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.3;
     }
     .empName {
+      flex: 0 1 auto;
       min-width: 0;
       overflow: hidden;
       font-family: var(--font-en);
@@ -374,17 +439,30 @@
     }
     .empId {
       flex: 0 0 auto;
-      padding: 1px 5px;
-      border-radius: var(--radius-pill);
-      background: #f1f5f9;
       color: #94a3b8;
       font-family: var(--font-en);
-      font-size: 9.5px;
+      font-size: 10.5px;
       font-weight: 700;
-      line-height: 1.4;
+      line-height: 1.3;
       font-variant-numeric: tabular-nums;
       direction: ltr;
       unicode-bidi: isolate;
+    }
+    .empDays {
+      color: var(--text-secondary);
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .empFacts {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px 6px;
+      max-width: 100%;
+      margin-inline-start: 8px;
+      vertical-align: baseline;
     }
     .selfBadge {
       flex: 0 0 auto;
@@ -399,65 +477,68 @@
       white-space: nowrap;
     }
 
-    /* Proportional shadow under the name: width = leave days / days in month. */
+    /* Full-width month ruler: one tick per day, leave runs placed by date. */
     .shadowTrack {
       position: relative;
-      height: 9px;
-      margin-top: 4px;
+      min-width: 0;
+      margin-top: 6px;
     }
-    .shadowBar {
-      position: absolute;
-      inset-inline-start: 0;
-      top: 2px;
-      width: var(--w, 0%);
-      min-width: 8px;
-      height: 5px;
+    .monthTrack {
+      position: relative;
+      height: 10px;
       border-radius: var(--radius-pill);
-      background: linear-gradient(to left, var(--accent) 0%, var(--accent-fade) 100%);
-      box-shadow: 0 6px 12px -3px var(--accent-soft);
-      opacity: .85;
+      background: #f8fafc;
+      box-shadow: inset 0 0 0 1px #eef2f7;
+      overflow: hidden;
+    }
+    .monthTrack::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-image: repeating-linear-gradient(
+        to left,
+        transparent 0,
+        transparent calc(var(--day, 3.3333%) - 1px),
+        rgba(148, 163, 184, .22) calc(var(--day, 3.3333%) - 1px),
+        rgba(148, 163, 184, .22) var(--day, 3.3333%)
+      );
+      pointer-events: none;
+    }
+    /* Same day grid redrawn on top so the leave bar itself is split per day. */
+    .monthTrack::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-image: repeating-linear-gradient(
+        to left,
+        transparent 0,
+        transparent calc(var(--day, 3.3333%) - 1px),
+        rgba(255, 255, 255, .55) calc(var(--day, 3.3333%) - 1px),
+        rgba(255, 255, 255, .55) var(--day, 3.3333%)
+      );
+      pointer-events: none;
+    }
+    .trackSpan {
+      position: absolute;
+      top: 1.5px;
+      bottom: 1.5px;
+      inset-inline-start: var(--start, 0%);
+      width: var(--w, 0%);
+      min-width: 3px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(to left, var(--accent) 0%, var(--accent-2, var(--accent)) 100%);
+      box-shadow: 0 4px 10px -3px var(--accent-soft);
       transform-origin: right center;
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
     }
     @keyframes stretch {
       from { transform: scaleX(0); opacity: .2; }
-      to { transform: scaleX(1); opacity: .85; }
+      to { transform: scaleX(1); opacity: 1; }
     }
 
-    .daysPill {
-      flex: 0 0 auto;
-      margin-top: 1px;
-      padding: 4px 9px;
-      border: 1px solid var(--pill-border);
-      border-radius: var(--radius-pill);
-      background: var(--pill-bg);
-      color: var(--pill-text);
-      font-size: 11.5px;
-      font-weight: 800;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-
-    .empMeta {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 4px 7px;
-      margin-top: 5px;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-    .dept {
-      color: var(--text-secondary);
-      font-family: var(--font-en);
-      font-size: 10.5px;
-      font-weight: 700;
-      direction: ltr;
-      unicode-bidi: isolate;
-    }
     .kindTag {
       padding: 0 5px;
       border: 1px solid #ccfbf1;
@@ -479,42 +560,19 @@
       line-height: 1.6;
       white-space: nowrap;
     }
-    .periods {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 4px 6px;
-      margin-top: 4px;
-    }
-    .periodChip {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 2px;
-      padding: 1px 8px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-pill);
-      background: var(--surface-muted);
+    .empDate {
       color: var(--text-secondary);
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 700;
-      line-height: 1.7;
+      line-height: 1.5;
       white-space: nowrap;
     }
-    .periodChip bdi {
-      font-variant-numeric: tabular-nums;
-      font-weight: 800;
-    }
-    .empRow.is-expired .periodChip {
-      border-color: #eef2f7;
-      background: #f8fafc;
-      color: #94a3b8;
-    }
-    .sep { color: #cbd5e1; }
-    .range bdi {
+    .empDate bdi {
       color: var(--text-secondary);
-      font-weight: 700;
+      font-weight: 800;
       font-variant-numeric: tabular-nums;
     }
+    .empDate .gap { color: #cbd5e1; }
 
     /* ── States ── */
     .stateCard {
@@ -676,10 +734,32 @@
       'use strict';
 
       var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-      var TYPE_TITLES = { annual: 'الإجازة السنوية', sick: 'الإجازة المرضية' };
-      var TYPE_EMPTY = {
-        annual: 'لا توجد إجازات سنوية مسجّلة في هذا الشهر.',
-        sick: 'لا توجد إجازات مرضية مسجّلة في هذا الشهر.'
+      var LEAVE_LABELS = { annual: 'سنوية', sick: 'مرضية' };
+      var DEPT_ORDER = [
+        'supervisors',
+        'load control',
+        'export checker',
+        'export operators',
+        'inventory',
+        'officers',
+        'documentation',
+        'import checkers',
+        'release control',
+        'import operators',
+        'flight dispatch'
+      ];
+      var DEPT_COLORS = {
+        'supervisors': '#0891b2',
+        'load control': '#059669',
+        'export checker': '#dc2626',
+        'export operators': '#7c3aed',
+        'inventory': '#ea580c',
+        'officers': '#2563eb',
+        'documentation': '#0891b2',
+        'import checkers': '#059669',
+        'release control': '#dc2626',
+        'import operators': '#7c3aed',
+        'flight dispatch': '#f59e0b'
       };
 
       var els = {
@@ -723,6 +803,19 @@
 
       function monthName(key) {
         return MONTHS_AR[parseInt(key.slice(5, 7), 10) - 1] || key;
+      }
+
+      function deptKey(dept) {
+        return String(dept || '').trim().toLowerCase() || 'other';
+      }
+
+      function deptColor(dept) {
+        return DEPT_COLORS[deptKey(dept)] || '#64748b';
+      }
+
+      function deptRank(dept) {
+        var index = DEPT_ORDER.indexOf(deptKey(dept));
+        return index === -1 ? DEPT_ORDER.length : index;
       }
 
       function displayName(raw) {
@@ -786,106 +879,75 @@
         return count + ' يومًا';
       }
 
-      function segmentsLabel(count) {
-        if (count === 2) return 'فترتان';
-        if (count <= 10) return count + ' فترات';
-        return count + ' فترة';
-      }
-
-      function periodText(fromDay, toDay, monthKey) {
-        var chip = span('periodChip');
-        chip.appendChild(numEl(fromDay));
-        if (fromDay !== toDay) {
-          chip.appendChild(document.createTextNode(' – '));
-          chip.appendChild(numEl(toDay));
-        }
-        chip.appendChild(document.createTextNode(' ' + monthName(monthKey)));
-        return chip;
-      }
-
-      function periodsEl(entry, monthKey) {
-        var periods = entry.ranges || [];
-        if (periods.length < 2) return null;
-        var wrap = div('periods');
-        periods.forEach(function (range) {
-          wrap.appendChild(periodText(
-            parseInt(range.from.slice(8, 10), 10),
-            parseInt(range.to.slice(8, 10), 10),
-            monthKey
-          ));
+      function dateEl(entry, monthKey) {
+        var wrap = span('empDate');
+        var ranges = entry.ranges && entry.ranges.length
+          ? entry.ranges
+          : [{ from: entry.from, to: entry.to }];
+        ranges.forEach(function (range, index) {
+          if (index) wrap.appendChild(span('gap', ' · '));
+          var fromDay = parseInt(range.from.slice(8, 10), 10);
+          var toDay = parseInt(range.to.slice(8, 10), 10);
+          wrap.appendChild(numEl(fromDay));
+          if (fromDay !== toDay) {
+            wrap.appendChild(document.createTextNode(' – '));
+            wrap.appendChild(numEl(toDay));
+          }
         });
-        return wrap;
-      }
-
-      function rangeEl(entry, monthKey) {
-        var wrap = span('range');
-        var fromDay = parseInt(entry.from.slice(8, 10), 10);
-        var toDay = parseInt(entry.to.slice(8, 10), 10);
-        var name = monthName(monthKey);
-
-        if (fromDay === toDay) {
-          wrap.appendChild(document.createTextNode('يوم '));
-          wrap.appendChild(numEl(fromDay));
-          wrap.appendChild(document.createTextNode(' ' + name));
-        } else {
-          wrap.appendChild(document.createTextNode('من '));
-          wrap.appendChild(numEl(fromDay));
-          wrap.appendChild(document.createTextNode(' إلى '));
-          wrap.appendChild(numEl(toDay));
-          wrap.appendChild(document.createTextNode(' ' + name));
-        }
-
-        if (entry.segments > 1) {
-          wrap.appendChild(document.createTextNode(' · ' + segmentsLabel(entry.segments)));
-        }
+        wrap.appendChild(document.createTextNode(' ' + monthName(monthKey)));
         return wrap;
       }
 
       function buildRow(entry, index, monthDays, monthKey, isSelf, expired) {
         var row = document.createElement('article');
-        row.className = 'empRow';
+        row.className = 'empRow type-' + entry.type;
         if (isSelf) row.classList.add('is-self');
         if (expired) row.classList.add('is-expired');
         row.setAttribute('data-id', entry.id);
-        row.style.setProperty('--w', Math.min(100, (entry.days / monthDays) * 100).toFixed(1) + '%');
-        row.style.setProperty('--i', String(Math.min(index, 14)));
 
-        var top = div('empTop');
-        var nameWrap = div('empNameWrap');
+        var head = div('empHead');
         var nameLine = div('empNameLine');
+        var nameId = div('empNameId');
 
         var name = span('empName', displayName(entry.name));
         name.title = displayName(entry.name);
-        var id = span('empId', entry.id);
-        nameLine.appendChild(name);
+        nameId.appendChild(name);
+        nameId.appendChild(span('nameDash', '-'));
+        nameId.appendChild(span('empId', entry.id));
+        nameLine.appendChild(nameId);
         if (isSelf) nameLine.appendChild(span('selfBadge', 'أنت'));
-        nameLine.appendChild(id);
+        head.appendChild(nameLine);
+
+        var facts = div('empFacts');
+        facts.appendChild(span('leaveTag ' + entry.type, LEAVE_LABELS[entry.type] || ''));
+        if (entry.kind === 'import') facts.appendChild(span('kindTag', 'وارد'));
+        facts.appendChild(span('empDays', daysLabel(entry.days)));
+        facts.appendChild(dateEl(entry, monthKey));
+        if (expired) facts.appendChild(span('expiredTag', 'منقضية'));
+        head.appendChild(facts);
+
+        row.appendChild(head);
 
         var track = div('shadowTrack');
         track.setAttribute('aria-hidden', 'true');
-        track.appendChild(div('shadowBar'));
 
-        nameWrap.appendChild(nameLine);
-        nameWrap.appendChild(track);
+        var ruler = div('monthTrack');
+        ruler.style.setProperty('--day', (100 / monthDays).toFixed(4) + '%');
+        var ranges = entry.ranges && entry.ranges.length
+          ? entry.ranges
+          : [{ from: entry.from, to: entry.to }];
+        ranges.forEach(function (range, rangeIndex) {
+          var fromDay = parseInt(range.from.slice(8, 10), 10);
+          var toDay = parseInt(range.to.slice(8, 10), 10);
+          var mark = div('trackSpan');
+          mark.style.setProperty('--start', (((fromDay - 1) / monthDays) * 100).toFixed(3) + '%');
+          mark.style.setProperty('--w', (((toDay - fromDay + 1) / monthDays) * 100).toFixed(3) + '%');
+          mark.style.setProperty('--i', String(Math.min(index + rangeIndex, 14)));
+          ruler.appendChild(mark);
+        });
+        track.appendChild(ruler);
 
-        top.appendChild(nameWrap);
-        top.appendChild(span('daysPill', daysLabel(entry.days)));
-
-        var meta = div('empMeta');
-        meta.appendChild(span('dept', entry.dept));
-        if (entry.kind === 'import') meta.appendChild(span('kindTag', 'وارد'));
-        meta.appendChild(span('sep', '·'));
-        if (entry.segments > 1) {
-          meta.appendChild(span('range', segmentsLabel(entry.segments)));
-        } else {
-          meta.appendChild(rangeEl(entry, monthKey));
-        }
-        if (expired) meta.appendChild(span('expiredTag', 'منقضية'));
-
-        row.appendChild(top);
-        row.appendChild(meta);
-        var periods = periodsEl(entry, monthKey);
-        if (periods) row.appendChild(periods);
+        row.appendChild(track);
         return row;
       }
 
@@ -901,22 +963,23 @@
           }
         }
         if (!savedId) savedId = savedIds[0] || '';
-        var frag = document.createDocumentFragment();
 
         function isSelfEntry(entry) {
           return !!savedId && String(entry.id) === savedId;
         }
 
-        var selfType = '';
+        var byDept = {};
         entries.forEach(function (entry) {
-          if (isSelfEntry(entry)) selfType = entry.type;
+          var name = String(entry.dept || '').trim() || 'Other';
+          var key = deptKey(name);
+          if (!byDept[key]) byDept[key] = { name: name, entries: [] };
+          byDept[key].entries.push(entry);
         });
-        var groupOrder = selfType === 'sick' ? ['sick', 'annual'] : ['annual', 'sick'];
 
-        groupOrder.forEach(function (type) {
-          var groupEntries = entries.filter(function (entry) { return entry.type === type; });
-          var selfEntries = groupEntries.filter(isSelfEntry);
-          var otherEntries = groupEntries.filter(function (entry) {
+        var departments = Object.keys(byDept).map(function (key) {
+          var group = byDept[key];
+          var selfEntries = group.entries.filter(isSelfEntry);
+          var otherEntries = group.entries.filter(function (entry) {
             return !isSelfEntry(entry);
           });
           var activeOthers = otherEntries.filter(function (entry) {
@@ -925,35 +988,71 @@
           var expiredOthers = otherEntries.filter(function (entry) {
             return isExpired(entry, today);
           });
-          var ordered = selfEntries.concat(activeOthers, expiredOthers);
+          return {
+            name: group.name,
+            entries: selfEntries.concat(activeOthers, expiredOthers),
+            isSelf: selfEntries.length > 0,
+            activeOthers: activeOthers.length,
+            hasActive: group.entries.some(function (entry) {
+              return !isExpired(entry, today);
+            })
+          };
+        });
 
+        departments.sort(function (a, b) {
+          if (a.isSelf !== b.isSelf) return a.isSelf ? -1 : 1;
+          if (a.hasActive !== b.hasActive) return a.hasActive ? -1 : 1;
+          var rank = deptRank(a.name) - deptRank(b.name);
+          if (rank) return rank;
+          return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+        });
+
+        var frag = document.createDocumentFragment();
+        departments.forEach(function (dept) {
           var section = document.createElement('section');
-          section.className = 'leaveGroup ' + type;
-          section.setAttribute('aria-label', TYPE_TITLES[type]);
+          section.className = 'deptCard';
+          section.style.setProperty('--dept', deptColor(dept.name));
 
-          var head = div('groupHead');
-          head.appendChild(div('groupDot'));
+          var unique = {};
+          dept.entries.forEach(function (entry) { unique[entry.id] = true; });
+          var people = Object.keys(unique).length;
+          section.setAttribute('aria-label', dept.name + '، ' + employeesPhrase(people));
+
+          var head = div('deptHead');
+          var icon = div('deptIcon');
+          icon.setAttribute('aria-hidden', 'true');
+          icon.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+            'stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M3 21h18M3 10h18M5 21V10l7-6 7 6v11"/>' +
+            '<rect x="9" y="14" width="2" height="3"/>' +
+            '<rect x="13" y="14" width="2" height="3"/></svg>';
+          head.appendChild(icon);
+
           var title = document.createElement('h2');
-          title.className = 'groupTitle';
-          title.textContent = TYPE_TITLES[type];
+          title.className = 'deptTitle';
+          title.textContent = dept.name;
+          title.title = dept.name;
           head.appendChild(title);
-          head.appendChild(span('groupCount', String(groupEntries.length)));
+
+          if (dept.isSelf) head.appendChild(span('deptSelfBadge', 'قسمك'));
+
+          var count = span('deptCount', String(people));
+          count.title = people + ' موظف';
+          head.appendChild(count);
+
           section.appendChild(head);
 
-          if (!groupEntries.length) {
-            section.appendChild(div('groupEmpty')).textContent = TYPE_EMPTY[type];
-          } else {
-            var showedExpiredHead = false;
-            ordered.forEach(function (entry, index) {
-              var self = isSelfEntry(entry);
-              var expired = isExpired(entry, today);
-              if (expired && !self && activeOthers.length && !showedExpiredHead) {
-                section.appendChild(div('expiredSeparator')).textContent = 'إجازات منقضية';
-                showedExpiredHead = true;
-              }
-              section.appendChild(buildRow(entry, index, month.days, monthKey, self, expired));
-            });
-          }
+          var showedExpiredHead = false;
+          dept.entries.forEach(function (entry, index) {
+            var self = isSelfEntry(entry);
+            var expired = isExpired(entry, today);
+            if (expired && !self && dept.activeOthers && !showedExpiredHead) {
+              section.appendChild(div('expiredSeparator')).textContent = 'إجازات منقضية';
+              showedExpiredHead = true;
+            }
+            section.appendChild(buildRow(entry, index, month.days, monthKey, self, expired));
+          });
           frag.appendChild(section);
         });
 
@@ -1000,6 +1099,7 @@
         els.emptyState.hidden = !isEmpty;
         els.listCard.hidden = isEmpty;
         if (isEmpty) {
+          els.listCard.innerHTML = '';
           els.emptyBody.textContent = 'لا توجد إجازات سنوية أو مرضية مسجّلة في ' + monthName(monthKey) + '.';
         } else {
           renderList(month, monthKey);
