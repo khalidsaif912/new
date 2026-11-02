@@ -1357,13 +1357,16 @@
           const res = await fetch(`${root}/roster-diff/names-ar.json?ts=${Date.now()}`);
           if (res.ok) {
             const json = await res.json();
-            const pack = (json && json[k]) || {};
-            Object.entries(pack.byId || {}).forEach(([id, ar]) => {
-              if (id && ar) byId.set(String(id), String(ar));
-            });
-            Object.entries(pack.byEn || {}).forEach(([en, ar]) => {
-              if (en && ar) byEn.set(normalizeName(en), String(ar));
-            });
+            const loadPack = (pack) => {
+              Object.entries((pack && pack.byId) || {}).forEach(([id, ar]) => {
+                if (id && ar) byId.set(String(id), String(ar));
+              });
+              Object.entries((pack && pack.byEn) || {}).forEach(([en, ar]) => {
+                if (en && ar) byEn.set(normalizeName(en), String(ar));
+              });
+            };
+            loadPack(json && json.all);
+            loadPack(json && json[k]);
           }
         } catch (_) {}
 
