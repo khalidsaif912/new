@@ -16,16 +16,12 @@ SOURCES = (("export", DOCS_DIR / "schedules"), ("import", DOCS_DIR / "import" / 
 
 def load_records():
     records = []
-    seen_ids = set()
     for kind, folder in SOURCES:
         for path in sorted(folder.glob("*.json")):
             if path.name == "index.json":
                 continue
             data = json.loads(path.read_text(encoding="utf-8"))
             emp_id = str(data.get("id") or path.stem).strip()
-            if emp_id in seen_ids:
-                continue
-            seen_ids.add(emp_id)
             records.append(
                 {
                     "id": emp_id,
@@ -61,11 +57,11 @@ def build():
             for day in days:
                 date = day.get("date")
                 if date:
-                    day_group[(record["id"], date)] = day.get("shift_group")
+                    day_group[(record["kind"], record["id"], date)] = day.get("shift_group")
                 leave_type = LEAVE_TYPES.get(day.get("shift_group"))
                 if not leave_type or not date:
                     continue
-                key = (record["id"], leave_type)
+                key = (record["kind"], record["id"], leave_type)
                 months[month][key].append((date, record))
                 all_leave_dates[key].add(date)
 
@@ -92,7 +88,7 @@ def build():
         day = dt.date.fromisoformat(last_leave) + dt.timedelta(days=1)
         gap = []
         for _ in range(62):
-            group = day_group.get((key[0], day.isoformat()))
+            group = day_group.get((key[0], key[1], day.isoformat()))
             if group is None:
                 return None
             if group == "Off Day":
@@ -117,14 +113,15 @@ def build():
     for month in sorted(months):
         year, month_no = (int(part) for part in month.split("-"))
         entries = []
-        for (emp_id, leave_type), items in months[month].items():
+        for (kind, emp_id, leave_type), items in months[month].items():
             dates = sorted({date for date, _ in items})
             record = items[0][1]
-            actual_to = max(run_end[((emp_id, leave_type), day)] for day in dates)
+            key = (kind, emp_id, leave_type)
+            actual_to = max(run_end[(key, day)] for day in dates)
             ranges = date_ranges(dates)
             returns = []
             for date_range in ranges:
-                info = return_by_run.get(((emp_id, leave_type), date_range["to"]))
+                info = return_by_run.get((key, date_range["to"]))
                 if not info:
                     continue
                 gap = [day for day in info["gap"] if day.strftime("%Y-%m") == month]

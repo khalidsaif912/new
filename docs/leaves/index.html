@@ -177,6 +177,106 @@
       white-space: nowrap;
     }
 
+    /* ── Tabs ── */
+    .pageNav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-top: 10px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, .05);
+    }
+    .pageNavTab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 32px;
+      padding: 0 8px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pageNavTab svg {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      opacity: .75;
+    }
+    .pageNavTab:hover {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+    .pageNavTab.is-active {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      box-shadow: 0 3px 8px -3px rgba(30, 64, 175, .5);
+    }
+    .pageNavTab.is-active svg { opacity: 1; }
+
+    .sourceTabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 8px;
+      overflow: hidden;
+      border: 1px solid #5e71cf;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #4457bb 0%, #3f51b5 100%);
+      box-shadow: 0 4px 12px rgba(63, 81, 181, .20);
+    }
+    .sourceTab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 12px 8px 9px;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      color: rgba(255, 255, 255, .62);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sourceTab + .sourceTab { border-inline-start: 1px solid rgba(255, 255, 255, .12); }
+    .sourceTab:hover { color: rgba(255, 255, 255, .88); background: rgba(255, 255, 255, .06); }
+    .sourceTab.is-active {
+      color: #fff;
+      border-bottom-color: #29b6f6;
+      background: rgba(255, 255, 255, .07);
+    }
+    .sourceTabCount {
+      min-width: 20px;
+      padding: 0 6px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, .16);
+      color: #fff;
+      font-family: var(--font-en);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.7;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      transition: background .2s ease, color .2s ease;
+    }
+    .sourceTab.is-active .sourceTabCount {
+      background: #29b6f6;
+      color: #082f49;
+    }
+
     /* ── Month strip ── */
     .monthStripWrap { margin: 10px 0; }
     .monthStrip {
@@ -581,16 +681,6 @@
       to { transform: scaleX(1); opacity: 1; }
     }
 
-    .kindTag {
-      padding: 0 5px;
-      border: 1px solid #ccfbf1;
-      border-radius: var(--radius-pill);
-      background: #f0fdfa;
-      color: #0f766e;
-      font-size: 9px;
-      font-weight: 800;
-      line-height: 1.6;
-    }
     .expiredTag {
       padding: 0 6px;
       border: 1px solid #e2e8f0;
@@ -729,6 +819,38 @@
       </div>
     </header>
 
+    <nav class="pageNav" aria-label="التنقل بين الصفحات">
+      <a class="pageNavTab" id="navRosterDiff" href="../roster-diff/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 3v4M16 3v4"/>
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <path d="M3 10h18"/>
+          <path d="M9 15h6"/>
+        </svg>
+        <span>فروقات الروستر</span>
+      </a>
+      <a class="pageNavTab is-active" href="./" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 2v4M16 2v4"/>
+          <rect x="3" y="4" width="18" height="18" rx="3"/>
+          <path d="M3 10h18"/>
+          <path d="M12 14v4M10 16h4"/>
+        </svg>
+        <span>الغيابات</span>
+      </a>
+    </nav>
+
+    <div class="sourceTabs" id="sourceTabs" role="group" aria-label="مصدر الجدول">
+      <button class="sourceTab is-active" type="button" data-source="export" aria-pressed="true">
+        <span>الصادر</span>
+        <span class="sourceTabCount" data-count="export">0</span>
+      </button>
+      <button class="sourceTab" type="button" data-source="import" aria-pressed="false">
+        <span>الوارد</span>
+        <span class="sourceTabCount" data-count="import">0</span>
+      </button>
+    </div>
+
     <div class="monthStripWrap">
       <div class="monthStrip" id="monthStrip" role="group" aria-label="اختيار الشهر"></div>
     </div>
@@ -777,6 +899,7 @@
 
       var MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
       var LEAVE_LABELS = { annual: 'سنوية', sick: 'مرضية' };
+      var SOURCE_LABELS = { export: 'الصادر', import: 'الوارد' };
       var DEPT_ORDER = [
         'supervisors',
         'load control',
@@ -809,6 +932,8 @@
         heroLabel: document.getElementById('heroLabel'),
         heroMonth: document.getElementById('heroMonth'),
         strip: document.getElementById('monthStrip'),
+        sourceTabs: document.getElementById('sourceTabs'),
+        navRosterDiff: document.getElementById('navRosterDiff'),
         skeleton: document.getElementById('skeleton'),
         listCard: document.getElementById('listCard'),
         emptyState: document.getElementById('emptyState'),
@@ -821,8 +946,22 @@
 
       var DATA = null;
       var activeMonth = '';
+      var activeSource = 'export';
       var renderedDay = todayIso();
       var renderedSavedId = '';
+      var sourceButtons = els.sourceTabs
+        ? Array.prototype.slice.call(els.sourceTabs.querySelectorAll('.sourceTab'))
+        : [];
+      var sourceCounts = {};
+
+      sourceButtons.forEach(function (button) {
+        sourceCounts[button.getAttribute('data-source')] = button.querySelector('.sourceTabCount');
+      });
+
+      try {
+        if (new URLSearchParams(location.search).get('source') === 'import') activeSource = 'import';
+      } catch (e) {}
+      updateSourceTabs(null);
 
       function span(className, text) {
         var el = document.createElement('span');
@@ -896,6 +1035,65 @@
 
       function isExpired(entry, today) {
         return (entry.actual_to || entry.to) < today;
+      }
+
+      function entriesForSource(month) {
+        return ((month && month.entries) || []).filter(function (entry) {
+          return (entry.kind || 'export') === activeSource;
+        });
+      }
+
+      function peopleCount(entries) {
+        var unique = {};
+        entries.forEach(function (entry) { unique[entry.id] = true; });
+        return Object.keys(unique).length;
+      }
+
+      function monthSourceCounts(month) {
+        var seen = { export: {}, import: {} };
+        ((month && month.entries) || []).forEach(function (entry) {
+          var kind = entry.kind === 'import' ? 'import' : 'export';
+          seen[kind][entry.id] = true;
+        });
+        return {
+          export: Object.keys(seen.export).length,
+          import: Object.keys(seen.import).length
+        };
+      }
+
+      function updateSourceTabs(month) {
+        var counts = monthSourceCounts(month);
+        sourceButtons.forEach(function (button) {
+          var kind = button.getAttribute('data-source') === 'import' ? 'import' : 'export';
+          var on = kind === activeSource;
+          button.classList.toggle('is-active', on);
+          button.setAttribute('aria-pressed', on ? 'true' : 'false');
+          button.setAttribute('aria-label', SOURCE_LABELS[kind] + ': ' + employeesPhrase(counts[kind]));
+          if (sourceCounts[kind]) sourceCounts[kind].textContent = String(counts[kind]);
+        });
+        if (els.navRosterDiff) {
+          els.navRosterDiff.href = '../roster-diff/' + (activeSource === 'import' ? '?source=import' : '');
+        }
+      }
+
+      function writeSourceUrl() {
+        try {
+          var params = new URLSearchParams(location.search);
+          if (activeSource === 'import') params.set('source', 'import');
+          else params.delete('source');
+          var query = params.toString();
+          history.replaceState(null, '', location.pathname + (query ? '?' + query : '') + (location.hash || ''));
+        } catch (e) {}
+      }
+
+      function setSource(source) {
+        var next = source === 'import' ? 'import' : 'export';
+        if (next === activeSource) return;
+        activeSource = next;
+        writeSourceUrl();
+        if (!DATA) return;
+        buildMonthStrip();
+        renderMonth(DATA.months[activeMonth] ? activeMonth : initialMonth(), { announce: false });
       }
 
       function employeesPhrase(count) {
@@ -996,7 +1194,6 @@
 
         var facts = div('empFacts');
         facts.appendChild(span('leaveTag ' + entry.type, LEAVE_LABELS[entry.type] || ''));
-        if (entry.kind === 'import') facts.appendChild(span('kindTag', 'وارد'));
         facts.appendChild(span('empDays', daysLabel(entry.days)));
         facts.appendChild(dateEl(entry, monthKey));
         if (expired) facts.appendChild(span('expiredTag', 'منقضية'));
@@ -1046,7 +1243,7 @@
       }
 
       function renderList(month, monthKey) {
-        var entries = month.entries || [];
+        var entries = entriesForSource(month);
         var today = todayIso();
         var savedIds = readSavedIds();
         var savedId = '';
@@ -1178,11 +1375,10 @@
         activeMonth = monthKey;
         renderedDay = todayIso();
         renderedSavedId = readSavedIds().join(',');
-        var entries = month.entries || [];
-        var unique = {};
-        entries.forEach(function (entry) { unique[entry.id] = true; });
-        var people = Object.keys(unique).length;
+        var entries = entriesForSource(month);
+        var people = peopleCount(entries);
 
+        updateSourceTabs(month);
         els.heroNum.textContent = String(people);
         els.heroLabel.textContent = heroLabelFor(people);
         els.heroMonth.textContent = monthName(monthKey) + ' ' + monthKey.slice(0, 4);
@@ -1194,7 +1390,7 @@
         els.listCard.hidden = isEmpty;
         if (isEmpty) {
           els.listCard.innerHTML = '';
-          els.emptyBody.textContent = 'لا توجد إجازات سنوية أو مرضية مسجّلة في ' + monthName(monthKey) + '.';
+          els.emptyBody.textContent = 'لا توجد إجازات مسجّلة في ' + SOURCE_LABELS[activeSource] + ' خلال ' + monthName(monthKey) + '.';
         } else {
           renderList(month, monthKey);
         }
@@ -1205,7 +1401,7 @@
           } catch (e) {}
         }
         if (!options || options.announce !== false) {
-          els.status.textContent = 'شهر ' + monthName(monthKey) + ': ' + employeesPhrase(people) + '.';
+          els.status.textContent = 'شهر ' + monthName(monthKey) + '، ' + SOURCE_LABELS[activeSource] + ': ' + employeesPhrase(people) + '.';
         }
       }
 
@@ -1213,15 +1409,13 @@
         els.strip.innerHTML = '';
         Object.keys(DATA.months).sort().forEach(function (key) {
           var month = DATA.months[key];
-          var unique = {};
-          (month.entries || []).forEach(function (entry) { unique[entry.id] = true; });
-          var people = Object.keys(unique).length;
+          var people = peopleCount(entriesForSource(month));
 
           var chip = document.createElement('button');
           chip.type = 'button';
           chip.className = 'monthChip';
           chip.setAttribute('data-month', key);
-          chip.setAttribute('aria-label', monthName(key) + ': ' + employeesPhrase(people));
+          chip.setAttribute('aria-label', monthName(key) + '، ' + SOURCE_LABELS[activeSource] + ': ' + employeesPhrase(people));
           if (!people) chip.classList.add('is-empty');
           chip.appendChild(span('chipMonth', monthName(key)));
           chip.appendChild(span('chipCount', String(people)));
@@ -1241,7 +1435,7 @@
         if (DATA.months[current]) return current;
 
         var withEntries = Object.keys(DATA.months).sort().filter(function (key) {
-          return (DATA.months[key].entries || []).length > 0;
+          return entriesForSource(DATA.months[key]).length > 0;
         });
         if (withEntries.length) return withEntries[withEntries.length - 1];
         return Object.keys(DATA.months).sort().pop();
@@ -1301,6 +1495,11 @@
       }
 
       els.retryBtn.addEventListener('click', load);
+      sourceButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          setSource(button.getAttribute('data-source'));
+        });
+      });
       window.addEventListener('hashchange', function () {
         var key = (location.hash || '').replace('#', '');
         if (DATA && DATA.months[key] && key !== activeMonth) {
