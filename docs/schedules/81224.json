@@ -3026,9 +3026,9 @@
         "day": 30,
         "day_name_ar": "الاثنين",
         "day_name_en": "Monday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day"
+        "shift_code": "OTN",
+        "shift_label": "⏱️ OTN",
+        "shift_group": "Standby"
       }
     ],
     "2026-12": [

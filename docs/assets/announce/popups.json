@@ -1,22 +1,20 @@
 {
   "items": [
     {
-      "id": "a2r4nvsuw",
-      "title": "جديد",
-      "text": "صفحة الإجازات تجريبية",
-      "mode": "both",
-      "imageId": "a990881f1",
-      "imageIds": [
-        "a990881f1"
-      ],
-      "linkUrl": "https://khalidsaif912.github.io/new/docs/leaves",
-      "linkLabel": "صفحة الإجازات",
-      "days": 3,
+      "id": "ar2exy4fg",
+      "title": "في مشكلة في الموقع",
+      "text": "جاري التعديل",
+      "mode": "text",
+      "imageId": "",
+      "imageIds": [],
+      "linkUrl": "",
+      "linkLabel": "",
+      "days": 1,
       "durationSec": 12,
-      "startAt": 1793521092492,
+      "startAt": 1793619692205,
       "enabled": true,
-      "at": 1793521092492
+      "at": 1793619692205
     }
   ],
-  "at": 1793521092492
+  "at": 1793619699838
 }
