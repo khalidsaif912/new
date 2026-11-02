@@ -606,7 +606,8 @@
       '#' + ROOT_ID + '.show .rap-card{transform:none}',
       '#' + ROOT_ID + ' .rap-close{position:absolute;top:10px;inset-inline-end:10px;width:34px;height:34px;border:0;border-radius:999px;',
       'background:rgba(15,23,42,.72);color:#fff;font-size:18px;line-height:1;cursor:pointer;z-index:2}',
-      '#' + ROOT_ID + ' .rap-img{display:block;width:100%;max-height:280px;object-fit:cover;background:#e2e8f0}',
+      '#' + ROOT_ID + ' .rap-img{display:block;width:auto;max-width:100%;height:auto;max-height:min(70vh,600px);margin:0 auto;object-fit:contain;background:#f1f5f9}',
+      '#' + ROOT_ID + ' .rap-card.rap-with-text>.rap-img{max-height:min(46vh,380px)}',
       '#' + ROOT_ID + ' .rap-body{padding:18px 18px 16px}',
       '#' + ROOT_ID + ' .rap-title{margin:0 0 8px;font-size:18px;font-weight:800;color:#0f172a;line-height:1.35}',
       '#' + ROOT_ID + ' .rap-text{margin:0;font-size:14px;font-weight:600;color:#334155;line-height:1.65;white-space:pre-wrap}',
@@ -622,9 +623,11 @@
       'animation:rapDrain linear forwards}',
       '#' + ROOT_ID + ' .rap-timer > i.paused{animation-play-state:paused}',
       '@keyframes rapDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}',
+      '@media (max-width:480px){#' + ROOT_ID + '{padding:10px}#' + ROOT_ID + ' .rap-card{width:100%;max-height:min(92dvh,860px);border-radius:16px}',
+      '#' + ROOT_ID + ' .rap-img{max-height:min(68dvh,600px)}}',
       '#' + ROOT_ID + ' .rap-card.rap-slides{width:min(460px,100%);max-height:min(92vh,820px);overflow:hidden;display:flex;flex-direction:column}',
-      '#' + ROOT_ID + ' .rap-slides-frame{position:relative;background:#0f172a;min-height:220px;flex:1 1 auto}',
-      '#' + ROOT_ID + ' .rap-slides-frame .rap-img{max-height:min(62vh,560px);object-fit:contain;background:#0f172a}',
+      '#' + ROOT_ID + ' .rap-slides-frame{position:relative;background:#0f172a;min-height:220px;flex:1 1 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}',
+      '#' + ROOT_ID + ' .rap-slides-frame .rap-img{width:auto;max-width:100%;height:auto;max-height:min(62vh,560px);margin:0 auto;object-fit:contain;background:#0f172a}',
       '#' + ROOT_ID + ' .rap-slides-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;',
       'padding:10px 16px 0;font-size:12px;font-weight:700;color:#64748b}',
       '#' + ROOT_ID + ' .rap-dots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:8px 16px 0}',
@@ -787,7 +790,7 @@
         '</a>'
       : '';
     root.innerHTML =
-      '<div class="rap-card">' +
+      '<div class="rap-card' + (imgHtml && bodyHtml ? ' rap-with-text' : '') + '">' +
         '<button type="button" class="rap-close" aria-label="إغلاق">×</button>' +
         imgHtml +
         bodyHtml +
