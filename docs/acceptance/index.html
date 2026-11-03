@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Acceptance Roster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --font-en: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-ar: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  }
+  html, body { width:100%; overflow-x:hidden; }
+  body {
+    margin:0; padding:0; min-height:100dvh;
+    background:#eef1f7;
+    font-family:var(--font-en);
+    color:#0f172a;
+    -webkit-font-smoothing:antialiased;
+    touch-action:manipulation;
+  }
+  body.ar { font-family:var(--font-ar); }
+  * { box-sizing:border-box; }
+
+  .wrap { max-width:680px; margin:0 auto; padding:calc(16px + var(--safe-top)) 14px calc(28px + var(--safe-bottom)); }
+
+  .header {
+    background:linear-gradient(135deg, #1e40af 0%, #1976d2 50%, #0ea5e9 100%);
+    color:#fff;
+    padding:22px 16px 16px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 4px 16px rgba(30,64,175,.14);
+    position:relative;
+    overflow:hidden;
+  }
+  .header::before {
+    content:''; position:absolute; top:-30px; right:-40px;
+    width:140px; height:140px; border-radius:50%;
+    background:rgba(255,255,255,.08); pointer-events:none;
+  }
+  .header::after {
+    content:''; position:absolute; bottom:-50px; left:-30px;
+    width:160px; height:160px; border-radius:50%;
+    background:rgba(255,255,255,.06); pointer-events:none;
+  }
+  .bannerTitle { margin:0; position:relative; z-index:1; line-height:1.1; color:#fff; }
+  .bannerTitleEyebrow {
+    display:block; font-size:11px; font-weight:700; letter-spacing:.22em;
+    text-transform:uppercase; opacity:.88; margin-bottom:5px;
+  }
+  .bannerTitleMain {
+    display:block; font-size:28px; font-weight:800; letter-spacing:-.03em;
+  }
+  body.ar .bannerTitleEyebrow { letter-spacing:.06em; text-transform:none; font-size:12px; }
+  body.ar .bannerTitleMain { font-size:26px; letter-spacing:0; }
+
+  .langToggle {
+    position:absolute; top:10px; left:12px; z-index:30;
+    background:transparent; border:none; padding:2px;
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1px; color:#fff; cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  body.ar .langToggle { left:auto; right:12px; }
+  .langToggle svg { display:block; width:13px; height:13px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.55)); }
+  .langToggleLabel {
+    font-size:9px; font-weight:800; line-height:1;
+    text-shadow:0 1px 3px rgba(0,0,0,.65);
+  }
+
+  .dateNavRow {
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+    gap:6px; margin-top:12px;
+  }
+  .dayNav {
+    flex:0 0 auto; width:36px; height:36px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.35);
+    background:rgba(255,255,255,.14);
+    color:#fff; display:grid; place-items:center;
+    cursor:pointer; padding:0;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .2s ease, opacity .2s ease;
+  }
+  .dayNav:hover { background:rgba(255,255,255,.24); }
+  .dayNav:disabled { opacity:.35; cursor:default; }
+  .dayNav svg { display:block; width:16px; height:16px; }
+  body.ar .dayNav svg { transform:scaleX(-1); }
+
+  .datePickerWrapper {
+    position:relative; flex:1 1 auto; min-width:0;
+    min-height:70px; z-index:3;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .dateTag {
+    display:flex; align-items:center; justify-content:center;
+    min-height:70px; padding:0; margin:0;
+    border:none; background:transparent; color:#fff;
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+    text-align:center; line-height:1; position:relative; z-index:3;
+  }
+  .dateTagMain {
+    display:flex; align-items:center; justify-content:center;
+    gap:min(2.4vw, 12px);
+    direction:ltr; width:max-content; max-width:100%; margin-inline:auto;
+    pointer-events:none;
+  }
+  body.ar .dateTagMain { direction:rtl; }
+  .dateTagDay, .dateTagWeek, .dateTagMonth {
+    font-family:var(--font-en);
+    color:rgba(255,255,255,.78);
+    text-shadow:0 1px 2px rgba(0,0,0,.55), 0 0 1px rgba(255,255,255,.45);
+    -webkit-text-stroke:.15px rgba(0,0,0,.28);
+    paint-order:stroke fill;
+  }
+  body.ar .dateTagDay, body.ar .dateTagWeek, body.ar .dateTagMonth { font-family:var(--font-ar); }
+  .dateTagDay {
+    display:block; flex:0 0 auto;
+    font-size:clamp(54px, 17vw, 82px); font-weight:800;
+    letter-spacing:-.04em; line-height:.9; font-variant-numeric:tabular-nums;
+  }
+  body.ar .dateTagDay { letter-spacing:0; }
+  .dateTagSide {
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+    gap:3px; line-height:1; flex:0 0 auto;
+    padding-inline-start:min(1.8vw, 10px);
+    border-inline-start:1px solid rgba(255,255,255,.35);
+    direction:ltr; unicode-bidi:isolate;
+  }
+  body.ar .dateTagSide {
+    align-items:flex-end;
+    padding-inline-start:0;
+    padding-inline-end:min(1.8vw, 10px);
+    border-inline-start:none;
+    border-inline-end:1px solid rgba(255,255,255,.35);
+  }
+  .dateTagWeek {
+    display:block; font-size:clamp(13px, 3.8vw, 17px); font-weight:700;
+    letter-spacing:-.01em; line-height:1.05; text-align:left; white-space:nowrap;
+  }
+  body.ar .dateTagWeek { letter-spacing:0; text-align:right; }
+  .dateTagMonth {
+    display:block; font-size:clamp(20px, 6.5vw, 30px); font-weight:700;
+    letter-spacing:-.02em; line-height:1; text-align:left; white-space:nowrap;
+  }
+  body.ar .dateTagMonth { letter-spacing:0; text-align:right; }
+  #datePicker {
+    position:absolute; inset:0; width:100%; height:100%; min-height:70px;
+    margin:0; padding:0; opacity:0; cursor:pointer;
+    font-size:16px; border:none; color:transparent; background:transparent;
+    z-index:5; touch-action:manipulation;
+  }
+
+  .todayBtn {
+    position:relative; z-index:2;
+    margin-top:8px;
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:5px 14px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.38);
+    background:rgba(255,255,255,.15);
+    color:#fff; font-size:11px; font-weight:800; letter-spacing:.02em;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .todayBtn[hidden] { display:none; }
+  .todayBtn:hover { background:rgba(255,255,255,.24); }
+
+  .summaryBar {
+    display:flex; justify-content:center; align-items:stretch;
+    gap:8px; margin-top:14px; flex-wrap:nowrap;
+  }
+  .summaryChip {
+    background:#fff;
+    border:1px solid rgba(15,23,42,.1);
+    border-radius:14px;
+    padding:9px 4px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(15,23,42,.06);
+    min-width:0; flex:1 1 0;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  }
+  .summaryChip .chipVal {
+    font-size:22px; font-weight:900; color:#1e40af;
+    height:26px; display:flex; align-items:center; justify-content:center; line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .summaryChip .chipLabel {
+    font-size:9.5px; font-weight:800; color:#334155;
+    text-transform:uppercase; letter-spacing:.2px; margin-top:4px;
+    line-height:1.1; white-space:nowrap;
+  }
+  body.ar .summaryChip .chipLabel { text-transform:none; letter-spacing:0; font-size:10px; }
+  #chipOn .chipVal { color:#1e40af; }
+  #chipOff .chipVal { color:#4338ca; }
+  #chipLeave .chipVal { color:#059669; }
+  #chipTraining .chipVal { color:#0284c7; }
+  #chipTotal .chipVal { color:#334155; }
+
+  .deptCard {
+    margin-top:18px;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(15,23,42,.07);
+    box-shadow:0 4px 18px rgba(15,23,42,.08);
+  }
+  .deptBar { height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc); }
+  .deptHead {
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    background:#fff;
+    border-bottom:2px solid #2563eb18;
+  }
+  .deptIcon {
+    width:40px; height:40px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    background:#2563eb15; color:#2563eb;
+  }
+  .deptTitle { font-size:18px; font-weight:800; color:#1e293b; flex:1; letter-spacing:-.2px; }
+  .deptBadge {
+    min-width:48px; padding:6px 10px; border-radius:12px; text-align:center;
+    background:#2563eb15; color:#2563eb; border:1px solid #2563eb18;
+  }
+  .deptBadgeLabel {
+    font-size:10px; opacity:.7; display:block; margin-bottom:1px;
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  .deptBadgeVal { font-size:17px; font-weight:900; }
+
+  .shiftStack { padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .shiftCard { border-radius:14px; overflow:hidden; }
+  .shiftSummary {
+    display:flex; align-items:center; gap:10px;
+    padding:11px 14px; cursor:pointer;
+    list-style:none; -webkit-appearance:none; appearance:none; user-select:none;
+  }
+  .shiftSummary::-webkit-details-marker { display:none; }
+  .shiftSummary::marker { display:none; }
+  .shiftSummary::after {
+    content:'▾'; font-size:14px; color:#94a3b8;
+    transition:transform .2s; flex-shrink:0;
+  }
+  .shiftCard[open] .shiftSummary::after { transform:rotate(180deg); }
+  .shiftIcon { font-size:20px; line-height:1; flex-shrink:0; }
+  .shiftLabel { font-size:15px; font-weight:800; flex:1; letter-spacing:-.1px; }
+  .shiftCount {
+    font-size:13px; font-weight:800; padding:3px 10px; border-radius:20px; flex-shrink:0;
+  }
+  .shiftBody { background:rgba(255,255,255,.7); }
+
+  .empRow {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 16px;
+    border-top:1px solid rgba(15,23,42,.06);
+  }
+  .empRowAlt { background:rgba(15,23,42,.02); }
+  .empRow.isMe { background:rgba(37,99,235,.08); }
+  .empName { font-size:15px; font-weight:700; color:#1e293b; line-height:1.25; }
+  .empRow.isMe .empName { color:#1e40af; }
+  .empId { font-weight:600; color:#64748b; font-variant-numeric:tabular-nums; }
+  .empRow.isMe .empId { color:#3b82f6; }
+  .empStatus {
+    font-size:13px; font-weight:600; flex-shrink:0;
+    text-align:end; direction:ltr; unicode-bidi:isolate;
+  }
+  body.ar .empStatus { direction:rtl; }
+  .youBadge {
+    display:inline-block; padding:1px 6px; border-radius:999px;
+    background:#2563eb; color:#fff; font-size:9px; font-weight:800;
+    vertical-align:middle; margin-inline-start:4px;
+  }
+  .shiftRangeLabel { font-size:10px; opacity:.7; }
+
+  .emptyCard {
+    margin-top:18px; padding:30px 18px; text-align:center;
+    background:#fff; border-radius:18px;
+    border:1px solid rgba(15,23,42,.07);
+    box-shadow:0 4px 18px rgba(15,23,42,.08);
+    color:#64748b; font-size:14px; font-weight:600;
+  }
+  .emptyIcon { font-size:26px; margin-bottom:8px; }
+
+  .footer {
+    margin-top:20px; text-align:center;
+    color:#64748b; font-size:12px; line-height:1.8;
+  }
+  body.ar .footer { direction:rtl; }
+  .footerSource { direction:ltr; unicode-bidi:isolate; }
+  .footer strong { color:#475569; }
+  .footer .footerDate { color:#1e40af; }
+  .footer .footerSource { color:#1e293b; word-break:break-word; }
+
+  @media (max-width:380px){
+    .summaryBar { gap:6px; }
+    .summaryChip { padding:8px 2px; }
+    .summaryChip .chipVal { font-size:19px; }
+    .summaryChip .chipLabel { font-size:8.5px; letter-spacing:0; }
+    body.ar .summaryChip .chipLabel { font-size:9px; }
+    .empName { font-size:14px; }
+    .deptTitle { font-size:16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <button class="langToggle" id="langToggle" type="button" aria-label="Switch language">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
+      <span class="langToggleLabel" id="langToggleLabel">ع</span>
+    </button>
+    <h1 class="bannerTitle">
+      <span class="bannerTitleEyebrow" id="titleEyebrow">Acceptance</span>
+      <span class="bannerTitleMain" id="titleMain">Duty Roster</span>
+    </h1>
+
+    <div class="dateNavRow">
+      <button type="button" class="dayNav" id="prevDay" aria-label="Previous day">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="datePickerWrapper">
+        <label class="dateTag" id="dateTag" for="datePicker">
+          <span class="dateTagMain">
+            <span class="dateTagDay" id="dateTagDay"></span>
+            <span class="dateTagSide">
+              <span class="dateTagWeek" id="dateTagWeek"></span>
+              <span class="dateTagMonth" id="dateTagMonth"></span>
+            </span>
+          </span>
+        </label>
+        <input id="datePicker" type="date" aria-label="Select roster date">
+      </div>
+      <button type="button" class="dayNav" id="nextDay" aria-label="Next day">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <button type="button" class="todayBtn" id="todayBtn" hidden>Today</button>
+  </div>
+
+  <div class="summaryBar">
+    <div class="summaryChip" id="chipOn">
+      <div class="chipVal" id="onDutyVal">0</div>
+      <div class="chipLabel" id="onDutyLabel">On Duty</div>
+    </div>
+    <div class="summaryChip" id="chipOff">
+      <div class="chipVal" id="offVal">0</div>
+      <div class="chipLabel" id="offLabel">Off</div>
+    </div>
+    <div class="summaryChip" id="chipLeave">
+      <div class="chipVal" id="leaveVal">0</div>
+      <div class="chipLabel" id="leaveLabel">Leave</div>
+    </div>
+    <div class="summaryChip" id="chipTraining">
+      <div class="chipVal" id="trainingVal">0</div>
+      <div class="chipLabel" id="trainingLabel">Training</div>
+    </div>
+    <div class="summaryChip" id="chipTotal">
+      <div class="chipVal" id="totalVal">0</div>
+      <div class="chipLabel" id="totalLabel">Total</div>
+    </div>
+  </div>
+
+  <div id="rosterRoot"></div>
+
+  <div class="footer">
+    <strong id="updatedLabel">Last Updated:</strong> <span class="footerDate" id="updatedValue">—</span><br>
+    <strong id="sourceLabel">Source:</strong> <span class="footerSource" id="sourceValue"></span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DATA = {"min":"2026-09-01","max":"2026-12-31","modified":"2026-11-02T13:33:26Z","months":{"2026-09":{"days":30,"employees":[{"name":"Jayantha","id":"8195","ar":"جاينثا","shifts":{"1":"ME06","2":"ME06","3":"ME06","4":"OFF","5":"OFF","6":"ME06","7":"ME06","8":"ME06","9":"ME06","10":"ME06","11":"OFF","12":"OFF","13":"ME06","14":"ME06","15":"ME06","16":"ME06","17":"ME06","18":"OFF","19":"OFF","20":"ME06","21":"ME06","22":"ME06","23":"ME06","24":"ME06","25":"OFF","26":"OFF","27":"ME06","28":"ME06","29":"ME06","30":"ME06"}},{"name":"Muna Al Amri","id":"81026","ar":"منى العامري","shifts":{"1":"AE13","2":"ME06","3":"ME06","4":"OFF","5":"OFF","6":"ME06","7":"ME06","8":"ME06","9":"AE13","10":"TR","11":"OFF","12":"OFF","13":"AE13","14":"AE13","15":"AE13","16":"ME06","17":"ME06","18":"OFF","19":"OFF","20":"ME06","21":"ME06","22":"ME06","23":"AE13","24":"AE13","25":"OFF","26":"OFF","27":"AE13","28":"AE13","29":"AE13","30":"ME06"}},{"name":"Ahmed Al Harrasi","id":"82451","ar":"أحمد الحراصي","shifts":{"1":"LV","2":"LV","3":"LV","4":"LV","5":"LV","6":"LV","7":"LV","8":"LV","9":"LV","10":"LV","11":"OFF","12":"OFF","13":"MN06","14":"MN06","15":"MN06","16":"AN13","17":"AN13","18":"OFF","19":"OFF","20":"AN13","21":"AN13","22":"AN13","23":"MN06","24":"MN06","25":"OFF","26":"OFF","27":"MN06","28":"MN06","29":"MN06","30":"AN13"}},{"name":"Said Al Luwaihi","id":"82446","ar":"سعيد اللويهي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"MN06","7":"MN06","8":"MN06","9":"AN13","10":"AN13","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"AN13","16":"MN06","17":"MN06","18":"OFF","19":"OFF","20":"MN06","21":"MN06","22":"MN06","23":"AN13","24":"AN13","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"MN06"}},{"name":"Nasma Al Farsi","id":"82469","ar":"نسمة الفارسي","shifts":{"1":"MN06","2":"AN13","3":"AN13","4":"OFF","5":"OFF","6":"AN13","7":"AN13","8":"AN13","9":"MN06","10":"TR","11":"OFF","12":"OFF","13":"MN06","14":"MN06","15":"MN06","16":"AN13","17":"AN13","18":"OFF","19":"OFF","20":"AN13","21":"AN13","22":"AN13","23":"MN06","24":"MN06","25":"OFF","26":"OFF","27":"MN06","28":"MN06","29":"MN06","30":"AN13"}},{"name":"Waleed Al Kharusi","id":"82466","ar":"وليد الخروصي","shifts":{"1":"MN06","2":"AN13","3":"AN13","4":"OFF","5":"OFF","6":"AN13","7":"AN13","8":"AN13","9":"MN06","10":"MN06","11":"OFF","12":"OFF","13":"MN06","14":"MN06","15":"TR","16":"TR","17":"AN13","18":"OFF","19":"OFF","20":"AN13","21":"AN13","22":"AN13","23":"MN06","24":"MN06","25":"OFF","26":"OFF","27":"MN06","28":"MN06","29":"MN06","30":"AN13"}},{"name":"Zainab Al Hashimi","id":"82475","ar":"زينب الهاشمي","shifts":{"1":"LV","2":"LV","3":"LV","4":"OFF","5":"OFF","6":"ME06","7":"ME06","8":"ME06","9":"AE13","10":"AE13","11":"OFF","12":"OFF","13":"AE13","14":"AE13","15":"TR","16":"TR","17":"ME06","18":"OFF","19":"OFF","20":"ME06","21":"ME06","22":"ME06","23":"AE13","24":"AE13","25":"OFF","26":"OFF","27":"AE13","28":"AE13","29":"AE13","30":"ME06"}},{"name":"Khalil Al Mazroei","id":"82598","ar":"خليل المزروعي","shifts":{"1":"LV","2":"LV","3":"LV","4":"LV","5":"LV","6":"LV","7":"LV","8":"LV","9":"LV","10":"OFF","11":"OFF","12":"MN06","13":"MN06","14":"MN06","15":"AN13","16":"AN13","17":"OFF","18":"OFF","19":"MN06","20":"MN06","21":"AN13","22":"AN13","23":"AN13","24":"OFF","25":"OFF","26":"MN06","27":"MN06","28":"MN06","29":"AN13","30":"AN13"}},{"name":"Omar Al Harthy","id":"82662","ar":"عمر الحارثي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"OFF","7":"MN06","8":"AN13","9":"AN13","10":"AN13","11":"AN13","12":"OFF","13":"OFF","14":"AN13","15":"AN13","16":"AN13","17":"MN06","18":"MN06","19":"OFF","20":"OFF","21":"MN06","22":"MN06","23":"MN06","24":"AN13","25":"AN13","26":"OFF","27":"OFF","28":"AN13","29":"AN13","30":"AN13"}},{"name":"Mudrek Al Harthy","id":"82670","ar":"مدرك الحارثي","shifts":{"1":"LV","2":"LV","3":"OFF","4":"OFF","5":"MN06","6":"MN06","7":"AN13","8":"AN13","9":"AN13","10":"AE14","11":"OFF","12":"AN13","13":"AN13","14":"AN13","15":"MN06","16":"MN06","17":"OFF","18":"OFF","19":"AN13","20":"AN13","21":"MN06","22":"MN06","23":"MN06","24":"OFF","25":"OFF","26":"AN13","27":"AN13","28":"AN13","29":"MN06","30":"MN06"}},{"name":"AlMuhannad Al Abri","id":"82479","ar":"المهند العبري","shifts":{"1":"OFF","2":"MN06","3":"AN13","4":"MN09","5":"OFF","6":"OFF","7":"MN06","8":"MN06","9":"MN06","10":"AN13","11":"AN13","12":"OFF","13":"OFF","14":"MN06","15":"MN06","16":"NN21","17":"NN21","18":"AN13","19":"OFF","20":"OFF","21":"MN06","22":"AN13","23":"AN13","24":"AN13","25":"AN13","26":"OFF","27":"OFF","28":"MN06","29":"MN06","30":"MN06"}},{"name":"Ali Al Maqbali","id":"82474","ar":"علي المقبالي","shifts":{"1":"NN21","2":"OFF","3":"OFF","4":"OFF","5":"AN13","6":"AN13","7":"AN13","8":"NN21","9":"NN21","10":"OFF","11":"OFF","12":"OFF","13":"LV","14":"LV","15":"LV","16":"LV","17":"LV","18":"OFF","19":"OFF","20":"OFF","21":"AN13","22":"AN13","23":"MN06","24":"NN21","25":"NN21","26":"OFF","27":"OFF","28":"OFF","29":"AN13","30":"AN13"}},{"name":"Ahmed Al Quraini","id":"82580","ar":"أحمد القريني","shifts":{"1":"AN13","2":"NN21","3":"NN21","4":"OFF","5":"OFF","6":"OFF","7":"AN13","8":"AN13","9":"AN13","10":"NN21","11":"NN21","12":"OFF","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"NN21","19":"NN21","20":"OFF","21":"OFF","22":"OFF","23":"AN13","24":"AN13","25":"MN06","26":"NN21","27":"NN21","28":"OFF","29":"OFF","30":"OFF"}},{"name":"Mohd Al Balushi","id":"82613","ar":"محمد البلوشي","shifts":{"1":"MN06","2":"AN13","3":"AN13","4":"NN21","5":"OFF","6":"AE14","7":"OFF","8":"MN06","9":"MN06","10":"MN06","11":"AN13","12":"NN21","13":"OFF","14":"OFF","15":"OFF","16":"MN06","17":"AN13","18":"AN13","19":"AN13","20":"NN21","21":"OFF","22":"OFF","23":"OFF","24":"MN06","25":"MN06","26":"AN13","27":"AN13","28":"NN21","29":"OFF","30":"OFF"}},{"name":"Jihad Al Sarmi","id":"82579","ar":"جهاد الصارمي","shifts":{"1":"OFF","2":"AN13","3":"AN13","4":"MN06","5":"NN21","6":"OFF","7":"OFF","8":"OFF","9":"MN06","10":"MN06","11":"MN06","12":"MN06","13":"NN21","14":"OFF","15":"OFF","16":"OFF","17":"MN06","18":"MN06","19":"AN13","20":"MN06","21":"NN21","22":"OFF","23":"OFF","24":"OFF","25":"MN06","26":"MN06","27":"AN13","28":"MN06","29":"NN21","30":"OFF"}},{"name":"Mazin Al Houti","id":"82651","ar":"مازن الحوطي","shifts":{"1":"AN13","2":"OFF","3":"MN06","4":"AN13","5":"MN09","6":"NN21","7":"NN21","8":"OFF","9":"OFF","10":"OFF","11":"MN06","12":"AN13","13":"AN13","14":"NN21","15":"NN21","16":"OFF","17":"OFF","18":"OFF","19":"MN06","20":"AN13","21":"AN13","22":"NN21","23":"NN21","24":"OFF","25":"OFF","26":"OFF","27":"MN06","28":"AN13","29":"AN13","30":"NN21"}}]},"2026-10":{"days":31,"employees":[{"name":"Muna Al Amri","id":"81026","ar":"منى العامري","shifts":{"1":"ME06","2":"OFF","3":"OFF","4":"ME06","5":"ME06","6":"ME06","7":"AE13","8":"TR","9":"OFF","10":"OFF","11":"AE13","12":"AE13","13":"AE13","14":"ME06","15":"ME06","16":"OFF","17":"OFF","18":"ME06","19":"ME06","20":"ME06","21":"AE13","22":"AE13","23":"OFF","24":"OFF","25":"ME06","26":"ME06","27":"ME06","28":"ME06","29":"ME06","30":"OFF","31":"OFF"}},{"name":"Ahmed Al Harrasi","id":"82451","ar":"أحمد الحراصي","shifts":{"1":"AN13","2":"OFF","3":"OFF","4":"AN13","5":"AN13","6":"AN13","7":"TR","8":"MN06","9":"OFF","10":"OFF","11":"MN06","12":"MN06","13":"MN06","14":"AN13","15":"AN13","16":"OFF","17":"OFF","18":"AN13","19":"AN13","20":"AN13","21":"MN06","22":"MN06","23":"OFF","24":"OFF","25":"LV","26":"LV","27":"LV","28":"LV","29":"LV","30":"OFF","31":"OFF"}},{"name":"Said Al Luwaihi","id":"82446","ar":"سعيد اللويهي","shifts":{"1":"ME06","2":"OFF","3":"OFF","4":"ME06","5":"ME06","6":"TR","7":"AE14","8":"AE14","9":"OFF","10":"OFF","11":"AE14","12":"AE14","13":"AE14","14":"ME06","15":"ME06","16":"OFF","17":"OFF","18":"ME06","19":"ME06","20":"ME06","21":"AE14","22":"AE14","23":"OFF","24":"OFF","25":"AE14","26":"AE14","27":"AE14","28":"ME06","29":"ME06","30":"OFF","31":"OFF"}},{"name":"Nasma Al Farsi","id":"82469","ar":"نسمة الفارسي","shifts":{"1":"AN13","2":"OFF","3":"OFF","4":"TR","5":"AN13","6":"AN13","7":"MN09","8":"MN06","9":"OFF","10":"OFF","11":"MN09","12":"MN09","13":"MN06","14":"AN13","15":"AN13","16":"OFF","17":"OFF","18":"AN13","19":"AN13","20":"AN13","21":"MN09","22":"MN06","23":"OFF","24":"OFF","25":"MN06","26":"MN06","27":"MN06","28":"AN13","29":"AN13","30":"OFF","31":"OFF"}},{"name":"Waleed Al Kharusi","id":"82466","ar":"وليد الخروصي","shifts":{"1":"AN13","2":"OFF","3":"OFF","4":"AN13","5":"TR","6":"AN13","7":"MN06","8":"MN06","9":"OFF","10":"OFF","11":"MN06","12":"MN06","13":"MN06","14":"AN13","15":"AN13","16":"OFF","17":"OFF","18":"AN13","19":"AN13","20":"AN13","21":"MN06","22":"MN06","23":"OFF","24":"OFF","25":"LV","26":"LV","27":"LV","28":"LV","29":"LV","30":"OFF","31":"OFF"}},{"name":"Zainab Al Hashimi","id":"82475","ar":"زينب الهاشمي","shifts":{"1":"ME06","2":"OFF","3":"OFF","4":"TR","5":"ME06","6":"ME06","7":"AE13","8":"AE13","9":"OFF","10":"OFF","11":"AE13","12":"AE13","13":"AE13","14":"ME06","15":"ME06","16":"OFF","17":"OFF","18":"ME06","19":"ME06","20":"ME06","21":"AE13","22":"AE13","23":"OFF","24":"OFF","25":"AE13","26":"AE13","27":"AE13","28":"ME06","29":"ME06","30":"OFF","31":"OFF"}},{"name":"Khalil Al Mazroei","id":"82598","ar":"خليل المزروعي","shifts":{"1":"OFF","2":"OFF","3":"MN06","4":"MN06","5":"MN06","6":"AN13","7":"AN13","8":"OFF","9":"OFF","10":"MN06","11":"MN06","12":"MN06","13":"AN13","14":"AN13","15":"OFF","16":"OFF","17":"MN06","18":"MN06","19":"MN06","20":"AN13","21":"AN13","22":"OFF","23":"OFF","24":"MN06","25":"MN06","26":"MN06","27":"AN13","28":"AN13","29":"OFF","30":"OFF","31":"MN06"}},{"name":"Omar Al Harthy","id":"82662","ar":"عمر الحارثي","shifts":{"1":"AN13","2":"MN06","3":"OFF","4":"OFF","5":"LV","6":"LV","7":"LV","8":"LV","9":"LV","10":"OFF","11":"OFF","12":"AN13","13":"AN13","14":"AN13","15":"AN13","16":"MN06","17":"OFF","18":"OFF","19":"AN13","20":"AN13","21":"AN13","22":"AN13","23":"MN06","24":"OFF","25":"OFF","26":"LV","27":"LV","28":"LV","29":"MN06","30":"MN06","31":"OFF"}},{"name":"Mudrek Al Harthy","id":"82670","ar":"مدرك الحارثي","shifts":{"1":"OFF","2":"OFF","3":"AN13","4":"AN13","5":"MN06","6":"MN06","7":"MN06","8":"OFF","9":"OFF","10":"AN13","11":"AN13","12":"MN06","13":"MN06","14":"MN06","15":"OFF","16":"OFF","17":"MN06","18":"AN13","19":"MN06","20":"MN06","21":"MN06","22":"OFF","23":"OFF","24":"AN13","25":"AN13","26":"AN13","27":"MN06","28":"MN06","29":"OFF","30":"OFF","31":"MN06"}},{"name":"AlMuhannad Al Abri","id":"82479","ar":"المهند العبري","shifts":{"1":"MN06","2":"OFF","3":"OFF","4":"AN13","5":"AN13","6":"AN13","7":"MN06","8":"MN06","9":"OFF","10":"OFF","11":"TR","12":"AN13","13":"MN06","14":"MN06","15":"MN06","16":"OFF","17":"OFF","18":"LV","19":"LV","20":"LV","21":"LV","22":"LV","23":"OFF","24":"OFF","25":"MN06","26":"MN06","27":"MN06","28":"MN06","29":"MN06","30":"OFF","31":"OFF"}},{"name":"Ali Al Maqbali","id":"82474","ar":"علي المقبالي","shifts":{"1":"NN21","2":"NN21","3":"NN21","4":"OFF","5":"OFF","6":"OFF","7":"AN13","8":"AN13","9":"AN13","10":"NN21","11":"NN21","12":"OFF","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"NN21","19":"NN21","20":"OFF","21":"OFF","22":"OFF","23":"LV","24":"LV","25":"LV","26":"NN21","27":"NN21","28":"OFF","29":"OFF","30":"OFF","31":"AN13"}},{"name":"Ahmed Al Quraini","id":"82580","ar":"أحمد القريني","shifts":{"1":"LV","2":"LV","3":"LV","4":"NN21","5":"NN21","6":"OFF","7":"OFF","8":"OFF","9":"MN06","10":"AN13","11":"AN13","12":"NN21","13":"NN21","14":"OFF","15":"OFF","16":"OFF","17":"AN13","18":"AN13","19":"MN06","20":"NN21","21":"NN21","22":"OFF","23":"OFF","24":"OFF","25":"AN13","26":"AN13","27":"MN06","28":"NN21","29":"NN21","30":"OFF","31":"OFF"}},{"name":"Mohd Al Balushi","id":"82613","ar":"محمد البلوشي","shifts":{"1":"OFF","2":"AN13","3":"AN13","4":"AN13","5":"AN13","6":"NN21","7":"OFF","8":"OFF","9":"OFF","10":"MN06","11":"AN13","12":"AN13","13":"AN13","14":"NN21","15":"OFF","16":"OFF","17":"OFF","18":"MN06","19":"AN13","20":"AN13","21":"AN13","22":"NN21","23":"OFF","24":"OFF","25":"OFF","26":"MN06","27":"AN13","28":"AN13","29":"AN13","30":"NN21","31":"OFF"}},{"name":"Jihad Al Sarmi","id":"82579","ar":"جهاد الصارمي","shifts":{"1":"OFF","2":"OFF","3":"MN06","4":"MN06","5":"TR","6":"MN06","7":"NN21","8":"OFF","9":"OFF","10":"OFF","11":"MN06","12":"MN06","13":"MN06","14":"MN06","15":"NN21","16":"OFF","17":"OFF","18":"OFF","19":"AN13","20":"MN06","21":"MN06","22":"MN06","23":"NN21","24":"OFF","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"MN09","31":"NN21"}},{"name":"Mazin Al Houti","id":"82651","ar":"مازن الحوطي","shifts":{"1":"LV","2":"OFF","3":"OFF","4":"OFF","5":"AN13","6":"AN13","7":"AN13","8":"NN21","9":"NN21","10":"OFF","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"TR","16":"NN21","17":"NN21","18":"OFF","19":"OFF","20":"OFF","21":"AN13","22":"AN13","23":"AN13","24":"NN21","25":"NN21","26":"OFF","27":"OFF","28":"OFF","29":"AN13","30":"AN13","31":"AN13"}}]},"2026-11":{"days":30,"employees":[{"name":"Muna Al Amri","id":"81026","ar":"منى العامري","shifts":{"1":"ME06","2":"ME06","3":"ME06","4":"MN06","5":"MN06","6":"OFF","7":"OFF","8":"AE13","9":"AE13","10":"AE13","11":"ME06","12":"ME06","13":"OFF","14":"OFF","15":"ME06","16":"ME06","17":"ME06","18":"AE13","19":"AE13","20":"OFF","21":"OFF","22":"AE13","23":"AE13","24":"AE13","25":"ME06","26":"ME06","27":"OFF","28":"OFF","29":"ME06","30":"ME06","31":"ME06"}},{"name":"Ahmed Al Harrasi","id":"82451","ar":"أحمد الحراصي","shifts":{"1":"LV","2":"LV","3":"LV","4":"LV","5":"LV","6":"OFF","7":"OFF","8":"MN06","9":"MN06","10":"MN06","11":"AN13","12":"AN13","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"MN06","19":"MN06","20":"OFF","21":"OFF","22":"MN06","23":"MN06","24":"MN06","25":"AN13","26":"AN13","27":"OFF","28":"OFF","29":"AN13","30":"AN13","31":"AN13"}},{"name":"Said Al Luwaihi","id":"82446","ar":"سعيد اللويهي","shifts":{"1":"ME06","2":"ME06","3":"ME06","4":"AE14","5":"AE14","6":"OFF","7":"OFF","8":"AE14","9":"AE14","10":"AE14","11":"ME06","12":"ME06","13":"OFF","14":"OFF","15":"ME06","16":"ME06","17":"ME06","18":"AE14","19":"AE14","20":"OFF","21":"OFF","22":"AE14","23":"AE14","24":"AE14","25":"ME06","26":"ME06","27":"OFF","28":"OFF","29":"ME06","30":"ME06","31":"ME06"}},{"name":"Nasma Al Farsi","id":"82469","ar":"نسمة الفارسي","shifts":{"1":"AN13","2":"AN13","3":"AN13","4":"MN06","5":"MN06","6":"OFF","7":"OFF","8":"MN09","9":"MN09","10":"MN06","11":"AN13","12":"AN13","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"MN09","19":"MN06","20":"OFF","21":"OFF","22":"LV","23":"LV","24":"LV","25":"LV","26":"LV","27":"LV","28":"LV","29":"LV","30":"LV","31":"LV"}},{"name":"Waleed Al Kharusi","id":"82466","ar":"وليد الخروصي","shifts":{"1":"LV","2":"LV","3":"LV","4":"LV","5":"LV","6":"OFF","7":"OFF","8":"MN06","9":"MN06","10":"MN06","11":"AN13","12":"AN13","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"MN06","19":"MN06","20":"OFF","21":"OFF","22":"MN06","23":"MN06","24":"MN06","25":"AN13","26":"AN13","27":"OFF","28":"OFF","29":"AN13","30":"AN13","31":"AN13"}},{"name":"Zainab Al Hashimi","id":"82475","ar":"زينب الهاشمي","shifts":{"1":"ME06","2":"ME06","3":"ME06","4":"AE13","5":"AE13","6":"OFF","7":"OFF","8":"AE13","9":"AE13","10":"AE13","11":"ME06","12":"ME06","13":"OFF","14":"OFF","15":"ME06","16":"ME06","17":"ME06","18":"AE13","19":"AE13","20":"OFF","21":"OFF","22":"LV","23":"LV","24":"LV","25":"LV","26":"LV","27":"LV","28":"LV","29":"LV","30":"LV","31":"LV"}},{"name":"Khalil Al Mazroei","id":"82598","ar":"خليل المزروعي","shifts":{"1":"MN06","2":"MN06","3":"AN13","4":"AN13","5":"OFF","6":"OFF","7":"MN06","8":"MN06","9":"MN06","10":"MN06","11":"AN13","12":"OFF","13":"OFF","14":"MN06","15":"MN06","16":"MN06","17":"AN13","18":"AN13","19":"OFF","20":"OFF","21":"MN06","22":"MN06","23":"MN06","24":"AN13","25":"AN13","26":"OFF","27":"OFF","28":"MN06","29":"MN06","30":"MN06","31":"AN13"}},{"name":"Omar Al Harthy","id":"82662","ar":"عمر الحارثي","shifts":{"1":"OFF","2":"AN13","3":"AN13","4":"AN13","5":"AN13","6":"MN06","7":"OFF","8":"OFF","9":"AN13","10":"AN13","11":"AN13","12":"MN06","13":"MN06","14":"OFF","15":"OFF","16":"AN13","17":"AN13","18":"AN13","19":"AN13","20":"MN06","21":"OFF","22":"OFF","23":"LV","24":"LV","25":"LV","26":"LV","27":"LV","28":"OFF","29":"OFF","30":"AN13","31":"AN13"}},{"name":"Mudrek Al Harthy","id":"82670","ar":"مدرك الحارثي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"MN06","5":"OFF","6":"OFF","7":"AN13","8":"MN06","9":"MN06","10":"MN06","11":"MN06","12":"OFF","13":"OFF","14":"AN13","15":"AN13","16":"MN06","17":"MN06","18":"MN06","19":"OFF","20":"OFF","21":"MN09","22":"AN13","23":"AN13","24":"MN06","25":"MN06","26":"OFF","27":"OFF","28":"AN13","29":"AN13","30":"MN06","31":"MN06"}},{"name":"AlMuhannad Al Abri","id":"82479","ar":"المهند العبري","shifts":{"1":"AN13","2":"AN13","3":"AN13","4":"MN06","5":"MN06","6":"OFF","7":"OFF","8":"LV","9":"LV","10":"LV","11":"LV","12":"LV","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"MN06","18":"MN06","19":"MN06","20":"OFF","21":"OFF","22":"AN13","23":"AN13","24":"MN06","25":"MN09","26":"MN06","27":"OFF","28":"OFF","29":"AN13","30":"AN13","31":"MN06"}},{"name":"Ali Al Maqbali","id":"82474","ar":"علي المقبالي","shifts":{"1":"AN13","2":"AN13","3":"NN21","4":"NN21","5":"OFF","6":"OFF","7":"OFF","8":"AN13","9":"AN13","10":"AN13","11":"NN21","12":"NN21","13":"OFF","14":"OFF","15":"OFF","16":"AN13","17":"NN21","18":"NN21","19":"NN21","20":"NN21","21":"OFF","22":"OFF","23":"OFF","24":"AN13","25":"NN21","26":"NN21","27":"NN21","28":"NN21","29":"OFF","30":"OFF","31":"OFF"}},{"name":"Ahmed Al Quraini","id":"82580","ar":"أحمد القريني","shifts":{"1":"OFF","2":"AN13","3":"AN13","4":"MN06","5":"NN21","6":"NN21","7":"OFF","8":"OFF","9":"OFF","10":"AN13","11":"AN13","12":"MN06","13":"NN21","14":"NN21","15":"OFF","16":"OFF","17":"OFF","18":"LV","19":"LV","20":"LV","21":"LV","22":"LV","23":"OFF","24":"OFF","25":"OFF","26":"AN13","27":"MN06","28":"MN06","29":"NN21","30":"NN21","31":"OFF"}},{"name":"Mohd Al Balushi","id":"82613","ar":"محمد البلوشي","shifts":{"1":"OFF","2":"OFF","3":"MN06","4":"AN13","5":"AN13","6":"AN13","7":"NN21","8":"OFF","9":"OFF","10":"OFF","11":"MN06","12":"AN13","13":"AN13","14":"AN13","15":"NN21","16":"OFF","17":"OFF","18":"OFF","19":"AN13","20":"MN09","21":"NN21","22":"NN21","23":"NN21","24":"OFF","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"AN13","31":"NN21"}},{"name":"Jihad Al Sarmi","id":"82579","ar":"جهاد الصارمي","shifts":{"1":"OFF","2":"OFF","3":"OFF","4":"AN13","5":"MN06","6":"MN06","7":"MN06","8":"NN21","9":"OFF","10":"OFF","11":"OFF","12":"AN13","13":"MN09","14":"MN06","15":"MN06","16":"NN21","17":"OFF","18":"OFF","19":"OFF","20":"AN13","21":"AN13","22":"MN06","23":"MN06","24":"NN21","25":"OFF","26":"OFF","27":"OFF","28":"MN09","29":"MN06","30":"MN06","31":"MN06"}},{"name":"Mazin Al Houti","id":"82651","ar":"مازن الحوطي","shifts":{"1":"NN21","2":"NN21","3":"OFF","4":"OFF","5":"OFF","6":"AN13","7":"AN13","8":"AN13","9":"NN21","10":"NN21","11":"OFF","12":"OFF","13":"OFF","14":"LV","15":"LV","16":"LV","17":"LV","18":"LV","19":"LV","20":"LV","21":"LV","22":"LV","23":"LV","24":"LV","25":"LV","26":"LV","27":"OFF","28":"OFF","29":"OFF","30":"AN13","31":"AN13"}}]},"2026-12":{"days":31,"employees":[{"name":"Muna Al Amri","id":"81026","ar":"منى العامري","shifts":{"1":"ME06","2":"AE13","3":"AE13","4":"OFF","5":"OFF","6":"AE13","7":"AE13","8":"AE13","9":"ME06","10":"ME06","11":"OFF","12":"OFF","13":"ME06","14":"ME06","15":"ME06","16":"AE13","17":"AE13","18":"OFF","19":"OFF","20":"AE13","21":"AE13","22":"AE13","23":"ME06","24":"ME06","25":"OFF","26":"OFF","27":"ME06","28":"ME06","29":"ME06","30":"AE13","31":"AE13"}},{"name":"Ahmed Al Harrasi","id":"82451","ar":"أحمد الحراصي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"MN06","7":"MN06","8":"MN06","9":"AN13","10":"AN13","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"AN13","16":"MN06","17":"MN06","18":"OFF","19":"OFF","20":"MN06","21":"MN06","22":"MN06","23":"AN13","24":"AN13","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"MN06","31":"MN06"}},{"name":"Said Al Luwaihi","id":"82446","ar":"سعيد اللويهي","shifts":{"1":"ME06","2":"AE14","3":"AE14","4":"OFF","5":"OFF","6":"AE14","7":"AE14","8":"AE14","9":"ME06","10":"ME06","11":"OFF","12":"OFF","13":"ME06","14":"ME06","15":"ME06","16":"AE14","17":"AE14","18":"OFF","19":"OFF","20":"AE14","21":"AE14","22":"AE14","23":"ME06","24":"ME06","25":"OFF","26":"OFF","27":"ME06","28":"ME06","29":"ME06","30":"AE14","31":"AE14"}},{"name":"Nasma Al Farsi","id":"82469","ar":"نسمة الفارسي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"MN06","7":"MN06","8":"MN06","9":"AN13","10":"AN13","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"AN13","16":"MN06","17":"MN06","18":"OFF","19":"OFF","20":"MN06","21":"MN06","22":"MN06","23":"AN13","24":"AN13","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"MN06","31":"MN06"}},{"name":"Waleed Al Kharusi","id":"82466","ar":"وليد الخروصي","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"MN06","7":"MN06","8":"MN06","9":"AN13","10":"AN13","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"AN13","16":"MN06","17":"MN06","18":"OFF","19":"OFF","20":"MN06","21":"MN06","22":"MN06","23":"AN13","24":"AN13","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"AN13","30":"MN06","31":"MN06"}},{"name":"Zainab Al Hashimi","id":"82475","ar":"زينب الهاشمي","shifts":{"1":"ME06","2":"AE13","3":"AE13","4":"OFF","5":"OFF","6":"AE13","7":"AE13","8":"AE13","9":"ME06","10":"ME06","11":"OFF","12":"OFF","13":"ME06","14":"ME06","15":"ME06","16":"AE13","17":"AE13","18":"OFF","19":"OFF","20":"AE13","21":"AE13","22":"AE13","23":"ME06","24":"ME06","25":"OFF","26":"OFF","27":"ME06","28":"ME06","29":"ME06","30":"AE13","31":"AE13"}},{"name":"Khalil Al Mazroei","id":"82598","ar":"خليل المزروعي","shifts":{"1":"MN06","2":"AN13","3":"OFF","4":"OFF","5":"MN06","6":"MN06","7":"MN06","8":"MN06","9":"AN13","10":"OFF","11":"OFF","12":"MN06","13":"MN06","14":"MN06","15":"MN06","16":"AN13","17":"OFF","18":"OFF","19":"MN06","20":"MN06","21":"MN06","22":"MN06","23":"AN13","24":"OFF","25":"OFF","26":"MN06","27":"MN06","28":"MN06","29":"MN06","30":"AN13","31":"OFF"}},{"name":"Omar Al Harthy","id":"82662","ar":"عمر الحارثي","shifts":{"1":"AN13","2":"AN13","3":"AN13","4":"MN06","5":"OFF","6":"OFF","7":"AN13","8":"AN13","9":"AN13","10":"AN13","11":"MN06","12":"OFF","13":"OFF","14":"AN13","15":"AN13","16":"AN13","17":"AN13","18":"MN06","19":"OFF","20":"OFF","21":"AN13","22":"AN13","23":"AN13","24":"AN13","25":"MN06","26":"OFF","27":"OFF","28":"AN13","29":"AN13","30":"AN13","31":"MN06"}},{"name":"Mudrek Al Harthy","id":"82670","ar":"مدرك الحارثي","shifts":{"1":"MN06","2":"MN06","3":"OFF","4":"OFF","5":"AN13","6":"MN06","7":"MN06","8":"MN06","9":"MN06","10":"OFF","11":"OFF","12":"AN13","13":"MN06","14":"MN06","15":"MN06","16":"MN06","17":"OFF","18":"OFF","19":"AN13","20":"MN06","21":"MN06","22":"MN06","23":"MN06","24":"OFF","25":"OFF","26":"AN13","27":"MN06","28":"MN06","29":"AN13","30":"MN06","31":"OFF"}},{"name":"AlMuhannad Al Abri","id":"82479","ar":"المهند العبري","shifts":{"1":"AN13","2":"MN06","3":"MN06","4":"OFF","5":"OFF","6":"AN13","7":"AN13","8":"MN06","9":"MN06","10":"MN06","11":"OFF","12":"OFF","13":"AN13","14":"AN13","15":"MN06","16":"MN06","17":"MN06","18":"OFF","19":"OFF","20":"AN13","21":"AN13","22":"MN06","23":"MN06","24":"MN06","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"MN06","30":"MN06","31":"MN06"}},{"name":"Ali Al Maqbali","id":"82474","ar":"علي المقبالي","shifts":{"1":"AN13","2":"AN13","3":"AN13","4":"NN21","5":"NN21","6":"OFF","7":"OFF","8":"OFF","9":"AN13","10":"AN13","11":"AN13","12":"NN21","13":"NN21","14":"OFF","15":"OFF","16":"OFF","17":"AN13","18":"AN13","19":"AN13","20":"NN21","21":"NN21","22":"OFF","23":"OFF","24":"OFF","25":"AN13","26":"AN13","27":"AN13","28":"NN21","29":"NN21","30":"OFF","31":"OFF"}},{"name":"Ahmed Al Quraini","id":"82580","ar":"أحمد القريني","shifts":{"1":"OFF","2":"OFF","3":"AN13","4":"AN13","5":"MN06","6":"NN21","7":"NN21","8":"OFF","9":"OFF","10":"OFF","11":"AN13","12":"AN13","13":"MN06","14":"NN21","15":"NN21","16":"OFF","17":"OFF","18":"OFF","19":"AN13","20":"AN13","21":"MN06","22":"NN21","23":"NN21","24":"OFF","25":"OFF","26":"OFF","27":"AN13","28":"AN13","29":"MN06","30":"NN21","31":"NN21"}},{"name":"Mohd Al Balushi","id":"82613","ar":"محمد البلوشي","shifts":{"1":"OFF","2":"OFF","3":"OFF","4":"MN06","5":"AN13","6":"AN13","7":"AN13","8":"NN21","9":"OFF","10":"OFF","11":"OFF","12":"MN06","13":"AN13","14":"AN13","15":"AN13","16":"NN21","17":"OFF","18":"OFF","19":"OFF","20":"MN06","21":"AN13","22":"AN13","23":"AN13","24":"NN21","25":"OFF","26":"OFF","27":"OFF","28":"MN06","29":"AN13","30":"AN13","31":"AN13"}},{"name":"Jihad Al Sarmi","id":"82579","ar":"جهاد الصارمي","shifts":{"1":"NN21","2":"OFF","3":"OFF","4":"OFF","5":"AN13","6":"MN09","7":"MN06","8":"MN06","9":"NN21","10":"OFF","11":"OFF","12":"OFF","13":"AN13","14":"MN09","15":"MN06","16":"MN06","17":"NN21","18":"OFF","19":"OFF","20":"OFF","21":"AN13","22":"MN09","23":"MN06","24":"MN06","25":"NN21","26":"OFF","27":"OFF","28":"OFF","29":"AN13","30":"MN09","31":"MN06"}},{"name":"Mazin Al Houti","id":"82651","ar":"مازن الحوطي","shifts":{"1":"AN13","2":"NN21","3":"NN21","4":"OFF","5":"OFF","6":"OFF","7":"AN13","8":"AN13","9":"AN13","10":"NN21","11":"NN21","12":"OFF","13":"OFF","14":"OFF","15":"AN13","16":"AN13","17":"AN13","18":"NN21","19":"NN21","20":"OFF","21":"OFF","22":"OFF","23":"AN13","24":"AN13","25":"AN13","26":"NN21","27":"NN21","28":"OFF","29":"OFF","30":"OFF","31":"AN13"}}]}}};
+  var SOURCE_NAME = "Acceptance Roster / latest.xlsx";
+  var LANG = localStorage.getItem('rosterLang') || 'en';
+  var AR = LANG === 'ar';
+
+  var WEEK_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var WEEK_AR = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  var MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var MON_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  var MON_SHORT_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  var GROUPS = ['Morning','Afternoon','Night','Standby','Off Day','Annual Leave','Sick Leave','Training','Other'];
+  var META = {
+    'Morning':     { bg:'#fef3c7', border:'#f59e0b44', summaryBorder:'#f59e0b33', label:'#92400e', countBg:'#f59e0b22', icon:'☀️', en:'Morning', ar:'صباحي' },
+    'Afternoon':   { bg:'#ffedd5', border:'#f9731644', summaryBorder:'#f9731633', label:'#9a3412', countBg:'#f9731622', icon:'🌤️', en:'Afternoon', ar:'مسائي' },
+    'Night':       { bg:'#ede9fe', border:'#8b5cf644', summaryBorder:'#8b5cf633', label:'#5b21b6', countBg:'#8b5cf622', icon:'🌙', en:'Night', ar:'ليلي' },
+    'Standby':     { bg:'#f0f0f0', border:'#9e9e9e44', summaryBorder:'#9e9e9e33', label:'#555555', countBg:'#cccccc22', icon:'🧍', en:'Standby', ar:'احتياط' },
+    'Off Day':     { bg:'#e0e7ff', border:'#6366f144', summaryBorder:'#6366f133', label:'#3730a3', countBg:'#6366f122', icon:'🛋️', en:'Off Day', ar:'يوم راحة' },
+    'Annual Leave':{ bg:'#d1fae5', border:'#10b98144', summaryBorder:'#10b98133', label:'#065f46', countBg:'#10b98122', icon:'✈️', en:'Annual Leave', ar:'إجازة سنوية' },
+    'Sick Leave':  { bg:'#ffedd5', border:'#f59e0b44', summaryBorder:'#f59e0b33', label:'#b45309', countBg:'#f59e0b22', icon:'🤒', en:'Sick Leave', ar:'إجازة مرضية' },
+    'Training':    { bg:'#e0f2fe', border:'#0ea5e944', summaryBorder:'#0ea5e933', label:'#075985', countBg:'#0ea5e922', icon:'📚', en:'Training', ar:'تدريب' },
+    'Other':       { bg:'#f1f5f9', border:'#94a3b844', summaryBorder:'#94a3b833', label:'#334155', countBg:'#94a3b822', icon:'📋', en:'Other', ar:'أخرى' }
+  };
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function ymd(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function parseYmd(s) {
+    var p = String(s || '').split('-');
+    return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  }
+  function addDays(d, n) {
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() + n);
+    return x;
+  }
+  function todayYmd() {
+    var n = new Date();
+    return ymd(new Date(n.getFullYear(), n.getMonth(), n.getDate()));
+  }
+  function clampYmd(s) {
+    if (s < DATA.min) return DATA.min;
+    if (s > DATA.max) return DATA.max;
+    return s;
+  }
+  function groupFor(code) {
+    var c = String(code || '').trim().toUpperCase();
+    if (!c || c === '0') return 'Other';
+    if (c === 'AL' || c === 'LV' || c.indexOf('ANNUAL') !== -1) return 'Annual Leave';
+    if (c === 'SL' || c.indexOf('SICK') !== -1) return 'Sick Leave';
+    if (c === 'TR' || c.indexOf('TRAINING') !== -1) return 'Training';
+    if (c === 'ST' || c === 'STM' || c === 'STN' || c === 'STNE22' || c === 'STME06' || c === 'STMN06' || c === 'STAE14' || c.indexOf('STANDBY') !== -1) return 'Standby';
+    if (c.indexOf('OT') === 0) return 'Standby';
+    if (c === 'OFF' || c === 'O' || c === 'REST' || c.indexOf('OFF DAY') !== -1) return 'Off Day';
+    var map = { MN06:'Morning', ME06:'Morning', ME07:'Morning', ME12:'Morning', MN12:'Afternoon', AN13:'Afternoon', AE14:'Afternoon', NN21:'Night', NE22:'Night' };
+    if (map[c]) return map[c];
+    if (c.indexOf('AE') === 0 || c.indexOf('AN') === 0) return 'Afternoon';
+    if (c.indexOf('NN') === 0 || c.indexOf('NE') === 0 || c.indexOf('NT') === 0) return 'Night';
+    if (c.indexOf('MN') === 0 || c.indexOf('ME') === 0) return 'Morning';
+    return 'Other';
+  }
+  function ownId() {
+    var q = '';
+    try {
+      q = new URLSearchParams(window.location.search).get('emp') || '';
+    } catch (e) {}
+    return q || localStorage.getItem('exportSavedEmpId') || localStorage.getItem('savedEmpId') || '';
+  }
+  function rangeSuffix(emp, day, group) {
+    if (group !== 'Annual Leave' && group !== 'Sick Leave' && group !== 'Training') return '';
+    var shifts = emp.shifts || {};
+    var start = day;
+    var end = day;
+    while (shifts[String(start - 1)] && groupFor(shifts[String(start - 1)]) === group) start--;
+    while (shifts[String(end + 1)] && groupFor(shifts[String(end + 1)]) === group) end++;
+    if (start === end) return '';
+    var from = AR ? 'من' : 'FROM';
+    var to = AR ? 'إلى' : 'TO';
+    return '(<span class="shiftRange"><span class="shiftRangeLabel">' + from + '</span> ' + start + ' <span class="shiftRangeLabel">' + to + '</span> ' + end + '</span>)';
+  }
+
+  var OWN = ownId();
+  var current = clampYmd(todayYmd());
+
+  function applyChrome() {
+    document.documentElement.lang = AR ? 'ar' : 'en';
+    document.documentElement.dir = AR ? 'rtl' : 'ltr';
+    document.body.classList.toggle('ar', AR);
+    document.title = AR ? 'روستر الأكسبتنس' : 'Acceptance Roster';
+    document.getElementById('langToggleLabel').textContent = AR ? 'EN' : 'ع';
+    document.getElementById('titleEyebrow').textContent = AR ? 'الأكسبتنس' : 'Acceptance';
+    document.getElementById('titleMain').textContent = AR ? 'روستر الدوام' : 'Duty Roster';
+    document.getElementById('onDutyLabel').textContent = AR ? 'على الدوام' : 'On Duty';
+    document.getElementById('offLabel').textContent = AR ? 'راحة' : 'Off';
+    document.getElementById('leaveLabel').textContent = AR ? 'إجازة' : 'Leave';
+    document.getElementById('trainingLabel').textContent = AR ? 'تدريب' : 'Training';
+    document.getElementById('totalLabel').textContent = AR ? 'الإجمالي' : 'Total';
+    document.getElementById('updatedLabel').textContent = AR ? 'آخر تحديث:' : 'Last Updated:';
+    document.getElementById('sourceLabel').textContent = AR ? 'المصدر:' : 'Source:';
+    document.getElementById('prevDay').setAttribute('aria-label', AR ? 'اليوم السابق' : 'Previous day');
+    document.getElementById('nextDay').setAttribute('aria-label', AR ? 'اليوم التالي' : 'Next day');
+    document.getElementById('todayBtn').textContent = AR ? 'اليوم' : 'Today';
+    document.getElementById('sourceValue').textContent = SOURCE_NAME;
+
+    var updatedEl = document.getElementById('updatedValue');
+    if (DATA.modified) {
+      var m = new Date(DATA.modified.indexOf('Z') !== -1 ? DATA.modified : DATA.modified + 'Z');
+      if (!isNaN(m.getTime())) {
+        var parts;
+        if (AR) {
+          parts = String(m.getDate()).padStart(2, '0') + ' ' + MON_AR[m.getMonth()] + ' ' + m.getFullYear() + ' / ' + pad2(m.getHours()) + ':' + pad2(m.getMinutes());
+        } else {
+          parts = String(m.getDate()).padStart(2, '0') + ' ' + MON_SHORT_EN[m.getMonth()] + ' ' + m.getFullYear() + ' / ' + pad2(m.getHours()) + ':' + pad2(m.getMinutes());
+        }
+        updatedEl.textContent = parts;
+        return;
+      }
+    }
+    updatedEl.textContent = '—';
+  }
+
+  function render() {
+    var date = parseYmd(current);
+    var day = date.getDate();
+    var monthKey = current.slice(0, 7);
+    var month = DATA.months[monthKey];
+
+    document.getElementById('dateTagDay').textContent = day;
+    document.getElementById('dateTagWeek').textContent = (AR ? WEEK_AR : WEEK_EN)[date.getDay()];
+    document.getElementById('dateTagMonth').textContent = (AR ? MON_AR : MON_EN)[date.getMonth()];
+
+    var picker = document.getElementById('datePicker');
+    picker.min = DATA.min;
+    picker.max = DATA.max;
+    picker.value = current;
+    picker.setAttribute('aria-label', AR ? 'اختر تاريخ الروستر' : 'Select roster date');
+
+    var today = clampYmd(todayYmd());
+    document.getElementById('todayBtn').hidden = current === today;
+    document.getElementById('prevDay').disabled = current <= DATA.min;
+    document.getElementById('nextDay').disabled = current >= DATA.max;
+
+    var root = document.getElementById('rosterRoot');
+    if (!month) {
+      document.getElementById('onDutyVal').textContent = '0';
+      document.getElementById('offVal').textContent = '0';
+      document.getElementById('leaveVal').textContent = '0';
+      document.getElementById('trainingVal').textContent = '0';
+      document.getElementById('totalVal').textContent = '0';
+      root.innerHTML = '<div class="emptyCard"><div class="emptyIcon">🗓️</div>' +
+        (AR ? 'لا يوجد روستر لهذا التاريخ' : 'No roster for this date') + '</div>';
+      return;
+    }
+
+    var buckets = {};
+    GROUPS.forEach(function (g) { buckets[g] = []; });
+    var total = 0;
+    var own = null;
+
+    month.employees.forEach(function (emp) {
+      var code = emp.shifts && emp.shifts[String(day)];
+      if (!code) return;
+      total++;
+      var group = groupFor(code);
+      buckets[group].push({ emp: emp, code: code });
+      if (OWN && emp.id === OWN) own = { emp: emp, group: group };
+    });
+
+    function count(groups) {
+      return groups.reduce(function (sum, g) { return sum + buckets[g].length; }, 0);
+    }
+    document.getElementById('onDutyVal').textContent = count(['Morning', 'Afternoon', 'Night']);
+    document.getElementById('offVal').textContent = count(['Off Day']);
+    document.getElementById('leaveVal').textContent = count(['Annual Leave', 'Sick Leave']);
+    document.getElementById('trainingVal').textContent = count(['Training']);
+    document.getElementById('totalVal').textContent = total;
+
+    var html = '';
+    html += '<div class="deptCard">';
+    html += '<div class="deptBar"></div>';
+    html += '<div class="deptHead">';
+    html += '<div class="deptIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M3.77 10.77 2 9l2-4.5 1.1.55c.55.28.9.84.9 1.45s.35 1.17.9 1.45L8 8.5l3-6 1.05.53a2 2 0 0 1 1.09 1.52l.72 5.4a2 2 0 0 0 1.09 1.52l4.4 2.2c.42.22.78.55 1.01.96l.6 1.03c.49.88-.06 1.98-1.06 2.1l-1.18.15c-.47.06-.95-.02-1.37-.24L4.29 11.15a2 2 0 0 1-.52-.38Z"/></svg></div>';
+    html += '<div class="deptTitle">' + (AR ? 'الأكسبتنس' : 'Acceptance') + '</div>';
+    html += '<div class="deptBadge"><span class="deptBadgeLabel">' + (AR ? 'الإجمالي' : 'Total') + '</span><span class="deptBadgeVal">' + total + '</span></div>';
+    html += '</div>';
+    html += '<div class="shiftStack">';
+
+    GROUPS.forEach(function (group) {
+      var list = buckets[group];
+      if (!list.length) return;
+      var meta = META[group] || META.Other;
+      html += '<details class="shiftCard" open style="border:1px solid ' + meta.border + '; background:' + meta.bg + '">';
+      html += '<summary class="shiftSummary" style="background:' + meta.bg + '; border-bottom:1px solid ' + meta.summaryBorder + '">';
+      html += '<span class="shiftIcon">' + meta.icon + '</span>';
+      html += '<span class="shiftLabel" style="color:' + meta.label + '">' + (AR ? meta.ar : meta.en) + '</span>';
+      html += '<span class="shiftCount" style="background:' + meta.countBg + '; color:' + meta.label + '">' + list.length + '</span>';
+      html += '</summary>';
+      html += '<div class="shiftBody">';
+      list.forEach(function (item, index) {
+        var emp = item.emp;
+        var isMe = OWN && emp.id === OWN;
+        var displayName = (AR && emp.ar) ? emp.ar : emp.name;
+        var suffix = rangeSuffix(emp, day, group);
+        html += '<div class="empRow' + (index % 2 ? ' empRowAlt' : '') + (isMe ? ' isMe' : '') + '">';
+        html += '<span class="empName">' + esc(displayName) + ' <span class="empId">- ' + esc(emp.id) + '</span>' +
+          (isMe ? ' <span class="youBadge">' + (AR ? 'أنت' : 'You') + '</span>' : '') + '</span>';
+        html += '<span class="empStatus" style="color:' + meta.label + '">' + esc(item.code) + (suffix ? ' ' + suffix : '') + '</span>';
+        html += '</div>';
+      });
+      html += '</div></details>';
+    });
+
+    if (!total) {
+      html += '<div class="emptyCard"><div class="emptyIcon">🗓️</div>' + (AR ? 'لا يوجد دوام مسجل لهذا اليوم' : 'No shifts recorded for this date') + '</div>';
+    }
+
+    html += '</div></div>';
+    root.innerHTML = html;
+
+    if (own) {
+      var meRow = root.querySelector('.empRow.isMe');
+      if (meRow) meRow.setAttribute('data-group', own.group);
+    }
+  }
+
+  function goTo(value) {
+    current = clampYmd(value);
+    render();
+  }
+
+  document.getElementById('prevDay').addEventListener('click', function () {
+    goTo(ymd(addDays(parseYmd(current), -1)));
+  });
+  document.getElementById('nextDay').addEventListener('click', function () {
+    goTo(ymd(addDays(parseYmd(current), 1)));
+  });
+  document.getElementById('todayBtn').addEventListener('click', function () {
+    goTo(todayYmd());
+  });
+  document.getElementById('datePicker').addEventListener('change', function () {
+    if (this.value) goTo(this.value);
+  });
+  document.getElementById('langToggle').addEventListener('click', function () {
+    LANG = AR ? 'en' : 'ar';
+    AR = LANG === 'ar';
+    localStorage.setItem('rosterLang', LANG);
+    applyChrome();
+    render();
+  });
+
+  applyChrome();
+  render();
+})();
+</script>
+</body>
+</html>

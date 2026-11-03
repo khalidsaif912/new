@@ -1,0 +1,51 @@
+name: Acceptance Roster
+
+on:
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: [acceptance-roster-updated]
+  schedule:
+    # The Acceptance workbook changes rarely; poll a few times a day.
+    - cron: "0 */6 * * *"
+
+concurrency:
+  group: docs-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build_acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate Acceptance page
+        env:
+          ACCEPTANCE_ROSTER: ${{ secrets.ACCEPTANCE_ROSTER }}
+        run: python generate_acceptance.py
+
+      - name: Commit updated Acceptance docs
+        run: |
+          git add docs/acceptance
+          bash scripts/ci_commit_and_push.sh "Update acceptance roster page"
