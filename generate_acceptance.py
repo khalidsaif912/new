@@ -282,24 +282,123 @@ HTML_TEMPLATE = """<!doctype html>
     text-shadow:0 1px 3px rgba(0,0,0,.65);
   }
 
-  .dateNavRow {
-    position:relative; z-index:2;
+  #banner-changer-btn {
+    position:absolute; bottom:12px; top:auto; left:12px; z-index:30;
+    background:transparent; border:none; border-radius:0;
+    min-width:auto; min-height:auto; padding:2px;
+    color:#fff; cursor:pointer; line-height:0;
+    display:inline-flex; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  #banner-changer-btn:hover { background:transparent; transform:scale(1.08); opacity:.92; }
+  #banner-changer-btn .banner-changer-icon svg {
+    display:block; width:13px; height:13px;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));
+  }
+
+  /* Home-style split header: title row, then banner-btn / date / lang row */
+  .header.homeDateSplit {
+    display:grid;
+    grid-template-columns:28px minmax(0,1fr) 28px;
+    grid-template-rows:auto auto;
+    align-items:center;
+    direction:ltr;
+    padding:26px 18px 12px;
+    min-height:0;
+  }
+  .header.homeDateSplit .bannerTitle,
+  .header.homeDateSplit > h1 { grid-column:1 / -1; grid-row:1; }
+  .header.homeDateSplit #banner-changer-btn {
+    grid-column:1; grid-row:2;
+    position:relative !important; inset:auto !important;
+    justify-self:center; align-self:center; transform:none !important;
+    z-index:31; padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+  }
+  .header.homeDateSplit .langToggle,
+  .header.homeDateSplit #langToggle {
+    grid-column:3; grid-row:2;
+    position:relative !important; inset:auto !important;
+    justify-self:center; align-self:center; transform:none !important;
+    z-index:31; padding:2px; min-width:0; min-height:0; width:auto; height:auto;
+  }
+  .header.homeDateSplit .langToggle:hover,
+  .header.homeDateSplit #banner-changer-btn:hover { transform:scale(1.08) !important; }
+  .header.homeDateSplit .langToggle svg { width:13px; height:13px; }
+  .header.homeDateSplit .langToggleLabel { font-size:8px; }
+  .header.homeDateSplit .datePickerWrapper {
+    grid-column:2; grid-row:2;
+    position:relative; display:block;
+    width:100%; max-width:100%; margin-top:0;
+    z-index:20; min-height:56px;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  }
+  .header.homeDateSplit .dateTag {
     display:flex; align-items:center; justify-content:center;
-    gap:6px; margin-top:12px;
-  }
-  .dayNav {
-    flex:0 0 auto; width:36px; height:36px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.35);
-    background:rgba(255,255,255,.14);
-    color:#fff; display:grid; place-items:center;
-    cursor:pointer; padding:0;
+    min-height:56px; padding:0; border:none; border-radius:0;
+    background:transparent; color:#fff; cursor:pointer;
+    user-select:none; -webkit-user-select:none; text-align:center; line-height:1;
+    position:relative; z-index:3; pointer-events:auto;
     -webkit-tap-highlight-color:transparent;
-    transition:background .2s ease, opacity .2s ease;
   }
-  .dayNav:hover { background:rgba(255,255,255,.24); }
-  .dayNav:disabled { opacity:.35; cursor:default; }
-  .dayNav svg { display:block; width:16px; height:16px; }
-  body.ar .dayNav svg { transform:scaleX(-1); }
+  .header.homeDateSplit .dateTagMain {
+    position:relative; display:flex; align-items:center; justify-content:center;
+    gap:min(2.4vw, 12px); pointer-events:none; direction:ltr;
+    width:max-content; max-width:100%; margin-inline:auto;
+  }
+  body.ar .header.homeDateSplit .dateTagMain { direction:rtl; }
+  .header.homeDateSplit .dateTagDay,
+  .header.homeDateSplit .dateTagWeek,
+  .header.homeDateSplit .dateTagMonth {
+    font-family:var(--font-en);
+    color:rgba(255,255,255,.72);
+    text-shadow:0 1px 2px rgba(0,0,0,.55), 0 0 1px rgba(255,255,255,.45);
+    -webkit-text-stroke:.15px rgba(0,0,0,.28);
+    paint-order:stroke fill;
+  }
+  body.ar .header.homeDateSplit .dateTagDay,
+  body.ar .header.homeDateSplit .dateTagWeek,
+  body.ar .header.homeDateSplit .dateTagMonth { font-family:var(--font-ar); }
+  .header.homeDateSplit .dateTagSide {
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+    gap:3px; line-height:1; flex:0 0 auto;
+    padding-inline-start:min(1.8vw, 10px);
+    border-inline-start:1px solid rgba(255,255,255,.35);
+    direction:ltr; unicode-bidi:isolate; min-width:0; width:max-content;
+  }
+  body.ar .header.homeDateSplit .dateTagSide {
+    align-items:flex-end; padding-inline-start:0;
+    padding-inline-end:min(1.8vw, 10px);
+    border-inline-start:none; border-inline-end:1px solid rgba(255,255,255,.35);
+  }
+  .header.homeDateSplit .dateTagDay {
+    display:block; flex:0 0 auto;
+    font-size:clamp(56px, 18vw, 88px); font-weight:800;
+    letter-spacing:-.04em; line-height:.9; font-variant-numeric:tabular-nums;
+    pointer-events:none;
+  }
+  body.ar .header.homeDateSplit .dateTagDay { letter-spacing:0; }
+  .header.homeDateSplit .dateTagWeek {
+    display:block; font-size:clamp(13px, 3.8vw, 17px); font-weight:700;
+    letter-spacing:-.01em; line-height:1.05; text-align:left; white-space:nowrap;
+    width:100%; pointer-events:none;
+  }
+  body.ar .header.homeDateSplit .dateTagWeek { letter-spacing:0; text-align:right; }
+  .header.homeDateSplit .dateTagMonthWrap {
+    display:block; line-height:1; text-align:left; width:100%;
+  }
+  body.ar .header.homeDateSplit .dateTagMonthWrap { text-align:right; }
+  .header.homeDateSplit .dateTagMonth {
+    display:block; font-size:clamp(22px, 7vw, 36px); font-weight:700;
+    letter-spacing:-.02em; line-height:1; text-align:left; white-space:nowrap;
+  }
+  body.ar .header.homeDateSplit .dateTagMonth { letter-spacing:0; text-align:right; }
+  .header.homeDateSplit #datePicker {
+    position:absolute; inset:0; width:100%; height:100%; min-height:56px;
+    margin:0; padding:0; opacity:0; cursor:pointer;
+    font-size:16px; border:none; color:transparent; background:transparent;
+    z-index:5; touch-action:manipulation;
+  }
 
   .datePickerWrapper {
     position:relative; flex:1 1 auto; min-width:0;
@@ -520,7 +619,7 @@ HTML_TEMPLATE = """<!doctype html>
 <body>
 <div class="wrap">
 
-  <div class="header">
+  <div class="header homeDateSplit">
     <button class="langToggle" id="langToggle" type="button" aria-label="Switch language">
       <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>
       <span class="langToggleLabel" id="langToggleLabel">ع</span>
@@ -529,31 +628,27 @@ HTML_TEMPLATE = """<!doctype html>
       <span class="bannerTitleEyebrow" id="titleEyebrow">Acceptance</span>
       <span class="bannerTitleMain" id="titleMain">Duty Roster</span>
     </h1>
-
-    <div class="dateNavRow">
-      <button type="button" class="dayNav" id="prevDay" aria-label="Previous day">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <div class="datePickerWrapper">
-        <label class="dateTag" id="dateTag" for="datePicker">
-          <span class="dateTagMain">
-            <span class="dateTagDay" id="dateTagDay"></span>
-            <span class="dateTagSide">
-              <span class="dateTagWeek" id="dateTagWeek"></span>
+    <div class="datePickerWrapper">
+      <label class="dateTag" id="dateTag" for="datePicker">
+        <span class="dateTagMain">
+          <span class="dateTagDay" id="dateTagDay"></span>
+          <span class="dateTagSide">
+            <span class="dateTagWeek" id="dateTagWeek"></span>
+            <span class="dateTagMonthWrap">
               <span class="dateTagMonth" id="dateTagMonth"></span>
             </span>
           </span>
-        </label>
-        <input id="datePicker" type="date" aria-label="Select roster date">
-      </div>
-      <button type="button" class="dayNav" id="nextDay" aria-label="Next day">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
+        </span>
+      </label>
+      <input id="datePicker" type="date" aria-label="Select roster date">
     </div>
-    <button type="button" class="todayBtn" id="todayBtn" hidden>Today</button>
   </div>
 
   <div class="summaryBar">
+    <a href="../index.html" id="exportBtn" class="summaryChip exportChip" title="الذهاب إلى جدول الصادر" style="text-decoration:none;">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/></svg></div>
+      <div class="chipLabel" id="exportLabel">Export</div>
+    </a>
     <div class="summaryChip" id="chipOn">
       <div class="chipVal" id="onDutyVal">0</div>
       <div class="chipLabel" id="onDutyLabel">On Duty</div>
@@ -692,9 +787,8 @@ HTML_TEMPLATE = """<!doctype html>
     document.getElementById('totalLabel').textContent = AR ? 'الإجمالي' : 'Total';
     document.getElementById('updatedLabel').textContent = AR ? 'آخر تحديث:' : 'Last Updated:';
     document.getElementById('sourceLabel').textContent = AR ? 'المصدر:' : 'Source:';
-    document.getElementById('prevDay').setAttribute('aria-label', AR ? 'اليوم السابق' : 'Previous day');
-    document.getElementById('nextDay').setAttribute('aria-label', AR ? 'اليوم التالي' : 'Next day');
-    document.getElementById('todayBtn').textContent = AR ? 'اليوم' : 'Today';
+    document.getElementById('exportLabel').textContent = AR ? 'الصادر' : 'Export';
+    document.getElementById('exportBtn').setAttribute('title', AR ? 'الذهاب إلى جدول الصادر' : 'Go to the Export roster');
     document.getElementById('sourceValue').textContent = SOURCE_NAME;
 
     var updatedEl = document.getElementById('updatedValue');
@@ -729,11 +823,6 @@ HTML_TEMPLATE = """<!doctype html>
     picker.max = DATA.max;
     picker.value = current;
     picker.setAttribute('aria-label', AR ? 'اختر تاريخ الروستر' : 'Select roster date');
-
-    var today = clampYmd(todayYmd());
-    document.getElementById('todayBtn').hidden = current === today;
-    document.getElementById('prevDay').disabled = current <= DATA.min;
-    document.getElementById('nextDay').disabled = current >= DATA.max;
 
     var root = document.getElementById('rosterRoot');
     if (!month) {
@@ -823,15 +912,6 @@ HTML_TEMPLATE = """<!doctype html>
     render();
   }
 
-  document.getElementById('prevDay').addEventListener('click', function () {
-    goTo(ymd(addDays(parseYmd(current), -1)));
-  });
-  document.getElementById('nextDay').addEventListener('click', function () {
-    goTo(ymd(addDays(parseYmd(current), 1)));
-  });
-  document.getElementById('todayBtn').addEventListener('click', function () {
-    goTo(todayYmd());
-  });
   document.getElementById('datePicker').addEventListener('change', function () {
     if (this.value) goTo(this.value);
   });
@@ -845,6 +925,33 @@ HTML_TEMPLATE = """<!doctype html>
 
   applyChrome();
   render();
+
+  // Load the shared homepage banner scripts (same photo + switcher as the home page).
+  (function loadBannerEnhancements() {
+    function siteRoot() {
+      if (location.protocol === 'file:') return '';
+      var path = location.pathname || '/';
+      if (path.indexOf('/roster-site/') !== -1) return '/roster-site';
+      if (location.hostname && location.hostname.endsWith('github.io')) {
+        var segs = path.split('/').filter(Boolean);
+        if (segs.length >= 2 && segs[1] === 'docs') return '/' + segs[0] + '/docs';
+        return segs.length ? '/' + segs[0] : '';
+      }
+      return '';
+    }
+    var root = location.origin + siteRoot();
+    function addScript(src) {
+      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.setAttribute('data-local-src', src);
+      document.body.appendChild(s);
+    }
+    addScript(root + '/banner-store.js?v=20261031a');
+    addScript(root + '/banner-changer.js?v=20261031a');
+    addScript(root + '/bg-texture-shuffle.js?v=20261031a');
+  })();
 })();
 </script>
 </body>
