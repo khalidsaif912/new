@@ -1,20 +1,4 @@
 {
-  "items": [
-    {
-      "id": "ar2exy4fg",
-      "title": "في مشكلة في الموقع",
-      "text": "جاري التعديل",
-      "mode": "text",
-      "imageId": "",
-      "imageIds": [],
-      "linkUrl": "",
-      "linkLabel": "",
-      "days": 1,
-      "durationSec": 12,
-      "startAt": 1793619692205,
-      "enabled": true,
-      "at": 1793619692205
-    }
-  ],
-  "at": 1793619699838
+  "items": [],
+  "at": 1793734903561
 }
