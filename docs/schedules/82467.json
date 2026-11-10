@@ -3017,9 +3017,9 @@
         "day": 29,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day"
+        "shift_code": "OTN",
+        "shift_label": "⏱️ OTN",
+        "shift_group": "Standby"
       },
       {
         "date": "2026-11-30",
@@ -3037,16 +3037,6 @@
         "day": 6,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-07",
-        "day": 7,
-        "day_name_ar": "الاثنين",
-        "day_name_en": "Monday",
         "shift_code": "OFF",
         "shift_label": "🛌 Off Day",
         "shift_group": "Off Day",
@@ -3073,16 +3063,6 @@
         "projected": true
       },
       {
-        "date": "2026-12-15",
-        "day": 15,
-        "day_name_ar": "الثلاثاء",
-        "day_name_en": "Tuesday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
         "date": "2026-12-16",
         "day": 16,
         "day_name_ar": "الأربعاء",
@@ -3103,16 +3083,6 @@
         "projected": true
       },
       {
-        "date": "2026-12-23",
-        "day": 23,
-        "day_name_ar": "الأربعاء",
-        "day_name_en": "Wednesday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
         "date": "2026-12-24",
         "day": 24,
         "day_name_ar": "الخميس",
@@ -3127,16 +3097,6 @@
         "day": 30,
         "day_name_ar": "الأربعاء",
         "day_name_en": "Wednesday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-31",
-        "day": 31,
-        "day_name_ar": "الخميس",
-        "day_name_en": "Thursday",
         "shift_code": "OFF",
         "shift_label": "🛌 Off Day",
         "shift_group": "Off Day",

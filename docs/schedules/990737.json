@@ -2954,27 +2954,27 @@
         "day": 22,
         "day_name_ar": "الأحد",
         "day_name_en": "Sunday",
-        "shift_code": "MN06",
-        "shift_label": "🌅 Morning (MN06)",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-11-23",
         "day": 23,
         "day_name_ar": "الاثنين",
         "day_name_en": "Monday",
-        "shift_code": "MN06",
-        "shift_label": "🌅 Morning (MN06)",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-11-24",
         "day": 24,
         "day_name_ar": "الثلاثاء",
         "day_name_en": "Tuesday",
-        "shift_code": "MN06",
-        "shift_label": "🌅 Morning (MN06)",
-        "shift_group": "Morning"
+        "shift_code": "LV",
+        "shift_label": "✈️ Annual Leave",
+        "shift_group": "Annual Leave"
       },
       {
         "date": "2026-11-25",
@@ -3031,87 +3031,6 @@
         "shift_group": "Morning"
       }
     ],
-    "2026-12": [
-      {
-        "date": "2026-12-04",
-        "day": 4,
-        "day_name_ar": "الجمعة",
-        "day_name_en": "Friday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-05",
-        "day": 5,
-        "day_name_ar": "السبت",
-        "day_name_en": "Saturday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-11",
-        "day": 11,
-        "day_name_ar": "الجمعة",
-        "day_name_en": "Friday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-12",
-        "day": 12,
-        "day_name_ar": "السبت",
-        "day_name_en": "Saturday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-18",
-        "day": 18,
-        "day_name_ar": "الجمعة",
-        "day_name_en": "Friday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-19",
-        "day": 19,
-        "day_name_ar": "السبت",
-        "day_name_en": "Saturday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-25",
-        "day": 25,
-        "day_name_ar": "الجمعة",
-        "day_name_en": "Friday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      },
-      {
-        "date": "2026-12-26",
-        "day": 26,
-        "day_name_ar": "السبت",
-        "day_name_en": "Saturday",
-        "shift_code": "OFF",
-        "shift_label": "🛌 Off Day",
-        "shift_group": "Off Day",
-        "projected": true
-      }
-    ]
+    "2026-12": []
   }
 }
