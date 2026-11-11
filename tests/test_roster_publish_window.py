@@ -62,6 +62,24 @@ class ExtraDeptSheetTests(unittest.TestCase):
         self.assertNotIn("Acceptance", depts)
         self.assertNotIn("master", depts)
 
+    def test_flight_attending_and_flta_publish_as_flight_dispatch(self):
+        out = ordered_department_sheets(
+            [
+                "Export Operators",
+                "Flight Attending",
+                "FLTA",
+                "Officers",
+            ],
+            hidden=set(),
+        )
+        depts = [dept for _, dept in out]
+        self.assertEqual(depts, [
+            "Officers",
+            "Export Operators",
+            "Flight Dispatch",
+            "Flight Dispatch",
+        ])
+
 
 if __name__ == "__main__":
     unittest.main()
