@@ -44,6 +44,10 @@
       chargeScreenVisit: 'Visit app page',
       chargeScreenInstall: 'Install app',
       chargeScreenDialogHint: 'Open the page or download the APK',
+      acceptance: 'Acceptance Roster',
+      acceptanceSub: 'Acceptance duty roster',
+      leaves: 'Leaves',
+      leavesSub: 'Monthly leave list',
       spotlightBtn: 'Surprise me',
       spotlightBtnSub: 'A quick pick from the site',
       spotlightTitle: 'For you',
@@ -98,6 +102,10 @@
       chargeScreenVisit: 'زيارة صفحة التطبيق',
       chargeScreenInstall: 'تثبيت التطبيق',
       chargeScreenDialogHint: 'افتح الصفحة أو نزّل ملف التثبيت',
+      acceptance: 'الأكسبتنس',
+      acceptanceSub: 'روستر دوام الأكسبتنس',
+      leaves: 'الإجازات',
+      leavesSub: 'إجازات الشهر',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'اقتراح لك',
@@ -205,6 +213,20 @@
       '<rect x="25" y="18" width="14" height="28" rx="3" fill="#22c55e"/>' +
       '<path d="M32 24v10M27 29h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>' +
       '</svg>',
+    acceptance:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="12" y="10" width="40" height="46" rx="7" fill="#bfdbfe" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<rect x="24" y="6" width="16" height="9" rx="3" fill="#93c5fd" stroke="#0f172a" stroke-width="2"/>' +
+      '<path d="M20 26h24M20 34h16" stroke="#1d4ed8" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M22 44l5 5 11-13" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>',
+    leaves:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<rect x="10" y="12" width="44" height="42" rx="7" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M10 24h44" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/>' +
+      '</svg>',
     games: null
   };
 
@@ -284,6 +306,8 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
+    ensureAcceptanceAppLink();
+    ensureLeavesAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
@@ -306,6 +330,8 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
+    ensureAcceptanceAppLink();
+    ensureLeavesAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     sheet.classList.add('open');
@@ -381,6 +407,18 @@
   function chargeScreenApkUrl() {
     // Always absolute — relative/`download` breaks APK install inside the PWA/WebView.
     return 'https://khalidsaif912.github.io/new/docs/charge-screen/ChargeScreen.apk';
+  }
+
+  function acceptancePageUrl() {
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/acceptance/';
+    return 'https://khalidsaif912.github.io/new/docs/acceptance/';
+  }
+
+  function leavesPageUrl() {
+    var now = new Date();
+    var monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    if (typeof getSiteRootUrl === 'function') return getSiteRootUrl() + '/leaves/#' + monthKey;
+    return 'https://khalidsaif912.github.io/new/docs/leaves/#' + monthKey;
   }
 
   function withMePageUrl() {
@@ -780,6 +818,47 @@
     if (ico) ico.innerHTML = iconForApp('chargeScreen');
   }
 
+  function ensureLinkCardApp(id, href) {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var card = grid.querySelector('a.siteAppsLink[data-app-id="' + id + '"]');
+    if (!card) {
+      card = document.createElement('a');
+      card.className = 'siteAppsLink siteAppsLink--' + id;
+      card.setAttribute('data-app-id', id);
+      card.setAttribute('data-open-same', '1');
+      card.innerHTML =
+        '<span class="siteAppsLink-icon"></span>' +
+        '<span class="siteAppsLink-title"></span>' +
+        '<span class="siteAppsLink-sub"></span>';
+      grid.insertBefore(card, grid.firstElementChild);
+    }
+    card.href = href;
+    card.setAttribute('data-open-same', '1');
+    card.removeAttribute('target');
+    card.removeAttribute('rel');
+    var title = card.querySelector('.siteAppsLink-title');
+    var sub = card.querySelector('.siteAppsLink-sub');
+    var ico = card.querySelector('.siteAppsLink-icon');
+    if (title) {
+      title.setAttribute('data-i18n', id);
+      title.textContent = t(id);
+    }
+    if (sub) {
+      sub.setAttribute('data-i18n-sub', id);
+      sub.textContent = t(id + 'Sub');
+    }
+    if (ico) ico.innerHTML = iconForApp(id);
+  }
+
+  function ensureAcceptanceAppLink() {
+    ensureLinkCardApp('acceptance', acceptancePageUrl());
+  }
+
+  function ensureLeavesAppLink() {
+    ensureLinkCardApp('leaves', leavesPageUrl());
+  }
+
   function ensureChargeScreenDialog() {
     var sheet = document.getElementById('chargeScreenActionSheet');
     if (sheet) return sheet;
@@ -936,7 +1015,7 @@
       );
     }
 
-    var order = ['wa', 'chargeScreen', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var order = ['acceptance', 'leaves', 'wa', 'chargeScreen', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -999,6 +1078,8 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
+    ensureAcceptanceAppLink();
+    ensureLeavesAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     grid.addEventListener('click', function (e) {
@@ -1426,6 +1507,8 @@
     ensureWhatsAppAppLink();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
+    ensureAcceptanceAppLink();
+    ensureLeavesAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     ensureChargeScreenDialog();

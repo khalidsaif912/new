@@ -56,6 +56,22 @@ SVG_APPS_BTN = (
     '<rect x="14" y="14" width="7" height="7" rx="1.5"/>'
     '</svg>'
 )
+SVG_APP_ACCEPTANCE = (
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<rect x="12" y="10" width="40" height="46" rx="7" fill="#bfdbfe" stroke="#0f172a" stroke-width="2.2"/>'
+    '<rect x="24" y="6" width="16" height="9" rx="3" fill="#93c5fd" stroke="#0f172a" stroke-width="2"/>'
+    '<path d="M20 26h24M20 34h16" stroke="#1d4ed8" stroke-width="2.4" stroke-linecap="round"/>'
+    '<path d="M22 44l5 5 11-13" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+    '</svg>'
+)
+SVG_APP_LEAVES = (
+    '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
+    '<rect x="10" y="12" width="44" height="42" rx="7" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/>'
+    '<path d="M10 24h44" stroke="#0f172a" stroke-width="2.2"/>'
+    '<path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>'
+    '<path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/>'
+    '</svg>'
+)
 SVG_APP_LABEL = (
     '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">'
     '<path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/>'
@@ -797,6 +813,16 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--acceptance" href="https://khalidsaif912.github.io/new/docs/acceptance/" data-app-id="acceptance" data-open-same="1">
+        <span class="siteAppsLink-icon">{SVG_APP_ACCEPTANCE}</span>
+        <span class="siteAppsLink-title" data-i18n="acceptance">Acceptance Roster</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="acceptance">Acceptance duty roster</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
+        <span class="siteAppsLink-icon">{SVG_APP_LEAVES}</span>
+        <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
+        <span class="siteAppsLink-sub" data-i18n-sub="leaves">Monthly leave list</span>
+      </a>
       <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
         <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
