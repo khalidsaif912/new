@@ -98,9 +98,11 @@ def test_patch_chip_replaces_read_sign():
 
 
 def test_patch_apps_ver():
+    from sync_with_me_chip import _apps_line
+
     text, changed = patch_apps_ver(SAMPLE)
     assert changed
-    assert "site-apps.js?v=20260925a" in text
+    assert _apps_line() in text
     text2, changed2 = patch_apps_ver(text)
     assert not changed2
 

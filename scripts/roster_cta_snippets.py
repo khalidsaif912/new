@@ -675,7 +675,7 @@ SITE_SHARE_MODAL_HTML = f"""<div id="siteShareSheet" class="siteShareSheet" aria
 </div>
 """
 
-SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RELATED APPS MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+SITE_APPS_CSS = r"""    /* ═══════ RELATED APPS MODAL ═══════ */
     .siteAppsSheet {
       position: fixed;
       inset: 0;
@@ -719,9 +719,9 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
     }
     .siteAppsGrid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
       text-align: start;
     }
     .siteAppsLink {
@@ -729,12 +729,12 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-height: 96px;
-      padding: 12px 10px;
+      gap: 5px;
+      min-height: 0;
+      padding: 9px 4px;
       border-radius: 14px;
       border: 1px solid #e2e8f0;
-      background: #f8fafc;
+      background: #fff;
       text-decoration: none;
       color: #0f172a;
       transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -747,9 +747,9 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
       background: #fff;
       border: 1px solid #e2e8f0;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
@@ -758,18 +758,18 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
       display: block;
     }
     .siteAppsLink-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
-      line-height: 1.25;
+      line-height: 1.15;
       text-align: center;
       color: #0f172a;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .siteAppsLink-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      line-height: 1.3;
-      text-align: center;
+      display: none;
     }
     .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
     .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
@@ -796,9 +796,11 @@ SITE_APPS_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â�
       }
     }
     @media (max-width: 360px) {
-      .siteAppsLink { min-height: 88px; padding: 10px 8px; }
-      .siteAppsLink-icon { width: 40px; height: 40px; }
-      .siteAppsLink-title { font-size: 11px; }
+      .siteAppsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+      .siteAppsLink { padding: 7px 3px; border-radius: 12px; }
+      .siteAppsLink-icon { width: 34px; height: 34px; border-radius: 11px; }
+      .siteAppsLink-icon svg, .siteAppsFlatSvg, .siteAppsFlatImg { width: 22px; height: 22px; }
+      .siteAppsLink-title { font-size: 10px; }
     }
     .siteAppsCloseWrap {
       margin-top: 4px;
@@ -815,53 +817,43 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
     <div class="siteAppsGrid" id="siteAppsGrid">
       <a class="siteAppsLink siteAppsLink--acceptance" href="https://khalidsaif912.github.io/new/docs/acceptance/" data-app-id="acceptance" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_ACCEPTANCE}</span>
-        <span class="siteAppsLink-title" data-i18n="acceptance">Acceptance Roster</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="acceptance">Acceptance duty roster</span>
+        <span class="siteAppsLink-title" data-i18n="acceptance">Acceptance</span>
       </a>
       <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_LEAVES}</span>
         <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="leaves">Monthly leave list</span>
       </a>
       <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
-        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_READ_SIGN}</span>
         <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
       </a>
       <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
         <span class="siteAppsLink-icon">{SVG_APP_LABEL}</span>
-        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+        <span class="siteAppsLink-title" data-i18n="labels">Labels</span>
       </a>
       <a class="siteAppsLink siteAppsLink--calc" href="https://khalidsaif912.github.io/new/docs/calculator/index.html" data-app-id="calc" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_CALC}</span>
         <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
       </a>
       <a class="siteAppsLink siteAppsLink--quicklist" href="https://khalidsaif912.github.io/new/docs/QuickList/index.html" data-app-id="quicklist" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_CART}</span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
       </a>
       <a class="siteAppsLink siteAppsLink--book" href="https://khalidsaif912.github.io/new/docs/a-cup-of-book/" data-app-id="book" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="book">A Cup of Book</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="book">Reading topics</span>
+        <span class="siteAppsLink-title" data-i18n="book">Reading</span>
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon">{SVG_APP_STORE}</span>
-        <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        <span class="siteAppsLink-title" data-i18n="store">Store</span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon">{SVG_APP_GAME}</span>
-        <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        <span class="siteAppsLink-title" data-i18n="games">Games</span>
       </a>
     </div>
     <div class="siteAppsCloseWrap">
@@ -1280,6 +1272,8 @@ IOS_PERF_VER = "20260903c"
 CHANGE_ALERT_VER = "20261020a"
 # Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
 MANTLE_CLIENT_VER = "20261031a"
+# Related apps launcher (docs/site-apps.js). Bump when the launcher JS/CSS changes.
+SITE_APPS_VER = "20261112a"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1307,7 +1301,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   addScript(root + '/announce-popup.js?v=""" + MANTLE_CLIENT_VER + """');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261018a');
+    addScript(root + '/site-apps.js?v=""" + SITE_APPS_VER + """');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
@@ -1353,7 +1347,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
   function loadSecondary() {
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261018a');
+    addScript(root + '/site-apps.js?v=""" + SITE_APPS_VER + """');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

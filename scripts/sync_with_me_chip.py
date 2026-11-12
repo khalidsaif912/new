@@ -182,21 +182,23 @@ def patch_chip(text: str) -> tuple[str, bool]:
     return text, changed
 
 
+def _apps_line() -> str:
+    """Single source of truth for the launcher cache key (bumped in roster_cta_snippets)."""
+    try:
+        from roster_cta_snippets import SITE_APPS_VER  # type: ignore
+    except Exception:  # noqa: BLE001
+        SITE_APPS_VER = "20261112a"
+    return "addScript(root + '/site-apps.js?v=" + SITE_APPS_VER + "');"
+
+
 def patch_apps_ver(text: str) -> tuple[str, bool]:
-    if "site-apps.js?v=20260925a" in text:
+    line = _apps_line()
+    if line in text:
         return text, False
-    text2, n = SITE_APPS_VER_RE.subn(
-        "addScript(root + '/site-apps.js?v=20260925a');",
-        text,
-        count=1,
-    )
+    text2, n = SITE_APPS_VER_RE.subn(line, text, count=1)
     if n:
         return text2, True
-    text2, n = SITE_APPS_VER_FIXED_RE.subn(
-        "addScript(root + '/site-apps.js?v=20260925a');",
-        text,
-        count=1,
-    )
+    text2, n = SITE_APPS_VER_FIXED_RE.subn(line, text, count=1)
     if n:
         return text2, True
     return text, False

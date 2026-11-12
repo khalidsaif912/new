@@ -694,7 +694,49 @@
         margin-top:12px;
       }
       .summaryChip { padding:8px 7px; min-width:60px; flex:0 0 auto; width:auto; }
-      .summaryChip .chipVal { font-size:18px; }
+      .summaryChip .chipVal .chip-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .summaryChip .chipVal .waveHand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+    .summaryChip .chipVal .waveHand .chip-icon {
+      margin: 0;
+    }
+    a.summaryChip.trainingChip{
+      overflow:visible !important;
+      position:relative;
+    }
+    a.summaryChip.trainingChip .trainingNewPill{display:none!important}
+    a.summaryChip.trainingChip .chipLabel::after{
+      content:none !important;
+      display:none !important;
+    }
+    .trainingNewBadge{display:none!important}
+    .welcomeChip .feature-new-badge,
+    #welcomeChip .feature-new-badge,
+    #myScheduleBtn .feature-new-badge{
+      display:none !important;
+    }
+    /* Emp/Depts count: large screens only on export (Read&Sign keeps the mobile slot).
+       Import pages override this to always show the chip. */
+    #summarySwitchChip { display:none !important; }
+    @media (min-width:1024px){
+      #summarySwitchChip {
+        display:flex !important;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+      }
+    }
+    .summaryChip .chipVal { font-size:18px; }
       .summaryChip .chip-icon { width:20px; height:20px; }
       .summaryChip .chipLabel { font-size:10px; letter-spacing:.15px; font-weight:800; }
       .waveHand img { width:26px; height:26px; margin:-2px 0; }
@@ -755,7 +797,7 @@
         <div class="chipLabel">My Schedule</div>
       </a>
       <a href="#" id="welcomeChip" class="summaryChip welcomeChip" title="Go to your schedule" style="text-decoration:none;">
-        <div class="chipVal"><span class="waveHand" id="welcomeEmojiSlot" aria-hidden="true"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
+        <div class="chipVal"><span class="waveHand"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></div>
         <div class="chipLabel" id="welcomeName"></div>
       </a>
     </div>

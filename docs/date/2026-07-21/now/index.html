@@ -1412,6 +1412,222 @@
       width: 100%;
     }
 
+    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    .siteShareSheet {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10001;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .siteShareSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .siteShareCard {
+      width: min(100%, 360px);
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 16px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
+    }
+    .siteShareTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteShareHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    .siteShareQr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      margin: 0 auto 12px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+    }
+    .siteShareUrl {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 11px;
+      color: #475569;
+      word-break: break-all;
+      line-height: 1.45;
+      margin: 0 0 14px;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      direction: ltr;
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .siteShareActions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .siteShareActions .roster-cta-btn--compare {
+      grid-column: 1 / -1;
+    }
+    .siteShareCloseWrap {
+      margin-top: 4px;
+    }
+    .siteShareCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
+
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 10002;
+      padding: 16px;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .siteAppsSheet.open {
+      display: flex;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .siteAppsCard {
+      width: min(100%, 400px);
+      max-height: min(92vh, 560px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 14px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+      text-align: center;
+    }
+    .siteAppsTitle {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+    .siteAppsHint {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    .siteAppsGrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+      text-align: start;
+    }
+    .siteAppsLink {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 0;
+      padding: 9px 4px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      text-decoration: none;
+      color: #0f172a;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .siteAppsLink:active {
+      transform: scale(0.98);
+    }
+    .siteAppsLink-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+    .siteAppsLink-icon svg {
+      display: block;
+    }
+    .siteAppsLink-title {
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.15;
+      text-align: center;
+      color: #0f172a;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .siteAppsLink-sub {
+      display: none;
+    }
+    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
+    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
+    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
+    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
+    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
+    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
+    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
+    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
+    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
+      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes siteAppsStorePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+    @media (hover: hover) {
+      .siteAppsLink:hover {
+        background: #fff;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+      }
+    }
+    @media (max-width: 360px) {
+      .siteAppsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+      .siteAppsLink { padding: 7px 3px; border-radius: 12px; }
+      .siteAppsLink-icon { width: 34px; height: 34px; border-radius: 11px; }
+      .siteAppsLink-icon svg, .siteAppsFlatSvg, .siteAppsFlatImg { width: 22px; height: 22px; }
+      .siteAppsLink-title { font-size: 10px; }
+    }
+    .siteAppsCloseWrap {
+      margin-top: 4px;
+    }
+    .siteAppsCloseWrap .roster-cta-btn {
+      width: 100%;
+    }
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
@@ -2408,45 +2624,45 @@
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
+      <a class="siteAppsLink siteAppsLink--acceptance" href="https://khalidsaif912.github.io/new/docs/acceptance/" data-app-id="acceptance" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="10" width="40" height="46" rx="7" fill="#bfdbfe" stroke="#0f172a" stroke-width="2.2"/><rect x="24" y="6" width="16" height="9" rx="3" fill="#93c5fd" stroke="#0f172a" stroke-width="2"/><path d="M20 26h24M20 34h16" stroke="#1d4ed8" stroke-width="2.4" stroke-linecap="round"/><path d="M22 44l5 5 11-13" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="acceptance">Acceptance</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="12" width="44" height="42" rx="7" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/><path d="M10 24h44" stroke="#0f172a" stroke-width="2.2"/><path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/><path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
+      </a>
       <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/><path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/><path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/><path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
       </a>
-<a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
+      <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M10 12h24l18 18-6 6L28 18H10z" fill="#6ee7b7"/><circle cx="22" cy="24" r="4.2" fill="#fff" stroke="#0f172a" stroke-width="2"/><path d="M30 42l8-8" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+        <span class="siteAppsLink-title" data-i18n="labels">Labels</span>
       </a>
       <a class="siteAppsLink siteAppsLink--calc" href="https://khalidsaif912.github.io/new/docs/calculator/index.html" data-app-id="calc" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="6" width="40" height="52" rx="8" fill="#fbbf24" stroke="#0f172a" stroke-width="2.4"/><rect x="18" y="12" width="28" height="12" rx="4" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="18" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="31" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="44" y="30" width="4" height="8" rx="1.5" fill="#fb7185" stroke="#0f172a" stroke-width="1.6"/><rect x="18" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="31" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="44" y="42" width="4" height="8" rx="1.5" fill="#38bdf8" stroke="#0f172a" stroke-width="1.6"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
       </a>
       <a class="siteAppsLink siteAppsLink--quicklist" href="https://khalidsaif912.github.io/new/docs/QuickList/index.html" data-app-id="quicklist" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M18 18h28l4 34H14l4-34z" fill="#c4b5fd" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M22 18a10 10 0 0 1 20 0" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><path d="M18 18h28l-2 10H20z" fill="#a78bfa"/><circle cx="26" cy="40" r="2.4" fill="#0f172a"/><circle cx="38" cy="40" r="2.4" fill="#0f172a"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
       </a>
       <a class="siteAppsLink siteAppsLink--book" href="https://khalidsaif912.github.io/new/docs/a-cup-of-book/" data-app-id="book" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="book">A Cup of Book</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="book">Reading topics</span>
+        <span class="siteAppsLink-title" data-i18n="book">Reading</span>
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/><path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/><rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        <span class="siteAppsLink-title" data-i18n="store">Store</span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon"><img class="siteAppsFlatImg" src="https://khalidsaif912.github.io/new/docs/assets/icons/app-games.png" width="30" height="30" alt="" decoding="async"></span>
-        <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        <span class="siteAppsLink-title" data-i18n="games">Games</span>
       </a>
     </div>
     <div class="siteAppsCloseWrap">
@@ -4167,7 +4383,7 @@ function goToRosterDiff(event) {
   addScript(root + '/announce-popup.js?v=20261020i');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261111a');
+    addScript(root + '/site-apps.js?v=20261112a');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
