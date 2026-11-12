@@ -41,6 +41,8 @@ from roster_cta_snippets import (  # noqa: E402
     QA_ICON_ROSTER,
     QA_ICON_STATS,
     QA_PLUS_SVG,
+    MOBILE_BOTTOM_QUICK_HTML,
+    MOBILE_BOTTOM_QUICK_CSS,
     IOS_PERF_VER,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
     PERF_RENDER_CSS,
@@ -1736,6 +1738,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
 
 {SHIFT_COPY_CSS}
 {QA_CARD_CSS}
+{MOBILE_BOTTOM_QUICK_CSS}
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
     .footer strong {{ color:#64748b; }}
@@ -1880,6 +1883,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   {dept_cards_html}
 
   <!-- ════ ACTIONS ════ -->
+  {MOBILE_BOTTOM_QUICK_HTML}
   <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
     <div class="qaCardBar" aria-hidden="true"></div>
     <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
@@ -3063,6 +3067,7 @@ function setSummaryChipHrefs() {{
   var my = document.getElementById('myScheduleBtn');
   var imp = document.getElementById('importBtn');
   var trn = document.getElementById('trainingBtn');
+  var trnB = document.getElementById('trainingBtnBottom');
   var diff = document.getElementById('diffChipBtn');
   var readSign = document.getElementById('readSignChipBtn');
   var withMe = document.getElementById('withMeChipBtn');
@@ -3070,6 +3075,7 @@ function setSummaryChipHrefs() {{
   if (my) my.href = base + '/my-schedules/index.html';
   if (imp) imp.href = base + '/import/';
   if (trn) trn.href = base + '/training/';
+  if (trnB) trnB.href = base + '/training/';
   if (diff) diff.href = base + '/roster-diff/index.html';
   if (readSign) readSign.href = base + '/read-and-sign/';
   if (withMe) withMe.href = base + '/with-me/';
@@ -4495,6 +4501,14 @@ def main():
             f.write(_src)
 
     write_site_last_updated_json(datetime.now(TZ))
+
+    # Schedules were rewritten above; refresh the leaves page so it matches the roster.
+    try:
+        from leaves_data_build import rebuild as rebuild_leaves_data
+
+        rebuild_leaves_data(Path(__file__).resolve().parent)
+    except Exception as e:
+        print(f"WARNING: leaves data rebuild skipped: {e}")
 
     try:
         from mantle_overlay_snapshot import snapshot_banner_overlay, snapshot_announce_popups

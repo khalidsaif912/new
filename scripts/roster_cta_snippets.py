@@ -1654,6 +1654,63 @@ IMPORT_BOTTOM_CTA_CSS = """    .importBottom {
     }
 """
 
+# On phones the summary bar is a single no-wrap row, so the TRG chip moves down
+# next to the bottom action buttons instead of squeezing the other chips.
+MOBILE_BOTTOM_QUICK_HTML = """
+  <nav class="bottomMobileQuick" aria-label="Training">
+    <a class="roster-cta-btn roster-cta-btn--training" id="trainingBtnBottom" href="#" style="text-decoration:none;">
+      <span class="roster-cta-icon">{icon}</span>
+      <span class="roster-cta-label"><span class="qaEn">Training</span><span class="qaAr" lang="ar">التدريب</span></span>
+    </a>
+  </nav>
+""".replace("{icon}", SVG_CHIP_TRAINING)
+
+MOBILE_BOTTOM_QUICK_CSS = """    .bottomMobileQuick { display: none; }
+    @media (max-width: 640px) {
+      /* Move the training shortcut from the summary bar to the bottom buttons. */
+      .summaryBar #trainingBtn,
+      .summaryBar a.summaryChip.trainingChip { display: none !important; }
+      .bottomMobileQuick {
+        display: flex;
+        gap: 8px;
+        margin: 16px 0 0;
+      }
+      .bottomMobileQuick .roster-cta-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 56px;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 18px;
+        background: #F3F4F8;
+        color: #101426;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(23, 32, 64, .10);
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .bottomMobileQuick .roster-cta-icon {
+        flex: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: #7c3aed1a;
+        color: #7c3aed;
+      }
+      .bottomMobileQuick .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+      .bottomMobileQuick .roster-cta-label { min-width: 0; }
+      .bottomMobileQuick .qaAr { display: none; }
+      body.ar .bottomMobileQuick .qaEn, html[dir="rtl"] .bottomMobileQuick .qaEn { display: none; }
+      body.ar .bottomMobileQuick .qaAr, html[dir="rtl"] .bottomMobileQuick .qaAr { display: inline; }
+    }
+"""
+
 IMPORT_BOTTOM_FLEX_OLD = """    .importBottom .quickActions {
       margin-bottom: 6px;
       display: flex;

@@ -1,11 +1,6 @@
 {
   "employees": [
     {
-      "id": "82428",
-      "name": "ABDULLAH AL MAHARBI",
-      "department": "Flight Dispatch"
-    },
-    {
       "id": "82663",
       "name": "ABDULLAH AL SINAWI",
       "department": "Import Checkers"
@@ -36,19 +31,9 @@
       "department": "Import Checkers"
     },
     {
-      "id": "82427",
-      "name": "AHMED AL ORAIMI",
-      "department": "Flight Dispatch"
-    },
-    {
       "id": "82476",
       "name": "AHMED AL RUJAIBI",
       "department": "Documentation"
-    },
-    {
-      "id": "82415",
-      "name": "AHMED ALBALUSHI",
-      "department": "Flight Dispatch"
     },
     {
       "id": "82473",
@@ -66,11 +51,6 @@
       "department": "Flight Dispatch"
     },
     {
-      "id": "82496",
-      "name": "ANWAR AL HABSI",
-      "department": "Import Checkers"
-    },
-    {
       "id": "82566",
       "name": "ANWAR ALAMRI",
       "department": "Flight Dispatch"
@@ -86,19 +66,9 @@
       "department": "Flight Dispatch"
     },
     {
-      "id": "82559",
-      "name": "BADAR AL BUSAIDI",
-      "department": "Import Checkers"
-    },
-    {
       "id": "82468",
       "name": "BADAR AL FULAITI",
       "department": "Flight Dispatch"
-    },
-    {
-      "id": "8608",
-      "name": "BADAR AL REZAIQI",
-      "department": "Release Control"
     },
     {
       "id": "82583",
@@ -123,11 +93,6 @@
     {
       "id": "80215",
       "name": "GLENDO",
-      "department": "Documentation"
-    },
-    {
-      "id": "82664",
-      "name": "HAIFA AL BALUSHI",
       "department": "Documentation"
     },
     {
@@ -186,19 +151,9 @@
       "department": "Import Operators"
     },
     {
-      "id": "8336",
-      "name": "KHALID AL BALUSHI",
-      "department": "Import Checkers"
-    },
-    {
       "id": "82458",
       "name": "KHALID AL ZADJALI",
       "department": "Import Operators"
-    },
-    {
-      "id": "82537",
-      "name": "KHALIFA AL SAADI",
-      "department": "Flight Dispatch"
     },
     {
       "id": "990751",
@@ -221,11 +176,6 @@
       "department": "Release Control"
     },
     {
-      "id": "82431",
-      "name": "MAHMOOD AL BALUSHI",
-      "department": "Flight Dispatch"
-    },
-    {
       "id": "82452",
       "name": "MAHMOOD AL HADIDI",
       "department": "Documentation"
@@ -233,11 +183,6 @@
     {
       "id": "82286",
       "name": "MAHMOOD AL SHAMSI",
-      "department": "Import Checkers"
-    },
-    {
-      "id": "82049",
-      "name": "MAJID AL GHAFRI",
       "department": "Import Checkers"
     },
     {
@@ -301,11 +246,6 @@
       "department": "Release Control"
     },
     {
-      "id": "82590",
-      "name": "NASSER AL MAMARI",
-      "department": "Import Checkers"
-    },
-    {
       "id": "82416",
       "name": "NASSER AL OMAIRI",
       "department": "Flight Dispatch"
@@ -346,11 +286,6 @@
       "department": "Flight Dispatch"
     },
     {
-      "id": "80481",
-      "name": "SALIM AL MAAWALI",
-      "department": "Import Checkers"
-    },
-    {
       "id": "990896",
       "name": "SAMEER MAHMOOD",
       "department": "Supervisors"
@@ -359,11 +294,6 @@
       "id": "80479",
       "name": "SAMI AL HADABI",
       "department": "Flight Dispatch"
-    },
-    {
-      "id": "82642",
-      "name": "SANAD AL HARTHI",
-      "department": "Import Checkers"
     },
     {
       "id": "80833",
@@ -379,11 +309,6 @@
       "id": "82675",
       "name": "TARIQ AL BARWANI",
       "department": "Documentation"
-    },
-    {
-      "id": "8901",
-      "name": "UDUGAMA",
-      "department": "Supervisors"
     },
     {
       "id": "81021",

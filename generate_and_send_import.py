@@ -53,6 +53,8 @@ from roster_cta_snippets import (  # noqa: E402
     IOS_PERF_VER,
     LANG_TOGGLE_HTML,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
+    MOBILE_BOTTOM_QUICK_CSS,
+    MOBILE_BOTTOM_QUICK_HTML,
     PERF_RENDER_CSS,
     QA_CARD_ICON_SVG,
     QA_CHEVRON_SVG,
@@ -1003,6 +1005,7 @@ def import_leave_label(code: str, group_key: str) -> str:
 def import_actions_card_html(employees_total: int, departments_total: int) -> str:
     """Bottom Actions card — same layout/shortcuts as the Export duty pages."""
     return f"""
+  {MOBILE_BOTTOM_QUICK_HTML}
   <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
     <div class="qaCardBar" aria-hidden="true"></div>
     <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
@@ -1232,6 +1235,8 @@ def build_duty_html(
     # Use same language toggle mechanism, but update base paths for Import
     # repo_base_path example: "/roster-site/import" or "/import" depending on hosting.
     # We'll compute BASE in JS at runtime to work in both local + GitHub Pages.
+    # The reused Export stylesheet may already carry the mobile bottom bar CSS.
+    bottom_quick_css = "" if ".bottomMobileQuick" in style else MOBILE_BOTTOM_QUICK_CSS
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1328,6 +1333,7 @@ def build_duty_html(
     }}
 {PERF_RENDER_CSS}
 {SHIFT_RANGE_CSS}
+{bottom_quick_css}
   </style>{IMPORT_PWA_HEAD_SNIPPET}
 </head>
 <body>
@@ -1729,6 +1735,8 @@ setSummaryChipHrefs();
   var root = getSiteRootUrl();
   var alumni = document.getElementById('alumniBtn');
   if (alumni) alumni.href = root + '/alumni/';
+  var trnBottom = document.getElementById('trainingBtnBottom');
+  if (trnBottom) trnBottom.href = root + '/training/';
   var cta = document.getElementById('ctaBtn');
   if (cta) cta.href = base + '/now/';
   setSummaryChipHrefs();
@@ -2038,6 +2046,19 @@ def main() -> None:
         payload = build_employee_json(parsed, emp, existing)
         sched_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    # Drop schedules of employees who left the Import workbook, so the leaves
+    # page and pickers match the published roster.
+    try:
+        from generate_employee_schedules import prune_stale_schedules
+
+        prune_stale_schedules(
+            str(sched_dir),
+            {str(emp["id"]) for emp in parsed["employees"]},
+            f"{parsed['year']}-{parsed['month']:02d}",
+        )
+    except Exception as e:
+        print(f"WARNING: stale import schedules not pruned: {e}")
+
     # Employee index for With-me / pickers (export + import merge on the client)
     index_emps = []
     for p in sorted(sched_dir.glob("*.json")):
@@ -2102,6 +2123,13 @@ def main() -> None:
         print(f"WARNING: OFF month projection skipped: {e}")
 
     write_legacy_roster_site_import_redirect(repo_root)
+    # Import schedules just changed: refresh the leaves page data from them.
+    try:
+        from leaves_data_build import rebuild as rebuild_leaves_data
+
+        rebuild_leaves_data(repo_root)
+    except Exception as e:
+        print(f"WARNING: leaves data rebuild skipped: {e}")
     try:
         from mantle_overlay_snapshot import snapshot_banner_overlay, snapshot_announce_popups
         snapshot_banner_overlay(repo_root / "docs")

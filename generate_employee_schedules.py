@@ -261,6 +261,7 @@ def generate_employee_schedules(wb, year: int, month: int):
         "department": "",
         "schedules": {}
     })
+    seen_ids = set()
     
     # معالجة كل قسم
     for sheet_name, dept_name in ordered_department_sheets(wb.sheetnames):
@@ -293,6 +294,7 @@ def generate_employee_schedules(wb, year: int, month: int):
             emp_id = extract_employee_id(name)
             if not emp_id:
                 continue
+            seen_ids.add(emp_id)
             
             emp_name = re.sub(r'\s*-\s*\d{3,}(?:\s*\([^)]*\))?\s*$', '', name).strip()
             
@@ -364,7 +366,47 @@ def generate_employee_schedules(wb, year: int, month: int):
         saved_count += 1
     
     print(f"\n✅ Generated schedules for {saved_count} employees")
+    prune_stale_schedules(schedules_dir, seen_ids, f"{year}-{month:02d}")
     return saved_count
+
+
+def prune_stale_schedules(schedules_dir: str, seen_ids: set, month_key: str) -> None:
+    """Delete schedule JSONs for employees who are no longer in the roster workbook.
+
+    Without this the folder keeps former employees forever, so the leaves page
+    (and the employee pickers) list people who are not on the published roster.
+    Skipped when a newer *official* month is already stored, so backfills and
+    projected OFF months never wipe history.
+    """
+    if not seen_ids:
+        return
+    try:
+        names = [n for n in os.listdir(schedules_dir) if n.endswith(".json") and n != "index.json"]
+    except OSError:
+        return
+    for name in names:
+        path = os.path.join(schedules_dir, name)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                schedules = json.load(f).get("schedules") or {}
+        except Exception:
+            continue
+        for ym, rows in schedules.items():
+            # Projected months only carry synthesized OFF days; ignore them.
+            if ym > month_key and any(not r.get("projected") for r in rows or []):
+                print("🧹 Skipping cleanup: newer roster months are already stored")
+                return
+    removed = 0
+    for name in names:
+        if name[:-5] in seen_ids:
+            continue
+        try:
+            os.remove(os.path.join(schedules_dir, name))
+            removed += 1
+        except OSError:
+            continue
+    if removed:
+        print(f"🧹 Removed {removed} schedule(s) for employees no longer in the roster")
 
 
 def generate_schedule_index():
