@@ -50,7 +50,6 @@ DEPARTMENTS = [
     "Export Checker",
     "Export Operators",
     "Flight Dispatch",
-    "FLTA",
     "Unassigned",
 ]
 

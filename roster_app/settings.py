@@ -14,17 +14,39 @@ TZ = ZoneInfo("Asia/Muscat")
 # Local cache directory inside repo (committed by actions)
 ROSTERS_DIR = os.environ.get("ROSTERS_DIR", "rosters").strip() or "rosters"
 
-# Excel sheets
+# Excel sheets. Historical "Flight Attending" / "FLTA" tabs publish as Flight Dispatch
+# (same section title as Import), ordered directly under Export Operators.
+FLIGHT_DISPATCH_DEPT_NAME = "Flight Dispatch"
+FLIGHT_DISPATCH_SHEET_ALIASES = frozenset({
+    "flight dispatch",
+    "flight dispatch (export)",
+    "flight attending",
+    "flta",
+    "flte",
+})
+
 DEPARTMENTS = [
     ("Officers", "Officers"),
     ("Supervisors", "Supervisors"),
     ("Load Control", "Load Control"),
     ("Export Checker", "Export Checker"),
     ("Export Operators", "Export Operators"),
-    ("Flight Dispatch", "Flight Dispatch"),
-    ("FLTA", "FLTA"),
+    ("Flight Dispatch", FLIGHT_DISPATCH_DEPT_NAME),
+    ("FLTA", FLIGHT_DISPATCH_DEPT_NAME),
+    ("Flight Attending", FLIGHT_DISPATCH_DEPT_NAME),
     ("Unassigned", "Unassigned"),
 ]
+
+
+def export_dept_display_name(sheet_name: str) -> str:
+    """Map export workbook tab names to the published department title."""
+    key = (sheet_name or "").strip().lower()
+    if key in FLIGHT_DISPATCH_SHEET_ALIASES:
+        return FLIGHT_DISPATCH_DEPT_NAME
+    for known_sheet, dept_name in DEPARTMENTS:
+        if (known_sheet or "").strip().lower() == key:
+            return dept_name
+    return (sheet_name or "").strip() or sheet_name
 
 # Combined/settings tabs are not department cards (would duplicate or be empty).
 SKIP_ROSTER_SHEETS = frozenset({
@@ -77,7 +99,7 @@ def ordered_department_sheets(sheetnames, hidden=None):
     for name in names:
         if name in seen or name in hidden or is_skipped_roster_sheet(name):
             continue
-        out.append((name, (name or "").strip() or name))
+        out.append((name, export_dept_display_name(name)))
         seen.add(name)
     return out
 

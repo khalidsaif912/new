@@ -14,6 +14,7 @@ def test_inventory_ids_are_pulled_from_source_departments():
         INVENTORY_EMP_IDS,
         insert_card_after_export_operators,
         is_inventory_employee,
+        place_flight_dispatch_and_inventory_cards,
         take_inventory_employees,
     )
 
@@ -38,6 +39,46 @@ def test_inventory_ids_are_pulled_from_source_departments():
     out = insert_card_after_export_operators(cards, f"<div class='deptTitle'>{INVENTORY_DEPT_NAME}</div>")
     assert [c for c in out if "Inventory" in c or "Export Operators" in c or "Officers" in c]
     assert out[1].find("Inventory") != -1
+
+    ordered = place_flight_dispatch_and_inventory_cards(
+        ["<div class='deptTitle'>Export Operators</div>", "<div class='deptTitle'>Officers</div>"],
+        "<div class='deptTitle'>Flight Dispatch</div>",
+        f"<div class='deptTitle'>{INVENTORY_DEPT_NAME}</div>",
+    )
+    titles = []
+    for card in ordered:
+        if "Export Operators" in card:
+            titles.append("Export Operators")
+        elif "Flight Dispatch" in card:
+            titles.append("Flight Dispatch")
+        elif "Inventory" in card:
+            titles.append("Inventory")
+        elif "Officers" in card:
+            titles.append("Officers")
+    assert titles == ["Export Operators", "Flight Dispatch", "Inventory", "Officers"]
+
+
+def test_flight_dispatch_aliases_and_import_copy():
+    from roster_app.settings import (
+        FLIGHT_DISPATCH_DEPT_NAME,
+        export_dept_display_name,
+        ordered_department_sheets,
+    )
+    from generate_and_send import flight_dispatch_buckets_from_import
+
+    assert export_dept_display_name("FLTA") == FLIGHT_DISPATCH_DEPT_NAME
+    assert export_dept_display_name("Flight Attending") == FLIGHT_DISPATCH_DEPT_NAME
+    assert export_dept_display_name("Flight Dispatch (Export)") == FLIGHT_DISPATCH_DEPT_NAME
+
+    depts = [d for _, d in ordered_department_sheets(
+        ["Export Operators", "FLTA", "Officers"],
+        hidden=set(),
+    )]
+    assert depts == ["Officers", "Export Operators", FLIGHT_DISPATCH_DEPT_NAME]
+
+    buckets = flight_dispatch_buckets_from_import(2026, 11, 11)
+    total = sum(len(v) for v in buckets.values())
+    assert total >= 10
 
 
 def test_generator_never_bakes_open_shift_from_clock():
