@@ -538,9 +538,7 @@
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
     a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
     a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
-    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; gap:4px; }
-    a.summaryChip.leavesChip .chipValNum { font-size:15px; font-weight:900; color:#0d9488; line-height:1; }
-    a.summaryChip.leavesChip .chipValNum[hidden] { display:none; }
+    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; }
     a.summaryChip.leavesChip:hover { box-shadow:0 8px 20px rgba(13,148,136,.18); }
     .summaryChip {
       background:#fff;
@@ -1288,7 +1286,7 @@
 
     /* Copy Shift + pinned actions */
     .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .qaFlow.qaFlowOdd > *:last-child { grid-column: 1 / -1; }
     .qaCard #copyShiftBtn {
       flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
       min-height: 84px; padding: 14px 18px; border-radius: 20px;
@@ -3898,17 +3896,6 @@ function startSummarySwitchLoop() {
   });
 })();
 
-(function countLeavesChip() {
-  var el = document.getElementById('leavesChipNum');
-  if(!el) return;
-  var n = 0;
-  document.querySelectorAll(
-    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
-  ).forEach(function(c){ n += parseInt(c.textContent, 10) || 0; });
-  el.textContent = n > 0 ? String(n) : '';
-  el.hidden = n <= 0;
-})();
-
 function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
   document.body.classList.toggle('ar',isAr);
@@ -4809,7 +4796,7 @@ setSummaryChipHrefs();
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=20261112c');
-    addScript(root + '/quick-actions.js?v=20261112f');
+    addScript(root + '/quick-actions.js?v=20261112g');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

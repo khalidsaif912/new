@@ -525,9 +525,7 @@
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
     a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
     a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
-    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; gap:4px; }
-    a.summaryChip.leavesChip .chipValNum { font-size:15px; font-weight:900; color:#0d9488; line-height:1; }
-    a.summaryChip.leavesChip .chipValNum[hidden] { display:none; }
+    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; }
     a.summaryChip.leavesChip:hover { box-shadow:0 8px 20px rgba(13,148,136,.18); }
     .summaryChip {
       background:#fff;
@@ -1275,7 +1273,7 @@
 
     /* Copy Shift + pinned actions */
     .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .qaFlow.qaFlowOdd > *:last-child { grid-column: 1 / -1; }
     .qaCard #copyShiftBtn {
       flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
       min-height: 84px; padding: 14px 18px; border-radius: 20px;
@@ -1704,7 +1702,7 @@
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/leaves/" id="leavesChip" class="summaryChip leavesChip" style="text-decoration:none;" title="Leaves">
-      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M9 15.5l2 2 4-4"/></svg><span class="chipValNum" id="leavesChipNum"></span></div>
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M9 15.5l2 2 4-4"/></svg></div>
       <div class="chipLabel" data-key="leavesPage">Leaves</div>
     </a>
     <a href="https://khalidsaif912.github.io/roster-site/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
@@ -3700,17 +3698,6 @@ function startSummarySwitchLoop() {
   });
 })();
 
-(function countLeavesChip() {
-  var el = document.getElementById('leavesChipNum');
-  if(!el) return;
-  var n = 0;
-  document.querySelectorAll(
-    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
-  ).forEach(function(c){ n += parseInt(c.textContent, 10) || 0; });
-  el.textContent = n > 0 ? String(n) : '';
-  el.hidden = n <= 0;
-})();
-
 function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
   document.body.classList.toggle('ar',isAr);
@@ -4400,7 +4387,7 @@ function goToRosterDiff(event) {
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=20261112c');
-    addScript(root + '/quick-actions.js?v=20261112f');
+    addScript(root + '/quick-actions.js?v=20261112g');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

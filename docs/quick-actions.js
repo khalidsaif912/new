@@ -206,6 +206,36 @@
     for (var i = actions.length; i < MAX_ACTIONS; i += 1) html += addSlotHtml();
     row.innerHTML = html;
     updateTotal(actions.length);
+    syncFlowSpan();
+  }
+
+  /* Full-width last tile only when the *visible* tile count is odd.
+     Hidden tiles (e.g. the phone-only Training tile on desktop) must not
+     leave an empty grid cell behind. */
+  function syncFlowSpan() {
+    var flow = $('qaFlow');
+    if (!flow) return;
+    var visible = 0;
+    Array.prototype.forEach.call(flow.children, function (node) {
+      if (node.getClientRects().length) visible += 1;
+    });
+    flow.classList.toggle('qaFlowOdd', visible % 2 === 1);
+  }
+
+  function watchFlowSpan() {
+    var pending = false;
+    window.addEventListener(
+      'resize',
+      function () {
+        if (pending) return;
+        pending = true;
+        window.requestAnimationFrame(function () {
+          pending = false;
+          syncFlowSpan();
+        });
+      },
+      { passive: true }
+    );
   }
 
   /* ── collapse / expand ───────────────────────────────────────── */
@@ -388,6 +418,7 @@
     if (!document.querySelector('.qaCard')) return;
     initCollapse();
     render();
+    watchFlowSpan();
     document.addEventListener('click', onClick);
     document.addEventListener('keydown', onKeydown);
     document.addEventListener('rosterLangChanged', function () {
