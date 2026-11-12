@@ -30,6 +30,22 @@
     "82656": "ULD ATT",
     "81223": "ULD ATT"
   },
+  "import_code_prefixes": {
+    "SU": "Supervisor",
+    "FLT": "Flight Dispatcher",
+    "DOC": "Documentation",
+    "CHK": "Import Checker",
+    "OPT": "Import Operator",
+    "REL": "Release Control"
+  },
+  "import_defaults_by_dept": {
+    "Supervisors": "Supervisor",
+    "Documentation": "Documentation",
+    "Import Checkers": "Import Checker",
+    "Release Control": "Release Control",
+    "Import Operators": "Import Operator",
+    "Flight Dispatch": "Flight Dispatcher"
+  },
   "driver_roles": [
     "FLT ATT",
     "FLT ATT (IMP)",

@@ -1797,6 +1797,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=""" + SITE_APPS_VER + """');
+    addScript(root + '/quick-actions.js?v=""" + QUICK_ACTIONS_VER + """');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

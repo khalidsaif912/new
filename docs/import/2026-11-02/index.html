@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="../../ios-tap-fix.js?v=20260903c"></script>
+  <script defer src="../../ios-tap-fix.js?v=20261112a"></script>
   <title>Import Duty Roster</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -538,6 +538,10 @@
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
     a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
     a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
+    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; gap:4px; }
+    a.summaryChip.leavesChip .chipValNum { font-size:15px; font-weight:900; color:#0d9488; line-height:1; }
+    a.summaryChip.leavesChip .chipValNum[hidden] { display:none; }
+    a.summaryChip.leavesChip:hover { box-shadow:0 8px 20px rgba(13,148,136,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -599,15 +603,7 @@
       }
     }
 
-        /* Emp/Depts count: always visible on import (no Read&Sign chip) */
-    #summarySwitchChip {
-      display:flex !important;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-    }
-
-#summarySwitchChip .chipVal { transition:opacity .2s ease; }
+    #summarySwitchChip .chipVal { transition:opacity .2s ease; }
     #summarySwitchChip .chipLabel { transition:opacity .2s ease; }
     .summaryChip .chipLabel { 
       font-size:11px;
@@ -885,19 +881,33 @@
       margin-top: 4px;
     }
 
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â QUICK ACTIONS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+    /* ═══════ QUICK ACTIONS — see scripts/roster_cta_snippets.py ═══════ */
     .quickActions.roster-cta {
       --cta-font: "Segoe UI", system-ui, -apple-system, sans-serif;
       --cta-gap: 10px;
-      --cta-max: min(100%, 680px);
       margin-top: 22px;
       padding: 0 2px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: var(--cta-gap);
       width: 100%;
-      max-width: var(--cta-max);
+      max-width: 100%;
       margin-inline: auto;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(1) {
+      grid-column: 1 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(2) {
+      grid-column: 3 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn:nth-child(3) {
+      grid-column: 5 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--share {
+      grid-column: 2 / span 2;
+    }
+    .quickActions.roster-cta:not(.roster-cta--import) > .roster-cta-btn--apps {
+      grid-column: 4 / span 2;
     }
     .roster-cta-btn {
       display: inline-flex;
@@ -934,7 +944,6 @@
       line-height: 0;
     }
     .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
-    .roster-cta-icon .roster-icon { width: 18px; height: 18px; }
     .roster-cta-label {
       white-space: nowrap;
       overflow: hidden;
@@ -944,6 +953,21 @@
       background: #e8f1ff;
       border-color: #b8c9f5;
       color: #1e3a8a;
+    }
+    .roster-cta-btn--subscribe {
+      background: #ffffff;
+      border-color: #d4c4f7;
+      color: #1f2937;
+    }
+    .roster-cta-btn--compare {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #1f2937;
+    }
+    .roster-cta-btn--muted {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
     }
     .roster-cta-btn--share {
       background: #ecfdf5;
@@ -960,14 +984,8 @@
       border-color: #c4b5fd;
       color: #5b21b6;
     }
-    .roster-cta-btn--muted {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-      color: #475569;
-    }
     .roster-cta--import {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      max-width: var(--cta-max);
+      grid-template-columns: 1fr 1fr;
     }
     @media (hover: hover) {
       .roster-cta-btn:hover {
@@ -975,6 +993,8 @@
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
       .roster-cta-btn--roster:hover { background: #dce8ff; }
+      .roster-cta-btn--subscribe:hover { background: #faf5ff; }
+      .roster-cta-btn--compare:hover { background: #fef3c7; }
       .roster-cta-btn--share:hover { background: #d1fae5; }
       .roster-cta-btn--apps:hover { background: #e0f2fe; }
       .roster-cta-btn--texture:hover { background: #ede9fe; }
@@ -995,123 +1015,77 @@
         gap: 5px;
         min-height: 40px;
       }
-      .roster-cta-icon { width: 16px; height: 16px; }
-      .roster-cta-icon svg { width: 16px; height: 16px; }
-      .roster-cta-icon .roster-icon { width: 16px; height: 16px; }
+      .roster-cta-icon { font-size: 16px; }
     }
-    .quickActions.secondaryBar,
-    .quickActions.rosterCopyBar,
-    .quickActions.alumniBar {
-      margin-top: 10px;
-      padding: 0 2px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--cta-gap, 10px);
-      width: 100%;
-      max-width: var(--cta-max, min(100%, 440px));
-      margin-inline: auto;
-    }
-    .quickActions.secondaryBar:not(:has(> :nth-child(2))),
-    .quickActions.rosterCopyBar:not(:has(> :nth-child(2))),
-    .quickActions.alumniBar:not(:has(> :nth-child(2))) {
-      grid-template-columns: 1fr;
-    }
-    .secondaryBar .roster-cta-btn,
-    .rosterCopyBar .roster-cta-btn,
-    .alumniBar .roster-cta-btn {
-      width: 100%;
-      min-width: 0;
-    }
-    .roster-cta-btn--alumni {
-      background: #f0fdfa;
-      border-color: #99f6e4;
-      color: #0f766e;
-    }
-    @media (hover: hover) {
-      .roster-cta-btn--alumni:hover { background: #ccfbf1; }
-    }
-    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+
+    /* ═══════ SITE SHARE MODAL ═══════ */
     .siteShareSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10001;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10001; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteShareSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
+    .siteShareSheet.open { display:flex; pointer-events:auto; visibility:visible; }
     .siteShareCard {
-      width: min(100%, 360px);
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
+      width:min(100%, 360px); background:#fff; border-radius:18px; padding:18px 16px 14px;
+      border:1px solid rgba(15,23,42,.1); box-shadow:0 20px 48px rgba(15,23,42,.22);
+      text-align:center;
     }
-    .siteShareTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteShareHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
+    .siteShareTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteShareHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
     .siteShareQr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      margin: 0 auto 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
+      display:flex; align-items:center; justify-content:center;
+      min-height:220px; margin:0 auto 12px;
+      background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:10px;
     }
     .siteShareUrl {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 11px;
-      color: #475569;
-      word-break: break-all;
-      line-height: 1.45;
-      margin: 0 0 14px;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      direction: ltr;
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:11px; color:#475569; word-break:break-all; line-height:1.45;
+      margin:0 0 14px; padding:8px 10px; background:#f1f5f9; border-radius:10px;
     }
     .siteShareActions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;
     }
-    .siteShareActions .roster-cta-btn--compare {
-      grid-column: 1 / -1;
+    .siteShareActions .roster-cta-btn--compare { grid-column:1 / -1; }
+    .siteShareCloseWrap { margin-top:4px; }
+    .siteShareCloseWrap .roster-cta-btn { width:100%; }
+
+    /* ═══════ RELATED APPS MODAL ═══════ */
+    .siteAppsSheet {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.45); z-index:10002; padding:16px;
+      pointer-events:none; visibility:hidden;
     }
-    .siteShareCloseWrap {
-      margin-top: 4px;
+    .siteAppsSheet.open { display:flex; pointer-events:auto; visibility:visible; }
+    .siteAppsCard {
+      width:min(100%,400px); max-height:min(92vh,560px); overflow:auto;
+      -webkit-overflow-scrolling:touch; background:#fff; border-radius:18px;
+      padding:18px 14px 14px; border:1px solid rgba(15,23,42,.1);
+      box-shadow:0 20px 48px rgba(15,23,42,.22); text-align:center;
     }
-    .siteShareCloseWrap .roster-cta-btn {
-      width: 100%;
+    .siteAppsTitle { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 4px; }
+    .siteAppsHint { font-size:12px; color:#64748b; margin:0 0 14px; line-height:1.4; }
+    .siteAppsGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:start; }
+    .siteAppsLink {
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+      min-height:96px; padding:12px 10px; border-radius:14px; border:1px solid #e2e8f0;
+      background:#f8fafc; text-decoration:none; color:#0f172a;
+      -webkit-tap-highlight-color:transparent;
     }
+    .siteAppsLink-icon {
+      display:flex; align-items:center; justify-content:center; width:44px; height:44px;
+      border-radius:12px; background:#fff; border:1px solid #e2e8f0;
+      box-shadow:0 2px 8px rgba(15,23,42,.06);
+    }
+    .siteAppsLink-title { font-size:12px; font-weight:800; line-height:1.25; text-align:center; color:#0f172a; }
+    .siteAppsLink-sub { font-size:10px; font-weight:600; color:#64748b; line-height:1.3; text-align:center; }
+    .siteAppsLink--games {
+      grid-column:1 / -1; flex-direction:row; min-height:72px; justify-content:flex-start;
+      padding-inline:14px; gap:12px;
+    }
+    .siteAppsLink--games .siteAppsLink-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; flex:1; }
+    .siteAppsLink--games .siteAppsLink-title, .siteAppsLink--games .siteAppsLink-sub { text-align:start; }
+    .siteAppsCloseWrap { margin-top:4px; }
+    .siteAppsCloseWrap .roster-cta-btn { width:100%; }
+
     /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SHIFT COPY (bottom button + modal) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .shiftCopySheet {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
@@ -1184,139 +1158,350 @@
       .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
-    /* ═══════ RELATED APPS MODAL ═══════ */
-    .siteAppsSheet {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.45);
-      z-index: 10002;
-      padding: 16px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-    .siteAppsSheet.open {
-      display: flex;
-      pointer-events: auto;
-      visibility: visible;
-    }
-    .siteAppsCard {
-      width: min(100%, 400px);
-      max-height: min(92vh, 560px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+    /* ═══════ ACTIONS CARD + STATUS PANEL ═══════ */
+    .qaCard, .qaCard * { box-sizing: border-box; }
+    .qaCard {
+      margin: 22px 0 0;
       background: #fff;
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-      text-align: center;
-    }
-    .siteAppsTitle {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-    .siteAppsHint {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px;
-      line-height: 1.4;
-    }
-    .siteAppsGrid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 8px;
-      text-align: start;
-    }
-    .siteAppsLink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      min-height: 0;
-      padding: 9px 4px;
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      background: #fff;
-      text-decoration: none;
-      color: #0f172a;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .siteAppsLink:active {
-      transform: scale(0.98);
-    }
-    .siteAppsLink-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 13px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-    }
-    .siteAppsLink-icon svg {
-      display: block;
-    }
-    .siteAppsLink-title {
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.15;
-      text-align: center;
-      color: #0f172a;
-      max-width: 100%;
+      border-radius: 26px;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      box-shadow: 0 10px 26px rgba(23, 32, 64, .16);
+      color: #101426;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    .siteAppsLink-sub {
-      display: none;
+    .qaCardBar { display: none; }
+
+    .qaCardHead {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 20px 20px 12px;
+      border: 0; background: none; font-family: inherit; color: inherit;
+      text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
-    .siteAppsLink--labels .siteAppsLink-icon { background: #ecfdf5; border-color: #a7f3d0; }
-    .siteAppsLink--calc .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--quicklist .siteAppsLink-icon { background: #f5f3ff; border-color: #ddd6fe; }
-    .siteAppsLink--book .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--store .siteAppsLink-icon { background: #ffedd5; border-color: #fdba74; }
-    .siteAppsLink--wa .siteAppsLink-icon { background: #dcfce7; border-color: #86efac; }
-    .siteAppsLink--ideas .siteAppsLink-icon { background: #fffbeb; border-color: #fde68a; }
-    .siteAppsLink--readSign .siteAppsLink-icon { background: #ecfdf5; border-color: #99f6e4; }
-    .siteAppsLink--games .siteAppsLink-icon { background: #fdf2f8; border-color: #fbcfe8; }
-    .siteAppsLink--store .siteAppsLink-icon svg.siteAppsStoreSvg {
-      animation: siteAppsStorePulse 2.4s ease-in-out infinite;
-      transform-origin: center;
+    .qaCardHead:focus-visible { outline: 3px solid #0E9BD8; outline-offset: -3px; }
+    .qaCardIcon { display: none; }
+    .qaCardTitle {
+      flex: 1 1 auto; min-width: 0; margin: 0;
+      font-size: 22px; font-weight: 700; line-height: 1.2;
+      letter-spacing: -.3px; color: #101426;
     }
-    @keyframes siteAppsStorePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.07); }
+    .qaCardTotal {
+      flex: none; width: auto; min-height: 0;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 7px 12px; border: 0; border-radius: 999px;
+      background: #F1F2F7; color: #4A4F63;
+      font-size: 12px; font-weight: 600; line-height: 1;
     }
+    .qaCardTotalWord { display: inline-flex; gap: 4px; }
+    .qaCardChev {
+      flex: none; width: 26px; height: 26px; border-radius: 999px;
+      display: grid; place-items: center; color: #7C8298;
+      transition: transform .2s ease;
+    }
+    .qaCard:not(.collapsed) .qaCardChev { transform: rotate(180deg); }
+    .qaCard.collapsed .qaCardHead { padding-bottom: 18px; }
+    .qaCard.collapsed .qaCardBody { display: none; }
+
+    .qaCard .qaAr { display: none; }
+    html[dir="rtl"] .qaCard .qaEn, body.ar .qaCard .qaEn { display: none; }
+    html[dir="rtl"] .qaCard .qaAr, body.ar .qaCard .qaAr { display: inline; }
+
+    .qaCardBody { display: flex; flex-direction: column; gap: 9px; padding: 0 20px 20px; }
+
+    .qaGrid {
+      display: grid;
+      grid-template-columns: 1.02fr 1fr;
+      gap: 8px;
+    }
+    .qaMini { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .qaCard .roster-cta-btn {
+      display: flex; width: 100%; min-width: 0;
+      border: 0; border-radius: 20px; background: #F3F4F8; color: #101426;
+      font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1.2;
+      text-align: start; text-decoration: none; box-shadow: none; padding: 12px;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaCard .roster-cta-icon {
+      flex: none; width: 36px; height: 36px; border-radius: 999px;
+      display: grid; place-items: center; line-height: 0;
+      background: #333A56; color: #fff; border: 0;
+    }
+    .qaCard .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .qaCard .roster-cta-label {
+      min-width: 0; font-size: 15px; font-weight: 700; color: inherit;
+      white-space: normal; overflow: visible; text-overflow: clip;
+    }
+
+    /* big tile — sky blue instead of the mock's navy */
+    .qaCard #ctaBtn {
+      grid-column: 1; grid-row: 1 / span 2;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px;
+      min-height: 196px; padding: 16px; border-radius: 22px;
+      background: linear-gradient(158deg, #82DBFB 0%, #41BCEF 42%, #0E9BD8 100%);
+      color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: rgba(255, 255, 255, .26); color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon svg { width: 20px; height: 20px; }
+    .qaCard #ctaBtn .roster-cta-label {
+      font-size: 22px; font-weight: 700; line-height: 1.15;
+      letter-spacing: -.2px; color: #fff;
+    }
+
+    /* Share + Apps */
+    .qaMini .roster-cta-btn {
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px;
+      min-height: 94px; padding: 12px; border-radius: 18px;
+    }
+    .qaMini .roster-cta-label { font-size: 14px; }
+    .qaCard #qaStatsBtn {
+      background: #E1F5FE; color: #0B4A6F;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px;
+    }
+    .qaCard #qaStatsBtn .roster-cta-icon { background: #0E7FA8; color: #fff; }
+    .qaCard #qaStatsBtn .roster-cta-label {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0; width: 100%;
+    }
+    .qaCard .qaStatsNum { font-size: 20px; font-weight: 800; line-height: 1; color: #0B4A6F; }
+    .qaCard .qaStatsWord {
+      font-size: 10px; font-weight: 700; line-height: 1.1; letter-spacing: .02em;
+      color: #2D6987; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaCard #qaStatsBtn.is-alt { background: #DEF7EC; color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .roster-cta-icon { background: #0F7A4F; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsNum { color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsWord { color: #17694A; }
+    .qaCard #moreAppsBtn { background: #EDECF4; color: #262B40; }
+    .qaCard #moreAppsBtn .roster-cta-icon { background: #333A56; color: #fff; }
+
+    /* Former Colleagues */
+    .qaCard #alumniBtn {
+      grid-column: 2; grid-row: 2;
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 94px; padding: 14px 18px; border-radius: 20px;
+      background: #DDF6EF; color: #0B3B33;
+    }
+    .qaCard #alumniBtn .roster-cta-icon { background: #12857E; color: #fff; }
+    .qaCard #alumniBtn .roster-cta-label { font-size: 14px; text-align: end; }
+
+    /* Copy Shift + pinned actions */
+    .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .qaCard #copyShiftBtn {
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #EDE4F8; color: #2B1B4D;
+    }
+    .qaCard #copyShiftBtn .roster-cta-icon { background: #5B2EC9; color: #fff; }
+    .qaCard #copyShiftBtn .roster-cta-label { font-size: 15px; text-align: end; }
+
+    .qaFlow .qaSlot { position: relative; min-width: 0; }
+    .qaFlow .qaSlotLink {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      height: 100%; min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #E6F6FE; color: #0B4A6F; text-decoration: none; font-weight: 700;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaFlow .qaSlotIcon {
+      flex: none; order: -1; width: 36px; height: 36px; border-radius: 999px;
+      background: #fff; border: 1px solid #D5E9F5; display: grid; place-items: center; line-height: 0;
+    }
+    .qaFlow .qaSlotIcon svg, .qaFlow .qaSlotIcon img { width: 22px; height: 22px; display: block; }
+    .qaFlow .qaSlotLabel {
+      min-width: 0; font-size: 15px; font-weight: 700; line-height: 1.2; text-align: end;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaFlow .qaSlotRemove {
+      position: absolute; top: 5px; inset-inline-end: 5px;
+      width: 20px; height: 20px; padding: 0; border-radius: 999px;
+      border: 1px solid #BFDCF0; background: #fff; color: #0B6E9A;
+      font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .qaFlow .qaSlotRemove:hover { background: #EAF7FE; }
+    .qaFlow .qaSlotRemove:focus-visible { outline: 2px solid #0E9BD8; outline-offset: 1px; }
+
+    /* Add Action slots */
+    .qaAddRow { display: flex; gap: 8px; }
+    .qaCard .qaAddSlot {
+      flex: 1 1 0; min-width: 0; height: 64px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 0 4px; border: 2px dashed #C3C7D6; border-radius: 20px;
+      background: #fff; color: #3A3F52; font-family: inherit;
+      font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaCard .qaAddSlot svg { flex: none; }
+    .qaCard .qaAddSlot:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
     @media (hover: hover) {
-      .siteAppsLink:hover {
-        background: #fff;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-        transform: translateY(-1px);
+      .qaCard .roster-cta-btn:hover,
+      .qaFlow .qaSlotLink:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(23, 32, 64, .16);
       }
+      .qaCard .qaAddSlot:hover { border-color: #0E9BD8; color: #0B6E9A; }
     }
-    @media (max-width: 360px) {
-      .siteAppsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-      .siteAppsLink { padding: 7px 3px; border-radius: 12px; }
-      .siteAppsLink-icon { width: 34px; height: 34px; border-radius: 11px; }
-      .siteAppsLink-icon svg, .siteAppsFlatSvg, .siteAppsFlatImg { width: 22px; height: 22px; }
-      .siteAppsLink-title { font-size: 10px; }
+    .qaCard .roster-cta-btn:active,
+    .qaFlow .qaSlotLink:active { transform: scale(.985); box-shadow: none; }
+    .qaCard .roster-cta-btn:focus-visible,
+    .qaFlow .qaSlotLink:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
+    @media (max-width: 359px) {
+      .qaCardHead { padding: 18px 16px 10px; }
+      .qaCardBody { padding: 0 16px 16px; }
+      .qaCardTitle { font-size: 20px; }
+      .qaCard #ctaBtn { min-height: 176px; padding: 14px; }
+      .qaCard #ctaBtn .roster-cta-icon { width: 38px; height: 38px; }
+      .qaCard #ctaBtn .roster-cta-label { font-size: 19px; }
+      .qaMini .roster-cta-btn { min-height: 88px; padding: 10px; border-radius: 16px; }
+      .qaMini .roster-cta-label { font-size: 12px; }
+      .qaCard #qaStatsBtn { padding: 10px 8px; }
+      .qaCard .qaStatsNum { font-size: 18px; }
+      .qaCard .qaStatsWord { font-size: 9px; }
+      .qaMini .roster-cta-icon { width: 30px; height: 30px; }
+      .qaMini .roster-cta-icon svg { width: 15px; height: 15px; }
+      .qaCard #alumniBtn { min-height: 88px; padding: 12px 14px; }
+      .qaCard #alumniBtn .roster-cta-label { font-size: 13px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 78px; padding: 12px 14px; }
+      .qaFlow .qaSlotLabel { font-size: 13px; }
+      .qaCard .qaAddSlot { font-size: 11px; height: 60px; }
     }
-    .siteAppsCloseWrap {
-      margin-top: 4px;
+    @media (min-width: 520px) {
+      .qaCard #ctaBtn { min-height: 228px; }
+      .qaMini .roster-cta-btn { min-height: 110px; }
+      .qaCard #alumniBtn { min-height: 110px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 96px; }
     }
-    .siteAppsCloseWrap .roster-cta-btn {
-      width: 100%;
+
+    /* Add Action picker sheet (docs/quick-actions.js) */
+    .qaPickSheet {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: flex-end; justify-content: center;
+      background: rgba(15, 23, 42, .48);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
     }
+    .qaPickSheet.open { display: flex; }
+    .qaPickCard {
+      width: 100%; max-width: 520px; max-height: 86vh; overflow: auto;
+      background: #fff; border-radius: 26px 26px 0 0;
+      padding: 18px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 30px rgba(15, 23, 42, .28);
+      color: #101426;
+    }
+    .qaPickTitle { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+    .qaPickHint { margin: 4px 0 12px; font-size: 12px; font-weight: 500; color: #4A5568; line-height: 1.4; }
+    .qaPickGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .qaPickItem {
+      display: flex; align-items: center; gap: 9px; width: 100%; min-width: 0;
+      padding: 9px 10px; border-radius: 16px; border: 1px solid #E1E6F0;
+      background: #fff; color: #101426; font-family: inherit; text-align: start;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaPickItemIcon { display: grid; place-items: center; flex: none; line-height: 0; }
+    .qaPickItemIcon svg, .qaPickItemIcon img { width: 26px; height: 26px; display: block; }
+    .qaPickItemLabel {
+      flex: 1 1 auto; min-width: 0; font-size: 12px; font-weight: 700; line-height: 1.2;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaPickItemState {
+      flex: none; width: 20px; height: 20px; border-radius: 999px;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+      border: 1px solid #BFDCF0; background: #EAF7FE; color: #0B6E9A;
+    }
+    .qaPickItem[aria-pressed="true"] { border-color: #9EE3DA; background: #DDF6EF; color: #0B3B33; }
+    .qaPickItem[aria-pressed="true"] .qaPickItemState { border-color: #9EE3DA; background: #fff; color: #0B3B33; }
+    .qaPickItem:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    .qaPickActions { margin-top: 14px; }
+    .qaPickClose {
+      width: 100%; height: 46px; border-radius: 16px; border: 1px solid #BFDCF0;
+      background: #EAF7FE; color: #0B4A6F; font-family: inherit;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .qaPickClose:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    @media (min-width: 560px) {
+      .qaPickSheet { align-items: center; }
+      .qaPickCard { border-radius: 26px; }
+    }
+
+    /* ═══════ STATUS PANEL (footer) ═══════ */
+    html body .footer.qaFooter {
+      margin-top: 14px !important;
+      padding: 16px 18px !important;
+      background: rgba(255, 255, 255, .88) !important;
+      border: 0 !important; border-radius: 26px;
+      box-shadow: 0 8px 22px rgba(30, 30, 40, .20);
+      display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+      text-align: center; font-size: 12px; color: #2B3350; line-height: 1.5;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaFooter .qaStatusMeta { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #2B3350; }
+    .qaFooter .qaStatusMeta strong, .qaFooter .qaStatusMeta span { font-size: 12px; color: #2B3350; }
+
+    /* site-visits.js injects its own !important rules on #siteVisitsHost —
+       these must out-specify that id rule without touching the JS. */
+    html body .footer.qaFooter #siteVisitsHost.siteVisitsHost {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svPart {
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 2px !important;
+      white-space: nowrap !important;
+      border-radius: 16px !important;
+      border: 1px solid transparent !important;
+      background: #fff !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svLabel {
+      font-size: 8.5px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .04em !important; text-transform: uppercase !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svNum {
+      font-size: 16px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: -.02em !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
+
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) { background: #E4F6FE !important; border-color: #BFDCF0 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svNum { color: #0B4A6F !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) { background: #FFF1C9 !important; border-color: #F3D98A !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svNum { color: #6B4300 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) { background: #DDF7E8 !important; border-color: #A9E6C4 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svNum { color: #0F5A33 !important; }
+
+    .qaFooter .bgTextureShuffleWrap { position: relative; gap: 10px !important; margin-top: 2px !important; }
+    .qaFooter #bgScrollTopBtn,
+    .qaFooter #bgRefreshBtn {
+      width: 44px !important; height: 44px !important; border-radius: 999px !important;
+      display: inline-flex !important; align-items: center !important; justify-content: center !important;
+      flex: none !important; padding: 0 !important;
+    }
+    .qaFooter #bgScrollTopBtn { background: #EFE5FF !important; border: 1px solid #D2BEF5 !important; }
+    .qaFooter #bgScrollTopBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
+    .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
+    .qaFooter #bgTextureShuffleBtn {
+      height: 40px !important; min-height: 40px !important; padding: 0 14px !important;
+      border-radius: 999px !important; background: #EFE5FF !important;
+      border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
+      font-size: 11px !important; font-weight: 700 !important;
+    }
+    .qaFooter #bgTextureShuffleBtn svg { width: 16px !important; height: 16px !important; stroke: #4A2299 !important; }
+    .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
+    .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
@@ -1654,8 +1839,9 @@
   </div>
 
 
+  <noscript><style>.deptCard.collapsed .shiftStack{display:flex}</style></noscript>
   
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Supervisors">
       <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
@@ -1682,7 +1868,7 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="SAMEER MAHMOOD - 990896" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="SAMEER MAHMOOD - 990896" data-role="Supervisor" role="button" tabindex="0">
        <span class="empName" data-name-ar="سمير محمود - 990896">SAMEER MAHMOOD - 990896</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -1696,7 +1882,7 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="FROILAN - 80535" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="FROILAN - 80535" data-role="Supervisor" role="button" tabindex="0">
        <span class="empName" data-name-ar="فرويلان - 80535">FROILAN - 80535</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -1710,7 +1896,7 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="FRITZ - 80269" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="FRITZ - 80269" data-role="Supervisor" role="button" tabindex="0">
        <span class="empName" data-name-ar="فريتز - 80269">FRITZ - 80269</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1724,10 +1910,10 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOHAMMED AL ZADJALI - 81259" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOHAMMED AL ZADJALI - 81259" data-role="Supervisor" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد الزدجالي - 81259">MOHAMMED AL ZADJALI - 81259</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED SAID - 81032" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED SAID - 81032" data-role="Supervisor" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد سعيد - 81032">MOHAMMED SAID - 81032</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -1737,7 +1923,7 @@
       </div>
     </div>
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Documentation">
       <div style="height:5px; background:linear-gradient(to right, #0891b2, #0891b2cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #0891b218;">
@@ -1764,13 +1950,13 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOHAMMED AL WAHAIBI - 82541" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOHAMMED AL WAHAIBI - 82541" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد الوهيبي - 82541">MOHAMMED AL WAHAIBI - 82541</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="ALA AL WAHAIBI - 82473" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="آلاء الوهيبي - 82473">ALA AL WAHAIBI - 82473</span>
        <span class="empStatus" style="color:#92400e;">ME07</span>
-     </div><div class="empRow" data-emp-name="WAFAA SALIM - 81021" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="WAFAA SALIM - 81021" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="وفاء سالم - 81021">WAFAA SALIM - 81021</span>
        <span class="empStatus" style="color:#92400e;">ME06</span>
      </div>
@@ -1784,10 +1970,10 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MAHAMAD AL MAHARBI - 82460" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MAHAMAD AL MAHARBI - 82460" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد المحاربي - 82460">MAHAMAD AL MAHARBI - 82460</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MAHANAD AL HADI - 82665" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MAHANAD AL HADI - 82665" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="مهند الهادي - 82665">MAHANAD AL HADI - 82665</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -1801,10 +1987,10 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="GLENDO - 80215" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="GLENDO - 80215" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="جليندو - 80215">GLENDO - 80215</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="TARIQ AL BARWANI - 82675" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="TARIQ AL BARWANI - 82675" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="طارق البرواني - 82675">TARIQ AL BARWANI - 82675</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1818,16 +2004,16 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MAHMOOD AL HADIDI - 82452" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MAHMOOD AL HADIDI - 82452" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمود الحديدي - 82452">MAHMOOD AL HADIDI - 82452</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL YAARUBI - 82444" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL YAARUBI - 82444" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد اليعربي - 82444">MOHAMMED AL YAARUBI - 82444</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="AHMED AL RUJAIBI - 82476" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="AHMED AL RUJAIBI - 82476" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد الرجيبي - 82476">AHMED AL RUJAIBI - 82476</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="YOUSUF AL WAHEEDI - 82100" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="YOUSUF AL WAHEEDI - 82100" data-role="Documentation" role="button" tabindex="0">
        <span class="empName" data-name-ar="يوسف الوحيدي - 82100">YOUSUF AL WAHEEDI - 82100</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -1841,7 +2027,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="IBRAHIM AL QUTAITI - 81351" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="IBRAHIM AL QUTAITI - 81351" data-role="Documentation" data-leave="A/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="إبراهيم القطيطي - 81351">IBRAHIM AL QUTAITI - 81351</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 3</span>)</span>
      </div>
@@ -1851,7 +2037,7 @@
       </div>
     </div>
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Import Checkers">
       <div style="height:5px; background:linear-gradient(to right, #059669, #059669cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #05966918;">
@@ -1878,10 +2064,10 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOOSA AL BALUSHI - 82667" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOOSA AL BALUSHI - 82667" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="موسى البلوشي - 82667">MOOSA AL BALUSHI - 82667</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="OMAR AL FUTAISI - 82107" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="OMAR AL FUTAISI - 82107" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="عمر الفطيسي - 82107">OMAR AL FUTAISI - 82107</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -1895,13 +2081,13 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ADIL AL BULUSHI - 82457" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ADIL AL BULUSHI - 82457" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="عادل البلوشي - 82457">ADIL AL BULUSHI - 82457</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HUSAINI - 82455" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HUSAINI - 82455" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد الحسيني - 82455">AHMED AL HUSAINI - 82455</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="SULEIMAN AL MAHARBI - 80833" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="سليمان المحاربي - 80833">SULEIMAN AL MAHARBI - 80833</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -1915,13 +2101,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ABDULLAH AL SINAWI - 82663" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="عبدالله السناوي - 82663">ABDULLAH AL SINAWI - 82663</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="JABER AL JULANDANI - 81983" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="JABER AL JULANDANI - 81983" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="جابر الجلنداني - 81983">JABER AL JULANDANI - 81983</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="MAHMOOD AL SHAMSI - 82286" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="MAHMOOD AL SHAMSI - 82286" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمود الشامسي - 82286">MAHMOOD AL SHAMSI - 82286</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1935,28 +2121,28 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">8</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="AHMED AL FARSI - 82456" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="AHMED AL FARSI - 82456" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد الفارسي - 82456">AHMED AL FARSI - 82456</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL SHEHHI - 82583" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL SHEHHI - 82583" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر الشحي - 82583">BADAR AL SHEHHI - 82583</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="HILAL AL SHAMAKHI - 81991" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="هلال الشماخي - 81991">HILAL AL SHAMAKHI - 81991</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="IBRAHIM AL HADHRAMI - 82668" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="IBRAHIM AL HADHRAMI - 82668" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="إبراهيم الحضرمي - 82668">IBRAHIM AL HADHRAMI - 82668</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="HISHAM AL MAHARBI - 82454" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="هشام المحاربي - 82454">HISHAM AL MAHARBI - 82454</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL MAWALI - 82614" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد المعولي - 82614">MOHAMMED AL MAWALI - 82614</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="QAIS AL RASHDI - 82409" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="QAIS AL RASHDI - 82409" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="قيس الراشدي - 82409">QAIS AL RASHDI - 82409</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="WAHEB AL BARAIDAI - 82470" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="WAHEB AL BARAIDAI - 82470" data-role="Import Checker" role="button" tabindex="0">
        <span class="empName" data-name-ar="وهب البريدعي - 82470">WAHEB AL BARAIDAI - 82470</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -1970,10 +2156,10 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="HISHAM AL SIYABI - 82434" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="HISHAM AL SIYABI - 82434" data-role="Import Checker" data-leave="A/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="هشام السيابي - 82434">HISHAM AL SIYABI - 82434</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 5</span>)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="JAMAL AL SINANI - 81399" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="JAMAL AL SINANI - 81399" data-role="Import Checker" data-leave="A/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="جمال السناني - 81399">JAMAL AL SINANI - 81399</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 2</span>)</span>
      </div>
@@ -1983,7 +2169,7 @@
       </div>
     </div>
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Release Control">
       <div style="height:5px; background:linear-gradient(to right, #dc2626, #dc2626cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #dc262618;">
@@ -2010,7 +2196,7 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="SAID AL HADI - 81152" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="SAID AL HADI - 81152" data-role="Release Control" role="button" tabindex="0">
        <span class="empName" data-name-ar="سعيد الهادي - 81152">SAID AL HADI - 81152</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2024,7 +2210,7 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOOSA AL HADI - 82536" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOOSA AL HADI - 82536" data-role="Release Control" role="button" tabindex="0">
        <span class="empName" data-name-ar="موسى الهادي - 82536">MOOSA AL HADI - 82536</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2038,7 +2224,7 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="QASIM AL GHARIBI - 82412" data-role="Release Control" role="button" tabindex="0">
        <span class="empName" data-name-ar="قاسم الغريبي - 82412">QASIM AL GHARIBI - 82412</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2052,10 +2238,10 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOHAMMED AL KULAIBI - 81079" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOHAMMED AL KULAIBI - 81079" data-role="Release Control" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد الكليبي - 81079">MOHAMMED AL KULAIBI - 81079</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MAHIR AL BALUSHI - 82422" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MAHIR AL BALUSHI - 82422" data-role="Release Control" role="button" tabindex="0">
        <span class="empName" data-name-ar="ماهر البلوشي - 82422">MAHIR AL BALUSHI - 82422</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2065,7 +2251,7 @@
       </div>
     </div>
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Import Operators">
       <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #7c3aed18;">
@@ -2092,10 +2278,10 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="JUMA AL HABSI - 81151" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="JUMA AL HABSI - 81151" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="جمعة الحبسي - 81151">JUMA AL HABSI - 81151</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="KHALID AL ZADJALI - 82458" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="KHALID AL ZADJALI - 82458" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="خالد الزدجالي - 82458">KHALID AL ZADJALI - 82458</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2109,7 +2295,7 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="KHAMIS AL KASBI - 990751" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="KHAMIS AL KASBI - 990751" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="خميس الكاسبي - 990751">KHAMIS AL KASBI - 990751</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2123,13 +2309,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ALI AL RIYAMI - 82459" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="علي الريامي - 82459">ALI AL RIYAMI - 82459</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="QAIS AL MUKHAINI - 82435" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="QAIS AL MUKHAINI - 82435" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="قيس المخيني - 82435">QAIS AL MUKHAINI - 82435</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="SAID AL AMRI - 80834" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="SAID AL AMRI - 80834" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="سعيد العامري - 80834">SAID AL AMRI - 80834</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2143,19 +2329,19 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="AHMED AL AMRI - 81080" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="AHMED AL AMRI - 81080" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد العامري - 81080">AHMED AL AMRI - 81080</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="FARIS AL BALUSHI - 80478" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="FARIS AL BALUSHI - 80478" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="فارس البلوشي - 80478">FARIS AL BALUSHI - 80478</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="YASIR AL GHARABI - 990786" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="YASIR AL GHARABI - 990786" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="ياسر الغاربي - 990786">YASIR AL GHARABI - 990786</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="HAMED AL FAKHRI - 8836" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="HAMED AL FAKHRI - 8836" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="حمد الفاخري - 8836">HAMED AL FAKHRI - 8836</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="MOHAMMED AL BALUCHI - 82330" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="MOHAMMED AL BALUCHI - 82330" data-role="Import Operator" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد البلوشي - 82330">MOHAMMED AL BALUCHI - 82330</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2169,7 +2355,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="MOHAMED AL MAAWALI - 82535" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="MOHAMED AL MAAWALI - 82535" data-role="Import Operator" data-leave="A/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد المعولي - 82535">MOHAMED AL MAAWALI - 82535</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 4</span>)</span>
      </div>
@@ -2179,7 +2365,7 @@
       </div>
     </div>
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Flight Dispatch">
       <div style="height:5px; background:linear-gradient(to right, #f59e0b, #f59e0bcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #f59e0b18;">
@@ -2206,13 +2392,13 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر البرطماني - 82423">BADAR AL BURTAMANI - 82423</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="SAID AL SADI - 82410" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="سعيد السعدي - 82410">SAID AL SADI - 82410</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="يونس السيابي - 80480">YOUNIS AL SIYABI - 80480</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2226,10 +2412,10 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="SAMI AL HADABI - 80479" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="سامي الهدابي - 80479">SAMI AL HADABI - 80479</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="YAARAB AL RAQADI - 82571" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="يعرب الرقادي - 82571">YAARAB AL RAQADI - 82571</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2243,13 +2429,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="علي الشامسي - 82425">ALI AL SHAMSI - 82425</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL FULAITI - 82468" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="BADAR AL FULAITI - 82468" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر الفليتي - 82468">BADAR AL FULAITI - 82468</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="هيثم البلوشي - 82419">HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2263,22 +2449,22 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="بدر البوسعيدي - 82414">BADAR AL BUSAIDI - 82414</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد الهدابي - 990895">MOHD AL HADDABI - 990895</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="ناصر العميري - 82416">NASSER AL OMAIRI - 82416</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="AHMED AL HADI - 82654" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="أحمد الهادي - 82654">AHMED AL HADI - 82654</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="MOHAMMED AL SAADI - 82420" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="MOHAMMED AL SAADI - 82420" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="محمد السعدي - 82420">MOHAMMED AL SAADI - 82420</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="TALAL AL HUSEINI - 82417" data-role="Flight Dispatcher" role="button" tabindex="0">
        <span class="empName" data-name-ar="طلال الحسيني - 82417">TALAL AL HUSEINI - 82417</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2292,7 +2478,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ANWAR ALAMRI - 82566" data-role="Flight Dispatcher" data-leave="A/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="أنور العامري - 82566">ANWAR ALAMRI - 82566</span>
        <span class="empStatus" style="color:#065f46;">LV (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 2</span>)</span>
      </div>
@@ -2306,7 +2492,7 @@
         <span class="shiftCount" style="background:#ef444422; color:#991b1b;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ISMAIL AL MAHARBI - 82331" data-role="Flight Dispatcher" data-leave="S/L" role="button" tabindex="0">
        <span class="empName" data-name-ar="إسماعيل المحاربي - 82331">ISMAIL AL MAHARBI - 82331</span>
        <span class="empStatus" style="color:#991b1b;">SL (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 2</span>)</span>
      </div>
@@ -2318,37 +2504,59 @@
 
 
   <div class="importBottom">
-    <nav class="quickActions roster-cta" aria-label="Page actions">
-  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
-    <span class="roster-cta-label">Full Roster</span>
-  </a>
-  <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
-    <span class="roster-cta-label">Share Site</span>
-  </button>
-  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-    <span class="roster-cta-label">Apps</span>
-  </button>
-</nav>
+    
+  <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
+    <div class="qaCardBar" aria-hidden="true"></div>
+    <noscript><style>.qaCard.collapsed .qaCardBody{display:block}</style></noscript>
+    <button type="button" class="qaCardHead" id="qaCardToggle" aria-expanded="false" aria-controls="qaCardBody">
+      <span class="qaCardIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+      <span class="qaCardTitle" id="qaCardTitle"><span class="qaEn">Actions</span><span class="qaAr" lang="ar">إجراءات</span></span>
+      <span class="qaCardTotal" aria-hidden="true"><span id="qaCardTotalNum">4</span><span class="qaCardTotalWord"><span class="qaEn">shortcuts</span><span class="qaAr" lang="ar">اختصارات</span></span></span>
+      <span class="qaCardChev" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+    </button>
+    <div class="qaCardBody" id="qaCardBody">
+      <div class="qaGrid">
+        <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{BASE}/now/">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span>
+          <span class="roster-cta-label">Full Roster</span>
+        </a>
+        <div class="qaMini">
+          <button type="button" class="roster-cta-btn qaStatsBtn" id="qaStatsBtn" title="Employees / Departments">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <span class="roster-cta-label">
+              <b class="qaStatsNum" id="qaStatsNum">68</b>
+              <small class="qaStatsWord" id="qaStatsWord" data-key="employees">Employees</small>
+            </span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+            <span class="roster-cta-label">Apps</span>
+          </button>
+        </div>
+        <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="#">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="roster-cta-label">Former Colleagues</span>
+        </a>
+      </div>
+      <div class="qaFlow" id="qaFlow">
+        <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
+          <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
+        </button>
+      </div>
+      <div class="qaAddRow" id="qaAddRow">
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+      </div>
+    </div>
+  </section>
 
-  <!-- ════ SECONDARY ACTIONS ════ -->
-<nav class="quickActions secondaryBar" aria-label="More actions">
-  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M11.5 13h5M11.5 16h3"/></svg></span>
-    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
-  </button>
-  <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="alumni/">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-    <span class="roster-cta-label">Former Colleagues</span>
-  </a>
-</nav>
-
-<div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">01NOV2026 / 09:44</strong>
+    
+  <div class="footer">
+    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong id="importLastUpdated" style="color:#1e40af;">12NOV2026 / 16:44</strong>
     <br>Total: <strong id="importTotalEmployees">68 employees</strong>
-     &nbsp;·&nbsp; Source: <strong id="importSourceName">NOVEMBER 2026 IMPORT OPERATIONS.xlsx</strong>
+     &nbsp;·&nbsp; Source: <strong id="importSourceName">IMPORT ROSTER NOV 2026.xlsx</strong>
   </div>
 
   </div>
@@ -2404,45 +2612,41 @@
     <h2 class="siteAppsTitle" id="siteAppsTitle">Related apps</h2>
     <p class="siteAppsHint" id="siteAppsHint">Quick links to other tools</p>
     <div class="siteAppsGrid" id="siteAppsGrid">
-      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
-        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/><path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/><path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp Styler</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="wa">Format text fast</span>
+      <a class="siteAppsLink siteAppsLink--acceptance" href="https://khalidsaif912.github.io/new/docs/acceptance/" data-app-id="acceptance" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="10" width="40" height="46" rx="7" fill="#bfdbfe" stroke="#0f172a" stroke-width="2.2"/><rect x="24" y="6" width="16" height="9" rx="3" fill="#93c5fd" stroke="#0f172a" stroke-width="2"/><path d="M20 26h24M20 34h16" stroke="#1d4ed8" stroke-width="2.4" stroke-linecap="round"/><path d="M22 44l5 5 11-13" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="acceptance">Acceptance</span>
+      </a>
+      <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
+        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="12" width="44" height="42" rx="7" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/><path d="M10 24h44" stroke="#0f172a" stroke-width="2.2"/><path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/><path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/><path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="readSign">Read and Sign</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="readSign">Circulars &amp; acknowledgements</span>
       </a>
       <a class="siteAppsLink siteAppsLink--labels" href="https://lbit.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="labels">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 12h24l18 18-22 22L8 34V12z" fill="#34d399" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M10 12h24l18 18-6 6L28 18H10z" fill="#6ee7b7"/><circle cx="22" cy="24" r="4.2" fill="#fff" stroke="#0f172a" stroke-width="2"/><path d="M30 42l8-8" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="labels">SATS Labels</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="labels">Cargo labels</span>
+        <span class="siteAppsLink-title" data-i18n="labels">Labels</span>
       </a>
       <a class="siteAppsLink siteAppsLink--calc" href="https://khalidsaif912.github.io/new/docs/calculator/index.html" data-app-id="calc" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="6" width="40" height="52" rx="8" fill="#fbbf24" stroke="#0f172a" stroke-width="2.4"/><rect x="18" y="12" width="28" height="12" rx="4" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="18" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="31" y="30" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="44" y="30" width="4" height="8" rx="1.5" fill="#fb7185" stroke="#0f172a" stroke-width="1.6"/><rect x="18" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="31" y="42" width="10" height="8" rx="2" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="44" y="42" width="4" height="8" rx="1.5" fill="#38bdf8" stroke="#0f172a" stroke-width="1.6"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="calc">Quantities</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="calc">Shipment calc</span>
       </a>
       <a class="siteAppsLink siteAppsLink--quicklist" href="https://khalidsaif912.github.io/new/docs/QuickList/index.html" data-app-id="quicklist" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M18 18h28l4 34H14l4-34z" fill="#c4b5fd" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M22 18a10 10 0 0 1 20 0" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round"/><path d="M18 18h28l-2 10H20z" fill="#a78bfa"/><circle cx="26" cy="40" r="2.4" fill="#0f172a"/><circle cx="38" cy="40" r="2.4" fill="#0f172a"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="quicklist">QuickList</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="quicklist">Shopping lists</span>
       </a>
       <a class="siteAppsLink siteAppsLink--book" href="https://khalidsaif912.github.io/new/docs/a-cup-of-book/" data-app-id="book" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M12 10h18c6 0 10 4 10 10v34c0-4-4-8-10-8H12V10z" fill="#5eead4" stroke="#0f172a" stroke-width="2.2"/><path d="M52 10H34c-6 0-10 4-10 10v34c0-4 4-8 10-8h18V10z" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M22 18h6M22 24h8M40 18h6M40 24h8" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="book">A Cup of Book</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="book">Reading topics</span>
+        <span class="siteAppsLink-title" data-i18n="book">Reading</span>
       </a>
       <a class="siteAppsLink siteAppsLink--store" href="https://mystore-96d8e.web.app" target="_blank" rel="noopener noreferrer" data-app-id="store">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg siteAppsStoreSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><path d="M10 24h44v28a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V24z" fill="#fdba74" stroke="#0f172a" stroke-width="2.4"/><path d="M8 24l6-12h36l6 12H8z" fill="#fb923c" stroke="#0f172a" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 24h48" stroke="#0f172a" stroke-width="2.2"/><rect x="26" y="34" width="12" height="22" rx="2" fill="#fff7ed" stroke="#0f172a" stroke-width="2"/><rect x="16" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/><rect x="40" y="32" width="8" height="10" rx="1.5" fill="#fff" stroke="#0f172a" stroke-width="1.8"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="store">Mobhar Store Ã‚Â· Ã™â€¦Ã˜ÂªÃ˜Â¬Ã˜Â± Ã™â€¦Ã™ÂÃ˜Â¨Ã™â€¡Ã˜Â±</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="store">Electronics &amp; gadgets</span>
+        <span class="siteAppsLink-title" data-i18n="store">Store</span>
       </a>
       <a class="siteAppsLink siteAppsLink--games" href="https://dgr-exp.netlify.app/" target="_blank" rel="noopener noreferrer" data-app-id="games">
         <span class="siteAppsLink-icon"><img class="siteAppsFlatImg" src="https://khalidsaif912.github.io/new/docs/assets/icons/app-games.png" width="30" height="30" alt="" decoding="async"></span>
-        <span class="siteAppsLink-title" data-i18n="games">Memory Games</span>
-        <span class="siteAppsLink-sub" data-i18n-sub="games">Roster games hub</span>
+        <span class="siteAppsLink-title" data-i18n="games">Games</span>
       </a>
     </div>
     <div class="siteAppsCloseWrap">
@@ -3571,33 +3775,16 @@ function goToEmployeeSchedule(empName) {
       if (suppressNextClick) return;
       var card = head.closest('.deptCard');
       if (!card) return;
-      card.classList.remove('collapsed');
-      var shifts = card.querySelectorAll('details.shiftCard');
-      if (!shifts.length) return;
-      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
-      if (isNaN(step) || step < 0 || step > 2) step = 0;
-      if (step === 0) {
-        shifts.forEach(function(d) { d.setAttribute('open', ''); });
-        card.dataset.deptShiftStep = '1';
-      } else if (step === 1) {
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        card.dataset.deptShiftStep = '2';
+      if (typeof window.rosterToggleDeptCard === 'function') {
+        window.rosterToggleDeptCard(card);
       } else {
-        var now = new Date();
-        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-        var hour = muscatTime.getHours();
-        var minute = muscatTime.getMinutes();
-        var tt = hour * 60 + minute;
-        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        var target = null;
-        shifts.forEach(function(d) {
-          if (d.dataset.shift === currentShift) target = d;
-        });
-        if (!target) target = shifts[0];
-        if (target) target.setAttribute('open', '');
-        card.dataset.deptShiftStep = '0';
+        card.classList.toggle('collapsed');
       }
+    });
+    head.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      head.click();
     });
   });
 
@@ -3632,7 +3819,7 @@ var T = {
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     security:'Security', absences:'Absences',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me', leavesPage:'Leaves',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
@@ -3647,28 +3834,29 @@ var T = {
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     security:'الأمن', absences:'الغيابات',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي', leavesPage:'الإجازات',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
 };
 
-function updateSummarySwitchChip() {
-  var val = document.getElementById('summarySwitchVal');
-  var lbl = document.getElementById('summarySwitchLabel');
-  if(!val || !lbl) return;
+function updateQaStats() {
+  var num = document.getElementById('qaStatsNum');
+  var word = document.getElementById('qaStatsWord');
+  var btn = document.getElementById('qaStatsBtn');
+  if(!num || !word) return;
   var t = T[LANG] || T.en;
   var mode = window.__summarySwitchMode || 'employees';
   var counts = window.__summaryCounts || {};
   if(mode === 'departments') {
-    val.style.color = '#059669';
-    val.textContent = counts.departments != null ? counts.departments : 6;
-    lbl.textContent = t.departments;
-    lbl.dataset.key = 'departments';
+    num.textContent = counts.departments != null ? counts.departments : 6;
+    word.textContent = t.departments;
+    word.dataset.key = 'departments';
+    if(btn) btn.classList.add('is-alt');
   } else {
-    val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 68;
-    lbl.textContent = t.employees;
-    lbl.dataset.key = 'employees';
+    num.textContent = counts.employees != null ? counts.employees : 68;
+    word.textContent = t.employees;
+    word.dataset.key = 'employees';
+    if(btn) btn.classList.remove('is-alt');
   }
 }
 
@@ -3676,9 +3864,30 @@ function startSummarySwitchLoop() {
   if(window.__summarySwitchTimer) return;
   window.__summarySwitchTimer = setInterval(function(){
     window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
-    updateSummarySwitchChip();
-  }, 2200);
+    updateQaStats();
+  }, 3200);
 }
+
+(function bindQaStatsTap() {
+  var btn = document.getElementById('qaStatsBtn');
+  if(!btn || btn.__statsBound) return;
+  btn.__statsBound = true;
+  btn.addEventListener('click', function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateQaStats();
+  });
+})();
+
+(function countLeavesChip() {
+  var el = document.getElementById('leavesChipNum');
+  if(!el) return;
+  var n = 0;
+  document.querySelectorAll(
+    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
+  ).forEach(function(c){ n += parseInt(c.textContent, 10) || 0; });
+  el.textContent = n > 0 ? String(n) : '';
+  el.hidden = n <= 0;
+})();
 
 function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
@@ -3705,7 +3914,9 @@ function applyLang(lang) {
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
     else if(k==='withMePage') el.textContent=t.withMePage;
+    else if(k==='leavesPage') el.textContent=t.leavesPage;
   });
+  updateQaStats();
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
@@ -3741,9 +3952,11 @@ function applyLang(lang) {
     else el.textContent = text;
   }
   setCtaLabel('ctaBtn', t.viewFull);
-  setCtaLabel('shareSiteBtn', t.shareSite);
+  setCtaLabel('subscribeBtn', t.subscribe);
+  setCtaLabel('compareBtn', t.compare);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
+  updateQaStats();
   // Persist language BEFORE secondary i18n hooks — site-apps reads localStorage
   // when rebuilding the With me chip and would otherwise overwrite معي with With me.
   localStorage.setItem('rosterLang',lang);
@@ -3773,7 +3986,7 @@ function applyLang(lang) {
     if(dayEl) dayEl.textContent=dayN;
     if(monthEl) monthEl.textContent=monthN;
   }
-  updateSummarySwitchChip();
+  updateQaStats();
   if (window.rosterSyncHeaderDate) {
     var datePickerEl = document.getElementById('datePicker');
     var iso = datePickerEl && datePickerEl.value;
@@ -3790,7 +4003,9 @@ function toggleLang() { applyLang(LANG==='en'?'ar':'en'); }
 function setLocalCtaLinks() {
   var root = getSiteRootPath();
   var c1 = document.getElementById('ctaBtn');
+  var c2 = document.getElementById('subscribeBtn');
   if (c1) c1.href = root + '/now/';
+  if (c2) c2.href = root + '/subscribe/';
 }
 
 function goToTraining(e) {
@@ -3802,48 +4017,8 @@ setLocalCtaLinks();
 applyLang(LANG);
 startSummarySwitchLoop();
 
-(function bindSummarySwitchScroll() {
-  var chip = document.getElementById('summarySwitchChip');
-  if (!chip || chip.__scrollBound) return;
-  chip.__scrollBound = true;
-  chip.style.cursor = 'pointer';
-  chip.setAttribute('role', 'button');
-  chip.setAttribute('tabindex', '0');
-  function ensureShuffleButton() {
-    if (document.getElementById('bgTextureShuffleBtn')) return;
-    try {
-      var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260903c';
-      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-      var s = document.createElement('script');
-      s.src = src;
-      s.defer = true;
-      s.setAttribute('data-local-src', src);
-      document.body.appendChild(s);
-    } catch (e) {}
-  }
-  function scrollToBottom() {
-    ensureShuffleButton();
-    function go() {
-      var root = document.scrollingElement || document.documentElement;
-      var top = Math.max(0, root.scrollHeight - root.clientHeight);
-      window.scrollTo({ top: top, left: 0, behavior: 'smooth' });
-    }
-    go();
-    // The "Shuffle background" button is injected lazily (requestIdleCallback,
-    // up to ~3s), which grows the footer. Re-scroll several times so we always
-    // land on the true bottom once that button appears.
-    var delays = [150, 400, 800, 1400, 2200, 3200];
-    delays.forEach(function (ms) { window.setTimeout(go, ms); });
-  }
-  chip.addEventListener('click', scrollToBottom);
-  chip.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToBottom(); }
-  });
-})();
-
 // ═══════════════════════════════════════════════════
-// Department layout: all sections open + time-based shift open
+// Department layout: header only until tapped (collapsed by default)
 // ═══════════════════════════════════════════════════
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
@@ -3862,25 +4037,85 @@ startSummarySwitchLoop();
     return 'Morning';
   }
 
-  function openMatchingShift(card){
-    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
-    if(!shiftCards.length) return;
-    shiftCards.forEach(function(shiftCard){
-      var key = shiftCard.dataset.shift || '';
-      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
-        shiftCard.open = false;
-        shiftCard.removeAttribute('open');
-      }
-    });
-    var currentShift = getCurrentShiftForMuscat();
-    var target = shiftCards.find(function(shiftCard){
-      return shiftCard.dataset.shift === currentShift;
-    });
-    if(target) {
-      target.open = true;
-      target.setAttribute('open', '');
-    }
+  function shiftCardsOf(card){
+    return Array.prototype.slice.call(card.querySelectorAll('details.shiftCard'));
   }
+
+  // Remember which departments the user opened, so a reload restores them
+  // (expanded ones reopen on the current shift, closed ones stay closed).
+  var OPEN_STATE_KEY = 'importDeptOpenState';
+  function deptKey(card){
+    if(!card) return '';
+    var k = card.getAttribute('data-dept') || (card.dataset ? card.dataset.dept : '') || '';
+    if(k) return String(k).trim();
+    var el = card.querySelector('.deptTitle');
+    if(!el) return '';
+    return ((el.dataset && el.dataset.key) || el.textContent || '').trim();
+  }
+  function readOpenState(){
+    try {
+      var raw = localStorage.getItem(OPEN_STATE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e) { return []; }
+  }
+  function writeOpenState(list){
+    try { localStorage.setItem(OPEN_STATE_KEY, JSON.stringify(list)); } catch(e) {}
+  }
+  function rememberDept(card, isOpen){
+    var key = deptKey(card);
+    if(!key) return;
+    var list = readOpenState().filter(function(k){ return k !== key; });
+    if(isOpen) list.push(key);
+    writeOpenState(list);
+  }
+  function isRememberedOpen(card){
+    var key = deptKey(card);
+    return !!key && readOpenState().indexOf(key) !== -1;
+  }
+
+  function setHeadState(card, expanded){
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+
+  // Only the department header stays visible; every shift row is closed.
+  function collapseDeptCard(card, remember){
+    if(!card) return;
+    card.classList.add('collapsed');
+    shiftCardsOf(card).forEach(function(sc){ sc.open = false; sc.removeAttribute('open'); });
+    setHeadState(card, false);
+    if(remember) rememberDept(card, false);
+  }
+
+  // Tap on the header: reveal every shift row, expand only the current shift
+  // (or the shift the user filtered on the /now/ page).
+  function expandDeptCard(card, remember){
+    if(!card) return;
+    card.classList.remove('collapsed');
+    var picked = window.__shiftFilterSelection || '';
+    var wanted = (picked && picked !== 'All') ? picked : getCurrentShiftForMuscat();
+    var target = null;
+    shiftCardsOf(card).forEach(function(sc){
+      sc.open = false;
+      sc.removeAttribute('open');
+      if(!target && (sc.dataset.shift || '') === wanted) target = sc;
+    });
+    if(target){ target.open = true; target.setAttribute('open', ''); }
+    setHeadState(card, true);
+    if(remember) rememberDept(card, true);
+  }
+
+  window.rosterExpandDeptCard = expandDeptCard;
+  window.rosterCollapseDeptCard = collapseDeptCard;
+  window.rosterToggleDeptCard = function(card){
+    if(!card) return;
+    if(card.classList.contains('collapsed')) expandDeptCard(card, true);
+    else collapseDeptCard(card, true);
+  };
 
   function cardHasSavedEmployee(card){
     var rows = Array.from(card.querySelectorAll('.empName'));
@@ -3894,13 +4129,13 @@ startSummarySwitchLoop();
     });
   }
 
-  // Keep all department sections visible/open.
+  // Restore the saved open/closed state of every department.
   deptCards.forEach(function(card){
-    card.classList.remove('collapsed');
-    openMatchingShift(card);
+    if(isRememberedOpen(card)) expandDeptCard(card, false);
+    else collapseDeptCard(card, false);
   });
 
-  // If a saved employee exists, move their department to top.
+  // If a saved employee exists, move their department to top (state unchanged).
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
@@ -3908,7 +4143,6 @@ startSummarySwitchLoop();
       if(firstDeptCard && firstDeptCard !== targetCard){
         targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
       }
-      openMatchingShift(targetCard);
     }
   }
 })();
@@ -3973,7 +4207,7 @@ startSummarySwitchLoop();
     });
   }
 
-  function filterShifts(selectedShiftRaw){
+  function filterShifts(selectedShiftRaw, fromUserClick){
     var selectedShift = normalizeShift(selectedShiftRaw);
     window.__shiftFilterSelection = selectedShift;
     var totalEmployees = 0;
@@ -4006,15 +4240,29 @@ startSummarySwitchLoop();
 
     window.__summaryCounts = window.__summaryCounts || {};
     window.__summaryCounts.employees = totalEmployees;
-    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
+
+    // A filter chip is an explicit request to see the lists, so reveal the
+    // department cards. The automatic call on load keeps the saved state.
+    if(fromUserClick){
+      document.querySelectorAll('.deptCard').forEach(function(card){
+        if(typeof window.rosterExpandDeptCard === 'function'){
+          window.rosterExpandDeptCard(card, true);
+        } else {
+          card.classList.remove('collapsed');
+          var head = card.querySelector('.deptHead');
+          if(head) head.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
   }
 
   window.applyShiftFilter = filterShifts;
 
   filterBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
-      filterShifts(btnShift(btn));
+      filterShifts(btnShift(btn), true);
     });
   });
 
@@ -4473,6 +4721,14 @@ function goToWithMe(event) {
   location.href = _importBase() + '/with-me/';
 }
 
+(function bindFlightSwitchIcons() {
+  var root = getSiteRootUrl();
+  var iconUrl = root + '/assets/icons/flight.png?v=20260428d';
+  document.querySelectorAll('.flightSwitchIcon').forEach(function(img) {
+    img.src = iconUrl;
+  });
+})();
+
 function setSummaryChipHrefs() {
   var importBase = _importBase() + '/my-schedules/index.html';
   var root = getSiteRootUrl();
@@ -4508,7 +4764,7 @@ setSummaryChipHrefs();
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260903c';
+  var ver = '20261112a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -4518,7 +4774,7 @@ setSummaryChipHrefs();
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
-  addScript(root + '/open-current-shift.js?v=20260908s');
+  addScript(root + '/open-current-shift.js?v=20261112a');
   addScript(root + '/emp-contact.js?v=20261017b');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');
@@ -4533,6 +4789,7 @@ setSummaryChipHrefs();
     addScript(root + '/roster-icons.js?v=' + ver);
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=20261112c');
+    addScript(root + '/quick-actions.js?v=20261112e');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);
@@ -4769,6 +5026,11 @@ setSummaryChipHrefs();
     var href = a.getAttribute('href') || '';
     a.href = href.replaceAll('{{BASE}}', base).replaceAll('{BASE}', base);
   });
+  var root = getSiteRootUrl();
+  var alumni = document.getElementById('alumniBtn');
+  if (alumni) alumni.href = root + '/alumni/';
+  var cta = document.getElementById('ctaBtn');
+  if (cta) cta.href = base + '/now/';
   setSummaryChipHrefs();
 })();
 

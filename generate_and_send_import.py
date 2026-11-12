@@ -29,6 +29,7 @@ import argparse
 import subprocess
 import calendar
 import datetime as dt
+import json
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
 
@@ -48,13 +49,19 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_ICON_CSS,
     CHIP_SCHEDULE_HTML,
     CHIP_WAVE_HTML,
-    import_cta_html,
     import_summary_bar_html,
     IOS_PERF_VER,
     LANG_TOGGLE_HTML,
     LOAD_LOCAL_ENHANCEMENTS_IMPORT,
     PERF_RENDER_CSS,
-    SHIFT_COPY_BUTTON_HTML,
+    QA_CARD_ICON_SVG,
+    QA_CHEVRON_SVG,
+    QA_ICON_ALUMNI,
+    QA_ICON_APPS,
+    QA_ICON_COPY,
+    QA_ICON_ROSTER,
+    QA_ICON_STATS,
+    QA_PLUS_SVG,
     SHIFT_COPY_MODAL_HTML,
     SHIFT_RANGE_CSS,
     SITE_APPS_MODAL_HTML,
@@ -749,6 +756,10 @@ def prepare_export_script_for_import(script: str, repo_root: Path | None = None)
             "localStorage.getItem('exportSavedEmpName') || localStorage.getItem('savedEmpName')",
             "(localStorage.getItem('importSavedEmpName') || '')",
         ),
+        (
+            "var OPEN_STATE_KEY = 'exportDeptOpenState';",
+            "var OPEN_STATE_KEY = 'importDeptOpenState';",
+        ),
     ]
     for old, new in subs:
         script = script.replace(old, new)
@@ -946,6 +957,101 @@ def _discover_import_dates(import_root: Path) -> List[str]:
     return found
 
 
+_SHIFT_ROLE_CFG: dict | None = None
+
+
+def _shift_role_config() -> dict:
+    """Shared role map for the bottom "Copy Shift" report."""
+    global _SHIFT_ROLE_CFG
+    if _SHIFT_ROLE_CFG is None:
+        path = Path(__file__).resolve().parent / "scripts" / "shift_report_roles.json"
+        try:
+            _SHIFT_ROLE_CFG = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"⚠️ shift_report_roles.json not usable: {exc}")
+            _SHIFT_ROLE_CFG = {}
+    return _SHIFT_ROLE_CFG
+
+
+def import_employee_role(dept_name: str, dept_code: str) -> str:
+    """Report role for one Import employee (JD prefix first, then department)."""
+    cfg = _shift_role_config()
+    prefixes = cfg.get("import_code_prefixes") or {}
+    code = str(dept_code or "").strip().upper()
+    for prefix in sorted(prefixes, key=len, reverse=True):
+        if code.startswith(prefix.upper()):
+            return str(prefixes[prefix])
+    by_dept = cfg.get("import_defaults_by_dept") or {}
+    return str(by_dept.get(dept_name, dept_name))
+
+
+def import_leave_label(code: str, group_key: str) -> str:
+    """Short leave code shown in the copied report (S/L, E/L, ...)."""
+    table = _shift_role_config().get("leave_labels") or {}
+    up = str(code or "").strip().upper()
+    if up in table:
+        return str(table[up])
+    if group_key == "Annual Leave":
+        return "A/L"
+    if group_key == "Sick Leave":
+        return "S/L"
+    if group_key == "Training":
+        return "Course"
+    return ""
+
+
+def import_actions_card_html(employees_total: int, departments_total: int) -> str:
+    """Bottom Actions card — same layout/shortcuts as the Export duty pages."""
+    return f"""
+  <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
+    <div class="qaCardBar" aria-hidden="true"></div>
+    <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
+    <button type="button" class="qaCardHead" id="qaCardToggle" aria-expanded="false" aria-controls="qaCardBody">
+      <span class="qaCardIcon" aria-hidden="true">{QA_CARD_ICON_SVG}</span>
+      <span class="qaCardTitle" id="qaCardTitle"><span class="qaEn">Actions</span><span class="qaAr" lang="ar">إجراءات</span></span>
+      <span class="qaCardTotal" aria-hidden="true"><span id="qaCardTotalNum">4</span><span class="qaCardTotalWord"><span class="qaEn">shortcuts</span><span class="qaAr" lang="ar">اختصارات</span></span></span>
+      <span class="qaCardChev" aria-hidden="true">{QA_CHEVRON_SVG}</span>
+    </button>
+    <div class="qaCardBody" id="qaCardBody">
+      <div class="qaGrid">
+        <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="{{BASE}}/now/">
+          <span class="roster-cta-icon">{QA_ICON_ROSTER}</span>
+          <span class="roster-cta-label">Full Roster</span>
+        </a>
+        <div class="qaMini">
+          <button type="button" class="roster-cta-btn qaStatsBtn" id="qaStatsBtn" title="Employees / Departments">
+            <span class="roster-cta-icon">{QA_ICON_STATS}</span>
+            <span class="roster-cta-label">
+              <b class="qaStatsNum" id="qaStatsNum">{employees_total}</b>
+              <small class="qaStatsWord" id="qaStatsWord" data-key="employees">Employees</small>
+            </span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+            <span class="roster-cta-icon">{QA_ICON_APPS}</span>
+            <span class="roster-cta-label">Apps</span>
+          </button>
+        </div>
+        <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="#">
+          <span class="roster-cta-icon">{QA_ICON_ALUMNI}</span>
+          <span class="roster-cta-label">Former Colleagues</span>
+        </a>
+      </div>
+      <div class="qaFlow" id="qaFlow">
+        <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
+          <span class="roster-cta-icon">{QA_ICON_COPY}</span>
+          <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
+        </button>
+      </div>
+      <div class="qaAddRow" id="qaAddRow">
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+      </div>
+    </div>
+  </section>
+"""
+
+
 def import_bootstrap_script() -> str:
     """Shared import-only bootstrap (dept order, saved employee pin, leave rows)."""
     path = Path(__file__).resolve().parent / "scripts" / "import_page_bootstrap.js"
@@ -1067,8 +1173,14 @@ def build_duty_html(
                     status_html = code
                 name_attr = html_escape(label, quote=True)
                 ar_name_attr = html_escape(name_i18n.arabic_display(label), quote=True)
+                role_attr = html_escape(import_employee_role(dept, code), quote=True)
+                leave_attr = ""
+                if key in ("Annual Leave", "Sick Leave", "Training", "Other"):
+                    leave_txt = import_leave_label(code, key)
+                    if leave_txt:
+                        leave_attr = f' data-leave="{html_escape(leave_txt, quote=True)}"'
                 alt = " empRowAlt" if idx % 2 == 1 else ""
-                emp_rows.append(f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
+                emp_rows.append(f"""<div class="empRow{alt}" data-emp-name="{name_attr}" data-role="{role_attr}"{leave_attr} role="button" tabindex="0">
        <span class="empName" data-name-ar="{ar_name_attr}">{label}</span>
        <span class="empStatus" style="color:{info['text']};">{status_html}</span>
      </div>""")
@@ -1085,7 +1197,7 @@ def build_duty_html(
     </details>
 """)
         cards.append(f"""
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="{html_escape(str(dept), quote=True)}">
       <div style="height:5px; background:linear-gradient(to right, {color}, {color}cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid {color}18;">
@@ -1245,11 +1357,11 @@ def build_duty_html(
 
   {summary}
 
+  <noscript><style>.deptCard.collapsed .shiftStack{{display:flex}}</style></noscript>
   {''.join(cards)}
 
   <div class="importBottom">
-    {import_cta_html(cta_href="{{BASE}}/now/")}
-    {SHIFT_COPY_BUTTON_HTML}
+    {import_actions_card_html(total_emp, len(depts))}
     {footer}
   </div>
 
@@ -1614,6 +1726,11 @@ setSummaryChipHrefs();
     var href = a.getAttribute('href') || '';
     a.href = href.replaceAll('{{{{BASE}}}}', base).replaceAll('{{BASE}}', base);
   }});
+  var root = getSiteRootUrl();
+  var alumni = document.getElementById('alumniBtn');
+  if (alumni) alumni.href = root + '/alumni/';
+  var cta = document.getElementById('ctaBtn');
+  if (cta) cta.href = base + '/now/';
   setSummaryChipHrefs();
 }})();
 
