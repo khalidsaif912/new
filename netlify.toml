@@ -1,0 +1,12 @@
+# Work mirror: GitHub Pages (github.io) is blocked on some networks.
+# Publish the same docs/ tree to https://new-roster.netlify.app/
+# and proxy Book List API so the browser never talks to sslip.io.
+
+[build]
+  publish = "docs"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://book-list.158-220-106-38.sslip.io/api/:splat"
+  status = 200
+  force = true

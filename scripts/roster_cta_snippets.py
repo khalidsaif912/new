@@ -224,6 +224,21 @@ CHIP_ALL_HTML = _chip_val(SVG_CHIP_CLIPBOARD)
 CHIP_READ_SIGN_HTML = _chip_val(SVG_CHIP_READ_SIGN)
 CHIP_WITH_ME_HTML = _chip_val(SVG_CHIP_WITH_ME)
 
+SVG_CHIP_LEAVES = _chip_svg(
+    '<rect x="3" y="5" width="18" height="16" rx="2.5"/>'
+    '<path d="M3 10h18"/>'
+    '<path d="M8 3v4M16 3v4"/>'
+    '<path d="M9 15.5l2 2 4-4"/>',
+    stroke="#0d9488",
+)
+# Icon + live count, so it can stand where the old Employees/Departments chip was.
+CHIP_LEAVES_HTML = (
+    '<div class="chipVal">'
+    f'{SVG_CHIP_LEAVES}'
+    '<span class="chipValNum" id="leavesChipNum"></span>'
+    '</div>'
+)
+
 SVG_LANG_GLOBE = (
     '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
     'stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
@@ -562,6 +577,433 @@ CTA_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â�
 
 CTA_CSS_PY = CTA_CSS.replace("{", "{{").replace("}", "}}")
 
+# ═══════ QUICK ACTIONS CARD (Export bottom section) ═══════
+# Redesign only: markup + CSS. All logic IDs/classes stay untouched:
+# ctaBtn, shareSiteBtn, moreAppsBtn, copyShiftBtn, alumniBtn, .roster-cta-btn,
+# .roster-cta-icon, .roster-cta-label, .quickActions.roster-cta,
+# .quickActions.secondaryBar, .footer, #siteLastUpdated, .siteVisitsHost,
+# .bgTextureShuffleWrap, #bgScrollTopBtn, #bgTextureShuffleBtn, #bgRefreshBtn.
+QA_FONT_LINKS = (
+    '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+    '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+    '  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">'
+)
+
+QA_CARD_ICON_SVG = (
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="3" width="7" height="7" rx="1.6"/>'
+    '<rect x="14" y="3" width="7" height="7" rx="1.6"/>'
+    '<rect x="3" y="14" width="7" height="7" rx="1.6"/>'
+    '<rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>'
+)
+
+QA_CHEVRON_SVG = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="m6 9 6 6 6-6"/></svg>'
+)
+
+# Tile icons: stroke uses currentColor so each tile sets the colour in CSS.
+QA_ICON_ROSTER = (
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>'
+    '<rect x="9" y="3" width="6" height="4" rx="1"/>'
+    '<path d="M9 12h6M9 16h4"/></svg>'
+)
+
+QA_ICON_SHARE = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>'
+    '<path d="M12 15V3"/><path d="m8 7 4-4 4 4"/></svg>'
+)
+
+QA_ICON_APPS = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="3" y="3" width="7" height="7" rx="1.6"/>'
+    '<rect x="14" y="3" width="7" height="7" rx="1.6"/>'
+    '<rect x="3" y="14" width="7" height="7" rx="1.6"/>'
+    '<rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>'
+)
+
+QA_ICON_ALUMNI = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'
+    '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+)
+
+QA_ICON_STATS = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'
+    '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+)
+
+QA_ICON_COPY = (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<rect x="8" y="8" width="12" height="12" rx="2"/>'
+    '<path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>'
+)
+
+QA_PLUS_SVG = (
+    '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" '
+    'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<path d="M12 5v14M5 12h14"/></svg>'
+)
+
+# Plain CSS (single braces). Injected into the page <style> after SHIFT_COPY_CSS.
+# Layout mirrors the approved mock: big sky-blue Roster tile, Share/Apps squares,
+# wide Colleagues tile, then a Copy Shift row, then the dashed Add Action slots.
+QA_CARD_CSS = """    /* ═══════ ACTIONS CARD + STATUS PANEL ═══════ */
+    .qaCard, .qaCard * { box-sizing: border-box; }
+    .qaCard {
+      margin: 22px 0 0;
+      background: #fff;
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(23, 32, 64, .16);
+      color: #101426;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaCardBar { display: none; }
+
+    .qaCardHead {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 20px 20px 12px;
+      border: 0; background: none; font-family: inherit; color: inherit;
+      text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaCardHead:focus-visible { outline: 3px solid #0E9BD8; outline-offset: -3px; }
+    .qaCardIcon { display: none; }
+    .qaCardTitle {
+      flex: 1 1 auto; min-width: 0; margin: 0;
+      font-size: 22px; font-weight: 700; line-height: 1.2;
+      letter-spacing: -.3px; color: #101426;
+    }
+    .qaCardTotal {
+      flex: none; width: auto; min-height: 0;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 7px 12px; border: 0; border-radius: 999px;
+      background: #F1F2F7; color: #4A4F63;
+      font-size: 12px; font-weight: 600; line-height: 1;
+    }
+    .qaCardTotalWord { display: inline-flex; gap: 4px; }
+    .qaCardChev {
+      flex: none; width: 26px; height: 26px; border-radius: 999px;
+      display: grid; place-items: center; color: #7C8298;
+      transition: transform .2s ease;
+    }
+    .qaCard:not(.collapsed) .qaCardChev { transform: rotate(180deg); }
+    .qaCard.collapsed .qaCardHead { padding-bottom: 18px; }
+    .qaCard.collapsed .qaCardBody { display: none; }
+
+    .qaCard .qaAr { display: none; }
+    html[dir="rtl"] .qaCard .qaEn, body.ar .qaCard .qaEn { display: none; }
+    html[dir="rtl"] .qaCard .qaAr, body.ar .qaCard .qaAr { display: inline; }
+
+    .qaCardBody { display: flex; flex-direction: column; gap: 9px; padding: 0 20px 20px; }
+
+    .qaGrid {
+      display: grid;
+      grid-template-columns: 1.02fr 1fr;
+      gap: 8px;
+    }
+    .qaMini { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .qaCard .roster-cta-btn {
+      display: flex; width: 100%; min-width: 0;
+      border: 0; border-radius: 20px; background: #F3F4F8; color: #101426;
+      font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1.2;
+      text-align: start; text-decoration: none; box-shadow: none; padding: 12px;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaCard .roster-cta-icon {
+      flex: none; width: 36px; height: 36px; border-radius: 999px;
+      display: grid; place-items: center; line-height: 0;
+      background: #333A56; color: #fff; border: 0;
+    }
+    .qaCard .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .qaCard .roster-cta-label {
+      min-width: 0; font-size: 15px; font-weight: 700; color: inherit;
+      white-space: normal; overflow: visible; text-overflow: clip;
+    }
+
+    /* big tile — sky blue instead of the mock's navy */
+    .qaCard #ctaBtn {
+      grid-column: 1; grid-row: 1 / span 2;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px;
+      min-height: 196px; padding: 16px; border-radius: 22px;
+      background: linear-gradient(158deg, #82DBFB 0%, #41BCEF 42%, #0E9BD8 100%);
+      color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: rgba(255, 255, 255, .26); color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon svg { width: 20px; height: 20px; }
+    .qaCard #ctaBtn .roster-cta-label {
+      font-size: 22px; font-weight: 700; line-height: 1.15;
+      letter-spacing: -.2px; color: #fff;
+    }
+
+    /* Share + Apps */
+    .qaMini .roster-cta-btn {
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px;
+      min-height: 94px; padding: 12px; border-radius: 18px;
+    }
+    .qaMini .roster-cta-label { font-size: 14px; }
+    .qaCard #qaStatsBtn {
+      background: #E1F5FE; color: #0B4A6F;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px;
+    }
+    .qaCard #qaStatsBtn .roster-cta-icon { background: #0E7FA8; color: #fff; }
+    .qaCard #qaStatsBtn .roster-cta-label {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0; width: 100%;
+    }
+    .qaCard .qaStatsNum { font-size: 20px; font-weight: 800; line-height: 1; color: #0B4A6F; }
+    .qaCard .qaStatsWord {
+      font-size: 10px; font-weight: 700; line-height: 1.1; letter-spacing: .02em;
+      color: #2D6987; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaCard #qaStatsBtn.is-alt { background: #DEF7EC; color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .roster-cta-icon { background: #0F7A4F; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsNum { color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsWord { color: #17694A; }
+    .qaCard #moreAppsBtn { background: #EDECF4; color: #262B40; }
+    .qaCard #moreAppsBtn .roster-cta-icon { background: #333A56; color: #fff; }
+
+    /* Former Colleagues */
+    .qaCard #alumniBtn {
+      grid-column: 2; grid-row: 2;
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 94px; padding: 14px 18px; border-radius: 20px;
+      background: #DDF6EF; color: #0B3B33;
+    }
+    .qaCard #alumniBtn .roster-cta-icon { background: #12857E; color: #fff; }
+    .qaCard #alumniBtn .roster-cta-label { font-size: 14px; text-align: end; }
+
+    /* Copy Shift + pinned actions */
+    .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .qaCard #copyShiftBtn {
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #EDE4F8; color: #2B1B4D;
+    }
+    .qaCard #copyShiftBtn .roster-cta-icon { background: #5B2EC9; color: #fff; }
+    .qaCard #copyShiftBtn .roster-cta-label { font-size: 15px; text-align: end; }
+
+    .qaFlow .qaSlot { position: relative; min-width: 0; }
+    .qaFlow .qaSlotLink {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      height: 100%; min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #E6F6FE; color: #0B4A6F; text-decoration: none; font-weight: 700;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaFlow .qaSlotIcon {
+      flex: none; order: -1; width: 36px; height: 36px; border-radius: 999px;
+      background: #fff; border: 1px solid #D5E9F5; display: grid; place-items: center; line-height: 0;
+    }
+    .qaFlow .qaSlotIcon svg, .qaFlow .qaSlotIcon img { width: 22px; height: 22px; display: block; }
+    .qaFlow .qaSlotLabel {
+      min-width: 0; font-size: 15px; font-weight: 700; line-height: 1.2; text-align: end;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaFlow .qaSlotRemove {
+      position: absolute; top: 5px; inset-inline-end: 5px;
+      width: 20px; height: 20px; padding: 0; border-radius: 999px;
+      border: 1px solid #BFDCF0; background: #fff; color: #0B6E9A;
+      font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .qaFlow .qaSlotRemove:hover { background: #EAF7FE; }
+    .qaFlow .qaSlotRemove:focus-visible { outline: 2px solid #0E9BD8; outline-offset: 1px; }
+
+    /* Add Action slots */
+    .qaAddRow { display: flex; gap: 8px; }
+    .qaCard .qaAddSlot {
+      flex: 1 1 0; min-width: 0; height: 64px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 0 4px; border: 2px dashed #C3C7D6; border-radius: 20px;
+      background: #fff; color: #3A3F52; font-family: inherit;
+      font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaCard .qaAddSlot svg { flex: none; }
+    .qaCard .qaAddSlot:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
+    @media (hover: hover) {
+      .qaCard .roster-cta-btn:hover,
+      .qaFlow .qaSlotLink:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(23, 32, 64, .16);
+      }
+      .qaCard .qaAddSlot:hover { border-color: #0E9BD8; color: #0B6E9A; }
+    }
+    .qaCard .roster-cta-btn:active,
+    .qaFlow .qaSlotLink:active { transform: scale(.985); box-shadow: none; }
+    .qaCard .roster-cta-btn:focus-visible,
+    .qaFlow .qaSlotLink:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
+    @media (max-width: 359px) {
+      .qaCardHead { padding: 18px 16px 10px; }
+      .qaCardBody { padding: 0 16px 16px; }
+      .qaCardTitle { font-size: 20px; }
+      .qaCard #ctaBtn { min-height: 176px; padding: 14px; }
+      .qaCard #ctaBtn .roster-cta-icon { width: 38px; height: 38px; }
+      .qaCard #ctaBtn .roster-cta-label { font-size: 19px; }
+      .qaMini .roster-cta-btn { min-height: 88px; padding: 10px; border-radius: 16px; }
+      .qaMini .roster-cta-label { font-size: 12px; }
+      .qaCard #qaStatsBtn { padding: 10px 8px; }
+      .qaCard .qaStatsNum { font-size: 18px; }
+      .qaCard .qaStatsWord { font-size: 9px; }
+      .qaMini .roster-cta-icon { width: 30px; height: 30px; }
+      .qaMini .roster-cta-icon svg { width: 15px; height: 15px; }
+      .qaCard #alumniBtn { min-height: 88px; padding: 12px 14px; }
+      .qaCard #alumniBtn .roster-cta-label { font-size: 13px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 78px; padding: 12px 14px; }
+      .qaFlow .qaSlotLabel { font-size: 13px; }
+      .qaCard .qaAddSlot { font-size: 11px; height: 60px; }
+    }
+    @media (min-width: 520px) {
+      .qaCard #ctaBtn { min-height: 228px; }
+      .qaMini .roster-cta-btn { min-height: 110px; }
+      .qaCard #alumniBtn { min-height: 110px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 96px; }
+    }
+
+    /* Add Action picker sheet (docs/quick-actions.js) */
+    .qaPickSheet {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: flex-end; justify-content: center;
+      background: rgba(15, 23, 42, .48);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaPickSheet.open { display: flex; }
+    .qaPickCard {
+      width: 100%; max-width: 520px; max-height: 86vh; overflow: auto;
+      background: #fff; border-radius: 26px 26px 0 0;
+      padding: 18px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 30px rgba(15, 23, 42, .28);
+      color: #101426;
+    }
+    .qaPickTitle { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+    .qaPickHint { margin: 4px 0 12px; font-size: 12px; font-weight: 500; color: #4A5568; line-height: 1.4; }
+    .qaPickGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .qaPickItem {
+      display: flex; align-items: center; gap: 9px; width: 100%; min-width: 0;
+      padding: 9px 10px; border-radius: 16px; border: 1px solid #E1E6F0;
+      background: #fff; color: #101426; font-family: inherit; text-align: start;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaPickItemIcon { display: grid; place-items: center; flex: none; line-height: 0; }
+    .qaPickItemIcon svg, .qaPickItemIcon img { width: 26px; height: 26px; display: block; }
+    .qaPickItemLabel {
+      flex: 1 1 auto; min-width: 0; font-size: 12px; font-weight: 700; line-height: 1.2;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaPickItemState {
+      flex: none; width: 20px; height: 20px; border-radius: 999px;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+      border: 1px solid #BFDCF0; background: #EAF7FE; color: #0B6E9A;
+    }
+    .qaPickItem[aria-pressed="true"] { border-color: #9EE3DA; background: #DDF6EF; color: #0B3B33; }
+    .qaPickItem[aria-pressed="true"] .qaPickItemState { border-color: #9EE3DA; background: #fff; color: #0B3B33; }
+    .qaPickItem:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    .qaPickActions { margin-top: 14px; }
+    .qaPickClose {
+      width: 100%; height: 46px; border-radius: 16px; border: 1px solid #BFDCF0;
+      background: #EAF7FE; color: #0B4A6F; font-family: inherit;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .qaPickClose:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    @media (min-width: 560px) {
+      .qaPickSheet { align-items: center; }
+      .qaPickCard { border-radius: 26px; }
+    }
+
+    /* ═══════ STATUS PANEL (footer) ═══════ */
+    html body .footer.qaFooter {
+      margin-top: 14px !important;
+      padding: 16px 18px !important;
+      background: rgba(255, 255, 255, .88) !important;
+      border: 0 !important; border-radius: 26px;
+      box-shadow: 0 8px 22px rgba(30, 30, 40, .20);
+      display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+      text-align: center; font-size: 12px; color: #2B3350; line-height: 1.5;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaFooter .qaStatusMeta { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #2B3350; }
+    .qaFooter .qaStatusMeta strong, .qaFooter .qaStatusMeta span { font-size: 12px; color: #2B3350; }
+
+    /* site-visits.js injects its own !important rules on #siteVisitsHost —
+       these must out-specify that id rule without touching the JS. */
+    html body .footer.qaFooter #siteVisitsHost.siteVisitsHost {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svPart {
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 2px !important;
+      white-space: nowrap !important;
+      border-radius: 16px !important;
+      border: 1px solid transparent !important;
+      background: #fff !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svLabel {
+      font-size: 10px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .06em !important; text-transform: uppercase !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svNum {
+      font-size: 20px !important; font-weight: 700 !important; line-height: 1.1 !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
+
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) { background: #E4F6FE !important; border-color: #BFDCF0 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svNum { color: #0B4A6F !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) { background: #FFF1C9 !important; border-color: #F3D98A !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svNum { color: #6B4300 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) { background: #DDF7E8 !important; border-color: #A9E6C4 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svNum { color: #0F5A33 !important; }
+
+    .qaFooter .bgTextureShuffleWrap { position: relative; gap: 10px !important; margin-top: 2px !important; }
+    .qaFooter #bgScrollTopBtn,
+    .qaFooter #bgRefreshBtn {
+      width: 44px !important; height: 44px !important; border-radius: 999px !important;
+      display: inline-flex !important; align-items: center !important; justify-content: center !important;
+      flex: none !important; padding: 0 !important;
+    }
+    .qaFooter #bgScrollTopBtn { background: #EFE5FF !important; border: 1px solid #D2BEF5 !important; }
+    .qaFooter #bgScrollTopBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
+    .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
+    .qaFooter #bgTextureShuffleBtn {
+      height: 44px !important; min-height: 44px !important; padding: 0 18px !important;
+      border-radius: 999px !important; background: #EFE5FF !important;
+      border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
+      font-size: 12px !important; font-weight: 700 !important;
+    }
+    .qaFooter #bgTextureShuffleBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
+    .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+"""
+
+
 SITE_SHARE_CSS = r"""    /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â SITE SHARE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
     .siteShareSheet {
       position: fixed;
@@ -822,10 +1264,6 @@ SITE_APPS_MODAL_HTML = f"""<div id="siteAppsSheet" class="siteAppsSheet" aria-hi
       <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_LEAVES}</span>
         <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
-      </a>
-      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
-        <span class="siteAppsLink-icon">{SVG_APP_WA}</span>
-        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon">{SVG_APP_READ_SIGN}</span>
@@ -1126,10 +1564,17 @@ def _btn(
 
 def export_cta_html(
     cta_href: str = "#",
+    with_arrow: bool = False,
 ) -> str:
+    cta = _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
+    if with_arrow:
+        cta = cta.replace(
+            "  </a>\n",
+            f'    <span class="qaGo" aria-hidden="true">{QA_GO_SVG}</span>\n  </a>\n',
+        )
     return (
         '<nav class="quickActions roster-cta" aria-label="Page actions">\n'
-        + _btn("a", "roster-cta-btn--roster", "ctaBtn", "Full Roster", SVG_CLIPBOARD, f' href="{cta_href}"')
+        + cta
         + _btn(
             "button",
             "roster-cta-btn--share shareSiteBtn",
@@ -1273,7 +1718,9 @@ CHANGE_ALERT_VER = "20261020a"
 # Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
 MANTLE_CLIENT_VER = "20261031a"
 # Related apps launcher (docs/site-apps.js). Bump when the launcher JS/CSS changes.
-SITE_APPS_VER = "20261112a"
+SITE_APPS_VER = "20261112c"
+# Quick Actions card behaviour (docs/quick-actions.js): collapse + Add Action picker.
+QUICK_ACTIONS_VER = "20261112e"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
@@ -1302,6 +1749,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=""" + SITE_APPS_VER + """');
+    addScript(root + '/quick-actions.js?v=""" + QUICK_ACTIONS_VER + """');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

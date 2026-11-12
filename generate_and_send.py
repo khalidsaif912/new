@@ -17,6 +17,7 @@ from roster_cta_snippets import (  # noqa: E402
     CHIP_DIFF_HTML,
     CHIP_FLIGHT_HTML,
     CHIP_ICON_CSS,
+    CHIP_LEAVES_HTML,
     CHIP_MORNING_HTML,
     CHIP_NIGHT_HTML,
     CHIP_WITH_ME_HTML,
@@ -28,10 +29,18 @@ from roster_cta_snippets import (  # noqa: E402
     APPLY_LANG_LANG_BTN_NEW,
     SITE_APPS_MODAL_HTML,
     SITE_SHARE_MODAL_HTML,
-    SHIFT_COPY_BUTTON_HTML,
     SHIFT_COPY_MODAL_HTML,
     SHIFT_COPY_CSS,
-    export_cta_html,
+    QA_CARD_CSS,
+    QA_CARD_ICON_SVG,
+    QA_CHEVRON_SVG,
+    QA_FONT_LINKS,
+    QA_ICON_ALUMNI,
+    QA_ICON_APPS,
+    QA_ICON_COPY,
+    QA_ICON_ROSTER,
+    QA_ICON_STATS,
+    QA_PLUS_SVG,
     IOS_PERF_VER,
     LOAD_LOCAL_ENHANCEMENTS_EXPORT,
     PERF_RENDER_CSS,
@@ -956,6 +965,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <script defer src="{pages_base}/ios-tap-fix.js?v={IOS_PERF_VER}"></script>
   <title>Duty Roster</title>
 {DATE_FONT_LINKS}
+{QA_FONT_LINKS}
   <style>
     /* ═══════ RESET ═══════ */
     :root {{
@@ -1147,6 +1157,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     a.summaryChip.readSignChip:hover {{ box-shadow:0 8px 20px rgba(15,118,110,.18); }}
     a.summaryChip.withMeChip .chipVal {{ color:#4f46e5; }}
     a.summaryChip.withMeChip:hover {{ box-shadow:0 8px 20px rgba(79,70,229,.18); }}
+    a.summaryChip.leavesChip .chipVal {{ display:flex; align-items:center; justify-content:center; gap:4px; }}
+    a.summaryChip.leavesChip .chipValNum {{ font-size:15px; font-weight:900; color:#0d9488; line-height:1; }}
+    a.summaryChip.leavesChip .chipValNum[hidden] {{ display:none; }}
+    a.summaryChip.leavesChip:hover {{ box-shadow:0 8px 20px rgba(13,148,136,.18); }}
     .summaryChip {{
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -1646,6 +1660,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     .siteAppsCloseWrap .roster-cta-btn {{ width:100%; }}
 
 {SHIFT_COPY_CSS}
+{QA_CARD_CSS}
     /* ═══════ FOOTER ═══════ */
     .footer {{ margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }}
     .footer strong {{ color:#64748b; }}
@@ -1741,10 +1756,10 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
       {CHIP_WITH_ME_HTML}
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
-    <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">{employees_total}</div>
-      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
-    </div>
+    <a href="{pages_base}/leaves/" id="leavesChip" class="summaryChip leavesChip" style="text-decoration:none;" title="Leaves">
+      {CHIP_LEAVES_HTML}
+      <div class="chipLabel" data-key="leavesPage">Leaves</div>
+    </a>
     <a href="{pages_base}/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       {CHIP_SCHEDULE_HTML}
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
@@ -1788,16 +1803,60 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   <!-- ════ DEPARTMENT CARDS ════ -->
   {dept_cards_html}
 
-  <!-- ════ CTA ════ -->
-{export_cta_html()}
+  <!-- ════ ACTIONS ════ -->
+  <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
+    <div class="qaCardBar" aria-hidden="true"></div>
+    <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
+    <button type="button" class="qaCardHead" id="qaCardToggle" aria-expanded="false" aria-controls="qaCardBody">
+      <span class="qaCardIcon" aria-hidden="true">{QA_CARD_ICON_SVG}</span>
+      <span class="qaCardTitle" id="qaCardTitle"><span class="qaEn">Actions</span><span class="qaAr" lang="ar">إجراءات</span></span>
+      <span class="qaCardTotal" aria-hidden="true"><span id="qaCardTotalNum">5</span><span class="qaCardTotalWord"><span class="qaEn">shortcuts</span><span class="qaAr" lang="ar">اختصارات</span></span></span>
+      <span class="qaCardChev" aria-hidden="true">{QA_CHEVRON_SVG}</span>
+    </button>
+    <div class="qaCardBody" id="qaCardBody">
+      <div class="qaGrid">
+        <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="#">
+          <span class="roster-cta-icon">{QA_ICON_ROSTER}</span>
+          <span class="roster-cta-label">Full Roster</span>
+        </a>
+        <div class="qaMini">
+          <button type="button" class="roster-cta-btn qaStatsBtn" id="qaStatsBtn" title="Employees / Departments">
+            <span class="roster-cta-icon">{QA_ICON_STATS}</span>
+            <span class="roster-cta-label">
+              <b class="qaStatsNum" id="qaStatsNum">{employees_total}</b>
+              <small class="qaStatsWord" id="qaStatsWord" data-key="employees">Employees</small>
+            </span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+            <span class="roster-cta-icon">{QA_ICON_APPS}</span>
+            <span class="roster-cta-label">Apps</span>
+          </button>
+        </div>
+        <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="alumni/">
+          <span class="roster-cta-icon">{QA_ICON_ALUMNI}</span>
+          <span class="roster-cta-label">Former Colleagues</span>
+        </a>
+      </div>
+      <div class="qaFlow" id="qaFlow">
+        <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
+          <span class="roster-cta-icon">{QA_ICON_COPY}</span>
+          <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
+        </button>
+      </div>
+      <div class="qaAddRow" id="qaAddRow">
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1">{QA_PLUS_SVG}<span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+      </div>
+    </div>
+  </section>
 
-  <!-- ════ COPY SHIFT ════ -->
-{SHIFT_COPY_BUTTON_HTML}
-
-  <!-- ════ FOOTER ════ -->
-  <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">{last_updated}</strong><br>
-    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>{source_name}</strong>
+  <!-- ════ FOOTER (status panel) ════ -->
+  <div class="footer qaFooter">
+    <div class="qaStatusMeta">
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">{last_updated}</span></div>
+      <div><strong>Source:</strong> <span>{source_name}</span></div>
+    </div>
   </div>
 
 </div>
@@ -2753,7 +2812,7 @@ var T = {{
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     security:'Security', absences:'Absences',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me', leavesPage:'Leaves',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   }},
   ar: {{
@@ -2768,28 +2827,29 @@ var T = {{
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     security:'الأمن', absences:'الغيابات',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي', leavesPage:'الإجازات',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }}
 }};
 
-function updateSummarySwitchChip() {{
-  var val = document.getElementById('summarySwitchVal');
-  var lbl = document.getElementById('summarySwitchLabel');
-  if(!val || !lbl) return;
+function updateQaStats() {{
+  var num = document.getElementById('qaStatsNum');
+  var word = document.getElementById('qaStatsWord');
+  var btn = document.getElementById('qaStatsBtn');
+  if(!num || !word) return;
   var t = T[LANG] || T.en;
   var mode = window.__summarySwitchMode || 'employees';
   var counts = window.__summaryCounts || {{}};
   if(mode === 'departments') {{
-    val.style.color = '#059669';
-    val.textContent = counts.departments != null ? counts.departments : {departments_total};
-    lbl.textContent = t.departments;
-    lbl.dataset.key = 'departments';
+    num.textContent = counts.departments != null ? counts.departments : {departments_total};
+    word.textContent = t.departments;
+    word.dataset.key = 'departments';
+    if(btn) btn.classList.add('is-alt');
   }} else {{
-    val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : {employees_total};
-    lbl.textContent = t.employees;
-    lbl.dataset.key = 'employees';
+    num.textContent = counts.employees != null ? counts.employees : {employees_total};
+    word.textContent = t.employees;
+    word.dataset.key = 'employees';
+    if(btn) btn.classList.remove('is-alt');
   }}
 }}
 
@@ -2797,9 +2857,30 @@ function startSummarySwitchLoop() {{
   if(window.__summarySwitchTimer) return;
   window.__summarySwitchTimer = setInterval(function(){{
     window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
-    updateSummarySwitchChip();
-  }}, 2200);
+    updateQaStats();
+  }}, 3200);
 }}
+
+(function bindQaStatsTap() {{
+  var btn = document.getElementById('qaStatsBtn');
+  if(!btn || btn.__statsBound) return;
+  btn.__statsBound = true;
+  btn.addEventListener('click', function(){{
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateQaStats();
+  }});
+}})();
+
+(function countLeavesChip() {{
+  var el = document.getElementById('leavesChipNum');
+  if(!el) return;
+  var n = 0;
+  document.querySelectorAll(
+    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
+  ).forEach(function(c){{ n += parseInt(c.textContent, 10) || 0; }});
+  el.textContent = n > 0 ? String(n) : '';
+  el.hidden = n <= 0;
+}})();
 
 function applyLang(lang) {{
   var t=T[lang], isAr=lang==='ar';
@@ -2824,7 +2905,9 @@ function applyLang(lang) {{
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
     else if(k==='withMePage') el.textContent=t.withMePage;
+    else if(k==='leavesPage') el.textContent=t.leavesPage;
   }});
+  updateQaStats();
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) {{ el.textContent=t.total; }});
   var deptMap={{'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
@@ -2862,9 +2945,9 @@ function applyLang(lang) {{
   setCtaLabel('ctaBtn', t.viewFull);
   setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
-  setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
+  updateQaStats();
   // Persist language BEFORE secondary i18n hooks — site-apps reads localStorage
   // when rebuilding the With me chip and would otherwise overwrite معي with With me.
   localStorage.setItem('rosterLang',lang);
@@ -2894,7 +2977,7 @@ function applyLang(lang) {{
     if(dayEl) dayEl.textContent=dayN;
     if(monthEl) monthEl.textContent=monthN;
   }}
-  updateSummarySwitchChip();
+  updateQaStats();
   if (window.rosterSyncHeaderDate) {{
     var datePickerEl = document.getElementById('datePicker');
     var iso = datePickerEl && datePickerEl.value;
@@ -2946,46 +3029,6 @@ setLocalCtaLinks();
 setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
-
-(function bindSummarySwitchScroll() {{
-  var chip = document.getElementById('summarySwitchChip');
-  if (!chip || chip.__scrollBound) return;
-  chip.__scrollBound = true;
-  chip.style.cursor = 'pointer';
-  chip.setAttribute('role', 'button');
-  chip.setAttribute('tabindex', '0');
-  function ensureShuffleButton() {{
-    if (document.getElementById('bgTextureShuffleBtn')) return;
-    try {{
-      var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v={IOS_PERF_VER}';
-      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-      var s = document.createElement('script');
-      s.src = src;
-      s.defer = true;
-      s.setAttribute('data-local-src', src);
-      document.body.appendChild(s);
-    }} catch (e) {{}}
-  }}
-  function scrollToBottom() {{
-    ensureShuffleButton();
-    function go() {{
-      var root = document.scrollingElement || document.documentElement;
-      var top = Math.max(0, root.scrollHeight - root.clientHeight);
-      window.scrollTo({{ top: top, left: 0, behavior: 'smooth' }});
-    }}
-    go();
-    // The "Shuffle background" button is injected lazily (requestIdleCallback,
-    // up to ~3s), which grows the footer. Re-scroll several times so we always
-    // land on the true bottom once that button appears.
-    var delays = [150, 400, 800, 1400, 2200, 3200];
-    delays.forEach(function (ms) {{ window.setTimeout(go, ms); }});
-  }}
-  chip.addEventListener('click', scrollToBottom);
-  chip.addEventListener('keydown', function (e) {{
-    if (e.key === 'Enter' || e.key === ' ') {{ e.preventDefault(); scrollToBottom(); }}
-  }});
-}})();
 
 // ═══════════════════════════════════════════════════
 // Department layout: all sections open + time-based shift open
@@ -3151,7 +3194,7 @@ startSummarySwitchLoop();
 
     window.__summaryCounts = window.__summaryCounts || {{}};
     window.__summaryCounts.employees = totalEmployees;
-    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
   }}
 

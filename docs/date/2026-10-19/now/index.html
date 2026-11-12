@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ═══════ RESET ═══════ */
     :root {
@@ -522,6 +525,10 @@
     a.summaryChip.readSignChip:hover { box-shadow:0 8px 20px rgba(15,118,110,.18); }
     a.summaryChip.withMeChip .chipVal { color:#4f46e5; }
     a.summaryChip.withMeChip:hover { box-shadow:0 8px 20px rgba(79,70,229,.18); }
+    a.summaryChip.leavesChip .chipVal { display:flex; align-items:center; justify-content:center; gap:4px; }
+    a.summaryChip.leavesChip .chipValNum { font-size:15px; font-weight:900; color:#0d9488; line-height:1; }
+    a.summaryChip.leavesChip .chipValNum[hidden] { display:none; }
+    a.summaryChip.leavesChip:hover { box-shadow:0 8px 20px rgba(13,148,136,.18); }
     .summaryChip {
       background:#fff;
       border:1px solid rgba(15,23,42,.1);
@@ -1138,6 +1145,349 @@
       .shiftCopyAct--share:hover { background: #d1fae5; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
     }
 
+    /* ═══════ ACTIONS CARD + STATUS PANEL ═══════ */
+    .qaCard, .qaCard * { box-sizing: border-box; }
+    .qaCard {
+      margin: 22px 0 0;
+      background: #fff;
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(23, 32, 64, .16);
+      color: #101426;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaCardBar { display: none; }
+
+    .qaCardHead {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 20px 20px 12px;
+      border: 0; background: none; font-family: inherit; color: inherit;
+      text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaCardHead:focus-visible { outline: 3px solid #0E9BD8; outline-offset: -3px; }
+    .qaCardIcon { display: none; }
+    .qaCardTitle {
+      flex: 1 1 auto; min-width: 0; margin: 0;
+      font-size: 22px; font-weight: 700; line-height: 1.2;
+      letter-spacing: -.3px; color: #101426;
+    }
+    .qaCardTotal {
+      flex: none; width: auto; min-height: 0;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 7px 12px; border: 0; border-radius: 999px;
+      background: #F1F2F7; color: #4A4F63;
+      font-size: 12px; font-weight: 600; line-height: 1;
+    }
+    .qaCardTotalWord { display: inline-flex; gap: 4px; }
+    .qaCardChev {
+      flex: none; width: 26px; height: 26px; border-radius: 999px;
+      display: grid; place-items: center; color: #7C8298;
+      transition: transform .2s ease;
+    }
+    .qaCard:not(.collapsed) .qaCardChev { transform: rotate(180deg); }
+    .qaCard.collapsed .qaCardHead { padding-bottom: 18px; }
+    .qaCard.collapsed .qaCardBody { display: none; }
+
+    .qaCard .qaAr { display: none; }
+    html[dir="rtl"] .qaCard .qaEn, body.ar .qaCard .qaEn { display: none; }
+    html[dir="rtl"] .qaCard .qaAr, body.ar .qaCard .qaAr { display: inline; }
+
+    .qaCardBody { display: flex; flex-direction: column; gap: 9px; padding: 0 20px 20px; }
+
+    .qaGrid {
+      display: grid;
+      grid-template-columns: 1.02fr 1fr;
+      gap: 8px;
+    }
+    .qaMini { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .qaCard .roster-cta-btn {
+      display: flex; width: 100%; min-width: 0;
+      border: 0; border-radius: 20px; background: #F3F4F8; color: #101426;
+      font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1.2;
+      text-align: start; text-decoration: none; box-shadow: none; padding: 12px;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaCard .roster-cta-icon {
+      flex: none; width: 36px; height: 36px; border-radius: 999px;
+      display: grid; place-items: center; line-height: 0;
+      background: #333A56; color: #fff; border: 0;
+    }
+    .qaCard .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
+    .qaCard .roster-cta-label {
+      min-width: 0; font-size: 15px; font-weight: 700; color: inherit;
+      white-space: normal; overflow: visible; text-overflow: clip;
+    }
+
+    /* big tile — sky blue instead of the mock's navy */
+    .qaCard #ctaBtn {
+      grid-column: 1; grid-row: 1 / span 2;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px;
+      min-height: 196px; padding: 16px; border-radius: 22px;
+      background: linear-gradient(158deg, #82DBFB 0%, #41BCEF 42%, #0E9BD8 100%);
+      color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: rgba(255, 255, 255, .26); color: #fff;
+    }
+    .qaCard #ctaBtn .roster-cta-icon svg { width: 20px; height: 20px; }
+    .qaCard #ctaBtn .roster-cta-label {
+      font-size: 22px; font-weight: 700; line-height: 1.15;
+      letter-spacing: -.2px; color: #fff;
+    }
+
+    /* Share + Apps */
+    .qaMini .roster-cta-btn {
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px;
+      min-height: 94px; padding: 12px; border-radius: 18px;
+    }
+    .qaMini .roster-cta-label { font-size: 14px; }
+    .qaCard #qaStatsBtn {
+      background: #E1F5FE; color: #0B4A6F;
+      flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px;
+    }
+    .qaCard #qaStatsBtn .roster-cta-icon { background: #0E7FA8; color: #fff; }
+    .qaCard #qaStatsBtn .roster-cta-label {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0; width: 100%;
+    }
+    .qaCard .qaStatsNum { font-size: 20px; font-weight: 800; line-height: 1; color: #0B4A6F; }
+    .qaCard .qaStatsWord {
+      font-size: 10px; font-weight: 700; line-height: 1.1; letter-spacing: .02em;
+      color: #2D6987; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaCard #qaStatsBtn.is-alt { background: #DEF7EC; color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .roster-cta-icon { background: #0F7A4F; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsNum { color: #0B3B26; }
+    .qaCard #qaStatsBtn.is-alt .qaStatsWord { color: #17694A; }
+    .qaCard #moreAppsBtn { background: #EDECF4; color: #262B40; }
+    .qaCard #moreAppsBtn .roster-cta-icon { background: #333A56; color: #fff; }
+
+    /* Former Colleagues */
+    .qaCard #alumniBtn {
+      grid-column: 2; grid-row: 2;
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 94px; padding: 14px 18px; border-radius: 20px;
+      background: #DDF6EF; color: #0B3B33;
+    }
+    .qaCard #alumniBtn .roster-cta-icon { background: #12857E; color: #fff; }
+    .qaCard #alumniBtn .roster-cta-label { font-size: 14px; text-align: end; }
+
+    /* Copy Shift + pinned actions */
+    .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .qaCard #copyShiftBtn {
+      flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #EDE4F8; color: #2B1B4D;
+    }
+    .qaCard #copyShiftBtn .roster-cta-icon { background: #5B2EC9; color: #fff; }
+    .qaCard #copyShiftBtn .roster-cta-label { font-size: 15px; text-align: end; }
+
+    .qaFlow .qaSlot { position: relative; min-width: 0; }
+    .qaFlow .qaSlotLink {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      height: 100%; min-height: 84px; padding: 14px 18px; border-radius: 20px;
+      background: #E6F6FE; color: #0B4A6F; text-decoration: none; font-weight: 700;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .qaFlow .qaSlotIcon {
+      flex: none; order: -1; width: 36px; height: 36px; border-radius: 999px;
+      background: #fff; border: 1px solid #D5E9F5; display: grid; place-items: center; line-height: 0;
+    }
+    .qaFlow .qaSlotIcon svg, .qaFlow .qaSlotIcon img { width: 22px; height: 22px; display: block; }
+    .qaFlow .qaSlotLabel {
+      min-width: 0; font-size: 15px; font-weight: 700; line-height: 1.2; text-align: end;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaFlow .qaSlotRemove {
+      position: absolute; top: 5px; inset-inline-end: 5px;
+      width: 20px; height: 20px; padding: 0; border-radius: 999px;
+      border: 1px solid #BFDCF0; background: #fff; color: #0B6E9A;
+      font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .qaFlow .qaSlotRemove:hover { background: #EAF7FE; }
+    .qaFlow .qaSlotRemove:focus-visible { outline: 2px solid #0E9BD8; outline-offset: 1px; }
+
+    /* Add Action slots */
+    .qaAddRow { display: flex; gap: 8px; }
+    .qaCard .qaAddSlot {
+      flex: 1 1 0; min-width: 0; height: 64px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 0 4px; border: 2px dashed #C3C7D6; border-radius: 20px;
+      background: #fff; color: #3A3F52; font-family: inherit;
+      font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaCard .qaAddSlot svg { flex: none; }
+    .qaCard .qaAddSlot:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
+    @media (hover: hover) {
+      .qaCard .roster-cta-btn:hover,
+      .qaFlow .qaSlotLink:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(23, 32, 64, .16);
+      }
+      .qaCard .qaAddSlot:hover { border-color: #0E9BD8; color: #0B6E9A; }
+    }
+    .qaCard .roster-cta-btn:active,
+    .qaFlow .qaSlotLink:active { transform: scale(.985); box-shadow: none; }
+    .qaCard .roster-cta-btn:focus-visible,
+    .qaFlow .qaSlotLink:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
+    @media (max-width: 359px) {
+      .qaCardHead { padding: 18px 16px 10px; }
+      .qaCardBody { padding: 0 16px 16px; }
+      .qaCardTitle { font-size: 20px; }
+      .qaCard #ctaBtn { min-height: 176px; padding: 14px; }
+      .qaCard #ctaBtn .roster-cta-icon { width: 38px; height: 38px; }
+      .qaCard #ctaBtn .roster-cta-label { font-size: 19px; }
+      .qaMini .roster-cta-btn { min-height: 88px; padding: 10px; border-radius: 16px; }
+      .qaMini .roster-cta-label { font-size: 12px; }
+      .qaCard #qaStatsBtn { padding: 10px 8px; }
+      .qaCard .qaStatsNum { font-size: 18px; }
+      .qaCard .qaStatsWord { font-size: 9px; }
+      .qaMini .roster-cta-icon { width: 30px; height: 30px; }
+      .qaMini .roster-cta-icon svg { width: 15px; height: 15px; }
+      .qaCard #alumniBtn { min-height: 88px; padding: 12px 14px; }
+      .qaCard #alumniBtn .roster-cta-label { font-size: 13px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 78px; padding: 12px 14px; }
+      .qaFlow .qaSlotLabel { font-size: 13px; }
+      .qaCard .qaAddSlot { font-size: 11px; height: 60px; }
+    }
+    @media (min-width: 520px) {
+      .qaCard #ctaBtn { min-height: 228px; }
+      .qaMini .roster-cta-btn { min-height: 110px; }
+      .qaCard #alumniBtn { min-height: 110px; }
+      .qaCard #copyShiftBtn, .qaFlow .qaSlotLink { min-height: 96px; }
+    }
+
+    /* Add Action picker sheet (docs/quick-actions.js) */
+    .qaPickSheet {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: flex-end; justify-content: center;
+      background: rgba(15, 23, 42, .48);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaPickSheet.open { display: flex; }
+    .qaPickCard {
+      width: 100%; max-width: 520px; max-height: 86vh; overflow: auto;
+      background: #fff; border-radius: 26px 26px 0 0;
+      padding: 18px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 30px rgba(15, 23, 42, .28);
+      color: #101426;
+    }
+    .qaPickTitle { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+    .qaPickHint { margin: 4px 0 12px; font-size: 12px; font-weight: 500; color: #4A5568; line-height: 1.4; }
+    .qaPickGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .qaPickItem {
+      display: flex; align-items: center; gap: 9px; width: 100%; min-width: 0;
+      padding: 9px 10px; border-radius: 16px; border: 1px solid #E1E6F0;
+      background: #fff; color: #101426; font-family: inherit; text-align: start;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .qaPickItemIcon { display: grid; place-items: center; flex: none; line-height: 0; }
+    .qaPickItemIcon svg, .qaPickItemIcon img { width: 26px; height: 26px; display: block; }
+    .qaPickItemLabel {
+      flex: 1 1 auto; min-width: 0; font-size: 12px; font-weight: 700; line-height: 1.2;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qaPickItemState {
+      flex: none; width: 20px; height: 20px; border-radius: 999px;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+      border: 1px solid #BFDCF0; background: #EAF7FE; color: #0B6E9A;
+    }
+    .qaPickItem[aria-pressed="true"] { border-color: #9EE3DA; background: #DDF6EF; color: #0B3B33; }
+    .qaPickItem[aria-pressed="true"] .qaPickItemState { border-color: #9EE3DA; background: #fff; color: #0B3B33; }
+    .qaPickItem:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    .qaPickActions { margin-top: 14px; }
+    .qaPickClose {
+      width: 100%; height: 46px; border-radius: 16px; border: 1px solid #BFDCF0;
+      background: #EAF7FE; color: #0B4A6F; font-family: inherit;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .qaPickClose:focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+    @media (min-width: 560px) {
+      .qaPickSheet { align-items: center; }
+      .qaPickCard { border-radius: 26px; }
+    }
+
+    /* ═══════ STATUS PANEL (footer) ═══════ */
+    html body .footer.qaFooter {
+      margin-top: 14px !important;
+      padding: 16px 18px !important;
+      background: rgba(255, 255, 255, .88) !important;
+      border: 0 !important; border-radius: 26px;
+      box-shadow: 0 8px 22px rgba(30, 30, 40, .20);
+      display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+      text-align: center; font-size: 12px; color: #2B3350; line-height: 1.5;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qaFooter .qaStatusMeta { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #2B3350; }
+    .qaFooter .qaStatusMeta strong, .qaFooter .qaStatusMeta span { font-size: 12px; color: #2B3350; }
+
+    /* site-visits.js injects its own !important rules on #siteVisitsHost —
+       these must out-specify that id rule without touching the JS. */
+    html body .footer.qaFooter #siteVisitsHost.siteVisitsHost {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svPart {
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 2px !important;
+      white-space: nowrap !important;
+      border-radius: 16px !important;
+      border: 1px solid transparent !important;
+      background: #fff !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svLabel {
+      font-size: 10px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .06em !important; text-transform: uppercase !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svNum {
+      font-size: 20px !important; font-weight: 700 !important; line-height: 1.1 !important;
+    }
+    html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
+
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) { background: #E4F6FE !important; border-color: #BFDCF0 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(1) .svNum { color: #0B4A6F !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) { background: #FFF1C9 !important; border-color: #F3D98A !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(3) .svNum { color: #6B4300 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) { background: #DDF7E8 !important; border-color: #A9E6C4 !important; }
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svLabel,
+    html body .footer.qaFooter #siteVisitsHost .svPart:nth-child(5) .svNum { color: #0F5A33 !important; }
+
+    .qaFooter .bgTextureShuffleWrap { position: relative; gap: 10px !important; margin-top: 2px !important; }
+    .qaFooter #bgScrollTopBtn,
+    .qaFooter #bgRefreshBtn {
+      width: 44px !important; height: 44px !important; border-radius: 999px !important;
+      display: inline-flex !important; align-items: center !important; justify-content: center !important;
+      flex: none !important; padding: 0 !important;
+    }
+    .qaFooter #bgScrollTopBtn { background: #EFE5FF !important; border: 1px solid #D2BEF5 !important; }
+    .qaFooter #bgScrollTopBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
+    .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
+    .qaFooter #bgTextureShuffleBtn {
+      height: 44px !important; min-height: 44px !important; padding: 0 18px !important;
+      border-radius: 999px !important; background: #EFE5FF !important;
+      border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
+      font-size: 12px !important; font-weight: 700 !important;
+    }
+    .qaFooter #bgTextureShuffleBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
+    .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
+
     /* ═══════ FOOTER ═══════ */
     .footer { margin-top:18px; text-align:center; font-size:12px; color:#94a3b8; padding:12px 0; line-height:1.9; }
     .footer strong { color:#64748b; }
@@ -1326,10 +1676,10 @@
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       <div class="chipLabel" data-key="withMePage">With me</div>
     </a>
-    <div class="summaryChip" id="summarySwitchChip">
-      <div class="chipVal" id="summarySwitchVal">85</div>
-      <div class="chipLabel" id="summarySwitchLabel" data-key="employees">Employees</div>
-    </div>
+    <a href="https://khalidsaif912.github.io/roster-site/leaves/" id="leavesChip" class="summaryChip leavesChip" style="text-decoration:none;" title="Leaves">
+      <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M9 15.5l2 2 4-4"/></svg><span class="chipValNum" id="leavesChipNum"></span></div>
+      <div class="chipLabel" data-key="leavesPage">Leaves</div>
+    </a>
     <a href="https://khalidsaif912.github.io/roster-site/my-schedules/index.html" id="myScheduleBtn" class="summaryChip" style="text-decoration:none;">
       <div class="chipVal"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
       <div class="chipLabel" data-key="mySchedule">My Schedule</div>
@@ -2139,40 +2489,60 @@
     </div>
     
 
-  <!-- ════ CTA ════ -->
-<nav class="quickActions roster-cta" aria-label="Page actions">
-  <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="#">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
-    <span class="roster-cta-label">Full Roster</span>
-  </a>
-  <button type="button" class="roster-cta-btn roster-cta-btn--share shareSiteBtn" id="shareSiteBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M8 7l4-4 4 4"/></svg></span>
-    <span class="roster-cta-label">Share Site</span>
-  </button>
-  <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-    <span class="roster-cta-label">Apps</span>
-  </button>
-</nav>
+  <!-- ════ ACTIONS ════ -->
+  <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
+    <div class="qaCardBar" aria-hidden="true"></div>
+    <noscript><style>.qaCard.collapsed .qaCardBody{display:block}</style></noscript>
+    <button type="button" class="qaCardHead" id="qaCardToggle" aria-expanded="false" aria-controls="qaCardBody">
+      <span class="qaCardIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+      <span class="qaCardTitle" id="qaCardTitle"><span class="qaEn">Actions</span><span class="qaAr" lang="ar">إجراءات</span></span>
+      <span class="qaCardTotal" aria-hidden="true"><span id="qaCardTotalNum">5</span><span class="qaCardTotalWord"><span class="qaEn">shortcuts</span><span class="qaAr" lang="ar">اختصارات</span></span></span>
+      <span class="qaCardChev" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+    </button>
+    <div class="qaCardBody" id="qaCardBody">
+      <div class="qaGrid">
+        <a class="roster-cta-btn roster-cta-btn--roster" id="ctaBtn" href="#">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span>
+          <span class="roster-cta-label">Full Roster</span>
+        </a>
+        <div class="qaMini">
+          <button type="button" class="roster-cta-btn qaStatsBtn" id="qaStatsBtn" title="Employees / Departments">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <span class="roster-cta-label">
+              <b class="qaStatsNum" id="qaStatsNum">85</b>
+              <small class="qaStatsWord" id="qaStatsWord" data-key="employees">Employees</small>
+            </span>
+          </button>
+          <button type="button" class="roster-cta-btn roster-cta-btn--apps moreAppsBtn" id="moreAppsBtn">
+            <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+            <span class="roster-cta-label">Apps</span>
+          </button>
+        </div>
+        <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="alumni/">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="roster-cta-label">Former Colleagues</span>
+        </a>
+      </div>
+      <div class="qaFlow" id="qaFlow">
+        <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
+          <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
+          <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
+        </button>
+      </div>
+      <div class="qaAddRow" id="qaAddRow">
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+        <button type="button" class="qaAddSlot" data-qa-add="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="qaEn">Add Action</span><span class="qaAr" lang="ar">إضافة إجراء</span></button>
+      </div>
+    </div>
+  </section>
 
-
-  <!-- ════ COPY SHIFT ════ -->
-<nav class="quickActions secondaryBar" aria-label="More actions">
-  <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5b21b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M11.5 13h5M11.5 16h3"/></svg></span>
-    <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
-  </button>
-  <a class="roster-cta-btn roster-cta-btn--alumni" id="alumniBtn" href="alumni/">
-    <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-    <span class="roster-cta-label">Former Colleagues</span>
-  </a>
-</nav>
-
-
-  <!-- ════ FOOTER ════ -->
-  <div class="footer">
-    <strong style="color:#475569;font-size:13px;">Last Updated:</strong> <strong style="color:#1e40af;" id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 12:51</strong><br>
-    <strong style="color:#475569;font-size:13px;">Source:</strong> <strong>Export New Roster OCTOBER 2026 Version 3.xlsx</strong>
+  <!-- ════ FOOTER (status panel) ════ -->
+  <div class="footer qaFooter">
+    <div class="qaStatusMeta">
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 15:09</span></div>
+      <div><strong>Source:</strong> <span>Export New Roster OCTOBER 2026 Version 3.xlsx</span></div>
+    </div>
   </div>
 
 </div>
@@ -2218,10 +2588,6 @@
       <a class="siteAppsLink siteAppsLink--leaves" href="https://khalidsaif912.github.io/new/docs/leaves/" data-app-id="leaves" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="12" width="44" height="42" rx="7" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/><path d="M10 24h44" stroke="#0f172a" stroke-width="2.2"/><path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/><path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/></svg></span>
         <span class="siteAppsLink-title" data-i18n="leaves">Leaves</span>
-      </a>
-      <a class="siteAppsLink siteAppsLink--wa" href="https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/" data-app-id="wa" data-open-same="1">
-        <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="10" y="8" width="44" height="48" rx="12" fill="#dcfce7" stroke="#0f172a" stroke-width="2.4"/><path d="M20 20h24M20 30h16M20 40h22" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/><path d="M42 18l8 8-8 8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="siteAppsLink-title" data-i18n="wa">WhatsApp</span>
       </a>
       <a class="siteAppsLink siteAppsLink--readSign" href="https://khalidsaif912.github.io/roster-site/read-and-sign/" data-app-id="readSign" data-open-same="1">
         <span class="siteAppsLink-icon"><svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="12" y="8" width="40" height="48" rx="6" fill="#99f6e4" stroke="#0f172a" stroke-width="2.2"/><path d="M20 20h24M20 28h18M20 36h20" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round"/><path d="M22 46l4 4 10-12" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -3277,7 +3643,7 @@ var T = {
     exportChecker:'Export Checker', exportOps:'Export Operators', inventory:'Inventory',
     flightDispatch:'Flight Dispatch', flta:'FLTA', unassigned:'Unassigned',
     security:'Security', absences:'Absences',
-    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me',
+    morning2:'Morning', afternoon2:'Afternoon', night2:'Night', allShifts:'All Shifts', mySchedule:'Schedule', importRoster:'Import', trainingPage:'TRG', diffPage:'Diff', readSignPage:'Read&Sign', withMePage:'With me', leavesPage:'Leaves',
     copyShift:'Copy Shift', copyTitle:'On-duty list', copyHint:'Copy or share a shift as WhatsApp text', copyDone:'Copied', copyEmpty:'No employees in this shift', copyFail:'Copy failed — long-press to copy', copyClose:'Close', copyAction:'Copy', shareAction:'Share', shareDone:'Shared',
   },
   ar: {
@@ -3292,28 +3658,29 @@ var T = {
     exportChecker:'مدقق الصادرات', exportOps:'مشغلو الصادرات', inventory:'المخزون',
     flightDispatch:'تجهيز الرحلات', flta:'FLTA', unassigned:'غير مُعيَّن',
     security:'الأمن', absences:'الغيابات',
-    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي',
+    morning2:'صباح', afternoon2:'ظهر', night2:'ليل', allShifts:'الكل', mySchedule:'جدولي', importRoster:'الوارد', trainingPage:'تدريب', diffPage:'فروقات', readSignPage:'إقرار', withMePage:'معي', leavesPage:'الإجازات',
     copyShift:'نسخ المناوبة', copyTitle:'قائمة المناوبين', copyHint:'انسخ أو شارك المناوبة كنص واتساب', copyDone:'تم نسخ', copyEmpty:'لا يوجد موظفون في هذه المناوبة', copyFail:'فشل النسخ — اضغط مطولاً للنسخ', copyClose:'إغلاق', copyAction:'نسخ', shareAction:'مشاركة', shareDone:'تمت المشاركة',
   }
 };
 
-function updateSummarySwitchChip() {
-  var val = document.getElementById('summarySwitchVal');
-  var lbl = document.getElementById('summarySwitchLabel');
-  if(!val || !lbl) return;
+function updateQaStats() {
+  var num = document.getElementById('qaStatsNum');
+  var word = document.getElementById('qaStatsWord');
+  var btn = document.getElementById('qaStatsBtn');
+  if(!num || !word) return;
   var t = T[LANG] || T.en;
   var mode = window.__summarySwitchMode || 'employees';
   var counts = window.__summaryCounts || {};
   if(mode === 'departments') {
-    val.style.color = '#059669';
-    val.textContent = counts.departments != null ? counts.departments : 7;
-    lbl.textContent = t.departments;
-    lbl.dataset.key = 'departments';
+    num.textContent = counts.departments != null ? counts.departments : 7;
+    word.textContent = t.departments;
+    word.dataset.key = 'departments';
+    if(btn) btn.classList.add('is-alt');
   } else {
-    val.style.color = '';
-    val.textContent = counts.employees != null ? counts.employees : 85;
-    lbl.textContent = t.employees;
-    lbl.dataset.key = 'employees';
+    num.textContent = counts.employees != null ? counts.employees : 85;
+    word.textContent = t.employees;
+    word.dataset.key = 'employees';
+    if(btn) btn.classList.remove('is-alt');
   }
 }
 
@@ -3321,9 +3688,30 @@ function startSummarySwitchLoop() {
   if(window.__summarySwitchTimer) return;
   window.__summarySwitchTimer = setInterval(function(){
     window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
-    updateSummarySwitchChip();
-  }, 2200);
+    updateQaStats();
+  }, 3200);
 }
+
+(function bindQaStatsTap() {
+  var btn = document.getElementById('qaStatsBtn');
+  if(!btn || btn.__statsBound) return;
+  btn.__statsBound = true;
+  btn.addEventListener('click', function(){
+    window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
+    updateQaStats();
+  });
+})();
+
+(function countLeavesChip() {
+  var el = document.getElementById('leavesChipNum');
+  if(!el) return;
+  var n = 0;
+  document.querySelectorAll(
+    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
+  ).forEach(function(c){ n += parseInt(c.textContent, 10) || 0; });
+  el.textContent = n > 0 ? String(n) : '';
+  el.hidden = n <= 0;
+})();
 
 function applyLang(lang) {
   var t=T[lang], isAr=lang==='ar';
@@ -3350,7 +3738,9 @@ function applyLang(lang) {
     else if(k==='diffPage') el.textContent=t.diffPage;
     else if(k==='readSignPage') el.textContent=t.readSignPage;
     else if(k==='withMePage') el.textContent=t.withMePage;
+    else if(k==='leavesPage') el.textContent=t.leavesPage;
   });
+  updateQaStats();
   document.querySelectorAll('.deptBadge span:first-child').forEach(function(el) { el.textContent=t.total; });
   var deptMap={'Officers':t.officers,'Supervisors':t.supervisors,'Load Control':t.loadControl,
     'Export Checker':t.exportChecker,'Export Operators':t.exportOps,'Inventory':t.inventory,
@@ -3388,9 +3778,9 @@ function applyLang(lang) {
   setCtaLabel('ctaBtn', t.viewFull);
   setCtaLabel('subscribeBtn', t.subscribe);
   setCtaLabel('compareBtn', t.compare);
-  setCtaLabel('shareSiteBtn', t.shareSite);
   setCtaLabel('moreAppsBtn', t.moreApps);
   setCtaLabel('copyShiftBtn', t.copyShift);
+  updateQaStats();
   // Persist language BEFORE secondary i18n hooks — site-apps reads localStorage
   // when rebuilding the With me chip and would otherwise overwrite معي with With me.
   localStorage.setItem('rosterLang',lang);
@@ -3420,7 +3810,7 @@ function applyLang(lang) {
     if(dayEl) dayEl.textContent=dayN;
     if(monthEl) monthEl.textContent=monthN;
   }
-  updateSummarySwitchChip();
+  updateQaStats();
   if (window.rosterSyncHeaderDate) {
     var datePickerEl = document.getElementById('datePicker');
     var iso = datePickerEl && datePickerEl.value;
@@ -3472,46 +3862,6 @@ setLocalCtaLinks();
 setSummaryChipHrefs();
 applyLang(LANG);
 startSummarySwitchLoop();
-
-(function bindSummarySwitchScroll() {
-  var chip = document.getElementById('summarySwitchChip');
-  if (!chip || chip.__scrollBound) return;
-  chip.__scrollBound = true;
-  chip.style.cursor = 'pointer';
-  chip.setAttribute('role', 'button');
-  chip.setAttribute('tabindex', '0');
-  function ensureShuffleButton() {
-    if (document.getElementById('bgTextureShuffleBtn')) return;
-    try {
-      var root = getSiteRootUrl();
-      var src = root + '/bg-texture-shuffle.js?v=20260903c';
-      if (document.querySelector('script[data-local-src="' + src + '"]')) return;
-      var s = document.createElement('script');
-      s.src = src;
-      s.defer = true;
-      s.setAttribute('data-local-src', src);
-      document.body.appendChild(s);
-    } catch (e) {}
-  }
-  function scrollToBottom() {
-    ensureShuffleButton();
-    function go() {
-      var root = document.scrollingElement || document.documentElement;
-      var top = Math.max(0, root.scrollHeight - root.clientHeight);
-      window.scrollTo({ top: top, left: 0, behavior: 'smooth' });
-    }
-    go();
-    // The "Shuffle background" button is injected lazily (requestIdleCallback,
-    // up to ~3s), which grows the footer. Re-scroll several times so we always
-    // land on the true bottom once that button appears.
-    var delays = [150, 400, 800, 1400, 2200, 3200];
-    delays.forEach(function (ms) { window.setTimeout(go, ms); });
-  }
-  chip.addEventListener('click', scrollToBottom);
-  chip.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToBottom(); }
-  });
-})();
 
 // ═══════════════════════════════════════════════════
 // Department layout: all sections open + time-based shift open
@@ -3677,7 +4027,7 @@ startSummarySwitchLoop();
 
     window.__summaryCounts = window.__summaryCounts || {};
     window.__summaryCounts.employees = totalEmployees;
-    if(window.updateSummarySwitchChip) window.updateSummarySwitchChip();
+    if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
   }
 
@@ -3976,7 +4326,8 @@ function goToRosterDiff(event) {
   addScript(root + '/announce-popup.js?v=20261031a');
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
-    addScript(root + '/site-apps.js?v=20261112a');
+    addScript(root + '/site-apps.js?v=20261112c');
+    addScript(root + '/quick-actions.js?v=20261112e');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

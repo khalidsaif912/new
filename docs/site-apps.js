@@ -43,6 +43,8 @@
       acceptanceSub: 'Acceptance duty roster',
       leaves: 'Leaves',
       leavesSub: 'Monthly leave list',
+      share: 'Share Site',
+      shareSub: 'Send the link or QR',
       chargeScreen: 'Charge',
       chargeScreenSub: 'Battery & roster on charge',
       chargeScreenVisit: 'Visit app page',
@@ -106,6 +108,8 @@
       acceptanceSub: 'روستر دوام الأكسبتنس',
       leaves: 'الإجازات',
       leavesSub: 'إجازات الشهر',
+      share: 'مشاركة الموقع',
+      shareSub: 'أرسل الرابط أو الباركود',
       spotlightBtn: 'اقتراح',
       spotlightBtnSub: 'شيء جميل من الموقع',
       spotlightTitle: 'اقتراح لك',
@@ -227,6 +231,13 @@
       '<path d="M22 8v8M42 8v8" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round"/>' +
       '<path d="M20 36h8M34 36h10M20 46h14" stroke="#b45309" stroke-width="2.4" stroke-linecap="round"/>' +
       '</svg>',
+    share:
+      '<svg class="siteAppsFlatSvg" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">' +
+      '<circle cx="46" cy="18" r="8" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<circle cx="18" cy="32" r="8" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<circle cx="46" cy="46" r="8" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.2"/>' +
+      '<path d="M25 28l14-7M25 36l14 7" stroke="#0284c7" stroke-width="2.8" stroke-linecap="round"/>' +
+      '</svg>',
     games: null
   };
 
@@ -302,12 +313,12 @@
     });
     sheet.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     ensureBookAppLink();
-    ensureBookListAppLink();
-    ensureWhatsAppAppLink();
+    pruneBlockedAppLinks();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
     ensureAcceptanceAppLink();
     ensureLeavesAppLink();
+    ensureShareAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     var spotlight = document.getElementById('spotlightSheet');
@@ -326,12 +337,12 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
-    ensureBookListAppLink();
-    ensureWhatsAppAppLink();
+    pruneBlockedAppLinks();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
     ensureAcceptanceAppLink();
     ensureLeavesAppLink();
+    ensureShareAppLink();
     ensureWithMeChip();
     organizeAppsGrid();
     sheet.classList.add('open');
@@ -383,10 +394,6 @@
       return getSiteRootUrl() + '/a-cup-of-book/';
     }
     return 'https://khalidsaif912.github.io/new/docs/a-cup-of-book/';
-  }
-
-  function bookListPageUrl() {
-    return 'https://new-roster.netlify.app/book-list/';
   }
 
   function alumniPageUrl() {
@@ -635,83 +642,17 @@
     patchBookLink();
   }
 
-  function patchBookListLink() {
-    var link = document.querySelector('.siteAppsLink--booklist, a.siteAppsLink[data-app-id="booklist"]');
-    if (!link) return;
-    link.href = bookListPageUrl();
-    link.setAttribute('data-open-same', '1');
-    link.removeAttribute('target');
-    link.removeAttribute('rel');
-  }
+  // Book List + WhatsApp are no longer part of the app launcher.
+  // Kept out of the grid (and out of the Quick Actions picker, which reads
+  // #siteAppsGrid). Re-enable by emptying APP_LINK_BLOCK.
+  var APP_LINK_BLOCK = { wa: 1, booklist: 1 };
 
-  function ensureBookListAppLink() {
+  function pruneBlockedAppLinks() {
     var grid = document.getElementById('siteAppsGrid');
     if (!grid) return;
-    var existing = grid.querySelector('.siteAppsLink--booklist, [data-app-id="booklist"]');
-    if (existing) {
-      patchBookListLink();
-      var title = existing.querySelector('[data-i18n="booklist"]');
-      var sub = existing.querySelector('[data-i18n-sub="booklist"]');
-      if (title) title.textContent = t('booklist');
-      if (sub) sub.textContent = t('booklistSub');
-      var icon = existing.querySelector('.siteAppsLink-icon');
-      if (icon) icon.innerHTML = iconForApp('booklist');
-      return;
-    }
-    var link = document.createElement('a');
-    link.className = 'siteAppsLink siteAppsLink--booklist';
-    link.setAttribute('data-app-id', 'booklist');
-    link.setAttribute('data-open-same', '1');
-    link.href = bookListPageUrl();
-    link.innerHTML =
-      '<span class="siteAppsLink-icon">' +
-      iconForApp('booklist') +
-      '</span>' +
-      '<span class="siteAppsLink-title" data-i18n="booklist">' +
-      t('booklist') +
-      '</span>' +
-      '<span class="siteAppsLink-sub" data-i18n-sub="booklist">' +
-      t('booklistSub') +
-      '</span>';
-    var labels = grid.querySelector('.siteAppsLink--labels, [data-app-id="labels"]');
-    if (labels && labels.nextSibling) {
-      grid.insertBefore(link, labels.nextSibling);
-    } else if (labels) {
-      grid.appendChild(link);
-    } else {
-      var calc = grid.querySelector('.siteAppsLink--calc');
-      if (calc && calc.nextSibling) grid.insertBefore(link, calc.nextSibling);
-      else grid.appendChild(link);
-    }
-    patchBookListLink();
-  }
-
-  function ensureWhatsAppAppLink() {
-    var grid = document.getElementById('siteAppsGrid');
-    if (!grid) return;
-    var href = 'https://khalidsaif912.github.io/new/docs/tools/whatsapp-text/';
-    var existing = grid.querySelector('a.siteAppsLink[data-app-id="wa"]');
-    if (!existing) {
-      var card = document.createElement('a');
-      card.className = 'siteAppsLink siteAppsLink--wa';
-      card.href = href;
-      card.setAttribute('data-app-id', 'wa');
-      card.setAttribute('data-open-same', '1');
-      card.innerHTML =
-        '<span class="siteAppsLink-icon">' + iconForApp('wa') + '</span>' +
-        '<span class="siteAppsLink-title" data-i18n="wa"></span>' +
-        '<span class="siteAppsLink-sub" data-i18n-sub="wa"></span>';
-      grid.insertBefore(card, grid.firstElementChild);
-      existing = card;
-    }
-    existing.href = href;
-    existing.removeAttribute('data-badge');
-    var title = existing.querySelector('[data-i18n="wa"]');
-    var sub = existing.querySelector('[data-i18n-sub="wa"]');
-    if (title) title.textContent = t('wa');
-    if (sub) sub.textContent = t('waSub');
-    var icon = existing.querySelector('.siteAppsLink-icon');
-    if (icon && !icon.innerHTML.trim()) icon.innerHTML = iconForApp('wa');
+    grid.querySelectorAll('[data-app-id]').forEach(function (el) {
+      if (APP_LINK_BLOCK[el.getAttribute('data-app-id')]) el.remove();
+    });
   }
 
   function ensureIdeasAppLink() {
@@ -857,6 +798,44 @@
 
   function ensureLeavesAppLink() {
     ensureLinkCardApp('leaves', leavesPageUrl());
+  }
+
+  // Share Site used to live in the bottom Actions card; it now opens the same
+  // share sheet from inside the Apps launcher.
+  function ensureShareAppLink() {
+    var grid = document.getElementById('siteAppsGrid');
+    if (!grid) return;
+    var card = grid.querySelector('.siteAppsLink[data-app-id="share"]');
+    if (!card) {
+      card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'siteAppsLink siteAppsLink--share';
+      card.setAttribute('data-app-id', 'share');
+      card.innerHTML =
+        '<span class="siteAppsLink-icon"></span>' +
+        '<span class="siteAppsLink-title"></span>' +
+        '<span class="siteAppsLink-sub"></span>';
+      card.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeModal();
+        if (window.rosterSiteShare && window.rosterSiteShare.open) {
+          window.rosterSiteShare.open();
+        }
+      });
+      grid.insertBefore(card, grid.firstElementChild);
+    }
+    var title = card.querySelector('.siteAppsLink-title');
+    var sub = card.querySelector('.siteAppsLink-sub');
+    var ico = card.querySelector('.siteAppsLink-icon');
+    if (title) {
+      title.setAttribute('data-i18n', 'share');
+      title.textContent = t('share');
+    }
+    if (sub) {
+      sub.setAttribute('data-i18n-sub', 'shareSub');
+      sub.textContent = t('shareSub');
+    }
+    if (ico) ico.innerHTML = iconForApp('share');
   }
 
   function ensureChargeScreenDialog() {
@@ -1015,7 +994,7 @@
       );
     }
 
-    var order = ['acceptance', 'leaves', 'wa', 'chargeScreen', 'calc', 'labels', 'booklist', 'quicklist', 'book', 'ideas', 'store', 'games'];
+    var order = ['acceptance', 'leaves', 'chargeScreen', 'calc', 'labels', 'quicklist', 'book', 'ideas', 'store', 'games'];
     var seen = {};
     order.forEach(function (id) {
       var el = findApp(id);
@@ -1074,8 +1053,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
-    ensureBookListAppLink();
-    ensureWhatsAppAppLink();
+    pruneBlockedAppLinks();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
     ensureAcceptanceAppLink();
@@ -1107,13 +1085,6 @@
         window.location.assign(bookPageUrl());
         return;
       }
-      if (e.target.closest('a.siteAppsLink--booklist')) {
-        if (!isStandaloneApp()) return;
-        e.preventDefault();
-        closeModal();
-        window.location.assign(bookListPageUrl());
-        return;
-      }
       var link = e.target.closest('a.siteAppsLink[data-open-same="1"]');
       if (!link || !isStandaloneApp()) return;
       e.preventDefault();
@@ -1140,15 +1111,15 @@
     style.textContent = [
       '.quickActions.secondaryBar{max-width:min(100%,540px)!important;margin-top:8px!important;gap:8px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}',
       '.secondaryBar .roster-cta-btn{min-height:46px!important;padding:10px 10px!important;font-size:12.5px!important;width:100%!important;min-width:0!important;}',
-      '#alumniBtn.roster-cta-btn--alumni,a.roster-cta-btn--alumni{',
+      '.secondaryBar #alumniBtn.roster-cta-btn--alumni,.secondaryBar a.roster-cta-btn--alumni{',
       'display:inline-flex!important;align-items:center!important;justify-content:center!important;',
       'gap:8px!important;background:#f0fdfa!important;border:1.5px solid #99f6e4!important;',
       'border-radius:999px!important;color:#0f766e!important;text-decoration:none!important;',
       'box-shadow:none!important;font-weight:700!important;',
       '}',
-      '#alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;color:inherit!important;}',
-      '#alumniBtn .roster-cta-icon svg{stroke:#0f766e!important;}',
-      '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}#alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
+      '.secondaryBar #alumniBtn .roster-cta-label{font-size:11.5px!important;letter-spacing:-.01em;color:inherit!important;}',
+      '.secondaryBar #alumniBtn .roster-cta-icon svg{stroke:#0f766e!important;}',
+      '@media (max-width:420px){.secondaryBar .roster-cta-btn{font-size:11.5px!important;padding:10px 8px!important;}.secondaryBar #alumniBtn .roster-cta-label{font-size:10.8px!important;}}',
       '.quickActions.spotlightBar{margin-top:8px!important;padding:0 2px!important;display:flex!important;justify-content:center!important;width:100%!important;max-width:min(100%,540px)!important;margin-inline:auto!important;}',
       '.spotlightBar .spotlightBtn{width:min(100%,255px)!important;justify-content:center!important;text-align:center!important;min-height:44px!important;padding:8px 12px!important;gap:7px!important;margin-inline:auto!important;}',
       '.spotlightBtnLabel{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;}',
@@ -1178,6 +1149,8 @@
       '.siteAppsLink--wa .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#a7f3d0)!important;border-color:#6ee7b7!important;}',
       '.siteAppsLink--chargeScreen .siteAppsLink-icon{background:linear-gradient(160deg,#ecfdf5,#86efac)!important;border-color:#4ade80!important;}',
       '.siteAppsLink--games .siteAppsLink-icon{background:linear-gradient(160deg,#fce7f3,#fbcfe8)!important;border-color:#f9a8d4!important;}',
+      'button.siteAppsLink{font:inherit;color:inherit;cursor:pointer;width:100%;text-align:center;-webkit-tap-highlight-color:transparent;}',
+      '.siteAppsLink--share .siteAppsLink-icon{background:linear-gradient(160deg,#e0f2fe,#bae6fd)!important;border-color:#7dd3fc!important;}',
       '.siteAppsLink--store .siteAppsLink-icon{background:linear-gradient(160deg,#ffedd5,#fdba74)!important;border-color:#fb923c!important;}',
       '#spotlightEmojiBtn{position:absolute;z-index:31;width:32px;height:32px;padding:0;border:none;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;}',
       '#spotlightEmojiBtn:hover{transform:scale(1.08);opacity:.96;}',
@@ -1336,6 +1309,14 @@
   }
 
   function ensureSpotlightButton() {
+    // The Quick Actions card owns the bottom action area; the legacy
+    // spotlight/"surprise me" bar must not sit between the card and the footer.
+    if (document.querySelector('.qaCard')) {
+      var stale = document.getElementById('spotlightBar');
+      if (stale) stale.remove();
+      ensureSpotlightEmojiButton();
+      return;
+    }
     var footer = document.querySelector('.footer');
     if (footer && footer.parentNode) {
       var bar = document.getElementById('spotlightBar');
@@ -1502,8 +1483,7 @@
     patchCalcLink();
     patchQuicklistLink();
     ensureBookAppLink();
-    ensureBookListAppLink();
-    ensureWhatsAppAppLink();
+    pruneBlockedAppLinks();
     ensureIdeasAppLink();
     ensureChargeScreenAppLink();
     ensureAcceptanceAppLink();
