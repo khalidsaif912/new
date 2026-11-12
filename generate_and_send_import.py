@@ -1005,7 +1005,6 @@ def import_leave_label(code: str, group_key: str) -> str:
 def import_actions_card_html(employees_total: int, departments_total: int) -> str:
     """Bottom Actions card — same layout/shortcuts as the Export duty pages."""
     return f"""
-  {MOBILE_BOTTOM_QUICK_HTML}
   <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
     <div class="qaCardBar" aria-hidden="true"></div>
     <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
@@ -1040,6 +1039,7 @@ def import_actions_card_html(employees_total: int, departments_total: int) -> st
         </a>
       </div>
       <div class="qaFlow" id="qaFlow">
+        {MOBILE_BOTTOM_QUICK_HTML}
         <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
           <span class="roster-cta-icon">{QA_ICON_COPY}</span>
           <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
@@ -1236,7 +1236,7 @@ def build_duty_html(
     # repo_base_path example: "/roster-site/import" or "/import" depending on hosting.
     # We'll compute BASE in JS at runtime to work in both local + GitHub Pages.
     # The reused Export stylesheet may already carry the mobile bottom bar CSS.
-    bottom_quick_css = "" if ".bottomMobileQuick" in style else MOBILE_BOTTOM_QUICK_CSS
+    bottom_quick_css = "" if ".qaTrainingTile" in style else MOBILE_BOTTOM_QUICK_CSS
     html = f"""<!doctype html>
 <html lang="en">
 <head>

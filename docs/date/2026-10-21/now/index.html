@@ -1489,49 +1489,30 @@
     .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
     .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
 
-    .bottomMobileQuick { display: none; }
+    /* Training tile: lives inside the Actions button group, phones only. */
+    .qaCard .qaTrainingTile { display: none; }
     @media (max-width: 640px) {
-      /* Move the training shortcut from the summary bar to the bottom buttons. */
+      /* Move the training shortcut from the summary bar into the button group. */
       .summaryBar #trainingBtn,
       .summaryBar a.summaryChip.trainingChip { display: none !important; }
-      .bottomMobileQuick {
+      .qaCard .qaTrainingTile {
         display: flex;
-        gap: 8px;
-        margin: 16px 0 0;
-      }
-      .bottomMobileQuick .roster-cta-btn {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        min-height: 56px;
-        padding: 12px 16px;
-        border: 0;
-        border-radius: 18px;
-        background: #F3F4F8;
-        color: #101426;
-        font-family: inherit;
-        font-size: 15px;
-        font-weight: 700;
-        box-shadow: 0 6px 18px rgba(23, 32, 64, .10);
+        flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+        min-height: 84px; padding: 14px 18px; border-radius: 20px;
+        background: #EDE4F8; color: #2B1B4D;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
-      .bottomMobileQuick .roster-cta-icon {
-        flex: none;
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: #7c3aed1a;
-        color: #7c3aed;
+      .qaCard .qaTrainingTile .roster-cta-icon {
+        flex: none; width: 36px; height: 36px; border-radius: 999px;
+        display: grid; place-items: center; line-height: 0;
+        background: #5B2EC9; color: #fff;
       }
-      .bottomMobileQuick .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
-      .bottomMobileQuick .roster-cta-label { min-width: 0; }
-      .bottomMobileQuick .qaAr { display: none; }
-      body.ar .bottomMobileQuick .qaEn, html[dir="rtl"] .bottomMobileQuick .qaEn { display: none; }
-      body.ar .bottomMobileQuick .qaAr, html[dir="rtl"] .bottomMobileQuick .qaAr { display: inline; }
+      .qaCard .qaTrainingTile .roster-cta-icon svg { display: block; width: 18px; height: 18px; stroke: currentColor; }
+      .qaCard .qaTrainingTile .roster-cta-label { min-width: 0; font-size: 15px; text-align: end; }
+      .qaTrainingTile .qaAr { display: none; }
+      body.ar .qaTrainingTile .qaEn, html[dir="rtl"] .qaTrainingTile .qaEn { display: none; }
+      body.ar .qaTrainingTile .qaAr, html[dir="rtl"] .qaTrainingTile .qaAr { display: inline; }
     }
 
     /* ═══════ FOOTER ═══════ */
@@ -2548,14 +2529,6 @@
     
 
   <!-- ════ ACTIONS ════ -->
-  
-  <nav class="bottomMobileQuick" aria-label="Training">
-    <a class="roster-cta-btn roster-cta-btn--training" id="trainingBtnBottom" href="#" style="text-decoration:none;">
-      <span class="roster-cta-icon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-      <span class="roster-cta-label"><span class="qaEn">Training</span><span class="qaAr" lang="ar">التدريب</span></span>
-    </a>
-  </nav>
-
   <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
     <div class="qaCardBar" aria-hidden="true"></div>
     <noscript><style>.qaCard.collapsed .qaCardBody{display:block}</style></noscript>
@@ -2590,6 +2563,10 @@
         </a>
       </div>
       <div class="qaFlow" id="qaFlow">
+        <a class="roster-cta-btn roster-cta-btn--training qaTrainingTile" id="trainingBtnBottom" href="#" style="text-decoration:none;">
+          <span class="roster-cta-icon"><svg class="chip-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+          <span class="roster-cta-label"><span class="qaEn">Training</span><span class="qaAr" lang="ar">التدريب</span></span>
+        </a>
         <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
           <span class="roster-cta-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
           <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>
@@ -2606,7 +2583,7 @@
   <!-- ════ FOOTER (status panel) ════ -->
   <div class="footer qaFooter">
     <div class="qaStatusMeta">
-      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 17:37</span></div>
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 21:11</span></div>
       <div><strong>Source:</strong> <span>Export New Roster OCTOBER 2026 Version 3.xlsx</span></div>
     </div>
   </div>
@@ -4451,7 +4428,7 @@ function goToRosterDiff(event) {
   function loadSecondary() {
     addScript(root + '/site-share.js?v=' + ver);
     addScript(root + '/site-apps.js?v=20261112c');
-    addScript(root + '/quick-actions.js?v=20261112e');
+    addScript(root + '/quick-actions.js?v=20261112f');
     addScript(root + '/shift-copy.js?v=' + ver);
     addScript(root + '/install-pwa.js?v=20260814pwa');
     addScript(root + '/bg-texture-shuffle.js?v=' + ver);

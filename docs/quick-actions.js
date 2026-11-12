@@ -180,9 +180,10 @@
     var badge = $('qaCardTotalNum');
     if (!badge) return;
     var body = $('qaCardBody');
-    // The stats tile is a counter, not a shortcut — leave it out of the badge.
+    // The stats tile is a counter and the Training tile is a duplicate of the
+    // top chip — leave both out of the badge.
     var base = body
-      ? body.querySelectorAll('.roster-cta-btn:not(#qaStatsBtn)').length
+      ? body.querySelectorAll('.roster-cta-btn:not(#qaStatsBtn):not(#trainingBtnBottom)').length
       : 4;
     badge.textContent = String(base + extra);
   }

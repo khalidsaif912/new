@@ -1883,7 +1883,6 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   {dept_cards_html}
 
   <!-- ════ ACTIONS ════ -->
-  {MOBILE_BOTTOM_QUICK_HTML}
   <section class="qaCard collapsed" aria-labelledby="qaCardTitle">
     <div class="qaCardBar" aria-hidden="true"></div>
     <noscript><style>.qaCard.collapsed .qaCardBody{{display:block}}</style></noscript>
@@ -1918,6 +1917,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
         </a>
       </div>
       <div class="qaFlow" id="qaFlow">
+        {MOBILE_BOTTOM_QUICK_HTML}
         <button type="button" class="roster-cta-btn roster-cta-btn--texture copyShiftBtn" id="copyShiftBtn">
           <span class="roster-cta-icon">{QA_ICON_COPY}</span>
           <span class="roster-cta-label" id="copyShiftLabel">Copy Shift</span>

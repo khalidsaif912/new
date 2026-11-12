@@ -1654,60 +1654,38 @@ IMPORT_BOTTOM_CTA_CSS = """    .importBottom {
     }
 """
 
-# On phones the summary bar is a single no-wrap row, so the TRG chip moves down
-# next to the bottom action buttons instead of squeezing the other chips.
-MOBILE_BOTTOM_QUICK_HTML = """
-  <nav class="bottomMobileQuick" aria-label="Training">
-    <a class="roster-cta-btn roster-cta-btn--training" id="trainingBtnBottom" href="#" style="text-decoration:none;">
-      <span class="roster-cta-icon">{icon}</span>
-      <span class="roster-cta-label"><span class="qaEn">Training</span><span class="qaAr" lang="ar">التدريب</span></span>
-    </a>
-  </nav>
-""".replace("{icon}", SVG_CHIP_TRAINING)
+# On phones the summary bar is a single no-wrap row, so the TRG chip moves into
+# the Actions grid as one more tile instead of squeezing the other chips.
+# Goes inside .qaFlow (next to Copy Shift) — never a standalone bar.
+MOBILE_BOTTOM_QUICK_HTML = """<a class="roster-cta-btn roster-cta-btn--training qaTrainingTile" id="trainingBtnBottom" href="#" style="text-decoration:none;">
+          <span class="roster-cta-icon">{icon}</span>
+          <span class="roster-cta-label"><span class="qaEn">Training</span><span class="qaAr" lang="ar">التدريب</span></span>
+        </a>""".replace("{icon}", SVG_CHIP_TRAINING)
 
-MOBILE_BOTTOM_QUICK_CSS = """    .bottomMobileQuick { display: none; }
+MOBILE_BOTTOM_QUICK_CSS = """    /* Training tile: lives inside the Actions button group, phones only. */
+    .qaCard .qaTrainingTile { display: none; }
     @media (max-width: 640px) {
-      /* Move the training shortcut from the summary bar to the bottom buttons. */
+      /* Move the training shortcut from the summary bar into the button group. */
       .summaryBar #trainingBtn,
       .summaryBar a.summaryChip.trainingChip { display: none !important; }
-      .bottomMobileQuick {
+      .qaCard .qaTrainingTile {
         display: flex;
-        gap: 8px;
-        margin: 16px 0 0;
-      }
-      .bottomMobileQuick .roster-cta-btn {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        min-height: 56px;
-        padding: 12px 16px;
-        border: 0;
-        border-radius: 18px;
-        background: #F3F4F8;
-        color: #101426;
-        font-family: inherit;
-        font-size: 15px;
-        font-weight: 700;
-        box-shadow: 0 6px 18px rgba(23, 32, 64, .10);
+        flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
+        min-height: 84px; padding: 14px 18px; border-radius: 20px;
+        background: #EDE4F8; color: #2B1B4D;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
-      .bottomMobileQuick .roster-cta-icon {
-        flex: none;
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: #7c3aed1a;
-        color: #7c3aed;
+      .qaCard .qaTrainingTile .roster-cta-icon {
+        flex: none; width: 36px; height: 36px; border-radius: 999px;
+        display: grid; place-items: center; line-height: 0;
+        background: #5B2EC9; color: #fff;
       }
-      .bottomMobileQuick .roster-cta-icon svg { display: block; width: 18px; height: 18px; }
-      .bottomMobileQuick .roster-cta-label { min-width: 0; }
-      .bottomMobileQuick .qaAr { display: none; }
-      body.ar .bottomMobileQuick .qaEn, html[dir="rtl"] .bottomMobileQuick .qaEn { display: none; }
-      body.ar .bottomMobileQuick .qaAr, html[dir="rtl"] .bottomMobileQuick .qaAr { display: inline; }
+      .qaCard .qaTrainingTile .roster-cta-icon svg { display: block; width: 18px; height: 18px; stroke: currentColor; }
+      .qaCard .qaTrainingTile .roster-cta-label { min-width: 0; font-size: 15px; text-align: end; }
+      .qaTrainingTile .qaAr { display: none; }
+      body.ar .qaTrainingTile .qaEn, html[dir="rtl"] .qaTrainingTile .qaEn { display: none; }
+      body.ar .qaTrainingTile .qaAr, html[dir="rtl"] .qaTrainingTile .qaAr { display: inline; }
     }
 """
 
@@ -1778,7 +1756,7 @@ MANTLE_CLIENT_VER = "20261031a"
 # Related apps launcher (docs/site-apps.js). Bump when the launcher JS/CSS changes.
 SITE_APPS_VER = "20261112c"
 # Quick Actions card behaviour (docs/quick-actions.js): collapse + Add Action picker.
-QUICK_ACTIONS_VER = "20261112e"
+QUICK_ACTIONS_VER = "20261112f"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {
