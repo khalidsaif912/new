@@ -578,25 +578,27 @@
       white-space: nowrap;
     }
 
-    /* Full-width month ruler: one tick per day, leave runs placed by date. */
+    /* Full-width month ruler: a thin day rail, with day chips on top of it.
+       The rail stays short — only the date boxes grow. */
     .shadowTrack {
       position: relative;
       min-width: 0;
-      margin-top: 6px;
+      margin-top: 7px;
     }
     .monthTrack {
       position: relative;
-      height: 10px;
-      border-radius: var(--radius-pill);
-      background: #f8fafc;
-      box-shadow: inset 0 0 0 1px #eef2f7;
-      overflow: hidden;
+      height: 18px;
+      overflow: visible;
     }
+    /* Thin 8px rail with one tick per day. */
     .monthTrack::before {
       content: "";
       position: absolute;
-      inset: 0;
-      border-radius: inherit;
+      inset-inline: 0;
+      top: 5px;
+      height: 8px;
+      border-radius: var(--radius-pill);
+      background-color: #f8fafc;
       background-image: repeating-linear-gradient(
         to left,
         transparent 0,
@@ -604,14 +606,18 @@
         rgba(148, 163, 184, .22) calc(var(--day, 3.3333%) - 1px),
         rgba(148, 163, 184, .22) var(--day, 3.3333%)
       );
+      box-shadow: inset 0 0 0 1px #eef2f7;
       pointer-events: none;
+      z-index: 1;
     }
     /* Same day grid redrawn on top so the leave bar itself is split per day. */
     .monthTrack::after {
       content: "";
       position: absolute;
-      inset: 0;
-      border-radius: inherit;
+      inset-inline: 0;
+      top: 5px;
+      height: 8px;
+      border-radius: var(--radius-pill);
       background-image: repeating-linear-gradient(
         to left,
         transparent 0,
@@ -620,11 +626,12 @@
         rgba(255, 255, 255, .55) var(--day, 3.3333%)
       );
       pointer-events: none;
+      z-index: 3;
     }
     .trackSpan {
       position: absolute;
-      top: 1.5px;
-      bottom: 1.5px;
+      top: 5px;
+      bottom: 5px;
       inset-inline-start: var(--start, 0%);
       width: var(--w, 0%);
       min-width: 3px;
@@ -635,6 +642,7 @@
       transform-origin: right center;
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
+      z-index: 2;
     }
     html[lang="en"] .trackSpan {
       background: linear-gradient(to right, var(--accent) 0%, var(--accent-2, var(--accent)) 100%);
@@ -642,48 +650,89 @@
     html[lang="en"] .trackSpan,
     html[lang="en"] .trackGap,
     html[lang="en"] .trackWork { transform-origin: left center; }
-    /* Elapsed leave days use the deep tone, today's cell uses the accent amber. */
+    /* Elapsed leave days use the deep tone. */
     .trackPast {
       position: absolute;
       inset-block: 0;
       inset-inline-start: 0;
       background: var(--accent-past, #334155);
     }
-    .trackToday {
-      position: absolute;
-      inset-block: 0;
-      inset-inline-start: var(--tstart, 0%);
-      width: var(--tw, 0%);
-      background: #f59e0b;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55);
-    }
-    .trackGap,
-    .trackWork {
+    .trackGap {
       position: absolute;
       inset-inline-start: var(--start, 0%);
       width: var(--w, 0%);
       min-width: 2px;
+      top: 7px;
+      bottom: 7px;
       border-radius: 3px;
+      background: #cbd5e1;
       transform-origin: right center;
       animation: stretch .7s cubic-bezier(.22, 1, .36, 1) both;
       animation-delay: calc(var(--i, 0) * 30ms);
+      z-index: 2;
     }
-    .trackGap {
-      top: 1.5px;
-      bottom: 1.5px;
-      background: #cbd5e1;
+    /* Every day number sits in a square box on top of the rail:
+       leave start/end (accent), back-to-work (blue), today (amber),
+       and the month's first/last day (grey). */
+    .trackChip {
+      position: absolute;
+      inset-inline-start: calc((var(--day-index, 1) - .5) * var(--day, 3.3333%));
+      top: calc((100% - var(--chip-size, 18px)) / 2);
+      width: var(--chip-size, 18px);
+      height: var(--chip-size, 18px);
+      margin-inline-start: calc(var(--chip-size, 18px) / -2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-family: var(--font-en);
+      font-size: var(--chip-font, 10.5px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.02em;
+      font-variant-numeric: tabular-nums;
+      animation: pop .35s cubic-bezier(.22, 1, .36, 1) both;
+      animation-delay: calc(var(--i, 0) * 30ms);
     }
-    .trackWork {
-      top: 0;
-      bottom: 0;
+    /* Leave start and end day, colored like the leave bar. */
+    .trackChip.trackFrom,
+    .trackChip.trackTo {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 6px -2px var(--accent-soft), 0 0 0 1.5px #fff;
+      z-index: 5;
+    }
+    .trackChip.trackWork {
       background: #2563eb;
-      box-shadow: 0 4px 10px -4px rgba(37, 99, 235, .65);
+      color: #fff;
+      box-shadow: 0 2px 6px -1px rgba(37, 99, 235, .55), 0 0 0 1.5px #fff;
+      z-index: 7;
+    }
+    .trackChip.trackToday {
+      background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+      color: #fff;
+      box-shadow: 0 2px 6px -1px rgba(245, 158, 11, .55), 0 0 0 1.5px #fff;
+      z-index: 6;
+    }
+    /* Month first/last day stays quiet so it never competes with leave days. */
+    .trackChip.trackEdge {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #94a3b8;
+      z-index: 4;
     }
     .empRow.is-expired .trackGap { background: #e2e8f0; }
-    .empRow.is-expired .trackWork { background: #94a3b8; box-shadow: none; }
+    .empRow.is-expired .trackChip.trackWork {
+      background: #94a3b8;
+      box-shadow: 0 0 0 1.5px #fff;
+    }
     @keyframes stretch {
       from { transform: scaleX(0); opacity: .2; }
       to { transform: scaleX(1); opacity: 1; }
+    }
+    @keyframes pop {
+      from { transform: scale(.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .expiredTag {
@@ -788,6 +837,17 @@
       font-weight: 600;
     }
 
+    @media (max-width: 520px) {
+      /* Phones: name + ID on one line, details on a clean second line. */
+      .empNameLine { display: flex; }
+      .empFacts {
+        display: flex;
+        flex-wrap: wrap;
+        margin-inline-start: 0;
+        margin-top: 3px;
+      }
+      .leaveTag { display: none; }
+    }
     @media (max-width: 380px) {
       .backBtnLabel { display: none; }
       .backBtn { min-width: 40px; padding: 0 9px; }
@@ -913,7 +973,10 @@
           expired: 'منقضية',
           expiredGroup: 'إجازات منقضية',
           rest: 'راحة',
-          backToWork: 'بداية الدوام'
+          backToWork: 'بداية الدوام',
+          today: 'اليوم',
+          leaveStart: 'بداية الإجازة',
+          leaveEnd: 'نهاية الإجازة'
         },
         en: {
           pageTitle: 'Leaves',
@@ -934,7 +997,10 @@
           expired: 'Expired',
           expiredGroup: 'Expired leaves',
           rest: 'Rest',
-          backToWork: 'Back to work'
+          backToWork: 'Back to work',
+          today: 'Today',
+          leaveStart: 'Leave starts',
+          leaveEnd: 'Leave ends'
         }
       };
       var DEPT_AR = {
@@ -1251,6 +1317,16 @@
         return mark;
       }
 
+      function placeChip(ruler, className, day, index, title, label) {
+        var chip = div('trackChip ' + className);
+        chip.style.setProperty('--day-index', String(day));
+        chip.style.setProperty('--i', String(Math.min(index, 14)));
+        chip.textContent = String(label);
+        if (title) chip.title = title;
+        ruler.appendChild(chip);
+        return chip;
+      }
+
       function markLeaveProgress(mark, fromDay, toDay, monthKey, today) {
         var todayMonth = today.slice(0, 7);
         var todayDay = parseInt(today.slice(8, 10), 10);
@@ -1266,12 +1342,6 @@
           var past = span('trackPast');
           past.style.width = ((pastDays / days) * 100).toFixed(4) + '%';
           mark.appendChild(past);
-        }
-        if (monthKey === todayMonth && todayDay >= fromDay && todayDay <= toDay) {
-          var now = span('trackToday');
-          now.style.setProperty('--tstart', (((todayDay - fromDay) / days) * 100).toFixed(4) + '%');
-          now.style.setProperty('--tw', ((100 / days)).toFixed(4) + '%');
-          mark.appendChild(now);
         }
       }
 
@@ -1310,15 +1380,50 @@
 
         var ruler = div('monthTrack');
         ruler.style.setProperty('--day', (100 / monthDays).toFixed(4) + '%');
+        track.setAttribute('data-days', String(monthDays));
         var ranges = entry.ranges && entry.ranges.length
           ? entry.ranges
           : [{ from: entry.from, to: entry.to }];
         var today = todayIso();
+        var todayMonth = today.slice(0, 7);
+        var todayDay = parseInt(today.slice(8, 10), 10);
+
+        /* Day-number boxes: one box per day, highest priority wins. */
+        var chips = [];
+        function addChip(day, className, title, priority) {
+          if (!day || day < 1 || day > monthDays) return;
+          for (var c = 0; c < chips.length; c++) {
+            if (chips[c].day === day) {
+              if (priority > chips[c].priority) {
+                chips[c].className = className;
+                chips[c].title = title;
+                chips[c].priority = priority;
+              }
+              return;
+            }
+          }
+          chips.push({ day: day, className: className, title: title, priority: priority });
+        }
+
+        /* Month bounds first: they yield to any leave, work or today box. */
+        addChip(1, 'trackEdge', null, 1);
+        addChip(monthDays, 'trackEdge', null, 1);
+
         ranges.forEach(function (range, rangeIndex) {
           var fromDay = parseInt(range.from.slice(8, 10), 10);
           var toDay = parseInt(range.to.slice(8, 10), 10);
           var mark = placeMark(ruler, 'trackSpan', fromDay, toDay, monthDays, index + rangeIndex);
           if (!expired) markLeaveProgress(mark, fromDay, toDay, monthKey, today);
+          addChip(
+            fromDay, 'trackFrom',
+            t('leaveStart') + ': ' + fromDay + ' ' + monthName(monthKey), 3
+          );
+          if (toDay !== fromDay) {
+            addChip(
+              toDay, 'trackTo',
+              t('leaveEnd') + ': ' + toDay + ' ' + monthName(monthKey), 3
+            );
+          }
         });
 
         (entry.returns || []).forEach(function (ret, returnIndex) {
@@ -1333,11 +1438,23 @@
           }
           if (ret.work) {
             var workDay = parseInt(ret.work.slice(8, 10), 10);
-            placeMark(
-              ruler, 'trackWork', workDay, workDay, monthDays, delay,
-              t('backToWork') + ': ' + workDay + ' ' + monthName(monthKey)
+            addChip(
+              workDay, 'trackWork',
+              t('backToWork') + ': ' + workDay + ' ' + monthName(monthKey), 5
             );
           }
+        });
+
+        /* Today owns its column and outranks every other box. */
+        if (todayMonth === monthKey) {
+          addChip(
+            todayDay, 'trackToday',
+            t('today') + ': ' + todayDay + ' ' + monthName(monthKey), 6
+          );
+        }
+
+        chips.forEach(function (chip, chipIndex) {
+          placeChip(ruler, chip.className, chip.day, chipIndex, chip.title, chip.day);
         });
 
         track.appendChild(ruler);
@@ -1455,6 +1572,25 @@
 
         els.listCard.innerHTML = '';
         els.listCard.appendChild(frag);
+        fitChips();
+      }
+
+      /* Day boxes must stay squares that fit inside a single day cell.
+         Measured once per render (and on resize) so numbers never collide. */
+      function fitChips() {
+        if (!els.listCard) return;
+        var ruler = els.listCard.querySelector('.monthTrack');
+        if (!ruler) return;
+        var days = 30;
+        try {
+          var probe = ruler.parentNode && ruler.parentNode.getAttribute('data-days');
+          if (probe) days = parseInt(probe, 10) || 30;
+        } catch (e) {}
+        var dayPx = ruler.getBoundingClientRect().width / days;
+        var size = Math.max(10, Math.min(18, Math.floor(dayPx)));
+        var font = size <= 12 ? 8 : (size <= 15 ? 9 : 10.5);
+        els.listCard.style.setProperty('--chip-size', size + 'px');
+        els.listCard.style.setProperty('--chip-font', font + 'px');
       }
 
       function updateStripActive() {
@@ -1700,6 +1836,12 @@
       });
       window.addEventListener('pageshow', function (e) {
         if (e && e.persisted) refreshIfNeeded(true);
+      });
+      /* Rail width changes with the viewport; keep the day boxes square. */
+      var fitTimer = 0;
+      window.addEventListener('resize', function () {
+        if (fitTimer) clearTimeout(fitTimer);
+        fitTimer = setTimeout(fitChips, 120);
       });
 
       applyLanguage(readStoredLang());
