@@ -837,16 +837,11 @@
       font-weight: 600;
     }
 
-    @media (max-width: 520px) {
-      /* Phones: name + ID on one line, details on a clean second line. */
-      .empNameLine { display: flex; }
-      .empFacts {
-        display: flex;
-        flex-wrap: wrap;
-        margin-inline-start: 0;
-        margin-top: 3px;
-      }
+    @media (max-width: 600px) {
+      /* Phones: the bar colour already says annual vs sick, so the tag is
+         dropped and the details ride on the name's line instead of a new one. */
       .leaveTag { display: none; }
+      .empFacts { margin-inline-start: 6px; gap: 2px 5px; }
     }
     @media (max-width: 380px) {
       .backBtnLabel { display: none; }
