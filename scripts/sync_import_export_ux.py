@@ -102,7 +102,7 @@ OLD_QUICK_ACTIONS_RE = re.compile(
 LOAD_ENHANCE_RE = re.compile(r"\(function loadLocalEnhancements\(\) \{[\s\S]*?\}\)\(\);")
 IMPORT_GUARD_MARKER = "/* ===== Import path overrides ===== */"
 SUMMARY_BAR_START = '<div class="summaryBar">'
-DEPT_CARD_MARKER = '<div class="deptCard">'
+DEPT_CARD_MARKER = '<div class="deptCard'
 CTA_INSIDE_BOTTOM_RE = re.compile(
     r'<div class="importBottom">\s*<nav class="quickActions roster-cta"[\s\S]*?</nav>\s*',
     re.DOTALL,

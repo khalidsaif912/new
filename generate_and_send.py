@@ -349,6 +349,74 @@ def is_inventory_employee(name: str) -> bool:
     return employee_id_from_name(name) in INVENTORY_EMP_IDS
 
 
+# ─────────────────────────────────────────────────────────────
+# Roles for the bottom "Copy Shift" report (A1 Staff / A2 Drivers)
+# Config: scripts/shift_report_roles.json
+# ─────────────────────────────────────────────────────────────
+_SHIFT_ROLE_CFG: dict | None = None
+_JD_CODE_BY_ID: dict = {}
+
+
+def shift_role_cfg() -> dict:
+    global _SHIFT_ROLE_CFG
+    if _SHIFT_ROLE_CFG is None:
+        path = Path(__file__).resolve().parent / "scripts" / "shift_report_roles.json"
+        try:
+            _SHIFT_ROLE_CFG = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"⚠️ shift_report_roles.json not usable: {exc}")
+            _SHIFT_ROLE_CFG = {}
+    return _SHIFT_ROLE_CFG
+
+
+def register_jd_codes(wb) -> None:
+    """Map staff number -> JD code (SP/LC/CH/OP/OF) from the 'as per JD' sheet."""
+    if wb is None:
+        return
+    for sheet_name in getattr(wb, "sheetnames", []):
+        if "jd" not in str(sheet_name).lower():
+            continue
+        ws = wb[sheet_name]
+        for r in range(1, ws.max_row + 1):
+            code = norm(ws.cell(row=r, column=2).value).upper()
+            name = norm(ws.cell(row=r, column=3).value)
+            if code not in {"SP", "LC", "CH", "OP", "OF"} or not name:
+                continue
+            emp_id = employee_id_from_name(name)
+            if emp_id:
+                _JD_CODE_BY_ID[emp_id] = code
+
+
+def employee_role(name: str, dept_name: str = "") -> str:
+    """Report role for one employee: explicit override, JD code default, dept default."""
+    cfg = shift_role_cfg()
+    emp_id = employee_id_from_name(name or "")
+    overrides = cfg.get("employees") or {}
+    if emp_id and emp_id in overrides:
+        return str(overrides[emp_id])
+    code = _JD_CODE_BY_ID.get(emp_id, "")
+    by_code = cfg.get("defaults_by_code") or {}
+    if code and code in by_code:
+        return str(by_code[code])
+    by_dept = cfg.get("defaults_by_dept") or {}
+    return str(by_dept.get(dept_name, "Staff"))
+
+
+def leave_code_label(raw: str, group_key: str) -> str:
+    """Short leave code shown in the copied report (S/L, E/L, ...)."""
+    table = shift_role_cfg().get("leave_labels") or {}
+    up = norm(raw).upper()
+    if up in table:
+        return str(table[up])
+    if group_key == "Annual Leave":
+        return "A/L"
+    if group_key == "Sick Leave":
+        return "S/L"
+    if group_key == "Training":
+        return "Course"
+    return ""
+
+
 def department_sheets_from_wb(wb) -> list:
     hidden = set()
     for name in wb.sheetnames:
@@ -440,7 +508,7 @@ def flight_dispatch_buckets(day_date) -> dict:
     # Same ordering as the Import section: FLTA…, FLTB…, then by name.
     rows.sort(key=lambda r: (r[0], r[1].upper()))
     for _code, display, grp, label in rows:
-        buckets.setdefault(grp, []).append({"name": display, "shift": label})
+        buckets.setdefault(grp, []).append({"name": display, "shift": label, "code": ""})
     return buckets
 
 
@@ -896,12 +964,19 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
         shift_label = display_name
 
         rows_html = ""
+        is_leave_group = group_key in ("Annual Leave", "Sick Leave", "Training", "Other")
         for i, e in enumerate(emps):
             alt = " empRowAlt" if i % 2 == 1 else ""
             emp_display = name_i18n.format_name_id(e["name"])
             name_attr = html_escape(emp_display, quote=True)
             ar_name_attr = html_escape(name_i18n.arabic_display(emp_display), quote=True)
-            rows_html += f"""<div class="empRow{alt}" data-emp-name="{name_attr}" role="button" tabindex="0">
+            role_attr = html_escape(employee_role(emp_display, dept_name), quote=True)
+            leave_attr = ""
+            if is_leave_group:
+                leave_txt = leave_code_label(str(e.get("code") or ""), group_key)
+                if leave_txt:
+                    leave_attr = f' data-leave="{html_escape(leave_txt, quote=True)}"'
+            rows_html += f"""<div class="empRow{alt}" data-emp-name="{name_attr}" data-role="{role_attr}"{leave_attr} role="button" tabindex="0">
       <span class="empName" data-name-ar="{ar_name_attr}">{emp_display}</span>
        <span class="empStatus" style="color:{colors['status_color']};">{e['shift']}</span>
      </div>"""
@@ -928,7 +1003,7 @@ def dept_card_html(dept_name: str, dept_color: dict, buckets: dict, open_group: 
 """
 
     return f"""
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="{dept_name}">
       <div style="height:5px; background:linear-gradient(to right, {dept_color['grad_from']}, {dept_color['grad_to']});"></div>
 
       <div class="deptHead" style="border-bottom:2px solid {dept_color['border']};">
@@ -1801,6 +1876,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
   </div>
 
   <!-- ════ DEPARTMENT CARDS ════ -->
+  <noscript><style>.deptCard.collapsed .shiftStack{{display:flex}}</style></noscript>
   {dept_cards_html}
 
   <!-- ════ ACTIONS ════ -->
@@ -2751,33 +2827,16 @@ function goToEmployeeSchedule(empName) {{
       if (suppressNextClick) return;
       var card = head.closest('.deptCard');
       if (!card) return;
-      card.classList.remove('collapsed');
-      var shifts = card.querySelectorAll('details.shiftCard');
-      if (!shifts.length) return;
-      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
-      if (isNaN(step) || step < 0 || step > 2) step = 0;
-      if (step === 0) {{
-        shifts.forEach(function(d) {{ d.setAttribute('open', ''); }});
-        card.dataset.deptShiftStep = '1';
-      }} else if (step === 1) {{
-        shifts.forEach(function(d) {{ d.removeAttribute('open'); }});
-        card.dataset.deptShiftStep = '2';
+      if (typeof window.rosterToggleDeptCard === 'function') {{
+        window.rosterToggleDeptCard(card);
       }} else {{
-        var now = new Date();
-        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-        var hour = muscatTime.getHours();
-        var minute = muscatTime.getMinutes();
-        var tt = hour * 60 + minute;
-        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
-        shifts.forEach(function(d) {{ d.removeAttribute('open'); }});
-        var target = null;
-        shifts.forEach(function(d) {{
-          if (d.dataset.shift === currentShift) target = d;
-        }});
-        if (!target) target = shifts[0];
-        if (target) target.setAttribute('open', '');
-        card.dataset.deptShiftStep = '0';
+        card.classList.toggle('collapsed');
       }}
+    }});
+    head.addEventListener('keydown', function(e) {{
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      head.click();
     }});
   }});
 
@@ -3031,7 +3090,7 @@ applyLang(LANG);
 startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
-// Department layout: all sections open + time-based shift open
+// Department layout: header only until tapped (collapsed by default)
 // ═══════════════════════════════════════════════════
 (function(){{
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
@@ -3050,25 +3109,85 @@ startSummarySwitchLoop();
     return 'Morning';
   }}
 
-  function openMatchingShift(card){{
-    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
-    if(!shiftCards.length) return;
-    shiftCards.forEach(function(shiftCard){{
-      var key = shiftCard.dataset.shift || '';
-      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){{
-        shiftCard.open = false;
-        shiftCard.removeAttribute('open');
-      }}
-    }});
-    var currentShift = getCurrentShiftForMuscat();
-    var target = shiftCards.find(function(shiftCard){{
-      return shiftCard.dataset.shift === currentShift;
-    }});
-    if(target) {{
-      target.open = true;
-      target.setAttribute('open', '');
-    }}
+  function shiftCardsOf(card){{
+    return Array.prototype.slice.call(card.querySelectorAll('details.shiftCard'));
   }}
+
+  // Remember which departments the user opened, so a reload restores them
+  // (expanded ones reopen on the current shift, closed ones stay closed).
+  var OPEN_STATE_KEY = 'exportDeptOpenState';
+  function deptKey(card){{
+    if(!card) return '';
+    var k = card.getAttribute('data-dept') || (card.dataset ? card.dataset.dept : '') || '';
+    if(k) return String(k).trim();
+    var el = card.querySelector('.deptTitle');
+    if(!el) return '';
+    return ((el.dataset && el.dataset.key) || el.textContent || '').trim();
+  }}
+  function readOpenState(){{
+    try {{
+      var raw = localStorage.getItem(OPEN_STATE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }} catch(e) {{ return []; }}
+  }}
+  function writeOpenState(list){{
+    try {{ localStorage.setItem(OPEN_STATE_KEY, JSON.stringify(list)); }} catch(e) {{}}
+  }}
+  function rememberDept(card, isOpen){{
+    var key = deptKey(card);
+    if(!key) return;
+    var list = readOpenState().filter(function(k){{ return k !== key; }});
+    if(isOpen) list.push(key);
+    writeOpenState(list);
+  }}
+  function isRememberedOpen(card){{
+    var key = deptKey(card);
+    return !!key && readOpenState().indexOf(key) !== -1;
+  }}
+
+  function setHeadState(card, expanded){{
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }}
+
+  // Only the department header stays visible; every shift row is closed.
+  function collapseDeptCard(card, remember){{
+    if(!card) return;
+    card.classList.add('collapsed');
+    shiftCardsOf(card).forEach(function(sc){{ sc.open = false; sc.removeAttribute('open'); }});
+    setHeadState(card, false);
+    if(remember) rememberDept(card, false);
+  }}
+
+  // Tap on the header: reveal every shift row, expand only the current shift
+  // (or the shift the user filtered on the /now/ page).
+  function expandDeptCard(card, remember){{
+    if(!card) return;
+    card.classList.remove('collapsed');
+    var picked = window.__shiftFilterSelection || '';
+    var wanted = (picked && picked !== 'All') ? picked : getCurrentShiftForMuscat();
+    var target = null;
+    shiftCardsOf(card).forEach(function(sc){{
+      sc.open = false;
+      sc.removeAttribute('open');
+      if(!target && (sc.dataset.shift || '') === wanted) target = sc;
+    }});
+    if(target){{ target.open = true; target.setAttribute('open', ''); }}
+    setHeadState(card, true);
+    if(remember) rememberDept(card, true);
+  }}
+
+  window.rosterExpandDeptCard = expandDeptCard;
+  window.rosterCollapseDeptCard = collapseDeptCard;
+  window.rosterToggleDeptCard = function(card){{
+    if(!card) return;
+    if(card.classList.contains('collapsed')) expandDeptCard(card, true);
+    else collapseDeptCard(card, true);
+  }};
 
   function cardHasSavedEmployee(card){{
     var rows = Array.from(card.querySelectorAll('.empName'));
@@ -3082,13 +3201,13 @@ startSummarySwitchLoop();
     }});
   }}
 
-  // Keep all department sections visible/open.
+  // Restore the saved open/closed state of every department.
   deptCards.forEach(function(card){{
-    card.classList.remove('collapsed');
-    openMatchingShift(card);
+    if(isRememberedOpen(card)) expandDeptCard(card, false);
+    else collapseDeptCard(card, false);
   }});
 
-  // If a saved employee exists, move their department to top.
+  // If a saved employee exists, move their department to top (state unchanged).
   if(savedEmpId || savedEmpName){{
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){{
@@ -3096,7 +3215,6 @@ startSummarySwitchLoop();
       if(firstDeptCard && firstDeptCard !== targetCard){{
         targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
       }}
-      openMatchingShift(targetCard);
     }}
   }}
 }})();
@@ -3161,7 +3279,7 @@ startSummarySwitchLoop();
     }});
   }}
 
-  function filterShifts(selectedShiftRaw){{
+  function filterShifts(selectedShiftRaw, fromUserClick){{
     var selectedShift = normalizeShift(selectedShiftRaw);
     window.__shiftFilterSelection = selectedShift;
     var totalEmployees = 0;
@@ -3196,13 +3314,27 @@ startSummarySwitchLoop();
     window.__summaryCounts.employees = totalEmployees;
     if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
+
+    // A filter chip is an explicit request to see the lists, so reveal the
+    // department cards. The automatic call on load keeps the saved state.
+    if(fromUserClick){{
+      document.querySelectorAll('.deptCard').forEach(function(card){{
+        if(typeof window.rosterExpandDeptCard === 'function'){{
+          window.rosterExpandDeptCard(card, true);
+        }} else {{
+          card.classList.remove('collapsed');
+          var head = card.querySelector('.deptHead');
+          if(head) head.setAttribute('aria-expanded', 'true');
+        }}
+      }});
+    }}
   }}
 
   window.applyShiftFilter = filterShifts;
 
   filterBtns.forEach(function(btn){{
     btn.addEventListener('click', function(){{
-      filterShifts(btnShift(btn));
+      filterShifts(btnShift(btn), true);
     }});
   }});
 
@@ -3493,6 +3625,7 @@ def generate_date_pages_for_month(
 
     If wb is None, it still generates pages but shows a 'no roster' notice.
     """
+    register_jd_codes(wb)
     import calendar
     from datetime import datetime as dt
 
@@ -3551,10 +3684,10 @@ def generate_date_pages_for_month(
                         label, grp = map_shift(raw)
                         label = _apply_shift_range_label(label, grp, day, daynum_to_raw, raw)
 
-                        buckets.setdefault(grp, []).append({"name": name, "shift": label})
+                        buckets.setdefault(grp, []).append({"name": name, "shift": label, "code": norm(raw).upper()})
 
                         # /now page: include ALL groups so the shift filter buttons work for any date
-                        buckets_now.setdefault(grp, []).append({"name": name, "shift": label})
+                        buckets_now.setdefault(grp, []).append({"name": name, "shift": label, "code": norm(raw).upper()})
                     merge_shift_buckets(inventory_buckets, take_inventory_employees(buckets))
                     merge_shift_buckets(inventory_buckets_now, take_inventory_employees(buckets_now))
                     dept_color = UNASSIGNED_COLOR if dept_name == "Unassigned" else DEPT_COLORS[idx % len(DEPT_COLORS)]
@@ -4131,6 +4264,7 @@ def main():
 
     # الصفحة الرئيسية تستخدم اليوم الحقيقي (Muscat)، لا يوم 1 من ملف الشهر الجديد
     wb = wbs.get(curr_key)
+    register_jd_codes(wb)
 
     # ─────────────────────────────────────────────────────────────
     # من هنا: توليد الصفحة الرئيسية docs/index.html و docs/now/
@@ -4245,10 +4379,10 @@ def main():
             label, grp = map_shift(raw)
             label = _apply_shift_range_label(label, grp, today_day, daynum_to_raw, raw)
 
-            buckets.setdefault(grp, []).append({"name": name, "shift": label})
+            buckets.setdefault(grp, []).append({"name": name, "shift": label, "code": norm(raw).upper()})
 
             if grp == active_group:
-                buckets_now.setdefault(grp, []).append({"name": name, "shift": label})
+                buckets_now.setdefault(grp, []).append({"name": name, "shift": label, "code": norm(raw).upper()})
 
         merge_shift_buckets(inventory_buckets, take_inventory_employees(buckets))
         merge_shift_buckets(inventory_buckets_now, take_inventory_employees(buckets_now))

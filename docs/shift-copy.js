@@ -115,22 +115,156 @@
     return total;
   }
 
+  // ── Report layout (Oman Air export duty report) ───────────────────────────
+  var DUTY_SHIFTS = { Morning: true, Afternoon: true, Night: true };
+
+  var SECTION = {
+    staff: "A1) Staff:",
+    drivers: "A2) Drivers:",
+    support: "B) Support Team:",
+    leaves: "C) Annual Leave/Emergency Leave/Course/Off in lieu/ Sick Leave:",
+    trainees: "D) Trainee:",
+    overtime: "E) Overtime Justification:"
+  };
+
+  // The report is always English (WhatsApp recipients), whatever the page language is.
+  var EN_SHIFT = { Morning: "Morning", Afternoon: "Afternoon", Night: "Night" };
+  var EN_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  function enDate(iso) {
+    var parts = String(iso || "").split("-");
+    if (parts.length !== 3) return iso || "";
+    var d = parseInt(parts[2], 10);
+    var mo = parseInt(parts[1], 10);
+    return d + " " + (EN_MONTHS[mo - 1] || mo) + " " + parts[0];
+  }
+
+  // Department order inside the report.
+  var REPORT_DEPT_ORDER = ["Officers", "Supervisors", "Load Control", "Export Checker",
+    "Flight Dispatch", "Inventory", "Acceptance", "Unassigned"];
+
+  // Names/roles are padded so the "..." column lines up in a monospace view.
+  var DOTS_COL = 46;
+
+  function currentMuscatDutyShift() {
+    var now = new Date();
+    var muscat = new Date(now.getTime() + (4 * 3600 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var m = muscat.getHours() * 60 + muscat.getMinutes();
+    if (m >= 21 * 60 || m < 5 * 60) return "Night";
+    if (m >= 13 * 60) return "Afternoon";
+    return "Morning";
+  }
+
+  function splitEmpName(raw) {
+    var s = String(raw || "").replace(/\s*\((Inventory|مخزون)\)\s*$/i, "").trim();
+    var m = s.match(/^(.*?)\s*-\s*(\d{4,})\s*$/);
+    if (m) return { name: (m[1] || "").replace(/^\*+/, "").trim(), id: m[2] };
+    return { name: s.replace(/^\*+/, "").trim(), id: "" };
+  }
+
+  function roleOf(row, dept) {
+    var attr = (row.getAttribute("data-role") || "").trim();
+    return attr || dept;
+  }
+
+  function isDriverRole(role) {
+    return /(^|[^A-Za-z])ATT([^A-Za-z]|$)|driver/i.test(role || "");
+  }
+
+  function rowLine(rec) {
+    var base = rec.id ? "SN " + rec.id + " " + rec.name : rec.name;
+    var gap = base.length >= DOTS_COL ? "  " : new Array(DOTS_COL - base.length + 1).join(" ");
+    return "\u200e" + base + gap + "... " + rec.role;
+  }
+
+  function addSection(lines, title, rows) {
+    if (lines.length) lines.push("");
+    lines.push("\u200e" + title);
+    lines.push("");
+    if (!rows.length) lines.push("\u200eNIL");
+    else rows.forEach(function (r) { lines.push(rowLine(r)); });
+  }
+
+  function deptRankForReport(dept) {
+    var i = REPORT_DEPT_ORDER.indexOf(dept);
+    return i === -1 ? REPORT_DEPT_ORDER.length : i;
+  }
+
+  function sortByDept(rows) {
+    return rows.slice().sort(function (a, b) {
+      var d = deptRankForReport(a.dept) - deptRankForReport(b.dept);
+      if (d) return d;
+      return (a.order || 0) - (b.order || 0);
+    });
+  }
+
+  function rosterRows(groups) {
+    var out = [];
+    var cards = document.querySelectorAll(".deptCard");
+    Array.prototype.forEach.call(cards, function (card) {
+      var dept = deptEnglishName(card) || "";
+      groups.forEach(function (group) {
+        var panel = card.querySelector('.shiftCard[data-shift="' + attrEscape(group) + '"]');
+        if (!panel) return;
+        Array.prototype.forEach.call(panel.querySelectorAll(".empRow"), function (row) {
+          var rec = splitEmpName(row.getAttribute("data-emp-name"));
+          if (!rec.name) return;
+          rec.role = roleOf(row, dept);
+          rec.dept = dept;
+          rec.leave = (row.getAttribute("data-leave") || "").trim();
+          rec.order = out.length;
+          out.push(rec);
+        });
+      });
+    });
+    return out;
+  }
+
   function buildText(shiftKey) {
-    var groups = collectGroups(shiftKey);
-    if (!groups.length) return "";
+    var reportShift = DUTY_SHIFTS[shiftKey] ? shiftKey : currentMuscatDutyShift();
+    var onDuty = rosterRows([reportShift]);
+
+    var staff = [];
+    var drivers = [];
+    var support = [];
+    onDuty.forEach(function (rec) {
+      if (/support/i.test(rec.role)) support.push(rec);
+      else if (isDriverRole(rec.role)) drivers.push(rec);
+      else staff.push(rec);
+    });
+
+    var leaveRows = rosterRows(["Annual Leave", "Sick Leave", "Other"]);
+    var seen = {};
+    var leaves = [];
+    leaveRows.forEach(function (rec) {
+      if (!rec.leave) return;
+      var key = rec.id || rec.name;
+      if (seen[key]) return;
+      seen[key] = true;
+      rec.role = rec.leave;
+      leaves.push(rec);
+    });
+
+    var traineeRows = rosterRows(["Training"]);
+    var trainees = traineeRows.map(function (rec) {
+      rec.role = rec.leave || "Trainee";
+      return rec;
+    });
+
+    if (!staff.length && !drivers.length && !leaves.length && !trainees.length && !support.length) {
+      return "";
+    }
+
     var lines = [];
     // Header: shift name + date, so the recipient knows what the list is.
-    lines.push("\u200e*" + labelFor(shiftKey) + " — " + formatDate(refIsoDate()) + "*");
-    lines.push("");
-    groups.forEach(function (g, i) {
-      // Prefix each line with a Left-to-Right Mark so WhatsApp keeps LTR
-      // alignment even when the app UI is Arabic (RTL).
-      lines.push("\u200e*" + g.dept + "*");
-      g.names.forEach(function (n) {
-        lines.push("\u200e" + n);
-      });
-      if (i < groups.length - 1) lines.push("");
-    });
+    lines.push("\u200e*" + (EN_SHIFT[reportShift] || reportShift) + " — " + enDate(refIsoDate()) + "*");
+    addSection(lines, SECTION.staff, sortByDept(staff));
+    addSection(lines, SECTION.drivers, sortByDept(drivers));
+    addSection(lines, SECTION.support, sortByDept(support));
+    addSection(lines, SECTION.leaves, sortByDept(leaves));
+    addSection(lines, SECTION.trainees, sortByDept(trainees));
+    addSection(lines, SECTION.overtime, []);
     // Trailing invisible LTR line: gives the WhatsApp timestamp its own line
     // so the last name is no longer shifted to make room for the time.
     return lines.join("\n") + "\n\u200e";
@@ -331,7 +465,8 @@
   window.rosterSiteShiftCopy = {
     open: open,
     close: close,
-    setLang: refresh
+    setLang: refresh,
+    text: buildText
   };
 
   if (document.readyState === "loading") {

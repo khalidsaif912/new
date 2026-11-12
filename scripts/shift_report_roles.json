@@ -1,0 +1,61 @@
+{
+  "_note": "Roles used by the bottom 'Copy Shift' report (A1 Staff / A2 Drivers). Add or edit entries by staff number. Unlisted employees fall back to defaults_by_code (taken from the 'Full staffs as per JD' sheet) and then defaults_by_dept.",
+  "defaults_by_code": {
+    "SP": "Supervisor",
+    "LC": "Load Control",
+    "CH": "W/B Checker",
+    "OP": "FLT ATT",
+    "OF": "Officer"
+  },
+  "defaults_by_dept": {
+    "Officers": "Officer",
+    "Supervisors": "Supervisor",
+    "Load Control": "Load Control",
+    "Export Checker": "W/B Checker",
+    "Export Operators": "FLT ATT",
+    "Flight Dispatch": "Flight Dispatcher",
+    "Inventory": "Inventory",
+    "Acceptance": "Acceptance"
+  },
+  "employees": {
+    "8715": "W/B Checker",
+    "81832": "W/B Checker",
+    "990465": "W/B Checker",
+    "82645": "MHS",
+    "82577": "N/B Checker",
+    "82649": "Cargo Ramp H/O",
+    "82468": "FLT ATT",
+    "82571": "FLT ATT",
+    "82425": "FLT ATT (IMP)",
+    "82656": "ULD ATT",
+    "81223": "ULD ATT"
+  },
+  "driver_roles": [
+    "FLT ATT",
+    "FLT ATT (IMP)",
+    "ULD ATT"
+  ],
+  "support_roles": [
+    "Support Team"
+  ],
+  "leave_labels": {
+    "AL": "A/L",
+    "LV": "A/L",
+    "ANNUAL LEAVE": "A/L",
+    "SL": "S/L",
+    "SICK LEAVE": "S/L",
+    "EL": "E/L",
+    "EMERGENCY LEAVE": "E/L",
+    "UL": "E/L",
+    "PAL": "Patient Accompanying Leave",
+    "PA": "Patient Accompanying Leave",
+    "PATIENT ACCOMPANYING LEAVE": "Patient Accompanying Leave",
+    "OFL": "Off in lieu",
+    "OL": "Off in lieu",
+    "OFF IN LIEU": "Off in lieu",
+    "TR": "Course",
+    "TRAINING": "Course",
+    "TRAINING/COURSE": "Course",
+    "COURSE": "Course"
+  }
+}

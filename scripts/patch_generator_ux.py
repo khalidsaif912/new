@@ -230,36 +230,19 @@ NEW_DEPT = """    head.addEventListener('click', function() {{
       if (suppressNextClick) return;
       var card = head.closest('.deptCard');
       if (!card) return;
-      card.classList.remove('collapsed');
-      var shifts = card.querySelectorAll('details.shiftCard');
-      if (!shifts.length) return;
-      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
-      if (isNaN(step) || step < 0 || step > 2) step = 0;
-      if (step === 0) {{
-        shifts.forEach(function(d) {{ d.setAttribute('open', ''); }});
-        card.dataset.deptShiftStep = '1';
-      }} else if (step === 1) {{
-        shifts.forEach(function(d) {{ d.removeAttribute('open'); }});
-        card.dataset.deptShiftStep = '2';
+      if (typeof window.rosterToggleDeptCard === 'function') {{
+        window.rosterToggleDeptCard(card);
       }} else {{
-        var now = new Date();
-        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-        var hour = muscatTime.getHours();
-        var minute = muscatTime.getMinutes();
-        var tt = hour * 60 + minute;
-        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
-        shifts.forEach(function(d) {{ d.removeAttribute('open'); }});
-        var target = null;
-        shifts.forEach(function(d) {{
-          if (d.dataset.shift === currentShift) target = d;
-        }});
-        if (!target) target = shifts[0];
-        if (target) target.setAttribute('open', '');
-        card.dataset.deptShiftStep = '0';
+        card.classList.toggle('collapsed');
       }}
+    }});
+    head.addEventListener('keydown', function(e) {{
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      head.click();
     }});"""
 
-if "deptShiftStep" not in t:
+if "deptShiftStep" not in t and "rosterToggleDeptCard" not in t:
     if OLD_DEPT not in t:
         raise SystemExit("dept toggle block not found")
     t = t.replace(OLD_DEPT, NEW_DEPT, 1)

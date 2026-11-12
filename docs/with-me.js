@@ -733,7 +733,7 @@
   function parseRosterHtmlRegex(html, shiftKey) {
     var groups = [];
     var safeShift = shiftKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    var cardRe = /<div class="deptCard">([\s\S]*?)(?=<div class="deptCard">|\Z)/g;
+    var cardRe = /<div class="deptCard(?: collapsed)?">([\s\S]*?)(?=<div class="deptCard(?: collapsed)?">|\Z)/g;
     var cardMatch;
     while ((cardMatch = cardRe.exec(html))) {
       var block = cardMatch[1];

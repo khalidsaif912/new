@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260903c"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20261112a"></script>
   <title>Duty Roster</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1449,11 +1449,12 @@
       background: #fff !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svLabel {
-      font-size: 10px !important; font-weight: 700 !important; line-height: 1.1 !important;
-      letter-spacing: .06em !important; text-transform: uppercase !important;
+      font-size: 8.5px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .04em !important; text-transform: uppercase !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svNum {
-      font-size: 20px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      font-size: 16px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: -.02em !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
 
@@ -1479,12 +1480,12 @@
     .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
     .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
     .qaFooter #bgTextureShuffleBtn {
-      height: 44px !important; min-height: 44px !important; padding: 0 18px !important;
+      height: 40px !important; min-height: 40px !important; padding: 0 14px !important;
       border-radius: 999px !important; background: #EFE5FF !important;
       border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
-      font-size: 12px !important; font-weight: 700 !important;
+      font-size: 11px !important; font-weight: 700 !important;
     }
-    .qaFooter #bgTextureShuffleBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgTextureShuffleBtn svg { width: 16px !important; height: 16px !important; stroke: #4A2299 !important; }
     .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
     .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
 
@@ -1721,6 +1722,7 @@
   </div>
 
   <!-- ════ DEPARTMENT CARDS ════ -->
+  <noscript><style>.deptCard.collapsed .shiftStack{display:flex}</style></noscript>
   
 
   <!-- ════ ACTIONS ════ -->
@@ -1774,7 +1776,7 @@
   <!-- ════ FOOTER (status panel) ════ -->
   <div class="footer qaFooter">
     <div class="qaStatusMeta">
-      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 15:09</span></div>
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 16:13</span></div>
       <div><strong>Source:</strong> <span>latest.xlsx</span></div>
     </div>
   </div>
@@ -2816,33 +2818,16 @@ function goToEmployeeSchedule(empName) {
       if (suppressNextClick) return;
       var card = head.closest('.deptCard');
       if (!card) return;
-      card.classList.remove('collapsed');
-      var shifts = card.querySelectorAll('details.shiftCard');
-      if (!shifts.length) return;
-      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
-      if (isNaN(step) || step < 0 || step > 2) step = 0;
-      if (step === 0) {
-        shifts.forEach(function(d) { d.setAttribute('open', ''); });
-        card.dataset.deptShiftStep = '1';
-      } else if (step === 1) {
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        card.dataset.deptShiftStep = '2';
+      if (typeof window.rosterToggleDeptCard === 'function') {
+        window.rosterToggleDeptCard(card);
       } else {
-        var now = new Date();
-        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-        var hour = muscatTime.getHours();
-        var minute = muscatTime.getMinutes();
-        var tt = hour * 60 + minute;
-        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        var target = null;
-        shifts.forEach(function(d) {
-          if (d.dataset.shift === currentShift) target = d;
-        });
-        if (!target) target = shifts[0];
-        if (target) target.setAttribute('open', '');
-        card.dataset.deptShiftStep = '0';
+        card.classList.toggle('collapsed');
       }
+    });
+    head.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      head.click();
     });
   });
 
@@ -3098,7 +3083,7 @@ applyLang(LANG);
 startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
-// Department layout: all sections open + time-based shift open
+// Department layout: header only until tapped (collapsed by default)
 // ═══════════════════════════════════════════════════
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
@@ -3117,25 +3102,85 @@ startSummarySwitchLoop();
     return 'Morning';
   }
 
-  function openMatchingShift(card){
-    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
-    if(!shiftCards.length) return;
-    shiftCards.forEach(function(shiftCard){
-      var key = shiftCard.dataset.shift || '';
-      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
-        shiftCard.open = false;
-        shiftCard.removeAttribute('open');
-      }
-    });
-    var currentShift = getCurrentShiftForMuscat();
-    var target = shiftCards.find(function(shiftCard){
-      return shiftCard.dataset.shift === currentShift;
-    });
-    if(target) {
-      target.open = true;
-      target.setAttribute('open', '');
-    }
+  function shiftCardsOf(card){
+    return Array.prototype.slice.call(card.querySelectorAll('details.shiftCard'));
   }
+
+  // Remember which departments the user opened, so a reload restores them
+  // (expanded ones reopen on the current shift, closed ones stay closed).
+  var OPEN_STATE_KEY = 'exportDeptOpenState';
+  function deptKey(card){
+    if(!card) return '';
+    var k = card.getAttribute('data-dept') || (card.dataset ? card.dataset.dept : '') || '';
+    if(k) return String(k).trim();
+    var el = card.querySelector('.deptTitle');
+    if(!el) return '';
+    return ((el.dataset && el.dataset.key) || el.textContent || '').trim();
+  }
+  function readOpenState(){
+    try {
+      var raw = localStorage.getItem(OPEN_STATE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e) { return []; }
+  }
+  function writeOpenState(list){
+    try { localStorage.setItem(OPEN_STATE_KEY, JSON.stringify(list)); } catch(e) {}
+  }
+  function rememberDept(card, isOpen){
+    var key = deptKey(card);
+    if(!key) return;
+    var list = readOpenState().filter(function(k){ return k !== key; });
+    if(isOpen) list.push(key);
+    writeOpenState(list);
+  }
+  function isRememberedOpen(card){
+    var key = deptKey(card);
+    return !!key && readOpenState().indexOf(key) !== -1;
+  }
+
+  function setHeadState(card, expanded){
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+
+  // Only the department header stays visible; every shift row is closed.
+  function collapseDeptCard(card, remember){
+    if(!card) return;
+    card.classList.add('collapsed');
+    shiftCardsOf(card).forEach(function(sc){ sc.open = false; sc.removeAttribute('open'); });
+    setHeadState(card, false);
+    if(remember) rememberDept(card, false);
+  }
+
+  // Tap on the header: reveal every shift row, expand only the current shift
+  // (or the shift the user filtered on the /now/ page).
+  function expandDeptCard(card, remember){
+    if(!card) return;
+    card.classList.remove('collapsed');
+    var picked = window.__shiftFilterSelection || '';
+    var wanted = (picked && picked !== 'All') ? picked : getCurrentShiftForMuscat();
+    var target = null;
+    shiftCardsOf(card).forEach(function(sc){
+      sc.open = false;
+      sc.removeAttribute('open');
+      if(!target && (sc.dataset.shift || '') === wanted) target = sc;
+    });
+    if(target){ target.open = true; target.setAttribute('open', ''); }
+    setHeadState(card, true);
+    if(remember) rememberDept(card, true);
+  }
+
+  window.rosterExpandDeptCard = expandDeptCard;
+  window.rosterCollapseDeptCard = collapseDeptCard;
+  window.rosterToggleDeptCard = function(card){
+    if(!card) return;
+    if(card.classList.contains('collapsed')) expandDeptCard(card, true);
+    else collapseDeptCard(card, true);
+  };
 
   function cardHasSavedEmployee(card){
     var rows = Array.from(card.querySelectorAll('.empName'));
@@ -3149,13 +3194,13 @@ startSummarySwitchLoop();
     });
   }
 
-  // Keep all department sections visible/open.
+  // Restore the saved open/closed state of every department.
   deptCards.forEach(function(card){
-    card.classList.remove('collapsed');
-    openMatchingShift(card);
+    if(isRememberedOpen(card)) expandDeptCard(card, false);
+    else collapseDeptCard(card, false);
   });
 
-  // If a saved employee exists, move their department to top.
+  // If a saved employee exists, move their department to top (state unchanged).
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
@@ -3163,7 +3208,6 @@ startSummarySwitchLoop();
       if(firstDeptCard && firstDeptCard !== targetCard){
         targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
       }
-      openMatchingShift(targetCard);
     }
   }
 })();
@@ -3228,7 +3272,7 @@ startSummarySwitchLoop();
     });
   }
 
-  function filterShifts(selectedShiftRaw){
+  function filterShifts(selectedShiftRaw, fromUserClick){
     var selectedShift = normalizeShift(selectedShiftRaw);
     window.__shiftFilterSelection = selectedShift;
     var totalEmployees = 0;
@@ -3263,13 +3307,27 @@ startSummarySwitchLoop();
     window.__summaryCounts.employees = totalEmployees;
     if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
+
+    // A filter chip is an explicit request to see the lists, so reveal the
+    // department cards. The automatic call on load keeps the saved state.
+    if(fromUserClick){
+      document.querySelectorAll('.deptCard').forEach(function(card){
+        if(typeof window.rosterExpandDeptCard === 'function'){
+          window.rosterExpandDeptCard(card, true);
+        } else {
+          card.classList.remove('collapsed');
+          var head = card.querySelector('.deptHead');
+          if(head) head.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
   }
 
   window.applyShiftFilter = filterShifts;
 
   filterBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
-      filterShifts(btnShift(btn));
+      filterShifts(btnShift(btn), true);
     });
   });
 
@@ -3537,7 +3595,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260903c';
+  var ver = '20261112a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -3547,7 +3605,7 @@ function goToRosterDiff(event) {
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
-  addScript(root + '/open-current-shift.js?v=20260908s');
+  addScript(root + '/open-current-shift.js?v=20261112a');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20261031a');

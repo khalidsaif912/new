@@ -963,11 +963,12 @@ QA_CARD_CSS = """    /* ═══════ ACTIONS CARD + STATUS PANEL ══
       background: #fff !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svLabel {
-      font-size: 10px !important; font-weight: 700 !important; line-height: 1.1 !important;
-      letter-spacing: .06em !important; text-transform: uppercase !important;
+      font-size: 8.5px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .04em !important; text-transform: uppercase !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svNum {
-      font-size: 20px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      font-size: 16px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: -.02em !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
 
@@ -993,12 +994,12 @@ QA_CARD_CSS = """    /* ═══════ ACTIONS CARD + STATUS PANEL ══
     .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
     .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
     .qaFooter #bgTextureShuffleBtn {
-      height: 44px !important; min-height: 44px !important; padding: 0 18px !important;
+      height: 40px !important; min-height: 40px !important; padding: 0 14px !important;
       border-radius: 999px !important; background: #EFE5FF !important;
       border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
-      font-size: 12px !important; font-weight: 700 !important;
+      font-size: 11px !important; font-weight: 700 !important;
     }
-    .qaFooter #bgTextureShuffleBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgTextureShuffleBtn svg { width: 16px !important; height: 16px !important; stroke: #4A2299 !important; }
     .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
     .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
 """
@@ -1712,7 +1713,7 @@ I18N_APPS_EN = "moreApps:'Apps'"
 I18N_APPS_AR = "moreApps:'Ã˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€šÃ˜Â§Ã˜Âª'"
 
 # Ã¢â€â‚¬Ã¢â€â‚¬ iOS performance: defer heavy scripts, no duplicate ios-tap-fix Ã¢â€â‚¬Ã¢â€â‚¬
-IOS_PERF_VER = "20260903c"
+IOS_PERF_VER = "20261112a"
 # Employee alert FAB + popup (striped card). Keep in both loaders.
 CHANGE_ALERT_VER = "20261020a"
 # Ticker + banners + announce popups + visit counts (Mantle backoff/cache). Bump when those JS files change.
@@ -1735,7 +1736,7 @@ LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
-  addScript(root + '/open-current-shift.js?v=20260908s');
+  addScript(root + '/open-current-shift.js?v=20261112a');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=""" + MANTLE_CLIENT_VER + """');
@@ -1781,7 +1782,7 @@ LOAD_LOCAL_ENHANCEMENTS_IMPORT = """
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
-  addScript(root + '/open-current-shift.js?v=20260908s');
+  addScript(root + '/open-current-shift.js?v=20261112a');
   addScript(root + '/emp-contact.js?v=20261017b');
   addScript(root + '/date-banner-i18n.js?v=20260902a');
   addScript(root + '/emp-id-gate.js?v=20260831lock');

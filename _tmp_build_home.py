@@ -12,7 +12,7 @@ raw = subprocess.check_output(
 text = raw.decode("utf-8")
 text = text.replace("<title>Duty Roster</title>", "<title>Duty Roster · v20260807c</title>", 1)
 text = text.replace("site-visits.js?v=20260807b", "site-visits.js?v=20260807c")
-text = re.sub(r"change-alert\.js\?v=[^'\"]+", "change-alert.js?v=20260807c", text)
+text = re.sub(r"change-alert\.js\?v=[^'\"]+", "change-alert.js?v=20260909j", text)
 text = re.sub(r"holiday-ticker\.js\?v=[^'\"]+", "holiday-ticker.js?v=20260807c", text)
 if "home-ui-force.js" not in text:
     text = text.replace(

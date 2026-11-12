@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20260903c"></script>
+  <script defer src="https://khalidsaif912.github.io/roster-site/ios-tap-fix.js?v=20261112a"></script>
   <title>Duty Roster</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1449,11 +1449,12 @@
       background: #fff !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svLabel {
-      font-size: 10px !important; font-weight: 700 !important; line-height: 1.1 !important;
-      letter-spacing: .06em !important; text-transform: uppercase !important;
+      font-size: 8.5px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: .04em !important; text-transform: uppercase !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svNum {
-      font-size: 20px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      font-size: 16px !important; font-weight: 700 !important; line-height: 1.1 !important;
+      letter-spacing: -.02em !important;
     }
     html body .footer.qaFooter #siteVisitsHost .svDot { display: none !important; width: 0 !important; }
 
@@ -1479,12 +1480,12 @@
     .qaFooter #bgRefreshBtn { background: #E4F6FE !important; border: 1px solid #BFDCF0 !important; }
     .qaFooter #bgRefreshBtn svg { width: 18px !important; height: 18px !important; stroke: #0B4A6F !important; }
     .qaFooter #bgTextureShuffleBtn {
-      height: 44px !important; min-height: 44px !important; padding: 0 18px !important;
+      height: 40px !important; min-height: 40px !important; padding: 0 14px !important;
       border-radius: 999px !important; background: #EFE5FF !important;
       border: 1px solid #D2BEF5 !important; color: #4A2299 !important;
-      font-size: 12px !important; font-weight: 700 !important;
+      font-size: 11px !important; font-weight: 700 !important;
     }
-    .qaFooter #bgTextureShuffleBtn svg { width: 18px !important; height: 18px !important; stroke: #4A2299 !important; }
+    .qaFooter #bgTextureShuffleBtn svg { width: 16px !important; height: 16px !important; stroke: #4A2299 !important; }
     .qaFooter .deskLogHotspot { position: absolute !important; inset-inline-end: 0; bottom: 0; }
     .qaFooter :focus-visible { outline: 3px solid #0E9BD8; outline-offset: 2px; }
 
@@ -1721,8 +1722,9 @@
   </div>
 
   <!-- ════ DEPARTMENT CARDS ════ -->
+  <noscript><style>.deptCard.collapsed .shiftStack{display:flex}</style></noscript>
   
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Supervisors">
       <div style="height:5px; background:linear-gradient(to right, #0891b2, #0891b2cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #0891b218;">
@@ -1751,7 +1753,7 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Amri - 81404" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mohamed Al Amri - 81404" data-role="Supervisor" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد العامري - 81404">Mohamed Al Amri - 81404</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -1765,7 +1767,7 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Kalbani - 82593" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mohamed Al Kalbani - 82593" data-role="Supervisor" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد الكلباني - 82593">Mohamed Al Kalbani - 82593</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1779,10 +1781,10 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Saleh Al Rashdi - 82546" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Saleh Al Rashdi - 82546" data-role="Supervisor" role="button" tabindex="0">
       <span class="empName" data-name-ar="صالح الراشدي - 82546">Saleh Al Rashdi - 82546</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Jay Macalino - 80250" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Jay Macalino - 80250" data-role="Supervisor" role="button" tabindex="0">
       <span class="empName" data-name-ar="جاي ماكالينو - 80250">Jay Macalino - 80250</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -1796,7 +1798,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Talal Al Balushi - 81300" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Talal Al Balushi - 81300" data-role="Supervisor" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="طلال البلوشي - 81300">Talal Al Balushi - 81300</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 10 <span class="shiftRangeLabel">TO</span> 23</span>)</span>
      </div>
@@ -1807,7 +1809,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Load Control">
       <div style="height:5px; background:linear-gradient(to right, #059669, #059669cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #05966918;">
@@ -1836,13 +1838,13 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Habib Al Balushi - 82600" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Habib Al Balushi - 82600" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="حبيب البلوشي - 82600">Habib Al Balushi - 82600</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Muqaini - 82548" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Muqaini - 82548" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد المقيني - 82548">Ahmed Al Muqaini - 82548</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="Qasim Al Maqbali - 81409" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Qasim Al Maqbali - 81409" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="قاسم المقبالي - 81409">Qasim Al Maqbali - 81409</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -1856,13 +1858,13 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Hamed Al Fulaiti - 82596" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Hamed Al Fulaiti - 82596" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="حمد الفليتي - 82596">Hamed Al Fulaiti - 82596</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Kharusi - 82575" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Kharusi - 82575" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد الخروصي - 82575">Ahmed Al Kharusi - 82575</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="Jaafar Al Balushi - 81258" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Jaafar Al Balushi - 81258" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="جعفر البلوشي - 81258">Jaafar Al Balushi - 81258</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -1876,13 +1878,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Marwan Al Difai - 82437" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Marwan Al Difai - 82437" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="مروان الدفاعي - 82437">Marwan Al Difai - 82437</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mubarak Al Nofli - 82114" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Mubarak Al Nofli - 82114" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="مبارك النوفلي - 82114">Mubarak Al Nofli - 82114</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="Mohamed Al Siyabi - 81402" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Mohamed Al Siyabi - 81402" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد السيابي - 81402">Mohamed Al Siyabi - 81402</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -1896,16 +1898,16 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">4</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Omar Al Obaidi - 82551" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Omar Al Obaidi - 82551" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="عمر العبيدي - 82551">Omar Al Obaidi - 82551</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Saleh Al Aufi - 82550" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Saleh Al Aufi - 82550" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="صالح العوفي - 82550">Saleh Al Aufi - 82550</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Assad Al Omairi - 81348" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Assad Al Omairi - 81348" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="أسعد العميري - 81348">Assad Al Omairi - 81348</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Bushra Al Wahiebi - 82657" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Bushra Al Wahiebi - 82657" data-role="Load Control" role="button" tabindex="0">
       <span class="empName" data-name-ar="بشرى الوهيبي - 82657">Bushra Al Wahiebi - 82657</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -1919,10 +1921,10 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mudathir Al Hajri - 82441" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mudathir Al Hajri - 82441" data-role="Load Control" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="مدثر الحجري - 82441">Mudathir Al Hajri - 82441</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 18</span>)</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Al Muthana Al Shamfari - 82445" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Al Muthana Al Shamfari - 82445" data-role="Load Control" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="المثنى الشنفري - 82445">Al Muthana Al Shamfari - 82445</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 10 <span class="shiftRangeLabel">TO</span> 15</span>)</span>
      </div>
@@ -1933,7 +1935,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Export Checker">
       <div style="height:5px; background:linear-gradient(to right, #dc2626, #dc2626cc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #dc262618;">
@@ -1962,22 +1964,22 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Mazroie - 82658" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mohamed Al Mazroie - 82658" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد المزروعي - 82658">Mohamed Al Mazroie - 82658</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Khalil Al Hinai - 82671" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Khalil Al Hinai - 82671" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="خليل الهنائي - 82671">Khalil Al Hinai - 82671</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="Mohamed Al Mamari - 82674" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Mohamed Al Mamari - 82674" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد المعمري - 82674">Mohamed Al Mamari - 82674</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Raad Al Farsi - 82578" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Raad Al Farsi - 82578" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="رعد الفارسي - 82578">Raad Al Farsi - 82578</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="Riyadh Al Jabri - 82555" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Riyadh Al Jabri - 82555" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="رياض الجابري - 82555">Riyadh Al Jabri - 82555</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Riyadh Al Sulti - 82424" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Riyadh Al Sulti - 82424" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="رياض الصلتي - 82424">Riyadh Al Sulti - 82424</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -1991,22 +1993,22 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Khalifa Al Maqbali - 82673" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Khalifa Al Maqbali - 82673" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="خليفة المقبالي - 82673">Khalifa Al Maqbali - 82673</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Wissam Al Kharusi - 82464" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Wissam Al Kharusi - 82464" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="وسام الخروصي - 82464">Wissam Al Kharusi - 82464</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="Ali Al Farsi - 81393" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Ali Al Farsi - 81393" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="علي الفارسي - 81393">Ali Al Farsi - 81393</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Waleed Al Hadabi - 80482" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Waleed Al Hadabi - 80482" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="وليد الهدابي - 80482">Waleed Al Hadabi - 80482</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow" data-emp-name="Mohamed Al Maskari - 82661" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Mohamed Al Maskari - 82661" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد المسكري - 82661">Mohamed Al Maskari - 82661</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Fahim Al Hashni - 8930" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Fahim Al Hashni - 8930" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="فهيم الحسني - 8930">Fahim Al Hashni - 8930</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2020,22 +2022,22 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">6</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Saif Al Mahrizi - 82649" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Saif Al Mahrizi - 82649" data-role="Cargo Ramp H/O" role="button" tabindex="0">
       <span class="empName" data-name-ar="سيف المحرزي - 82649">Saif Al Mahrizi - 82649</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Khalid Al Raqadi - 8715" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Khalid Al Raqadi - 8715" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="خالد الرقادي - 8715">Khalid Al Raqadi - 8715</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="Dawood Al Siyabi - 82672" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Dawood Al Siyabi - 82672" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="داود السيابي - 82672">Dawood Al Siyabi - 82672</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Abdullah Al Shukeili - 82645" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Abdullah Al Shukeili - 82645" data-role="MHS" role="button" tabindex="0">
       <span class="empName" data-name-ar="عبدالله الشكيلي - 82645">Abdullah Al Shukeili - 82645</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="Mazin Al Hajri - 82547" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Mazin Al Hajri - 82547" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="مازن الحجري - 82547">Mazin Al Hajri - 82547</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ali Al Marjubi - 82577" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ali Al Marjubi - 82577" data-role="N/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="علي المرجبي - 82577">Ali Al Marjubi - 82577</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2049,34 +2051,34 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">10</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Ammar Al Hashmi - 82659" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Ammar Al Hashmi - 82659" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="عمار الهاشمي - 82659">Ammar Al Hashmi - 82659</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Mawali - 82283" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ahmed Al Mawali - 82283" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد المعولي - 82283">Ahmed Al Mawali - 82283</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ali Al Mamari - 82574" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Ali Al Mamari - 82574" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="علي المعمري - 82574">Ali Al Mamari - 82574</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ghaith Al Habsi - 82439" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ghaith Al Habsi - 82439" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="غيث الحبسي - 82439">Ghaith Al Habsi - 82439</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Hashmi - 82616" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Ahmed Al Hashmi - 82616" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد الهاشمي - 82616">Ahmed Al Hashmi - 82616</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Hosni Al Sulti - 80695" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Hosni Al Sulti - 80695" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="حسني الصلتي - 80695">Hosni Al Sulti - 80695</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Ahmed Al Bakari - 81832" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Ahmed Al Bakari - 81832" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد البكاري - 81832">Ahmed Al Bakari - 81832</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Rashid Shayai - 82677" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Rashid Shayai - 82677" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="راشد الشائعي - 82677">Rashid Shayai - 82677</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Adil Al Zadjali - 8584" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Adil Al Zadjali - 8584" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="عادل الزدجالي - 8584">Adil Al Zadjali - 8584</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Abdulfatah Al Shukeili - 990465" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Abdulfatah Al Shukeili - 990465" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="عبدالفتاح الشكيلي - 990465">Abdulfatah Al Shukeili - 990465</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2090,7 +2092,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Yousuf Al Balushi - 82587" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Yousuf Al Balushi - 82587" data-role="W/B Checker" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="يوسف البلوشي - 82587">Yousuf Al Balushi - 82587</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 3 <span class="shiftRangeLabel">TO</span> 29</span>)</span>
      </div>
@@ -2104,7 +2106,7 @@
         <span class="shiftCount" style="background:#ef444422; color:#991b1b;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Ali Yousuf Al Balushi - 990752" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Ali Yousuf Al Balushi - 990752" data-role="W/B Checker" data-leave="S/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="علي يوسف البلوشي - 990752">Ali Yousuf Al Balushi - 990752</span>
        <span class="empStatus" style="color:#991b1b;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 1 <span class="shiftRangeLabel">TO</span> 16</span>)</span>
      </div>
@@ -2115,7 +2117,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Export Operators">
       <div style="height:5px; background:linear-gradient(to right, #7c3aed, #7c3aedcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #7c3aed18;">
@@ -2144,10 +2146,10 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mohamed Al Amri - 81224" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mohamed Al Amri - 81224" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد العامري - 81224">Mohamed Al Amri - 81224</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Badar Al Hamadani - 81307" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Badar Al Hamadani - 81307" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="بدر الحمداني - 81307">Badar Al Hamadani - 81307</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2161,10 +2163,10 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Ahmed Al Balushi - 82415" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Ahmed Al Balushi - 82415" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد البلوشي - 82415">Ahmed Al Balushi - 82415</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Ghassan Al Tarsi - 82588" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Ghassan Al Tarsi - 82588" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="غسان الطارشي - 82588">Ghassan Al Tarsi - 82588</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2178,13 +2180,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Khamis Al Hinai - 82467" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Khamis Al Hinai - 82467" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="خميس الهنائي - 82467">Khamis Al Hinai - 82467</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Faisal Al Balushi - 82656" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Faisal Al Balushi - 82656" data-role="ULD ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="فيصل البلوشي - 82656">Faisal Al Balushi - 82656</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="Mohamed Al Falahi - 8762" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Mohamed Al Falahi - 8762" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد الفلاحي - 8762">Mohamed Al Falahi - 8762</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2198,19 +2200,19 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">5</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Mazin Al Siyabi - 81223" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Mazin Al Siyabi - 81223" data-role="ULD ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="مازن السيابي - 81223">Mazin Al Siyabi - 81223</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Adil Al Oraimi - 8941" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Adil Al Oraimi - 8941" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="عادل العريمي - 8941">Adil Al Oraimi - 8941</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Zakariya Al Balushi - 82429" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Zakariya Al Balushi - 82429" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="زكريا البلوشي - 82429">Zakariya Al Balushi - 82429</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Said Al Fahkri - 8744" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Said Al Fahkri - 8744" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="سعيد الفاخري - 8744">Said Al Fahkri - 8744</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="Jamal Al Hadi - 82565" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="Jamal Al Hadi - 82565" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="جمال الهادي - 82565">Jamal Al Hadi - 82565</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2224,7 +2226,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Muadh Al Qasimi - 82534" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Muadh Al Qasimi - 82534" data-role="FLT ATT" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="معاذ القاسمي - 82534">Muadh Al Qasimi - 82534</span>
        <span class="empStatus" style="color:#065f46;">(<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 9 <span class="shiftRangeLabel">TO</span> 14</span>)</span>
      </div>
@@ -2235,7 +2237,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Flight Dispatch">
       <div style="height:5px; background:linear-gradient(to right, #ea580c, #ea580ccc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #ea580c18;">
@@ -2264,13 +2266,13 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="AHMED AL HADI - 82654" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="AHMED AL HADI - 82654" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="أحمد الهادي - 82654">AHMED AL HADI - 82654</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL SAADI - 82420" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHAMMED AL SAADI - 82420" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد السعدي - 82420">MOHAMMED AL SAADI - 82420</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
-     </div><div class="empRow" data-emp-name="TALAL AL HUSEINI - 82417" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="TALAL AL HUSEINI - 82417" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="طلال الحسيني - 82417">TALAL AL HUSEINI - 82417</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2284,10 +2286,10 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="BADAR AL BURTAMANI - 82423" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="بدر البرطماني - 82423">BADAR AL BURTAMANI - 82423</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
-     </div><div class="empRow empRowAlt" data-emp-name="SAID AL SADI - 82410" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="SAID AL SADI - 82410" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="سعيد السعدي - 82410">SAID AL SADI - 82410</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2301,13 +2303,13 @@
         <span class="shiftCount" style="background:#8b5cf622; color:#5b21b6;">3</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="HAITHAM AL BALUSHI - 82419" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="هيثم البلوشي - 82419">HAITHAM AL BALUSHI - 82419</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow empRowAlt" data-emp-name="SAMI AL HADABI - 80479" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="SAMI AL HADABI - 80479" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="سامي الهدابي - 80479">SAMI AL HADABI - 80479</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
-     </div><div class="empRow" data-emp-name="YAARAB AL RAQADI - 82571" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="YAARAB AL RAQADI - 82571" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="يعرب الرقادي - 82571">YAARAB AL RAQADI - 82571</span>
        <span class="empStatus" style="color:#5b21b6;">NN21</span>
      </div>
@@ -2321,25 +2323,25 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">7</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="ALI AL SHAMSI - 82425" data-role="FLT ATT (IMP)" role="button" tabindex="0">
       <span class="empName" data-name-ar="علي الشامسي - 82425">ALI AL SHAMSI - 82425</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ANWAR ALAMRI - 82566" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="ANWAR ALAMRI - 82566" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="أنور العامري - 82566">ANWAR ALAMRI - 82566</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="BADAR AL FULAITI - 82468" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="BADAR AL FULAITI - 82468" data-role="FLT ATT" role="button" tabindex="0">
       <span class="empName" data-name-ar="بدر الفليتي - 82468">BADAR AL FULAITI - 82468</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="ISMAIL AL MAHARBI - 82331" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="ISMAIL AL MAHARBI - 82331" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="إسماعيل المحاربي - 82331">ISMAIL AL MAHARBI - 82331</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="BADAR AL BUSAIDI - 82414" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="بدر البوسعيدي - 82414">BADAR AL BUSAIDI - 82414</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="MOHD AL HADDABI - 990895" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد الهدابي - 990895">MOHD AL HADDABI - 990895</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" role="button" tabindex="0">
+     </div><div class="empRow" data-emp-name="NASSER AL OMAIRI - 82416" data-role="Flight Dispatcher" role="button" tabindex="0">
       <span class="empName" data-name-ar="ناصر العميري - 82416">NASSER AL OMAIRI - 82416</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2353,7 +2355,7 @@
         <span class="shiftCount" style="background:#10b98122; color:#065f46;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="YOUNIS AL SIYABI - 80480" data-role="Flight Dispatcher" data-leave="A/L" role="button" tabindex="0">
       <span class="empName" data-name-ar="يونس السيابي - 80480">YOUNIS AL SIYABI - 80480</span>
        <span class="empStatus" style="color:#065f46;">AL (<span class="shiftRange"><span class="shiftRangeLabel">FROM</span> 8 <span class="shiftRangeLabel">TO</span> 12</span>)</span>
      </div>
@@ -2364,7 +2366,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Inventory">
       <div style="height:5px; background:linear-gradient(to right, #ea580c, #ea580ccc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #ea580c18;">
@@ -2393,10 +2395,10 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Said Al Amri - 990737" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Said Al Amri - 990737" data-role="Supervisor" role="button" tabindex="0">
       <span class="empName" data-name-ar="سعيد العامري - 990737">Said Al Amri - 990737</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Subhi - 82592 (Inventory)" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Mohamed Al Subhi - 82592 (Inventory)" data-role="W/B Checker" role="button" tabindex="0">
       <span class="empName" data-name-ar="محمد الصبحي - 82592">Mohamed Al Subhi - 82592 (Inventory)</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2407,7 +2409,7 @@
     </div>
     
 
-    <div class="deptCard">
+    <div class="deptCard collapsed" data-dept="Officers">
       <div style="height:5px; background:linear-gradient(to right, #2563eb, #2563ebcc);"></div>
 
       <div class="deptHead" style="border-bottom:2px solid #2563eb18;">
@@ -2436,7 +2438,7 @@
         <span class="shiftCount" style="background:#f59e0b22; color:#92400e;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Abid Al Zadjali - 81034" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Abid Al Zadjali - 81034" data-role="Officer" role="button" tabindex="0">
       <span class="empName" data-name-ar="عابد الزدجالي - 81034">Abid Al Zadjali - 81034</span>
        <span class="empStatus" style="color:#92400e;">MN06</span>
      </div>
@@ -2450,7 +2452,7 @@
         <span class="shiftCount" style="background:#f9731622; color:#9a3412;">1</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Salim Al Masroori - 8926" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Salim Al Masroori - 8926" data-role="Officer" role="button" tabindex="0">
       <span class="empName" data-name-ar="سالم المسروري - 8926">Salim Al Masroori - 8926</span>
        <span class="empStatus" style="color:#9a3412;">AN13</span>
      </div>
@@ -2464,10 +2466,10 @@
         <span class="shiftCount" style="background:#6366f122; color:#3730a3;">2</span>
       </summary>
       <div class="shiftBody">
-        <div class="empRow" data-emp-name="Rodolfo Magcaling - 80235" role="button" tabindex="0">
+        <div class="empRow" data-emp-name="Rodolfo Magcaling - 80235" data-role="Officer" role="button" tabindex="0">
       <span class="empName" data-name-ar="رودولفو ماجكالينج - 80235">Rodolfo Magcaling - 80235</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
-     </div><div class="empRow empRowAlt" data-emp-name="Adil Al Balushi - 81392" role="button" tabindex="0">
+     </div><div class="empRow empRowAlt" data-emp-name="Adil Al Balushi - 81392" data-role="Officer" role="button" tabindex="0">
       <span class="empName" data-name-ar="عادل البلوشي - 81392">Adil Al Balushi - 81392</span>
        <span class="empStatus" style="color:#3730a3;">OFF</span>
      </div>
@@ -2529,7 +2531,7 @@
   <!-- ════ FOOTER (status panel) ════ -->
   <div class="footer qaFooter">
     <div class="qaStatusMeta">
-      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 15:09</span></div>
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">12 November 2026 / 16:13</span></div>
       <div><strong>Source:</strong> <span>Export New Roster OCTOBER 2026 Version 3.xlsx</span></div>
     </div>
   </div>
@@ -3571,33 +3573,16 @@ function goToEmployeeSchedule(empName) {
       if (suppressNextClick) return;
       var card = head.closest('.deptCard');
       if (!card) return;
-      card.classList.remove('collapsed');
-      var shifts = card.querySelectorAll('details.shiftCard');
-      if (!shifts.length) return;
-      var step = parseInt(card.dataset.deptShiftStep || '0', 10);
-      if (isNaN(step) || step < 0 || step > 2) step = 0;
-      if (step === 0) {
-        shifts.forEach(function(d) { d.setAttribute('open', ''); });
-        card.dataset.deptShiftStep = '1';
-      } else if (step === 1) {
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        card.dataset.deptShiftStep = '2';
+      if (typeof window.rosterToggleDeptCard === 'function') {
+        window.rosterToggleDeptCard(card);
       } else {
-        var now = new Date();
-        var muscatTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-        var hour = muscatTime.getHours();
-        var minute = muscatTime.getMinutes();
-        var tt = hour * 60 + minute;
-        var currentShift = (tt >= 21 * 60 || tt < 5 * 60) ? 'Night' : (tt >= 13 * 60 ? 'Afternoon' : 'Morning');
-        shifts.forEach(function(d) { d.removeAttribute('open'); });
-        var target = null;
-        shifts.forEach(function(d) {
-          if (d.dataset.shift === currentShift) target = d;
-        });
-        if (!target) target = shifts[0];
-        if (target) target.setAttribute('open', '');
-        card.dataset.deptShiftStep = '0';
+        card.classList.toggle('collapsed');
       }
+    });
+    head.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      head.click();
     });
   });
 
@@ -3853,7 +3838,7 @@ applyLang(LANG);
 startSummarySwitchLoop();
 
 // ═══════════════════════════════════════════════════
-// Department layout: all sections open + time-based shift open
+// Department layout: header only until tapped (collapsed by default)
 // ═══════════════════════════════════════════════════
 (function(){
   var deptCards = Array.from(document.querySelectorAll('.deptCard'));
@@ -3872,25 +3857,85 @@ startSummarySwitchLoop();
     return 'Morning';
   }
 
-  function openMatchingShift(card){
-    var shiftCards = Array.from(card.querySelectorAll('.shiftCard'));
-    if(!shiftCards.length) return;
-    shiftCards.forEach(function(shiftCard){
-      var key = shiftCard.dataset.shift || '';
-      if(key === 'Morning' || key === 'Afternoon' || key === 'Night'){
-        shiftCard.open = false;
-        shiftCard.removeAttribute('open');
-      }
-    });
-    var currentShift = getCurrentShiftForMuscat();
-    var target = shiftCards.find(function(shiftCard){
-      return shiftCard.dataset.shift === currentShift;
-    });
-    if(target) {
-      target.open = true;
-      target.setAttribute('open', '');
-    }
+  function shiftCardsOf(card){
+    return Array.prototype.slice.call(card.querySelectorAll('details.shiftCard'));
   }
+
+  // Remember which departments the user opened, so a reload restores them
+  // (expanded ones reopen on the current shift, closed ones stay closed).
+  var OPEN_STATE_KEY = 'exportDeptOpenState';
+  function deptKey(card){
+    if(!card) return '';
+    var k = card.getAttribute('data-dept') || (card.dataset ? card.dataset.dept : '') || '';
+    if(k) return String(k).trim();
+    var el = card.querySelector('.deptTitle');
+    if(!el) return '';
+    return ((el.dataset && el.dataset.key) || el.textContent || '').trim();
+  }
+  function readOpenState(){
+    try {
+      var raw = localStorage.getItem(OPEN_STATE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e) { return []; }
+  }
+  function writeOpenState(list){
+    try { localStorage.setItem(OPEN_STATE_KEY, JSON.stringify(list)); } catch(e) {}
+  }
+  function rememberDept(card, isOpen){
+    var key = deptKey(card);
+    if(!key) return;
+    var list = readOpenState().filter(function(k){ return k !== key; });
+    if(isOpen) list.push(key);
+    writeOpenState(list);
+  }
+  function isRememberedOpen(card){
+    var key = deptKey(card);
+    return !!key && readOpenState().indexOf(key) !== -1;
+  }
+
+  function setHeadState(card, expanded){
+    var head = card.querySelector('.deptHead');
+    if(!head) return;
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+
+  // Only the department header stays visible; every shift row is closed.
+  function collapseDeptCard(card, remember){
+    if(!card) return;
+    card.classList.add('collapsed');
+    shiftCardsOf(card).forEach(function(sc){ sc.open = false; sc.removeAttribute('open'); });
+    setHeadState(card, false);
+    if(remember) rememberDept(card, false);
+  }
+
+  // Tap on the header: reveal every shift row, expand only the current shift
+  // (or the shift the user filtered on the /now/ page).
+  function expandDeptCard(card, remember){
+    if(!card) return;
+    card.classList.remove('collapsed');
+    var picked = window.__shiftFilterSelection || '';
+    var wanted = (picked && picked !== 'All') ? picked : getCurrentShiftForMuscat();
+    var target = null;
+    shiftCardsOf(card).forEach(function(sc){
+      sc.open = false;
+      sc.removeAttribute('open');
+      if(!target && (sc.dataset.shift || '') === wanted) target = sc;
+    });
+    if(target){ target.open = true; target.setAttribute('open', ''); }
+    setHeadState(card, true);
+    if(remember) rememberDept(card, true);
+  }
+
+  window.rosterExpandDeptCard = expandDeptCard;
+  window.rosterCollapseDeptCard = collapseDeptCard;
+  window.rosterToggleDeptCard = function(card){
+    if(!card) return;
+    if(card.classList.contains('collapsed')) expandDeptCard(card, true);
+    else collapseDeptCard(card, true);
+  };
 
   function cardHasSavedEmployee(card){
     var rows = Array.from(card.querySelectorAll('.empName'));
@@ -3904,13 +3949,13 @@ startSummarySwitchLoop();
     });
   }
 
-  // Keep all department sections visible/open.
+  // Restore the saved open/closed state of every department.
   deptCards.forEach(function(card){
-    card.classList.remove('collapsed');
-    openMatchingShift(card);
+    if(isRememberedOpen(card)) expandDeptCard(card, false);
+    else collapseDeptCard(card, false);
   });
 
-  // If a saved employee exists, move their department to top.
+  // If a saved employee exists, move their department to top (state unchanged).
   if(savedEmpId || savedEmpName){
     var targetCard = deptCards.find(cardHasSavedEmployee);
     if(targetCard && targetCard.parentElement){
@@ -3918,7 +3963,6 @@ startSummarySwitchLoop();
       if(firstDeptCard && firstDeptCard !== targetCard){
         targetCard.parentElement.insertBefore(targetCard, firstDeptCard);
       }
-      openMatchingShift(targetCard);
     }
   }
 })();
@@ -3983,7 +4027,7 @@ startSummarySwitchLoop();
     });
   }
 
-  function filterShifts(selectedShiftRaw){
+  function filterShifts(selectedShiftRaw, fromUserClick){
     var selectedShift = normalizeShift(selectedShiftRaw);
     window.__shiftFilterSelection = selectedShift;
     var totalEmployees = 0;
@@ -4018,13 +4062,27 @@ startSummarySwitchLoop();
     window.__summaryCounts.employees = totalEmployees;
     if(window.updateQaStats) window.updateQaStats();
     setFilterBtnActive(selectedShift);
+
+    // A filter chip is an explicit request to see the lists, so reveal the
+    // department cards. The automatic call on load keeps the saved state.
+    if(fromUserClick){
+      document.querySelectorAll('.deptCard').forEach(function(card){
+        if(typeof window.rosterExpandDeptCard === 'function'){
+          window.rosterExpandDeptCard(card, true);
+        } else {
+          card.classList.remove('collapsed');
+          var head = card.querySelector('.deptHead');
+          if(head) head.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
   }
 
   window.applyShiftFilter = filterShifts;
 
   filterBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
-      filterShifts(btnShift(btn));
+      filterShifts(btnShift(btn), true);
     });
   });
 
@@ -4292,7 +4350,7 @@ function goToRosterDiff(event) {
 
 (function loadLocalEnhancements() {
   var root = getSiteRootUrl();
-  var ver = '20260903c';
+  var ver = '20261112a';
   function addScript(src) {
     if (document.querySelector('script[data-local-src="' + src + '"]')) return;
     var s = document.createElement('script');
@@ -4302,7 +4360,7 @@ function goToRosterDiff(event) {
     document.body.appendChild(s);
   }
   addScript(root + '/welcome-emoji-early.js?v=20260903a');
-  addScript(root + '/open-current-shift.js?v=20260908s');
+  addScript(root + '/open-current-shift.js?v=20261112a');
   addScript(root + '/roster-icons.js?v=' + ver);
   addScript(root + '/site-last-updated.js?v=' + ver);
   addScript(root + '/site-visits.js?v=20261031a');

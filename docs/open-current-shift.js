@@ -35,6 +35,15 @@
     return String((el && (el.getAttribute('data-shift') || el.dataset.shift)) || '').trim();
   }
 
+  // On the NOW page the user may have picked a shift filter; keep that shift
+  // open instead of snapping back to the current clock shift.
+  function preferredDutyShift() {
+    var picked = '';
+    try { picked = String(window.__shiftFilterSelection || ''); } catch (e) { picked = ''; }
+    if (picked && picked !== 'All' && DUTY_SHIFTS[picked]) return picked;
+    return currentDutyShift();
+  }
+
   function setOpen(el, shouldOpen) {
     if (!el) return;
     el.open = !!shouldOpen;
@@ -44,6 +53,7 @@
 
   function applyDutyOpenState(root) {
     var current = currentDutyShift();
+    var target = preferredDutyShift();
     var cards = (root || document).querySelectorAll('.deptCard');
     for (var i = 0; i < cards.length; i++) {
       var shifts = cards[i].querySelectorAll('details.shiftCard');
@@ -52,7 +62,7 @@
         var key = shiftKey(shifts[j]);
         if (!DUTY_SHIFTS[key]) continue;
         setOpen(shifts[j], false);
-        if (key === current) matched = shifts[j];
+        if (key === target) matched = shifts[j];
       }
       if (matched) setOpen(matched, true);
     }
