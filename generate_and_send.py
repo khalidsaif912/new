@@ -375,6 +375,66 @@ def buckets_employee_count(buckets: dict) -> int:
     return sum(len(buckets.get(g, [])) for g in GROUP_ORDER)
 
 
+# Flight Dispatch is not an Export sheet. The Export page shows a copy of the
+# Import roster's Flight Dispatch section, kept right under "Export Operators".
+FLIGHT_DISPATCH_DEPT_NAME = "Flight Dispatch"
+FLIGHT_DISPATCH_COLOR = DEPT_COLORS[5]
+
+_IMPORT_MONTH_CACHE: dict = {}
+
+
+def _import_month_parsed(month_key: str):
+    """Parse import-rosters/<YYYY-MM>.xlsx once per run using the Import parser."""
+    if month_key in _IMPORT_MONTH_CACHE:
+        return _IMPORT_MONTH_CACHE[month_key]
+    parsed = None
+    path = Path(__file__).resolve().parent / "import-rosters" / f"{month_key}.xlsx"
+    if path.exists():
+        try:
+            # Lazy import: the Import generator owns the workbook layout parsing.
+            from generate_and_send_import import find_sheet_for_date, parse_month_sheet
+
+            y, m = int(month_key[:4]), int(month_key[5:7])
+            sheet = find_sheet_for_date(str(path), datetime(y, m, 1).date())
+            parsed = parse_month_sheet(str(path), sheet)
+        except Exception as exc:
+            print(f"⚠️ Flight Dispatch: cannot read {path.name}: {exc}")
+    else:
+        print(f"ℹ️ Flight Dispatch: import-rosters/{path.name} missing; section skipped.")
+    _IMPORT_MONTH_CACHE[month_key] = parsed
+    return parsed
+
+
+def flight_dispatch_buckets(day_date) -> dict:
+    """Shift buckets for the Import Flight Dispatch team on one date."""
+    parsed = _import_month_parsed(day_date.strftime("%Y-%m"))
+    if not parsed:
+        return {}
+    day = day_date.day
+    buckets = {k: [] for k in GROUP_ORDER}
+    rows = []
+    for emp in parsed.get("employees") or []:
+        if (emp.get("dept_name") or "") != FLIGHT_DISPATCH_DEPT_NAME:
+            continue
+        shifts = emp.get("shifts") or {}
+        raw = shifts.get(day, "")
+        if not raw:
+            continue
+        daynum_to_raw = {int(k): v for k, v in shifts.items()}
+        label, grp = map_shift(raw)
+        label = append_range_suffix(label, day, daynum_to_raw, raw, group_key=grp)
+        emp_id = str(emp.get("id") or "").strip()
+        name = str(emp.get("name") or "").strip()
+        display = f"{name} - {emp_id}" if emp_id else name
+        rows.append((str(emp.get("dept_code") or "").upper(), display, grp, label))
+
+    # Same ordering as the Import section: FLTA…, FLTB…, then by name.
+    rows.sort(key=lambda r: (r[0], r[1].upper()))
+    for _code, display, grp, label in rows:
+        buckets.setdefault(grp, []).append({"name": display, "shift": label})
+    return buckets
+
+
 def insert_card_after_export_operators(cards: list, extra_card: str) -> list:
     if not extra_card:
         return cards
@@ -3473,6 +3533,17 @@ def generate_date_pages_for_month(
                     employees_total_all += buckets_employee_count(inventory_buckets)
                     employees_total_now += buckets_employee_count(inventory_buckets_now)
                     depts_count += 1
+
+                fd_buckets = flight_dispatch_buckets(date_obj)
+                fd_card = dept_card_html(FLIGHT_DISPATCH_DEPT_NAME, FLIGHT_DISPATCH_COLOR, fd_buckets) if fd_buckets else ""
+                if fd_card:
+                    # Inserted last so it lands directly under "Export Operators".
+                    dept_cards_all = insert_card_after_export_operators(dept_cards_all, fd_card)
+                    dept_cards_now = insert_card_after_export_operators(dept_cards_now, fd_card)
+                    fd_count = buckets_employee_count(fd_buckets)
+                    employees_total_all += fd_count
+                    employees_total_now += fd_count
+                    depts_count += 1
                 dept_cards_all = move_officers_card_last(dept_cards_all)
                 dept_cards_now = move_officers_card_last(dept_cards_now)
 
@@ -4169,6 +4240,21 @@ def main():
         employees_total_now += sum(len(inventory_buckets.get(g, [])) for g in [active_group, "Off Day", "Annual Leave", "Sick Leave", "Training", "Standby", "Other"])
         depts_count += 1
         all_shifts_by_dept.append({"dept": INVENTORY_DEPT_NAME, "shifts": inventory_buckets})
+
+    fd_buckets = flight_dispatch_buckets(now)
+    fd_card = dept_card_html(FLIGHT_DISPATCH_DEPT_NAME, FLIGHT_DISPATCH_COLOR, fd_buckets) if fd_buckets else ""
+    if fd_card:
+        # Inserted last so it lands directly under "Export Operators".
+        dept_cards_all = insert_card_after_export_operators(dept_cards_all, fd_card)
+        dept_cards_now = insert_card_after_export_operators(dept_cards_now, fd_card)
+        fd_count = buckets_employee_count(fd_buckets)
+        employees_total_all += fd_count
+        employees_total_now += sum(
+            len(fd_buckets.get(g, []))
+            for g in [active_group, "Off Day", "Annual Leave", "Sick Leave", "Training", "Standby", "Other"]
+        )
+        depts_count += 1
+        all_shifts_by_dept.append({"dept": FLIGHT_DISPATCH_DEPT_NAME, "shifts": fd_buckets})
     dept_cards_all = move_officers_card_last(dept_cards_all)
     dept_cards_now = move_officers_card_last(dept_cards_now)
     all_shifts_by_dept = move_officers_dept_last(all_shifts_by_dept)
