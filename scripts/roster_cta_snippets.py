@@ -231,13 +231,8 @@ SVG_CHIP_LEAVES = _chip_svg(
     '<path d="M9 15.5l2 2 4-4"/>',
     stroke="#0d9488",
 )
-# Icon + live count, so it can stand where the old Employees/Departments chip was.
-CHIP_LEAVES_HTML = (
-    '<div class="chipVal">'
-    f'{SVG_CHIP_LEAVES}'
-    '<span class="chipValNum" id="leavesChipNum"></span>'
-    '</div>'
-)
+# Icon only — the live count next to the icon was visual noise.
+CHIP_LEAVES_HTML = f'<div class="chipVal">{SVG_CHIP_LEAVES}</div>'
 
 SVG_LANG_GLOBE = (
     '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
@@ -789,7 +784,10 @@ QA_CARD_CSS = """    /* ═══════ ACTIONS CARD + STATUS PANEL ══
 
     /* Copy Shift + pinned actions */
     .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .qaFlow > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    /* When the visible tile count is odd, the last tile goes full width.
+       A class is used because hidden tiles (the phone-only Training tile on
+       desktop) still count towards :nth-child and used to leave a hole. */
+    .qaFlow.qaFlowOdd > *:last-child { grid-column: 1 / -1; }
     .qaCard #copyShiftBtn {
       flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
       min-height: 84px; padding: 14px 18px; border-radius: 20px;
@@ -1756,7 +1754,7 @@ MANTLE_CLIENT_VER = "20261031a"
 # Related apps launcher (docs/site-apps.js). Bump when the launcher JS/CSS changes.
 SITE_APPS_VER = "20261112c"
 # Quick Actions card behaviour (docs/quick-actions.js): collapse + Add Action picker.
-QUICK_ACTIONS_VER = "20261112f"
+QUICK_ACTIONS_VER = "20261112g"
 
 LOAD_LOCAL_ENHANCEMENTS_EXPORT = """
 (function loadLocalEnhancements() {

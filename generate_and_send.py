@@ -1234,9 +1234,7 @@ def page_shell_html(date_label: str, iso_date: str, employees_total: int, depart
     a.summaryChip.readSignChip:hover {{ box-shadow:0 8px 20px rgba(15,118,110,.18); }}
     a.summaryChip.withMeChip .chipVal {{ color:#4f46e5; }}
     a.summaryChip.withMeChip:hover {{ box-shadow:0 8px 20px rgba(79,70,229,.18); }}
-    a.summaryChip.leavesChip .chipVal {{ display:flex; align-items:center; justify-content:center; gap:4px; }}
-    a.summaryChip.leavesChip .chipValNum {{ font-size:15px; font-weight:900; color:#0d9488; line-height:1; }}
-    a.summaryChip.leavesChip .chipValNum[hidden] {{ display:none; }}
+    a.summaryChip.leavesChip .chipVal {{ display:flex; align-items:center; justify-content:center; }}
     a.summaryChip.leavesChip:hover {{ box-shadow:0 8px 20px rgba(13,148,136,.18); }}
     .summaryChip {{
       background:#fff;
@@ -2932,17 +2930,6 @@ function startSummarySwitchLoop() {{
     window.__summarySwitchMode = (window.__summarySwitchMode === 'employees') ? 'departments' : 'employees';
     updateQaStats();
   }});
-}})();
-
-(function countLeavesChip() {{
-  var el = document.getElementById('leavesChipNum');
-  if(!el) return;
-  var n = 0;
-  document.querySelectorAll(
-    '.shiftCard[data-shift="Annual Leave"] .shiftCount, .shiftCard[data-shift="Sick Leave"] .shiftCount'
-  ).forEach(function(c){{ n += parseInt(c.textContent, 10) || 0; }});
-  el.textContent = n > 0 ? String(n) : '';
-  el.hidden = n <= 0;
 }})();
 
 function applyLang(lang) {{
