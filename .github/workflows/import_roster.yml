@@ -72,6 +72,10 @@ jobs:
           python generate_and_send_import.py
           echo "Done!"
 
+      - name: Guard - no Leaves chip counter in generated pages
+        if: steps.check_import_changes.outputs.should_process == 'true'
+        run: python scripts/ci_guard_leaves_chip.py
+
       - name: Commit updated Import docs
         if: steps.check_import_changes.outputs.should_process == 'true'
         run: bash scripts/ci_commit_import_docs.sh "${{ steps.check_import_changes.outputs.changed }}" "${{ steps.check_import_changes.outputs.filename }}"

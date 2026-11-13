@@ -1,0 +1,21 @@
+# Leaves chip — icon only, no counter
+
+The top `Leaves` summary chip shows **an icon only**. Do not add a number,
+badge, or counter next to it.
+
+Historical failure: the counter (`chipValNum` / `leavesChipNum` + a
+`countLeavesChip` script) summed `Annual Leave` + `Sick Leave` shift counts from
+the page. Because leave cards repeat inside every department card, the number
+looked wrong (like a department count). It was removed twice because the first
+fix patched only published HTML; the next roster generate restored it from the
+generator.
+
+Root-cause fix (keep these):
+
+- `scripts/roster_cta_snippets.py` → `CHIP_LEAVES_HTML` is the SVG only.
+- `generate_and_send.py` → no `chipValNum` CSS, no `countLeavesChip` script.
+- `scripts/ci_guard_leaves_chip.py` runs in `roster.yml` and
+  `import_roster.yml` and fails the build if the counter returns.
+
+Never patch only `docs/*.html` for this; fix the generator/snippet. To clean
+already-published pages run `python scripts/sync_leaves_chip_no_count.py`.

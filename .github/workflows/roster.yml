@@ -180,6 +180,10 @@ jobs:
         if: success() && steps.prefetch_absence.outputs.absence_ready != 'true'
         run: echo "Absence file unavailable from SharePoint in this run; skipping absence processing."
 
+      - name: Guard - no Leaves chip counter in generated pages
+        if: success()
+        run: python scripts/ci_guard_leaves_chip.py
+
       - name: Commit updated docs
         if: success()
         run: |
