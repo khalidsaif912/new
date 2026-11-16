@@ -1273,6 +1273,9 @@
 
     /* Copy Shift + pinned actions */
     .qaFlow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    /* When the visible tile count is odd, the last tile goes full width.
+       A class is used because hidden tiles (the phone-only Training tile on
+       desktop) still count towards :nth-child and used to leave a hole. */
     .qaFlow.qaFlowOdd > *:last-child { grid-column: 1 / -1; }
     .qaCard #copyShiftBtn {
       flex-direction: row; align-items: center; justify-content: space-between; gap: 10px;
@@ -2608,7 +2611,7 @@
   <!-- ════ FOOTER (status panel) ════ -->
   <div class="footer qaFooter">
     <div class="qaStatusMeta">
-      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">13 November 2026 / 00:32</span></div>
+      <div><strong>Last Updated:</strong> <span id="siteLastUpdated" data-site-last-updated="1">16 November 2026 / 16:52</span></div>
       <div><strong>Source:</strong> <span>Export New Roster NOVEMBER 2026 Version 2.xlsx</span></div>
     </div>
   </div>
